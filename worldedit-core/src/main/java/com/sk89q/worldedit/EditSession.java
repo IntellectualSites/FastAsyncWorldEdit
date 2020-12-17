@@ -2767,7 +2767,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 newVset = this.getHollowed(newVset);
             }
         }
-        return setBlocks(newVset, pattern);
+        return this.changes += setBlocks(newVset, pattern);
     }
 
     /**
@@ -2840,7 +2840,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (!filled) {
             vset = getHollowed(vset);
         }
-        return setBlocks(vset, pattern);
+        return this.changes += setBlocks(vset, pattern);
     }
 
     /**
@@ -2892,7 +2892,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             if (!filled) {
                 newVset = this.getHollowed(newVset);
             }
-            return setBlocks(newVset, pattern);
+            return this.changes += setBlocks(newVset, pattern);
         }
         return changes;
     }
