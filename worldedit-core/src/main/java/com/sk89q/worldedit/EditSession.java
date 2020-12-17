@@ -2046,18 +2046,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         int yy;
 
-        double nextXn = invRadiusX;
+        double nextXn = 0;
         forX: for (int x = 0; x <= ceilRadiusX; ++x) {
             final double xn = nextXn;
             double dx = xn * xn;
             nextXn = (x + 1) * invRadiusX;
-            double nextZn = invRadiusZ;
+            double nextZn = 0;
             forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                 final double zn = nextZn;
                 double dz = zn * zn;
                 double dxz = dx + dz;
                 nextZn = (z + 1) * invRadiusZ;
-                double nextYn = invRadiusY;
+                double nextYn = 0;
 
                 forY: for (int y = 0; y <= ceilRadiusY; ++y) {
                     final double yn = nextYn;
@@ -2076,7 +2076,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     }
 
                     if (!filled) {
-                        if (nextXn * nextXn + dy + dz <= 1 && nextYn * nextYn + dx + dz <= 1 && nextZn * nextZn + dx + dy <= 1) {
+                        if (nextXn * nextXn + dy * dy + dz * dz <= 1 && nextYn * nextYn + dx * dx + dz * dz <= 1 && nextZn * nextZn + dx * dx + dy * dy <= 1) {
                             continue;
                         }
                     }
