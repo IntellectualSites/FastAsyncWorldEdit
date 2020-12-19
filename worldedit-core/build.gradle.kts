@@ -59,6 +59,7 @@ dependencies {
     "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
         isTransitive = false
     }
+    "api"("com.intellectualsites.paster:Paster:1.0-SNAPSHOT")
 }
 
 tasks.named<Test>("test") {
