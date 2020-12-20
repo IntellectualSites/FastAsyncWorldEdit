@@ -56,7 +56,7 @@ dependencies {
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
-    "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
+    "compile"("com.plotsquared:PlotSquared-Core:5.13.3") {
         isTransitive = false
     }
     "api"("com.intellectualsites.paster:Paster:1.0-SNAPSHOT")
