@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.bukkit;
 
-
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.google.common.base.Joiner;
@@ -92,19 +91,6 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
  * Plugin for Bukkit.
  */
 public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
-
-    // This must be before the Logger is initialized, which fails in 1.8
-    private static final String FAILED_VERSION_CHECK =
-        "\n**********************************************\n"
-            + "** This Minecraft version (%s) is not supported by this version of WorldEdit.\n"
-            + "** Please download an OLDER version of WorldEdit which does.\n"
-            + "**********************************************\n";
-
-    static {
-        if (PaperLib.getMinecraftVersion() < 13) {
-            throw new IllegalStateException(String.format(FAILED_VERSION_CHECK, Bukkit.getVersion()));
-        }
-    }
 
     private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
