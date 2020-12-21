@@ -38,7 +38,7 @@ dependencies {
     "implementation"("org.slf4j:slf4j-api:1.7.27")
     "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
 
-    val antlrVersion = "4.7.2"
+    val antlrVersion = "4.9"
     "antlr"("org.antlr:antlr4:$antlrVersion")
     "implementation"("org.antlr:antlr4-runtime:$antlrVersion")
 
