@@ -27,7 +27,7 @@ configurations.all {
 
 dependencies {
     "api"(project(":worldedit-core"))
-    "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.11.2")
+    "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.14.0")
 
     "minecraft"("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 }

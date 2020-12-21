@@ -19,7 +19,7 @@ configurations.all {
 
 dependencies {
     "compile"(project(":worldedit-core"))
-    "compile"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
+    "compile"("org.apache.logging.log4j:log4j-slf4j-impl:2.14.0")
 
     "minecraft"("com.mojang:minecraft:$minecraftVersion")
     "mappings"("net.fabricmc:yarn:$yarnMappings")
