@@ -68,7 +68,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Reads schematic files using the Sponge Schematic Specification.
  */
-@Deprecated // High mem usage + slow
 public class SpongeSchematicReader extends NBTSchematicReader {
 
     private static final Logger log = LoggerFactory.getLogger(SpongeSchematicReader.class);
@@ -93,7 +92,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         Map<String, Tag> schematic = schematicTag.getValue();
 
         final Platform platform = WorldEdit.getInstance().getPlatformManager()
-                .queryCapability(Capability.WORLD_EDITING);
+            .queryCapability(Capability.WORLD_EDITING);
         int liveDataVersion = platform.getDataVersion();
 
         if (schematicVersion == 1) {
@@ -102,17 +101,23 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             return readVersion1(schematicTag);
         } else if (schematicVersion == 2) {
             dataVersion = requireTag(schematic, "DataVersion", IntTag.class).getValue();
+            if (dataVersion < 0) {
+                log.warn("Schematic has an unknown data version ({}). Data may be incompatible.",
+                    dataVersion);
+                // Do not DFU unknown data
+                dataVersion = liveDataVersion;
+            }
             if (dataVersion > liveDataVersion) {
                 log.warn("Schematic was made in a newer Minecraft version ({} > {}). Data may be incompatible.",
-                        dataVersion, liveDataVersion);
+                    dataVersion, liveDataVersion);
             } else if (dataVersion < liveDataVersion) {
                 fixer = platform.getDataFixer();
                 if (fixer != null) {
                     log.debug("Schematic was made in an older Minecraft version ({} < {}), will attempt DFU.",
-                            dataVersion, liveDataVersion);
+                        dataVersion, liveDataVersion);
                 } else {
                     log.info("Schematic was made in an older Minecraft version ({} < {}), but DFU is not available. Data may be incompatible.",
-                            dataVersion, liveDataVersion);
+                        dataVersion, liveDataVersion);
                 }
             }
 
@@ -130,7 +135,11 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             if (schematicVersion == 1) {
                 return OptionalInt.of(Constants.DATA_VERSION_MC_1_13_2);
             } else if (schematicVersion == 2) {
-                return OptionalInt.of(requireTag(schematic, "DataVersion", IntTag.class).getValue());
+                int dataVersion = requireTag(schematic, "DataVersion", IntTag.class).getValue();
+                if (dataVersion < 0) {
+                    return OptionalInt.empty();
+                }
+                return OptionalInt.of(dataVersion);
             }
             return OptionalInt.empty();
         } catch (IOException e) {
@@ -140,9 +149,6 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 
     private CompoundTag getBaseTag() throws IOException {
         NamedTag rootTag = inputStream.readNamedTag();
-        if (!rootTag.getName().equals("Schematic")) {
-            throw new IOException("Tag 'Schematic' does not exist or is not first");
-        }
         CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
 
         // Check
@@ -226,9 +232,9 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         }
         if (tileEntities != null) {
             List<Map<String, Tag>> tileEntityTags = tileEntities.getValue().stream()
-                    .map(tag -> (CompoundTag) tag)
-                    .map(CompoundTag::getValue)
-                    .collect(Collectors.toList());
+                .map(tag -> (CompoundTag) tag)
+                .map(CompoundTag::getValue)
+                .collect(Collectors.toList());
 
             for (Map<String, Tag> tileEntity : tileEntityTags) {
                 int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
@@ -321,8 +327,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             }
             BiomeType biome = BiomeTypes.get(key);
             if (biome == null) {
-                log.warn("Unknown biome type :" + key +
-                             " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
+                log.warn("Unknown biome type :" + key
+                    + " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
             }
             Tag idTag = palettePart.getValue();
             if (!(idTag instanceof IntTag)) {
@@ -385,8 +391,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             EntityType entityType = EntityTypes.get(id);
             if (entityType != null) {
                 Location location = NBTConversions.toLocation(clipboard,
-                        requireTag(tags, "Pos", ListTag.class),
-                        requireTag(tags, "Rotation", ListTag.class));
+                    requireTag(tags, "Pos", ListTag.class),
+                    requireTag(tags, "Rotation", ListTag.class));
                 BaseEntity state = new BaseEntity(entityType, entityTag);
                 clipboard.createEntity(location, state);
             } else {

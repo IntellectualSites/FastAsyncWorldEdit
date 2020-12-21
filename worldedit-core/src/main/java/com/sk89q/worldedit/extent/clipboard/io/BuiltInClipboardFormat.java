@@ -20,12 +20,14 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.object.io.PGZIPOutputStream;
-import com.boydti.fawe.object.io.ResettableFileInputStream;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.object.schematic.PNGWriter;
 import com.google.common.collect.ImmutableSet;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.NamedTag;
+import com.sk89q.jnbt.Tag;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -56,27 +59,36 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            if (inputStream instanceof FileInputStream) {
-                inputStream = new ResettableFileInputStream((FileInputStream) inputStream);
-            }
-            BufferedInputStream buffered = new BufferedInputStream(inputStream);
-            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            SchematicReader input = new SchematicReader(nbtStream);
-            input.setUnderlyingStream(inputStream);
-            return input;
+            NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(inputStream));
+            return new MCEditSchematicReader(nbtStream);
         }
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            throw new IOException("This format does not support saving, use `schem` or `sponge` as format"); // Is more helpful
+            throw new IOException("This format does not support saving");
         }
 
         @Override
         public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase(Locale.ROOT);
-            return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
+            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                NamedTag rootTag = str.readNamedTag();
+                if (!rootTag.getName().equals("Schematic")) {
+                    return false;
+                }
+                CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
+
+                // Check
+                Map<String, Tag> schematic = schematicTag.getValue();
+                if (!schematic.containsKey("Materials")) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+            return true;
         }
     },
+
     SPONGE_SCHEMATIC("sponge", "schem") {
 
         @Override
@@ -86,33 +98,36 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            if (inputStream instanceof FileInputStream) {
-                inputStream = new ResettableFileInputStream((FileInputStream) inputStream);
-            }
-            BufferedInputStream buffered = new BufferedInputStream(inputStream);
-            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            return new FastSchematicReader(nbtStream);
+            NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(inputStream));
+            return new SpongeSchematicReader(nbtStream);
         }
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            OutputStream gzip;
-            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
-                gzip = outputStream;
-            } else {
-                outputStream = new BufferedOutputStream(outputStream);
-                gzip = new PGZIPOutputStream(outputStream);
-            }
-            NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
-            return new FastSchematicWriter(nbtStream);
+            NBTOutputStream nbtStream = new NBTOutputStream(new GZIPOutputStream(outputStream));
+            return new SpongeSchematicWriter(nbtStream);
         }
 
         @Override
         public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase(Locale.ROOT);
-            return name.endsWith(".schem") || name.endsWith(".sponge");
-        }
+            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                NamedTag rootTag = str.readNamedTag();
+                if (!rootTag.getName().equals("Schematic")) {
+                    return false;
+                }
+                CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
 
+                // Check
+                Map<String, Tag> schematic = schematicTag.getValue();
+                if (!schematic.containsKey("Version")) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+
+            return true;
+        }
     },
 
     /**

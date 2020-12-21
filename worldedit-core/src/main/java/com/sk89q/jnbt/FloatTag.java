@@ -19,14 +19,12 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.jnbt.fawe.NumberTag;
+
 /**
  * The {@code TAG_Float} tag.
  */
 public final class FloatTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_FLOAT;
-    }
 
     private final float value;
 
@@ -49,5 +47,12 @@ public final class FloatTag extends NumberTag {
     public String toString() {
         return "TAG_Float(" + value + ")";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_FLOAT;
+    }
+    // FAWE End
 
 }

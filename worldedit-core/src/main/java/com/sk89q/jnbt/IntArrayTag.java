@@ -28,11 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class IntArrayTag extends Tag {
 
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_INT_ARRAY;
-    }
-
     private final int[] value;
 
     /**
@@ -63,5 +58,12 @@ public final class IntArrayTag extends Tag {
         }
         return "TAG_Int_Array(" + hex + ")";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_INT_ARRAY;
+    }
+    // FAWE End
 
 }

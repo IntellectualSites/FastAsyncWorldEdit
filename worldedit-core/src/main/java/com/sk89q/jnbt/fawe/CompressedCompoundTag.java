@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class CompressedCompoundTag<T> extends CompoundTag {
+
     private T in;
 
     public CompressedCompoundTag(T in) {
@@ -41,4 +42,5 @@ public abstract class CompressedCompoundTag<T> extends CompoundTag {
             throw new RuntimeException(e);
         }
     }
+
 }

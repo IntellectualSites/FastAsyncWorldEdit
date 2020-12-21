@@ -28,11 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LongArrayTag extends Tag {
 
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_LONG_ARRAY;
-    }
-
     private final long[] value;
 
     /**
@@ -63,5 +58,12 @@ public class LongArrayTag extends Tag {
         }
         return "TAG_Long_Array(" + hex + ")";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_LONG_ARRAY;
+    }
+    // FAWE End
 
 }

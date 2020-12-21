@@ -15,7 +15,7 @@ import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompressedCompoundTag;
-import com.sk89q.jnbt.CompressedSchematicTag;
+import com.sk89q.jnbt.fawe.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
@@ -23,7 +23,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.FastSchematicWriter;
+import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
@@ -65,6 +65,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region, false, true);
 
             Clipboard holder = new BlockArrayClipboard(region, clipboard);
+
             CompressedSchematicTag tag = new CompressedSchematicTag(holder);
             whenDone.run(tag);
         });
@@ -84,7 +85,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                 if (cTag instanceof CompressedSchematicTag) {
                     Clipboard clipboard = (Clipboard) cTag.getSource();
                     try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new BufferedOutputStream(new PGZIPOutputStream(stream)))) {
-                        new FastSchematicWriter(output).write(clipboard);
+                        new SpongeSchematicWriter(output).write(clipboard);
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp); BufferedOutputStream output = new BufferedOutputStream(new PGZIPOutputStream(stream))) {

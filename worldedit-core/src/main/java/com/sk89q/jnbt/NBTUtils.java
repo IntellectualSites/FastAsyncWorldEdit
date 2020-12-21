@@ -49,7 +49,7 @@ public final class NBTUtils {
             return "TAG_Byte_Array";
         } else if (clazz.equals(ByteTag.class)) {
             return "TAG_Byte";
-        } else if (CompoundTag.class.isAssignableFrom(clazz)) {
+        } else if (clazz.equals(CompoundTag.class)) {
             return "TAG_Compound";
         } else if (clazz.equals(DoubleTag.class)) {
             return "TAG_Double";
@@ -72,7 +72,7 @@ public final class NBTUtils {
         } else if (clazz.equals(LongArrayTag.class)) {
             return "TAG_Long_Array";
         } else {
-            throw new IllegalArgumentException("Invalid tag class ("
+            throw new IllegalArgumentException("Invalid tag classs ("
                     + clazz.getName() + ").");
         }
     }
@@ -89,7 +89,7 @@ public final class NBTUtils {
             return NBTConstants.TYPE_BYTE_ARRAY;
         } else if (clazz.equals(ByteTag.class)) {
             return NBTConstants.TYPE_BYTE;
-        } else if (CompoundTag.class.isAssignableFrom(clazz)) {
+        } else if (clazz.equals(CompoundTag.class)) {
             return NBTConstants.TYPE_COMPOUND;
         } else if (clazz.equals(DoubleTag.class)) {
             return NBTConstants.TYPE_DOUBLE;
@@ -112,7 +112,7 @@ public final class NBTUtils {
         } else if (clazz.equals(LongArrayTag.class)) {
             return NBTConstants.TYPE_LONG_ARRAY;
         } else {
-            throw new IllegalArgumentException("Invalid tag class ("
+            throw new IllegalArgumentException("Invalid tag classs ("
                     + clazz.getName() + ").");
         }
     }
