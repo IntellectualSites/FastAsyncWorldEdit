@@ -22,7 +22,7 @@ applyPlatformAndCoreConfiguration()
 
 configurations.all {
     resolutionStrategy {
-        force("com.google.guava:guava:21.0")
+        force("com.google.guava:guava:30.1-jre")
     }
 }
 
