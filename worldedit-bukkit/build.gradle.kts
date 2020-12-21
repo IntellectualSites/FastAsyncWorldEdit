@@ -69,7 +69,7 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
     "compile"("org.bstats:bstats-bukkit:1.8")
-    "compile"("com.intellectualsites.paster:Paster:1.0-SNAPSHOT")
+    "compile"("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
     "implementation"("com.github.InventivetalentDev:MapManager:1.7.+") { isTransitive = false }
     "implementation"("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
@@ -121,7 +121,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.bstats:bstats-bukkit:1.8"))
         }
         relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
-            include(dependency("com.intellectualsites.paster:Paster:1.0-SNAPSHOT"))
+            include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
         }
     }
 }
