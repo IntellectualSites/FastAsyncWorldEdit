@@ -51,7 +51,7 @@ dependencies {
     "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     "testImplementation"("ch.qos.logback:logback-core:${Versions.LOGBACK}")
     "testImplementation"("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
-    "compile"("com.github.luben:zstd-jni:1.4.3-1")
+    "compile"("com.github.luben:zstd-jni:1.4.8-1")
     "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
