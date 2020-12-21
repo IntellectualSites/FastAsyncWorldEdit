@@ -56,7 +56,7 @@ dependencies {
     "compileOnly"("org.jetbrains:annotations:20.1.0")
     "testCompileOnly"("org.jetbrains:annotations:20.1.0")
     "compileOnly"("org.spigotmc:spigot:1.16.4-R0.1-SNAPSHOT")
-    "implementation"("io.papermc:paperlib:1.0.4")
+    "implementation"("io.papermc:paperlib:1.0.6")
     "compileOnly"("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
