@@ -109,7 +109,7 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
         include(dependency("org.antlr:antlr4-runtime"))
         relocate("org.bstats", "com.sk89q.worldedit.bukkit.bstats") {
-            include(dependency("org.bstats:bstats-bukkit:1.7"))
+            include(dependency("org.bstats:bstats-bukkit:1.8"))
         }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib:1.0.4"))
@@ -118,7 +118,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
         relocate("org.bstats", "com.boydti.metrics") {
-            include(dependency("org.bstats:bstats-bukkit:1.7"))
+            include(dependency("org.bstats:bstats-bukkit:1.8"))
         }
         relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0-SNAPSHOT"))
