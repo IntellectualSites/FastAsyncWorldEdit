@@ -29,7 +29,7 @@ configurations.all {
 dependencies {
     "api"(project(":worldedit-libs:core"))
     "implementation"("de.schlichtherle:truezip:6.8.4")
-    "implementation"("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
+    "implementation"("net.java.truevfs:truevfs-profile-default_2.13:0.12.2")
     "implementation"("org.mozilla:rhino-runtime:1.7.12")
     "implementation"("org.yaml:snakeyaml:1.27")
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
