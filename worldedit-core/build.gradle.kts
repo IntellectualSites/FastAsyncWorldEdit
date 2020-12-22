@@ -110,7 +110,7 @@ tasks.named<Copy>("processResources") {
 }
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
-        include(dependency("com.github.luben:zstd-jni:1.4.3-1"))
+        include(dependency("com.github.luben:zstd-jni:1.4.8-1"))
 
     }
 }
