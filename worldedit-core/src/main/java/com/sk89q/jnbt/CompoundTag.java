@@ -63,16 +63,6 @@ public class CompoundTag extends Tag {
     }
 
     /**
-     * Return a new compound tag with the given values.
-     *
-     * @param value the value
-     * @return the new compound tag
-     */
-    public CompoundTag setValue(Map<String, Tag> value) {
-        return new CompoundTag(value);
-    }
-
-    /**
      * Create a compound tag builder.
      *
      * @return the builder

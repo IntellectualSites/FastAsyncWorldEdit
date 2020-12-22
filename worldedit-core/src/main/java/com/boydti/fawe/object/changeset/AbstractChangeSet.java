@@ -138,10 +138,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         }
         if (!tilesTo.isEmpty()) {
             for (Map.Entry<BlockVector3, CompoundTag> entry : tilesTo.entrySet()) {
-                CompoundTag nbt = entry.getValue();
                 BlockVector3 pos = entry.getKey();
-                MainUtil.setPosition(nbt, pos.getX() + bx, pos.getY(), pos.getZ() + bz);
-                addTileCreate(nbt);
+                addTileCreate(MainUtil.setPosition(entry.getValue(), pos.getX() + bx, pos.getY(), pos.getZ() + bz));
             }
         }
         Set<UUID> entRemoves = set.getEntityRemoves();
@@ -259,14 +257,12 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public void add(EntityCreate change) {
         CompoundTag tag = change.state.getNbtData();
-        MainUtil.setEntityInfo(tag, change.getEntity());
-        addEntityCreate(tag);
+        addEntityCreate(MainUtil.setEntityInfo(tag, change.getEntity()));
     }
 
     public void add(EntityRemove change) {
         CompoundTag tag = change.state.getNbtData();
-        MainUtil.setEntityInfo(tag, change.getEntity());
-        addEntityRemove(tag);
+        addEntityRemove(MainUtil.setEntityInfo(tag, change.getEntity()));
     }
 
     @Override
@@ -309,14 +305,12 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             if (from.hasNbtData()) {
                 CompoundTag nbt = from.getNbtData();
                 assert nbt != null;
-                MainUtil.setPosition(nbt, x, y, z);
-                addTileRemove(nbt);
+                addTileRemove(MainUtil.setPosition(nbt, x, y, z));
             }
             if (to.hasNbtData()) {
                 CompoundTag nbt = to.getNbtData();
                 assert nbt != null;
-                MainUtil.setPosition(nbt, x, y, z);
-                addTileCreate(nbt);
+                addTileCreate(MainUtil.setPosition(nbt, x, y, z));
             }
             int combinedFrom = from.getOrdinal();
             int combinedTo = to.getOrdinal();
@@ -332,8 +326,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             if (to.hasNbtData()) {
                 CompoundTag nbt = to.getNbtData();
                 assert nbt != null;
-                MainUtil.setPosition(nbt, x, y, z);
-                addTileCreate(nbt);
+                addTileCreate(MainUtil.setPosition(nbt, x, y, z));
             }
             int combinedTo = to.getInternalId();
             add(x, y, z, combinedFrom, combinedTo);
