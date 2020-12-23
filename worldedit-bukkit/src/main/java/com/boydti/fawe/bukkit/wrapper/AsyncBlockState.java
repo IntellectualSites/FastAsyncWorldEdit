@@ -1,6 +1,7 @@
 package com.boydti.fawe.bukkit.wrapper;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -16,18 +17,18 @@ import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class AsyncBlockState implements BlockState {
 
     private BaseBlock state;
     private BlockData blockData;
     private final AsyncBlock block;
-
-    public AsyncBlockState(AsyncBlock block) {
-        this(block, block.world.getFullBlock(block.x, block.y, block.z));
-    }
 
     public AsyncBlockState(AsyncBlock block, BaseBlock state) {
         this.state = state;
@@ -112,11 +113,11 @@ public class AsyncBlockState implements BlockState {
     @Override
     public void setBlockData(BlockData blockData) {
         this.blockData = blockData;
-        CompoundTag nbt = state.getNbtData();
+        CompoundTag nbt = this.getNbtData();
         BlockType oldType = state.getBlockType();
         com.sk89q.worldedit.world.block.BlockState newState = BukkitAdapter.adapt(blockData);
         if (nbt != null && newState.getBlockType() == oldType) {
-            state = newState.toBaseBlock(nbt);
+            this.setNbtData(nbt);
         } else {
             state = newState.toBaseBlock();
         }
@@ -146,12 +147,45 @@ public class AsyncBlockState implements BlockState {
         }
     }
 
-    public CompoundTag getNbtData() {
+    /**
+     * Returns the (unmodifiable) tag compound that belongs to this block state.
+     * If the block state is null, this will return null.
+     *
+     * @return NBT data
+     */
+    public synchronized @Nullable CompoundTag getNbtData() {
+        if (this.state == null) {
+            return null;
+        }
         return state.getNbtData();
     }
 
-    public void setNbtData(CompoundTag nbt) {
+    /**
+     * Clone the NBT {@link CompoundTag} into a new {@link Map}.
+     *
+     * @return Modifiable clone of NBT data
+     */
+    public @NotNull Map<String, Tag> cloneNbtMap() {
+        return Optional.ofNullable(this.getNbtData()).map(CompoundTag::getValue)
+            .map(HashMap::new).orElse(new HashMap<>());
+    }
+
+    /**
+     * Set the NBT data of the block.
+     *
+     * @param nbt New NBT data
+     */
+    public synchronized void setNbtData(@Nullable final CompoundTag nbt) {
         state = this.state.toBaseBlock(nbt);
+    }
+
+    /**
+     * Set the NBT data of the block.
+     *
+     * @param map New NBT data
+     */
+    public void setNbtData(@NotNull final Map<String, Tag> map) {
+        this.setNbtData(new CompoundTag(map));
     }
 
     @Override
@@ -163,7 +197,7 @@ public class AsyncBlockState implements BlockState {
     public void setRawData(byte data) {
         int combinedId = getTypeId() + (data << BlockTypesCache.BIT_OFFSET);
         state = com.sk89q.worldedit.world.block.BlockState.getFromInternalId(combinedId)
-            .toBaseBlock(state.getNbtData());
+            .toBaseBlock(this.getNbtData());
         this.blockData = BukkitAdapter.adapt(state);
     }
 

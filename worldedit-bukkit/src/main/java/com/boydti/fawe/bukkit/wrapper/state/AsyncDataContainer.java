@@ -16,17 +16,24 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class AsyncDataContainer implements PersistentDataContainer {
-    private final CompoundTag root;
 
-    public AsyncDataContainer(CompoundTag root) {
-        this.root = root;
+    private final Supplier<CompoundTag> supplier;
+    private final Consumer<CompoundTag> consumer;
+
+    public AsyncDataContainer(
+        final @NotNull Supplier<CompoundTag> supplier,
+        final @NotNull Consumer<CompoundTag> consumer
+    ) {
+        this.supplier = supplier;
+        this.consumer = consumer;
     }
 
     private CompoundTag root() {
-        CompoundTag value = (CompoundTag) root.getValue().get("PublicBukkitValues");
-        return value;
+        return (CompoundTag) supplier.get().getValue().get("PublicBukkitValues");
     }
 
     private Map<String, Tag> get() {
@@ -40,8 +47,9 @@ public final class AsyncDataContainer implements PersistentDataContainer {
             if (!create) {
                 return Collections.emptyMap();
             }
-            Map<String, Tag> map = root.getValue();
+            final Map<String, Tag> map = new HashMap<>(root().getValue());
             map.put("PublicBukkitValues", new CompoundTag(raw = new HashMap<>()));
+            this.consumer.accept(new CompoundTag(map));
         } else {
             raw = tag.getValue();
         }
@@ -52,7 +60,14 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Validate.notNull(key, "The provided key for the custom value was null");
         Validate.notNull(type, "The provided type for the custom value was null");
         Validate.notNull(value, "The provided value for the custom value was null");
-        get().put(key.toString(), FaweCache.IMP.asTag(type.toPrimitive(value, null)));
+        // Modify public values
+        final Map<String, Tag> publicValues = new HashMap<>(this.get());
+        publicValues.put(key.toString(), FaweCache.IMP.asTag(type.toPrimitive(value, null)));
+        // Modify the root tag
+        final Map<String, Tag> map = new HashMap<>(root().getValue());
+        map.put("PublicBukkitValues", new CompoundTag(publicValues));
+        // Update the owning object
+        this.consumer.accept(new CompoundTag(map));
     }
 
     public <T, Z> boolean has(NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -60,7 +75,7 @@ public final class AsyncDataContainer implements PersistentDataContainer {
         Validate.notNull(type, "The provided type for the custom value was null");
         Tag value = get(false).get(key.toString());
         if (value == null) {
-            return type == null;
+            return false;
         }
         return type.getPrimitiveType() == value.getValue().getClass();
     }
@@ -93,7 +108,14 @@ public final class AsyncDataContainer implements PersistentDataContainer {
 
     public void remove(NamespacedKey key) {
         Validate.notNull(key, "The provided key for the custom value was null");
-        get(false).remove(key.toString());
+        // Modify public values
+        final Map<String, Tag> publicValues = new HashMap<>(this.get(false));
+        publicValues.remove(key.toString());
+        // Modify the root tag
+        final Map<String, Tag> map = new HashMap<>(root().getValue());
+        map.put("PublicBukkitValues", new CompoundTag(publicValues));
+        // Update the owning object
+        this.consumer.accept(new CompoundTag(map));
     }
 
     public boolean isEmpty() {
