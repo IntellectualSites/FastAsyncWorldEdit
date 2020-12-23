@@ -92,15 +92,15 @@ import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
@@ -266,13 +266,13 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
         if (id != null) {
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
             Supplier<CompoundTag> saveTag = () -> {
-                NBTTagCompound tag = new NBTTagCompound();
-                readEntityIntoTag(mcEntity, tag);
-
+                final NBTTagCompound minecraftTag = new NBTTagCompound();
+                readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
-                CompoundTag natve = (CompoundTag) toNative(tag);
-                natve.getValue().put("Id", new StringTag(id));
-                return natve;
+                final CompoundTag tag = (CompoundTag) toNative(minecraftTag);
+                final Map<String, Tag> tags = new HashMap<>(tag.getValue());
+                tags.put("Id", new StringTag(id));
+                return new CompoundTag(tags);
             };
             return new LazyBaseEntity(type, saveTag);
         } else {
