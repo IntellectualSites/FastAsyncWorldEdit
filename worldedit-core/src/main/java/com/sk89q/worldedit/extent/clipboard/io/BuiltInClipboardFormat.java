@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.boydti.fawe.object.io.PGZIPOutputStream;
+import com.boydti.fawe.object.io.ResettableFileInputStream;
 import com.boydti.fawe.object.schematic.MinecraftStructure;
 import com.boydti.fawe.object.schematic.PNGWriter;
 import com.google.common.collect.ImmutableSet;
@@ -128,6 +129,44 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
             return true;
         }
+    },
+
+    FAST("fast", "fawe") {
+
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schem";
+        }
+
+        @Override
+        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+            if (inputStream instanceof FileInputStream) {
+                inputStream = new ResettableFileInputStream((FileInputStream) inputStream);
+            }
+            BufferedInputStream buffered = new BufferedInputStream(inputStream);
+            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
+            return new FastSchematicReader(nbtStream);
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            OutputStream gzip;
+            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+                gzip = outputStream;
+            } else {
+                outputStream = new BufferedOutputStream(outputStream);
+                gzip = new PGZIPOutputStream(outputStream);
+            }
+            NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
+            return new FastSchematicWriter(nbtStream);
+        }
+
+        @Override
+        public boolean isFormat(File file) {
+            String name = file.getName().toLowerCase(Locale.ROOT);
+            return name.endsWith(".schem") || name.endsWith(".sponge");
+        }
+
     },
 
     /**
