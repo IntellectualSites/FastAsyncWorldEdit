@@ -2076,7 +2076,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     }
 
                     if (!filled) {
-                        if (nextXn * nextXn + dy * dy + dz * dz <= 1 && nextYn * nextYn + dx * dx + dz * dz <= 1 && nextZn * nextZn + dx * dx + dy * dy <= 1) {
+                        if (nextXn * nextXn + dy + dz <= 1 && nextYn * nextYn + dx + dz <= 1 && nextZn * nextZn + dx + dy <= 1) {
                             continue;
                         }
                     }
