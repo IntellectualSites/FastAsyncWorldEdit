@@ -6,6 +6,7 @@ import com.boydti.fawe.util.TaskManager;
 import org.bukkit.Chunk;
 import org.bukkit.ChunkSnapshot;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
@@ -14,6 +15,8 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class AsyncChunk implements Chunk {
@@ -118,6 +121,16 @@ public class AsyncChunk implements Chunk {
             return new BlockState[0];
         }
         return TaskManager.IMP.sync(() -> world.getChunkAt(x, z).getTileEntities(useSnapshot));
+    }
+
+    @NotNull @Override
+    public Collection<BlockState> getTileEntities(@NotNull Predicate<Block> blockPredicate,
+        boolean useSnapshot) {
+        if (!isLoaded()) {
+            return Collections.emptyList();
+        }
+        return TaskManager.IMP.sync(() -> world.getChunkAt(x, z)
+            .getTileEntities(blockPredicate, useSnapshot));
     }
 
     @Override
