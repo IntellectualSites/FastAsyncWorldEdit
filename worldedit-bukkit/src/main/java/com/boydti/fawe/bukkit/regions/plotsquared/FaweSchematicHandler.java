@@ -9,13 +9,15 @@ import com.boydti.fawe.util.IOUtil;
 import com.boydti.fawe.util.TaskManager;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.location.Location;
+import com.plotsquared.core.plot.schematic.Schematic;
 import com.plotsquared.core.queue.LocalBlockQueue;
 import com.plotsquared.core.util.MainUtil;
 import com.plotsquared.core.util.SchematicHandler;
 import com.plotsquared.core.util.task.RunnableVal;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompressedCompoundTag;
-import com.sk89q.jnbt.fawe.CompressedSchematicTag;
+import com.sk89q.jnbt.CompressedSchematicTag;
+import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
@@ -23,22 +25,30 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
+import com.sk89q.worldedit.extent.clipboard.io.FastSchematicReader;
+import com.sk89q.worldedit.extent.clipboard.io.FastSchematicWriter;
+import com.sk89q.worldedit.extent.clipboard.io.MCEditSchematicReader;
+import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicReader;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import net.jpountz.lz4.LZ4BlockInputStream;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
 
 import static org.bukkit.Bukkit.getWorld;
 
@@ -114,16 +124,14 @@ public class FaweSchematicHandler extends SchematicHandler {
             com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
             return;
         }
-        CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
-        if (weTag instanceof CompressedSchematicTag) {
-            Clipboard clipboard = ((CompressedSchematicTag) weTag).getSource();
-            URL url = FaweAPI.upload(clipboard, BuiltInClipboardFormat.SPONGE_SCHEMATIC);
-            whenDone.run(url);
-            return;
-        }
+        final CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
         MainUtil.upload(uuid, file, "schem", new RunnableVal<OutputStream>() {
             @Override
             public void run(OutputStream output) {
+                if (weTag instanceof CompressedSchematicTag) {
+                    Clipboard clipboard = ((CompressedSchematicTag) weTag).getSource();
+                    BuiltInClipboardFormat.SPONGE_SCHEMATIC.write(output, clipboard);
+                }
                 try {
                     try (PGZIPOutputStream gzip = new PGZIPOutputStream(output)) {
                         try (NBTOutputStream nos = new NBTOutputStream(gzip)) {
@@ -136,5 +144,43 @@ public class FaweSchematicHandler extends SchematicHandler {
                 }
             }
         }, whenDone);
+    }
+
+    @Override
+    public Schematic getSchematic(@NotNull InputStream is) {
+        try {
+            FastSchematicReader schematicReader = new FastSchematicReader(
+                new NBTInputStream(new BufferedInputStream(new GZIPInputStream(new BufferedInputStream(is)))));
+            Clipboard clip = schematicReader.read();
+            return new Schematic(clip);
+        } catch (IOException e) {
+            if (e instanceof EOFException) {
+                e.printStackTrace();
+                return null;
+            }
+            try {
+                SpongeSchematicReader schematicReader =
+                    new SpongeSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
+                Clipboard clip = schematicReader.read();
+                return new Schematic(clip);
+            } catch (IOException e2) {
+                if (e2 instanceof EOFException) {
+                    e.printStackTrace();
+                    return null;
+                }
+                try {
+                    MCEditSchematicReader schematicReader =
+                        new MCEditSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
+                    Clipboard clip = schematicReader.read();
+                    return new Schematic(clip);
+                } catch (IOException e3) {
+                    e.printStackTrace();
+                    PlotSquared.debug(
+                        is.toString() + " | " + is.getClass().getCanonicalName() + " is not in GZIP format : " + e
+                            .getMessage());
+                }
+            }
+        }
+        return null;
     }
 }
