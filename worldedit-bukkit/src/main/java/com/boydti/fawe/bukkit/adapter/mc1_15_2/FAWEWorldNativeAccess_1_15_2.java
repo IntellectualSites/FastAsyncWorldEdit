@@ -58,7 +58,7 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
 
     @Override
     public IBlockData toNative(com.sk89q.worldedit.world.block.BlockState state) {
-        int stateId = BlockStateIdAccess.getBlockStateId(state);
+        int stateId = adapter.ordinalToIbdID(state.getOrdinalChar());
         return BlockStateIdAccess.isValidInternalId(stateId)
                 ? Block.getByCombinedId(stateId)
                 : ((CraftBlockData) BukkitAdapter.adapt(state)).getState();
@@ -72,7 +72,8 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
     @Nullable
     @Override
     public IBlockData setBlockState(Chunk chunk, BlockPosition position, IBlockData state) {
-        return chunk.setType(position, state, false);
+        return chunk.setType(position, state,
+            this.sideEffectSet != null && this.sideEffectSet.shouldApply(SideEffect.UPDATE));
     }
 
     @Override
@@ -165,10 +166,5 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
     @Override
     public void onBlockStateChange(BlockPosition pos, IBlockData oldState, IBlockData newState) {
         getWorld().a(pos, oldState, newState);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
-        return this.adapter.setBlock(this.getChunk(position.getBlockX() >> 4, position.getBlockZ() >> 4).bukkitChunk, position.getBlockX(), position.getBlockY(), position.getBlockZ(), block, sideEffectSet.shouldApply(SideEffect.LIGHTING));
     }
 }

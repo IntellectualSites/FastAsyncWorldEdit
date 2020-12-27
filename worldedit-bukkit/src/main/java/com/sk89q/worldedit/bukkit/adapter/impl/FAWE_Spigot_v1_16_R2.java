@@ -106,6 +106,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_16_R2 parent;
     private char[] ibdToStateOrdinal;
+    private int[] ordinalToIbdID;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -125,11 +126,14 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
             return false;
         }
         ibdToStateOrdinal = new char[BlockTypesCache.states.length]; // size
+        ordinalToIbdID = new int[ibdToStateOrdinal.length]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
             BlockMaterial_1_16_2 material = (BlockMaterial_1_16_2) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
-            ibdToStateOrdinal[id] = state.getOrdinalChar();
+            char ordinal = state.getOrdinalChar();
+            ibdToStateOrdinal[id] = ordinal;
+            ordinalToIbdID[ordinal] = id;
         }
         return true;
     }
@@ -344,6 +348,17 @@ public final class FAWE_Spigot_v1_16_R2 extends CachedBukkitAdapter implements I
                     .error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
                            ibd.getBlock(), Block.REGISTRY_ID.getId(ibd), ibdToStateOrdinal.length, e1);
                 return 0;
+            }
+        }
+    }
+
+    public int ordinalToIbdID(char ordinal) {
+        synchronized (this) {
+            try {
+                return ordinalToIbdID[ordinal];
+            } catch (NullPointerException e) {
+                init();
+                return ordinalToIbdID(ordinal);
             }
         }
     }
