@@ -315,6 +315,21 @@ public class AsyncBlock implements Block {
     }
 
     @Override
+    public boolean isBuildable() {
+        return this.getUnsafeBlock().isBuildable();
+    }
+
+    @Override
+    public boolean isBurnable() {
+        return this.getType().isBurnable();
+    }
+
+    @Override
+    public boolean isReplaceable() {
+        return this.getUnsafeBlock().isReplaceable();
+    }
+
+    @Override
     public double getTemperature() {
         return this.getWorld().getTemperature(this.getX(), this.getZ());
     }
