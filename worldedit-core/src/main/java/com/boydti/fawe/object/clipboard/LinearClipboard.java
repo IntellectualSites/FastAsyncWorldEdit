@@ -21,10 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
-/**
- * Best used when clipboard selections are small, or using legacy formats
- * (Small being < Integer.MAX_VALUE/BLOCK_SIZE_BYTES blocks)
- */
 public abstract class LinearClipboard extends SimpleClipboard {
 
     protected final HashSet<ClipboardEntity> entities = new HashSet<>();
