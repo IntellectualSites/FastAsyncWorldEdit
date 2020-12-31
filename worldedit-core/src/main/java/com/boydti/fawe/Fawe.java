@@ -235,8 +235,8 @@ public class Fawe {
         // Setting up config.yml
         File file = new File(this.implementation.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = implementation.getPlatform().replace("\"", "");
-        try (InputStream stream = getClass().getResourceAsStream(File.separator + "fawe.properties");
-             BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
+        try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
             String commitString = br.readLine();
             String dateString = br.readLine();

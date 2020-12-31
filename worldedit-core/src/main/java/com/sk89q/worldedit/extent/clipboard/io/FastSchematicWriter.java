@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.FaweOutputStream;
 import com.boydti.fawe.util.IOUtil;
-import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntArrayTag;
 import com.sk89q.jnbt.ListTag;
@@ -39,6 +39,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -58,8 +59,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -72,6 +71,7 @@ public class FastSchematicWriter implements ClipboardWriter {
 
     private static final int MAX_SIZE = Short.MAX_VALUE - Short.MIN_VALUE;
     private final NBTOutputStream outputStream;
+    private boolean brokenEntities = false;
 
     /**
      * Create a new schematic writer.
@@ -81,6 +81,10 @@ public class FastSchematicWriter implements ClipboardWriter {
     public FastSchematicWriter(NBTOutputStream outputStream) {
         checkNotNull(outputStream);
         this.outputStream = outputStream;
+    }
+
+    public void setBrokenEntities(boolean brokenEntities) {
+        this.brokenEntities = brokenEntities;
     }
 
     @Override
@@ -117,6 +121,7 @@ public class FastSchematicWriter implements ClipboardWriter {
         outputStream.writeLazyCompoundTag("Schematic", out -> {
             out.writeNamedTag("DataVersion", WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion());
             out.writeNamedTag("Version", CURRENT_VERSION);
+            out.writeNamedTag("FAWE", Fawe.get().getVersion().build);
             out.writeNamedTag("Width", (short) width);
             out.writeNamedTag("Height", (short) height);
             out.writeNamedTag("Length", (short) length);
@@ -241,8 +246,12 @@ public class FastSchematicWriter implements ClipboardWriter {
 
                     // Store our location data, overwriting any
                     values.remove("id");
+                    Location loc = entity.getLocation();
+                    if (!brokenEntities) {
+                        loc = loc.setPosition(loc.add(min.toVector3()));
+                    }
                     values.put("Id", new StringTag(state.getType().getId()));
-                    values.put("Pos", writeVector(entity.getLocation()));
+                    values.put("Pos", writeVector(loc));
                     values.put("Rotation", writeRotation(entity.getLocation()));
 
                     CompoundTag entityTag = new CompoundTag(values);
@@ -310,30 +319,6 @@ public class FastSchematicWriter implements ClipboardWriter {
         try (LZ4BlockInputStream in = new LZ4BlockInputStream(new ByteArrayInputStream(biomesCompressed.toByteArray()))) {
             IOUtil.copy(in, (DataOutput) out);
         }
-    }
-
-    private void writeEntities(Clipboard clipboard, NBTOutputStream schematic) throws IOException {
-        List<CompoundTag> entities = clipboard.getEntities().stream().map(e -> {
-            BaseEntity state = e.getState();
-            if (state == null) {
-                return null;
-            }
-            Map<String, Tag> values = Maps.newHashMap();
-            CompoundTag rawData = state.getNbtData();
-            if (rawData != null) {
-                values.putAll(rawData.getValue());
-            }
-            values.remove("id");
-            values.put("Id", new StringTag(state.getType().getId()));
-            values.put("Pos", writeVector(e.getLocation().toVector()));
-            values.put("Rotation", writeRotation(e.getLocation()));
-
-            return new CompoundTag(values);
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-        if (entities.isEmpty()) {
-            return;
-        }
-        schematic.writeNamedTag("Entities", new ListTag(CompoundTag.class, entities));
     }
 
     @Override
