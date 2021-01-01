@@ -63,6 +63,14 @@ public final class NBTInputStream implements Closeable {
         this.is = dis;
     }
 
+    public void mark(int mark) {
+        is.mark(mark);
+    }
+
+    public void reset() throws IOException {
+        is.reset();
+    }
+
     /**
      * Reads an NBT tag from the stream.
      *
@@ -101,7 +109,7 @@ public final class NBTInputStream implements Closeable {
             if (child != null) {
                 child.acceptRoot(this, type, 0);
             } else {
-                readTagPaylodLazy(type, 0);
+                readTagPayloadLazy(type, 0);
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -121,7 +129,7 @@ public final class NBTInputStream implements Closeable {
 
     private byte[] buf;
 
-    public void readTagPaylodLazy(int type, int depth) throws IOException {
+    public void readTagPayloadLazy(int type, int depth) throws IOException {
         switch (type) {
             case NBTConstants.TYPE_END:
                 return;
@@ -154,7 +162,7 @@ public final class NBTInputStream implements Closeable {
                 int childType = is.readByte();
                 length = is.readInt();
                 for (int i = 0; i < length; ++i) {
-                    readTagPaylodLazy(childType, depth + 1);
+                    readTagPayloadLazy(childType, depth + 1);
                 }
                 return;
             }
@@ -167,7 +175,7 @@ public final class NBTInputStream implements Closeable {
                         return;
                     }
                     is.skipBytes(is.readShort() & 0xFFFF);
-                    readTagPaylodLazy(childType, depth + 1);
+                    readTagPayloadLazy(childType, depth + 1);
                 }
             }
             case NBTConstants.TYPE_INT_ARRAY: {
@@ -183,7 +191,7 @@ public final class NBTInputStream implements Closeable {
         }
     }
 
-    public void readTagPaylodLazy(int type, int depth, StreamDelegate scope) throws IOException {
+    public void readTagPayloadLazy(int type, int depth, StreamDelegate scope) throws IOException {
         switch (type) {
             case NBTConstants.TYPE_END:
                 return;
@@ -295,11 +303,11 @@ public final class NBTInputStream implements Closeable {
                 child = scope.get0();
                 if (child == null) {
                     for (int i = 0; i < length; ++i) {
-                        readTagPaylodLazy(childType, depth + 1);
+                        readTagPayloadLazy(childType, depth + 1);
                     }
                 } else {
                     for (int i = 0; i < length; ++i) {
-                        readTagPaylodLazy(childType, depth + 1, child);
+                        readTagPayloadLazy(childType, depth + 1, child);
                     }
                 }
                 return;
@@ -332,9 +340,9 @@ public final class NBTInputStream implements Closeable {
                     }
                     StreamDelegate child = scope.get(is);
                     if (child == null) {
-                        readTagPaylodLazy(childType, depth + 1);
+                        readTagPayloadLazy(childType, depth + 1);
                     } else {
-                        readTagPaylodLazy(childType, depth + 1, child);
+                        readTagPayloadLazy(childType, depth + 1, child);
                     }
                 }
             }

@@ -30,6 +30,7 @@ import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
@@ -46,6 +47,7 @@ import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
@@ -60,6 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -141,7 +144,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         return fixer.fixUp(DataFixer.FixTypes.BIOME, biomePalettePart, dataVersion);
     }
 
-    public StreamDelegate createDelegate() {
+    public StreamDelegate createVersionDelegate() {
         StreamDelegate root = new StreamDelegate();
         StreamDelegate schematic = root.add("Schematic");
         schematic.add("DataVersion").withInt((i, v) -> dataVersion = v);
@@ -151,7 +154,12 @@ public class FastSchematicReader extends NBTSchematicReader {
                 dataVersion = Constants.DATA_VERSION_MC_1_13_2;
             }
         });
-        schematic.add("FAWEVersion").withInt((i, v) -> faweWritten = v);
+        return root;
+    }
+
+    public StreamDelegate createDelegate() {
+        StreamDelegate root = new StreamDelegate();
+        StreamDelegate schematic = root.add("Schematic");
         schematic.add("Width").withInt((i, v) -> width = v);
         schematic.add("Height").withInt((i, v) -> height = v);
         schematic.add("Length").withInt((i, v) -> length = v);
@@ -161,17 +169,19 @@ public class FastSchematicReader extends NBTSchematicReader {
         metadata.add("WEOffsetX").withInt((i, v) -> offsetX = v);
         metadata.add("WEOffsetY").withInt((i, v) -> offsetY = v);
         metadata.add("WEOffsetZ").withInt((i, v) -> offsetZ = v);
+        metadata.add("FAWEVersion").withInt((i, v) -> faweWritten = v);
 
         StreamDelegate paletteDelegate = schematic.add("Palette");
         paletteDelegate.withValue((ValueReader<Map<String, Object>>) (ignore, v) -> {
             palette = new char[v.size()];
             for (Entry<String, Object> entry : v.entrySet()) {
-                BlockState state = null;
+                BlockState state;
+                String palettePart = fix(entry.getKey());
                 try {
-                    String palettePart = fix(entry.getKey());
                     state = BlockState.get(palettePart);
-                } catch (InputParseException e) {
-                    e.printStackTrace();
+                } catch (InputParseException ignored) {
+                    log.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
+                    state = BlockTypes.AIR.getDefaultState();
                 }
                 int index = (int) entry.getValue();
                 palette[index] = (char) state.getOrdinal();
@@ -233,10 +243,14 @@ public class FastSchematicReader extends NBTSchematicReader {
     @Override
     public Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
         StreamDelegate root = createDelegate();
+        StreamDelegate versions = createVersionDelegate();
+        inputStream.mark(Integer.MAX_VALUE);
+        inputStream.readNamedTagLazy(versions);
+        inputStream.reset();
         inputStream.readNamedTagLazy(root);
 
         if (version != 1 && version != 2) {
-            throw new IOException("This schematic version is currently not supported");
+            throw new IOException("This schematic version is currently not supported (" + version + ")");
         }
 
         if (blocks != null) {
@@ -250,13 +264,10 @@ public class FastSchematicReader extends NBTSchematicReader {
 
         BlockVector3 dimensions = BlockVector3.at(width, height, length);
         BlockVector3 origin;
-        BlockVector3 weOrigin;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
             origin = BlockVector3.at(-offsetX, -offsetY, -offsetZ);
-            weOrigin = min.subtract(offsetX, offsetY, offsetZ);
         } else {
             origin = BlockVector3.ZERO;
-            weOrigin = min;
         }
 
         Clipboard clipboard = createOutput.apply(dimensions);
