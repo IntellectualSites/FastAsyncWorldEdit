@@ -5,7 +5,7 @@ import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.CompressedCompoundTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
+import com.sk89q.worldedit.extent.clipboard.io.FastSchematicWriter;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 
@@ -22,7 +22,7 @@ public class CompressedSchematicTag extends CompressedCompoundTag<Clipboard> {
         FastByteArrayOutputStream blocksOut = new FastByteArrayOutputStream();
         try (LZ4BlockOutputStream lz4out = new LZ4BlockOutputStream(blocksOut)) {
             NBTOutputStream nbtOut = new NBTOutputStream(lz4out);
-            new SpongeSchematicWriter(nbtOut).write(getSource());
+            new FastSchematicWriter(nbtOut).write(getSource());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
