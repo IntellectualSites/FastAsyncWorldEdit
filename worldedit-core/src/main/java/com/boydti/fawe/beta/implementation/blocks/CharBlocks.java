@@ -54,14 +54,13 @@ public abstract class CharBlocks implements IBlocks {
     };
     public final char[][] blocks;
     public final Section[] sections;
-    private final Object[] loadLock = new Object[16];
+    private final Object loadLock = new Object();
 
     public CharBlocks() {
         blocks = new char[16][];
         sections = new Section[16];
         for (int i = 0; i < 16; i++) {
             sections[i] = EMPTY;
-            loadLock[i] = new Object();
         }
     }
 
@@ -122,7 +121,7 @@ public abstract class CharBlocks implements IBlocks {
         if (section.isFull()) {
             return section.get(this, layer);
         }
-        synchronized (loadLock[layer]) {
+        synchronized (loadLock) {
             return sections[layer].get(this, layer);
         }
     }
