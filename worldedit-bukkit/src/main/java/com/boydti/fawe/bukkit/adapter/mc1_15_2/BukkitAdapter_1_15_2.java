@@ -9,7 +9,6 @@ import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
-import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -155,33 +154,25 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     }
 
     public static Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
-        final Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(chunkX, chunkZ, false);
+        Chunk nmsChunk = nmsWorld.getChunkIfLoaded(chunkX, chunkZ);
         if (nmsChunk != null) {
-            TaskManager.IMP.task(() -> nmsChunk.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
             return nmsChunk;
         }
         if (Fawe.isMainThread()) {
-            final Chunk nmsChunkMain = nmsWorld.getChunkAt(chunkX, chunkZ);
-            TaskManager.IMP.task(() -> nmsChunkMain.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
-            return nmsChunkMain;
+            return nmsWorld.getChunkAt(chunkX, chunkZ);
         }
         if (PaperLib.isPaper()) {
             CraftWorld craftWorld = nmsWorld.getWorld();
             CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(chunkX, chunkZ, true);
             try {
-                final CraftChunk chunk = (CraftChunk) future.get();
-                TaskManager.IMP.task(() -> chunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
+                CraftChunk chunk = (CraftChunk) future.get();
                 return chunk.getHandle();
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
         // TODO optimize
-        return TaskManager.IMP.sync(() -> {
-            Chunk chunk = nmsWorld.getChunkAt(chunkX, chunkZ);
-            chunk.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance());
-            return chunk;
-        });
+        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(chunkX, chunkZ));
     }
 
     public static PlayerChunk getPlayerChunk(WorldServer nmsWorld, final int cx, final int cz) {

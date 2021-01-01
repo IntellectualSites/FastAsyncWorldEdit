@@ -609,7 +609,6 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                                     task.run();
                                 }
                             }
-                            nmsChunk.bukkitChunk.removePluginChunkTicket(WorldEditPlugin.getInstance());
                             if (callback == null) {
                                 if (finalizer != null) {
                                     finalizer.run();
