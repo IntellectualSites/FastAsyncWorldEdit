@@ -9,6 +9,7 @@ import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -151,25 +152,33 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
     }
 
     public static Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
-        Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(chunkX, chunkZ, false);
+        final Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(chunkX, chunkZ, false);
         if (nmsChunk != null) {
+            TaskManager.IMP.task(() -> nmsChunk.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
             return nmsChunk;
         }
         if (Fawe.isMainThread()) {
-            return nmsWorld.getChunkAt(chunkX, chunkZ);
+            final Chunk nmsChunkMain = nmsWorld.getChunkAt(chunkX, chunkZ);
+            TaskManager.IMP.task(() -> nmsChunkMain.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
+            return nmsChunkMain;
         }
         if (PaperLib.isPaper()) {
             CraftWorld craftWorld = nmsWorld.getWorld();
             CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(chunkX, chunkZ, true);
             try {
-                CraftChunk chunk = (CraftChunk) future.get();
+                final CraftChunk chunk = (CraftChunk) future.get();
+                TaskManager.IMP.task(() -> chunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
                 return chunk.getHandle();
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
         // TODO optimize
-        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(chunkX, chunkZ));
+        return TaskManager.IMP.sync(() -> {
+            Chunk chunk = nmsWorld.getChunkAt(chunkX, chunkZ);
+            chunk.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance());
+            return chunk;
+        });
     }
 
     public static PlayerChunk getPlayerChunk(WorldServer nmsWorld, final int cx, final int cz) {
@@ -187,35 +196,32 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             return;
         }
         if (playerChunk.hasBeenLoaded()) {
-            TaskManager.IMP.sync(() -> {
-                try {
-                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                    if (dirtyBits == 0) {
-                        nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
-                    }
-                    if (mask == 0) {
-                        dirtyBits = 65535;
-                    } else {
-                        dirtyBits |= mask;
-                    }
-
-                    fieldDirtyBits.set(playerChunk, dirtyBits);
-                    fieldDirtyCount.set(playerChunk, 64);
-
-                    if (lighting) {
-                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-                        boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
-                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                            p.playerConnection.sendPacket(packet);
-                        });
-                    }
-
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+            try {
+                int dirtyBits = fieldDirtyBits.getInt(playerChunk);
+                if (dirtyBits == 0) {
+                    nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
                 }
-                return null;
-            });
+                if (mask == 0) {
+                    dirtyBits = 65535;
+                } else {
+                    dirtyBits |= mask;
+                }
+
+                fieldDirtyBits.set(playerChunk, dirtyBits);
+                fieldDirtyCount.set(playerChunk, 64);
+
+                if (lighting) {
+                    ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+                    boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
+                    PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
+                    playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                        p.playerConnection.sendPacket(packet);
+                    });
+                }
+
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
     }
 

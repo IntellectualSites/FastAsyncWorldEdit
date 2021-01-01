@@ -5,12 +5,14 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
 import com.destroystokyo.paper.util.misc.PooledLinkedHashSets;
 import com.mojang.datafixers.util.Either;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -163,25 +165,33 @@ public final class BukkitAdapter_1_16_4 extends NMSAdapter {
     }
 
     public static Chunk ensureLoaded(World nmsWorld, int chunkX, int chunkZ) {
-        Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(chunkX, chunkZ, false);
+        final Chunk nmsChunk = nmsWorld.getChunkProvider().getChunkAt(chunkX, chunkZ, false);
         if (nmsChunk != null) {
+            TaskManager.IMP.task(() -> nmsChunk.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
             return nmsChunk;
         }
         if (Fawe.isMainThread()) {
-            return nmsWorld.getChunkAt(chunkX, chunkZ);
+            final Chunk nmsChunkMain = nmsWorld.getChunkAt(chunkX, chunkZ);
+            TaskManager.IMP.task(() -> nmsChunkMain.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
+            return nmsChunkMain;
         }
         if (PaperLib.isPaper()) {
             CraftWorld craftWorld = nmsWorld.getWorld();
             CompletableFuture<org.bukkit.Chunk> future = craftWorld.getChunkAtAsync(chunkX, chunkZ, true);
             try {
-                CraftChunk chunk = (CraftChunk) future.get();
+                final CraftChunk chunk = (CraftChunk) future.get();
+                TaskManager.IMP.task(() -> chunk.addPluginChunkTicket(WorldEditPlugin.getInstance()));
                 return chunk.getHandle();
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
         // TODO optimize
-        return TaskManager.IMP.sync(() -> nmsWorld.getChunkAt(chunkX, chunkZ));
+        return TaskManager.IMP.sync(() -> {
+            Chunk chunk = nmsWorld.getChunkAt(chunkX, chunkZ);
+            chunk.bukkitChunk.addPluginChunkTicket(WorldEditPlugin.getInstance());
+            return chunk;
+        });
     }
 
     public static PlayerChunk getPlayerChunk(WorldServer nmsWorld, final int chunkX, final int chunkZ) {
@@ -199,51 +209,52 @@ public final class BukkitAdapter_1_16_4 extends NMSAdapter {
             return;
         }
         if (playerChunk.hasBeenLoaded()) {
-            TaskManager.IMP.sync(() -> {
-                ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-                Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
-                if (optional.isPresent()) {
-                    PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(optional.get(), 65535);
+            ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+            Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
+            if (optional.isPresent()) {
+                PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(optional.get(), 65535);
+                playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                    p.playerConnection.sendPacket(chunkpacket);
+                });
+
+                if (lighting) {
+                    //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
+                    boolean trustEdges = true;
+                    PacketPlayOutLightUpdate packet =
+                        new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(),
+                            trustEdges);
                     playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                        p.playerConnection.sendPacket(chunkpacket);
+                        p.playerConnection.sendPacket(packet);
                     });
+                }
+            } else if (PaperLib.isPaper()) {
+                //Require generic here to work with multiple dependencies trying to take control.
+                PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<?> objects =
+                    nmsWorld.getChunkProvider().playerChunkMap.playerViewDistanceNoTickMap
+                        .getObjectsInRange(chunkX, chunkZ);
+                if (objects == null) {
+                    return;
+                }
+                for (Object obj : objects.getBackingSet()) {
+                    if (obj == null) {
+                        continue;
+                    }
+                    EntityPlayer p = (EntityPlayer) obj;
+                    Chunk chunk = nmsWorld.getChunkProvider().getChunkAtIfLoadedImmediately(chunkX, chunkZ);
+                    if (chunk != null) {
+                        PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(chunk, 65535);
+                        p.playerConnection.sendPacket(chunkpacket);
 
-                    if (lighting) {
-                        boolean trustEdges = true; //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
-                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                        if (lighting) {
+                            //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
+                            boolean trustEdges = true;
+                            PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair,
+                                nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
                             p.playerConnection.sendPacket(packet);
-                        });
-                    }
-                } else if (PaperLib.isPaper()) {
-                    //Require generic here to work with multiple dependencies trying to take control.
-                    PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<?> objects =
-                        nmsWorld.getChunkProvider().playerChunkMap.playerViewDistanceNoTickMap.getObjectsInRange(chunkX, chunkZ);
-                    if (objects == null) {
-                        return null;
-                    }
-                    for (Object obj : objects.getBackingSet()) {
-                        if (obj == null) {
-                            continue;
-                        }
-                        EntityPlayer p = (EntityPlayer) obj;
-                        Chunk chunk = nmsWorld.getChunkProvider().getChunkAtIfLoadedImmediately(chunkX, chunkZ);
-                        if (chunk != null) {
-                            PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(chunk, 65535);
-                            p.playerConnection.sendPacket(chunkpacket);
-
-                            if (lighting) {
-                                boolean trustEdges =
-                                    true; //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
-                                PacketPlayOutLightUpdate packet =
-                                    new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                                p.playerConnection.sendPacket(packet);
-                            }
                         }
                     }
                 }
-                return null;
-            });
+            }
         }
     }
 
