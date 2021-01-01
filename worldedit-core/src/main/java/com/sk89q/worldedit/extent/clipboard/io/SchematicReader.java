@@ -378,7 +378,7 @@ public class SchematicReader implements ClipboardReader {
 
         BlockVector3 min = BlockVector3.at(originX, originY, originZ);
         if (!min.equals(BlockVector3.ZERO)) {
-            new BlockArrayClipboard(clipboard, min);
+            clipboard = new BlockArrayClipboard(clipboard, min);
         }
         return clipboard;
     }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import com.boydti.fawe.Fawe;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -114,6 +115,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         metadata.put("WEOffsetX", new IntTag(offset.getBlockX()));
         metadata.put("WEOffsetY", new IntTag(offset.getBlockY()));
         metadata.put("WEOffsetZ", new IntTag(offset.getBlockZ()));
+        metadata.put("FAWEVersion", new IntTag(Fawe.get().getVersion().build));
 
         schematic.put("Metadata", new CompoundTag(metadata));
 
