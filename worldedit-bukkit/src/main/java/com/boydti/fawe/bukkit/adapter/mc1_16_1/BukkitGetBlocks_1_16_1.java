@@ -827,7 +827,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
             return super.trim(true);
         } else {
             for (int i = 0; i < 16; i++) {
-                if (!hasSection(i) || super.sections[i] == CharBlocks.EMPTY) {
+                if (!hasSection(i) || !super.sections[i].isFull()) {
                     continue;
                 }
                 ChunkSection existing = getSections(true)[i];
