@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.adapter.mc1_16_4;
 
 import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
@@ -28,10 +27,8 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.BiomeStorage;
-import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.Chunk;
 import net.minecraft.server.v1_16_R3.ChunkSection;
@@ -94,6 +91,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
     public NibbleArray[] skyLight = new NibbleArray[16];
     private boolean createCopy = false;
     private BukkitGetBlocks_1_16_4_Copy copy = null;
+    private boolean forceLoadSections = true;
 
     public BukkitGetBlocks_1_16_4(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
@@ -322,6 +320,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
 
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+        forceLoadSections = false;
         copy = createCopy ? new BukkitGetBlocks_1_16_4_Copy(world, getChunkX(), getChunkZ()) : null;
         try {
             WorldServer nmsWorld = world;
@@ -370,7 +369,6 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
                     // If we're creating a copy, it's because we're delaying history so we do not want to write to
                     // the chunkSet yet.
                     if (createCopy) {
-                        setArr = setArr.clone();
                         copy.storeSection(layer);
                         copy.storeSetBlocks(layer, setArr);
                     }
@@ -416,7 +414,6 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
                             if (!BukkitAdapter_1_16_4
                                 .setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 log.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
-                                continue;
                             } else {
                                 updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             }
@@ -483,9 +480,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
 
                 Set<UUID> entityRemoves = set.getEntityRemoves();
                 if (entityRemoves != null && !entityRemoves.isEmpty()) {
-                    if (syncTasks == null) {
-                        syncTasks = new Runnable[3];
-                    }
+                    syncTasks = new Runnable[3];
 
                     syncTasks[2] = () -> {
                         final List<Entity>[] entities = nmsChunk.getEntitySlices();
@@ -645,6 +640,8 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
         } catch (Throwable e) {
             e.printStackTrace();
             return null;
+        } finally {
+            forceLoadSections = true;
         }
     }
 
@@ -766,7 +763,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
     }
 
     public ChunkSection[] getSections(boolean force) {
-        if (force) {
+        if (force && forceLoadSections) {
             return sections = getChunk().getSections().clone();
         }
         ChunkSection[] tmp = sections;
@@ -836,7 +833,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
                 if (!hasSection(i) || super.sections[i] == CharBlocks.EMPTY) {
                     continue;
                 }
-                ChunkSection existing = getSections(false)[i];
+                ChunkSection existing = getSections(true)[i];
                 try {
                     final DataPaletteBlock<IBlockData> blocksExisting = existing.getBlocks();
 

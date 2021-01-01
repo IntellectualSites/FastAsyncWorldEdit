@@ -109,7 +109,7 @@ public class BukkitGetBlocks_1_16_2_Copy extends BukkitGetBlocks_1_16_2 implemen
     }
 
     protected void storeSection(int layer) {
-        blocks[layer] = update(layer, null).clone();
+        blocks[layer] = load(layer).clone();
     }
 
     @Override
@@ -131,7 +131,7 @@ public class BukkitGetBlocks_1_16_2_Copy extends BukkitGetBlocks_1_16_2 implemen
     }
 
     protected void storeSetBlocks(int layer, char[] blocks) {
-        newSetBlocks[layer] = blocks;
+        newSetBlocks[layer] = blocks.clone();
     }
 
     @Override
