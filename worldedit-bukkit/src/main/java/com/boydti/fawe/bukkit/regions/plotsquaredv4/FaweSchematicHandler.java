@@ -23,7 +23,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicWriter;
+import com.sk89q.worldedit.extent.clipboard.io.FastSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
@@ -85,7 +85,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                 if (cTag instanceof CompressedSchematicTag) {
                     Clipboard clipboard = (Clipboard) cTag.getSource();
                     try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new BufferedOutputStream(new PGZIPOutputStream(stream)))) {
-                        new SpongeSchematicWriter(output).write(clipboard);
+                        new FastSchematicWriter(output).write(clipboard);
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp); BufferedOutputStream output = new BufferedOutputStream(new PGZIPOutputStream(stream))) {

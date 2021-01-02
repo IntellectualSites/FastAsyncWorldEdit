@@ -93,7 +93,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                 if (cTag instanceof CompressedSchematicTag) {
                     Clipboard clipboard = (Clipboard) cTag.getSource();
                     try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new BufferedOutputStream(new PGZIPOutputStream(stream)))) {
-                        new SpongeSchematicWriter(output).write(clipboard);
+                        new FastSchematicWriter(output).write(clipboard);
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp); BufferedOutputStream output = new BufferedOutputStream(new PGZIPOutputStream(stream))) {
