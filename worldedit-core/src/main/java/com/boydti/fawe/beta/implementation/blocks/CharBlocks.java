@@ -9,17 +9,24 @@ import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 public abstract class CharBlocks implements IBlocks {
 
     public static final Logger logger = LoggerFactory.getLogger(CharBlocks.class);
 
-    public static final Section FULL = new Section() {
+    protected final Section FULL = new Section() {
         @Override
         public final char[] get(CharBlocks blocks, int layer) {
             return blocks.blocks[layer];
         }
+
+        @Override
+        public final boolean isFull() {
+            return true;
+        }
     };
-    public static final Section EMPTY = new Section() {
+    protected final Section EMPTY = new Section() {
         @Override
         public final synchronized char[] get(CharBlocks blocks, int layer) {
             char[] arr = blocks.blocks[layer];
@@ -39,9 +46,15 @@ public abstract class CharBlocks implements IBlocks {
             }
             return arr;
         }
+
+        @Override
+        public final boolean isFull() {
+            return false;
+        }
     };
     public final char[][] blocks;
     public final Section[] sections;
+    private final Object loadLock = new Object();
 
     public CharBlocks() {
         blocks = new char[16][];
@@ -55,7 +68,7 @@ public abstract class CharBlocks implements IBlocks {
     public boolean trim(boolean aggressive) {
         boolean result = true;
         for (int i = 0; i < 16; i++) {
-            if (sections[i] == EMPTY && blocks[i] != null) {
+            if (!sections[i].isFull() && blocks[i] != null) {
                 blocks[i] = null;
             } else {
                 result = false;
@@ -67,7 +80,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public boolean trim(boolean aggressive, int layer) {
         boolean result = true;
-        if (sections[layer] == EMPTY && blocks[layer] != null) {
+        if (!sections[layer].isFull() && blocks[layer] != null) {
             blocks[layer] = null;
         } else {
             result = false;
@@ -99,12 +112,18 @@ public abstract class CharBlocks implements IBlocks {
 
     @Override
     public boolean hasSection(@Range(from = 0, to = 15) int layer) {
-        return sections[layer] == FULL;
+        return sections[layer].isFull();
     }
 
     @Override
     public char[] load(@Range(from = 0, to = 15) int layer) {
-        return sections[layer].get(this, layer);
+        Section section = sections[layer];
+        if (section.isFull()) {
+            return section.get(this, layer);
+        }
+        synchronized (loadLock) {
+            return sections[layer].get(this, layer);
+        }
     }
 
     @Override
@@ -148,6 +167,8 @@ public abstract class CharBlocks implements IBlocks {
     public abstract static class Section {
 
         public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer);
+
+        public abstract boolean isFull();
 
         public final char get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index) {
             return get(blocks, layer)[index];

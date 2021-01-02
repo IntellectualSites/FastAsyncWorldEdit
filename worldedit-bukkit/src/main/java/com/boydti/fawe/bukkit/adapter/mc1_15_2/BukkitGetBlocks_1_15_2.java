@@ -90,6 +90,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     public NibbleArray[] skyLight = new NibbleArray[16];
     private boolean createCopy = false;
     private BukkitGetBlocks_1_15_2_Copy copy = null;
+    private boolean forceLoadSections = true;
 
     public BukkitGetBlocks_1_15_2(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
@@ -316,6 +317,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+        forceLoadSections = false;
         copy = createCopy ? new BukkitGetBlocks_1_15_2_Copy(world, getChunkX(), getChunkZ()) : null;
         try {
             WorldServer nmsWorld = world;
@@ -364,7 +366,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                     // If we're creating a copy, it's because we're delaying history so we do not want to write to
                     // the chunkSet yet.
                     if (createCopy) {
-                        setArr = setArr.clone();
                         copy.storeSection(layer);
                         copy.storeSetBlocks(layer, setArr);
                     }
@@ -408,7 +409,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                             newSection = BukkitAdapter_1_15_2.newChunkSection(layer, this::load, setArr, fastmode);
                             if (!BukkitAdapter_1_15_2.setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 log.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
-                                continue;
                             } else {
                                 updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             }
@@ -475,9 +475,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
 
                 Set<UUID> entityRemoves = set.getEntityRemoves();
                 if (entityRemoves != null && !entityRemoves.isEmpty()) {
-                    if (syncTasks == null) {
-                        syncTasks = new Runnable[3];
-                    }
+                    syncTasks = new Runnable[3];
 
                     syncTasks[2] = () -> {
                         final List<Entity>[] entities = nmsChunk.getEntitySlices();
@@ -637,6 +635,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         } catch (Throwable e) {
             e.printStackTrace();
             return null;
+        } finally {
+            forceLoadSections = true;
         }
     }
 
@@ -758,7 +758,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     }
 
     public ChunkSection[] getSections(boolean force) {
-        if (force) {
+        if (force && forceLoadSections) {
             return sections = getChunk().getSections().clone();
         }
         ChunkSection[] tmp = sections;
@@ -825,10 +825,10 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
             return super.trim(true);
         } else {
             for (int i = 0; i < 16; i++) {
-                if (!hasSection(i) || super.sections[i] == CharBlocks.EMPTY) {
+                if (!hasSection(i) || !super.sections[i].isFull()) {
                     continue;
                 }
-                ChunkSection existing = getSections(false)[i];
+                ChunkSection existing = getSections(true)[i];
                 try {
                     final DataPaletteBlock<IBlockData> blocksExisting = existing.getBlocks();
 
