@@ -121,7 +121,6 @@ public class FastSchematicWriter implements ClipboardWriter {
         outputStream.writeLazyCompoundTag("Schematic", out -> {
             out.writeNamedTag("DataVersion", WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion());
             out.writeNamedTag("Version", CURRENT_VERSION);
-            out.writeNamedTag("FAWE", Fawe.get().getVersion().build);
             out.writeNamedTag("Width", (short) width);
             out.writeNamedTag("Height", (short) height);
             out.writeNamedTag("Length", (short) length);

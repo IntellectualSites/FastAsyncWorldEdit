@@ -106,7 +106,6 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         schematic.put("Version", new IntTag(CURRENT_VERSION));
         schematic.put("DataVersion", new IntTag(
             WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion()));
-        schematic.put("FAWEVersion", new IntTag(Fawe.get().getVersion().build));
 
         Map<String, Tag> metadata = new HashMap<>();
         metadata.put("WEOffsetX", new IntTag(offset.getBlockX()));
