@@ -58,6 +58,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -350,7 +351,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                     y = pos[1];
                     z = pos[2];
                 }
-                Map<String, Tag> values = tile.getValue();
+                Map<String, Tag> values = new HashMap<>(tile.getValue());
                 Tag id = values.get("Id");
                 if (id != null) {
                     values.put("x", new IntTag(x));
@@ -361,17 +362,14 @@ public class FastSchematicReader extends NBTSchematicReader {
                 values.remove("Id");
                 values.remove("Pos");
 
-                tile = fixBlockEntity(tile);
-                clipboard.setTile(x, y, z, tile);
+                clipboard.setTile(x, y, z, fixBlockEntity(new CompoundTag(values)));
             }
         }
 
         // entities
         if (entities != null && !entities.isEmpty()) {
             for (Map<String, Object> entRaw : entities) {
-                CompoundTag ent = FaweCache.IMP.asTag(entRaw);
-
-                Map<String, Tag> value = ent.getValue();
+                Map<String, Tag> value = new HashMap<>(FaweCache.IMP.asTag(entRaw).getValue());
                 StringTag id = (StringTag) value.get("Id");
                 if (id == null) {
                     id = (StringTag) value.get("id");
@@ -384,7 +382,7 @@ public class FastSchematicReader extends NBTSchematicReader {
 
                 EntityType type = EntityTypes.parse(id.getValue());
                 if (type != null) {
-                    ent = fixEntity(ent);
+                    final CompoundTag ent = fixEntity(new CompoundTag(value));
                     BaseEntity state = new BaseEntity(type, ent);
                     Location loc = ent.getEntityLocation(clipboard);
                     if (brokenEntities) {

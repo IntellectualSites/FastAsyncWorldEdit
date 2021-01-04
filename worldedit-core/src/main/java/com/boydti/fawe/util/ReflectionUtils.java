@@ -67,22 +67,6 @@ public class ReflectionUtils {
         blankField(enumClass, "enumConstants"); // IBM JDK
     }
 
-    public static <T> List<T> getList(List<T> list) {
-        try {
-            Class<? extends List<T>> clazz = (Class<? extends List<T>>) Class
-                .forName("java.util.Collections$UnmodifiableList");
-            if (!clazz.isInstance(list)) {
-                return list;
-            }
-            Field m = clazz.getDeclaredField("list");
-            m.setAccessible(true);
-            return (List<T>) m.get(list);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            return list;
-        }
-    }
-
     public static Object getHandle(Object wrapper) {
         final Method getHandle = makeMethod(wrapper.getClass(), "getHandle");
         return callMethod(getHandle, wrapper);

@@ -15,7 +15,7 @@ import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompressedCompoundTag;
-import com.sk89q.jnbt.CompressedSchematicTag;
+import com.sk89q.jnbt.fawe.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
@@ -65,6 +65,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region, false, true);
 
             Clipboard holder = new BlockArrayClipboard(region, clipboard);
+
             CompressedSchematicTag tag = new CompressedSchematicTag(holder);
             whenDone.run(tag);
         });

@@ -31,10 +31,12 @@ public abstract class Tag {
      */
     public abstract Object getValue();
 
+    // FAWE Start
     public Object toRaw() {
         return getValue();
     }
 
     public abstract int getTypeCode();
+    // FAWE End
 
 }

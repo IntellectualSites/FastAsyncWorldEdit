@@ -19,14 +19,12 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.jnbt.fawe.NumberTag;
+
 /**
  * The {@code TAG_Int} tag.
  */
 public final class IntTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_INT;
-    }
 
     private final int value;
 
@@ -49,5 +47,12 @@ public final class IntTag extends NumberTag {
     public String toString() {
         return "TAG_Int(" + value + ")";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_INT;
+    }
+    // FAWE End
 
 }

@@ -26,11 +26,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class StringTag extends Tag {
 
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_STRING;
-    }
-
     private final String value;
 
     /**
@@ -53,5 +48,12 @@ public final class StringTag extends Tag {
     public String toString() {
         return "TAG_String(" + value + ")";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_STRING;
+    }
+    // FAWE End
 
 }

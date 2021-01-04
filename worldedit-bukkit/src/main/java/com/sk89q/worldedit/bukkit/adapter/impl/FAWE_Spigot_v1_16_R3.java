@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
@@ -96,6 +95,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -272,13 +272,13 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
         if (id != null) {
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
             Supplier<CompoundTag> saveTag = () -> {
-                NBTTagCompound tag = new NBTTagCompound();
-                readEntityIntoTag(mcEntity, tag);
-
+                final NBTTagCompound minecraftTag = new NBTTagCompound();
+                readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
-                CompoundTag natve = (CompoundTag) toNative(tag);
-                natve.getValue().put("Id", new StringTag(id));
-                return natve;
+                final CompoundTag tag = (CompoundTag) toNative(minecraftTag);
+                final Map<String, Tag> tags = new HashMap<>(tag.getValue());
+                tags.put("Id", new StringTag(id));
+                return new CompoundTag(tags);
             };
             return new LazyBaseEntity(type, saveTag);
         } else {

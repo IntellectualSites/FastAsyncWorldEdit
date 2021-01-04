@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.regions.plotsquared;
 
-import com.boydti.fawe.FaweAPI;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
 import com.boydti.fawe.object.io.PGZIPOutputStream;
@@ -16,10 +15,10 @@ import com.plotsquared.core.util.SchematicHandler;
 import com.plotsquared.core.util.task.RunnableVal;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompressedCompoundTag;
-import com.sk89q.jnbt.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.jnbt.fawe.CompressedSchematicTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;

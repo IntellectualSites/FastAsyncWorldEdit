@@ -86,40 +86,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     },
 
-    /**
-     * The Schematic format used by MCEdit.
-     */
-    MCEDIT_SCHEMATIC("mcedit", "mce", "schematic") {
-
-        @Override
-        public String getPrimaryFileExtension() {
-            return "schematic";
-        }
-
-        @Override
-        public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            if (inputStream instanceof FileInputStream) {
-                inputStream = new ResettableFileInputStream((FileInputStream) inputStream);
-            }
-            BufferedInputStream buffered = new BufferedInputStream(inputStream);
-            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            SchematicReader input = new SchematicReader(nbtStream);
-            input.setUnderlyingStream(inputStream);
-            return input;
-        }
-
-        @Override
-        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            throw new IOException("This format does not support saving, use `schem` or `sponge` as format"); // Is more helpful
-        }
-
-        @Override
-        public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase(Locale.ROOT);
-            return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
-        }
-    },
-
     SPONGE_SCHEMATIC("sponge", "schem") {
 
         @Override
@@ -156,6 +122,48 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 return false;
             }
 
+            return true;
+        }
+    },
+
+    /**
+     * The Schematic format used by MCEdit.
+     */
+    MCEDIT_SCHEMATIC("mcedit", "mce", "schematic") {
+
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schematic";
+        }
+
+        @Override
+        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+            NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(inputStream));
+            return new MCEditSchematicReader(nbtStream);
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            throw new IOException("This format does not support saving");
+        }
+
+        @Override
+        public boolean isFormat(File file) {
+            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                NamedTag rootTag = str.readNamedTag();
+                if (!rootTag.getName().equals("Schematic")) {
+                    return false;
+                }
+                CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
+
+                // Check
+                Map<String, Tag> schematic = schematicTag.getValue();
+                if (!schematic.containsKey("Materials")) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
             return true;
         }
     },

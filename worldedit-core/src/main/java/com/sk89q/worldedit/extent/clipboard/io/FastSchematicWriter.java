@@ -121,15 +121,16 @@ public class FastSchematicWriter implements ClipboardWriter {
         outputStream.writeLazyCompoundTag("Schematic", out -> {
             out.writeNamedTag("DataVersion", WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion());
             out.writeNamedTag("Version", CURRENT_VERSION);
+            out.writeNamedTag("FAWE", Fawe.get().getVersion().build);
             out.writeNamedTag("Width", (short) width);
             out.writeNamedTag("Height", (short) height);
             out.writeNamedTag("Length", (short) length);
 
             // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
             out.writeNamedTag("Offset", new int[]{
-                    min.getBlockX(),
-                    min.getBlockY(),
-                    min.getBlockZ(),
+                min.getBlockX(),
+                min.getBlockY(),
+                min.getBlockZ(),
             });
 
             out.writeLazyCompoundTag("Metadata", out1 -> {
@@ -162,7 +163,7 @@ public class FastSchematicWriter implements ClipboardWriter {
                 BaseBlock block = pos.getFullBlock(finalClipboard);
                 CompoundTag nbt = block.getNbtData();
                 if (nbt != null) {
-                    Map<String, Tag> values = nbt.getValue();
+                    Map<String, Tag> values = new HashMap<>(nbt.getValue());
 
                     // Positions are kept in NBT, we don't want that.
                     values.remove("x");
@@ -175,12 +176,13 @@ public class FastSchematicWriter implements ClipboardWriter {
                     // Dum.
                     values.remove("id");
                     values.put("Pos", new IntArrayTag(new int[]{
-                            pos.getX(),
-                            pos.getY(),
-                            pos.getZ()
+                        pos.getX(),
+                        pos.getY(),
+                        pos.getZ()
                     }));
                     numTiles++;
-                    tilesOut.writeTagPayload(block.getNbtData());
+
+                    tilesOut.writeTagPayload(new CompoundTag(values));
                 }
 
                 int ordinal = block.getOrdinal();

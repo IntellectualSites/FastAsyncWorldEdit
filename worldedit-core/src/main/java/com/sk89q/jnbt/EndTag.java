@@ -25,11 +25,6 @@ package com.sk89q.jnbt;
 public final class EndTag extends Tag {
 
     @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_END;
-    }
-
-    @Override
     public Object getValue() {
         return null;
     }
@@ -38,5 +33,12 @@ public final class EndTag extends Tag {
     public String toString() {
         return "TAG_End";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_END;
+    }
+    // FAWE End
 
 }

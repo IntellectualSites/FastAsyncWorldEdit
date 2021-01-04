@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+// THIS CLASS HAS BEEN HEAVILY MODIFIED BY FAWE
+
 /**
  * This class reads <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * streams, and produces an object graph of subclasses of the {@code Tag}
@@ -469,7 +471,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
                     throw new IOException(
-                            "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+                        "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
                     return null;
                 }

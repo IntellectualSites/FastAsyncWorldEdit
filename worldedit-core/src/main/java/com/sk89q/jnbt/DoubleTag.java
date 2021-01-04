@@ -19,14 +19,12 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.jnbt.fawe.NumberTag;
+
 /**
  * The {@code TAG_Double} tag.
  */
 public final class DoubleTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_DOUBLE;
-    }
 
     private final double value;
 
@@ -49,5 +47,12 @@ public final class DoubleTag extends NumberTag {
     public String toString() {
         return "TAG_Double(" + value + ")";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_DOUBLE;
+    }
+    // FAWE End
 
 }

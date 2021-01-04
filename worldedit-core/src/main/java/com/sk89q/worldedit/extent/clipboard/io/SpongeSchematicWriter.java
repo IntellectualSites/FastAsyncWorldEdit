@@ -23,8 +23,6 @@ import com.boydti.fawe.Fawe;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.FloatTag;
 import com.sk89q.jnbt.IntArrayTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
@@ -37,7 +35,6 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -57,7 +54,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Writes schematic files using the Sponge schematic format.
  */
-@Deprecated // High mem usage + slow
 public class SpongeSchematicWriter implements ClipboardWriter {
 
     private static final int CURRENT_VERSION = 2;
@@ -109,7 +105,8 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         Map<String, Tag> schematic = new HashMap<>();
         schematic.put("Version", new IntTag(CURRENT_VERSION));
         schematic.put("DataVersion", new IntTag(
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion()));
+            WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion()));
+        schematic.put("FAWEVersion", new IntTag(Fawe.get().getVersion().build));
 
         Map<String, Tag> metadata = new HashMap<>();
         metadata.put("WEOffsetX", new IntTag(offset.getBlockX()));
@@ -125,9 +122,9 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
         // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
         schematic.put("Offset", new IntArrayTag(new int[]{
-                min.getBlockX(),
-                min.getBlockY(),
-                min.getBlockZ(),
+            min.getBlockX(),
+            min.getBlockY(),
+            min.getBlockZ(),
         }));
 
         int paletteMax = 0;
@@ -268,21 +265,6 @@ public class SpongeSchematicWriter implements ClipboardWriter {
             return;
         }
         schematic.put("Entities", new ListTag(CompoundTag.class, entities));
-    }
-
-    public Tag writeVector(Vector3 vector) {
-        List<DoubleTag> list = new ArrayList<>();
-        list.add(new DoubleTag(vector.getX()));
-        list.add(new DoubleTag(vector.getY()));
-        list.add(new DoubleTag(vector.getZ()));
-        return new ListTag(DoubleTag.class, list);
-    }
-
-    public Tag writeRotation(Location location) {
-        List<FloatTag> list = new ArrayList<>();
-        list.add(new FloatTag(location.getYaw()));
-        list.add(new FloatTag(location.getPitch()));
-        return new ListTag(FloatTag.class, list);
     }
 
     @Override
