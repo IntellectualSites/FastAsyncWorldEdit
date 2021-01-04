@@ -132,6 +132,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 int lx;
                 int ly;
                 int lz;
+                // 16*16*4
+                byte[] buff = new byte[1024];
+                int index = 0;
 
                 @Override
                 public void write(OutputStream out, int x, int y, int z) throws IOException {
@@ -144,13 +147,16 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     int x16 = (rx >> 8) & 0xF;
                     int z16 = (rz >> 8) & 0xF;
                     byte b4 = MathMan.pair16(x16, z16);
-                    out.write(b1);
-                    out.write(b2);
-                    out.write(b3);
-                    out.write(b4);
+                    System.arraycopy(new byte[] {b1, b2, b3, b4}, 0, buff, index, 4);
+                    index += 4;
+                    if (index == 1024) {
+                        out.write(buff);
+                        buff = new byte[1024];
+                        index = 0;
+                    }
                 }
 
-                byte[] buffer = new byte[4];
+                final byte[] buffer = new byte[4];
 
                 @Override
                 public int readX(FaweInputStream in) throws IOException {
@@ -170,22 +176,29 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             };
         } else {
             posDel = new FaweStreamPositionDelegate() {
-                final byte[] buffer = new byte[5];
                 int lx;
                 int ly;
                 int lz;
+                // 16*16*5
+                byte[] buff = new byte[1280];
+                int index = 0;
 
                 @Override
-                public void write(OutputStream stream, int x, int y, int z) throws IOException {
+                public void write(OutputStream out, int x, int y, int z) throws IOException {
                     int rx = -lx + (lx = x);
                     int ry = -ly + (ly = y);
                     int rz = -lz + (lz = z);
-                    stream.write((rx) & 0xff);
-                    stream.write(((rx) >> 8) & 0xff);
-                    stream.write((rz) & 0xff);
-                    stream.write(((rz) >> 8) & 0xff);
-                    stream.write((byte) ry);
+                    System.arraycopy(new byte[] {(byte) ((rx) & 0xff), (byte) (((rx) >> 8) & 0xff), (byte) ((rz) & 0xff),
+                        (byte) (((rz) >> 8) & 0xff), (byte) ry}, 0, buff, index, 5);
+                    index += 5;
+                    if (index == 1280) {
+                        out.write(buff);
+                        buff = new byte[1280];
+                        index = 0;
+                    }
                 }
+
+                final byte[] buffer = new byte[5];
 
                 @Override
                 public int readX(FaweInputStream is) throws IOException {
