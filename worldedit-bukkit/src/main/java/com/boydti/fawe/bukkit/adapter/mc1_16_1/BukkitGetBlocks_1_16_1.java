@@ -4,7 +4,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
@@ -318,7 +317,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         forceLoadSections = false;
-        copy = createCopy ? new BukkitGetBlocks_1_16_1_Copy(world, getChunkX(), getChunkZ()) : null;
+        copy = createCopy ? new BukkitGetBlocks_1_16_1_Copy(world) : null;
         try {
             WorldServer nmsWorld = world;
             Chunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
@@ -362,12 +361,9 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
 
                     bitMask |= 1 << layer;
 
-                    char[] setArr = set.load(layer);
-                    // If we're creating a copy, it's because we're delaying history so we do not want to write to
-                    // the chunkSet yet.
+                    char[] setArr = set.load(layer).clone();
                     if (createCopy) {
-                        copy.storeSection(layer);
-                        copy.storeSetBlocks(layer, setArr);
+                        copy.storeSection(layer, load(layer).clone());
                     }
 
                     ChunkSection newSection;

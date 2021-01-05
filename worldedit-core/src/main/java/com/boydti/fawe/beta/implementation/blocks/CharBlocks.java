@@ -9,13 +9,13 @@ import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class CharBlocks implements IBlocks {
 
     public static final Logger logger = LoggerFactory.getLogger(CharBlocks.class);
 
-    protected final Section FULL = new Section() {
+    protected static final Section FULL = new Section() {
         @Override
         public final char[] get(CharBlocks blocks, int layer) {
             return blocks.blocks[layer];
@@ -26,25 +26,30 @@ public abstract class CharBlocks implements IBlocks {
             return true;
         }
     };
-    protected final Section EMPTY = new Section() {
+    protected static final Section EMPTY = new Section() {
         @Override
-        public final synchronized char[] get(CharBlocks blocks, int layer) {
-            char[] arr = blocks.blocks[layer];
-            if (arr == null) {
-                arr = blocks.blocks[layer] = blocks.update(layer, null);
+        public final char[] get(CharBlocks blocks, int layer) {
+            blocks.loadLock.lock();
+            try {
+                char[] arr = blocks.blocks[layer];
                 if (arr == null) {
-                    throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                    arr = blocks.blocks[layer] = blocks.update(layer, null);
+                    if (arr == null) {
+                        throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                    }
+                } else {
+                    blocks.blocks[layer] = blocks.update(layer, arr);
+                    if (blocks.blocks[layer] == null) {
+                        throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                    }
                 }
-            } else {
-                blocks.blocks[layer] = blocks.update(layer, arr);
-                if (blocks.blocks[layer] == null) {
-                    throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                if (blocks.blocks[layer] != null) {
+                    blocks.sections[layer] = FULL;
                 }
+                return arr;
+            } finally {
+                blocks.loadLock.unlock();
             }
-            if (blocks.blocks[layer] != null) {
-                blocks.sections[layer] = FULL;
-            }
-            return arr;
         }
 
         @Override
@@ -54,7 +59,7 @@ public abstract class CharBlocks implements IBlocks {
     };
     public final char[][] blocks;
     public final Section[] sections;
-    private final Object loadLock = new Object();
+    private final ReentrantLock loadLock = new ReentrantLock ();
 
     public CharBlocks() {
         blocks = new char[16][];
@@ -117,13 +122,7 @@ public abstract class CharBlocks implements IBlocks {
 
     @Override
     public char[] load(@Range(from = 0, to = 15) int layer) {
-        Section section = sections[layer];
-        if (section.isFull()) {
-            return section.get(this, layer);
-        }
-        synchronized (loadLock) {
-            return sections[layer].get(this, layer);
-        }
+        return sections[layer].get(this, layer);
     }
 
     @Override
