@@ -351,7 +351,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             wrappedTask.run();
             return Futures.immediateCancelledFuture();
         } else {
-            return Fawe.get().getQueueHandler().async(wrappedTask);
+            return Fawe.get().getQueueHandler().submit(wrappedTask);
         }
     }
 }
