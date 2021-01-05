@@ -40,20 +40,33 @@ import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.MaskTraverser;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.MaskingExtent;
 import com.sk89q.worldedit.extent.NullExtent;
+import com.sk89q.worldedit.extent.PassthroughExtent;
+import com.sk89q.worldedit.extent.TracingExtent;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.extent.cache.LastAccessExtentCache;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
+import com.sk89q.worldedit.extent.reorder.ChunkBatchingExtent;
+import com.sk89q.worldedit.extent.reorder.MultiStageReorder;
+import com.sk89q.worldedit.extent.validation.BlockChangeLimiter;
+import com.sk89q.worldedit.extent.validation.DataValidatorExtent;
+import com.sk89q.worldedit.extent.world.BiomeQuirkExtent;
+import com.sk89q.worldedit.extent.world.BlockQuirkExtent;
+import com.sk89q.worldedit.extent.world.ChunkLoadingExtent;
+import com.sk89q.worldedit.extent.world.SideEffectExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
 import com.sk89q.worldedit.extent.world.WatchdogTickingExtent;
 import com.sk89q.worldedit.function.GroundFunction;
@@ -123,6 +136,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.collection.BlockMap;
 import com.sk89q.worldedit.util.collection.DoubleArrayList;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.NullWorld;
@@ -141,15 +155,19 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -263,6 +281,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             this.tracingExtents = null;
         }
+    }
     public EditSession(@NotNull EventBus eventBus, World world, int maxBlocks, @Nullable BlockBag blockBag, EditSessionEvent event) {
         this(eventBus, world, null, null, null, null, true, null, null, null, blockBag, event);
     }
