@@ -16,7 +16,7 @@ dependencies {
     compile(project(":worldedit-libs:sponge"))
     compile("org.spongepowered:spongeapi:7.1.0")
     compile("org.bstats:bstats-sponge:1.5")
-    testCompile("org.mockito:mockito-core:1.9.0-rc1")
+    testCompile("org.mockito:mockito-core:3.7.0")
 }
 
 sponge {
