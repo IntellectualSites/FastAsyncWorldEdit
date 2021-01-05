@@ -99,6 +99,7 @@ public class FastSchematicReader extends NBTSchematicReader {
     private char[] biomePalette;
     private BlockVector3 min = BlockVector3.ZERO;
     private boolean brokenEntities = false;
+    private boolean isWorldEdit = false;
 
 
     /**
@@ -170,6 +171,10 @@ public class FastSchematicReader extends NBTSchematicReader {
         metadata.add("WEOffsetY").withInt((i, v) -> offsetY = v);
         metadata.add("WEOffsetZ").withInt((i, v) -> offsetZ = v);
         metadata.add("FAWEVersion").withInt((i, v) -> faweWritten = v);
+
+        StreamDelegate worldEditSection = metadata.add("WorldEdit");
+        worldEditSection.withValue((ValueReader<String>) (index, v) -> isWorldEdit = true);
+
 
         StreamDelegate paletteDelegate = schematic.add("Palette");
         paletteDelegate.withValue((ValueReader<Map<String, Object>>) (ignore, v) -> {
@@ -389,7 +394,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                         clipboard.createEntity(loc, state);
                         continue;
                     }
-                    if (faweWritten == -1) {
+                    if (!isWorldEdit && faweWritten == -1) {
                         int locX = loc.getBlockX();
                         int locY = loc.getBlockY();
                         int locZ = loc.getBlockZ();
