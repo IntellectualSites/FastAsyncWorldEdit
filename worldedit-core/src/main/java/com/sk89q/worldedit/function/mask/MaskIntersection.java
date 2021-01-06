@@ -275,4 +275,14 @@ public class MaskIntersection extends AbstractMask {
         return new MaskIntersection(masks);
     }
 
+    @Override
+    public boolean replacesAir() {
+        for (Mask mask : masksArray) {
+            if (mask.replacesAir()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

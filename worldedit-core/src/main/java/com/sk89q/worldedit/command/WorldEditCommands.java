@@ -22,7 +22,7 @@ package com.sk89q.worldedit.command;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweVersion;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.util.IncendoPaster;
+import com.intellectualsites.paster.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -47,6 +47,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -139,7 +140,10 @@ public class WorldEditCommands {
     public void report(Actor actor) throws WorldEditException {
         String dest;
         try {
-            dest = IncendoPaster.debugPaste();
+            final File logFile = new File(Fawe.imp().getDirectory(), "../../logs/latest.log");
+            final File config = new File(Fawe.imp().getDirectory(), "config.yml");
+            final File legacyConfig = new File(Fawe.imp().getDirectory(), "config-legacy.yml");
+            dest = IncendoPaster.debugPaste(logFile, Fawe.imp().getDebugInfo(), config, legacyConfig);
         } catch (IOException e) {
             actor.printInfo(TextComponent.of(e.getMessage()));
             return;

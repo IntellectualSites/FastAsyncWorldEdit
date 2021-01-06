@@ -37,4 +37,9 @@ public class IdDataMask extends AbstractExtentMask implements ResettableMask {
         return new IdDataMask(getExtent());
     }
 
+    @Override
+    public boolean replacesAir() {
+        return true;
+    }
+
 }

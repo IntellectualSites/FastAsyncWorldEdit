@@ -187,35 +187,32 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             return;
         }
         if (playerChunk.hasBeenLoaded()) {
-            TaskManager.IMP.sync(() -> {
-                try {
-                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                    if (dirtyBits == 0) {
-                        nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
-                    }
-                    if (mask == 0) {
-                        dirtyBits = 65535;
-                    } else {
-                        dirtyBits |= mask;
-                    }
-
-                    fieldDirtyBits.set(playerChunk, dirtyBits);
-                    fieldDirtyCount.set(playerChunk, 64);
-
-                    if (lighting) {
-                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-                        boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
-                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                            p.playerConnection.sendPacket(packet);
-                        });
-                    }
-
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+            try {
+                int dirtyBits = fieldDirtyBits.getInt(playerChunk);
+                if (dirtyBits == 0) {
+                    nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
                 }
-                return null;
-            });
+                if (mask == 0) {
+                    dirtyBits = 65535;
+                } else {
+                    dirtyBits |= mask;
+                }
+
+                fieldDirtyBits.set(playerChunk, dirtyBits);
+                fieldDirtyCount.set(playerChunk, 64);
+
+                if (lighting) {
+                    ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+                    boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
+                    PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
+                    playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                        p.playerConnection.sendPacket(packet);
+                    });
+                }
+
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
         }
     }
 

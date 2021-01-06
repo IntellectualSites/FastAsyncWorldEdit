@@ -58,7 +58,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.jetbrains.annotations.Range;
 
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -131,20 +131,26 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.image")
     @Logging(PLACEMENT)
-    public void image(Actor actor, LocalSession session, EditSession editSession, String argStr, @Arg(desc = "boolean", def = "true") boolean randomize,
-                      @Arg(desc = "TODO", def = "100") int threshold, @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
+    public void image(Actor actor,
+                      LocalSession session,
+                      EditSession editSession,
+                      @Arg(desc = "Image URL (imgur only)") String imageURL,
+                      @Arg(desc = "boolean", def = "true") boolean randomize,
+                      @Arg(desc = "TODO", def = "100") int threshold,
+                      @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
         TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
-        URL url = new URL(argStr);
+        URL url = new URL(imageURL);
         if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
             throw new IOException("Only i.imgur.com links are allowed!");
         }
         BufferedImage image = MainUtil.readImage(url);
         if (dimensions != null) {
-            image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(), RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
+            image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
         }
 
-      BlockVector3 pos1 = session.getPlacementPosition(actor);
-      BlockVector3 pos2 = pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1);
+        BlockVector3 pos1 = session.getPlacementPosition(actor);
+        BlockVector3 pos2 = pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1);
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         int[] count = new int[1];
         final BufferedImage finalImage = image;

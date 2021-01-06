@@ -19,14 +19,12 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.jnbt.fawe.NumberTag;
+
 /**
  * The {@code TAG_Long} tag.
  */
 public final class LongTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_LONG;
-    }
 
     private final long value;
 
@@ -49,5 +47,12 @@ public final class LongTag extends NumberTag {
     public String toString() {
         return "TAG_Long(" + value + ")";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_LONG;
+    }
+    // FAWE End
 
 }

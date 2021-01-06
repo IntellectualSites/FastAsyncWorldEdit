@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
@@ -96,6 +95,7 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -107,6 +107,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
     private final Spigot_v1_16_R3 parent;
     private char[] ibdToStateOrdinal;
+    private int[] ordinalToIbdID;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -125,12 +126,15 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
         if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
             return false;
         }
-        ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
+        ibdToStateOrdinal = new char[BlockTypesCache.states.length]; // size
+        ordinalToIbdID = new int[ibdToStateOrdinal.length]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
             BlockMaterial_1_16_4 material = (BlockMaterial_1_16_4) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
-            ibdToStateOrdinal[id] = state.getOrdinalChar();
+            char ordinal = state.getOrdinalChar();
+            ibdToStateOrdinal[id] = ordinal;
+            ordinalToIbdID[ordinal] = id;
         }
         return true;
     }
@@ -268,13 +272,13 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
         if (id != null) {
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
             Supplier<CompoundTag> saveTag = () -> {
-                NBTTagCompound tag = new NBTTagCompound();
-                readEntityIntoTag(mcEntity, tag);
-
+                final NBTTagCompound minecraftTag = new NBTTagCompound();
+                readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
-                CompoundTag natve = (CompoundTag) toNative(tag);
-                natve.getValue().put("Id", new StringTag(id));
-                return natve;
+                final CompoundTag tag = (CompoundTag) toNative(minecraftTag);
+                final Map<String, Tag> tags = new HashMap<>(tag.getValue());
+                tags.put("Id", new StringTag(id));
+                return new CompoundTag(tags);
             };
             return new LazyBaseEntity(type, saveTag);
         } else {
@@ -345,6 +349,17 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
                     .error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
                            ibd.getBlock(), Block.REGISTRY_ID.getId(ibd), ibdToStateOrdinal.length, e1);
                 return 0;
+            }
+        }
+    }
+
+    public int ordinalToIbdID(char ordinal) {
+        synchronized (this) {
+            try {
+                return ordinalToIbdID[ordinal];
+            } catch (NullPointerException e) {
+                init();
+                return ordinalToIbdID(ordinal);
             }
         }
     }

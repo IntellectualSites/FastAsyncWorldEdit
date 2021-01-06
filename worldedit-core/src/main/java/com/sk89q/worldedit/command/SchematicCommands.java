@@ -147,7 +147,7 @@ public class SchematicCommands {
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.load", "worldedit.schematic.load", "worldedit.schematic.load.web", "worldedit.schematic.load.asset"})
     public void loadall(Player player, LocalSession session,
-                        @Arg(desc = "Format name.", def = "schematic")
+                        @Arg(desc = "Format name.", def = "fast")
                             String formatName,
                         @Arg(desc = "File name.")
                             String filename,
@@ -223,7 +223,7 @@ public class SchematicCommands {
     public void load(Actor actor, LocalSession session,
                      @Arg(desc = "File name.")
                          String filename,
-                     @Arg(desc = "Format name.", def = "sponge")
+                     @Arg(desc = "Format name.", def = "fast")
                          String formatName) throws FilenameException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
@@ -323,7 +323,7 @@ public class SchematicCommands {
     public void save(Actor actor, LocalSession session,
                      @Arg(desc = "File name.")
                          String filename,
-                     @Arg(desc = "Format name.", def = "sponge")
+                     @Arg(desc = "Format name.", def = "fast")
                          String formatName,
                      @Switch(name = 'f', desc = "Overwrite an existing file.")
                          boolean allowOverwrite,

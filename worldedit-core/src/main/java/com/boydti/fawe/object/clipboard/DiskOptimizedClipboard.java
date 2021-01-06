@@ -24,6 +24,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
@@ -44,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 /**
  * A clipboard with disk backed storage. (lower memory + loads on crash)
@@ -390,11 +390,11 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMap.put(new IntTriple(x, y, z), tag);
-        Map<String, Tag> values = tag.getValue();
+        final Map<String, Tag> values = new HashMap<>(tag.getValue());
         values.put("x", new IntTag(x));
         values.put("y", new IntTag(y));
         values.put("z", new IntTag(z));
+        nbtMap.put(new IntTriple(x, y, z), new CompoundTag(values));
         return true;
     }
 

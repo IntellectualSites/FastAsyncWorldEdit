@@ -28,14 +28,14 @@ configurations.all {
 
 dependencies {
     "api"(project(":worldedit-libs:core"))
-    "implementation"("de.schlichtherle:truezip:6.8.3")
-    "implementation"("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
+    "implementation"("de.schlichtherle:truezip:6.8.4")
+    "implementation"("net.java.truevfs:truevfs-profile-default_2.13:0.12.2")
     "implementation"("org.mozilla:rhino-runtime:1.7.12")
-    "implementation"("org.yaml:snakeyaml:1.23")
+    "implementation"("org.yaml:snakeyaml:1.27")
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "implementation"("com.google.code.findbugs:jsr305:3.0.2")
     "implementation"("com.google.code.gson:gson:${Versions.GSON}")
-    "implementation"("org.slf4j:slf4j-api:1.7.27")
+    "implementation"("org.slf4j:slf4j-api:1.7.30")
     "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
 
     val antlrVersion = "4.7.2"
@@ -51,14 +51,15 @@ dependencies {
     "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     "testImplementation"("ch.qos.logback:logback-core:${Versions.LOGBACK}")
     "testImplementation"("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
-    "compile"("com.github.luben:zstd-jni:1.4.3-1")
+    "compile"("com.github.luben:zstd-jni:1.4.8-1")
     "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")
     "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
         isTransitive = false
     }
-    "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
+    "compile"("com.plotsquared:PlotSquared-Core:5.13.3") {
         isTransitive = false
     }
+    "api"("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
 }
 
 tasks.named<Test>("test") {
@@ -109,7 +110,7 @@ tasks.named<Copy>("processResources") {
 }
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
-        include(dependency("com.github.luben:zstd-jni:1.4.3-1"))
+        include(dependency("com.github.luben:zstd-jni:1.4.8-1"))
 
     }
 }

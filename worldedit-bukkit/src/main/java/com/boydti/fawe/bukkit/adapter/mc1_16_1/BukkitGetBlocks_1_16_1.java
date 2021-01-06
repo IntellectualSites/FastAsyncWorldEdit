@@ -4,7 +4,6 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
@@ -90,6 +89,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
     public NibbleArray[] skyLight = new NibbleArray[16];
     private boolean createCopy = false;
     private BukkitGetBlocks_1_16_1_Copy copy = null;
+    private boolean forceLoadSections = true;
 
     public BukkitGetBlocks_1_16_1(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
@@ -316,7 +316,8 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
 
     @Override
     public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
-        copy = createCopy ? new BukkitGetBlocks_1_16_1_Copy(world, getChunkX(), getChunkZ()) : null;
+        forceLoadSections = false;
+        copy = createCopy ? new BukkitGetBlocks_1_16_1_Copy(world) : null;
         try {
             WorldServer nmsWorld = world;
             Chunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
@@ -357,13 +358,14 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                     if (!set.hasSection(layer)) {
                         continue;
                     }
-                    if (createCopy) {
-                        copy.storeSection(layer);
-                    }
 
                     bitMask |= 1 << layer;
 
-                    char[] setArr = set.load(layer);
+                    char[] setArr = set.load(layer).clone();
+                    if (createCopy) {
+                        copy.storeSection(layer, load(layer).clone());
+                    }
+
                     ChunkSection newSection;
                     ChunkSection existingSection = sections[layer];
                     if (existingSection == null) {
@@ -392,7 +394,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                                 this.nmsChunk = nmsChunk;
                                 this.sections = null;
                                 this.reset();
-                            } else if (existingSection != getSections()[layer]) {
+                            } else if (existingSection != getSections(false)[layer]) {
                                 this.sections[layer] = existingSection;
                                 this.reset();
                             } else if (!Arrays.equals(update(layer, new char[4096]), load(layer))) {
@@ -405,7 +407,6 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
                             if (!BukkitAdapter_1_16_1
                                     .setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 log.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
-                                continue;
                             } else {
                                 updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             }
@@ -472,9 +473,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
 
                 Set<UUID> entityRemoves = set.getEntityRemoves();
                 if (entityRemoves != null && !entityRemoves.isEmpty()) {
-                    if (syncTasks == null) {
-                        syncTasks = new Runnable[3];
-                    }
+                    syncTasks = new Runnable[3];
 
                     syncTasks[2] = () -> {
                         final List<Entity>[] entities = nmsChunk.getEntitySlices();
@@ -634,12 +633,14 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
         } catch (Throwable e) {
             e.printStackTrace();
             return null;
+        } finally {
+            forceLoadSections = true;
         }
     }
 
     @Override
     public synchronized char[] update(int layer, char[] data) {
-        ChunkSection section = getSections()[layer];
+        ChunkSection section = getSections(true)[layer];
         // Section is null, return empty array
         if (section == null) {
             data = new char[4096];
@@ -754,7 +755,10 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
         }
     }
 
-    public ChunkSection[] getSections() {
+    public ChunkSection[] getSections(boolean force) {
+        if (force && forceLoadSections) {
+            return sections = getChunk().getSections().clone();
+        }
         ChunkSection[] tmp = sections;
         if (tmp == null) {
             synchronized (this) {
@@ -806,7 +810,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
 
     @Override
     public boolean hasSection(int layer) {
-        return getSections()[layer] != null;
+        return getSections(false)[layer] != null;
     }
 
     @Override
@@ -819,10 +823,10 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks {
             return super.trim(true);
         } else {
             for (int i = 0; i < 16; i++) {
-                if (!hasSection(i) || super.sections[i] == CharBlocks.EMPTY) {
+                if (!hasSection(i) || !super.sections[i].isFull()) {
                     continue;
                 }
-                ChunkSection existing = getSections()[i];
+                ChunkSection existing = getSections(true)[i];
                 try {
                     final DataPaletteBlock<IBlockData> blocksExisting = existing.getBlocks();
 

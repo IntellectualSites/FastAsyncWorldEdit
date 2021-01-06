@@ -200,7 +200,7 @@ public class StreamDelegate {
             Object raw = is.readTagPayloadRaw(type, depth);
             valueReader.apply(0, raw);
         } else {
-            is.readTagPaylodLazy(type, depth + 1, this);
+            is.readTagPayloadLazy(type, depth + 1, this);
         }
     }
 

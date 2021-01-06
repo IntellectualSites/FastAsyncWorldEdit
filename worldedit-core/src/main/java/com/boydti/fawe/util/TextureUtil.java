@@ -629,7 +629,6 @@ public class TextureUtil implements TextureHolder {
                                 mods.add(modId);
                             }
                         }
-                        continue;
                     }
                     String modelsDir = "assets/%1$s/models/block/%2$s.json";
                     String texturesDir = "assets/%1$s/textures/%2$s.png";
@@ -638,14 +637,14 @@ public class TextureUtil implements TextureHolder {
                     }.getType();
 
                     for (BlockType blockType : BlockTypesCache.values) {
-                        if (!blockType.getMaterial().isFullCube()) {
+                        if (!blockType.getMaterial().isFullCube() || blockType.getId().toLowerCase().contains("shulker")) {
                             continue;
                         }
                         int combined = blockType.getInternalId();
                         String id = blockType.getId();
                         String[] split = id.split(":", 2);
                         String name = split.length == 1 ? id : split[1];
-                        String nameSpace = split.length == 1 ? "minecraft" : split[0];
+                        String nameSpace = split.length == 1 ? "" : split[0];
 
                         Map<String, String> texturesMap = new ConcurrentHashMap<>();
                         // Read models
@@ -684,8 +683,11 @@ public class TextureUtil implements TextureHolder {
                                 continue;
                             }
 
+                            String[] texSplit = models.iterator().next().split(":");
+                            String texture = texSplit[texSplit.length - 1];
+
                             textureFileName =
-                                String.format(texturesDir, nameSpace, models.iterator().next());
+                                String.format(texturesDir, nameSpace, texture);
                         }
 
                         BufferedImage image = readImage(zipFile, textureFileName);

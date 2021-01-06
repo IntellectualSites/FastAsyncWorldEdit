@@ -257,11 +257,11 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMap.put(new IntTriple(x, y, z), tag);
-        Map<String, Tag> values = tag.getValue();
+        final Map<String, Tag> values = new HashMap<>(tag.getValue());
         values.put("x", new IntTag(x));
         values.put("y", new IntTag(y));
         values.put("z", new IntTag(z));
+        nbtMap.put(new IntTriple(x, y, z), new CompoundTag(values));
         return true;
     }
 

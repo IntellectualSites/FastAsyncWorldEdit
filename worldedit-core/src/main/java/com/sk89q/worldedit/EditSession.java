@@ -125,8 +125,6 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockCategories;
-import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -148,6 +146,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -2046,18 +2045,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         int yy;
 
-        double nextXn = invRadiusX;
+        double nextXn = 0;
         forX: for (int x = 0; x <= ceilRadiusX; ++x) {
             final double xn = nextXn;
             double dx = xn * xn;
             nextXn = (x + 1) * invRadiusX;
-            double nextZn = invRadiusZ;
+            double nextZn = 0;
             forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
                 final double zn = nextZn;
                 double dz = zn * zn;
                 double dxz = dx + dz;
                 nextZn = (z + 1) * invRadiusZ;
-                double nextYn = invRadiusY;
+                double nextYn = 0;
 
                 forY: for (int y = 0; y <= ceilRadiusY; ++y) {
                     final double yn = nextYn;
@@ -2767,7 +2766,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 newVset = this.getHollowed(newVset);
             }
         }
-        return setBlocks(newVset, pattern);
+        return this.changes += setBlocks(newVset, pattern);
     }
 
     /**
@@ -2840,7 +2839,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         if (!filled) {
             vset = getHollowed(vset);
         }
-        return setBlocks(vset, pattern);
+        return this.changes += setBlocks(vset, pattern);
     }
 
     /**
@@ -2892,7 +2891,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             if (!filled) {
                 newVset = this.getHollowed(newVset);
             }
-            return setBlocks(newVset, pattern);
+            return this.changes += setBlocks(newVset, pattern);
         }
         return changes;
     }
@@ -3008,23 +3007,21 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     public int makeBiomeShape(final Region region, final Vector3 zero, final Vector3 unit, final BiomeType biomeType,
-                              final String expressionString, final boolean hollow)
-            throws ExpressionException, MaxChangedBlocksException {
+                              final String expressionString, final boolean hollow) throws ExpressionException {
         return makeBiomeShape(region, zero, unit, biomeType, expressionString, hollow, WorldEdit.getInstance().getConfiguration().calculationTimeout);
     }
 
     public int makeBiomeShape(final Region region, final Vector3 zero, final Vector3 unit, final BiomeType biomeType,
-                              final String expressionString, final boolean hollow, final int timeout)
-            throws ExpressionException, MaxChangedBlocksException {
+                              final String expressionString, final boolean hollow, final int timeout) throws ExpressionException {
 
-        final Expression expression = Expression.compile(expressionString, "x", "z");
+        final Expression expression = Expression.compile(expressionString, "x", "y", "z");
         expression.optimize();
 
         final EditSession editSession = this;
         final WorldEditExpressionEnvironment environment = new WorldEditExpressionEnvironment(editSession, unit, zero);
         expression.setEnvironment(environment);
 
-        final int[] timedOut = {0};
+        AtomicInteger timedOut = new AtomicInteger();
         final ArbitraryBiomeShape shape = new ArbitraryBiomeShape(region) {
             @Override
             protected BiomeType getBiome(int x, int y, int z, BiomeType defaultBiomeType) {
@@ -3041,7 +3038,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     // TODO: Allow biome setting via a script variable (needs BiomeType<->int mapping)
                     return defaultBiomeType;
                 } catch (ExpressionTimeoutException e) {
-                    timedOut[0] = timedOut[0] + 1;
+                    timedOut.getAndIncrement();
                     return null;
                 } catch (Exception e) {
                     log.warn("Failed to create shape", e);
@@ -3050,10 +3047,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
         };
         int changed = shape.generate(this, biomeType, hollow);
-        if (timedOut[0] > 0) {
+        if (timedOut.get() > 0) {
             throw new ExpressionTimeoutException(
-                    String.format("%d blocks changed. %d blocks took too long to evaluate (increase time with //timeout)",
-                            changed, timedOut[0]));
+                    String.format("%d biomes changed. %d biomes took too long to evaluate (increase time with //timeout)",
+                            changed, timedOut.get()));
         }
         return changed;
     }

@@ -22,6 +22,7 @@ package com.sk89q.worldedit.function.mask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockCategory;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
 
@@ -60,5 +61,10 @@ public class BlockCategoryMask extends AbstractExtentMask {
     @Override
     public Mask copy() {
         return new BlockCategoryMask(getExtent(), category);
+    }
+
+    @Override
+    public boolean replacesAir() {
+        return category.contains(BlockTypes.AIR);
     }
 }

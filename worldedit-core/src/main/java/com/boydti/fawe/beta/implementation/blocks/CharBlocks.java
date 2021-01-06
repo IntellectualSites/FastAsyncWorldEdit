@@ -9,39 +9,57 @@ import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public abstract class CharBlocks implements IBlocks {
 
     public static final Logger logger = LoggerFactory.getLogger(CharBlocks.class);
 
-    public static final Section FULL = new Section() {
+    protected static final Section FULL = new Section() {
         @Override
         public final char[] get(CharBlocks blocks, int layer) {
             return blocks.blocks[layer];
         }
-    };
-    public static final Section EMPTY = new Section() {
+
         @Override
-        public final synchronized char[] get(CharBlocks blocks, int layer) {
-            char[] arr = blocks.blocks[layer];
-            if (arr == null) {
-                arr = blocks.blocks[layer] = blocks.update(layer, null);
+        public final boolean isFull() {
+            return true;
+        }
+    };
+    protected static final Section EMPTY = new Section() {
+        @Override
+        public final char[] get(CharBlocks blocks, int layer) {
+            blocks.loadLock.lock();
+            try {
+                char[] arr = blocks.blocks[layer];
                 if (arr == null) {
-                    throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                    arr = blocks.blocks[layer] = blocks.update(layer, null);
+                    if (arr == null) {
+                        throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                    }
+                } else {
+                    blocks.blocks[layer] = blocks.update(layer, arr);
+                    if (blocks.blocks[layer] == null) {
+                        throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                    }
                 }
-            } else {
-                blocks.blocks[layer] = blocks.update(layer, arr);
-                if (blocks.blocks[layer] == null) {
-                    throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                if (blocks.blocks[layer] != null) {
+                    blocks.sections[layer] = FULL;
                 }
+                return arr;
+            } finally {
+                blocks.loadLock.unlock();
             }
-            if (blocks.blocks[layer] != null) {
-                blocks.sections[layer] = FULL;
-            }
-            return arr;
+        }
+
+        @Override
+        public final boolean isFull() {
+            return false;
         }
     };
     public final char[][] blocks;
     public final Section[] sections;
+    private final ReentrantLock loadLock = new ReentrantLock ();
 
     public CharBlocks() {
         blocks = new char[16][];
@@ -55,7 +73,7 @@ public abstract class CharBlocks implements IBlocks {
     public boolean trim(boolean aggressive) {
         boolean result = true;
         for (int i = 0; i < 16; i++) {
-            if (sections[i] == EMPTY && blocks[i] != null) {
+            if (!sections[i].isFull() && blocks[i] != null) {
                 blocks[i] = null;
             } else {
                 result = false;
@@ -67,7 +85,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public boolean trim(boolean aggressive, int layer) {
         boolean result = true;
-        if (sections[layer] == EMPTY && blocks[layer] != null) {
+        if (!sections[layer].isFull() && blocks[layer] != null) {
             blocks[layer] = null;
         } else {
             result = false;
@@ -99,7 +117,7 @@ public abstract class CharBlocks implements IBlocks {
 
     @Override
     public boolean hasSection(@Range(from = 0, to = 15) int layer) {
-        return sections[layer] == FULL;
+        return sections[layer].isFull();
     }
 
     @Override
@@ -148,6 +166,8 @@ public abstract class CharBlocks implements IBlocks {
     public abstract static class Section {
 
         public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer);
+
+        public abstract boolean isFull();
 
         public final char get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index) {
             return get(blocks, layer)[index];

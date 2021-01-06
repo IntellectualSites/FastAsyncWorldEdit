@@ -12,15 +12,18 @@ import net.minecraft.server.v1_15_R1.NBTTagList;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class LazyCompoundTag_1_15_2 extends CompoundTag {
+
     private final Supplier<NBTTagCompound> nmsTag;
+    private CompoundTag cachedValue;
 
     public LazyCompoundTag_1_15_2(Supplier<NBTTagCompound> tag) {
-        super(null);
+        super(new HashMap<>());
         this.nmsTag = tag;
     }
 
@@ -34,12 +37,10 @@ public class LazyCompoundTag_1_15_2 extends CompoundTag {
 
     @Override
     public Map<String, Tag> getValue() {
-        Map<String, Tag> value = super.getValue();
-        if (value == null) {
-            Tag tag = WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(nmsTag.get());
-            setValue(((CompoundTag) tag).getValue());
+        if (cachedValue == null) {
+            cachedValue = (CompoundTag) WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(nmsTag.get());
         }
-        return super.getValue();
+        return cachedValue.getValue();
     }
 
     public boolean containsKey(String key) {

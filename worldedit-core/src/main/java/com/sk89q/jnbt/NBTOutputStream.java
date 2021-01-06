@@ -32,6 +32,8 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+// THIS CLASS HAS BEEN HEAVILY MODIFIED BY FAWE
+
 /**
  * This class writes <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * {@code Tag} objects to an underlying {@code OutputStream}.

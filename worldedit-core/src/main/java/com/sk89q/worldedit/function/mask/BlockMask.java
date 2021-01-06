@@ -29,12 +29,12 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.block.ImmutableBaseBlock;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -185,7 +185,7 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public boolean test(BlockState state) {
-        return ordinals[state.getOrdinal()] || replacesAir() && state.getOrdinal() <= 3;
+        return ordinals[state.getOrdinal()] || replacesAir() && state.getOrdinal() == 0;
     }
 
     @Override
@@ -259,19 +259,16 @@ public class BlockMask extends ABlockMask {
 
         int setTypes = 0;
         BlockType setType = null;
-        BlockType unsetType = null;
         int totalTypes = 0;
 
         for (BlockType type : BlockTypesCache.values) {
             if (type != null) {
                 totalTypes++;
                 boolean hasAll = true;
-                boolean hasAny = false;
                 List<BlockState> all = type.getAllStates();
                 for (BlockState state : all) {
                     totalStates++;
                     hasAll &= test(state);
-                    hasAny = true;
                 }
                 if (hasAll) {
                     setTypes++;
@@ -326,6 +323,7 @@ public class BlockMask extends ABlockMask {
             cloned[BlockTypes.AIR.getDefaultState().getOrdinal()] = false;
             cloned[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()] = false;
             cloned[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()] = false;
+            cloned[0] = false;
         }
         return new BlockMask(getExtent(), cloned);
     }

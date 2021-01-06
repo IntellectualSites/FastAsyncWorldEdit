@@ -23,6 +23,7 @@ repositories {
         name = "ProtocolLib Repo"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
     }
+    maven { url = uri("https://repo.inventivetalent.org/content/groups/public/") }
     flatDir {dir(File("src/main/resources"))}
 }
 
@@ -56,7 +57,7 @@ dependencies {
     "compileOnly"("org.jetbrains:annotations:20.1.0")
     "testCompileOnly"("org.jetbrains:annotations:20.1.0")
     "compileOnly"("org.spigotmc:spigot:1.16.4-R0.1-SNAPSHOT")
-    "implementation"("io.papermc:paperlib:1.0.4")
+    "implementation"("io.papermc:paperlib:1.0.6")
     "compileOnly"("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
@@ -68,15 +69,16 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    "compile"("org.bstats:bstats-bukkit:1.7")
+    "compile"("org.bstats:bstats-bukkit:1.8")
+    "compile"("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
-    "implementation"("com.github.InventivetalentDev:MapManager:1.7.+") { isTransitive = false }
+    compileOnlyApi("org.inventivetalent:mapmanager:1.7.+") { isTransitive = false }
     "implementation"("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
     "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     "implementation"("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     "implementation"("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     "implementation"("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
-    "implementation"("com.comphenix.protocol:ProtocolLib:4.5.0") { isTransitive = false }
+    "implementation"("com.comphenix.protocol:ProtocolLib:4.5.1") { isTransitive = false }
 }
 
 tasks.named<Copy>("processResources") {
@@ -107,17 +109,17 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.slf4j:slf4j-api"))
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
         include(dependency("org.antlr:antlr4-runtime"))
-        relocate("org.bstats", "com.sk89q.worldedit.bukkit.bstats") {
-            include(dependency("org.bstats:bstats-bukkit:1.7"))
-        }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib:1.0.4"))
+            include(dependency("io.papermc:paperlib:1.0.6"))
         }
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
         relocate("org.bstats", "com.boydti.metrics") {
-            include(dependency("org.bstats:bstats-bukkit:1.7"))
+            include(dependency("org.bstats:bstats-bukkit:1.8"))
+        }
+        relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
+            include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
         }
     }
 }

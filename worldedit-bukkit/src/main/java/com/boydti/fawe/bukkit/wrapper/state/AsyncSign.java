@@ -19,6 +19,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class AsyncSign extends AsyncBlockState implements Sign {
+
     public AsyncSign(AsyncBlock block, BaseBlock state) {
         super(block, state);
     }
@@ -59,11 +60,12 @@ public class AsyncSign extends AsyncBlockState implements Sign {
 
     @Override
     public void setLine(int index, String line) throws IndexOutOfBoundsException {
-        CompoundTag nbt = getNbtData();
-        if (nbt != null) {
-            Map<String, Tag> map = nbt.getValue();
-            map.put("Text" + (index + 1), new StringTag(toJson(line)));
+        final Map<String, Tag> map = this.cloneNbtMap();
+        if (map.isEmpty()) {
+            return;
         }
+        map.put("Text" + (index + 1), new StringTag(toJson(line)));
+        this.setNbtData(map);
     }
 
     @Override
@@ -79,13 +81,13 @@ public class AsyncSign extends AsyncBlockState implements Sign {
     @Override
     @NotNull
     public PersistentDataContainer getPersistentDataContainer() {
-        return new AsyncDataContainer(getNbtData());
+        return new AsyncDataContainer(this::getNbtData, this::setNbtData);
     }
 
     @Override
     @Nullable
     public DyeColor getColor() {
-        CompoundTag nbt = getNbtData();
+        CompoundTag nbt = this.getNbtData();
         if (nbt != null) {
             String color = nbt.getString("Color").toUpperCase(Locale.ROOT);
             if (!color.isEmpty()) {
@@ -97,10 +99,11 @@ public class AsyncSign extends AsyncBlockState implements Sign {
 
     @Override
     public void setColor(DyeColor color) {
-        CompoundTag nbt = getNbtData();
-        if (nbt != null) {
-            Map<String, Tag> map = nbt.getValue();
-            map.put("Color", new StringTag(color.name().toLowerCase(Locale.ROOT)));
+        final Map<String, Tag> map = this.cloneNbtMap();
+        if (map.isEmpty()) {
+            return;
         }
+        map.put("Color", new StringTag(color.name().toLowerCase(Locale.ROOT)));
+        this.setNbtData(map);
     }
 }
