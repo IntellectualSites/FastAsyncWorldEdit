@@ -46,6 +46,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -336,8 +337,9 @@ public class BlockTransformExtent extends ResettableExtent {
                     Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
-                        Map<String, Tag> values = tag.getValue();
+                        Map<String, Tag> values = new HashMap<>(tag.getValue());
                         values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
+                        tag = new CompoundTag(values);
                     }
                 }
             }
