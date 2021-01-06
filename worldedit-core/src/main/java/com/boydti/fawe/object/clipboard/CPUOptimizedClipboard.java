@@ -152,10 +152,8 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     @Override
     public Collection<CompoundTag> getTileEntities() {
         convertTilesToIndex();
-        for (Map.Entry<Integer, CompoundTag> entry : nbtMapIndex.entrySet()) {
-            int index = entry.getKey();
-            CompoundTag tag = entry.getValue();
-            Map<String, Tag> values = tag.getValue();
+        nbtMapIndex.replaceAll((index, tag) -> {
+            Map<String, Tag> values = new HashMap<>(tag.getValue());
             if (!values.containsKey("x")) {
                 int y = index / getArea();
                 index -= y * getArea();
@@ -164,23 +162,26 @@ public class CPUOptimizedClipboard extends LinearClipboard {
                 values.put("x", new IntTag(x));
                 values.put("y", new IntTag(y));
                 values.put("z", new IntTag(z));
+                return new CompoundTag(values);
+            } else {
+                return tag;
             }
-        }
+        });
         return nbtMapIndex.values();
     }
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMapLoc.put(new IntTriple(x, y, z), tag);
+        nbtMapLoc.put(new IntTriple(x, y, z),  new CompoundTag(tag.getValue()));
         return true;
     }
 
     public boolean setTile(int index, CompoundTag tag) {
-        nbtMapIndex.put(index, tag);
-        Map<String, Tag> values = tag.getValue();
+        final Map<String, Tag> values = new HashMap<>(tag.getValue());
         values.remove("x");
         values.remove("y");
         values.remove("z");
+        nbtMapIndex.put(index, new CompoundTag(values));
         return true;
     }
 
