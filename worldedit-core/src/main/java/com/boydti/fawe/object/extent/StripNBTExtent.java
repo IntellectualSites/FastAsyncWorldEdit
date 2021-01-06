@@ -60,8 +60,7 @@ public class StripNBTExtent extends AbstractDelegateExtent {
         for (String key : strip) {
             value.remove(key);
         }
-        localBlock.toBaseBlock(new CompoundTag(value));
-        return (B) localBlock;
+        return (B) localBlock.toBaseBlock(new CompoundTag(value));
     }
 
     public <T extends NbtValued> T stripEntityNBT(T entity) {
