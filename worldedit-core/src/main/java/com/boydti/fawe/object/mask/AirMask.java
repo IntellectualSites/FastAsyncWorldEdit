@@ -16,4 +16,9 @@ public class AirMask extends BlockMask {
         return new AirMask(getExtent());
     }
 
+    @Override
+    public boolean replacesAir() {
+        return true;
+    }
+
 }

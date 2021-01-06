@@ -118,4 +118,14 @@ public class MaskUnion extends MaskIntersection {
         Set<Mask> masksCopy = masks.stream().map(Mask::copy).collect(Collectors.toSet());
         return new MaskUnion(masksCopy);
     }
+
+    @Override
+    public boolean replacesAir() {
+        for (Mask mask : getMasksArray()) {
+            if (mask.replacesAir()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
