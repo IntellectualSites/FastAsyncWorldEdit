@@ -60,7 +60,7 @@ public class StripNBTExtent extends AbstractDelegateExtent {
         for (String key : strip) {
             value.remove(key);
         }
-        localBlock.setNbtData(new CompoundTag(value));
+        localBlock.toBaseBlock(new CompoundTag(value));
         return (B) localBlock;
     }
 
