@@ -2,7 +2,7 @@ import java.util.Properties
 
 plugins {
     `kotlin-dsl`
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version embeddedKotlinVersion
 }
 
 repositories {
@@ -23,6 +23,9 @@ repositories {
     maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
+        content {
+            excludeGroup("net.milkbowl.vault")
+        }
     }
 }
 

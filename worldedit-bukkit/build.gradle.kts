@@ -11,7 +11,11 @@ repositories {
     maven { url = uri("https://hub.spigotmc.org/nexus/content/groups/public") }
     maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
-    maven { url = uri("https://maven.enginehub.org/repo/") }
+    maven { url = uri("https://maven.enginehub.org/repo/")
+        content {
+            excludeGroup("net.milkbowl.vault")
+        }
+    }
     maven { url = uri("https://ci.emc.gs/nexus/content/groups/aikar/") }
     maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
     maven {
@@ -22,6 +26,9 @@ repositories {
     maven {
         name = "ProtocolLib Repo"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
+        content {
+            includeGroup("com.comphenix.protocol")
+        }
     }
     maven { url = uri("https://repo.inventivetalent.org/content/groups/public/") }
     flatDir {dir(File("src/main/resources"))}
