@@ -29,6 +29,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.regions.Region;
@@ -37,6 +38,8 @@ import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -45,6 +48,9 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class EditSessionBuilder {
+
+    private static final Logger logger = LoggerFactory.getLogger(AbstractDelegateExtent.class);
+
     @NotNull
     private World world;
     private Player player;
@@ -222,16 +228,29 @@ public class EditSessionBuilder {
                     return toReturn;
                 }
             }
-            if (Settings.IMP.EXTENT.DEBUG && event.getActor() != null) {
-                event.getActor().printDebug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
-                event.getActor().printDebug(" - For area restrictions, it is recommended to use the FaweAPI");
-                event.getActor().printDebug(" - For block logging, it is recommended to use BlocksHub");
-                event.getActor().printDebug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
-                event.getActor().printDebug(" - To hide this message set `debug` to false in the FAWE config.yml");
-                if (toReturn.getClass().getName().contains("CoreProtect")) {
-                    event.getActor().printDebug("Note on CoreProtect: ");
-                    event.getActor().printDebug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
-                    event.getActor().printDebug(" - Use BlocksHub and set `debug` false in the FAWE config");
+            if (Settings.IMP.EXTENT.DEBUG) {
+                if (event.getActor() != null) {
+                    event.getActor().printDebug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
+                    event.getActor().printDebug(" - For area restrictions, it is recommended to use the FaweAPI");
+                    event.getActor().printDebug(" - For block logging, it is recommended to use BlocksHub");
+                    event.getActor().printDebug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
+                    event.getActor().printDebug(" - To hide this message set `debug` to false in the FAWE config.yml");
+                    if (toReturn.getClass().getName().contains("CoreProtect")) {
+                        event.getActor().printDebug("Note on CoreProtect: ");
+                        event.getActor().printDebug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
+                        event.getActor().printDebug(" - Use BlocksHub and set `debug` false in the FAWE config");
+                    }
+                } else {
+                    logger.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
+                    logger.debug(" - For area restrictions, it is recommended to use the FaweAPI");
+                    logger.debug(" - For block logging, it is recommended to use BlocksHub");
+                    logger.debug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
+                    logger.debug(" - To hide this message set `debug` to false in the FAWE config.yml");
+                    if (toReturn.getClass().getName().contains("CoreProtect")) {
+                        logger.debug("Note on CoreProtect: ");
+                        logger.debug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
+                        logger.debug(" - Use BlocksHub and set `debug` false in the FAWE config");
+                    }
                 }
             }
         }
