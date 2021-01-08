@@ -35,7 +35,7 @@ dependencies {
     "implementation"("com.google.guava:guava:${Versions.GUAVA}")
     "implementation"("com.google.code.findbugs:jsr305:3.0.2")
     "implementation"("com.google.code.gson:gson:${Versions.GSON}")
-    "implementation"("org.slf4j:slf4j-api:1.7.30")
+    "implementation"("org.slf4j:slf4j-api:1.7.26")
     "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
 
     val antlrVersion = "4.7.2"
