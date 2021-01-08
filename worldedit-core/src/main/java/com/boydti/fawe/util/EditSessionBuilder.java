@@ -235,22 +235,12 @@ public class EditSessionBuilder {
                     event.getActor().printDebug(" - For block logging, it is recommended to use BlocksHub");
                     event.getActor().printDebug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
                     event.getActor().printDebug(" - To hide this message set `debug` to false in the FAWE config.yml");
-                    if (toReturn.getClass().getName().contains("CoreProtect")) {
-                        event.getActor().printDebug("Note on CoreProtect: ");
-                        event.getActor().printDebug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
-                        event.getActor().printDebug(" - Use BlocksHub and set `debug` false in the FAWE config");
-                    }
                 } else {
                     logger.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
                     logger.debug(" - For area restrictions, it is recommended to use the FaweAPI");
                     logger.debug(" - For block logging, it is recommended to use BlocksHub");
                     logger.debug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
                     logger.debug(" - To hide this message set `debug` to false in the FAWE config.yml");
-                    if (toReturn.getClass().getName().contains("CoreProtect")) {
-                        logger.debug("Note on CoreProtect: ");
-                        logger.debug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
-                        logger.debug(" - Use BlocksHub and set `debug` false in the FAWE config");
-                    }
                 }
             }
         }
