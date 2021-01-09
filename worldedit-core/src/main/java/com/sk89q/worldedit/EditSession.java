@@ -1080,7 +1080,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         // Reset limit
         limit.set(originalLimit);
-        relighter.fixLightingSafe(true);
+        try {
+            relighter.fixLightingSafe(true);
+        } catch (Throwable e) {
+            player.printError(TranslatableComponent.of("fawe.error.lighting"));
+            e.printStackTrace();
+        }
         // Enqueue it
         if (getChangeSet() != null) {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {
