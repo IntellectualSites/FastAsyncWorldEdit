@@ -57,7 +57,9 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
         return null;
     }
 
-    void setLighting(char[][] lighting);
+    void setLightingToGet(char[][] lighting);
 
-    void setSkyLighting(char[][] lighting);
+    void setSkyLightingToGet(char[][] lighting);
+
+    void setHeightmapToGet(HeightMapType type, int[] data);
 }

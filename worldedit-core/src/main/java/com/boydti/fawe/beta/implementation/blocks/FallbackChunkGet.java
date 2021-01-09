@@ -107,12 +107,17 @@ public class FallbackChunkGet implements IChunkGet {
     }
 
     @Override
-    public void setLighting(char[][] lighting) {
+    public void setLightingToGet(char[][] lighting) {
         // do nothing
     }
 
     @Override
-    public void setSkyLighting(char[][] lighting) {
+    public void setSkyLightingToGet(char[][] lighting) {
+        // do nothing
+    }
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {
         // do nothing
     }
 

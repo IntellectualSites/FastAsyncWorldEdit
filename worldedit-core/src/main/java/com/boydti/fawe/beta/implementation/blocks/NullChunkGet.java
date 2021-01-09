@@ -70,10 +70,13 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public void setLighting(char[][] lighting) {}
+    public void setLightingToGet(char[][] lighting) {}
 
     @Override
-    public void setSkyLighting(char[][] lighting) {}
+    public void setSkyLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {}
 
     public boolean trim(boolean aggressive) {
         return true;

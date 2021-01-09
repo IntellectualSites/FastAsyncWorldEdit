@@ -861,7 +861,7 @@ public class NMSRelighter implements Relighter {
                             }
                         }
                     }
-                    chunk.flushLightToGet();
+                    chunk.flushLightToGet(true);
                     Fawe.imp().getPlatformAdapter().sendChunk(chunk.getOrCreateGet(), bitMask, true);
                     iter.remove();
                 }

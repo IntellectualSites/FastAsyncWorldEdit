@@ -125,7 +125,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks implements BukkitGetBl
     }
 
     @Override
-    public void setLighting(char[][] light) {
+    public void setLightingToGet(char[][] light) {
         if (light != null) {
             lightUpdate = true;
             try {
@@ -137,7 +137,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks implements BukkitGetBl
     }
 
     @Override
-    public void setSkyLighting(char[][] light) {
+    public void setSkyLightingToGet(char[][] light) {
         if (light != null) {
             lightUpdate = true;
             try {
@@ -146,6 +146,13 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks implements BukkitGetBl
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {
+        BitArrayUnstretched bitArray = new BitArrayUnstretched(9, 256);
+        bitArray.fromRaw(data);
+        nmsChunk.heightMap.get(HeightMap.Type.valueOf(type.name())).a(bitArray.getData());
     }
 
     public int getChunkZ() {
@@ -468,33 +475,10 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks implements BukkitGetBl
 
                 Map<HeightMapType, int[]> heightMaps = set.getHeightMaps();
                 for (Map.Entry<HeightMapType, int[]> entry : heightMaps.entrySet()) {
-                    BitArrayUnstretched bitArray = new BitArrayUnstretched(9, 256);
-                    bitArray.fromRaw(entry.getValue());
-                    nmsChunk.heightMap.get(HeightMap.Type.valueOf(entry.getKey().name())).a(bitArray.getData());
+                    BukkitGetBlocks_1_16_4.this.setHeightmapToGet(entry.getKey(), entry.getValue());
                 }
-
-                boolean lightUpdate = false;
-
-                // Lighting
-                char[][] light = set.getLight();
-                if (light != null) {
-                    lightUpdate = true;
-                    try {
-                        fillLightNibble(light, EnumSkyBlock.BLOCK);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                char[][] skyLight = set.getSkyLight();
-                if (skyLight != null) {
-                    lightUpdate = true;
-                    try {
-                        fillLightNibble(skyLight, EnumSkyBlock.SKY);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
+                BukkitGetBlocks_1_16_4.this.setLightingToGet(set.getLight());
+                BukkitGetBlocks_1_16_4.this.setSkyLightingToGet(set.getSkyLight());
 
                 Runnable[] syncTasks = null;
 
