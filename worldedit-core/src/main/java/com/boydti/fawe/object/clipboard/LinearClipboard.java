@@ -29,6 +29,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
         super(dimensions);
     }
 
+    // We shouldn't expose methods that directly reference the index as people cannot be trusted to use it properly.
     public abstract <B extends BlockStateHolder<B>> boolean setBlock(int i, B block);
 
     public abstract BaseBlock getFullBlock(int i);
