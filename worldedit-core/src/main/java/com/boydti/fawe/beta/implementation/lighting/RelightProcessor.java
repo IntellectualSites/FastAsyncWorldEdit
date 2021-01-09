@@ -57,6 +57,6 @@ public class RelightProcessor implements IBatchProcessor {
 
     @Override
     public ProcessorScope getScope() {
-        return ProcessorScope.CUSTOM;
+        return ProcessorScope.READING_SET_BLOCKS;
     }
 }

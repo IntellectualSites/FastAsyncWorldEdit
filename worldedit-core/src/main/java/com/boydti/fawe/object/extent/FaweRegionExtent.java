@@ -151,6 +151,6 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
 
     @Override
     public ProcessorScope getScope() {
-        return ProcessorScope.SAVING_BLOCKS;
+        return ProcessorScope.READING_SET_BLOCKS;
     }
 }

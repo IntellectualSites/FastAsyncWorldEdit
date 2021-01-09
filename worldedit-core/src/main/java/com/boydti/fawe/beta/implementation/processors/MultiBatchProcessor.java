@@ -6,7 +6,6 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.extent.Extent;
@@ -95,10 +94,6 @@ public class MultiBatchProcessor implements IBatchProcessor {
                         if (chunkSet == null) {
                             return null;
                         }
-                        if (i == 4 && Settings.IMP.EXPERIMENTAL.SEND_BEFORE_HISTORY) {
-                            log.debug("Consider using PostProcess for processor " + processor.getClass().getSimpleName()
-                                + " as it is a SAVING_BLOCKS (history) scope.");
-                        }
                     }
                 }
             }
@@ -125,7 +120,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
         try {
             for (IBatchProcessor processor : processors) {
                 // We do NOT want to edit blocks in post processing
-                if (processor.getScope() != ProcessorScope.SAVING_BLOCKS) {
+                if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
                     continue;
                 }
                 set = processor.postProcessSet(chunk, get, set).get();

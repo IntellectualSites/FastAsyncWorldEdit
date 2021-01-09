@@ -128,5 +128,10 @@ public interface IBatchProcessor {
         return this;
     }
 
-    ProcessorScope getScope();
+    /**
+     * Default to CUSTOM ProcessorScope as we want custom processors people add to be before we write history, but after FAWE does it's own stuff.
+     */
+    default ProcessorScope getScope() {
+        return ProcessorScope.CUSTOM;
+    }
 }

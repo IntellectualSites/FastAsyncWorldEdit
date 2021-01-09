@@ -5,12 +5,12 @@ package com.boydti.fawe.beta.implementation.processors;
  * Order in which processors are executed:
  *  - ADDING_BLOCKS (processors that strictly ADD blocks to an edit ONLY)
  *  - CHANGING_BLOCKS (processors that strictly ADD or CHANGE blocks being set)
- *  - REMOVING_BLOCKS (processors that string ADD, CHANGE or REMOVE blockks being set)
+ *  - REMOVING_BLOCKS (processors that string ADD, CHANGE or REMOVE blocks being set)
  *  - CUSTOM (processors that do not specify a SCOPE)
- *  - SAVING_BLOCKS (processors that do NONE of the above, and save the blocks being set/changed/removed)
+ *  - READING_SET_BLOCKS (processors that do not alter blocks at all, and read the blocks that are actually going to set, e.g. history processors)
  */
 public enum ProcessorScope {
-    ADDING_BLOCKS(0), CHANGING_BLOCKS(1), REMOVING_BLOCKS(2), CUSTOM(3), SAVING_BLOCKS(4);
+    ADDING_BLOCKS(0), CHANGING_BLOCKS(1), REMOVING_BLOCKS(2), CUSTOM(3), READING_SET_BLOCKS(4);
 
     private final int value;
 
@@ -31,7 +31,7 @@ public enum ProcessorScope {
             case 2:
                 return ProcessorScope.REMOVING_BLOCKS;
             case 4:
-                return ProcessorScope.SAVING_BLOCKS;
+                return ProcessorScope.READING_SET_BLOCKS;
             case 3:
             default:
                 return ProcessorScope.CUSTOM;

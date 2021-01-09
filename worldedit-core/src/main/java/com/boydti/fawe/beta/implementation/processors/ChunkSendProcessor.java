@@ -84,6 +84,6 @@ public class ChunkSendProcessor implements IBatchProcessor {
 
     @Override
     public ProcessorScope getScope() {
-        return ProcessorScope.SAVING_BLOCKS;
+        return ProcessorScope.READING_SET_BLOCKS;
     }
 }
