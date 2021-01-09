@@ -4,6 +4,10 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
+import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
+import com.boydti.fawe.beta.implementation.lighting.RelightProcessor;
+import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.beta.implementation.processors.LimitExtent;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.Settings;
@@ -68,6 +72,7 @@ public class EditSessionBuilder {
     private EditSessionEvent event;
     private String command;
     private RelightMode relightMode;
+    private Relighter relighter;
 
     /**
      * An EditSession builder<br>
@@ -388,6 +393,14 @@ public class EditSessionBuilder {
             } else {
 //                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
             }
+            // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks
+            if (placeChunks && ((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.IMP.LIGHTING.MODE > 0))) {
+                relighter = new NMSRelighter(queue, Settings.IMP.LIGHTING.DO_HEIGHTMAPS,
+                    relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE));
+                extent.addProcessor(new RelightProcessor(relighter));
+            } else {
+                relighter = NullRelighter.INSTANCE;
+            }
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
             } else if (limit != null && !limit.isUnlimited()) {
@@ -446,4 +459,7 @@ public class EditSessionBuilder {
         return blockBag;
     }
 
+    public Relighter getRelighter() {
+        return relighter;
+    }
 }

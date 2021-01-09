@@ -1,11 +1,13 @@
 package com.boydti.fawe.bukkit;
 
+import com.boydti.fawe.FAWEPlatformAdapterImpl;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.IFawe;
 import com.boydti.fawe.beta.implementation.cache.preloader.AsyncPreloader;
 import com.boydti.fawe.beta.implementation.cache.preloader.Preloader;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
+import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
@@ -58,6 +60,7 @@ public class FaweBukkit implements IFawe, Listener {
     private BukkitImageListener imageListener;
     private CFIPacketListener packetListener;
     private final boolean chunksStretched;
+    private final FAWEPlatformAdapterImpl platformAdapter;
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
@@ -80,6 +83,8 @@ public class FaweBukkit implements IFawe, Listener {
 
         chunksStretched =
             Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]) >= 16;
+
+        platformAdapter = new NMSAdapter();
 
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
         TaskManager.IMP.later(this::setupPlotSquared, 0);
@@ -292,6 +297,11 @@ public class FaweBukkit implements IFawe, Listener {
 
     @Override public boolean isChunksStretched() {
         return chunksStretched;
+    }
+
+    @Override
+    public FAWEPlatformAdapterImpl getPlatformAdapter() {
+        return platformAdapter;
     }
 
     private void setupPlotSquared() {

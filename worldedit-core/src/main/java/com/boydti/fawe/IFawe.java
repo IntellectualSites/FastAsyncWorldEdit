@@ -43,4 +43,6 @@ public interface IFawe {
         return true;
     }
 
+    FAWEPlatformAdapterImpl getPlatformAdapter();
+
 }

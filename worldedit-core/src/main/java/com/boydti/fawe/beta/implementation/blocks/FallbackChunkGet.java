@@ -107,6 +107,16 @@ public class FallbackChunkGet implements IChunkGet {
     }
 
     @Override
+    public void setLighting(char[][] lighting) {
+        // do nothing
+    }
+
+    @Override
+    public void setSkyLighting(char[][] lighting) {
+        // do nothing
+    }
+
+    @Override
     public boolean trim(boolean aggressive) {
         return true;
     }

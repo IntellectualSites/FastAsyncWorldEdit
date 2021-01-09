@@ -7,6 +7,7 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
+import com.boydti.fawe.bukkit.adapter.BukkitGetBlocks;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
 import com.boydti.fawe.config.Settings;
@@ -74,7 +75,7 @@ import javax.annotation.Nullable;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
+public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBlocks {
 
     private static final Logger log = LoggerFactory.getLogger(BukkitGetBlocks_1_15_2.class);
 
@@ -90,6 +91,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     private boolean createCopy = false;
     private BukkitGetBlocks_1_15_2_Copy copy = null;
     private boolean forceLoadSections = true;
+    private boolean written = false;
+    private boolean lightUpdate = false;
 
     public BukkitGetBlocks_1_15_2(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
@@ -118,6 +121,30 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
     @Override
     public IChunkGet getCopy() {
         return copy;
+    }
+
+    @Override
+    public void setLighting(char[][] light) {
+        if (light != null) {
+            lightUpdate = true;
+            try {
+                fillLightNibble(light, EnumSkyBlock.BLOCK);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void setSkyLighting(char[][] light) {
+        if (light != null) {
+            lightUpdate = true;
+            try {
+                fillLightNibble(light, EnumSkyBlock.SKY);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getChunkZ() {
@@ -583,8 +610,11 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
                         nmsChunk.d(true); // Set Modified
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
+                        written = true;
                         // send to player
-                        BukkitAdapter_1_15_2.sendChunk(nmsWorld, chunkX, chunkZ, finalMask, finalLightUpdate);
+                        if (Settings.IMP.LIGHTING.MODE == 0 || !Settings.IMP.LIGHTING.DELAY_PACKET_SENDING) {
+                            this.send(finalMask, finalLightUpdate);
+                        }
                         if (finalizer != null) {
                             finalizer.run();
                         }
@@ -634,6 +664,14 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks {
         } finally {
             forceLoadSections = true;
         }
+    }
+
+    @Override
+    public synchronized void send(int mask, boolean lighting) {
+        if (!written) {
+            throw new IllegalStateException("Chunk cannot be sent without first having been called!");
+        }
+        BukkitAdapter_1_15_2.sendChunk(world, chunkX, chunkZ, mask, lighting);
     }
 
     @Override

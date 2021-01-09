@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -210,6 +211,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     @Override
     public Future<IChunkSet> postProcessSet(final IChunk chunk, final IChunkGet get,final  IChunkSet set) {
         return (Future<IChunkSet>) addWriteTask(() -> processSet(chunk, get, set));
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.SAVING_BLOCKS;
     }
 
     public abstract void addTileCreate(CompoundTag tag);

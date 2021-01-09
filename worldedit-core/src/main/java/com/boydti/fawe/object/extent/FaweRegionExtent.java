@@ -2,6 +2,7 @@ package com.boydti.fawe.object.extent;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IBatchProcessor;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.util.ExtentTraverser;
 import com.boydti.fawe.util.WEManager;
@@ -146,5 +147,10 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
             return null;
         }
         return super.createEntity(location, entity);
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.SAVING_BLOCKS;
     }
 }

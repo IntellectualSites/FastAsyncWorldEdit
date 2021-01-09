@@ -20,6 +20,7 @@
 package com.sk89q.worldedit;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
@@ -222,6 +223,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final int maxY;
     private final List<WatchdogTickingExtent> watchdogExtents = new ArrayList<>(2);
 
+    private final Relighter relighter;
 
     @Deprecated
     public EditSession(@NotNull EventBus bus, World world, @Nullable Player player,
@@ -257,6 +259,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.maxY = world.getMaxY();
         this.blockBag = builder.getBlockBag();
         this.history = changeSet != null;
+        this.relighter = builder.getRelighter();
     }
 
     /**
@@ -1077,6 +1080,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         // Reset limit
         limit.set(originalLimit);
+        relighter.fixLightingSafe(true);
         // Enqueue it
         if (getChangeSet() != null) {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {

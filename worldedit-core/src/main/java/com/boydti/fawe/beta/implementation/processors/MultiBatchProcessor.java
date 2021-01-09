@@ -6,24 +6,34 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.extent.Extent;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public class MultiBatchProcessor implements IBatchProcessor {
+
+    private static final Logger log = LoggerFactory.getLogger(MultiBatchProcessor.class);
+
     private IBatchProcessor[] processors;
     private final LoadingCache<Class<?>, Map<Long, Filter>> classToThreadIdToFilter =
         FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
-
     public MultiBatchProcessor(IBatchProcessor... processors) {
         this.processors = processors;
     }
@@ -65,18 +75,31 @@ public class MultiBatchProcessor implements IBatchProcessor {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        Map<Integer, Set<IBatchProcessor>> ordered = new HashMap<>();
         try {
             IChunkSet chunkSet = set;
-            for (int i = processors.length - 1; i >= 0; i--) {
-                IBatchProcessor processor = processors[i];
-                if (processor instanceof Filter) {
-                    chunkSet = ((IBatchProcessor) classToThreadIdToFilter.getUnchecked(processor.getClass())
-                        .computeIfAbsent(Thread.currentThread().getId(), k -> ((Filter) processor).fork())).processSet(chunk, get, chunkSet);
-                } else {
-                    chunkSet = processor.processSet(chunk, get, chunkSet);
+            for (IBatchProcessor processor : processors) {
+                if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
+                    ordered.merge(processor.getScope().intValue(), new HashSet<>(Collections.singleton(processor)), (existing, theNew) -> {
+                        existing.add(processor);
+                        return existing;
+                    });
+                    continue;
                 }
-                if (chunkSet == null) {
-                    return null;
+                chunkSet = processSet(processor, chunk, get, chunkSet);
+            }
+            if (ordered.size() > 0) {
+                for (int i = 1; i <= 4; i++) {
+                    for (IBatchProcessor processor : ordered.get(i)) {
+                        chunkSet = processSet(processor,chunk, get, chunkSet);
+                        if (chunkSet == null) {
+                            return null;
+                        }
+                        if (i == 4 && Settings.IMP.EXPERIMENTAL.SEND_BEFORE_HISTORY) {
+                            log.debug("Consider using PostProcess for processor " + processor.getClass().getSimpleName()
+                                + " as it is a SAVING_BLOCKS (history) scope.");
+                        }
+                    }
                 }
             }
             return chunkSet;
@@ -86,11 +109,25 @@ public class MultiBatchProcessor implements IBatchProcessor {
         }
     }
 
+    @Nullable
+    private IChunkSet processSet(IBatchProcessor processor, IChunk chunk, IChunkGet get, IChunkSet chunkSet) {
+        if (processor instanceof Filter) {
+            chunkSet = ((IBatchProcessor) classToThreadIdToFilter.getUnchecked(processor.getClass())
+                .computeIfAbsent(Thread.currentThread().getId(), k -> ((Filter) processor).fork())).processSet(chunk, get, chunkSet);
+        } else {
+            chunkSet = processor.processSet(chunk, get, chunkSet);
+        }
+        return chunkSet;
+    }
+
     @Override
     public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         try {
-            for (int i = processors.length - 1 ; i >= 0; i--) {
-                IBatchProcessor processor = processors[i];
+            for (IBatchProcessor processor : processors) {
+                // We do NOT want to edit blocks in post processing
+                if (processor.getScope() != ProcessorScope.SAVING_BLOCKS) {
+                    continue;
+                }
                 set = processor.postProcessSet(chunk, get, set).get();
                 if (set == null) {
                     return null;
@@ -162,5 +199,14 @@ public class MultiBatchProcessor implements IBatchProcessor {
     @Override
     public String toString() {
         return super.toString() + "{" + StringMan.join(processors, ",") + "}";
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        int scope = 0;
+        for (IBatchProcessor processor : processors) {
+            scope = Math.max(scope, processor.getScope().intValue());
+        }
+        return ProcessorScope.valueOf(0);
     }
 }

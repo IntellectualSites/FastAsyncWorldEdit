@@ -56,4 +56,8 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     default IChunkGet getCopy() {
         return null;
     }
+
+    void setLighting(char[][] lighting);
+
+    void setSkyLighting(char[][] lighting);
 }

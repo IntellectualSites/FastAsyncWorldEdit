@@ -177,6 +177,12 @@ public final class NullChunk implements IQueueChunk {
         return false;
     }
 
+    @Override
+    public void setLighting(char[][] lighting) {}
+
+    @Override
+    public void setSkyLighting(char[][] lighting) {}
+
     @Nullable
     public <T extends Future<T>> T call(@Nullable IChunkSet set, @Nullable Runnable finalize) {
         return null;

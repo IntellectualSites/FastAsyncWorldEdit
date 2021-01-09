@@ -624,6 +624,14 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
+    public void setLighting(char[][] lighting) {}
+
+    @Override
+    public void setSkyLighting(char[][] lighting) {
+
+    }
+
+    @Override
     public Future call(IChunkSet set, Runnable finalize) {
         return null;
     }

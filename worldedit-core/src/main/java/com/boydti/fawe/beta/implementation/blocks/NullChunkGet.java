@@ -69,6 +69,12 @@ public final class NullChunkGet implements IChunkGet {
         return false;
     }
 
+    @Override
+    public void setLighting(char[][] lighting) {}
+
+    @Override
+    public void setSkyLighting(char[][] lighting) {}
+
     public boolean trim(boolean aggressive) {
         return true;
     }

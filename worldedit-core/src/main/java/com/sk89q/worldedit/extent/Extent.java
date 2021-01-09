@@ -23,6 +23,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
@@ -707,6 +708,9 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default Extent addPostProcessor(IBatchProcessor processor) {
+        if (processor.getScope() == ProcessorScope.SAVING_BLOCKS) {
+            throw new IllegalArgumentException("You cannot alter blocks in a PostProcessor");
+        }
         return processor.construct(this);
     }
 

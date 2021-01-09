@@ -49,4 +49,9 @@ public final class EmptyBatchProcessor implements IBatchProcessor {
     private EmptyBatchProcessor() {
     }
 
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.ADDING_BLOCKS;
+    }
+
 }

@@ -104,6 +104,12 @@ public class BukkitGetBlocks_1_16_1_Copy implements IChunkGet {
         return false;
     }
 
+    @Override
+    public void setLighting(char[][] lighting) {}
+
+    @Override
+    public void setSkyLighting(char[][] lighting) {}
+
     protected void storeBiomes(BiomeStorage biomeStorage) {
         this.biomeStorage = new BiomeStorage(BukkitAdapter_1_16_1.getBiomeArray(biomeStorage).clone());
     }
