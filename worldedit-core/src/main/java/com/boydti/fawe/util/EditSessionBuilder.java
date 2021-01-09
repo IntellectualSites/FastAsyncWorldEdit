@@ -64,7 +64,6 @@ public class EditSessionBuilder {
     @NotNull
     private EventBus eventBus = WorldEdit.getInstance().getEventBus();
     private BlockBag blockBag;
-    private boolean threaded = true;
     private EditSessionEvent event;
     private String command;
     private RelightMode relightMode;
@@ -307,7 +306,7 @@ public class EditSessionBuilder {
             if (placeChunks) {
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
-                } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && threaded) {
+                } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
                     ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, fastmode);
                     queue = parallel.getExtent();
                     extent = parallel;
