@@ -77,8 +77,7 @@ import javax.annotation.Nullable;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable,
-    VirtualWorld {
+public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
 
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
@@ -93,6 +92,9 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     protected final CFIPrimitives primitives = new CFIPrimitives();
     private CFIPrimitives oldPrimitives = new CFIPrimitives();
+
+    @Override
+    public void flush() {}
 
     public final class CFIPrimitives implements Cloneable {
 

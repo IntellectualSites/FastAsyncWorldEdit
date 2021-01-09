@@ -25,7 +25,7 @@ import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.BlockMaterial_1_16_1;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.BukkitAdapter_1_16_1;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.BukkitGetBlocks_1_16_1;
-import com.boydti.fawe.bukkit.adapter.mc1_16_1.FAWEWorldNativeAccess_1_16;
+import com.boydti.fawe.bukkit.adapter.mc1_16_1.FAWEWorldNativeAccess_1_16_R1;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.MapChunkUtil_1_16_1;
 import com.boydti.fawe.bukkit.adapter.mc1_16_1.nbt.LazyCompoundTag_1_16_1;
 import com.google.common.base.Preconditions;
@@ -244,7 +244,7 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
 
     @Override
     public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
-        return new FAWEWorldNativeAccess_1_16(this,
+        return new FAWEWorldNativeAccess_1_16_R1(this,
                 new WeakReference<>(((CraftWorld)world).getHandle()));
     }
 

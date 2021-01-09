@@ -48,6 +48,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -233,4 +234,7 @@ public class NullWorld extends AbstractWorld {
     public boolean regenerate(Region region, Extent extent, RegenOptions options) {
         return false;
     }
+
+    @Override
+    public void flush() {}
 }

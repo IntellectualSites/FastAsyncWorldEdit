@@ -401,4 +401,6 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     default boolean setBiome(BlockVector3 position, BiomeType biome) {
         return false;
     }
+
+    void flush();
 }

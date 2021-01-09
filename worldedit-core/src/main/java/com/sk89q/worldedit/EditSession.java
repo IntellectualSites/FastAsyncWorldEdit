@@ -222,6 +222,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final int maxY;
     private final List<WatchdogTickingExtent> watchdogExtents = new ArrayList<>(2);
 
+    private final boolean wnaMode;
+
 
     @Deprecated
     public EditSession(@NotNull EventBus bus, World world, @Nullable Player player,
@@ -257,6 +259,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.maxY = world.getMaxY();
         this.blockBag = builder.getBlockBag();
         this.history = changeSet != null;
+        this.wnaMode = builder.isWNAMode();
     }
 
     /**
@@ -1074,6 +1077,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             } else {
                 player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.level"));
             }
+        }
+        if (wnaMode) {
+            getWorld().flush();
         }
         // Reset limit
         limit.set(originalLimit);

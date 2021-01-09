@@ -67,6 +67,7 @@ public class EditSessionBuilder {
     private EditSessionEvent event;
     private String command;
     private RelightMode relightMode;
+    private Boolean wnaMode;
 
     /**
      * An EditSession builder<br>
@@ -203,6 +204,11 @@ public class EditSessionBuilder {
         return setDirty();
     }
 
+    public EditSessionBuilder forceWNA() {
+        this.wnaMode = true;
+        return setDirty();
+    }
+
     private EditSessionBuilder setDirty() {
         compiled = false;
         return this;
@@ -303,7 +309,8 @@ public class EditSessionBuilder {
             World unwrapped = WorldWrapper.unwrap(world);
             boolean placeChunks = this.fastmode || this.limit.FAST_PLACEMENT;
 
-            if (placeChunks) {
+            if (placeChunks && (wnaMode == null || !wnaMode)) {
+                wnaMode = false;
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
                 } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
@@ -314,6 +321,7 @@ public class EditSessionBuilder {
                     extent = queue = Fawe.get().getQueueHandler().getQueue(world);
                 }
             } else {
+                wnaMode = true;
                 extent = world;
             }
             Extent root = extent;
@@ -443,6 +451,10 @@ public class EditSessionBuilder {
 
     public BlockBag getBlockBag() {
         return blockBag;
+    }
+
+    public boolean isWNAMode() {
+        return wnaMode;
     }
 
 }

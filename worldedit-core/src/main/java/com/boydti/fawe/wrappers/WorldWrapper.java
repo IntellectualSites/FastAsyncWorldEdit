@@ -38,6 +38,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -318,5 +319,10 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public BiomeType getBiome(BlockVector3 position) {
         return parent.getBiome(position);
+    }
+
+    @Override
+    public void flush() {
+        parent.flush();
     }
 }
