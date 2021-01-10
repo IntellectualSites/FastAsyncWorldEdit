@@ -18,7 +18,7 @@ import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
-import com.boydti.fawe.bukkit.util.BukkitTaskMan;
+import com.boydti.fawe.bukkit.util.BukkitTaskManager;
 import com.boydti.fawe.bukkit.util.ItemUtil;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.config.Settings;
@@ -192,7 +192,7 @@ public class FaweBukkit implements IFawe, Listener {
      * The task manager handles sync/async tasks.
      */
     @Override public TaskManager getTaskManager() {
-        return new BukkitTaskMan(plugin);
+        return new BukkitTaskManager(plugin);
     }
 
     public Plugin getPlugin() {

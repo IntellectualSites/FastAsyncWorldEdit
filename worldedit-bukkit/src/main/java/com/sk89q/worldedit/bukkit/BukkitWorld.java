@@ -63,6 +63,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.slf4j.Logger;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -560,5 +561,12 @@ public class BukkitWorld extends AbstractWorld {
     public void sendFakeChunk(Player player, ChunkPacket packet) {
         org.bukkit.entity.Player bukkitPlayer = BukkitAdapter.adapt(player);
         WorldEditPlugin.getInstance().getBukkitImplAdapter().sendFakeChunk(getWorld(), bukkitPlayer, packet);
+    }
+
+    @Override
+    public void flush() {
+        if (worldNativeAccess != null) {
+            worldNativeAccess.flush();
+        }
     }
 }

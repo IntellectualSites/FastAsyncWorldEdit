@@ -30,7 +30,6 @@ import com.boydti.fawe.object.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
@@ -62,7 +61,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -318,18 +316,11 @@ public class FastSchematicReader extends NBTSchematicReader {
         }
         if (biomesOut != null && biomesOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
-                if (clipboard instanceof LinearClipboard) {
-                    LinearClipboard linear = (LinearClipboard) clipboard;
-                    int volume = width * length;
-                    for (int index = 0; index < volume; index++) {
+                for (int z = 0; z < length; z++) {
+                    for (int x = 0; x < width; x++) {
                         BiomeType biome = getBiomeType(fis);
-                        linear.setBiome(index, biome);
-                    }
-                } else {
-                    for (int z = 0; z < length; z++) {
-                        for (int x = 0; x < width; x++) {
-                            BiomeType biome = getBiomeType(fis);
-                            clipboard.setBiome(x, 0, z, biome);
+                        for (int y = 0; y < height; y ++) {
+                            clipboard.setBiome(x, y, z, biome);
                         }
                     }
                 }

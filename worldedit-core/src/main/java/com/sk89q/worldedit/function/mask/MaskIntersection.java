@@ -81,7 +81,7 @@ public class MaskIntersection extends AbstractMask {
             case 1:
                 return set.iterator().next();
             default:
-                return new MaskIntersection(masks).optimize();
+                return new MaskIntersection(set).optimize();
         }
     }
 

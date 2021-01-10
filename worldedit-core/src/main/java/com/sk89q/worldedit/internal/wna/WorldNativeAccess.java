@@ -30,6 +30,8 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
 
+import java.io.Flushable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
@@ -185,5 +187,7 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         // Seems used only for PoI updates
         onBlockStateChange(pos, oldState, newState);
     }
+
+    void flush();
 
 }

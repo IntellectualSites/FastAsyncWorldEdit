@@ -19,6 +19,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 import javax.annotation.Nullable;
 
@@ -102,4 +103,7 @@ public class MCAWorld extends AbstractWorld {
     public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
 
     }
+
+    @Override
+    public void flush() {}
 }

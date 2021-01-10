@@ -68,11 +68,11 @@ public class EditSessionBuilder {
     @NotNull
     private EventBus eventBus = WorldEdit.getInstance().getEventBus();
     private BlockBag blockBag;
-    private boolean threaded = true;
     private EditSessionEvent event;
     private String command;
     private RelightMode relightMode;
     private Relighter relighter;
+    private Boolean wnaMode;
 
     /**
      * An EditSession builder<br>
@@ -209,6 +209,11 @@ public class EditSessionBuilder {
         return setDirty();
     }
 
+    public EditSessionBuilder forceWNA() {
+        this.wnaMode = true;
+        return setDirty();
+    }
+
     private EditSessionBuilder setDirty() {
         compiled = false;
         return this;
@@ -309,10 +314,11 @@ public class EditSessionBuilder {
             World unwrapped = WorldWrapper.unwrap(world);
             boolean placeChunks = this.fastmode || this.limit.FAST_PLACEMENT;
 
-            if (placeChunks) {
+            if (placeChunks && (wnaMode == null || !wnaMode)) {
+                wnaMode = false;
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
-                } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && threaded) {
+                } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
                     ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, fastmode);
                     queue = parallel.getExtent();
                     extent = parallel;
@@ -320,6 +326,7 @@ public class EditSessionBuilder {
                     extent = queue = Fawe.get().getQueueHandler().getQueue(world);
                 }
             } else {
+                wnaMode = true;
                 extent = world;
             }
             Extent root = extent;
@@ -461,5 +468,13 @@ public class EditSessionBuilder {
 
     public Relighter getRelighter() {
         return relighter;
+    }
+
+    public boolean isWNAMode() {
+        return wnaMode;
+    }
+
+    public Region[] getAllowedRegions() {
+        return allowedRegions;
     }
 }

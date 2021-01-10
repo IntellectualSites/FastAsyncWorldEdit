@@ -6,11 +6,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class BukkitTaskMan extends TaskManager {
+public class BukkitTaskManager extends TaskManager {
 
     private final Plugin plugin;
 
-    public BukkitTaskMan(final Plugin plugin) {
+    public BukkitTaskManager(final Plugin plugin) {
         this.plugin = plugin;
     }
 

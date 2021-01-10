@@ -459,6 +459,16 @@ public final class WorldEdit {
         return getConfiguration().getWorkingDirectoryPath().resolve(path);
     }
 
+    //FAWE
+    /**
+     * Gets the path to the folder in which schematics are saved by default
+     *
+     * @return Path to the schematic folder
+     */
+    public Path getSchematicsFolderPath() {
+        return getWorkingDirectoryPath(getConfiguration().saveDir);
+    }
+
     /**
      * Get the direction vector for a player's direction.
      *

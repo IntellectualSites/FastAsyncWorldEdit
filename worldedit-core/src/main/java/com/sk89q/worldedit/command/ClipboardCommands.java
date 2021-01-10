@@ -55,6 +55,9 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -66,7 +69,9 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
+import com.sk89q.worldedit.regions.NullRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
@@ -140,14 +145,24 @@ public class ClipboardCommands {
         copy.setCopyingBiomes(copyBiomes);
 
         Mask sourceMask = editSession.getSourceMask();
+        Region[] regions = editSession.getAllowedRegions();
+        Region allowedRegion;
+        if (regions == null || regions.length == 0) {
+            allowedRegion = new NullRegion();
+        } else {
+            allowedRegion = new RegionIntersection(regions);
+        }
+        final Mask firstSourceMask = mask != null ? mask : sourceMask;
+        final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
+        if (finalMask != Masks.alwaysTrue()) {
+            copy.setSourceMask(finalMask);
+        }
         if (sourceMask != null) {
+            editSession.setSourceMask(null);
             new MaskTraverser(sourceMask).reset(editSession);
-            copy.setSourceMask(sourceMask);
             editSession.setSourceMask(null);
         }
-        if (mask != null) {
-            copy.setSourceMask(mask);
-        }
+
         Operations.completeLegacy(copy);
         saveDiskClipboard(clipboard);
         session.setClipboard(new ClipboardHolder(clipboard));
@@ -252,13 +267,22 @@ public class ClipboardCommands {
         copy.setRemovingEntities(true);
         copy.setCopyingBiomes(copyBiomes);
         Mask sourceMask = editSession.getSourceMask();
-        if (sourceMask != null) {
-            new MaskTraverser(sourceMask).reset(editSession);
-            copy.setSourceMask(sourceMask);
-            editSession.setSourceMask(null);
+        Region[] regions = editSession.getAllowedRegions();
+        Region allowedRegion;
+        if (regions == null || regions.length == 0) {
+            allowedRegion = new NullRegion();
+        } else {
+            allowedRegion = new RegionIntersection(regions);
         }
-        if (mask != null) {
-            copy.setSourceMask(mask);
+        final Mask firstSourceMask = mask != null ? mask : sourceMask;
+        final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
+        if (finalMask != Masks.alwaysTrue()) {
+            copy.setSourceMask(finalMask);
+        }
+        if (sourceMask != null) {
+            editSession.setSourceMask(null);
+            new MaskTraverser(sourceMask).reset(editSession);
+            editSession.setSourceMask(null);
         }
         Operations.completeLegacy(copy);
         saveDiskClipboard(clipboard);
