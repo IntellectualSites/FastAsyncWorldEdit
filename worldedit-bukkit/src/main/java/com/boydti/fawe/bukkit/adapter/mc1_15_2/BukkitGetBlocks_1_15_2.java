@@ -91,7 +91,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
     private boolean createCopy = false;
     private BukkitGetBlocks_1_15_2_Copy copy = null;
     private boolean forceLoadSections = true;
-    private boolean written = false;
     private boolean lightUpdate = false;
 
     public BukkitGetBlocks_1_15_2(World world, int chunkX, int chunkZ) {
@@ -173,6 +172,34 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
             base = index.getBiome(x >> 2, y >> 2, z >> 2);
         }
         return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(base)) : null;
+    }
+
+    @Override
+    public void removeSectionLighting(int layer, boolean sky) {
+        SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+        NibbleArray nibble = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
+        if (nibble != null) {
+            lightUpdate = true;
+            synchronized (nibble) {
+                byte[] bytes = nibble.getCloneIfSet();
+                if (bytes != NibbleArray.EMPTY_NIBBLE) {
+                    Arrays.fill(bytes, (byte) 0);
+                }
+            }
+        }
+        if (sky) {
+            SectionPosition sectionPositionSky = SectionPosition.a(nmsChunk.getPos(), layer);
+            NibbleArray nibbleSky = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPositionSky);
+            if (nibble != null) {
+                lightUpdate = true;
+                synchronized (nibbleSky) {
+                    byte[] bytes = nibbleSky.getCloneIfSet();
+                    if (bytes != NibbleArray.EMPTY_NIBBLE) {
+                        Arrays.fill(bytes, (byte) 0);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -594,7 +621,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
                         nmsChunk.d(true); // Set Modified
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
-                        written = true;
                         // send to player
                         if (Settings.IMP.LIGHTING.MODE == 0 || !Settings.IMP.LIGHTING.DELAY_PACKET_SENDING) {
                             this.send(finalMask, finalLightUpdate);
@@ -652,9 +678,6 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
 
     @Override
     public synchronized void send(int mask, boolean lighting) {
-        if (!written) {
-            throw new IllegalStateException("Chunk cannot be sent without first having been called!");
-        }
         BukkitAdapter_1_15_2.sendChunk(world, chunkX, chunkZ, mask, lighting);
     }
 

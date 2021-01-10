@@ -206,6 +206,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
             chunk.chunkSet.removeSectionLighting(layer, sky);
+            chunk.chunkExisting.removeSectionLighting(layer, sky);
         }
 
         @Override
@@ -481,7 +482,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         @Override
         public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
-            chunk.chunkSet.removeSectionLighting(layer, sky);
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            chunk.removeSectionLighting(layer, sky);
         }
 
         @Override
@@ -690,8 +693,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         @Override
         public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
+            chunk.getOrCreateGet();
             chunk.getOrCreateSet();
-            chunk.delegate = SET;
+            chunk.delegate = BOTH;
             chunk.removeSectionLighting(layer, sky);
         }
 

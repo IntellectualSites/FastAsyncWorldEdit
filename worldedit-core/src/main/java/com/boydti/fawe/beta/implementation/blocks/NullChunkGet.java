@@ -38,6 +38,9 @@ public final class NullChunkGet implements IChunkGet {
         return BiomeTypes.FOREST;
     }
 
+    @Override
+    public void removeSectionLighting(int layer, boolean sky) {}
+
     @NotNull
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypes.AIR.getDefaultState();

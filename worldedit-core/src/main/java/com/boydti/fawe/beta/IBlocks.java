@@ -42,6 +42,8 @@ public interface IBlocks extends Trimable {
             .map(layer -> (1 << layer)).sum();
     }
 
+    void removeSectionLighting(int layer, boolean sky);
+
     boolean trim(boolean aggressive, int layer);
 
     IBlocks reset();

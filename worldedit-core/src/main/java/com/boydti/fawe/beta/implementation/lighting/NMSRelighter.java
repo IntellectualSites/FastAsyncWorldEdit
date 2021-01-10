@@ -36,6 +36,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class NMSRelighter implements Relighter {
@@ -69,6 +70,7 @@ public class NMSRelighter implements Relighter {
     private final RelightMode relightMode;
     private final int maxY;
     private final boolean calculateHeightMaps;
+    private final ReentrantLock lightingLock;
     private boolean removeFirst;
 
     public NMSRelighter(IQueueExtent<IQueueChunk> queue, boolean calculateHeightMaps) {
@@ -85,10 +87,16 @@ public class NMSRelighter implements Relighter {
         this.maxY = queue.getMaxY();
         this.calculateHeightMaps = calculateHeightMaps;
         this.relightMode = relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE);
+        this.lightingLock = new ReentrantLock();
     }
 
     @Override public boolean isEmpty() {
         return skyToRelight.isEmpty() && lightQueue.isEmpty() && extentdSkyToRelight.isEmpty() && concurrentLightQueue.isEmpty();
+    }
+
+    @Override
+    public synchronized ReentrantLock getLock() {
+        return lightingLock;
     }
 
     @Override public synchronized void removeAndRelight(boolean sky) {
@@ -992,7 +1000,7 @@ public class NMSRelighter implements Relighter {
                     BlockMaterial material = state.getMaterial();
                     int opacity = material.getLightOpacity();
                     int brightness = material.getLightValue();
-                    if (brightness > 1) {
+                    if (brightness != iChunk.getEmmittedLight(x, y, z)) {
                         addLightUpdate(bx + x, y, bz + z);
                     }
 

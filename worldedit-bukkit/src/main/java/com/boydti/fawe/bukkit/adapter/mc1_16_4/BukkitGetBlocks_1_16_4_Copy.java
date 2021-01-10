@@ -133,6 +133,9 @@ public class BukkitGetBlocks_1_16_4_Copy implements IChunkGet {
     }
 
     @Override
+    public void removeSectionLighting(int layer, boolean sky) {}
+
+    @Override
     public boolean trim(boolean aggressive, int layer) {
         return false;
     }

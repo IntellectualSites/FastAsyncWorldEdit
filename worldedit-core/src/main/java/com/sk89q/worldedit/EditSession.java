@@ -20,6 +20,7 @@
 package com.sk89q.worldedit;
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
 import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
@@ -1096,7 +1097,20 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         // Reset limit
         limit.set(originalLimit);
         try {
-            relighter.fixLightingSafe(true);
+            if (relighter != null && !(relighter instanceof NullRelighter)) {
+                // Only relight once!
+                if (!relighter.getLock().tryLock()) {
+                    relighter.getLock().lock();
+                    relighter.getLock().unlock();
+                } else {
+                    if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                        relighter.removeAndRelight(true);
+                    } else {
+                        relighter.fixSkyLighting();
+                        relighter.fixBlockLighting();
+                    }
+                }
+            }
         } catch (Throwable e) {
             player.printError(TranslatableComponent.of("fawe.error.lighting"));
             e.printStackTrace();

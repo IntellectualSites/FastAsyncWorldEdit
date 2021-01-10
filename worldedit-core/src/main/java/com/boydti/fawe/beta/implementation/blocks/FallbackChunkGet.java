@@ -45,6 +45,11 @@ public class FallbackChunkGet implements IChunkGet {
     }
 
     @Override
+    public void removeSectionLighting(int layer, boolean sky) {
+        // do nothing
+    }
+
+    @Override
     public BlockState getBlock(int x, int y, int z) {
         return extent.getBlock(bx + x, y, bz + z);
     }
