@@ -1590,7 +1590,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         if (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size.getBlockZ()) {
             // Buffer if overlapping
-            disableQueue();
+            enableQueue();
         }
 
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
