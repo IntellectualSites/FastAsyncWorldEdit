@@ -457,6 +457,7 @@ public class EditSessionBuilder {
         return wnaMode;
     }
 
+    @Nullable
     public Region[] getAllowedRegions() {
         return allowedRegions;
     }
