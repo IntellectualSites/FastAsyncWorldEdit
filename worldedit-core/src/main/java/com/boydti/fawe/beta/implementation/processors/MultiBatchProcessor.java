@@ -89,7 +89,11 @@ public class MultiBatchProcessor implements IBatchProcessor {
             }
             if (ordered.size() > 0) {
                 for (int i = 1; i <= 4; i++) {
-                    for (IBatchProcessor processor : ordered.get(i)) {
+                    Set<IBatchProcessor> processors = ordered.get(i);
+                    if (processors == null) {
+                        continue;
+                    }
+                    for (IBatchProcessor processor : processors) {
                         chunkSet = processSet(processor,chunk, get, chunkSet);
                         if (chunkSet == null) {
                             return null;
