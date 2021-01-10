@@ -1627,10 +1627,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             allowedRegion = new RegionIntersection(allowedRegions);
         }
-        mask = MaskIntersection.of(getSourceMask(), mask, new RegionMask(allowedRegion)).optimize();
+        Mask sourceMask = this.getSourceMask();
+        mask = MaskIntersection.of(sourceMask, mask, new RegionMask(allowedRegion)).optimize();
         if (mask != Masks.alwaysTrue()) {
             copy.setSourceMask(mask);
-            if (this.getSourceMask().equals(mask)) {
+            if (sourceMask != null && sourceMask.equals(mask)) {
                 setSourceMask(null);
             }
         }
