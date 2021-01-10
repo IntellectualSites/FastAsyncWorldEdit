@@ -19,6 +19,7 @@ import net.minecraft.server.v1_16_R1.Chunk;
 import net.minecraft.server.v1_16_R1.ChunkProviderServer;
 import net.minecraft.server.v1_16_R1.EnumDirection;
 import net.minecraft.server.v1_16_R1.IBlockData;
+import net.minecraft.server.v1_16_R1.MinecraftServer;
 import net.minecraft.server.v1_16_R1.NBTBase;
 import net.minecraft.server.v1_16_R1.NBTTagCompound;
 import net.minecraft.server.v1_16_R1.PlayerChunk;
@@ -48,7 +49,9 @@ public class FAWEWorldNativeAccess_1_16_R1 implements WorldNativeAccess<Chunk, I
     public FAWEWorldNativeAccess_1_16_R1(FAWE_Spigot_v1_16_R1 adapter, WeakReference<World> world) {
         this.adapter = adapter;
         this.world = world;
-        this.lastTick = new AtomicInteger(getWorld().getServer().getCurrentTick());
+        // Use the actual tick as minecraft-defined so we don't try to force blocks into the world when the server's already lagging.
+        //  - With the caveat that we don't want to have too many cached changed (1024) so we'd flush those at 1024 anyway.
+        this.lastTick = new AtomicInteger(MinecraftServer.currentTick);
     }
 
     private World getWorld() {
@@ -81,7 +84,7 @@ public class FAWEWorldNativeAccess_1_16_R1 implements WorldNativeAccess<Chunk, I
     @Nullable
     @Override
     public IBlockData setBlockState(Chunk chunk, BlockPosition position, IBlockData state) {
-        int currentTick = getWorld().getServer().getCurrentTick();
+        int currentTick = MinecraftServer.currentTick;
         if (Fawe.isMainThread()) {
             if (lastTick.get() > currentTick) {
                 lastTick.set(currentTick);
