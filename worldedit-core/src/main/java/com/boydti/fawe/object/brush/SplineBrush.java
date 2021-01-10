@@ -4,6 +4,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -13,6 +14,7 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.MathUtils;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Node;
@@ -195,15 +197,15 @@ public class SplineBrush implements Brush, ResettableTool {
         if (det_max == det_x) {
             double a = (xz * yz - xy * zz) / det_x;
             double b = (xy * yz - xz * yy) / det_x;
-            dir = BlockVector3.at(1.0, a, b);
+            dir = BlockVector3.at(1.0, (int) MathUtils.roundHalfUp(a), (int) MathUtils.roundHalfUp(b));
         } else if (det_max == det_y) {
             double a = (yz * xz - xy * zz) / det_y;
             double b = (xy * xz - yz * xx) / det_y;
-            dir = BlockVector3.at(a, 1.0, b);
+            dir = BlockVector3.at((int) MathUtils.roundHalfUp(a), 1.0, (int) MathUtils.roundHalfUp(b));
         } else {
             double a = (yz * xy - xz * yy) / det_z;
             double b = (xz * xy - yz * xx) / det_z;
-            dir = BlockVector3.at(a, b, 1.0);
+            dir = BlockVector3.at((int) MathUtils.roundHalfUp(a), (int) MathUtils.roundHalfUp(b), 1.0);
         }
         return dir.normalize();
     }

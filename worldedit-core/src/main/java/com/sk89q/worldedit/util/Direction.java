@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.util;
 
+import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
@@ -79,7 +80,8 @@ public enum Direction {
     }
 
     Direction(Vector3 vector, int flags, int left, int right) {
-        this.blockPoint = BlockVector3.at(Math.signum(vector.getX()), Math.signum(vector.getY()), Math.signum(vector.getZ()));
+        this.blockPoint = BlockVector3.at(MathMan.roundInt(Math.signum(vector.getX())),
+            MathMan.roundInt(Math.signum(vector.getY())), MathMan.roundInt(Math.signum(vector.getZ())));
         this.direction = vector.normalize();
         this.flags = flags;
         this.left = left;
