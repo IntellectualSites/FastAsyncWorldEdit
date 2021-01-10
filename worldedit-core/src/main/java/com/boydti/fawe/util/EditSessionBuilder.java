@@ -393,6 +393,7 @@ public class EditSessionBuilder {
                     }
                 }
             } else {
+                allowedRegions = new Region[]{RegionWrapper.GLOBAL()};
 //                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
             }
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
