@@ -77,4 +77,12 @@ public class RegionMask extends AbstractMask {
         return new RegionMask(region.clone());
     }
 
+    @Override
+    public Mask optimize() {
+        if (region.isGlobal()) {
+            return Masks.alwaysTrue();
+        }
+        return this;
+    }
+
 }
