@@ -12,7 +12,6 @@ import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.block.BlockState;
-import io.netty.util.internal.ConcurrentSet;
 import net.minecraft.server.v1_16_R1.Block;
 import net.minecraft.server.v1_16_R1.BlockPosition;
 import net.minecraft.server.v1_16_R1.Chunk;
@@ -30,7 +29,8 @@ import org.bukkit.craftbukkit.v1_16_R1.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
 import java.lang.ref.WeakReference;
-import java.util.LinkedHashSet;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,7 +44,8 @@ public class FAWEWorldNativeAccess_1_16_R1 implements WorldNativeAccess<Chunk, I
     private final WeakReference<World> world;
     private SideEffectSet sideEffectSet;
     private final AtomicInteger lastTick;
-    private final Set<CachedChange> cachedChanges = new ConcurrentSet<>();
+    private final Set<CachedChange> cachedChanges = new HashSet<>();
+    private final Set<IntPair> cachedChunksToSend = new HashSet<>();
 
     public FAWEWorldNativeAccess_1_16_R1(FAWE_Spigot_v1_16_R1 adapter, WeakReference<World> world) {
         this.adapter = adapter;
@@ -83,24 +84,25 @@ public class FAWEWorldNativeAccess_1_16_R1 implements WorldNativeAccess<Chunk, I
 
     @Nullable
     @Override
-    public IBlockData setBlockState(Chunk chunk, BlockPosition position, IBlockData state) {
+    public synchronized IBlockData setBlockState(Chunk chunk, BlockPosition position, IBlockData state) {
         int currentTick = MinecraftServer.currentTick;
         if (Fawe.isMainThread()) {
-            if (lastTick.get() > currentTick) {
-                lastTick.set(currentTick);
-                flush();
-            }
             return chunk.setType(position, state,
                 this.sideEffectSet != null && this.sideEffectSet.shouldApply(SideEffect.UPDATE));
         }
         // Since FAWE is.. Async we need to do it on the main thread (wooooo.. :( )
         cachedChanges.add(new CachedChange(chunk, position, state));
-        if (lastTick.get() > currentTick || cachedChanges.size() > 1024) {
-            lastTick.set(currentTick);
-            flush();
+        cachedChunksToSend.add(new IntPair(chunk.bukkitChunk.getX(), chunk.bukkitChunk.getZ()));
+        boolean nextTick = lastTick.get() > currentTick;
+        if (nextTick || cachedChanges.size() >= 1024) {
+            if (nextTick) {
+                lastTick.set(currentTick);
+            }
+            flushAsync(nextTick);
         }
         return state;
     }
+
 
     @Override
     public IBlockData getValidBlockForPosition(IBlockData block, BlockPosition position) {
@@ -194,18 +196,40 @@ public class FAWEWorldNativeAccess_1_16_R1 implements WorldNativeAccess<Chunk, I
         getWorld().a(pos, oldState, newState);
     }
 
-    @Override
-    public synchronized void flush() {
-        Set<IntPair> toSend = new LinkedHashSet<>();
+    private synchronized void flushAsync(final boolean sendChunks) {
+        final Set<CachedChange> changes = Collections.unmodifiableSet(cachedChanges);
+        cachedChanges.clear();
+        final Set<IntPair> toSend;
+        if (sendChunks) {
+            toSend = Collections.unmodifiableSet(cachedChunksToSend);
+            cachedChunksToSend.clear();
+        } else {
+            toSend = Collections.emptySet();
+        }
         RunnableVal<Object> r = new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
-                cachedChanges.forEach(cc -> {
-                    cc.chunk.setType(cc.position, cc.blockData,
-                        sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE));
-                    toSend.add(new IntPair(cc.chunk.getBukkitChunk().getX(), cc.chunk.bukkitChunk.getZ()));
-                });
+                changes.forEach(cc -> cc.chunk.setType(cc.position, cc.blockData,
+                    sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)));
+                if (!sendChunks) {
+                    return;
+                }
                 for (IntPair chunk : toSend) {
+                    BukkitAdapter_1_16_1.sendChunk(getWorld().getWorld().getHandle(), chunk.x, chunk.z, 0, false);
+                }
+            }
+        };
+        TaskManager.IMP.async(() -> TaskManager.IMP.sync(r));
+    }
+
+    @Override
+    public synchronized void flush() {
+        RunnableVal<Object> r = new RunnableVal<Object>() {
+            @Override
+            public void run(Object value) {
+                cachedChanges.forEach(cc -> cc.chunk.setType(cc.position, cc.blockData,
+                    sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)));
+                for (IntPair chunk : cachedChunksToSend) {
                     BukkitAdapter_1_16_1.sendChunk(getWorld().getWorld().getHandle(), chunk.x, chunk.z, 0, false);
                 }
             }
@@ -216,6 +240,7 @@ public class FAWEWorldNativeAccess_1_16_R1 implements WorldNativeAccess<Chunk, I
             TaskManager.IMP.sync(r);
         }
         cachedChanges.clear();
+        cachedChunksToSend.clear();
     }
 
     private static final class CachedChange {

@@ -267,7 +267,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.history = changeSet != null;
         this.relighter = builder.getRelighter();
         this.wnaMode = builder.isWNAMode();
-        this.allowedRegions = builder.getAllowedRegions().clone();
+        this.allowedRegions = builder.getAllowedRegions() != null ? builder.getAllowedRegions().clone() : null;
     }
 
     /**
