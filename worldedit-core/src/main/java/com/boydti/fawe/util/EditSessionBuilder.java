@@ -398,6 +398,7 @@ public class EditSessionBuilder {
                     }
                 }
             } else {
+                allowedRegions = new Region[]{RegionWrapper.GLOBAL()};
 //                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
             }
             // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks

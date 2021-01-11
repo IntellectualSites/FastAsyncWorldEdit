@@ -84,15 +84,15 @@ public abstract class Vector3 {
     }
 
     public int getBlockX() {
-        return MathMan.roundInt(getX());
+        return (int) MathUtils.roundHalfUp(getX());
     }
 
     public int getBlockY() {
-        return MathMan.roundInt(getY());
+        return (int) MathUtils.roundHalfUp(getY());
     }
 
     public int getBlockZ() {
-        return MathMan.roundInt(getZ());
+        return (int) MathUtils.roundHalfUp(getZ());
     }
 
     public MutableVector3 setComponents(Vector3 other) {
@@ -595,7 +595,8 @@ public abstract class Vector3 {
      * @return a new {@code BlockVector}
      */
     public static BlockVector3 toBlockPoint(double x, double y, double z) {
-        return BlockVector3.at(x, y, z);
+        return BlockVector3.at(MathUtils.roundHalfUp(x), MathUtils.roundHalfUp(y), MathUtils.roundHalfUp(z));
+        //return BlockVector3.at(x, y, z);
     }
 
     /**
