@@ -540,7 +540,7 @@ public class ClipboardCommands {
         transform = transform.rotateY(-rotateY);
         transform = transform.rotateX(-rotateX);
         transform = transform.rotateZ(-rotateZ);
-        holder.setTransform(holder.getTransform().combine(transform));
+        holder.setTransform(transform.combine(holder.getTransform()));
         actor.printInfo(TranslatableComponent.of("worldedit.rotate.rotated"));
     }
 
@@ -555,7 +555,7 @@ public class ClipboardCommands {
         ClipboardHolder holder = session.getClipboard();
         AffineTransform transform = new AffineTransform();
         transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());
-        holder.setTransform(holder.getTransform().combine(transform));
+        holder.setTransform(transform.combine(holder.getTransform()));
         actor.printInfo(TranslatableComponent.of("worldedit.flip.flipped"));
     }
 
