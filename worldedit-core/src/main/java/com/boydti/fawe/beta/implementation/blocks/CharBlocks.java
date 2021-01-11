@@ -26,30 +26,25 @@ public abstract class CharBlocks implements IBlocks {
             return true;
         }
     };
-    protected static final Section EMPTY = new Section() {
+    protected final Section EMPTY = new Section() {
         @Override
-        public final char[] get(CharBlocks blocks, int layer) {
-            blocks.loadLock.lock();
-            try {
-                char[] arr = blocks.blocks[layer];
+        public final synchronized char[] get(CharBlocks blocks, int layer) {
+            char[] arr = blocks.blocks[layer];
+            if (arr == null) {
+                arr = blocks.blocks[layer] = blocks.update(layer, null);
                 if (arr == null) {
-                    arr = blocks.blocks[layer] = blocks.update(layer, null);
-                    if (arr == null) {
-                        throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
-                    }
-                } else {
-                    blocks.blocks[layer] = blocks.update(layer, arr);
-                    if (blocks.blocks[layer] == null) {
-                        throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
-                    }
+                    throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
                 }
-                if (blocks.blocks[layer] != null) {
-                    blocks.sections[layer] = FULL;
+            } else {
+                blocks.blocks[layer] = blocks.update(layer, arr);
+                if (blocks.blocks[layer] == null) {
+                    throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
                 }
-                return arr;
-            } finally {
-                blocks.loadLock.unlock();
             }
+            if (blocks.blocks[layer] != null) {
+                blocks.sections[layer] = FULL;
+            }
+            return arr;
         }
 
         @Override
@@ -59,7 +54,6 @@ public abstract class CharBlocks implements IBlocks {
     };
     public final char[][] blocks;
     public final Section[] sections;
-    private final ReentrantLock loadLock = new ReentrantLock ();
 
     public CharBlocks() {
         blocks = new char[16][];

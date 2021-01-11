@@ -297,12 +297,24 @@ public class AffineTransform implements Transform, Serializable {
     public boolean isScaled(Vector3 vector) {
         boolean flip = false;
         if (vector.getX() != 0 && m00 < 0) {
-            flip = !flip;
+            flip = true;
         }
         if (vector.getY() != 0 && m11 < 0) {
             flip = !flip;
         }
         if (vector.getZ() != 0 && m22 < 0) {
+            flip = !flip;
+        }
+        if (flip) {
+            return true;
+        }
+        if (vector.getX() != 0 && m01 != 0 && m01 == m10) {
+            flip = true;
+        }
+        if (vector.getY() != 0 && m02 != 0 && m02 == m20) {
+            flip = !flip;
+        }
+        if (vector.getZ() != 0 && m21 != 0 && m21 == m12) {
             flip = !flip;
         }
         return flip;

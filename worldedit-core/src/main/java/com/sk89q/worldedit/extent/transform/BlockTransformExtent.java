@@ -84,7 +84,7 @@ public class BlockTransformExtent extends ResettableExtent {
     private int[] BLOCK_ROTATION_BITMASK;
     private int[][] BLOCK_TRANSFORM;
     private int[][] BLOCK_TRANSFORM_INVERSE;
-    private int[] ALL = new int[0];
+    private final int[] ALL = new int[0];
 
     public BlockTransformExtent(Extent parent) {
         this(parent, new AffineTransform());
@@ -437,13 +437,28 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return transformBlock(super.getBlock(x, y, z), false);
+    }
+
+    @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         return transformBlock(super.getFullBlock(position), false);
     }
 
     @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return transformBlock(super.getFullBlock(x, y, z), false);
+    }
+
+    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return super.setBlock(location, transformBlock(block, true));
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+        return super.setBlock(x, y, z, transformInverse(block));
     }
 
     public void setTransform(Transform affine) {
@@ -520,15 +535,5 @@ public class BlockTransformExtent extends ResettableExtent {
 
     private BlockState transformInverse(BlockState block) {
         return transform(block, BLOCK_TRANSFORM_INVERSE, transformInverse);
-    }
-
-    @Override
-    public BlockState getBlock(int x, int y, int z) {
-        return transform(super.getBlock(x, y, z));
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        return super.setBlock(x, y, z, transformInverse(block));
     }
 }
