@@ -38,6 +38,9 @@ public final class NullChunkGet implements IChunkGet {
         return BiomeTypes.FOREST;
     }
 
+    @Override
+    public void removeSectionLighting(int layer, boolean sky) {}
+
     @NotNull
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypes.AIR.getDefaultState();
@@ -68,6 +71,15 @@ public final class NullChunkGet implements IChunkGet {
     @Override public boolean isCreateCopy() {
         return false;
     }
+
+    @Override
+    public void setLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setSkyLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {}
 
     public boolean trim(boolean aggressive) {
         return true;

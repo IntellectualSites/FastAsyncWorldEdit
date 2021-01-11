@@ -51,4 +51,9 @@ public class BatchProcessorHolder implements IBatchProcessorHolder {
         IBatchProcessor tmp = getProcessor();
         return super.toString() + "{" + (tmp == this ? "" : getProcessor()) + "}";
     }
+
+    @Override
+    public ProcessorScope getScope() {
+        return getProcessor().getScope();
+    }
 }

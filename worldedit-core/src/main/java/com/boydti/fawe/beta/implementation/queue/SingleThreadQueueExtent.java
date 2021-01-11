@@ -14,6 +14,7 @@ import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
 import com.boydti.fawe.beta.implementation.processors.ExtentBatchProcessorHolder;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
@@ -351,5 +352,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     @Override
     public ChunkFilterBlock initFilterBlock() {
         return new CharFilterBlock(this);
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.ADDING_BLOCKS;
     }
 }

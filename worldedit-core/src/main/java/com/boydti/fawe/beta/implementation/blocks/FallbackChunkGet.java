@@ -45,6 +45,11 @@ public class FallbackChunkGet implements IChunkGet {
     }
 
     @Override
+    public void removeSectionLighting(int layer, boolean sky) {
+        // do nothing
+    }
+
+    @Override
     public BlockState getBlock(int x, int y, int z) {
         return extent.getBlock(bx + x, y, bz + z);
     }
@@ -104,6 +109,21 @@ public class FallbackChunkGet implements IChunkGet {
 
     @Override public boolean isCreateCopy() {
         return false;
+    }
+
+    @Override
+    public void setLightingToGet(char[][] lighting) {
+        // do nothing
+    }
+
+    @Override
+    public void setSkyLightingToGet(char[][] lighting) {
+        // do nothing
+    }
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {
+        // do nothing
     }
 
     @Override

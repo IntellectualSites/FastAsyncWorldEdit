@@ -5,6 +5,7 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.exception.FaweException;
 import com.sk89q.jnbt.CompoundTag;
@@ -354,5 +355,10 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     @Override
     public Extent construct(Extent child) {
         throw reason;
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.ADDING_BLOCKS;
     }
 }

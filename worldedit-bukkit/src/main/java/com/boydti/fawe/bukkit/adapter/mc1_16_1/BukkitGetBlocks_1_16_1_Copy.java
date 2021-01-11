@@ -104,6 +104,15 @@ public class BukkitGetBlocks_1_16_1_Copy implements IChunkGet {
         return false;
     }
 
+    @Override
+    public void setLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setSkyLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {}
+
     protected void storeBiomes(BiomeStorage biomeStorage) {
         this.biomeStorage = new BiomeStorage(BukkitAdapter_1_16_1.getBiomeArray(biomeStorage).clone());
     }
@@ -121,6 +130,9 @@ public class BukkitGetBlocks_1_16_1_Copy implements IChunkGet {
         }
         return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(base)) : null;
     }
+
+    @Override
+    public void removeSectionLighting(int layer, boolean sky) {}
 
     @Override
     public boolean trim(boolean aggressive, int layer) {

@@ -7,6 +7,7 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
+import com.boydti.fawe.bukkit.adapter.BukkitGetBlocks;
 import com.boydti.fawe.bukkit.adapter.DelegateLock;
 import com.boydti.fawe.bukkit.adapter.mc1_16_4.nbt.LazyCompoundTag_1_16_4;
 import com.boydti.fawe.config.Settings;
@@ -75,7 +76,7 @@ import java.util.function.Function;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
+public class BukkitGetBlocks_1_16_4 extends CharGetBlocks implements BukkitGetBlocks {
 
     private static final Logger log = LoggerFactory.getLogger(BukkitGetBlocks_1_16_4.class);
 
@@ -91,6 +92,7 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
     private boolean createCopy = false;
     private BukkitGetBlocks_1_16_4_Copy copy = null;
     private boolean forceLoadSections = true;
+    private boolean lightUpdate = false;
 
     public BukkitGetBlocks_1_16_4(World world, int chunkX, int chunkZ) {
         this(((CraftWorld) world).getHandle(), chunkX, chunkZ);
@@ -121,6 +123,37 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
         return copy;
     }
 
+    @Override
+    public void setLightingToGet(char[][] light) {
+        if (light != null) {
+            lightUpdate = true;
+            try {
+                fillLightNibble(light, EnumSkyBlock.BLOCK);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void setSkyLightingToGet(char[][] light) {
+        if (light != null) {
+            lightUpdate = true;
+            try {
+                fillLightNibble(light, EnumSkyBlock.SKY);
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {
+        BitArrayUnstretched bitArray = new BitArrayUnstretched(9, 256);
+        bitArray.fromRaw(data);
+        nmsChunk.heightMap.get(HeightMap.Type.valueOf(type.name())).a(bitArray.getData());
+    }
+
     public int getChunkZ() {
         return chunkZ;
     }
@@ -140,6 +173,34 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
             base = index.getBiome(x >> 2, y >> 2, z >> 2);
         }
         return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(world.r().b(IRegistry.ay), base)) : null;
+    }
+
+    @Override
+    public void removeSectionLighting(int layer, boolean sky) {
+        SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+        NibbleArray nibble = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
+        if (nibble != null) {
+            lightUpdate = true;
+            synchronized (nibble) {
+                byte[] bytes = nibble.getCloneIfSet();
+                if (bytes != NibbleArray.EMPTY_NIBBLE) {
+                    Arrays.fill(bytes, (byte) 0);
+                }
+            }
+        }
+        if (sky) {
+            SectionPosition sectionPositionSky = SectionPosition.a(nmsChunk.getPos(), layer);
+            NibbleArray nibbleSky = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPositionSky);
+            if (nibble != null) {
+                lightUpdate = true;
+                synchronized (nibbleSky) {
+                    byte[] bytes = nibbleSky.getCloneIfSet();
+                    if (bytes != NibbleArray.EMPTY_NIBBLE) {
+                        Arrays.fill(bytes, (byte) 0);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -441,33 +502,10 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
 
                 Map<HeightMapType, int[]> heightMaps = set.getHeightMaps();
                 for (Map.Entry<HeightMapType, int[]> entry : heightMaps.entrySet()) {
-                    BitArrayUnstretched bitArray = new BitArrayUnstretched(9, 256);
-                    bitArray.fromRaw(entry.getValue());
-                    nmsChunk.heightMap.get(HeightMap.Type.valueOf(entry.getKey().name())).a(bitArray.getData());
+                    BukkitGetBlocks_1_16_4.this.setHeightmapToGet(entry.getKey(), entry.getValue());
                 }
-
-                boolean lightUpdate = false;
-
-                // Lighting
-                char[][] light = set.getLight();
-                if (light != null) {
-                    lightUpdate = true;
-                    try {
-                        fillLightNibble(light, EnumSkyBlock.BLOCK);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                char[][] skyLight = set.getSkyLight();
-                if (skyLight != null) {
-                    lightUpdate = true;
-                    try {
-                        fillLightNibble(skyLight, EnumSkyBlock.SKY);
-                    } catch (Throwable e) {
-                        e.printStackTrace();
-                    }
-                }
+                BukkitGetBlocks_1_16_4.this.setLightingToGet(set.getLight());
+                BukkitGetBlocks_1_16_4.this.setSkyLightingToGet(set.getSkyLight());
 
                 Runnable[] syncTasks = null;
 
@@ -589,7 +627,9 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
                         nmsChunk.mustNotSave = false;
                         nmsChunk.markDirty();
                         // send to player
-                        BukkitAdapter_1_16_4.sendChunk(nmsWorld, chunkX, chunkZ, finalMask, finalLightUpdate);
+                        if (Settings.IMP.LIGHTING.MODE == 0 || !Settings.IMP.LIGHTING.DELAY_PACKET_SENDING) {
+                            this.send(finalMask, finalLightUpdate);
+                        }
                         if (finalizer != null) {
                             finalizer.run();
                         }
@@ -639,6 +679,11 @@ public class BukkitGetBlocks_1_16_4 extends CharGetBlocks {
         } finally {
             forceLoadSections = true;
         }
+    }
+
+    @Override
+    public synchronized void send(int mask, boolean lighting) {
+        BukkitAdapter_1_16_4.sendChunk(world, chunkX, chunkZ, mask, lighting);
     }
 
     @Override

@@ -36,4 +36,9 @@ public final class NullProcessor implements IBatchProcessor {
     private NullProcessor() {
     }
 
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.ADDING_BLOCKS;
+    }
+
 }

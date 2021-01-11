@@ -624,6 +624,15 @@ public class MCAChunk implements IChunk {
     }
 
     @Override
+    public void setLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setSkyLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {}
+
+    @Override
     public Future call(IChunkSet set, Runnable finalize) {
         return null;
     }

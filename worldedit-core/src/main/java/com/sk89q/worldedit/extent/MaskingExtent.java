@@ -28,6 +28,7 @@ import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -127,5 +128,10 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     @Override
     public Filter fork() {
         return new MaskingExtent(getExtent(), this.mask.copy(), this.threadIdToFilter);
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.REMOVING_BLOCKS;
     }
 }

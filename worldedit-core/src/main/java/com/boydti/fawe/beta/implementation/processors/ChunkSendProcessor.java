@@ -81,4 +81,9 @@ public class ChunkSendProcessor implements IBatchProcessor {
     public Extent construct(Extent child) {
         throw new UnsupportedOperationException("Processing only");
     }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.READING_SET_BLOCKS;
+    }
 }

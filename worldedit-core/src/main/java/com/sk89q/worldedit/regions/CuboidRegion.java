@@ -25,6 +25,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -773,6 +774,5 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         }
         return null;
     }
-
 
 }

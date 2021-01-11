@@ -104,6 +104,7 @@
 	"fawe.error.worldedit.some.fails.blockbag": "Missing blocks: {0}",
     "fawe.error.mask.angle": "Cannot combine degree with block-step",
     "fawe.error.invalid-flag": "The flag {0} is not applicable here",
+    "fawe.error.lighting": "Error when attempting lighting. You may need to reload the chunks to see the edit.",
 
 	"fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {2}",

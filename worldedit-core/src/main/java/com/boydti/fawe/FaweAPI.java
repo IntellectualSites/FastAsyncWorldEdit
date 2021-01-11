@@ -361,7 +361,7 @@ public class FaweAPI {
         } else {
             relighter.removeLighting();
         }
-        relighter.sendChunks();
+        relighter.flush();
         return count;
     }
 

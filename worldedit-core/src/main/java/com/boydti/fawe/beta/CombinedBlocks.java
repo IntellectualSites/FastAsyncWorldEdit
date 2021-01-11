@@ -40,6 +40,12 @@ public class CombinedBlocks implements IBlocks {
     }
 
     @Override
+    public void removeSectionLighting(int layer, boolean sky) {
+        primary.removeSectionLighting(layer, sky);
+        secondary.removeSectionLighting(layer, sky);
+    }
+
+    @Override
     public boolean hasSection(int layer) {
         return primary.hasSection(layer) || secondary.hasSection(layer);
     }

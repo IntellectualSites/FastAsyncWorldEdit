@@ -1,9 +1,11 @@
 package com.boydti.fawe.beta.implementation.lighting;
 
+import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.RelightMode;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.util.MathMan;
@@ -34,6 +36,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class NMSRelighter implements Relighter {
@@ -64,11 +67,17 @@ public class NMSRelighter implements Relighter {
     private final Map<Long, long[][][] /* z y x */> lightQueue;
     private final AtomicBoolean lightLock = new AtomicBoolean(false);
     private final ConcurrentHashMap<Long, long[][][]> concurrentLightQueue;
+    private final RelightMode relightMode;
     private final int maxY;
     private final boolean calculateHeightMaps;
+    private final ReentrantLock lightingLock;
     private boolean removeFirst;
 
     public NMSRelighter(IQueueExtent<IQueueChunk> queue, boolean calculateHeightMaps) {
+        this(queue, calculateHeightMaps, null);
+    }
+
+    public NMSRelighter(IQueueExtent<IQueueChunk> queue, boolean calculateHeightMaps, RelightMode relightMode) {
         this.queue = queue;
         this.skyToRelight = new Long2ObjectOpenHashMap<>(12);
         this.lightQueue = new Long2ObjectOpenHashMap<>(12);
@@ -77,10 +86,17 @@ public class NMSRelighter implements Relighter {
         this.heightMaps = new Long2ObjectOpenHashMap<>(12);
         this.maxY = queue.getMaxY();
         this.calculateHeightMaps = calculateHeightMaps;
+        this.relightMode = relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE);
+        this.lightingLock = new ReentrantLock();
     }
 
     @Override public boolean isEmpty() {
         return skyToRelight.isEmpty() && lightQueue.isEmpty() && extentdSkyToRelight.isEmpty() && concurrentLightQueue.isEmpty();
+    }
+
+    @Override
+    public synchronized ReentrantLock getLock() {
+        return lightingLock;
     }
 
     @Override public synchronized void removeAndRelight(boolean sky) {
@@ -778,6 +794,7 @@ public class NMSRelighter implements Relighter {
                 }
             }
             fixBlockLighting();
+            sendChunks();
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -786,7 +803,11 @@ public class NMSRelighter implements Relighter {
     public void fixBlockLighting() {
         synchronized (lightQueue) {
             while (!lightLock.compareAndSet(false, true)) {
-                ;
+                try {
+                    lightLock.wait(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             try {
                 updateBlockLight(this.lightQueue);
@@ -796,7 +817,7 @@ public class NMSRelighter implements Relighter {
         }
     }
 
-    public synchronized void sendChunks() {
+    public synchronized void flush() {
         Iterator<Map.Entry<Long, Integer>> iter = chunksToSend.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<Long, Integer> entry = iter.next();
@@ -824,6 +845,40 @@ public class NMSRelighter implements Relighter {
                     queue.flush();
                 }
             });
+        }
+    }
+
+    public synchronized void sendChunks() {
+        RunnableVal<Object> runnable = new RunnableVal<Object>() {
+            @Override
+            public void run(Object value) {
+                Iterator<Map.Entry<Long, Integer>> iter = chunksToSend.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry<Long, Integer> entry = iter.next();
+                    long pair = entry.getKey();
+                    int bitMask = entry.getValue();
+                    int x = MathMan.unpairIntX(pair);
+                    int z = MathMan.unpairIntY(pair);
+                    ChunkHolder<?> chunk = (ChunkHolder<?>) queue.getOrCreateChunk(x, z);
+                    chunk.setBitMask(bitMask);
+                    if (calculateHeightMaps && heightMaps != null) {
+                        Map<HeightMapType, int[]> heightMapList = heightMaps.get(pair);
+                        if (heightMapList != null) {
+                            for (Map.Entry<HeightMapType, int[]> heightMapEntry : heightMapList.entrySet()) {
+                                chunk.setHeightMap(heightMapEntry.getKey(), heightMapEntry.getValue());
+                            }
+                        }
+                    }
+                    chunk.flushLightToGet(true);
+                    Fawe.imp().getPlatformAdapter().sendChunk(chunk.getOrCreateGet(), bitMask, true);
+                    iter.remove();
+                }
+            }
+        };
+        if (Settings.IMP.LIGHTING.ASYNC) {
+            runnable.run();
+        } else {
+            TaskManager.IMP.sync(runnable);
         }
     }
 
@@ -913,7 +968,7 @@ public class NMSRelighter implements Relighter {
             for (RelightSkyEntry chunk : chunks) { // Propagate skylight
                 int layer = y >> 4;
                 byte[] mask = chunk.mask;
-                if ((y & 15) == 15 && chunk.fix[layer] != SkipReason.NONE) {
+                if (chunk.fix[layer] != SkipReason.NONE) {
                     if ((y & 15) == 0 && layer != 0 && chunk.fix[layer - 1] == SkipReason.NONE) {
                         fill(mask, chunk.x, y, chunk.z, chunk.fix[layer]);
                     }
@@ -945,7 +1000,7 @@ public class NMSRelighter implements Relighter {
                     BlockMaterial material = state.getMaterial();
                     int opacity = material.getLightOpacity();
                     int brightness = material.getLightValue();
-                    if (brightness > 1) {
+                    if (brightness != iChunk.getEmmittedLight(x, y, z)) {
                         addLightUpdate(bx + x, y, bz + z);
                     }
 
@@ -957,25 +1012,26 @@ public class NMSRelighter implements Relighter {
                         if (heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] == 0 && material.isSolid()) {
                             heightMapList.get(HeightMapType.OCEAN_FLOOR)[j] = y + 1;
                         }
+                        Map<Property<?>, Object> states = state.getStates();
                         try {
                             if (heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] == 0 && (material.isSolid() || material.isLiquid() || (
-                                state.getStates().containsKey(waterLogged) && state.getState(waterLogged)))) {
+                                states.containsKey(waterLogged) && state.getState(waterLogged)))) {
                                 heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
                             }
                         } catch (Exception ignored) {
                             log.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
-                            log.debug(state.getStates().entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                            log.debug(states.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
                                 .collect(Collectors.joining(", ", "{", "}")));
                         }
                         try {
                             if (heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] == 0 && (material.isSolid() || material.isLiquid() || (
-                                state.getStates().containsKey(waterLogged) && state.getState(waterLogged))) && !state.getBlockType().getId()
+                                states.containsKey(waterLogged) && state.getState(waterLogged))) && !state.getBlockType().getId()
                                 .toLowerCase().contains("leaves")) {
                                 heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
                             }
                         } catch (Exception ignored) {
                             log.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
-                            log.debug(state.getStates().entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                            log.debug(states.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
                                 .collect(Collectors.joining(", ", "{", "}")));
                         }
                     }
