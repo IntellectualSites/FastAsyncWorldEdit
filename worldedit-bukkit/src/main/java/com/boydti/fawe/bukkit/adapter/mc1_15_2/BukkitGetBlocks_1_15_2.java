@@ -150,7 +150,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
     public void setHeightmapToGet(HeightMapType type, int[] data) {
         BitArray bitArray = new BitArray(9, 256);
         bitArray.fromRaw(data);
-        nmsChunk.heightMap.get(HeightMap.Type.valueOf(type.name())).a(bitArray.getData());
+        getChunk().heightMap.get(HeightMap.Type.valueOf(type.name())).a(bitArray.getData());
     }
 
     public int getChunkZ() {
@@ -176,7 +176,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
 
     @Override
     public void removeSectionLighting(int layer, boolean sky) {
-        SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+        SectionPosition sectionPosition = SectionPosition.a(getChunk().getPos(), layer);
         NibbleArray nibble = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
         if (nibble != null) {
             lightUpdate = true;
@@ -188,7 +188,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
             }
         }
         if (sky) {
-            SectionPosition sectionPositionSky = SectionPosition.a(nmsChunk.getPos(), layer);
+            SectionPosition sectionPositionSky = SectionPosition.a(getChunk().getPos(), layer);
             NibbleArray nibbleSky = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPositionSky);
             if (nibble != null) {
                 lightUpdate = true;
@@ -225,7 +225,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
     public int getSkyLight(int x, int y, int z) {
         int layer = y >> 4;
         if (skyLight[layer] == null) {
-            SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+            SectionPosition sectionPosition = SectionPosition.a(getChunk().getPos(), layer);
             NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPosition);
             // If the server hasn't generated the section's NibbleArray yet, it will be null
             if (nibbleArray == null) {
@@ -245,7 +245,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
     public int getEmmittedLight(int x, int y, int z) {
         int layer = y >> 4;
         if (blockLight[layer] == null) {
-            SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+            SectionPosition sectionPosition = SectionPosition.a(getChunk().getPos(), layer);
             NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
             // If the server hasn't generated the section's NibbleArray yet, it will be null
             if (nibbleArray == null) {
@@ -352,7 +352,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
 
     private void updateGet(BukkitGetBlocks_1_15_2 get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
         synchronized (get) {
-            if (this.nmsChunk != nmsChunk) {
+            if (this.getChunk() != nmsChunk) {
                 this.nmsChunk = nmsChunk;
                 this.sections = sections.clone();
                 this.reset();
@@ -451,7 +451,7 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
                     synchronized (this) {
                         synchronized (lock) {
                             lock.untilFree();
-                            if (this.nmsChunk != nmsChunk) {
+                            if (this.getChunk() != nmsChunk) {
                                 this.nmsChunk = nmsChunk;
                                 this.sections = null;
                                 this.reset();
