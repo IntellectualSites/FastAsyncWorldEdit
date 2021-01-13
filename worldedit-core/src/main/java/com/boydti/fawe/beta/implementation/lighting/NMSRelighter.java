@@ -95,7 +95,7 @@ public class NMSRelighter implements Relighter {
     }
 
     @Override
-    public synchronized ReentrantLock getLock() {
+    public ReentrantLock getLock() {
         return lightingLock;
     }
 

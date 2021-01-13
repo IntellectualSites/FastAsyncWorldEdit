@@ -1099,7 +1099,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         try {
             if (relighter != null && !(relighter instanceof NullRelighter)) {
                 // Only relight once!
-                if (!relighter.getLock().tryLock()) {
+                if (Settings.IMP.LIGHTING.DELAY_PACKET_SENDING && !relighter.getLock().tryLock()) {
                     relighter.getLock().lock();
                     relighter.getLock().unlock();
                 } else {
@@ -1108,6 +1108,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     } else {
                         relighter.fixSkyLighting();
                         relighter.fixBlockLighting();
+                    }
+                    if (Settings.IMP.LIGHTING.DELAY_PACKET_SENDING) {
+                        relighter.getLock().unlock();
                     }
                 }
             }
