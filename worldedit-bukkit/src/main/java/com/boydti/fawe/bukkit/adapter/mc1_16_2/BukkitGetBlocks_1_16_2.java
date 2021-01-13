@@ -379,7 +379,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
     }
 
     @Override
-    public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+    public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         forceLoadSections = false;
         copy = createCopy ? new BukkitGetBlocks_1_16_2_Copy(world) : null;
         try {
@@ -427,7 +427,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
 
                     char[] setArr = set.load(layer).clone();
                     if (createCopy) {
-                        copy.storeSection(layer, load(layer).clone());
+                        copy.storeSection(layer, loadPrivately(layer).clone());
                     }
 
                     ChunkSection newSection;
@@ -461,13 +461,13 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
                             } else if (existingSection != getSections(false)[layer]) {
                                 this.sections[layer] = existingSection;
                                 this.reset();
-                            } else if (!Arrays.equals(update(layer, new char[4096]), load(layer))) {
+                            } else if (!Arrays.equals(update(layer, new char[4096]), loadPrivately(layer))) {
                                 this.reset(layer);
                             } else if (lock.isModified()) {
                                 this.reset(layer);
                             }
                             newSection = BukkitAdapter_1_16_2
-                                .newChunkSection(layer, this::load, setArr, fastmode);
+                                .newChunkSection(layer, this::loadPrivately, setArr, fastmode);
                             if (!BukkitAdapter_1_16_2
                                 .setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 log.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
@@ -678,6 +678,14 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
             return null;
         } finally {
             forceLoadSections = true;
+        }
+    }
+
+    private char[] loadPrivately(int layer) {
+        if (super.sections[layer].isFull()) {
+            return super.blocks[layer];
+        } else {
+            return BukkitGetBlocks_1_16_2.this.update(layer, null);
         }
     }
 
