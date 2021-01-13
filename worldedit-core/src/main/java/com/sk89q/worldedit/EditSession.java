@@ -1098,18 +1098,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         limit.set(originalLimit);
         try {
             if (relighter != null && !(relighter instanceof NullRelighter)) {
-                // Only relight once!
-                if (Settings.IMP.LIGHTING.DELAY_PACKET_SENDING && !relighter.getLock().tryLock()) {
-                    relighter.getLock().lock();
-                    relighter.getLock().unlock();
-                } else {
-                    if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
-                        relighter.removeAndRelight(true);
-                    } else {
-                        relighter.fixSkyLighting();
-                        relighter.fixBlockLighting();
-                    }
-                    if (Settings.IMP.LIGHTING.DELAY_PACKET_SENDING) {
+                // Don't relight twice!
+                if (!relighter.isFinished() && relighter.getLock().tryLock()) {
+                    try {
+                        if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                            relighter.removeAndRelight(true);
+                        } else {
+                            relighter.fixLightingSafe(true);
+                        }
+                    } finally {
                         relighter.getLock().unlock();
                     }
                 }
