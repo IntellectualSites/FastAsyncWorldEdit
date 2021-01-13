@@ -1000,7 +1000,7 @@ public class NMSRelighter implements Relighter {
                     BlockMaterial material = state.getMaterial();
                     int opacity = material.getLightOpacity();
                     int brightness = material.getLightValue();
-                    if (brightness != iChunk.getEmmittedLight(x, y, z)) {
+                    if (brightness > 0 && brightness != iChunk.getEmmittedLight(x, y, z)) {
                         addLightUpdate(bx + x, y, bz + z);
                     }
 
