@@ -250,8 +250,19 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             //  - memory is low & queue size > num threads + 8
             //  - queue size > target size and primary queue has less than num threads submissions
             if (enabledQueue && ((lowMem && size > Settings.IMP.QUEUE.PARALLEL_THREADS + 8) || (size > Settings.IMP.QUEUE.TARGET_SIZE && Fawe.get().getQueueHandler().isUnderutilized()))) {
-                chunk = chunks.removeFirst();
-                final Future future = submitUnchecked(chunk);
+                int i = 0;
+                boolean found = false;
+                while (i < chunks.size() && (chunk = chunks.get(i)) != null) {
+                    if (Thread.holdsLock(chunk)) {
+                        found = true;
+                        break;
+                    }
+                    i++;
+                }
+                Future future = null;
+                if (found) {
+                    future = submitUnchecked(chunk);
+                }
                 if (future != null && !future.isDone()) {
                     final int targetSize;
                     if (lowMem) {
