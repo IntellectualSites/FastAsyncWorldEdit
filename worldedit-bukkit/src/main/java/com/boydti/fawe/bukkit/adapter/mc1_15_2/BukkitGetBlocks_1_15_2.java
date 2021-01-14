@@ -27,6 +27,7 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import io.papermc.lib.PaperLib;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.BlockPosition;
@@ -181,8 +182,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
         if (nibble != null) {
             lightUpdate = true;
             synchronized (nibble) {
-                byte[] bytes = nibble.getCloneIfSet();
-                if (bytes != NibbleArray.EMPTY_NIBBLE) {
+                byte[] bytes = PaperLib.isPaper() ? nibble.getIfSet() : nibble.asBytes();
+                if (!PaperLib.isPaper() || bytes != NibbleArray.EMPTY_NIBBLE) {
                     Arrays.fill(bytes, (byte) 0);
                 }
             }
@@ -193,8 +194,8 @@ public class BukkitGetBlocks_1_15_2 extends CharGetBlocks implements BukkitGetBl
             if (nibble != null) {
                 lightUpdate = true;
                 synchronized (nibbleSky) {
-                    byte[] bytes = nibbleSky.getCloneIfSet();
-                    if (bytes != NibbleArray.EMPTY_NIBBLE) {
+                    byte[] bytes = PaperLib.isPaper() ? nibbleSky.getIfSet() : nibbleSky.asBytes();
+                    if (!PaperLib.isPaper() || bytes != NibbleArray.EMPTY_NIBBLE) {
                         Arrays.fill(bytes, (byte) 0);
                     }
                 }
