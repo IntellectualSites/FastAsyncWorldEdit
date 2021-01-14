@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.HistoryExtent;
@@ -31,10 +30,8 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
-import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
-import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -47,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
@@ -280,46 +276,6 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) {
-        checkNotNull(region);
-        checkNotNull(block);
-        boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
-
-        int changes = 0;
-        for (BlockVector3 pos : region) {
-            if (setBlock(pos, block)) {
-                changes++;
-            }
-        }
-        return changes;
-    }
-
-    @Override
-    public int setBlocks(Region region, Pattern pattern) {
-        return getExtent().setBlocks(region, pattern);
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) {
-        return getExtent().replaceBlocks(region, filter, replacement);
-    }
-
-    @Override
-    public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) {
-        return getExtent().replaceBlocks(region, filter, pattern);
-    }
-
-    @Override
-    public int replaceBlocks(Region region, Mask mask, Pattern pattern) {
-        return getExtent().replaceBlocks(region, mask, pattern);
-    }
-
-    @Override
-    public int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
-        return getExtent().setBlocks(vset, pattern);
-    }
-
-    @Override
     public int getMaxY() {
         return extent.getMaxY();
     }
@@ -386,15 +342,5 @@ public class AbstractDelegateExtent implements Extent {
 
     protected Operation commitBefore() {
         return null;
-    }
-
-    @Override
-    public <T extends Filter> T apply(Region region, T filter, boolean full) {
-        return getExtent().apply(region, filter, full);
-    }
-
-    @Override
-    public <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {
-        return getExtent().apply(positions, filter);
     }
 }
