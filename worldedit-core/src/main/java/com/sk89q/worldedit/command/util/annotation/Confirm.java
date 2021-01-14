@@ -20,6 +20,8 @@ import org.enginehub.piston.inject.InjectAnnotation;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.inject.MemoizingValueAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -155,7 +157,17 @@ public @interface Confirm {
                 actor.setMeta("cmdConfirm", wait);
                 try {
                     // This is really dumb but also stops the double //confirm requirement...
-                    Map<Key<?>, Optional<?>> memory = (Map<Key<?>, Optional<?>>) Reflect.memory.get(context);
+                    final MemoizingValueAccess memoizingValueAccess;
+                    if (!(context instanceof MemoizingValueAccess)) {
+                        if (!context.getClass().getSimpleName().contains("AutoValue_CommandParametersImpl")) {
+                            LoggerFactory.getLogger(Confirm.class).warn("InjectedValueAccess " + context.getClass().getName() + " given to Confirm");
+                            return true;
+                        }
+                        memoizingValueAccess = (MemoizingValueAccess) Reflect.injectedValues.get(context);
+                    } else {
+                        memoizingValueAccess = (MemoizingValueAccess) context;
+                    }
+                    Map<Key<?>, Optional<?>> memory = (Map<Key<?>, Optional<?>>) Reflect.memory.get(memoizingValueAccess);
                     memory.put(Key.of(InterruptableCondition.class), Optional.of(wait));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
@@ -183,16 +195,28 @@ public @interface Confirm {
 
     class Reflect {
         static final Field memory;
+        static final Field injectedValues;
         static {
-            Field f;
+            Field memoryField;
             try {
-                f = MemoizingValueAccess.class.getDeclaredField("memory");
-                f.setAccessible(true);
+                memoryField = MemoizingValueAccess.class.getDeclaredField("memory");
+                memoryField.setAccessible(true);
             } catch (NoSuchFieldException e) {
                 e.printStackTrace();
-                f = null;
+                memoryField = null;
             }
-            memory = f;
+            memory = memoryField;
+
+            Field injectedValuesField;
+            try {
+                Class<?> c = Class.forName("org.enginehub.piston.impl.AutoValue_CommandParametersImpl");
+                injectedValuesField = c.getDeclaredField("injectedValues");
+                injectedValuesField.setAccessible(true);
+            } catch (NoSuchFieldException | ClassNotFoundException e) {
+                e.printStackTrace();
+                injectedValuesField = null;
+            }
+            injectedValues = injectedValuesField;
         }
     }
 }
