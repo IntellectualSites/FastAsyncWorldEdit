@@ -155,11 +155,9 @@ public @interface Confirm {
                 actor.setMeta("cmdConfirm", wait);
                 try {
                     // This is really dumb but also stops the double //confirm requirement...
-                    Field f = MemoizingValueAccess.class.getDeclaredField("memory");
-                    f.setAccessible(true);
-                    Map<Key<?>, Optional<?>> memory = (Map<Key<?>, Optional<?>>) f.get(context);
-                    memory.put(Key.of(ReentrantLock.class), Optional.of(lock));
-                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    Map<Key<?>, Optional<?>> memory = (Map<Key<?>, Optional<?>>) Reflect.memory.get(context);
+                    memory.put(Key.of(InterruptableCondition.class), Optional.of(wait));
+                } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
                 // Waits till 15 seconds then returns false unless awakened
@@ -176,21 +174,25 @@ public @interface Confirm {
         }
 
         boolean checkExisting(InjectedValueAccess context) {
-            Optional<ReentrantLock> lock = context.injectedValue(Key.of(ReentrantLock.class));
+            Optional<InterruptableCondition> lock = context.injectedValue(Key.of(InterruptableCondition.class));
+            // lock if locked will be held by current thread unless something has gone REALLY wrong
+            //  in which case this is the least of our worries...
+            return lock.isPresent();
+        }
+    }
+
+    class Reflect {
+        static final Field memory;
+        static {
+            Field f;
             try {
-                // This is really dumb but also stops the double //confirm requirement...
-                Field f = MemoizingValueAccess.class.getDeclaredField("memory");
+                f = MemoizingValueAccess.class.getDeclaredField("memory");
                 f.setAccessible(true);
-                Map<Key<?>, Optional<?>> memory = (Map<Key<?>, Optional<?>>) f.get(context);
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+            } catch (NoSuchFieldException e) {
                 e.printStackTrace();
+                f = null;
             }
-            if (lock.isPresent()) {
-                // lock if locked will be held by current thread unless something has gone REALLY wrong
-                //  in which case this is the least of our worries...
-                return true;
-            }
-            return false;
+            memory = f;
         }
     }
 }
