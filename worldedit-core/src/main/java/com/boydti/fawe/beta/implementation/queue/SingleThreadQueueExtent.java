@@ -114,7 +114,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             for (IChunk chunk : this.chunks.values()) {
                 chunk.recycle();
             }
+            getChunkLock.lock();
             this.chunks.clear();
+            getChunkLock.unlock();
         }
         this.enabledQueue = true;
         this.lastChunk = null;
@@ -163,7 +165,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             lastChunk = null;
         }
         final long index = MathMan.pairInt(chunk.getX(), chunk.getZ());
+        getChunkLock.lock();
         chunks.remove(index, chunk);
+        getChunkLock.unlock();
         V future = submitUnchecked(chunk);
         submissions.add(future);
         return future;
@@ -374,7 +378,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     }
                 }
             }
+            getChunkLock.lock();
             chunks.clear();
+            getChunkLock.unlock();
         }
         pollSubmissions(0, true);
     }
