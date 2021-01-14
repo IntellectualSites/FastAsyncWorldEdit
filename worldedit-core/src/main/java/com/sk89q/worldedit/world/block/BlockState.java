@@ -26,8 +26,10 @@ import com.boydti.fawe.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.extent.OutputExtent;
@@ -56,6 +58,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     private final int ordinal;
     private final char ordinalChar;
     private final BlockType blockType;
+    private BlockMaterial material;
     private final BaseBlock emptyBaseBlock;
     private CompoundInput compoundInput = CompoundInput.NULL;
 
@@ -362,7 +365,16 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
 
     @Override
     public BlockMaterial getMaterial() {
-        return blockType.getMaterial();
+        if (this.material == null) {
+            if (blockType == BlockTypes.__RESERVED__) {
+                return this.material = blockType.getMaterial();
+            }
+            this.material = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
+            if (this.material.hasContainer()) {
+                this.compoundInput = CompoundInput.CONTAINER;
+            }
+        }
+        return material;
     }
 
     @Override
