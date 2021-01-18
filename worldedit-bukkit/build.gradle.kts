@@ -57,13 +57,13 @@ dependencies {
     "compile"("org.spigotmcv1_16_r2:spigotmcv1_16_r2:1_16_r2")
     "compile"("org.spigotmcv1_16_r3:spigotmcv1_16_r3:1_16_r3")
     "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
-    "api"("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT") {
+    "api"("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
         isTransitive = false
     }
     "compileOnly"("org.jetbrains:annotations:20.1.0")
     "testCompileOnly"("org.jetbrains:annotations:20.1.0")
-    "compileOnly"("org.spigotmc:spigot:1.16.4-R0.1-SNAPSHOT")
+    "compileOnly"("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
     "implementation"("io.papermc:paperlib:1.0.6")
     "compileOnly"("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")

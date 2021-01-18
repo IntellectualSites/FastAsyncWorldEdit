@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_16_4;
+package com.boydti.fawe.bukkit.adapter.mc1_16_5;
 
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -12,7 +12,7 @@ import net.minecraft.server.v1_16_R3.ITileEntity;
 import net.minecraft.server.v1_16_R3.Material;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 
-public class BlockMaterial_1_16_4 implements BlockMaterial {
+public class BlockMaterial_1_16_5 implements BlockMaterial {
     private final Block block;
     private final IBlockData defaultState;
     private final Material material;
@@ -21,11 +21,11 @@ public class BlockMaterial_1_16_4 implements BlockMaterial {
     private final org.bukkit.Material craftMaterial;
     private final int opacity;
 
-    public BlockMaterial_1_16_4(Block block) {
+    public BlockMaterial_1_16_5(Block block) {
         this(block, block.getBlockData());
     }
 
-    public BlockMaterial_1_16_4(Block block, IBlockData defaultState) {
+    public BlockMaterial_1_16_5(Block block, IBlockData defaultState) {
         this.block = block;
         this.defaultState = defaultState;
         this.material = defaultState.getMaterial();

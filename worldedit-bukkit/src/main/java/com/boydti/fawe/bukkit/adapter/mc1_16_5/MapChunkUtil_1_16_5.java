@@ -1,10 +1,10 @@
-package com.boydti.fawe.bukkit.adapter.mc1_16_4;
+package com.boydti.fawe.bukkit.adapter.mc1_16_5;
 
 import com.boydti.fawe.bukkit.adapter.MapChunkUtil;
 import net.minecraft.server.v1_16_R3.PacketPlayOutMapChunk;
 
-public class MapChunkUtil_1_16_4 extends MapChunkUtil<PacketPlayOutMapChunk> {
-    public MapChunkUtil_1_16_4() throws NoSuchFieldException {
+public class MapChunkUtil_1_16_5 extends MapChunkUtil<PacketPlayOutMapChunk> {
+    public MapChunkUtil_1_16_5() throws NoSuchFieldException {
         fieldX = PacketPlayOutMapChunk.class.getDeclaredField("a");
         fieldZ = PacketPlayOutMapChunk.class.getDeclaredField("b");
         fieldBitMask = PacketPlayOutMapChunk.class.getDeclaredField("c");

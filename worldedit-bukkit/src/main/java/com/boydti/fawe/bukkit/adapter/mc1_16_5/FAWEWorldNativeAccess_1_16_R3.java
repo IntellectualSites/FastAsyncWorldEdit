@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_16_4;
+package com.boydti.fawe.bukkit.adapter.mc1_16_5;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.IntPair;
@@ -214,7 +214,7 @@ public class FAWEWorldNativeAccess_1_16_R3 implements WorldNativeAccess<Chunk, I
                     return;
                 }
                 for (IntPair chunk : toSend) {
-                    BukkitAdapter_1_16_4.sendChunk(getWorld().getWorld().getHandle(), chunk.x, chunk.z, 0, false);
+                    BukkitAdapter_1_16_5.sendChunk(getWorld().getWorld().getHandle(), chunk.x, chunk.z, 0, false);
                 }
             }
         };
@@ -229,7 +229,7 @@ public class FAWEWorldNativeAccess_1_16_R3 implements WorldNativeAccess<Chunk, I
                 cachedChanges.forEach(cc -> cc.chunk.setType(cc.position, cc.blockData,
                     sideEffectSet != null && sideEffectSet.shouldApply(SideEffect.UPDATE)));
                 for (IntPair chunk : cachedChunksToSend) {
-                    BukkitAdapter_1_16_4.sendChunk(getWorld().getWorld().getHandle(), chunk.x, chunk.z, 0, false);
+                    BukkitAdapter_1_16_5.sendChunk(getWorld().getWorld().getHandle(), chunk.x, chunk.z, 0, false);
                 }
             }
         };
