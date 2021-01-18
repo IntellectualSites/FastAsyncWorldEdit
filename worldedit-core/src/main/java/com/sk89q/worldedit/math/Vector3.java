@@ -83,16 +83,31 @@ public abstract class Vector3 {
         return YzxOrderComparator.YZX_ORDER;
     }
 
+    /**
+     * Gets the x coordinate rounded, accounting for negative coordinates
+     *
+     * @return the x coordinate
+     */
     public int getBlockX() {
-        return (int) MathUtils.roundHalfUp(getX());
+        return MathMan.roundInt(getX());
     }
 
+    /**
+     * Gets the y coordinate rounded, accounting for negative coordinates
+     *
+     * @return the y coordinate
+     */
     public int getBlockY() {
-        return (int) MathUtils.roundHalfUp(getY());
+        return MathMan.roundInt(getY());
     }
 
+    /**
+     * Gets the z coordinate rounded, accounting for negative coordinates
+     *
+     * @return the z coordinate
+     */
     public int getBlockZ() {
-        return (int) MathUtils.roundHalfUp(getZ());
+        return MathMan.roundInt(getZ());
     }
 
     public MutableVector3 setComponents(Vector3 other) {
@@ -488,6 +503,15 @@ public abstract class Vector3 {
     }
 
     /**
+     * Rounds all components using {@link MathUtils#roundHalfUp(double)}
+     *
+     * @return a new vector
+     */
+    public Vector3 roundHalfUp() {
+        return Vector3.at(MathUtils.roundHalfUp(getX()), MathUtils.roundHalfUp(getY()), MathUtils.roundHalfUp(getZ()));
+    }
+
+    /**
      * Returns a vector with the absolute values of the components of
      * this vector.
      *
@@ -595,8 +619,7 @@ public abstract class Vector3 {
      * @return a new {@code BlockVector}
      */
     public static BlockVector3 toBlockPoint(double x, double y, double z) {
-        return BlockVector3.at(MathUtils.roundHalfUp(x), MathUtils.roundHalfUp(y), MathUtils.roundHalfUp(z));
-        //return BlockVector3.at(x, y, z);
+        return BlockVector3.at(x, y, z);
     }
 
     /**
