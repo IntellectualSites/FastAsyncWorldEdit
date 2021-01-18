@@ -15,7 +15,7 @@ import org.gradle.kotlin.dsl.register
 fun Project.applyLibrariesConfiguration() {
     applyCommonConfiguration()
     apply(plugin = "java-base")
-    apply(plugin = "maven")
+    apply(plugin = "maven-publish")
     apply(plugin = "com.github.johnrengelman.shadow")
 
     configurations {

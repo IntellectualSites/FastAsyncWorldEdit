@@ -7,3 +7,16 @@ listOf("bukkit", "core").forEach {
     include("worldedit-$it")
 }
 include("worldedit-libs:core:ap")
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "EngineHub Repository"
+            url = uri("https://maven.enginehub.org/repo/")
+            content {
+                excludeGroup("net.milkbowl.vault")
+            }
+        }
+    }
+}

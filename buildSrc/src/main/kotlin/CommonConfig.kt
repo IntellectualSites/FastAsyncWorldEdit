@@ -6,11 +6,11 @@ fun Project.applyCommonConfiguration() {
     version = rootProject.version
 
     repositories {
-        mavenCentral()
         mavenLocal()
         maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
         maven { url = uri("https://plotsquared.com/mvn/") }
-        maven { url = uri("https://maven.enginehub.org/repo/")
+        maven {
+            url = uri("https://maven.enginehub.org/repo/")
             content {
                 excludeGroup("net.milkbowl.vault")
             }

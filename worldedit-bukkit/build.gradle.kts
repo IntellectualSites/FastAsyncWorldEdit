@@ -44,48 +44,48 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
         isTransitive = false
     }
-    "api"(project(":worldedit-core"))
-    "api"(project(":worldedit-libs:bukkit"))
-    "compile"(":worldedit-adapters:")
+    api(project(":worldedit-core"))
+    api(project(":worldedit-libs:bukkit"))
+    compile(":worldedit-adapters:")
     // Paper-patched NMS jars
-    "compile"("com.destroystokyo.paperv1_15_r1:paperv1_15_r1:1_15_r1")
-    "compile"("com.destroystokyo.paperv1_16_r1:paperv1_16_r1:1_16_r1")
-    "compile"("com.destroystokyo.paperv1_16_r2:paperv1_16_r2:1_16_r2")
-    "compile"("com.destroystokyo.paperv1_16_r3:paperv1_16_r3:1_16_r3")
-    "compile"("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
-    "compile"("org.spigotmcv1_16_r1:spigotmcv1_16_r1:1_16_r1")
-    "compile"("org.spigotmcv1_16_r2:spigotmcv1_16_r2:1_16_r2")
-    "compile"("org.spigotmcv1_16_r3:spigotmcv1_16_r3:1_16_r3")
-    "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
-    "api"("com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT") {
+    compile("com.destroystokyo.paperv1_15_r1:paperv1_15_r1:1_15_r1")
+    compile("com.destroystokyo.paperv1_16_r1:paperv1_16_r1:1_16_r1")
+    compile("com.destroystokyo.paperv1_16_r2:paperv1_16_r2:1_16_r2")
+    compile("com.destroystokyo.paperv1_16_r3:paperv1_16_r3:1_16_r3")
+    compile("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
+    compile("org.spigotmcv1_16_r1:spigotmcv1_16_r1:1_16_r1")
+    compile("org.spigotmcv1_16_r2:spigotmcv1_16_r2:1_16_r2")
+    compile("org.spigotmcv1_16_r3:spigotmcv1_16_r3:1_16_r3")
+    implementation("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
+    api("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
         isTransitive = false
     }
-    "compileOnly"("org.jetbrains:annotations:20.1.0")
-    "testCompileOnly"("org.jetbrains:annotations:20.1.0")
-    "compileOnly"("org.spigotmc:spigot:1.16.4-R0.1-SNAPSHOT")
-    "implementation"("io.papermc:paperlib:1.0.6")
-    "compileOnly"("com.sk89q:dummypermscompat:1.10") {
+    compileOnly("org.jetbrains:annotations:20.1.0")
+    testCompileOnly("org.jetbrains:annotations:20.1.0")
+    compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
+    implementation("io.papermc:paperlib:1.0.6")
+    compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
-    "testImplementation"("org.mockito:mockito-core:1.9.0-rc1")
-    "compileOnly"("com.sk89q.worldguard:worldguard-bukkit:7.+") {
+    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
+    testImplementation("org.mockito:mockito-core:1.9.0-rc1")
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.+") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    "compile"("org.bstats:bstats-bukkit:1.8")
-    "compile"("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
+    implementation("org.bstats:bstats-bukkit:1.8")
+    api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
     compileOnlyApi("org.inventivetalent:mapmanager:1.7.+") { isTransitive = false }
-    "implementation"("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
-    "implementation"("com.massivecraft:mcore:7.0.1") { isTransitive = false }
-    "implementation"("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
-    "implementation"("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
-    "implementation"("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
-    "implementation"("com.comphenix.protocol:ProtocolLib:4.5.1") { isTransitive = false }
+    implementation("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
+    implementation("com.massivecraft:mcore:7.0.1") { isTransitive = false }
+    implementation("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
+    implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
+    implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
+    implementation("com.comphenix.protocol:ProtocolLib:4.5.1") { isTransitive = false }
 }
 
 tasks.named<Copy>("processResources") {

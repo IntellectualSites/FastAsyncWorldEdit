@@ -21,7 +21,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "java")
     apply(plugin = "eclipse")
     apply(plugin = "idea")
-    apply(plugin = "maven")
+    apply(plugin = "maven-publish")
 //    apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
 
