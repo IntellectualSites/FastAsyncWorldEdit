@@ -36,6 +36,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
@@ -299,6 +300,9 @@ public class RegionCommands {
                            Pattern to) throws WorldEditException {
         if (from == null) {
             from = new ExistingBlockMask(editSession);
+        }
+        if (from instanceof AbstractExtentMask) {
+            ((AbstractExtentMask) from).setExtent(editSession);
         }
         int affected = editSession.replaceBlocks(region, from, to);
         actor.printInfo(TranslatableComponent.of("worldedit.replace.replaced", TextComponent.of(affected)));

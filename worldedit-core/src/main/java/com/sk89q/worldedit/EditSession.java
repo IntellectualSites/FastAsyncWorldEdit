@@ -1098,16 +1098,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         limit.set(originalLimit);
         try {
             if (relighter != null && !(relighter instanceof NullRelighter)) {
-                // Only relight once!
-                if (!relighter.getLock().tryLock()) {
-                    relighter.getLock().lock();
-                    relighter.getLock().unlock();
-                } else {
-                    if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
-                        relighter.removeAndRelight(true);
-                    } else {
-                        relighter.fixSkyLighting();
-                        relighter.fixBlockLighting();
+                // Don't relight twice!
+                if (!relighter.isFinished() && relighter.getLock().tryLock()) {
+                    try {
+                        if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                            relighter.removeAndRelight(true);
+                        } else {
+                            relighter.fixLightingSafe(true);
+                        }
+                    } finally {
+                        relighter.getLock().unlock();
                     }
                 }
             }
@@ -1201,10 +1201,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         // Pick how we're going to visit blocks
         RecursiveVisitor visitor = new DirectionalVisitor(mask, replace, origin, direction, (int) (radius * 2 + 1));
 
-        // With queue enabled, FAWE may start attempting to place chunks before the operation is finished.
-        // This is unnacceptable for recursive operations.
-        disableQueue();
-
         // Start at the origin
         visitor.visit(origin);
 
@@ -1262,10 +1258,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1));
         }
-
-        // With queue enabled, FAWE may start attempting to place chunks before the operation is finished.
-        // This is unnacceptable for recursive operations.
-        disableQueue();
 
         // Start at the origin
         visitor.visit(origin);
@@ -1747,10 +1739,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1));
 
-        // With queue enabled, FAWE may start attempting to place chunks before the operation is finished.
-        // This is unnacceptable for recursive operations.
-        disableQueue();
-
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
             if (mask.test(position)) {
@@ -1791,10 +1779,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
-
-        // With queue enabled, FAWE may start attempting to place chunks before the operation is finished.
-        // This is unnacceptable for recursive operations.
-        disableQueue();
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {

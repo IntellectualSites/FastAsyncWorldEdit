@@ -389,7 +389,7 @@ public class Settings extends Config {
         })
         public boolean ALLOW_TICK_EXISTING = true;
         @Comment({
-            "Do not wait for a chunk's history to save before sending it",
+            "[SAFE] Do not wait for a chunk's history to save before sending it",
             " - Undo/redo commands will wait until the history has been written to disk before executing",
             " - Requires combine_stages = true"
         })

@@ -7,7 +7,9 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ConversionResult;
+import org.enginehub.piston.converter.FailedConversion;
 import org.enginehub.piston.converter.SuccessfulConversion;
+import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
@@ -97,7 +99,11 @@ public class Bindings {
 
                 @Override
                 public ConversionResult<Object> convert(String s, InjectedValueAccess access) {
-                    return SuccessfulConversion.fromSingle(invoke(s, argsFunc, access, method));
+                    Object o = invoke(s, argsFunc, access, method);
+                    if (o == null) {
+                        return FailedConversion.from(new NullPointerException());
+                    }
+                    return SuccessfulConversion.fromSingle(o);
                 }
             });
         }
@@ -118,7 +124,10 @@ public class Bindings {
             }
             return method.invoke(this, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            if (!(e.getCause() instanceof StopExecutionException)) {
+                throw new RuntimeException(e);
+            }
+            return null;
         }
     }
 }

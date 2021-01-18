@@ -71,6 +71,7 @@ public class NMSRelighter implements Relighter {
     private final int maxY;
     private final boolean calculateHeightMaps;
     private final ReentrantLock lightingLock;
+    private final AtomicBoolean finished = new AtomicBoolean(false);
     private boolean removeFirst;
 
     public NMSRelighter(IQueueExtent<IQueueChunk> queue, boolean calculateHeightMaps) {
@@ -95,8 +96,13 @@ public class NMSRelighter implements Relighter {
     }
 
     @Override
-    public synchronized ReentrantLock getLock() {
+    public ReentrantLock getLock() {
         return lightingLock;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return finished.get();
     }
 
     @Override public synchronized void removeAndRelight(boolean sky) {
@@ -839,10 +845,12 @@ public class NMSRelighter implements Relighter {
         }
         if (Settings.IMP.LIGHTING.ASYNC) {
             queue.flush();
+            finished.set(true);
         } else {
             TaskManager.IMP.sync(new RunnableVal<Object>() {
                 @Override public void run(Object value) {
                     queue.flush();
+                    finished.set(true);
                 }
             });
         }
@@ -873,6 +881,7 @@ public class NMSRelighter implements Relighter {
                     Fawe.imp().getPlatformAdapter().sendChunk(chunk.getOrCreateGet(), bitMask, true);
                     iter.remove();
                 }
+                finished.set(true);
             }
         };
         if (Settings.IMP.LIGHTING.ASYNC) {
@@ -1000,7 +1009,7 @@ public class NMSRelighter implements Relighter {
                     BlockMaterial material = state.getMaterial();
                     int opacity = material.getLightOpacity();
                     int brightness = material.getLightValue();
-                    if (brightness != iChunk.getEmmittedLight(x, y, z)) {
+                    if (brightness > 0 && brightness != iChunk.getEmmittedLight(x, y, z)) {
                         addLightUpdate(bx + x, y, bz + z);
                     }
 

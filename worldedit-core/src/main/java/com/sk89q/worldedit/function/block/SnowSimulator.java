@@ -24,13 +24,21 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.BooleanProperty;
+import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.Locale;
+import java.util.Map;
+
 public class SnowSimulator implements LayerFunction {
 
     public static final BooleanProperty snowy = (BooleanProperty) (Property<?>) BlockTypes.GRASS_BLOCK.getProperty("snowy");
+    private static final EnumProperty slab = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_SLAB.getProperty("type");
+    private static final EnumProperty stair = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("half");
+    private static final EnumProperty trapdoor = (EnumProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty("half");
+    private static final BooleanProperty trapdoorOpen = (BooleanProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty("open");
 
     private final BlockState ice = BlockTypes.ICE.getDefaultState();
     private final BlockState snow = BlockTypes.SNOW.getDefaultState();
@@ -92,6 +100,7 @@ public class SnowSimulator implements LayerFunction {
             return false;
         }
 
+
         // Can't put snow this far up
         if (position.getBlockY() == this.extent.getMaximumPoint().getBlockY()) {
             return false;
@@ -102,6 +111,22 @@ public class SnowSimulator implements LayerFunction {
 
         // Can only replace air (or snow in stack mode)
         if (!above.getBlockType().getMaterial().isAir() && (!stack || above.getBlockType() != BlockTypes.SNOW)) {
+            return false;
+        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmmittedLight(abovePosition) > 10) {
+            return false;
+        } else if (!block.getBlockType().getMaterial().isFullCube()) {
+            Map<Property<?>, Object> states = block.getStates();
+            if (states.containsKey(slab) && block.getState(slab).equalsIgnoreCase("bottom")) {
+                return false;
+            } else if (states.containsKey(trapdoorOpen) && states.containsKey(trapdoor) && (block.getState(trapdoorOpen)
+                || block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
+                return false;
+            } else if (states.containsKey(stair) && block.getState(stair).equalsIgnoreCase("bottom")) {
+                return false;
+            } else {
+                return false;
+            }
+        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && block.getBlockType().getMaterial().isTranslucent()) {
             return false;
         }
 

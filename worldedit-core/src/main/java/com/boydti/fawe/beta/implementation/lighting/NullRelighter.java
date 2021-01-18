@@ -53,4 +53,9 @@ public class NullRelighter implements Relighter {
     public ReentrantLock getLock() {
         return null;
     }
+
+    @Override
+    public boolean isFinished() {
+        return true;
+    }
 }

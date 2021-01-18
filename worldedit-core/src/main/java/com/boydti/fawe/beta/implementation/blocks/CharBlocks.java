@@ -9,8 +9,6 @@ import org.jetbrains.annotations.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 public abstract class CharBlocks implements IBlocks {
 
     public static final Logger logger = LoggerFactory.getLogger(CharBlocks.class);

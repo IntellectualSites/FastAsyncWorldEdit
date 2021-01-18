@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_16_4;
+package com.boydti.fawe.bukkit.adapter.mc1_16_5;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
@@ -51,7 +51,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 
-public final class BukkitAdapter_1_16_4 extends NMSAdapter {
+public final class BukkitAdapter_1_16_5 extends NMSAdapter {
     /*
     NMS fields
     */
@@ -310,7 +310,7 @@ public final class BukkitAdapter_1_16_4 extends NMSAdapter {
                 final int ordinal = paletteToBlock[i];
                 blockToPalette[ordinal] = Integer.MAX_VALUE;
                 final BlockState state = BlockTypesCache.states[ordinal];
-                final IBlockData ibd = ((BlockMaterial_1_16_4) state.getMaterial()).getState();
+                final IBlockData ibd = ((BlockMaterial_1_16_5) state.getMaterial()).getState();
                 palette.a(ibd);
             }
             try {

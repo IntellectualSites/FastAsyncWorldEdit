@@ -34,9 +34,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Tests true if the biome at applied points is the same as the one given.
  */
-public class BiomeMask extends AbstractMask {
+public class BiomeMask extends AbstractExtentMask {
 
-    private final Extent extent;
     private final Set<BiomeType> biomes = new HashSet<>();
 
     /**
@@ -46,9 +45,8 @@ public class BiomeMask extends AbstractMask {
      * @param biomes a list of biomes to match
      */
     public BiomeMask(Extent extent, Collection<BiomeType> biomes) {
-        checkNotNull(extent);
+        super(extent);
         checkNotNull(biomes);
-        this.extent = extent;
         this.biomes.addAll(biomes);
     }
 
@@ -92,7 +90,7 @@ public class BiomeMask extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        BiomeType biome = extent.getBiome(vector);
+        BiomeType biome = getExtent().getBiome(vector);
         return biomes.contains(biome);
     }
 
@@ -104,7 +102,12 @@ public class BiomeMask extends AbstractMask {
 
     @Override
     public Mask copy() {
-        return new BiomeMask(extent, new HashSet<>(biomes));
+        return new BiomeMask(getExtent(), new HashSet<>(biomes));
     }
 
+    @Override
+    public boolean test(Extent extent, BlockVector3 position) {
+        BiomeType biome = getExtent().getBiome(position);
+        return biomes.contains(biome);
+    }
 }

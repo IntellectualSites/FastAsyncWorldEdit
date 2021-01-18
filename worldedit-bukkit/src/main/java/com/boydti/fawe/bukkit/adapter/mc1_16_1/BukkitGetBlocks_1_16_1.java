@@ -27,6 +27,7 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import io.papermc.lib.PaperLib;
 import net.minecraft.server.v1_16_R1.BiomeBase;
 import net.minecraft.server.v1_16_R1.BiomeStorage;
 import net.minecraft.server.v1_16_R1.BlockPosition;
@@ -151,7 +152,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
     public void setHeightmapToGet(HeightMapType type, int[] data) {
         BitArrayUnstretched bitArray = new BitArrayUnstretched(9, 256);
         bitArray.fromRaw(data);
-        nmsChunk.heightMap.get(HeightMap.Type.valueOf(type.name())).a(bitArray.getData());
+        getChunk().heightMap.get(HeightMap.Type.valueOf(type.name())).a(bitArray.getData());
     }
 
     public int getChunkZ() {
@@ -177,25 +178,25 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
 
     @Override
     public void removeSectionLighting(int layer, boolean sky) {
-        SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+        SectionPosition sectionPosition = SectionPosition.a(getChunk().getPos(), layer);
         NibbleArray nibble = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
         if (nibble != null) {
             lightUpdate = true;
             synchronized (nibble) {
-                byte[] bytes = nibble.getCloneIfSet();
-                if (bytes != NibbleArray.EMPTY_NIBBLE) {
+                byte[] bytes = PaperLib.isPaper() ? nibble.getIfSet() : nibble.asBytes();
+                if (!PaperLib.isPaper() || bytes != NibbleArray.EMPTY_NIBBLE) {
                     Arrays.fill(bytes, (byte) 0);
                 }
             }
         }
         if (sky) {
-            SectionPosition sectionPositionSky = SectionPosition.a(nmsChunk.getPos(), layer);
+            SectionPosition sectionPositionSky = SectionPosition.a(getChunk().getPos(), layer);
             NibbleArray nibbleSky = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPositionSky);
             if (nibble != null) {
                 lightUpdate = true;
                 synchronized (nibbleSky) {
-                    byte[] bytes = nibbleSky.getCloneIfSet();
-                    if (bytes != NibbleArray.EMPTY_NIBBLE) {
+                    byte[] bytes = PaperLib.isPaper() ? nibbleSky.getIfSet() : nibbleSky.asBytes();
+                    if (!PaperLib.isPaper() || bytes != NibbleArray.EMPTY_NIBBLE) {
                         Arrays.fill(bytes, (byte) 0);
                     }
                 }
@@ -226,7 +227,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
     @Override public int getSkyLight(int x, int y, int z) {
         int layer = y >> 4;
         if (skyLight[layer] == null) {
-            SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+            SectionPosition sectionPosition = SectionPosition.a(getChunk().getPos(), layer);
             NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPosition);
             // If the server hasn't generated the section's NibbleArray yet, it will be null
             if (nibbleArray == null) {
@@ -245,7 +246,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
     @Override public int getEmmittedLight(int x, int y, int z) {
         int layer = y >> 4;
         if (blockLight[layer] == null) {
-            SectionPosition sectionPosition = SectionPosition.a(nmsChunk.getPos(), layer);
+            SectionPosition sectionPosition = SectionPosition.a(getChunk().getPos(), layer);
             NibbleArray nibbleArray = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.BLOCK).a(sectionPosition);
             // If the server hasn't generated the section's NibbleArray yet, it will be null
             if (nibbleArray == null) {
@@ -352,7 +353,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
 
     private void updateGet(BukkitGetBlocks_1_16_1 get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
         synchronized (get) {
-            if (this.nmsChunk != nmsChunk) {
+            if (this.getChunk() != nmsChunk) {
                 this.nmsChunk = nmsChunk;
                 this.sections = sections.clone();
                 this.reset();
@@ -376,7 +377,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
     }
 
     @Override
-    public <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
+    public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         forceLoadSections = false;
         copy = createCopy ? new BukkitGetBlocks_1_16_1_Copy(world) : null;
         try {
@@ -424,7 +425,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
 
                     char[] setArr = set.load(layer).clone();
                     if (createCopy) {
-                        copy.storeSection(layer, load(layer).clone());
+                        copy.storeSection(layer, loadPrivately(layer).clone());
                     }
 
                     ChunkSection newSection;
@@ -451,20 +452,20 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
                     synchronized (this) {
                         synchronized (lock) {
                             lock.untilFree();
-                            if (this.nmsChunk != nmsChunk) {
+                            if (this.getChunk() != nmsChunk) {
                                 this.nmsChunk = nmsChunk;
                                 this.sections = null;
                                 this.reset();
                             } else if (existingSection != getSections(false)[layer]) {
                                 this.sections[layer] = existingSection;
                                 this.reset();
-                            } else if (!Arrays.equals(update(layer, new char[4096]), load(layer))) {
+                            } else if (!Arrays.equals(update(layer, new char[4096]), loadPrivately(layer))) {
                                 this.reset(layer);
                             } else if (lock.isModified()) {
                                 this.reset(layer);
                             }
                             newSection = BukkitAdapter_1_16_1
-                                    .newChunkSection(layer, this::load, setArr, fastmode);
+                                    .newChunkSection(layer, this::loadPrivately, setArr, fastmode);
                             if (!BukkitAdapter_1_16_1
                                     .setSectionAtomic(sections, existingSection, newSection, layer)) {
                                 log.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
@@ -675,6 +676,14 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
             return null;
         } finally {
             forceLoadSections = true;
+        }
+    }
+
+    private char[] loadPrivately(int layer) {
+        if (super.sections[layer].isFull()) {
+            return super.blocks[layer];
+        } else {
+            return BukkitGetBlocks_1_16_1.this.update(layer, null);
         }
     }
 

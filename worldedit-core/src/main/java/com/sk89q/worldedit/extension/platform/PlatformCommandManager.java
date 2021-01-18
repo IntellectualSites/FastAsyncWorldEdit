@@ -609,7 +609,7 @@ public final class PlatformCommandManager {
         if (actor == null) {
             context = globalInjectedValues;
         } else {
-            context = initializeInjectedValues(args::toString, actor, null);
+            context = initializeInjectedValues(args::toString, actor, null, false);
         }
         return parseCommand(args, context);
     }
@@ -688,7 +688,7 @@ public final class PlatformCommandManager {
             }
         }
 
-        MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor, event);
+        MemoizingValueAccess context = initializeInjectedValues(event::getArguments, actor, event, false);
 
         ThrowableSupplier<Throwable> task = () -> commandManager.execute(context, ImmutableList.copyOf(split));
 
@@ -800,7 +800,7 @@ public final class PlatformCommandManager {
                 getCommandManager(), actor, "//help");
     }
 
-    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event) {
+    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event, boolean isSuggestions) {
         InjectedValueStore store = MapBackedValueStore.create();
         store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
         if (actor instanceof Player) {
@@ -817,6 +817,7 @@ public final class PlatformCommandManager {
                 localSession.tellVersion(actor);
                 return Optional.of(localSession);
             });
+        store.injectValue(Key.of(boolean.class), context -> Optional.of(isSuggestions));
         store.injectValue(Key.of(InjectedValueStore.class), ValueProvider.constant(store));
         store.injectValue(Key.of(Event.class), ValueProvider.constant(event));
         return MemoizingValueAccess.wrap(
@@ -841,7 +842,7 @@ public final class PlatformCommandManager {
             List<String> argStrings = split.stream()
                 .map(Substring::getSubstring)
                 .collect(Collectors.toList());
-            MemoizingValueAccess access = initializeInjectedValues(() -> arguments, event.getActor(), event);
+            MemoizingValueAccess access = initializeInjectedValues(() -> arguments, event.getActor(), event, true);
             ImmutableSet<Suggestion> suggestions;
             try {
                 suggestions = commandManager.getSuggestions(access, argStrings);

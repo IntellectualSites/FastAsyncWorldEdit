@@ -70,6 +70,13 @@ public interface Relighter {
 
     ReentrantLock getLock();
 
+    /**
+     * Returns true if the Relighter has been flushed
+     *
+     * @return true if finished
+     */
+    boolean isFinished();
+
     class SkipReason {
         public static final byte NONE = 0;
         public static final byte AIR = 1;

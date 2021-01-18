@@ -42,7 +42,7 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutY(pos.getY() - min.getY());
         mutable.mutZ(pos.getZ() - min.getZ());
         MutableVector3 tmp = new MutableVector3(transform.apply(mutable.toVector3()));
-        return min.add(tmp.toBlockPoint());
+        return min.add(tmp.roundHalfUp().toBlockPoint());
     }
 
     @Override

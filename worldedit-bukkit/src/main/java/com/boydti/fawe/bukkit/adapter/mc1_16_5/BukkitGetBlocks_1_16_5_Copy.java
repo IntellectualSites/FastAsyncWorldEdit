@@ -1,4 +1,4 @@
-package com.boydti.fawe.bukkit.adapter.mc1_16_4;
+package com.boydti.fawe.bukkit.adapter.mc1_16_5;
 
 
 import com.boydti.fawe.FaweCache;
@@ -6,7 +6,7 @@ import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
-import com.boydti.fawe.bukkit.adapter.mc1_16_4.nbt.LazyCompoundTag_1_16_4;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.nbt.LazyCompoundTag_1_16_5;
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
-public class BukkitGetBlocks_1_16_4_Copy implements IChunkGet {
+public class BukkitGetBlocks_1_16_5_Copy implements IChunkGet {
 
     private final Map<BlockVector3, CompoundTag> tiles = new HashMap<>();
     private final Set<CompoundTag> entities = new HashSet<>();
@@ -43,13 +43,13 @@ public class BukkitGetBlocks_1_16_4_Copy implements IChunkGet {
     private final char[][] blocks = new char[16][];
     private final WorldServer world;
 
-    protected BukkitGetBlocks_1_16_4_Copy(WorldServer world) {
+    protected BukkitGetBlocks_1_16_5_Copy(WorldServer world) {
         this.world = world;
     }
 
     protected void storeTile(TileEntity tile) {
         tiles.put(BlockVector3.at(tile.getPosition().getX(), tile.getPosition().getY(), tile.getPosition().getZ()),
-            new LazyCompoundTag_1_16_4(Suppliers.memoize(() -> tile.save(new NBTTagCompound()))));
+            new LazyCompoundTag_1_16_5(Suppliers.memoize(() -> tile.save(new NBTTagCompound()))));
     }
 
     @Override
@@ -115,7 +115,7 @@ public class BukkitGetBlocks_1_16_4_Copy implements IChunkGet {
     public void setHeightmapToGet(HeightMapType type, int[] data) {}
 
     protected void storeBiomes(BiomeStorage biomeStorage) {
-        this.biomeStorage = new BiomeStorage(biomeStorage.g, BukkitAdapter_1_16_4.getBiomeArray(biomeStorage).clone());
+        this.biomeStorage = new BiomeStorage(biomeStorage.registry, BukkitAdapter_1_16_5.getBiomeArray(biomeStorage).clone());
     }
 
     @Override

@@ -75,7 +75,6 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
      * @deprecated Magic Numbers
      * @return BlockState
      */
-
     @Deprecated
     public static BlockState getFromInternalId(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
@@ -408,11 +407,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     public boolean isAir() {
-        try {
-            return material.isAir();
-        } catch (NullPointerException ignored) {
-            return getMaterial().isAir();
-        }
+        return blockType.getMaterial().isAir();
     }
 
     @Override
