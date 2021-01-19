@@ -112,7 +112,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
 fun Project.applyShadowConfiguration() {
     tasks.named<ShadowJar>("shadowJar") {
-//        archiveClassifier.set("dist")
         dependencies {
             include(project(":worldedit-libs:core"))
             include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
