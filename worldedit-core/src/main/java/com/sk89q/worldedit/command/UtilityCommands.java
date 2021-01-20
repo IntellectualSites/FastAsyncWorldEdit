@@ -125,7 +125,7 @@ public class UtilityCommands {
     @Command(
         name = "/heightmapinterface",
             aliases = { "/hmi", "hmi" },
-        desc = "Generate the heightmap interface: https://github.com/boy0001/HeightMap"
+        desc = "Generate the heightmap interface: https://github.com/IntellectualSites/HeightMap"
     )
     @CommandPermissions("fawe.admin")
     public void heightmapInterface(Player player, @Arg(name = "min", desc = "int", def = "100") int min, @Arg(name = "max", desc = "int", def = "200") int max) throws IOException {
