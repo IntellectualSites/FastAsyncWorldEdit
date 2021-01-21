@@ -7,21 +7,43 @@ fun Project.applyCommonConfiguration() {
 
     repositories {
         mavenLocal()
-        maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
-        maven { url = uri("https://plotsquared.com/mvn/") }
         maven {
-            url = uri("https://maven.enginehub.org/repo/")
+            name = "IntellectualSites"
+            url = uri("https://mvn.intellectualsites.com/content/groups/public/")
             content {
-                excludeGroup("net.milkbowl.vault")
+                includeGroup("com.plotsquared")
+                includeGroup("com.intellectualsites.paster")
+                includeGroup("com.github.intellectualsites.plotsquared")
             }
         }
-        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
-        maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
-        maven { url = uri("https://repo.destroystokyo.com/repository/maven-public") }
-        ivy { url = uri("https://ci.athion.net/job")
-            patternLayout {
-                artifact("/[organisation]/[revision]/artifact/[module].[ext]")
-            }}
+        maven {
+            name = "EngineHub Repository"
+            url = uri("https://maven.enginehub.org/repo/")
+            content {
+                includeGroup("com.sk89q")
+                includeGroup("com.sk89q.lib")
+                includeGroupByRegex("org.enginehub.*")
+            }
+        }
+        maven {
+            name = "OSS Sonatype Snapshots"
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+        }
+        maven {
+            name = "OSS Sonatype Releases"
+            url = uri("https://oss.sonatype.org/content/repositories/releases/")
+        }
+        maven {
+            name = "Athion"
+            url = uri("https://ci.athion.net/plugin/repository/tools/")
+            content {
+                includeGroup("com.massivecraft")
+                includeGroup("com.thevoxelbox.voxelsniper")
+                includeGroup("com.palmergames.bukkit")
+                includeGroup("net.fabiozumbi12")
+                includeGroupByRegex("com.destroystokyo.*")
+            }
+        }
     }
 
     configurations.all {

@@ -8,6 +8,7 @@ plugins {
 repositories {
     jcenter()
     gradlePluginPortal()
+    /*
     maven {
         name = "Forge Maven"
         url = uri("https://files.minecraftforge.net/maven")
@@ -20,15 +21,16 @@ repositories {
         name = "sponge"
         url = uri("https://repo.spongepowered.org/maven")
     }
+     */
     maven {
         name = "EngineHub Repository"
         url = uri("https://maven.enginehub.org/repo/")
         content {
-            excludeGroup("net.milkbowl.vault")
+            includeGroup("com.sk89q")
         }
     }
 }
-
+/*
 configurations.all {
     resolutionStrategy {
         // Fabric needs this.
@@ -39,27 +41,32 @@ configurations.all {
         )
     }
 }
+ */
 
 val properties = Properties().also { props ->
     project.projectDir.resolveSibling("gradle.properties").bufferedReader().use {
         props.load(it)
     }
 }
+/*
 val loomVersion: String = properties.getProperty("loom.version")
 val mixinVersion: String = properties.getProperty("mixin.version")
+ */
 
 dependencies {
     implementation(gradleApi())
-    implementation("gradle.plugin.net.minecrell:licenser:0.4.1")
-    implementation("org.ajoberstar.grgit:grgit-gradle:4.0.2")
-    implementation("com.github.jengelman.gradle.plugins:shadow:5.2.0")
+    implementation("gradle.plugin.org.cadixdev.gradle:licenser:0.5.0")
+    implementation("org.ajoberstar.grgit:grgit-gradle:4.1.0")
+    implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
     implementation("net.ltgt.apt-eclipse:net.ltgt.apt-eclipse.gradle.plugin:0.21")
     implementation("net.ltgt.apt-idea:net.ltgt.apt-idea.gradle.plugin:0.21")
-    //implementation("org.jfrog.buildinfo:build-info-extractor-gradle:4.16.0")
-    //implementation("gradle.plugin.org.spongepowered:spongegradle:0.9.0")
-    //implementation("net.minecraftforge.gradle:ForgeGradle:3.0.181")
-    //implementation("net.fabricmc:fabric-loom:$loomVersion")
-    //implementation("net.fabricmc:sponge-mixin:$mixinVersion")
+    /*
     implementation("gradle.plugin.com.mendhak.gradlecrowdin:plugin:0.1.0")
     implementation("org.enginehub.gradle:gradle-codecov-plugin:0.1.0")
+    implementation("org.jfrog.buildinfo:build-info-extractor-gradle:4.16.0")
+    implementation("gradle.plugin.org.spongepowered:spongegradle:0.9.0")
+    implementation("net.minecraftforge.gradle:ForgeGradle:3.0.181")
+    implementation("net.fabricmc:fabric-loom:$loomVersion")
+    implementation("net.fabricmc:sponge-mixin:$mixinVersion")
+     */
 }

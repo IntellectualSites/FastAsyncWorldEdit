@@ -1,28 +1,48 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    `java-library`
+    id("java-library")
 }
 
 applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
 repositories {
-    maven { url = uri("https://hub.spigotmc.org/nexus/content/groups/public") }
-    maven { url = uri("https://repo.codemc.org/repository/maven-public") }
-    maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
-    maven { url = uri("https://maven.enginehub.org/repo/")
+    maven {
+        name = "Spigot"
+        url = uri("https://hub.spigotmc.org/nexus/content/groups/public")
         content {
-            excludeGroup("net.milkbowl.vault")
+            includeGroup("org.bukkit")
+            includeGroup("org.spigotmc")
         }
     }
-    maven { url = uri("https://ci.emc.gs/nexus/content/groups/aikar/") }
-    maven { url = uri("https://ci.athion.net/plugin/repository/tools/") }
+    maven {
+        name = "Paper"
+        url = uri("https://papermc.io/repo/repository/maven-public/")
+        content {
+            includeGroup("io.papermc")
+            includeGroup("com.destroystokyo.paper")
+        }
+    }
+    maven {
+        name = "EngineHub Repository"
+        url = uri("https://maven.enginehub.org/repo/")
+        content {
+            includeGroup("com.sk89q")
+        }
+    }
+    maven {
+        name = "Athion"
+        url = uri("https://ci.athion.net/plugin/repository/tools/")
+    }
     maven {
         this.name = "JitPack"
         this.url = uri("https://jitpack.io")
+        content {
+            includeGroup("net.milkbowl.vault")
+            includeGroup("com.github.TechFortress")
+        }
     }
-    maven { url = uri("https://repo.destroystokyo.com/repository/maven-public/") }
     maven {
         name = "ProtocolLib Repo"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
@@ -30,8 +50,21 @@ repositories {
             includeGroup("com.comphenix.protocol")
         }
     }
-    maven { url = uri("https://repo.inventivetalent.org/content/groups/public/") }
-    flatDir {dir(File("src/main/resources"))}
+    maven {
+        name = "Inventivetalent"
+        url = uri("https://repo.inventivetalent.org/content/groups/public/")
+        content {
+            includeGroupByRegex("org.inventivetalent.*")
+        }
+    }
+    maven {
+        name = "CodeMC"
+        url = uri("https://repo.codemc.org/repository/maven-public/")
+        content {
+            includeGroup("org.bstats")
+        }
+    }
+    flatDir { dir(File("src/main/resources")) }
 }
 
 configurations.all {
@@ -41,29 +74,27 @@ configurations.all {
 }
 
 dependencies {
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7") {
-        isTransitive = false
-    }
+    compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:bukkit"))
     compile(":worldedit-adapters:")
     // Paper-patched NMS jars
-    compile("com.destroystokyo.paperv1_15_r1:paperv1_15_r1:1_15_r1")
-    compile("com.destroystokyo.paperv1_16_r1:paperv1_16_r1:1_16_r1")
-    compile("com.destroystokyo.paperv1_16_r2:paperv1_16_r2:1_16_r2")
-    compile("com.destroystokyo.paperv1_16_r3:paperv1_16_r3:1_16_r3")
-    compile("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
-    compile("org.spigotmcv1_16_r1:spigotmcv1_16_r1:1_16_r1")
-    compile("org.spigotmcv1_16_r2:spigotmcv1_16_r2:1_16_r2")
-    compile("org.spigotmcv1_16_r3:spigotmcv1_16_r3:1_16_r3")
-    implementation("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
+    compileOnly("com.destroystokyo.paperv1_15_r1:paperv1_15_r1:1_15_r1")
+    compileOnly("com.destroystokyo.paperv1_16_r1:paperv1_16_r1:1_16_r1")
+    compileOnly("com.destroystokyo.paperv1_16_r2:paperv1_16_r2:1_16_r2")
+    compileOnly("com.destroystokyo.paperv1_16_r3:paperv1_16_r3:1_16_r3")
+    compileOnly("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
+    compileOnly("org.spigotmcv1_16_r1:spigotmcv1_16_r1:1_16_r1")
+    compileOnly("org.spigotmcv1_16_r2:spigotmcv1_16_r2:1_16_r2")
+    compileOnly("org.spigotmcv1_16_r3:spigotmcv1_16_r3:1_16_r3")
+    implementation("it.unimi.dsi:fastutil:8.2.1")
     api("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
         isTransitive = false
     }
+    compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:20.1.0")
     testCompileOnly("org.jetbrains:annotations:20.1.0")
-    compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
     implementation("io.papermc:paperlib:1.0.6")
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
@@ -76,9 +107,9 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    implementation("org.bstats:bstats-bukkit:1.8")
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
+    implementation("org.bstats:bstats-bukkit:1.8")
     compileOnlyApi("org.inventivetalent:mapmanager:1.7.+") { isTransitive = false }
     implementation("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
     implementation("com.massivecraft:mcore:7.0.1") { isTransitive = false }

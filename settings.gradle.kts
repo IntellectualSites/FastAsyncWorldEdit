@@ -15,7 +15,7 @@ dependencyResolutionManagement {
             name = "EngineHub Repository"
             url = uri("https://maven.enginehub.org/repo/")
             content {
-                excludeGroup("net.milkbowl.vault")
+                includeGroup("com.sk89q")
             }
         }
     }
