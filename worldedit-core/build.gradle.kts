@@ -38,7 +38,7 @@ dependencies {
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("org.slf4j:slf4j-api:1.7.26")
-    implementation("it.unimi.dsi:fastutil:8.2.1")
+    implementation("it.unimi.dsi:fastutil:8.4.4")
 
     antlr("org.antlr:antlr4:4.7.2")
     implementation("org.antlr:antlr4-runtime:4.7.2")
