@@ -13,7 +13,7 @@ dependencies {
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
     "implementation"("commons-cli:commons-cli:1.4")
     "implementation"("com.google.guava:guava:21.0")
-    "implementation"("com.google.code.gson:gson:2.8.0")
+    "implementation"("com.google.code.gson:gson:2.8.6")
 }
 
 tasks.named<Jar>("jar") {
