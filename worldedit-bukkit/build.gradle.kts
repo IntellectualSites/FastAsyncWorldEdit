@@ -9,7 +9,7 @@ applyShadowConfiguration()
 
 repositories {
     maven {
-        name = "Spigot"
+        name = "SpigotMC"
         url = uri("https://hub.spigotmc.org/nexus/content/groups/public")
         content {
             includeGroup("org.bukkit")
@@ -17,7 +17,7 @@ repositories {
         }
     }
     maven {
-        name = "Paper"
+        name = "PaperMC"
         url = uri("https://papermc.io/repo/repository/maven-public/")
         content {
             includeGroup("io.papermc")
@@ -25,7 +25,7 @@ repositories {
         }
     }
     maven {
-        name = "EngineHub Repository"
+        name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
         content {
             includeGroupByRegex("com.sk89q.*")
@@ -36,15 +36,15 @@ repositories {
         url = uri("https://ci.athion.net/plugin/repository/tools/")
     }
     maven {
-        this.name = "JitPack"
-        this.url = uri("https://jitpack.io")
+        name = "JitPack"
+        url = uri("https://jitpack.io")
         content {
-            includeGroup("net.milkbowl.vault")
+            includeGroup("com.github.MilkBowl")
             includeGroup("com.github.TechFortress")
         }
     }
     maven {
-        name = "ProtocolLib Repo"
+        name = "ProtocolLib"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
         content {
             includeGroup("com.comphenix.protocol")
