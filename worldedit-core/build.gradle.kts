@@ -49,7 +49,7 @@ dependencies {
     // ensure this is on the classpath for the AP
     annotationProcessor("com.google.guava:guava:21.0")
     compileOnly("com.google.auto.value:auto-value-annotations:1.7")
-    annotationProcessor("com.google.auto.value:auto-value:1.7")
+    annotationProcessor("com.google.auto.value:auto-value:1.7.4")
     testImplementation("ch.qos.logback:logback-core:1.2.3")
     testImplementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("com.github.luben:zstd-jni:1.4.8-1")
