@@ -36,7 +36,7 @@ dependencies {
     implementation("org.yaml:snakeyaml:1.27")
     implementation("com.google.guava:guava:21.0")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
-    implementation("com.google.code.gson:gson:2.8.0")
+    implementation("com.google.code.gson:gson:2.8.6")
     implementation("org.slf4j:slf4j-api:1.7.26")
     implementation("it.unimi.dsi:fastutil:8.4.4")
 
