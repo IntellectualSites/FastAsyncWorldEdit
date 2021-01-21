@@ -20,9 +20,8 @@ fun Project.applyCommonConfiguration() {
             name = "EngineHub Repository"
             url = uri("https://maven.enginehub.org/repo/")
             content {
-                includeGroup("com.sk89q")
-                includeGroup("com.sk89q.lib")
                 includeGroupByRegex("org.enginehub.*")
+                includeGroupByRegex("com.sk89q.*")
             }
         }
         maven {
