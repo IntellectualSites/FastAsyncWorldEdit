@@ -84,6 +84,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 
 import static com.boydti.fawe.bukkit.util.JavaVersionCheck.checkJvm;
+import static com.boydti.fawe.bukkit.util.SaneSoftwareCheck.checkVersion;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
@@ -162,7 +163,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             // register this so we can load world-dependent data right as the first world is loading
             getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
         } else {
-            getLogger().warning("Server reload detected. This may cause various issues with WorldEdit and dependent plugins.");
+            getLogger().warning("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins.");
+            getLogger().warning("For more information, see https://matthewmiller.dev/blog/problem-with-reload/");
             try {
                 setupPreWorldData();
                 // since worlds are loaded already, we can do this now
@@ -176,6 +178,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         // Check whether the server runs on 11 or greater
         checkJvm();
+        // Check if we are in a safe environment
+        checkVersion();
     }
 
     private void setupPreWorldData() {
