@@ -49,6 +49,7 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
+import de.notmyfault.serverlib.ServerLib;
 import io.papermc.lib.PaperLib;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -84,7 +85,6 @@ import java.util.Optional;
 import java.util.logging.Level;
 
 import static com.boydti.fawe.bukkit.util.JavaVersionCheck.checkJvm;
-import static com.boydti.fawe.bukkit.util.SaneSoftwareCheck.checkVersion;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
@@ -179,7 +179,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         // Check whether the server runs on 11 or greater
         checkJvm();
         // Check if we are in a safe environment
-        checkVersion();
+        ServerLib.checkUnsafeForks();
     }
 
     private void setupPreWorldData() {
