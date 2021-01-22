@@ -64,6 +64,13 @@ repositories {
             includeGroup("org.bstats")
         }
     }
+    maven {
+        name = "IntellectualSites 3rd Party"
+        url = uri("https://mvn.intellectualsites.com/content/repositories/thirdparty")
+        content {
+            includeGroup("de.notmyfault")
+        }
+    }
     flatDir { dir(File("src/main/resources")) }
 }
 
@@ -117,6 +124,7 @@ dependencies {
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.5.1") { isTransitive = false }
+    implementation("de.notmyfault:serverlib:1.0.0")
 }
 
 tasks.named<Copy>("processResources") {
@@ -147,6 +155,7 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.slf4j:slf4j-api"))
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
         include(dependency("org.antlr:antlr4-runtime"))
+        include(dependency("de.notmyfault:serverlib"))
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib:1.0.6"))
         }
