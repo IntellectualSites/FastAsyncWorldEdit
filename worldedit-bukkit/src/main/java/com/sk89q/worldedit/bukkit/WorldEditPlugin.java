@@ -96,7 +96,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
-    private static final int BSTATS_PLUGIN_ID = 1403;
 
     private BukkitImplAdapter bukkitAdapter;
     private BukkitServerInterface server;
@@ -174,7 +173,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         }
 
         // Setup metrics
-        new Metrics(this, BSTATS_PLUGIN_ID);
+        new Metrics(this, 1403);
 
         // Check whether the server runs on 11 or greater
         checkJvm();

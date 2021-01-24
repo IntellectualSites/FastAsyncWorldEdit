@@ -58,13 +58,6 @@ repositories {
         }
     }
     maven {
-        name = "CodeMC"
-        url = uri("https://repo.codemc.org/repository/maven-public/")
-        content {
-            includeGroup("org.bstats")
-        }
-    }
-    maven {
         name = "IntellectualSites 3rd Party"
         url = uri("https://mvn.intellectualsites.com/content/repositories/thirdparty")
         content {
@@ -116,7 +109,7 @@ dependencies {
     }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
-    implementation("org.bstats:bstats-bukkit:1.8")
+    implementation("org.bstats:bstats-bukkit:2.1.0")
     compileOnlyApi("org.inventivetalent:mapmanager:1.7.+") { isTransitive = false }
     implementation("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
     implementation("com.massivecraft:mcore:7.0.1") { isTransitive = false }
@@ -163,7 +156,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
         relocate("org.bstats", "com.boydti.metrics") {
-            include(dependency("org.bstats:bstats-bukkit:1.8"))
+            include(dependency("org.bstats:bstats-bukkit:2.1.0"))
         }
         relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
