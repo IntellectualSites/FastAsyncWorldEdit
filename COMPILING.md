@@ -1,9 +1,8 @@
 Compiling
 =========
 
-You can compile FastAsyncWorldEdit as long as you have the [Java Development Kit (JDK)](http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html) for Java 8.
-Newer versions of the JDK may not compile. 
-You only need one version of the JDK installed.
+You can compile FastAsyncWorldEdit as long as you have some version of Java greater than or equal to 8 installed. Gradle will download JDK 8 specifically if needed,
+but it needs some version of Java to bootstrap from.
 
 The build process uses Gradle, which you do *not* need to download. FastAsyncWorldEdit is a multi-module project with two active modules:
 
@@ -29,7 +28,7 @@ You will find:
 * The core FastAsyncWorldEdit API in **worldedit-core/build/libs**
 * FastAsyncWorldEdit for Bukkit in **worldedit-bukkit/build/libs***
 
-If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-1.15-#` version.
+If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-1.16-#` version.
 
 ## Other commands
 

@@ -6,7 +6,22 @@
 
 FAWE is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
 
-## Links 
+**A Minecraft Map Editor... that runs in-game!**
+
+* With selections, schematics, copy and paste, brushes, and scripting!
+* Use it in creative, survival in single player or on your server.
+* Use it on your Minecraft server to fix grieving and mistakes.
+
+Java Edition required. WorldEdit is compatible with Forge, Fabric, Bukkit, Spigot, Paper, and Sponge.
+
+## Download FastAsyncWorldEdit
+### 1.15+
+* [Download](https://www.spigotmc.org/resources/fast-async-worldedit.13932/)
+* [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
+
+Looking builds for older versions? Download them [here](https://intellectualsites.github.io/download/).
+
+## Links
 
 * [Spigot Page](https://www.spigotmc.org/threads/fast-async-worldedit.100104/)
 * [Discord](https://discord.gg/KxkjDVg)
@@ -15,13 +30,26 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 * [Crowdin](https://intellectualsites.crowdin.com/fastasyncworldedit)
 * [JavaDocs](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/javadoc/)
 
-## Downloads
-### 1.15+
-* [Download](https://www.spigotmc.org/resources/fast-async-worldedit.13932/)
-* [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
+Edit the Code
+---------
 
-Looking builds for older versions? Download them [here](https://intellectualsites.github.io/download/).
+Want to add new features to WorldEdit or fix bugs yourself? You can get the game running, with WorldEdit, from the code here, without any additional outside steps, by doing the following *four* things:
 
+1. Download WorldEdit's source code and put it somewhere. We recommend you use something called Git if you already know how to use it, but [you can also just download a .zip file](https://github.com/EngineHub/WorldEdit/archive/master.zip). (If you plan on contributing the changes, you will need to figure out Git.)
+2. Install any version of Java greater than or equal to 8.
+   * Note that if you do _not_ install JDK 8 exactly, Gradle will download it for you on first run. However, it is still required to have some form of Java installed for Gradle to start at all.
+3. Open terminal / command prompt / bash and navigate to the directory where you put the source code.
+4. Run **one** of these following commands:
+   * Mac OS X / Linux: `./gradlew :worldedit-fabric:runClient`
+   * Windows - Command Prompt: `gradlew :worldedit-fabric:runClient`
+   * Windows - PowerShell: `.\gradlew :worldedit-fabric:runClient`
+
+🎉 That's it. 🎉 It takes a long time to actually transform WorldEdit into a mod. If it succeeds, **the Minecraft game will open and you can create a single player world with WorldEdit**.
+
+---
+
+For additional information about compiling WorldEdit, see [COMPILING.md](COMPILING.md).
+FAWE is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
 
 ## Building
 FAWE uses gradle to build  
