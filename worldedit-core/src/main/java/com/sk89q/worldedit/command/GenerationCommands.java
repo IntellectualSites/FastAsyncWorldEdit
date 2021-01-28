@@ -174,14 +174,21 @@ public class GenerationCommands {
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
 
-    @Command(
-        name = "/ore",
-        desc = "Generates ores"
-    )
+    @Command(name = "/ore", desc = "Generates ores")
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     @Confirm(Confirm.Processor.REGION)
-    public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern material, @Arg(desc="Ore vein size") @Range(from = 0, to=Integer.MAX_VALUE) int size, int freq, @Range(from=0, to=100) int rarity, @Range(from=0, to=255) int minY, @Range(from=0, to=255) int maxY) throws WorldEditException {
+    public void ore(Actor actor,
+                    LocalSession session,
+                    EditSession editSession,
+                    @Selection Region region,
+                    @Arg(desc = "Mask") Mask mask,
+                    @Arg(desc = "Pattern") Pattern material,
+                    @Arg(desc = "Ore vein size") @Range(from = 0, to = Integer.MAX_VALUE) int size,
+                    @Arg(desc = "Ore vein frequency (number of times to attempt to place ore)", def = "10") @Range(from = 0, to = Integer.MAX_VALUE) int freq,
+                    @Arg(desc = "Ore vein rarity (% chance each attempt is placed)", def = "100") @Range(from = 0, to = 100) int rarity,
+                    @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
+                    @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY) throws WorldEditException {
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
