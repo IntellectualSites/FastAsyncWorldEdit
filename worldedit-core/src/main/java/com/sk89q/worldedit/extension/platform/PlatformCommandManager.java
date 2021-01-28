@@ -471,7 +471,7 @@ public final class PlatformCommandManager {
             registerSubCommands(
                 "/anvil",
                 ImmutableList.of(),
-                "Manipulate billions of blocks https://github.com/boy0001/FastAsyncWorldedit/wiki/Anvil-API",
+                "Manipulate billions of blocks",
                 AnvilCommandsRegistration.builder(),
                 new AnvilCommands(worldEdit)
             );

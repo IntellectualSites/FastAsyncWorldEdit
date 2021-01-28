@@ -21,7 +21,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "java")
     apply(plugin = "eclipse")
     apply(plugin = "idea")
-    apply(plugin = "maven")
+    apply(plugin = "maven-publish")
 //    apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
 
@@ -29,7 +29,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     configure<JavaPluginConvention> {
         sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = sourceCompatibility
     }
 
     tasks
@@ -55,11 +55,11 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     dependencies {
         "compileOnly"("org.jetbrains:annotations:20.1.0")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
-        "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
-        "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
-        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.6.1")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.6.1")
+        "testImplementation"("org.mockito:mockito-core:3.3.3")
+        "testImplementation"("org.mockito:mockito-junit-jupiter:3.3.3")
+        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:5.6.1")
     }
 
     // Java 8 turns on doclint which we fail
@@ -112,7 +112,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
 fun Project.applyShadowConfiguration() {
     tasks.named<ShadowJar>("shadowJar") {
-//        archiveClassifier.set("dist")
         dependencies {
             include(project(":worldedit-libs:core"))
             include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))

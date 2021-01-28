@@ -49,11 +49,11 @@ public class BukkitImplLoader {
     private static final String LOAD_ERROR_MESSAGE =
         "\n**********************************************\n"
             + "** This FastAsyncWorldEdit version does not fully support your version of Bukkit.\n"
+            + "** You can fix this by:\n"
+            +  "** - Updating your server version\n** - Updating FAWE\n"
             + "**\n" + "** When working with blocks or undoing, chests will be empty, signs\n"
             + "** will be blank, and so on. There will be no support for entity\n"
             + "** and block property-related functions.\n"
-            + "**\n"
-            + "** Please see https://worldedit.enginehub.org/en/latest/faq/#bukkit-adapters\n"
             + "**********************************************\n";
 
     /**

@@ -49,6 +49,7 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
+import de.notmyfault.serverlib.ServerLib;
 import io.papermc.lib.PaperLib;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -95,7 +96,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
-    private static final int BSTATS_PLUGIN_ID = 1403;
 
     private BukkitImplAdapter bukkitAdapter;
     private BukkitServerInterface server;
@@ -162,7 +162,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             // register this so we can load world-dependent data right as the first world is loading
             getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
         } else {
-            getLogger().warning("Server reload detected. This may cause various issues with WorldEdit and dependent plugins.");
+            getLogger().warning("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins.");
+            getLogger().warning("For more information, see https://matthewmiller.dev/blog/problem-with-reload/");
             try {
                 setupPreWorldData();
                 // since worlds are loaded already, we can do this now
@@ -172,10 +173,12 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         }
 
         // Setup metrics
-        new Metrics(this, BSTATS_PLUGIN_ID);
+        new Metrics(this, 1403);
 
         // Check whether the server runs on 11 or greater
         checkJvm();
+        // Check if we are in a safe environment
+        ServerLib.checkUnsafeForks();
     }
 
     private void setupPreWorldData() {

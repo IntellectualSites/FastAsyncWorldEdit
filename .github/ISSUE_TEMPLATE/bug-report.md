@@ -24,7 +24,7 @@ assignees: ''
 **Required Information**
 - FAWE Version Number (`/version FastAsyncWorldEdit`):     
 - Spigot/Paper Version Number (`/version`):     
-- Minecraft Version: [e.g. 1.16.4]     
+- Minecraft Version: [e.g. 1.16.5]     
 
 **Describe the bug**
 A clear and concise description of what the bug is.
@@ -43,5 +43,5 @@ Steps to reproduce the behavior:
 <!--- Make sure you've completed the following steps (put an "X" between of brackets): -->
 - [] I included all information required in the sections above
 - [] I made sure there are no duplicates of this report [(Use Search)](https://github.com/IntellectualSites/FastAsyncWorldEdit/issues?q=is%3Aissue)
-- [] I made sure I am using an up-to-date version of [FastAsyncWorldEdit for 1.16.4](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
+- [] I made sure I am using an up-to-date version of [FastAsyncWorldEdit for 1.16.5](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
 - [] I made sure the bug/error is not caused by any other plugin

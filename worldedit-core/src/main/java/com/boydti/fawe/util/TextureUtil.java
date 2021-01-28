@@ -10,6 +10,8 @@ import com.google.gson.stream.JsonReader;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.PropertiesConfiguration;
+import com.sk89q.worldedit.util.report.Unreported;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -18,14 +20,19 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,6 +54,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 // TODO FIXME
 public class TextureUtil implements TextureHolder {
+
+    private static final Logger log = LoggerFactory.getLogger(TextureUtil.class);
 
     private static final int[] FACTORS = new int[766];
 
@@ -344,8 +353,20 @@ public class TextureUtil implements TextureHolder {
     public TextureUtil(File folder) throws FileNotFoundException {
         this.folder = folder;
         if (!folder.exists()) {
-            throw new FileNotFoundException(
-                "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+            log.info("Downloading asset jar from Mojang, please wait...");
+            new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
+            try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
+                 FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
+                byte[] dataBuffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                    fileOutputStream.write(dataBuffer, 0, bytesRead);
+                }
+                log.info("Asset jar down has been downloaded successfully.");
+            } catch (IOException e) {
+                log.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+                log.error("If the file exists, please make sure the server has read access to the directory.");
+            }
         }
     }
 
@@ -606,8 +627,18 @@ public class TextureUtil implements TextureHolder {
                 }
             }
             if (files.length == 0) {
-                getLogger(TextureUtil.class).debug(
-                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.15.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
+                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
+                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
+                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
+                    byte[] dataBuffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                    }
+                } catch (IOException e) {
+                    log.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+                    log.error("If the file exists, please make sure the server has read access to the directory.");
+                }
             } else {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);
