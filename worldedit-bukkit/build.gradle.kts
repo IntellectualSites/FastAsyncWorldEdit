@@ -118,7 +118,7 @@ dependencies {
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.5.1") { isTransitive = false }
-    implementation("de.notmyfault:serverlib:1.0.0")
+    implementation("de.notmyfault:serverlib:1.0.1")
 }
 
 tasks.named<Copy>("processResources") {
