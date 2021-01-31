@@ -10,13 +10,11 @@ assignees: ''
 <!-- ⚠️⚠️ Do Not Delete This! You must follow this template. ⚠️⚠️ -->
 <!--- Incomplete reports will be marked as invalid, and closed, with few exceptions.-->
 
-<!--- If you are using 1.14 or 1.15 consider updating to 1.16.3 before raising an issue -->
+<!--- If you are using 1.14 or 1.15 consider updating to 1.16.5 before raising an issue -->
 <!--- The priority lays on 1.16 right now, so issues reported for or 1.15 will be fixed for the 1.16 versions -->
 
 **[REQUIRED] FastAsyncWorldEdit Configuration Files** 
 <!--- Issue /fawe debugpaste in game or in your console and copy the supplied URL here -->
-<!--- If you cannot perform the above, we require logs/latest.log; config.yml and config-legacy.yml -->
-<!--- Please provide this information by using a paste service such as https://haste.athion.net -->
 <!--- If you are unwilling to supply the information we need, we reserve the right to not assist you. Redact IP addresses if you need to. -->
 
 **/fawe debugpaste**:

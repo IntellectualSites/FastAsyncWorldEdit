@@ -46,5 +46,5 @@ jobs:
     - name: "Run BuildTools"
       run: "java -jar BuildTools.jar --rev 1.16.5"
     - name: "Clean Build"
-      run: "./gradlew clean build sourcesJar javadocJar"
+      run: "./gradlew clean build -x test sourcesJar javadocJar"
       
