@@ -196,11 +196,11 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
     }
 
     private synchronized void flushAsync(final boolean sendChunks) {
-        final Set<CachedChange> changes = Collections.unmodifiableSet(cachedChanges);
+        final Set<CachedChange> changes = Collections.unmodifiableSet(new HashSet<>(cachedChanges));
         cachedChanges.clear();
         final Set<IntPair> toSend;
         if (sendChunks) {
-            toSend = Collections.unmodifiableSet(cachedChunksToSend);
+            toSend = Collections.unmodifiableSet(new HashSet<>(cachedChunksToSend));
             cachedChunksToSend.clear();
         } else {
             toSend = Collections.emptySet();
