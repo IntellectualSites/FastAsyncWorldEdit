@@ -2,5 +2,5 @@
   "extends": [
     "config:base"
   ],
-  "ignoreDeps": ["guava", "rhino-runtime", "mockito-core", "antlr4", "antlr4-runtime", "paranamer", "fastutil"]
+  "ignoreDeps": ["guava", "rhino-runtime", "mockito-core", "antlr4", "antlr4-runtime", "paranamer", "fastutil", "auto-value-annotations", "auto-value"]
 }

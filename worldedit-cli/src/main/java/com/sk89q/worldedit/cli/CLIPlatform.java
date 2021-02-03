@@ -145,6 +145,13 @@ class CLIPlatform extends AbstractPlatform {
         return app.getInternalVersion();
     }
 
+    // FAWE start
+    @Override
+    public String getId() {
+        return "intellectualsites:cli";
+    }
+    // FAWE end
+
     @Override
     public Map<Capability, Preference> getCapabilities() {
         Map<Capability, Preference> capabilities = new EnumMap<>(Capability.class);

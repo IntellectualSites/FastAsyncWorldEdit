@@ -40,6 +40,7 @@ import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -101,7 +102,8 @@ public class WorldEditCommands {
         for (Platform platform : pm.getPlatforms()) {
             producer.append(
                     TextComponent.of("* ", TextColor.GRAY)
-                    .append(TextComponent.of(platform.getPlatformName()))
+                            .append(TextComponent.of(platform.getPlatformName())
+                                    .hoverEvent(HoverEvent.showText(TextComponent.of(platform.getId()))))
                     .append(TextComponent.of("(" + platform.getPlatformVersion() + ")"))
             ).newline();
         }
@@ -113,7 +115,7 @@ public class WorldEditCommands {
             producer.append(
                 TextComponent.of(capability.name(), TextColor.GRAY)
                     .append(TextComponent.of(": ")
-                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "NONE")))
+                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "none")))
             ).newline();
         }
         actor.print(new MessageBox("Capabilities", producer, TextColor.GRAY).create());

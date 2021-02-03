@@ -53,6 +53,8 @@ import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
@@ -69,6 +71,10 @@ import java.util.stream.Collectors;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ToolCommands {
+
+    private static final Component UNBIND_COMMAND_COMPONENT = TextComponent.builder("/tool unbind", TextColor.AQUA)
+            .clickEvent(ClickEvent.suggestCommand("/tool unbind"))
+            .build();
 
     public static void register(CommandRegistrationHandler registration,
                                 CommandManager commandManager,
@@ -142,11 +148,16 @@ public class ToolCommands {
         player.printInfo(TranslatableComponent.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
     }
 
+    static void sendUnbindInstruction(Player sender, Component commandComponent) {
+        sender.printDebug(TranslatableComponent.of("worldedit.tool.unbind-instruction", commandComponent));
+    }
+
     private static void setTool(Player player, LocalSession session, Tool tool,
                                 String translationKey) throws InvalidToolBindException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(itemStack.getType(), tool);
         player.printInfo(TranslatableComponent.of(translationKey, itemStack.getRichName()));
+        sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
 
     private final WorldEdit we;
