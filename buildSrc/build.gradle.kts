@@ -48,10 +48,6 @@ val properties = Properties().also { props ->
         props.load(it)
     }
 }
-/*
-val loomVersion: String = properties.getProperty("loom.version")
-val mixinVersion: String = properties.getProperty("mixin.version")
- */
 
 dependencies {
     implementation(gradleApi())

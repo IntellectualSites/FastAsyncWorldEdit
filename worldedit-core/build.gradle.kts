@@ -22,9 +22,11 @@ repositories {
 
 applyPlatformAndCoreConfiguration()
 
-configurations.all {
-    resolutionStrategy {
-        force("com.google.guava:guava:21.0")
+configurations {
+    all {
+        resolutionStrategy {
+            force("com.google.guava:guava:21.0")
+        }
     }
 }
 
@@ -111,37 +113,3 @@ tasks.named<ShadowJar>("shadowJar") {
 
     }
 }
-/*
-val crowdinApiKey = "crowdin_apikey"
-
-if (project.hasProperty(crowdinApiKey) && !gradle.startParameter.isOffline) {
-    tasks.named<UploadSourceFileTask>("crowdinUpload") {
-        apiKey = "${project.property(crowdinApiKey)}"
-        projectId = "worldedit-core"
-        files = arrayOf(
-            object {
-                var name = "strings.json"
-                var source = "${file("src/main/resources/lang/strings.json")}"
-            }
-        )
-    }
-
-    val dlTranslationsTask = tasks.named<DownloadTranslationsTask>("crowdinDownload") {
-        apiKey = "${project.property(crowdinApiKey)}"
-        destination = "${buildDir.resolve("crowdin-i18n")}"
-        projectId = "worldedit-core"
-    }
-
-    tasks.named<Copy>("processResources") {
-        dependsOn(dlTranslationsTask)
-        from(dlTranslationsTask.get().destination) {
-            into("lang")
-        }
-    }
-
-    tasks.named("classes") {
-        dependsOn("crowdinDownload")
-    }
-}
-
- */
