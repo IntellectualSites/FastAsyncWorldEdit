@@ -78,7 +78,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     public DiskOptimizedClipboard(BlockVector3 dimensions, File file) {
         super(dimensions);
         if (HEADER_SIZE + ((long) getVolume() << 1) >= Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Dimensions too large for this clipboard format");
+            throw new IllegalArgumentException("Dimensions too large for this clipboard format. Use //lazycopy for large selections.");
         } else if (HEADER_SIZE + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1) >= Integer.MAX_VALUE) {
             log.error("Dimensions are too large for biomes to be stored in a DiskOptimizedClipboard");
             canHaveBiomes = false;
