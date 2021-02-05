@@ -344,7 +344,6 @@ public class BrushCommands {
                               @Switch(name = 'd', desc = "sags the catenary toward the facing direction")
                                   boolean facingDirection) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        Brush brush = new CatenaryBrush(shell, select, facingDirection, lengthFactor);
         set(context, new CatenaryBrush(shell, select, facingDirection, lengthFactor))
             .setSize(radius).setFill(fill);
     }
