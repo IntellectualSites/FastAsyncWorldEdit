@@ -9,8 +9,8 @@
 	"fawe.info.updated.lighting.selection": "Lighting has been updated in {0} chunks. (It may take a second for the packets to send)",
 	"fawe.info.set.region": "Selection set to your current allowed region",
 
-	"fawe.info.worldedit.toggle.tips.on": "Disabled FAWE tips.",
-	"fawe.info.worldedit.toggle.tips.off": "Enabled FAWE tips.",
+	"fawe.info.worldedit.toggle.tips.on": "Enabled FAWE tips.",
+	"fawe.info.worldedit.toggle.tips.off": "Disabled FAWE tips.",
 	"fawe.info.worldedit.bypassed": "Currently bypassing FAWE restriction.",
 	"fawe.info.worldedit.restricted": "Your FAWE edits are now restricted.",
 	"fawe.info.worldedit.oom.admin": "Possible options:\n - //fast\n - Do smaller edits\n - Allocate more memory\n - Disable `max-memory-percent`",
