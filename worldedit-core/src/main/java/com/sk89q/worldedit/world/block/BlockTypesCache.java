@@ -205,7 +205,6 @@ public class BlockTypesCache {
                     String defaultState = blockMap.remove(id);
                     if (defaultState == null) {
                         if (internalId != 0) {
-                            getLogger(BlockTypesCache.class).info("Ignoring invalid block {}", id);
                             continue;
                         }
                         defaultState = id;
