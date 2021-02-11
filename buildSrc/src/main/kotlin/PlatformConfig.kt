@@ -27,11 +27,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
 
-    configure<JavaPluginConvention> {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = sourceCompatibility
-    }
-
     tasks
         .withType<JavaCompile>()
         .matching { it.name == "compileJava" || it.name == "compileTestJava" }
@@ -55,11 +50,11 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     dependencies {
         "compileOnly"("org.jetbrains:annotations:20.1.0")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.6.1")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.6.1")
-        "testImplementation"("org.mockito:mockito-core:3.3.3")
-        "testImplementation"("org.mockito:mockito-junit-jupiter:3.3.3")
-        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:5.6.1")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
+        "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
+        "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
+        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
     }
 
     // Java 8 turns on doclint which we fail

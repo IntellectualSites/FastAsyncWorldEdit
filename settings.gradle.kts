@@ -6,7 +6,7 @@ listOf("bukkit", "core").forEach {
     include("worldedit-libs:$it")
     include("worldedit-$it")
 }
-include("worldedit-mod")
+// include("worldedit-mod")
 include("worldedit-libs:core:ap")
 
 dependencyResolutionManagement {

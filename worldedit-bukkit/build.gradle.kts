@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("java-library")
+    `java-library`
 }
 
 applyPlatformAndCoreConfiguration()
@@ -87,7 +87,7 @@ dependencies {
     compileOnly("org.spigotmcv1_16_r1:spigotmcv1_16_r1:1_16_r1")
     compileOnly("org.spigotmcv1_16_r2:spigotmcv1_16_r2:1_16_r2")
     compileOnly("org.spigotmcv1_16_r3:spigotmcv1_16_r3:1_16_r3")
-    implementation("it.unimi.dsi:fastutil:8.4.4")
+    implementation("it.unimi.dsi:fastutil")
     api("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
         isTransitive = false
@@ -99,7 +99,7 @@ dependencies {
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
+    implementation("org.slf4j:slf4j-jdk14:${Versions.SLF4J}")
     testImplementation("org.mockito:mockito-core:1.9.0-rc1")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
@@ -122,8 +122,10 @@ dependencies {
 }
 
 tasks.named<Copy>("processResources") {
+    val internalVersion = project.ext["internalVersion"]
+    inputs.property("internalVersion", internalVersion)
     filesMatching("plugin.yml") {
-        expand("internalVersion" to project.ext["internalVersion"])
+        expand("internalVersion" to internalVersion)
     }
     // exclude adapters entirely from this JAR, they should only be in the shadow JAR
     exclude("**/worldedit-adapters.jar")
@@ -149,20 +151,17 @@ tasks.named<ShadowJar>("shadowJar") {
         include(dependency("org.slf4j:slf4j-api"))
         include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
         include(dependency("org.antlr:antlr4-runtime"))
-        relocate("de.notmyfault", "com.boydti.fawe") {
-            include(dependency("de.notmyfault:serverlib:1.0.1"))
+        relocate("org.bstats", "com.sk89q.worldedit.bstats") {
+            include(dependency("org.bstats:"))
         }
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
-            include(dependency("io.papermc:paperlib:1.0.6"))
+            include(dependency("io.papermc:paperlib"))
         }
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
-        relocate("org.bstats", "com.boydti.fawe.metrics") {
-            include(dependency("org.bstats:bstats-bukkit:2.1.0"))
-        }
-        relocate("org.bstats", "com.boydti.fawe.metrics") {
-            include(dependency("org.bstats:bstats-base:2.1.0"))
+        relocate("de.notmyfault", "com.boydti.fawe") {
+            include(dependency("de.notmyfault:serverlib:1.0.1"))
         }
         relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))

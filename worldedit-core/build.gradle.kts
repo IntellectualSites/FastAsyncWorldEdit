@@ -22,38 +22,38 @@ repositories {
 
 applyPlatformAndCoreConfiguration()
 
-configurations {
-    all {
-        resolutionStrategy {
-            force("com.google.guava:guava:21.0")
+dependencies {
+    constraints {
+        implementation( "org.yaml:snakeyaml") {
+            version { strictly("1.26") }
+            because("Bukkit provides SnakeYaml")
         }
     }
-}
 
-dependencies {
     api(project(":worldedit-libs:core"))
     implementation("de.schlichtherle:truezip:6.8.4")
-    implementation("net.java.truevfs:truevfs-profile-default_2.13:0.12.2")
-    implementation("org.mozilla:rhino-runtime:1.7.12")
-    implementation("org.yaml:snakeyaml:1.27")
-    implementation("com.google.guava:guava:21.0")
-    implementation("com.google.code.findbugs:jsr305:3.0.2")
-    implementation("com.google.code.gson:gson:2.8.6")
-    implementation("org.slf4j:slf4j-api:1.7.26")
-    implementation("it.unimi.dsi:fastutil:8.4.4")
+    implementation("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
+    implementation("org.mozilla:rhino-runtime:1.7.13")
+    implementation("org.yaml:snakeyaml")
+    implementation("com.google.guava:guava")
+    implementation("com.google.code.findbugs:jsr305:1.3.9")
+    implementation("com.google.code.gson:gson")
+    implementation("org.slf4j:slf4j-api:${Versions.SLF4J}")
+    implementation("it.unimi.dsi:fastutil")
 
-    antlr("org.antlr:antlr4:4.7.2")
-    implementation("org.antlr:antlr4-runtime:4.7.2")
+    val antlrVersion = "4.9.1"
+    antlr("org.antlr:antlr4:$antlrVersion")
+    implementation("org.antlr:antlr4-runtime:$antlrVersion")
 
     implementation("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
     compileOnly(project(":worldedit-libs:core:ap"))
     annotationProcessor(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP
     annotationProcessor("com.google.guava:guava:21.0")
-    compileOnly("com.google.auto.value:auto-value-annotations:1.7")
-    annotationProcessor("com.google.auto.value:auto-value:1.7")
-    testImplementation("ch.qos.logback:logback-core:1.2.3")
-    testImplementation("ch.qos.logback:logback-classic:1.2.3")
+    compileOnly("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
+    annotationProcessor("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
+    testImplementation("ch.qos.logback:logback-core:${Versions.LOGBACK}")
+    testImplementation("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
     implementation("com.github.luben:zstd-jni:1.4.8-2")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
