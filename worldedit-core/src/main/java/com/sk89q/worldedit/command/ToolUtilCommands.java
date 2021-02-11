@@ -284,7 +284,7 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.targetoffset")
     public void targetOffset(Player player, EditSession editSession, LocalSession session,
-                             int offset) throws WorldEditException {
+                             @Arg(name = "offset", desc = "offset", def = "0") int offset) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));

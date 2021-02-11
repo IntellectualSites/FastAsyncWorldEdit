@@ -192,7 +192,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
         if (sky) {
             SectionPosition sectionPositionSky = SectionPosition.a(getChunk().getPos(), layer);
             NibbleArray nibbleSky = world.getChunkProvider().getLightEngine().a(EnumSkyBlock.SKY).a(sectionPositionSky);
-            if (nibble != null) {
+            if (nibbleSky != null) {
                 lightUpdate = true;
                 synchronized (nibbleSky) {
                     byte[] bytes = PaperLib.isPaper() ? nibbleSky.getIfSet() : nibbleSky.asBytes();

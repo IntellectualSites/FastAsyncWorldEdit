@@ -63,7 +63,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -290,6 +289,9 @@ public class BukkitWorld extends AbstractWorld {
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             if (treeTypeMapping.get(type) == null) {
                 WorldEdit.logger.error("No TreeType mapping for TreeGenerator.TreeType." + type);
+                // FAWE start
+                WorldEdit.logger.warn("Your FAWE version is newer than " + Bukkit.getVersion() + " and contains features of future minecraft versions which do not exist in " + Bukkit.getVersion() + ", hence the tree type " + type + " is not available.");
+                // FAWE end
             }
         }
     }
