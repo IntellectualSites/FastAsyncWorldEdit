@@ -109,7 +109,7 @@ dependencies {
     }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
-    implementation("org.bstats:bstats-bukkit:2.1.0")
+    implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.1.0")
     compileOnlyApi("org.inventivetalent:mapmanager:1.7.+") { isTransitive = false }
     implementation("com.github.TechFortress:GriefPrevention:16.+") { isTransitive = false }
