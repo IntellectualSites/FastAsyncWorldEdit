@@ -54,7 +54,7 @@ dependencies {
     annotationProcessor("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     testImplementation("ch.qos.logback:logback-core:${Versions.LOGBACK}")
     testImplementation("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
-    implementation("com.github.luben:zstd-jni:1.4.8-2")
+    implementation("com.github.luben:zstd-jni:1.4.8-4")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
     api("com.plotsquared:PlotSquared-Core:5.13.3") { isTransitive = false }
@@ -109,7 +109,7 @@ tasks.named<Copy>("processResources") {
 }
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
-        include(dependency("com.github.luben:zstd-jni:1.4.8-2"))
+        include(dependency("com.github.luben:zstd-jni:1.4.8-4"))
 
     }
 }

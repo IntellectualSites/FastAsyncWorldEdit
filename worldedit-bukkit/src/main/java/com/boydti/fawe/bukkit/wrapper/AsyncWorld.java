@@ -1393,6 +1393,11 @@ public class AsyncWorld extends PassthroughExtent implements World {
     }
 
     @Override
+    public long getGameTime() {
+        return parent.getGameTime();
+    }
+
+    @Override
     @Deprecated
     public void getChunkAtAsync(int x, int z, @NotNull ChunkLoadCallback cb) {
         parent.getChunkAtAsync(x, z, cb);
