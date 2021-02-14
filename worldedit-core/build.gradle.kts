@@ -36,7 +36,7 @@ dependencies {
     implementation("org.mozilla:rhino-runtime:1.7.13")
     implementation("org.yaml:snakeyaml")
     implementation("com.google.guava:guava")
-    implementation("com.google.code.findbugs:jsr305:1.3.9")
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("com.google.code.gson:gson")
     implementation("org.slf4j:slf4j-api:${Versions.SLF4J}")
     implementation("it.unimi.dsi:fastutil")
