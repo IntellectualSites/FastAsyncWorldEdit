@@ -19,6 +19,10 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTagType;
+import com.sk89q.worldedit.util.nbt.ListBinaryTag;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,11 +32,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helps create list tags.
+ *
+ * @deprecated Use {@link com.sk89q.worldedit.util.nbt.ListBinaryTag.Builder}.
  */
+@Deprecated
 public class ListTagBuilder {
 
-    private final Class<? extends Tag> type;
-    private final List<Tag> entries;
+    private final ListBinaryTag.Builder<BinaryTag> builder;
 
     /**
      * Create a new instance.
@@ -41,8 +47,9 @@ public class ListTagBuilder {
      */
     ListTagBuilder(Class<? extends Tag> type) {
         checkNotNull(type);
-        this.type = type;
-        this.entries = new ArrayList<>();
+        this.builder = type != EndTag.class
+                ? ListBinaryTag.builder((BinaryTagType<BinaryTag>) AdventureNBTConverter.getAdventureType(type))
+                : ListBinaryTag.builder();
     }
 
     /**
@@ -53,10 +60,7 @@ public class ListTagBuilder {
      */
     public ListTagBuilder add(Tag value) {
         checkNotNull(value);
-        if (!type.isInstance(value)) {
-            throw new IllegalArgumentException(value.getClass().getCanonicalName() + " is not of expected type " + type.getCanonicalName());
-        }
-        entries.add(value);
+        builder.add(value.asBinaryTag());
         return this;
     }
 
@@ -80,7 +84,7 @@ public class ListTagBuilder {
      * @return the new list tag
      */
     public ListTag build() {
-        return new ListTag(type, new ArrayList<>(entries));
+        return new ListTag(this.builder.build());
     }
 
     /**

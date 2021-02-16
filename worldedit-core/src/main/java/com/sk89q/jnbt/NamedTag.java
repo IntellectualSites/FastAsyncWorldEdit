@@ -23,7 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A tag that has a name.
+ * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
+@Deprecated
 public class NamedTag {
 
     private final String name;

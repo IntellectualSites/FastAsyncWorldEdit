@@ -459,9 +459,9 @@ public class BukkitWorld extends AbstractWorld {
             try {
                 return worldNativeAccess.setBlock(position, block, sideEffects);
             } catch (Exception e) {
-                if (block instanceof BaseBlock && ((BaseBlock) block).getNbtData() != null) {
+                if (block instanceof BaseBlock && ((BaseBlock) block).getNbt() != null) {
                     logger.warn("Tried to set a corrupt tile entity at " + position.toString()
-                        + ": " + ((BaseBlock) block).getNbtData(), e);
+                        + ": " + ((BaseBlock) block).getNbt(), e);
                 } else {
                     logger.warn("Failed to set block via adapter, falling back to generic", e);
                 }

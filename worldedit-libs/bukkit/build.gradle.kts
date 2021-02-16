@@ -13,5 +13,5 @@ repositories {
 }
 
 dependencies {
-    "shade"("net.kyori:text-adapter-bukkit:3.0.6")
+    "shade"("net.kyori:text-adapter-bukkit:${Versions.TEXT_EXTRAS}")
 }

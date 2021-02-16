@@ -25,7 +25,6 @@ import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -40,6 +39,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import java.util.Collections;
@@ -351,7 +352,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     @Override
-    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+    public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
         if (compoundTag == null) {
             return toBaseBlock();
         }

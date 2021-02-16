@@ -72,6 +72,7 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -92,6 +93,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -1308,13 +1310,15 @@ public class LocalSession implements TextureHolder {
 
         BaseBlock block = ServerCUIHandler.createStructureBlock(player);
         if (block != null) {
-            // If it's null, we don't need to do anything. The old was already removed.
-            Map<String, Tag> tags = block.getNbtData().getValue();
-            BlockVector3 tempCuiTemporaryBlock = BlockVector3.at(
-                    ((IntTag) tags.get("x")).getValue(),
-                    ((IntTag) tags.get("y")).getValue(),
-                    ((IntTag) tags.get("z")).getValue()
+            CompoundBinaryTag tags = Objects.requireNonNull(
+                    block.getNbt(), "createStructureBlock should return nbt"
             );
+            BlockVector3 tempCuiTemporaryBlock = BlockVector3.at(
+                    tags.getInt("x"),
+                    tags.getInt("y"),
+                    tags.getInt("z")
+            );
+            // If it's null, we don't need to do anything. The old was already removed.
             if (cuiTemporaryBlock != null && !tempCuiTemporaryBlock.equals(cuiTemporaryBlock)) {
                 // Update the existing block if it's the same location
                 player.sendFakeBlock(cuiTemporaryBlock, null);
