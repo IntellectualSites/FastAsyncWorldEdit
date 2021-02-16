@@ -24,7 +24,7 @@ Looking builds for older versions? Download them [here](https://intellectualsite
 ## Links
 
 * [Spigot Page](https://www.spigotmc.org/threads/fast-async-worldedit.100104/)
-* [Discord](https://discord.gg/KxkjDVg)
+* [Discord](https://discord.gg/intellectualsites)
 * [Wiki](https://wiki.intellectualsites.com/FastAsyncWorldEdit/index)
 * [Report Issue](https://github.com/IntellectualSites/FastAsyncWorldEdit/issues)
 * [Crowdin](https://intellectualsites.crowdin.com/fastasyncworldedit)
@@ -66,7 +66,7 @@ The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.16-###.j
 Have an idea for an optimization, or a cool feature?
  - We will accept most PR's
  - Let us know what you've tested / what may need further testing
- - If you need any help, create a ticket or discuss on [Discord](https://discord.gg/KxkjDVg)
+ - If you need any help, create a ticket or discuss on [Discord](https://discord.gg/intellectualsites)
 
 ## YourKit
 <a href="https://www.yourkit.com">
