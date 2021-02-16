@@ -35,6 +35,9 @@ import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.NumberBinaryTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -320,10 +323,11 @@ public class BlockTransformExtent extends ResettableExtent {
         }
     }
 
-    private static BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundTag tag, Transform transform) {
+    private static BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundBinaryTag tag, Transform transform) {
         if (tag != null) {
-            if (tag.containsKey("Rot")) {
-                int rot = tag.asInt("Rot");
+            BinaryTag rotTag = tag.get("Rot");
+            if (rotTag instanceof NumberBinaryTag) {
+                int rot = ((NumberBinaryTag) rotTag).intValue();
 
                 Direction direction = MCDirections.fromRotation(rot);
 
@@ -337,9 +341,9 @@ public class BlockTransformExtent extends ResettableExtent {
                     Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
-                        Map<String, Tag> values = new HashMap<>(tag.getValue());
-                        values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
-                        tag = new CompoundTag(values);
+                        return transformed.toBaseBlock(
+                                tag.putByte("Rot", (byte) MCDirections.toRotation(newDirection))
+                        );
                     }
                 }
             }
@@ -483,7 +487,7 @@ public class BlockTransformExtent extends ResettableExtent {
         int transformedId = transformState(state, transform);
         BlockState transformed = BlockState.getFromInternalId(transformedId);
         if (block.hasNbtData()) {
-            return (B) transformBaseBlockNBT(transformed, block.getNbtData(), transform);
+            return (B) transformBaseBlockNBT(transformed, (CompoundBinaryTag) block.getNbtData(), transform);
         }
         return (B) (block instanceof BaseBlock ? transformed.toBaseBlock() : transformed);
     }
@@ -516,7 +520,7 @@ public class BlockTransformExtent extends ResettableExtent {
     public final BaseBlock transform(BlockStateHolder<BaseBlock> block) {
         BlockState transformed = transform(block.toImmutableState());
         if (block.hasNbtData()) {
-            return transformBaseBlockNBT(transformed, block.getNbtData(), transform);
+            return transformBaseBlockNBT(transformed, (CompoundBinaryTag) block.getNbtData(), transform);
         }
         return transformed.toBaseBlock();
     }
@@ -524,7 +528,7 @@ public class BlockTransformExtent extends ResettableExtent {
     protected final BlockStateHolder transformInverse(BlockStateHolder block) {
         BlockState transformed = transformInverse(block.toImmutableState());
         if (block.hasNbtData()) {
-            return transformBaseBlockNBT(transformed, block.getNbtData(), transformInverse);
+            return transformBaseBlockNBT(transformed, (CompoundBinaryTag) block.getNbtData(), transformInverse);
         }
         return transformed;
     }
