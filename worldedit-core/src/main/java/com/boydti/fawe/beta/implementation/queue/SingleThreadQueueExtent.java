@@ -347,6 +347,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                             } else {
                                 e.printStackTrace();
                             }
+                            log.error("Please report this error on our issue tracker");
+                            e.getCause().printStackTrace();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
