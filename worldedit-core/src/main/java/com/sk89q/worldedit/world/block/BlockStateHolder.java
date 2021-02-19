@@ -179,8 +179,6 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      * @return The BaseBlock
      */
     default BaseBlock toBaseBlock(CompoundBinaryTag compoundTag) {
-        DeprecationUtil.checkDelegatingOverride(getClass());
-
         return toBaseBlock(compoundTag == null ? null : LazyReference.computed(compoundTag));
     }
 
