@@ -70,6 +70,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -302,6 +303,12 @@ public class Regen_v1_16_R3 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         return new ProtoChunk(new ChunkCoordIntPair(x, z), ChunkConverter.a) {
             public boolean generateFlatBedrock() {
                 return generateFlatBedrock;
+            }
+
+            // no one will ever see the entities!
+            @Override
+            public List<NBTTagCompound> y() {
+                return Collections.emptyList();
             }
         };
     }
