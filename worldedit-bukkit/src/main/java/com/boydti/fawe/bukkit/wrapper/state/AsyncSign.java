@@ -15,6 +15,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -25,6 +26,21 @@ public class AsyncSign extends AsyncBlockState implements Sign {
     }
 
     private boolean isEditable = false;
+
+    @Override
+    public @NotNull List<net.kyori.adventure.text.Component> lines() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public net.kyori.adventure.text.@NotNull Component line(int index) throws IndexOutOfBoundsException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void line(int index, net.kyori.adventure.text.@NotNull Component line) throws IndexOutOfBoundsException {
+
+    }
 
     @Override
     public String[] getLines() {
