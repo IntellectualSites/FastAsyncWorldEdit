@@ -9,7 +9,7 @@ dependencies {
         exclude(group = "junit", module = "junit")
     }
     "shade"("com.thoughtworks.paranamer:paranamer:2.6")
-    "shade"("com.github.luben:zstd-jni:1.4.8-4")
+    "shade"("com.github.luben:zstd-jni:1.4.8-5")
     "shade"("com.sk89q.lib:jlibnoise:1.0.0")
     "shade"("org.enginehub.piston:core:0.5.6")
     "shade"("org.enginehub.piston.core-ap:runtime:0.5.6")
