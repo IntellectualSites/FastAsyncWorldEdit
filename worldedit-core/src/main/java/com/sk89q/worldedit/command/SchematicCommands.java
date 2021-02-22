@@ -617,12 +617,19 @@ public class SchematicCommands {
 
         if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT > -1) {
             headerBytesElem += String.format(" / %dkb",
-                Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT );
+                Settings.IMP.EXPERIMENTAL.PER_PLAYER_FILE_SIZE_LIMIT);
         }
 
-        String fullHeader = "| Schematics: " + headerBytesElem + " |";
-        PaginationBox paginationBox = PaginationBox.fromComponents(fullHeader, pageCommand, components);
-        actor.print(paginationBox.create(page));
+        if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS) {
+            String fullHeader = "| My Schematics: " + headerBytesElem + " |";
+            PaginationBox paginationBox = PaginationBox.fromComponents(fullHeader, pageCommand, components);
+            actor.print(paginationBox.create(page));
+        } else {
+            String fullHeader = "| Schematics: " + headerBytesElem + " |";
+            PaginationBox paginationBox = PaginationBox.fromComponents(fullHeader, pageCommand, components);
+            actor.print(paginationBox.create(page));
+        }
+
     }
 
     @Command(
