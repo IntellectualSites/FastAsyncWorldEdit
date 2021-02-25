@@ -147,6 +147,8 @@ tasks.named<Jar>("jar") {
     }
 }
 
+addJarManifest(WorldEditKind.Plugin, includeClasspath = true)
+
 tasks.named<ShadowJar>("shadowJar") {
     from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
         exclude("META-INF/")
