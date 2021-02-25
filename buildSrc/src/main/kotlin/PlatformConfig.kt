@@ -37,6 +37,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
             //options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
             options.isDeprecation = false
             options.encoding = "UTF-8"
+            options.compilerArgs.add("-parameters")
         }
 
 //    configure<CheckstyleExtension> {
@@ -126,3 +127,29 @@ val CLASSPATH = listOf("truezip", "truevfs", "js")
     .map { "$it.jar" }
     .flatMap { listOf(it, "WorldEdit/$it") }
     .joinToString(separator = " ")
+
+sealed class WorldEditKind(
+        val name: String,
+        val mainClass: String = "com.sk89q.worldedit.internal.util.InfoEntryPoint"
+) {
+    class Standalone(mainClass: String) : WorldEditKind("STANDALONE", mainClass)
+    object Mod : WorldEditKind("MOD")
+    object Plugin : WorldEditKind("PLUGIN")
+}
+
+fun Project.addJarManifest(kind: WorldEditKind, includeClasspath: Boolean = false) {
+    tasks.named<Jar>("jar") {
+        val version = project(":worldedit-core").version
+        inputs.property("version", version)
+        val attributes = mutableMapOf(
+                "Implementation-Version" to version,
+                "WorldEdit-Version" to version,
+                "WorldEdit-Kind" to kind.name,
+                "Main-Class" to kind.mainClass
+        )
+        if (includeClasspath) {
+            attributes["Class-Path"] = CLASSPATH
+        }
+        manifest.attributes(attributes)
+    }
+}

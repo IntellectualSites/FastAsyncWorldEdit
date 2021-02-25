@@ -26,7 +26,7 @@ dependencies {
 }
 
 <<<<<<< HEAD
-addJarManifest(includeClasspath = true)
+addJarManifest(WorldEditKind.Mod, includeClasspath = true)
 =======
 tasks.named<Jar>("jar") {
     manifest {
