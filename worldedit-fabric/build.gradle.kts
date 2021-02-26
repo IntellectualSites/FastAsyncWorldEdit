@@ -43,7 +43,7 @@ dependencies {
     "annotationProcessor"("net.fabricmc:sponge-mixin:${project.versions.mixin}")
     "annotationProcessor"("net.fabricmc:fabric-loom:${project.versions.loom}")
 
-    "testCompile"("org.mockito:mockito-core:1.9.0-rc1")
+    "testCompile"("org.mockito:mockito-core:3.8.0")
 }
 
 configure<BasePluginConvention> {

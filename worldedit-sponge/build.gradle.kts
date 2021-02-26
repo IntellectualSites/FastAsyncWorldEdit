@@ -22,7 +22,7 @@ dependencies {
     api(project(":worldedit-libs:sponge"))
     api("org.spongepowered:spongeapi:7.1.0")
     api("org.bstats:bstats-sponge:1.7")
-    testImplementation("org.mockito:mockito-core:1.9.0-rc1")
+    testImplementation("org.mockito:mockito-core:3.8.0")
 }
 
 <<<<<<< HEAD

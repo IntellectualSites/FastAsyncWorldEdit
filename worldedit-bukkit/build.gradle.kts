@@ -107,7 +107,7 @@ dependencies {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
-    testImplementation("org.mockito:mockito-core:1.9.0-rc1")
+    testImplementation("org.mockito:mockito-core:3.8.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
