@@ -178,7 +178,7 @@ public class WorldEditCommands {
         name = "cui",
         desc = "Complete CUI handshake (internal usage)"
     )
-    @CommandPermissions()
+    @CommandPermissions(value = "worldedit.cui", queued = false)
     public void cui(Player player, LocalSession session) {
         session.setCUISupport(true);
         session.dispatchCUISetup(player);
@@ -188,6 +188,7 @@ public class WorldEditCommands {
         name = "tz",
         desc = "Set your timezone for snapshots"
     )
+    @CommandPermissions(value = "worldedit.timezone", queued = false)
     public void tz(Actor actor, LocalSession session,
                    @Arg(desc = "The timezone to set")
                        String timezone) {

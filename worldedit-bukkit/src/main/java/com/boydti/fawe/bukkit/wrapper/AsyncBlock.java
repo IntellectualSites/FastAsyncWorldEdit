@@ -428,6 +428,12 @@ public class AsyncBlock implements Block {
 
     @Nonnull
     @Override
+    public float getDestroySpeed(@Nonnull ItemStack itemStack, boolean considerEnchants) {
+        throw new UnsupportedOperationException("FAWE does not support this yet");
+    }
+
+    @Nonnull
+    @Override
     public BoundingBox getBoundingBox() {
         return this.getUnsafeBlock().getBoundingBox();
     }
