@@ -71,6 +71,13 @@ repositories {
             includeGroup("net.kyori")
         }
     }
+    maven {
+        name = "OSS Sonatype Releases"
+        url = uri("https://oss.sonatype.org/content/repositories/releases/")
+        content {
+            includeGroup("net.kyori")
+        }
+    }
     flatDir { dir(File("src/main/resources")) }
 }
 
@@ -114,8 +121,8 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    compileOnly("net.kyori:adventure-api:4.5.1")
-    testCompileOnly("net.kyori:adventure-api:4.5.1")
+    compileOnly("net.kyori:adventure-api:4.6.0")
+    testCompileOnly("net.kyori:adventure-api:4.6.0")
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
