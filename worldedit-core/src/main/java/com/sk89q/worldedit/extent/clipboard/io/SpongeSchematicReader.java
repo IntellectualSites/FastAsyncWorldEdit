@@ -124,7 +124,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             BlockArrayClipboard clip = readVersion1(schematicTag);
             return readVersion2(clip, schematicTag);
         }
-        throw new IOException("This schematic version is currently not supported");
+        throw new IOException("This schematic version is not supported; Version: " + schematicVersion + ", DataVersion: " + dataVersion + ". It's very likely your schematic has an invalid file extension, if the schematic has been created on a version lower than 1.13.2, the extension MUST be `.schematic`, elsewise the schematic can't be read properly.");
     }
 
     @Override
