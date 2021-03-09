@@ -438,11 +438,30 @@ public class AsyncWorld extends PassthroughExtent implements World {
 
     @Override
     @NotNull
+    public Item dropItem(
+        @NotNull Location location,
+        @NotNull ItemStack item,
+        @Nullable Consumer<Item> function) {
+        return TaskManager.IMP.sync(() -> parent.dropItem(location, item));
+    }
+
+    @Override
+    @NotNull
     public Item dropItemNaturally(
         @NotNull
         final Location location,
         @NotNull
         final ItemStack item) {
+        return TaskManager.IMP.sync(() -> parent.dropItemNaturally(location, item));
+    }
+
+    @Override
+    @NotNull
+    public Item dropItemNaturally(
+        @NotNull
+        Location location,
+        @NotNull ItemStack item,
+        @Nullable Consumer<Item> function) {
         return TaskManager.IMP.sync(() -> parent.dropItemNaturally(location, item));
     }
 
