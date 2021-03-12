@@ -200,7 +200,7 @@ public class PropertyPattern extends AbstractExtentPattern {
                                 i++;
                             }
                             if (charSequence.length() > 0) {
-                                key = PropertyKey.get(charSequence);
+                                key = PropertyKey.getByName(charSequence);
                             }
                             last = i + 1;
                         }
