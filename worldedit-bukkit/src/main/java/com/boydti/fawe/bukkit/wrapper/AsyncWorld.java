@@ -26,6 +26,7 @@ import org.bukkit.GameRule;
 import org.bukkit.HeightMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.Raid;
 import org.bukkit.Sound;
@@ -1404,6 +1405,12 @@ public class AsyncWorld extends PassthroughExtent implements World {
     public CompletableFuture<Chunk> getChunkAtAsync(int x, int z, boolean gen,
                                                     boolean urgent) {
         return parent.getChunkAtAsync(x, z, gen, urgent);
+    }
+
+    @Override
+    @NotNull
+    public NamespacedKey getKey() {
+        throw new UnsupportedOperationException("FAWE does not support this yet");
     }
 
     @Override
