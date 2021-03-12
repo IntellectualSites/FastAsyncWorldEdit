@@ -162,6 +162,11 @@ public class AsyncBlock implements Block {
         return z;
     }
 
+    @Override
+    public boolean isValidTool(@Nonnull ItemStack itemStack) {
+        return getDrops(itemStack).size() !=0;
+    }
+
     @Nonnull
     @Override
     public Location getLocation() {
