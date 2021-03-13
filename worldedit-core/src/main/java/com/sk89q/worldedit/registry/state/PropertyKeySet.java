@@ -71,8 +71,7 @@ public class PropertyKeySet implements Set<PropertyKey> {
     @NotNull
     @Override
     public <T> T[] toArray(@NotNull T[] a) {
-        @SuppressWarnings("unchecked")
-        T[] array = (T[]) Array.newInstance(a.getClass(), this.bits.cardinality());
+        T[] array = Arrays.copyOf(a, this.bits.cardinality());
         Iterator<PropertyKey> iter = iterator();
         for (int i = 0; i < array.length && iter.hasNext(); i++) {
             //noinspection unchecked
