@@ -59,7 +59,7 @@ public class BlockTypesCache {
                 // Ensure the properties are registered
                 int maxOrdinal = 0;
                 for (String key : properties.keySet()) {
-                    maxOrdinal = Math.max(PropertyKey.getOrCreate(key).ordinal(), maxOrdinal);
+                    maxOrdinal = Math.max(PropertyKey.getOrCreate(key).getId(), maxOrdinal);
                 }
                 this.propertiesMapArr = new AbstractProperty[maxOrdinal + 1];
                 int prop_arr_i = 0;
@@ -70,7 +70,7 @@ public class BlockTypesCache {
                 for (Map.Entry<String, ? extends Property<?>> entry : properties.entrySet()) {
                     PropertyKey key = PropertyKey.getOrCreate(entry.getKey());
                     AbstractProperty<?> property = ((AbstractProperty) entry.getValue()).withOffset(bitOffset);
-                    this.propertiesMapArr[key.ordinal()] = property;
+                    this.propertiesMapArr[key.getId()] = property;
                     this.propertiesArr[prop_arr_i++] = property;
                     propMap.put(entry.getKey(), property);
 
