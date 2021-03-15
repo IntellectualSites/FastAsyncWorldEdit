@@ -9,6 +9,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.registry.state.PropertyKeySet;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -152,7 +152,7 @@ public class BlockMaskBuilder {
                     case ']':
                     case ',': {
                         charSequence.setSubstring(last, i);
-                        if (key == null && PropertyKey.get(charSequence) == null) {
+                        if (key == null && PropertyKey.getByName(charSequence) == null) {
                             suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
                         }
                         if (operator == null) {
@@ -220,7 +220,7 @@ public class BlockMaskBuilder {
                                 break;
                         }
                         if (charSequence.length() > 0 || key == null) {
-                            key = PropertyKey.get(charSequence);
+                            key = PropertyKey.getByName(charSequence);
                             if (key == null) {
                                 suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
                             }
@@ -258,9 +258,9 @@ public class BlockMaskBuilder {
 
     private void suggest(String input, String property, Collection<BlockType> finalTypes) throws InputParseException {
         throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
-            Set<PropertyKey> keys = EnumSet.noneOf(PropertyKey.class);
+            Set<PropertyKey> keys = PropertyKeySet.empty();
             finalTypes.forEach(t -> t.getProperties().forEach(p -> keys.add(p.getKey())));
-            return keys.stream().map(PropertyKey::getId)
+            return keys.stream().map(PropertyKey::getName)
                     .filter(p -> StringMan.blockStateMatches(property, p))
                     .sorted(StringMan.blockStateComparator(property))
                     .collect(Collectors.toList());

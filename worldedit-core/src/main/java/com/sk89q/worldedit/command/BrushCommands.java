@@ -928,7 +928,7 @@ public class BrushCommands {
     }
 
     private InputStream getHeightmapStream(String filename) throws FileNotFoundException {
-        if (filename == null) {
+        if (filename == null || "none".equalsIgnoreCase(filename)) {
             return null;
         }
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";

@@ -181,13 +181,13 @@ public class BlockType implements Keyed, Pattern {
     }
 
     public boolean hasProperty(PropertyKey key) {
-        int ordinal = key.ordinal();
-        return this.settings.propertiesMapArr.length > ordinal ? this.settings.propertiesMapArr[ordinal] != null : false;
+        int ordinal = key.getId();
+        return this.settings.propertiesMapArr.length > ordinal && this.settings.propertiesMapArr[ordinal] != null;
     }
 
     public <V> Property<V> getProperty(PropertyKey key) {
         try {
-            return (Property<V>) this.settings.propertiesMapArr[key.ordinal()];
+            return (Property<V>) this.settings.propertiesMapArr[key.getId()];
         } catch (IndexOutOfBoundsException ignored) {
             return null;
         }
