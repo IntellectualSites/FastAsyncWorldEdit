@@ -36,6 +36,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -353,19 +354,25 @@ public class TextureUtil implements TextureHolder {
     public TextureUtil(File folder) throws FileNotFoundException {
         this.folder = folder;
         if (!folder.exists()) {
-            log.info("Downloading asset jar from Mojang, please wait...");
-            new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
-            try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
-                 FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
-                byte[] dataBuffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                    fileOutputStream.write(dataBuffer, 0, bytesRead);
+            try {
+                log.info("Downloading asset jar from Mojang, please wait...");
+                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
+                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
+                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
+                    byte[] dataBuffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                    }
+                    log.info("Asset jar down has been downloaded successfully.");
+                } catch (IOException e) {
+                    log.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar in it.");
+                    log.error("If the file exists, please make sure the server has read access to the directory.");
                 }
-                log.info("Asset jar down has been downloaded successfully.");
-            } catch (IOException e) {
-                log.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
-                log.error("If the file exists, please make sure the server has read access to the directory.");
+            } catch (AccessControlException e) {
+                log.error("Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
+                log.error("Please create the following folder manually: `FastAsyncWorldEdit/textures` with `.minecraft/versions` jar in it.");
+
             }
         }
     }
