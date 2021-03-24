@@ -13,7 +13,6 @@ import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
-import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
@@ -235,14 +234,6 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
                 log.debug("Attempting to use plugin 'GriefPrevention'");
-            } catch (Throwable ignored) {
-            }
-        }
-
-        if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
-            try {
-                managers.add(new FreeBuildRegion());
-                log.debug("Attempting to use plugin '<internal.freebuild>'");
             } catch (Throwable ignored) {
             }
         }
