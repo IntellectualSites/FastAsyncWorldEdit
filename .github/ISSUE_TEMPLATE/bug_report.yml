@@ -86,6 +86,16 @@ body:
       placeholder: "For example: FastAsyncWorldEdit version 1.16-606;4a6af71"
     validations:
       required: true
+      
+  - type: checkboxes
+    attributes:
+      label: Checklist
+      description: Make sure you have followed each of the steps outlined here.
+      options:
+        - label: I have included a Fawe debugpaste.
+          required: true
+        - label: I am using the newest build from https://ci.athion.net/job/FastAsyncWorldEdit-1.16/ and the issue still persists.
+          required: true
 
   - type: markdown
     attributes:
