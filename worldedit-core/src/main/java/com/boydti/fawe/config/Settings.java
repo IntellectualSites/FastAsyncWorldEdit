@@ -366,13 +366,6 @@ public class Settings extends Config {
         public boolean KEEP_ENTITIES_IN_BLOCKS = false;
 
         @Comment({
-                "[SAFE] Experimental freebuild region restrictions",
-                " - PERM: fawe.freebuild",
-                " - PERM: fawe.freebuild.<plugin>"
-        })
-        public boolean FREEBUILD = false;
-
-        @Comment({
                 "Other experimental features"
         })
         public boolean OTHER = false;
