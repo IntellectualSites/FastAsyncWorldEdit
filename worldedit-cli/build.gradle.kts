@@ -11,7 +11,7 @@ addJarManifest(WorldEditKind.Standalone("com.sk89q.worldedit.cli.CLIWorldEdit"))
 
 dependencies {
     "api"(project(":worldedit-core"))
-    "implementation"(platform("org.apache.logging.log4j:log4j-bom:2.14.0"))
+    "implementation"(platform("org.apache.logging.log4j:log4j-bom:2.14.1"))
     "implementation"("org.apache.logging.log4j:log4j-core")
     "implementation"("org.apache.logging.log4j:log4j-slf4j-impl")
     "implementation"("commons-cli:commons-cli:1.4")
