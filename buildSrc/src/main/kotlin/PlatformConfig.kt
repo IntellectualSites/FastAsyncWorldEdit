@@ -114,7 +114,6 @@ fun Project.applyShadowConfiguration() {
             include(project(":worldedit-core"))
             exclude("com.google.code.findbugs:jsr305")
         }
-        archiveFileName.set("FastAsyncWorldEdit-${project.version}.jar")
         exclude("GradleStart**")
         exclude(".cache")
         exclude("LICENSE*")

@@ -23,6 +23,7 @@ tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include { true }
     }
+    archiveFileName.set("FastAsyncWorldEdit-CLI-${project.version}.jar")
     minimize {
         exclude(dependency("org.apache.logging.log4j:log4j-core"))
     }

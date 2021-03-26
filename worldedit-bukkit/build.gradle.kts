@@ -160,6 +160,7 @@ tasks.named<ShadowJar>("shadowJar") {
     from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
         exclude("META-INF/")
     })
+    archiveFileName.set("FastAsyncWorldEdit-Bukkit-${project.version}.jar")
     dependencies {
         relocate("org.slf4j", "com.sk89q.worldedit.slf4j")
         relocate("org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge")
