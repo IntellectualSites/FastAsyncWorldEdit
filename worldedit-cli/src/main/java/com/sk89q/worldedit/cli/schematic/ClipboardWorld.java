@@ -19,7 +19,10 @@
 
 package com.sk89q.worldedit.cli.schematic;
 
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -27,10 +30,11 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.cli.CLIWorld;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.Region;
@@ -39,6 +43,7 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.AbstractWorld;
+import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -50,7 +55,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-
 import javax.annotation.Nullable;
 
 public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld {
@@ -75,6 +79,21 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     @Override
     public String getId() {
         return getName().replace(" ", "_").toLowerCase(Locale.ROOT);
+    }
+
+    @Override
+    public void refreshChunk(int chunkX, int chunkZ) {
+
+    }
+
+    @Override
+    public IChunkGet get(int x, int z) {
+        return null;
+    }
+
+    @Override
+    public void sendFakeChunk(@org.jetbrains.annotations.Nullable Player player, ChunkPacket packet) {
+
     }
 
     @Override
@@ -107,7 +126,7 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     }
 
     @Override
-    public boolean regenerate(Region region, EditSession editSession) {
+    public boolean regenerate(Region region, Extent extent, RegenOptions options) {
         return false;
     }
 
@@ -150,14 +169,24 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     }
 
     @Override
-    public BiomeType getBiome(BlockVector2 position) {
+    public BiomeType getBiome(BlockVector3 position) {
         return clipboard.getBiome(position);
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
+        return false;
+    }
+
+    @Override
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         dirty = true;
         return clipboard.setBiome(position, biome);
+    }
+
+    @Override
+    public void flush() {
+
     }
 
     @Override
@@ -184,6 +213,11 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     @Override
     public boolean hasBiomes() {
         return clipboard.hasBiomes();
+    }
+
+    @Override
+    public void removeEntity(Entity entity) {
+
     }
 
     @Override

@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.annotation.Nullable;
 
 class CLIPlatform extends AbstractPlatform {
@@ -144,13 +143,6 @@ class CLIPlatform extends AbstractPlatform {
     public String getPlatformVersion() {
         return app.getInternalVersion();
     }
-
-    // FAWE start
-    @Override
-    public String getId() {
-        return "intellectualsites:cli";
-    }
-    // FAWE end
 
     @Override
     public Map<Capability, Preference> getCapabilities() {
