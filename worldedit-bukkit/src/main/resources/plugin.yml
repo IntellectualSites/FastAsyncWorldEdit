@@ -94,6 +94,7 @@ permissions:
       worldedit.selection.inset: true
       worldedit.analysis.distr: true
       worldedit.analysis.count: true
+      worldedit.analysis.sel: true
       worldedit.selection.size: true
       worldedit.selection.expand: true
       worldedit.selection.shift: true
