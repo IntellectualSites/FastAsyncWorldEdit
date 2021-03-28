@@ -13,5 +13,5 @@ dependencies {
     "shade"("com.sk89q.lib:jlibnoise:1.0.0")
     "shade"("org.enginehub.piston:core:0.5.6")
     "shade"("org.enginehub.piston.core-ap:runtime:0.5.6")
-    "shade"("org.enginehub.piston:default-impl:0.5.6")
+    "shade"("org.enginehub.piston:default-impl:0.5.7")
 }
