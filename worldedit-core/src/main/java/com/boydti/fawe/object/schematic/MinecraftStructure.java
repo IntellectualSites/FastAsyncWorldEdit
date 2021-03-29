@@ -15,6 +15,7 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -29,6 +30,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -39,9 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private static final int WARN_SIZE = 32;
 
     private NBTInputStream inputStream;
@@ -160,7 +163,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         int height = region.getHeight();
         int length = region.getLength();
         if (width > WARN_SIZE || height > WARN_SIZE || length > WARN_SIZE) {
-            getLogger(MinecraftStructure.class).debug("A structure longer than 32 is unsupported by minecraft (but probably still works)");
+            LOGGER.info("A structure longer than 32 is unsupported by minecraft (but probably still works)");
         }
         Map<String, Object> structure = FaweCache.IMP.asMap("version", 1, "author", owner);
         // ignored: version / owner

@@ -20,9 +20,11 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.YAMLConfiguration;
 import com.sk89q.worldedit.util.report.Unreported;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -32,12 +34,14 @@ import java.nio.file.Path;
  */
 public class BukkitConfiguration extends YAMLConfiguration {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     public boolean noOpPermissions = false;
     public boolean commandBlockSupport = false;
     @Unreported private final WorldEditPlugin plugin;
 
     public BukkitConfiguration(YAMLProcessor config, WorldEditPlugin plugin) {
-        super(config, LoggerFactory.getLogger(plugin.getLogger().getName()));
+        super(config, LogManager.getLogger(plugin.getLogger().getName()));
         this.plugin = plugin;
     }
 
@@ -60,10 +64,10 @@ public class BukkitConfiguration extends YAMLConfiguration {
         File toDir = new File(getWorkingDirectory(), file);
         if (fromDir.exists() & !toDir.exists()) {
             if (fromDir.renameTo(toDir)) {
-                plugin.getLogger().info("Migrated " + name + " folder '" + file
-                    + "' from server root to plugin data folder.");
+                LOGGER.info("Migrated " + name + " folder '" + file
+                        + "' from server root to plugin data folder.");
             } else {
-                plugin.getLogger().warning("Error while migrating " + name + " folder!");
+                LOGGER.warn("Error while migrating " + name + " folder!");
             }
         }
     }

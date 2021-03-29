@@ -3,15 +3,15 @@ package com.boydti.fawe.beta.implementation.blocks;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IBlocks;
 import com.boydti.fawe.beta.IChunkSet;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Range;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class CharBlocks implements IBlocks {
 
-    public static final Logger logger = LoggerFactory.getLogger(CharBlocks.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     protected static final Section FULL = new Section() {
         @Override
@@ -139,9 +139,9 @@ public abstract class CharBlocks implements IBlocks {
         try {
             set(layer, index, value);
         } catch (ArrayIndexOutOfBoundsException exception) {
-            logger.error("Tried setting block at coordinates (" + x + "," + y + "," + z + ")");
+            LOGGER.error("Tried setting block at coordinates (" + x + "," + y + "," + z + ")");
             assert Fawe.imp() != null;
-            logger.error("Layer variable was = {}", layer, exception);
+            LOGGER.error("Layer variable was = {}", layer, exception);
         }
     }
 

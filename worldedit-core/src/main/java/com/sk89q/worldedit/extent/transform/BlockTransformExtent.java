@@ -27,6 +27,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.helper.MCDirections;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -43,6 +44,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -73,13 +75,14 @@ import static com.sk89q.worldedit.util.Direction.UP;
 import static com.sk89q.worldedit.util.Direction.WEST;
 import static com.sk89q.worldedit.util.Direction.findClosest;
 import static com.sk89q.worldedit.util.Direction.values;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Transforms blocks themselves (but not their position) according to a
  * given transform.
  */
 public class BlockTransformExtent extends ResettableExtent {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Set<PropertyKey> directional = PropertyKeySet.of(
             PropertyKey.HALF,
@@ -174,7 +177,7 @@ public class BlockTransformExtent extends ResettableExtent {
                     case 2:
                         return adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
                     default:
-                        getLogger(BlockTransformExtent.class).error("Invalid {} {}", property.getName(), property.getValues());
+                        LOGGER.error("Invalid {} {}", property.getName(), property.getValues());
                         return null;
                 }
             }
@@ -207,7 +210,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                 result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
                                 continue;
                             default:
-                                getLogger(BlockTransformExtent.class).warn("Unknown direction {}", value);
+                                LOGGER.warn("Unknown direction {}", value);
                                 result.add(0L);
                         }
                     }
@@ -247,7 +250,7 @@ public class BlockTransformExtent extends ResettableExtent {
                                 directions.add(combine(NORTHEAST));
                                 break;
                             default:
-                                getLogger(BlockTransformExtent.class).warn("Unknown direction {}", value);
+                                LOGGER.warn("Unknown direction {}", value);
                                 directions.add(0L);
                         }
                     }

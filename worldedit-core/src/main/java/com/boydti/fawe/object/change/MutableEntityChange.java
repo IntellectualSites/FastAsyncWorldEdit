@@ -10,17 +10,19 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class MutableEntityChange implements Change {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public CompoundTag tag;
     public boolean create;
@@ -59,7 +61,7 @@ public class MutableEntityChange implements Change {
             most = ((LongTag) map.get("PersistentIDMSB")).getValue();
             least = ((LongTag) map.get("PersistentIDLSB")).getValue();
         } else {
-            getLogger(MutableEntityChange.class).debug("Skipping entity without uuid.");
+            LOGGER.debug("Skipping entity without uuid.");
             return;
         }
         List<DoubleTag> pos = (List<DoubleTag>) map.get("Pos").getValue();
@@ -74,7 +76,7 @@ public class MutableEntityChange implements Change {
         Map<String, Tag> map = tag.getValue();
         Tag posTag = map.get("Pos");
         if (posTag == null) {
-            getLogger(MutableEntityChange.class).debug("Missing pos tag: " + tag);
+            LOGGER.debug("Missing pos tag: " + tag);
             return;
         }
         List<DoubleTag> pos = (List<DoubleTag>) posTag.getValue();

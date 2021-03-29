@@ -30,10 +30,12 @@ import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -56,11 +58,12 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public enum FaweCache implements Trimable {
     IMP
     ; // singleton
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public final int BLOCKS_PER_LAYER = 4096;
     public final int CHUNK_LAYERS = 16;
@@ -503,7 +506,7 @@ public enum FaweCache implements Trimable {
         } else if (value instanceof Boolean) {
             return asTag((byte) ((boolean) value ? 1 : 0));
         }
-        getLogger(FaweCache.class).error("Invalid nbt: {}", value);
+        LOGGER.error("Invalid nbt: {}", value);
         return null;
     }
 

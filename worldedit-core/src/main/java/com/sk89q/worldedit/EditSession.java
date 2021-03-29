@@ -95,6 +95,7 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.ExpressionTimeoutException;
 import com.sk89q.worldedit.internal.expression.LocalSlot.Variable;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
@@ -134,10 +135,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -170,7 +170,7 @@ import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 @SuppressWarnings({"FieldCanBeLocal"})
 public class EditSession extends PassthroughExtent implements AutoCloseable {
 
-    private static final Logger log = LoggerFactory.getLogger(EditSession.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
@@ -2555,7 +2555,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     timedOut[0] = timedOut[0] + 1;
                     return null;
                 } catch (Exception e) {
-                    log.warn("Failed to create shape", e);
+                    LOGGER.warn("Failed to create shape", e);
                     return null;
                 }
             }
@@ -3091,7 +3091,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     timedOut.getAndIncrement();
                     return null;
                 } catch (Exception e) {
-                    log.warn("Failed to create shape", e);
+                    LOGGER.warn("Failed to create shape", e);
                     return null;
                 }
             }

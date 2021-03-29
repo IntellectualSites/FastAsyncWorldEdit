@@ -43,6 +43,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
 import com.sk89q.worldedit.internal.command.CommandUtil;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
@@ -51,6 +52,7 @@ import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import de.notmyfault.serverlib.ServerLib;
 import io.papermc.lib.PaperLib;
+import org.apache.logging.log4j.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -68,8 +70,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -93,7 +93,7 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
  */
 public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
-    private static final Logger log = LoggerFactory.getLogger(WorldEditPlugin.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
     private static WorldEditPlugin INSTANCE;
 
@@ -129,7 +129,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             }
             return false;
         }).length > 0) {
-            getLogger().warning("DummyFawe detected and automatically deleted! This file is no longer necessary.");
+            LOGGER.warn("DummyFawe detected and automatically deleted! This file is no longer necessary.");
         }
     }
 
@@ -162,8 +162,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             // register this so we can load world-dependent data right as the first world is loading
             getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
         } else {
-            getLogger().warning("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins.");
-            getLogger().warning("For more information, see https://matthewmiller.dev/blog/problem-with-reload/");
+            LOGGER.warn("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins.");
+            LOGGER.warn("For more information, see https://matthewmiller.dev/blog/problem-with-reload/");
             try {
                 setupPreWorldData();
                 // since worlds are loaded already, we can do this now
@@ -226,7 +226,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                         }
                         return defaultState;
                     } catch (InputParseException e) {
-                        getLogger().log(Level.WARNING, "Error loading block state for " + material.getKey(), e);
+                        LOGGER.warn("Error loading block state for " + material.getKey(), e);
                         return blockState;
                     }
                 }));
@@ -260,7 +260,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                 ItemCategory.REGISTRY.register(itemTag.getKey().toString(), new ItemCategory(itemTag.getKey().toString()));
             }
         } catch (NoSuchMethodError ignored) {
-            getLogger().warning("The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
+            LOGGER.warn("The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
         }
     }
 
@@ -301,23 +301,23 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         try {
             adapterLoader.addFromPath(getClass().getClassLoader());
         } catch (IOException e) {
-            log.warn("Failed to search path for Bukkit adapters");
+            LOGGER.warn("Failed to search path for Bukkit adapters");
         }
 
         try {
             adapterLoader.addFromJar(getFile());
         } catch (IOException e) {
-            log.warn("Failed to search " + getFile() + " for Bukkit adapters", e);
+            LOGGER.warn("Failed to search " + getFile() + " for Bukkit adapters", e);
         }
         try {
             bukkitAdapter = adapterLoader.loadAdapter();
-            log.info("Using " + bukkitAdapter.getClass().getCanonicalName() + " as the Bukkit adapter");
+            LOGGER.info("Using " + bukkitAdapter.getClass().getCanonicalName() + " as the Bukkit adapter");
         } catch (AdapterLoadException e) {
             Platform platform = worldEdit.getPlatformManager().queryCapability(Capability.WORLD_EDITING);
             if (platform instanceof BukkitServerInterface) {
-                log.warn(e.getMessage());
+                LOGGER.warn(e.getMessage());
             } else {
-                log.info("WorldEdit could not find a Bukkit adapter for this MC version, "
+                LOGGER.info("WorldEdit could not find a Bukkit adapter for this MC version, "
                              + "but it seems that you have another implementation of WorldEdit installed (" + platform.getPlatformName() + ") "
                              + "that handles the world editing.");
             }
@@ -365,7 +365,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                 }
                 copyDefaultConfig(stream, actual, name);
             } catch (IOException e) {
-                getLogger().severe("Unable to read default configuration: " + name);
+                LOGGER.error("Unable to read default configuration: " + name);
             }
         }
     }
@@ -378,9 +378,9 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
                 output.write(buf, 0, length);
             }
 
-            getLogger().info("Default configuration file written: " + name);
+            LOGGER.info("Default configuration file written: " + name);
         } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Failed to write default config file", e);
+            LOGGER.warn("Failed to write default config file", e);
         }
     }
 

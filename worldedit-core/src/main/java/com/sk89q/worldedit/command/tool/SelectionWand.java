@@ -26,16 +26,16 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.util.Location;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 public enum SelectionWand implements DoubleActionBlockTool {
     INSTANCE;
 
-    private static final Logger logger = LoggerFactory.getLogger(SelectionWand.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     @Override
     public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
@@ -43,7 +43,7 @@ public enum SelectionWand implements DoubleActionBlockTool {
         BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
         if (selector.selectPrimary(blockPoint, ActorSelectorLimits.forActor(player))) {
             if (Settings.IMP.EXPERIMENTAL.OTHER) {
-                logger.info("actSecondary Hit and about to explain with explainPrimarySelection");
+                LOGGER.info("actSecondary Hit and about to explain with explainPrimarySelection");
             }
             selector.explainPrimarySelection(player, session, blockPoint);
         }
@@ -57,7 +57,7 @@ public enum SelectionWand implements DoubleActionBlockTool {
 
         if (selector.selectSecondary(blockPoint, ActorSelectorLimits.forActor(player))) {
             if (Settings.IMP.EXPERIMENTAL.OTHER) {
-                logger.info("actPrimary Hit and about to explain with explainSecondarySelection");
+                LOGGER.info("actPrimary Hit and about to explain with explainSecondarySelection");
             }
             selector.explainSecondarySelection(player, session, blockPoint);
         }

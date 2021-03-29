@@ -11,6 +11,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -21,8 +22,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.Closeable;
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
  */
 public class DiskOptimizedClipboard extends LinearClipboard implements Closeable {
 
-    private static final Logger log = LoggerFactory.getLogger(DiskOptimizedClipboard.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final int HEADER_SIZE = 14;
 
@@ -80,7 +80,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         if (HEADER_SIZE + ((long) getVolume() << 1) >= Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Dimensions too large for this clipboard format. Use //lazycopy for large selections.");
         } else if (HEADER_SIZE + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1) >= Integer.MAX_VALUE) {
-            log.error("Dimensions are too large for biomes to be stored in a DiskOptimizedClipboard");
+            LOGGER.error("Dimensions are too large for biomes to be stored in a DiskOptimizedClipboard");
             canHaveBiomes = false;
         }
         nbtMap = new HashMap<>();

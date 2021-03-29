@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.PropertiesConfiguration;
 import com.sk89q.worldedit.util.report.Unreported;
@@ -20,8 +21,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
@@ -51,12 +51,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 // TODO FIXME
 public class TextureUtil implements TextureHolder {
 
-    private static final Logger log = LoggerFactory.getLogger(TextureUtil.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final int[] FACTORS = new int[766];
 
@@ -355,7 +355,7 @@ public class TextureUtil implements TextureHolder {
         this.folder = folder;
         if (!folder.exists()) {
             try {
-                log.info("Downloading asset jar from Mojang, please wait...");
+                LOGGER.info("Downloading asset jar from Mojang, please wait...");
                 new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
@@ -364,14 +364,14 @@ public class TextureUtil implements TextureHolder {
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                         fileOutputStream.write(dataBuffer, 0, bytesRead);
                     }
-                    log.info("Asset jar down has been downloaded successfully.");
+                    LOGGER.info("Asset jar down has been downloaded successfully.");
                 } catch (IOException e) {
-                    log.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar in it.");
-                    log.error("If the file exists, please make sure the server has read access to the directory.");
+                    LOGGER.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar in it.");
+                    LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
             } catch (AccessControlException e) {
-                log.error("Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
-                log.error("Please create the following folder manually: `FastAsyncWorldEdit/textures` with `.minecraft/versions` jar in it.");
+                LOGGER.error("Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
+                LOGGER.error("Please create the following folder manually: `FastAsyncWorldEdit/textures` with `.minecraft/versions` jar in it.");
 
             }
         }
@@ -643,8 +643,8 @@ public class TextureUtil implements TextureHolder {
                         fileOutputStream.write(dataBuffer, 0, bytesRead);
                     }
                 } catch (IOException e) {
-                    log.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
-                    log.error("If the file exists, please make sure the server has read access to the directory.");
+                    LOGGER.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+                    LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
             } else {
                 for (File file : files) {

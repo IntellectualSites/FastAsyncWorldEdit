@@ -1,7 +1,8 @@
 package com.boydti.fawe.configuration.serialization;
 
 import com.boydti.fawe.configuration.Configuration;
-import org.slf4j.LoggerFactory;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +14,8 @@ import java.util.Map;
  * Utility class for storing and retrieving classes for {@link Configuration}.
  */
 public class ConfigurationSerialization {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static final String SERIALIZED_TYPE_KEY = "==";
     private static final Map<String, Class<? extends ConfigurationSerializable>> aliases =
@@ -196,15 +199,14 @@ public class ConfigurationSerialization {
             ConfigurationSerializable result = (ConfigurationSerializable) method.invoke(null, args);
 
             if (result == null) {
-                LoggerFactory.getLogger(ConfigurationSerialization.class).error(
-                        "Could not call method '" + method.toString() + "' of " + this.clazz + " for deserialization: method returned null");
+                LOGGER.error("Could not call method '" + method.toString() + "' of " + this.clazz + " for deserialization: method returned null");
             } else {
                 return result;
             }
         } catch (Throwable ex) {
-            LoggerFactory.getLogger(ConfigurationSerialization.class).error("Could not call method '" + method.toString() + "' of " + this.clazz
-                                    + " for deserialization",
-                            ex instanceof InvocationTargetException ? ex.getCause() : ex);
+            LOGGER.error("Could not call method '" + method.toString() + "' of " + this.clazz
+                            + " for deserialization",
+                    ex instanceof InvocationTargetException ? ex.getCause() : ex);
         }
 
         return null;
@@ -214,9 +216,9 @@ public class ConfigurationSerialization {
         try {
             return ctor.newInstance(args);
         } catch (Throwable ex) {
-            LoggerFactory.getLogger(ConfigurationSerialization.class).error("Could not call constructor '" + ctor.toString() + "' of " + this.clazz
-                                    + " for deserialization",
-                            ex instanceof InvocationTargetException ? ex.getCause() : ex);
+            LOGGER.error("Could not call constructor '" + ctor.toString() + "' of " + this.clazz
+                            + " for deserialization",
+                    ex instanceof InvocationTargetException ? ex.getCause() : ex);
         }
 
         return null;

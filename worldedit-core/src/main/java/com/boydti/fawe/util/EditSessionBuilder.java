@@ -36,14 +36,14 @@ import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -53,7 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class EditSessionBuilder {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractDelegateExtent.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     @NotNull
     private World world;
@@ -246,11 +246,11 @@ public class EditSessionBuilder {
                     event.getActor().printDebug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
                     event.getActor().printDebug(" - To hide this message set `debug` to false in the FAWE config.yml");
                 } else {
-                    logger.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
-                    logger.debug(" - For area restrictions, it is recommended to use the FaweAPI");
-                    logger.debug(" - For block logging, it is recommended to use BlocksHub");
-                    logger.debug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
-                    logger.debug(" - To hide this message set `debug` to false in the FAWE config.yml");
+                    LOGGER.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
+                    LOGGER.debug(" - For area restrictions, it is recommended to use the FaweAPI");
+                    LOGGER.debug(" - For block logging, it is recommended to use BlocksHub");
+                    LOGGER.debug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
+                    LOGGER.debug(" - To hide this message set `debug` to false in the FAWE config.yml");
                 }
             }
         }

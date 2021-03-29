@@ -2,6 +2,7 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.the
 
@@ -14,19 +15,10 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "IntellectualSites"
             url = uri("https://mvn.intellectualsites.com/content/groups/public/")
-            content {
-                includeGroup("com.plotsquared")
-                includeGroup("com.intellectualsites.paster")
-                includeGroup("com.github.intellectualsites.plotsquared")
-            }
         }
         maven {
             name = "EngineHub"
             url = uri("https://maven.enginehub.org/repo/")
-            content {
-                includeGroupByRegex("org.enginehub.*")
-                includeGroupByRegex("com.sk89q.*")
-            }
         }
         maven {
             name = "OSS Sonatype Snapshots"
@@ -39,19 +31,20 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "Athion"
             url = uri("https://ci.athion.net/plugin/repository/tools/")
-            content {
-                includeGroup("com.massivecraft")
-                includeGroup("com.thevoxelbox.voxelsniper")
-                includeGroup("com.palmergames.bukkit")
-                includeGroup("net.fabiozumbi12")
-                includeGroupByRegex("com.destroystokyo.*")
-            }
         }
     }
 
     configurations.all {
         resolutionStrategy {
             cacheChangingModulesFor(5, "MINUTES")
+        }
+    }
+
+    configurations.findByName("compileClasspath")?.apply {
+        resolutionStrategy.componentSelection {
+            withModule("org.slf4j:slf4j-api") {
+                reject("No SLF4J allowed on compile classpath")
+            }
         }
     }
 

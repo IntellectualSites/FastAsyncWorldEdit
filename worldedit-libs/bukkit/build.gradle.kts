@@ -5,10 +5,6 @@ repositories {
     maven {
         name = "SpigotMC"
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-        content {
-            includeGroup("org.bukkit")
-            includeGroup("org.spigotmc")
-        }
     }
 }
 

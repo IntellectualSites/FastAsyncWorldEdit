@@ -1,13 +1,14 @@
 package com.boydti.fawe.util;
 
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 /** An internal FAWE class not meant for public use. **/
 public enum ThirdPartyManager {
@@ -21,6 +22,8 @@ public enum ThirdPartyManager {
         "etdBRzLn5pRVDfr/mSQdPm6Jjer3wQOKhcn8fUxo5zM=", 143000),
 
     ;
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public final String url;
     public final int fileSize;
@@ -54,12 +57,12 @@ public enum ThirdPartyManager {
             String jarDigest = Base64.getEncoder().encodeToString(jarDigestBytes);
 
             if (this.digest.equals(jarDigest)) {
-                getLogger(ThirdPartyManager.class).debug("++++ HASH CHECK ++++");
-                getLogger(ThirdPartyManager.class).debug(this.url);
-                getLogger(ThirdPartyManager.class).debug(this.digest);
+                LOGGER.debug("++++ HASH CHECK ++++");
+                LOGGER.debug(this.url);
+                LOGGER.debug(this.digest);
                 return jarBytes;
             } else {
-                getLogger(ThirdPartyManager.class).debug(jarDigest + " | " + url);
+                LOGGER.debug(jarDigest + " | " + url);
                 throw new IllegalStateException("The downloaded jar does not match the hash");
             }
         } catch (NoSuchAlgorithmException e) {

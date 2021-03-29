@@ -3,7 +3,9 @@ package com.boydti.fawe.configuration.file;
 import com.boydti.fawe.configuration.Configuration;
 import com.boydti.fawe.configuration.ConfigurationSection;
 import com.boydti.fawe.configuration.InvalidConfigurationException;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.YAMLConfiguration;
+import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
@@ -16,13 +18,13 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 /**
  * An implementation of {@link com.boydti.fawe.configuration.Configuration} which saves all files in Yaml.
  * Note that this implementation is not synchronized.
  */
 public class YamlConfiguration extends FileConfiguration {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     protected static final String COMMENT_PREFIX = "# ";
     protected static final String BLANK_CONFIG = "{}\n";
     private final DumperOptions yamlOptions = new DumperOptions();
@@ -64,8 +66,7 @@ public class YamlConfiguration extends FileConfiguration {
                     dest = new File(file.getAbsolutePath() + "_broken_" + i++);
                 }
                 Files.copy(file.toPath(), dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                getLogger(YamlConfiguration.class).error("Could not read: {}\n"
-                                                             + "Renamed to: {}", file, dest.getName(), ex);
+                LOGGER.error("Could not read {}\n" + "Renamed to {}", file, dest.getAbsolutePath(), ex);
             } catch (final IOException e) {
                 e.printStackTrace();
             }
@@ -97,7 +98,7 @@ public class YamlConfiguration extends FileConfiguration {
         try {
             config.load(reader);
         } catch (final IOException | InvalidConfigurationException ex) {
-            getLogger(YAMLConfiguration.class).error("Cannot load configuration from stream", ex);
+            LOGGER.error("Cannot load configuration from stream", ex);
         }
 
         return config;

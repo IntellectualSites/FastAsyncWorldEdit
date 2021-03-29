@@ -32,6 +32,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -39,23 +40,22 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Range;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
 public class AbstractDelegateExtent implements Extent {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractDelegateExtent.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     //Not safe for public usage
     public Extent extent;
@@ -298,11 +298,11 @@ public class AbstractDelegateExtent implements Extent {
     @Override
     public Extent addProcessor(IBatchProcessor processor) {
         if (Settings.IMP.EXPERIMENTAL.OTHER) {
-            logger.info("addProcessor Info: \t " + processor.getClass().getName());
-            logger.info("The following is not an error or a crash:");
+            LOGGER.info("addProcessor Info: \t " + processor.getClass().getName());
+            LOGGER.info("The following is not an error or a crash:");
             StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
             for (StackTraceElement stackTraceElement : stackTrace) {
-                logger.info(stackTraceElement.toString());
+                LOGGER.info(stackTraceElement.toString());
             }
 
         }
@@ -316,11 +316,11 @@ public class AbstractDelegateExtent implements Extent {
     @Override
     public Extent addPostProcessor(IBatchProcessor processor) {
         if (Settings.IMP.EXPERIMENTAL.OTHER) {
-            logger.info("addPostProcessor Info: \t " + processor.getClass().getName());
-            logger.info("The following is not an error or a crash:");
+            LOGGER.info("addPostProcessor Info: \t " + processor.getClass().getName());
+            LOGGER.info("The following is not an error or a crash:");
             StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
             for (StackTraceElement stackTraceElement : stackTrace) {
-                logger.info(stackTraceElement.toString());
+                LOGGER.info(stackTraceElement.toString());
             }
 
         }

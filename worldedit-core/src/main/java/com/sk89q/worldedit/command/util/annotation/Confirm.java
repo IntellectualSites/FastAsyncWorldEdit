@@ -20,8 +20,6 @@ import org.enginehub.piston.inject.InjectAnnotation;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.inject.MemoizingValueAccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -160,7 +158,6 @@ public @interface Confirm {
                     final MemoizingValueAccess memoizingValueAccess;
                     if (!(context instanceof MemoizingValueAccess)) {
                         if (!context.getClass().getSimpleName().contains("AutoValue_CommandParametersImpl")) {
-                            LoggerFactory.getLogger(Confirm.class).warn("InjectedValueAccess " + context.getClass().getName() + " given to Confirm");
                             return true;
                         }
                         memoizingValueAccess = (MemoizingValueAccess) Reflect.injectedValues.get(context);

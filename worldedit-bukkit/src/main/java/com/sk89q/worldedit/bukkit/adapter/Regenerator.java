@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -28,9 +29,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.Logger;
 import org.bukkit.generator.BlockPopulator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents an abstract regeneration handler.
@@ -41,7 +42,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess, Chunk extends IChunkAccess, ChunkStatus extends Regenerator.ChunkStatusWrapper<IChunkAccess>> {
 
-    public static final Logger logger = LoggerFactory.getLogger(Regenerator.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     
     protected final org.bukkit.World originalBukkitWorld;
     protected final Region region;
@@ -492,7 +493,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             try {
                 processChunk(xz, accessibleChunks);
             } catch (Exception e) {
-                logger.error("Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz), e);
+                LOGGER.error("Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz), e);
             }
         }
     }

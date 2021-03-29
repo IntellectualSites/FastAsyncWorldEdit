@@ -40,6 +40,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.DataFixer;
@@ -52,8 +53,7 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FastSchematicReader extends NBTSchematicReader {
 
-    private static final Logger log = LoggerFactory.getLogger(FastSchematicReader.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final NBTInputStream inputStream;
     private DataFixer fixer;
     private int dataVersion = -1;
@@ -183,7 +183,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                 try {
                     state = BlockState.get(palettePart);
                 } catch (InputParseException ignored) {
-                    log.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
+                    LOGGER.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
                     state = BlockTypes.AIR.getDefaultState();
                 }
                 int index = (int) entry.getValue();
@@ -395,14 +395,14 @@ public class FastSchematicReader extends NBTSchematicReader {
                             for (Entity e : clipboard.getEntities()) {
                                 clipboard.removeEntity(e);
                             }
-                            log.error("Detected schematic entity outside clipboard region. FAWE will not load entities. "
+                            LOGGER.error("Detected schematic entity outside clipboard region. FAWE will not load entities. "
                                 + "Please try loading the schematic with the format \"legacyentity\"");
                             break;
                         }
                     }
                     clipboard.createEntity(loc.setPosition(loc.subtract(min.toVector3())), state);
                 } else {
-                    log.debug("Invalid entity: " + id);
+                    LOGGER.debug("Invalid entity: " + id);
                 }
             }
         }

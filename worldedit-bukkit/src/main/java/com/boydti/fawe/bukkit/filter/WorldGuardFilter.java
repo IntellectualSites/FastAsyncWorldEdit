@@ -3,18 +3,22 @@ package com.boydti.fawe.bukkit.filter;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class WorldGuardFilter extends CuboidRegionFilter {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private final World world;
     private boolean large;
     private RegionManager manager;
@@ -33,7 +37,7 @@ public class WorldGuardFilter extends CuboidRegionFilter {
                 BlockVector3 min = region.getMinimumPoint();
                 BlockVector3 max = region.getMaximumPoint();
                 if (max.getBlockX() - min.getBlockX() > 1024 || max.getBlockZ() - min.getBlockZ() > 1024) {
-                    getLogger(WorldGuardFilter.class).debug("Large or complex region shapes cannot be optimized. Filtering will be slower");
+                    LOGGER.debug("Large or complex region shapes cannot be optimized. Filtering will be slower");
                     large = true;
                     break;
                 }

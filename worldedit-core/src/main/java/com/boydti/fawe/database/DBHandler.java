@@ -1,16 +1,15 @@
 package com.boydti.fawe.database;
 
-import com.boydti.fawe.config.Config;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.World;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DBHandler {
 
-    private final Logger log = LoggerFactory.getLogger(Config.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static final DBHandler IMP = new DBHandler();
 
@@ -26,7 +25,7 @@ public class DBHandler {
             databases.put(world, database);
             return database;
         } catch (Throwable e) {
-            log.error("No JDBC driver found!", e);
+            LOGGER.error("No JDBC driver found!", e);
             return null;
         }
     }

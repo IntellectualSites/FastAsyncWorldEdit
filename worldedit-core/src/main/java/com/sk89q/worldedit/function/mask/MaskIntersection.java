@@ -19,7 +19,9 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import org.apache.logging.log4j.Logger;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -37,7 +39,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Combines several masks and requires that all masks return true
@@ -45,6 +46,8 @@ import static org.slf4j.LoggerFactory.getLogger;
  * on a list of masks.
  */
 public class MaskIntersection extends AbstractMask {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     protected final Set<Mask> masks;
     protected Mask[] masksArray;
@@ -160,9 +163,9 @@ public class MaskIntersection extends AbstractMask {
         while (combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
 
         if (maxIteration == 0) {
-            getLogger(MaskIntersection.class).error("Failed optimize MaskIntersection");
+            LOGGER.error("Failed optimize MaskIntersection");
             for (Mask mask : masks) {
-                getLogger(MaskIntersection.class).error(mask.getClass() + " / " + mask);
+                LOGGER.error(mask.getClass() + " / " + mask);
             }
         }
         // Return result

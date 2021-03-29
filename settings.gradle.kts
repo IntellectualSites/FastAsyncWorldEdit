@@ -15,9 +15,6 @@ dependencyResolutionManagement {
         maven {
             name = "EngineHub"
             url = uri("https://maven.enginehub.org/repo/")
-            content {
-                includeGroupByRegex("com.sk89q.*")
-            }
         }
     }
 }

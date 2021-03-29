@@ -11,26 +11,15 @@ repositories {
     maven {
         name = "SpigotMC"
         url = uri("https://hub.spigotmc.org/nexus/content/groups/public")
-        content {
-            includeGroup("org.bukkit")
-            includeGroup("org.spigotmc")
-        }
     }
     maven {
         name = "PaperMC"
         url = uri("https://papermc.io/repo/repository/maven-public/")
-        content {
-            includeGroup("io.papermc")
-            includeGroup("com.destroystokyo.paper")
-        }
-    }
+            }
     maven {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
-        content {
-            includeGroupByRegex("com.sk89q.*")
-        }
-    }
+            }
     maven {
         name = "Athion"
         url = uri("https://ci.athion.net/plugin/repository/tools/")
@@ -38,45 +27,26 @@ repositories {
     maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
-        content {
-            includeGroup("com.github.MilkBowl")
-            includeGroup("com.github.TechFortress")
-        }
-    }
+            }
     maven {
         name = "ProtocolLib"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
-        content {
-            includeGroup("com.comphenix.protocol")
-        }
-    }
+            }
     maven {
         name = "Inventivetalent"
         url = uri("https://repo.inventivetalent.org/content/groups/public/")
-        content {
-            includeGroupByRegex("org.inventivetalent.*")
-        }
-    }
+            }
     maven {
         name = "IntellectualSites 3rd Party"
         url = uri("https://mvn.intellectualsites.com/content/repositories/thirdparty")
-        content {
-            includeGroup("de.notmyfault")
-        }
-    }
+            }
     maven {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-        content {
-            includeGroup("net.kyori")
-        }
-    }
+            }
     maven {
         name = "OSS Sonatype Releases"
         url = uri("https://oss.sonatype.org/content/repositories/releases/")
-        content {
-            includeGroup("net.kyori")
-        }
     }
     flatDir { dir(File("src/main/resources")) }
 }
@@ -105,7 +75,13 @@ dependencies {
     api("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
         isTransitive = false
+        exclude(group = "org.slf4j", module = "slf4j-api")
     }
+    implementation(enforcedPlatform("org.apache.logging.log4j:log4j-bom:2.8.1") {
+        // Note: Paper will bump to 2.11.2, but we should only depend on 2.8 APIs for compatibility.
+        because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
+    })
+    implementation("org.apache.logging.log4j:log4j-api")
     compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:20.1.0")
     testCompileOnly("org.jetbrains:annotations:20.1.0")
@@ -113,7 +89,6 @@ dependencies {
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
     testImplementation("org.mockito:mockito-core:3.8.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
@@ -162,13 +137,14 @@ tasks.named<ShadowJar>("shadowJar") {
     })
     archiveFileName.set("FastAsyncWorldEdit-Bukkit-${project.version}.jar")
     dependencies {
-        relocate("org.slf4j", "com.sk89q.worldedit.slf4j")
-        relocate("org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge")
+        // In tandem with not bundling log4j, we shouldn't relocate base package here.
+        // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
         relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
         include(dependency(":worldedit-core"))
         include(dependency(":worldedit-libs:bukkit"))
-        include(dependency("org.slf4j:slf4j-api"))
-        include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
+        // Purposefully not included, we assume (even though no API exposes it) that Log4J will be present at runtime
+        // If it turns out not to be true for Spigot/Paper, our only two official platforms, this can be uncommented.
+        // include(dependency("org.apache.logging.log4j:log4j-api"))
         include(dependency("org.antlr:antlr4-runtime"))
         relocate("org.bstats", "com.sk89q.worldedit.bstats") {
             include(dependency("org.bstats:"))

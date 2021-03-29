@@ -5,14 +5,18 @@ import com.boydti.fawe.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class CFIChange implements Change {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private final File file;
 
     public CFIChange(File file) {
@@ -25,7 +29,7 @@ public class CFIChange implements Change {
         if (found != null) {
             return found.get();
         }
-        getLogger(CFIChange.class).debug("FAWE does not support: " + context.getExtent() + " for " + getClass() + " (bug Empire92)");
+        LOGGER.debug("FAWE does not support: " + context.getExtent() + " for " + getClass() + " (bug Empire92)");
         return null;
     }
 

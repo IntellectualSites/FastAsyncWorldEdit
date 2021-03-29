@@ -3,13 +3,16 @@ package com.boydti.fawe.bukkit.adapter;
 import co.aikar.timings.Timings;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.listener.ChunkListener;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 import org.spigotmc.AsyncCatcher;
 
 import java.lang.reflect.Method;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class BukkitQueueHandler extends QueueHandler {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private volatile boolean timingsEnabled;
     private static boolean alertTimingsChange = true;
 
@@ -32,7 +35,7 @@ public class BukkitQueueHandler extends QueueHandler {
                 if (timingsEnabled) {
                     if (alertTimingsChange) {
                         alertTimingsChange = false;
-                        getLogger(BukkitQueueHandler.class).debug("Having `parallel-threads` > 1 interferes with the timings.");
+                        LOGGER.debug("Having `parallel-threads` > 1 interferes with the timings.");
                     }
                     Timings.setTimingsEnabled(false);
                     methodCheck.invoke(null);

@@ -10,6 +10,7 @@ import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.registry.state.BooleanProperty;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
@@ -20,8 +21,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 public class NMSRelighter implements Relighter {
 
-    private static final Logger log = LoggerFactory.getLogger(NMSRelighter.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final int DISPATCH_SIZE = 64;
     private static final DirectionalProperty stairDirection;
     private static final EnumProperty stairHalf;
@@ -1028,8 +1028,8 @@ public class NMSRelighter implements Relighter {
                                 heightMapList.get(HeightMapType.MOTION_BLOCKING)[j] = y + 1;
                             }
                         } catch (Exception ignored) {
-                            log.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
-                            log.debug(states.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                            LOGGER.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
+                            LOGGER.debug(states.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
                                 .collect(Collectors.joining(", ", "{", "}")));
                         }
                         try {
@@ -1039,8 +1039,8 @@ public class NMSRelighter implements Relighter {
                                 heightMapList.get(HeightMapType.MOTION_BLOCKING_NO_LEAVES)[j] = y + 1;
                             }
                         } catch (Exception ignored) {
-                            log.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
-                            log.debug(states.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
+                            LOGGER.debug("Error calculating waterlogged state for BlockState: " + state.getBlockType().getId() + ". States:");
+                            LOGGER.debug(states.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue())
                                 .collect(Collectors.joining(", ", "{", "}")));
                         }
                     }

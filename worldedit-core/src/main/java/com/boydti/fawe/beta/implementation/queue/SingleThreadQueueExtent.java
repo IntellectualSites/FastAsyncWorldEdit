@@ -21,9 +21,9 @@ import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -38,8 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
-    // Don't bother with the full classpath.
-    private static final Logger log = LoggerFactory.getLogger("SingleThreadQueueExtent");
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     // Pool discarded chunks for reuse (can safely be cleared by another thread)
     // private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
@@ -302,10 +301,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                             future = (Future) future.get();
                         }
                     } catch (FaweException messageOnly) {
-                        log.warn(messageOnly.getMessage());
+                        LOGGER.warn(messageOnly.getMessage());
                     } catch (ExecutionException e) {
                         if (e.getCause() instanceof FaweException) {
-                            log.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
+                            LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
                         } else {
                             e.printStackTrace();
                         }
@@ -321,10 +320,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                         first = (Future) first.get();
                     }
                 } catch (FaweException messageOnly) {
-                    log.warn(messageOnly.getMessage());
+                    LOGGER.warn(messageOnly.getMessage());
                 } catch (ExecutionException e) {
                     if (e.getCause() instanceof FaweException) {
-                        log.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
+                        LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
                     } else {
                         e.printStackTrace();
                     }
@@ -340,14 +339,14 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                         try {
                             next = (Future) next.get();
                         } catch (FaweException messageOnly) {
-                            log.warn(messageOnly.getMessage());
+                            LOGGER.warn(messageOnly.getMessage());
                         } catch (ExecutionException e) {
                             if (e.getCause() instanceof FaweException) {
-                                log.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
+                                LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
                             } else {
                                 e.printStackTrace();
                             }
-                            log.error("Please report this error on our issue tracker");
+                            LOGGER.error("Please report this error on our issue tracker: https://github.com/IntellectualSites/FastAsyncWorldEdit/issues");
                             e.getCause().printStackTrace();
                         } catch (InterruptedException e) {
                             e.printStackTrace();

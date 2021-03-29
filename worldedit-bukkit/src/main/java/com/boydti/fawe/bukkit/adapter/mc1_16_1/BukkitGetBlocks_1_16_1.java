@@ -24,6 +24,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R1;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -50,14 +51,13 @@ import net.minecraft.server.v1_16_R1.NibbleArray;
 import net.minecraft.server.v1_16_R1.SectionPosition;
 import net.minecraft.server.v1_16_R1.TileEntity;
 import net.minecraft.server.v1_16_R1.WorldServer;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.AbstractSet;
 import java.util.Arrays;
@@ -74,11 +74,9 @@ import java.util.concurrent.Future;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBlocks {
 
-    private static final Logger log = LoggerFactory.getLogger(BukkitGetBlocks_1_16_1.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Function<BlockPosition, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
     private static final Function<TileEntity, CompoundTag> nmsTile2We = tileEntity -> new LazyCompoundTag_1_16_1(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
@@ -438,7 +436,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
                         } else {
                             existingSection = sections[layer];
                             if (existingSection == null) {
-                                log.error("Skipping invalid null section. chunk:" + chunkX + "," +
+                                LOGGER.error("Skipping invalid null section. chunk:" + chunkX + "," +
                                               chunkZ + " layer: " + layer);
                                 continue;
                             }
@@ -468,7 +466,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
                                     .newChunkSection(layer, this::loadPrivately, setArr, fastmode);
                             if (!BukkitAdapter_1_16_1
                                     .setSectionAtomic(sections, existingSection, newSection, layer)) {
-                                log.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
+                                LOGGER.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
                             } else {
                                 updateGet(this, nmsChunk, sections, newSection, setArr, layer);
                             }
@@ -548,8 +546,7 @@ public class BukkitGetBlocks_1_16_1 extends CharGetBlocks implements BukkitGetBl
                             final ListTag posTag = (ListTag) entityTagMap.get("Pos");
                             final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
                             if (idTag == null || posTag == null || rotTag == null) {
-                                getLogger(
-                                        BukkitGetBlocks_1_16_1.class).debug("Unknown entity tag: " + nativeTag);
+                                LOGGER.debug("Unknown entity tag: " + nativeTag);
                                 continue;
                             }
                             final double x = posTag.getDouble(0);

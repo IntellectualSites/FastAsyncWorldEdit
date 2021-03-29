@@ -37,6 +37,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
@@ -60,6 +61,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -75,9 +77,9 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Drawable, VirtualWorld {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
@@ -2128,7 +2130,7 @@ public class HeightMapMCAGenerator extends MCAWriter implements StreamChange, Dr
 
     @Override
     public IChunkGet get(int x, int z) {
-        getLogger(HeightMapMCAGenerator.class).debug("Should not be using buffering with HMMG");
+        LOGGER.debug("Should not be using buffering with HMMG");
         return new FallbackChunkGet(this, x, z);
     }
 }

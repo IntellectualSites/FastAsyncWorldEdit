@@ -21,6 +21,8 @@ package com.sk89q.wepif;
 
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -28,12 +30,10 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class NijiPermissionsResolver implements PermissionsResolver {
 
-    private static final Logger log = LoggerFactory.getLogger(NijiPermissionsResolver.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Server server;
     private final Permissions api;
@@ -85,7 +85,7 @@ public class NijiPermissionsResolver implements PermissionsResolver {
                 return api.Security.permission(player, permission);
             }
         } catch (Throwable t) {
-            log.warn("Failed to check permissions", t);
+            LOGGER.warn("Failed to check permissions", t);
             return false;
         }
     }
@@ -99,7 +99,7 @@ public class NijiPermissionsResolver implements PermissionsResolver {
                 return api.getHandler().has(server.getPlayerExact(name), permission);
             }
         } catch (Throwable t) {
-            log.warn("Failed to check permissions", t);
+            LOGGER.warn("Failed to check permissions", t);
             return false;
         }
     }
@@ -118,7 +118,7 @@ public class NijiPermissionsResolver implements PermissionsResolver {
                 return api.Security.inGroup(name, group);
             }
         } catch (Throwable t) {
-            log.warn("Failed to check groups", t);
+            LOGGER.warn("Failed to check groups", t);
             return false;
         }
     }
@@ -137,7 +137,7 @@ public class NijiPermissionsResolver implements PermissionsResolver {
             } catch (Throwable t) {
                 String group = api.Security.getGroup(player.getWorld().getName(), player.getName());
                 if (group != null) {
-                    groups = new String[] { group };
+                    groups = new String[]{group};
                 }
             }
             if (groups == null) {
@@ -146,7 +146,7 @@ public class NijiPermissionsResolver implements PermissionsResolver {
                 return groups;
             }
         } catch (Throwable t) {
-            log.warn("Failed to get groups", t);
+            LOGGER.warn("Failed to get groups", t);
             return new String[0];
         }
     }

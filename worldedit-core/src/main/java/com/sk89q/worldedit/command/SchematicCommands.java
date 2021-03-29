@@ -45,6 +45,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.operation.Operations;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
@@ -58,14 +59,13 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.Closer;
 import com.sk89q.worldedit.util.io.file.FilenameException;
+import org.apache.logging.log4j.Logger;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 import org.enginehub.piston.exception.StopExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -102,7 +102,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class SchematicCommands {
 
-    private static final Logger log = LoggerFactory.getLogger(SchematicCommands.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final WorldEdit worldEdit;
 
     /**
@@ -304,7 +304,7 @@ public class SchematicCommands {
             actor.printError("Unknown filename: " + filename);
         } catch (URISyntaxException | IOException e) {
             actor.printError("File could not be read or it does not exist: " + e.getMessage());
-            log.warn("Failed to load a saved clipboard", e);
+            LOGGER.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {
                 try {
@@ -701,7 +701,7 @@ public class SchematicCommands {
                 ClipboardReader reader = closer.register(format.getReader(bis));
 
                 Clipboard clipboard = reader.read();
-                log.info(actor.getName() + " loaded " + file.getCanonicalPath());
+                LOGGER.info(actor.getName() + " loaded " + file.getCanonicalPath());
                 return new ClipboardHolder(clipboard);
             }
         }
@@ -785,7 +785,7 @@ public class SchematicCommands {
                     TextComponent noSlotsErr = TextComponent.of( //TODO - to be moved into captions/translatablecomponents
                         String.format("You have " + numFiles + "/" + limit + " saved schematics. Delete some to save this one!",
                             TextColor.RED));
-                    log.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
+                    LOGGER.info(actor.getName() + " failed to save " + file.getCanonicalPath() + " - too many schematics!");
                     throw new WorldEditException(noSlotsErr) {
                     };
                 }
@@ -838,7 +838,7 @@ public class SchematicCommands {
                                 "You're about to be at " + String.format("%.1f", curKb) + "kb of schematics. ("
                                     + String.format("%dkb", allocatedKb) + " available) Delete some first to save this one!",
                                 TextColor.RED);
-                            log.info(actor.getName() + " failed to save " + SCHEMATIC_NAME + " - not enough space!");
+                            LOGGER.info(actor.getName() + " failed to save " + SCHEMATIC_NAME + " - not enough space!");
                             throw new WorldEditException(notEnoughKbErr) {
                             };
                         }
@@ -860,7 +860,7 @@ public class SchematicCommands {
                                 + " schematic file slots left.", TextColor.GRAY);
                         actor.print(slotsRemainingNotif);
                     }
-                    log.info(actor.getName() + " saved " + file.getCanonicalPath());
+                    LOGGER.info(actor.getName() + " saved " + file.getCanonicalPath());
                 } else {
                     actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
                 }

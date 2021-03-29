@@ -12,11 +12,6 @@ repositories {
     maven {
         name = "IntellectualSites"
         url = uri("https://mvn.intellectualsites.com/content/groups/public/")
-        content {
-            includeGroup("com.plotsquared")
-            includeGroup("com.intellectualsites.paster")
-            includeGroup("com.github.intellectualsites.plotsquared")
-        }
     }
 }
 
@@ -32,13 +27,14 @@ dependencies {
 
     api(project(":worldedit-libs:core"))
     implementation("de.schlichtherle:truezip:6.8.4")
-    implementation("net.java.truevfs:truevfs-profile-default_2.13:0.12.2")
     implementation("org.mozilla:rhino-runtime:1.7.13")
     implementation("org.yaml:snakeyaml")
     implementation("com.google.guava:guava")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("com.google.code.gson:gson")
-    implementation("org.slf4j:slf4j-api:${Versions.SLF4J}")
+    implementation("org.apache.logging.log4j:log4j-api:2.8.1") {
+        because("Mojang provides Log4J 2.8.1")
+    }
     implementation("it.unimi.dsi:fastutil")
 
     val antlrVersion = "4.9.1"
@@ -54,7 +50,7 @@ dependencies {
     annotationProcessor("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     testImplementation("ch.qos.logback:logback-core:${Versions.LOGBACK}")
     testImplementation("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
-    implementation("com.github.luben:zstd-jni:1.4.8-6")
+    implementation("com.github.luben:zstd-jni:1.4.9-2")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
     api("com.plotsquared:PlotSquared-Core:5.13.3") { isTransitive = false }
@@ -109,7 +105,7 @@ tasks.named<Copy>("processResources") {
 }
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
-        include(dependency("com.github.luben:zstd-jni:1.4.8-6"))
+        include(dependency("com.github.luben:zstd-jni:1.4.9-2"))
 
     }
 }

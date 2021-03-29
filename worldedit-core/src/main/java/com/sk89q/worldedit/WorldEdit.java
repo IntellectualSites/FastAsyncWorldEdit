@@ -46,6 +46,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.SchematicsEventListener;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.invoke.ReturnException;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.scripting.CraftScriptContext;
 import com.sk89q.worldedit.scripting.CraftScriptEngine;
@@ -71,8 +72,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockData;
 import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -109,7 +109,10 @@ import static com.sk89q.worldedit.event.platform.Interaction.OPEN;
  */
 public final class WorldEdit {
 
-    public static final Logger logger = LoggerFactory.getLogger(WorldEdit.class);
+    /**
+     * This is for internal use only.
+     */
+    public static final Logger logger = LogManagerCompat.getLogger();
 
     private static final WorldEdit instance = new WorldEdit();
     private static String version;

@@ -6,8 +6,10 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.FaweTimer;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -42,13 +44,10 @@ import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
-import org.slf4j.Logger;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 public abstract class ChunkListener implements Listener {
 
-    private final Logger logger = getLogger(ChunkListener.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     protected int rateLimit = 0;
     protected Location lastCancelPos;
     private int[] badLimit = new int[]{Settings.IMP.TICK_LIMITER.PHYSICS_MS,
@@ -62,7 +61,7 @@ public abstract class ChunkListener implements Listener {
             TaskManager.IMP.repeat(() -> {
                 Location tmpLoc = lastCancelPos;
                 if (tmpLoc != null) {
-                    logger.debug("[FAWE Tick Limiter] Detected and cancelled physics lag source at "
+                    LOGGER.debug("[FAWE Tick Limiter] Detected and cancelled physics lag source at "
                         + tmpLoc);
                 }
                 rateLimit--;
@@ -378,7 +377,7 @@ public abstract class ChunkListener implements Listener {
                             double vertical = Math.abs(velocity.getY());
                             if (Math.abs(velocity.getX()) > vertical
                                 || Math.abs(velocity.getZ()) > vertical) {
-                                logger.warn(
+                                LOGGER.warn(
                                     "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at "
                                         + ent.getLocation());
                                 ent.remove();
@@ -409,7 +408,7 @@ public abstract class ChunkListener implements Listener {
             cancelNearby(cx, cz);
             if (rateLimit <= 0) {
                 rateLimit = 20;
-                logger.warn(
+                LOGGER.warn(
                     "[FAWE `tick-limiter`] Detected and cancelled item lag source at " + loc);
             }
             event.setCancelled(true);
