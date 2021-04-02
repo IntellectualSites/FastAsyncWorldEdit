@@ -63,7 +63,6 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
 
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
             try {
-                editSession.disableBuffering();
                 BlockVector3 blockPoint = pos.toVector().toBlockPoint();
                 BaseBlock applied = secondary.apply(blockPoint);
                 if (applied.getBlockType().getMaterial().isAir()) {
@@ -93,7 +92,6 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
 
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
             try {
-                editSession.disableBuffering();
                 BlockVector3 blockPoint = pos.toVector().toBlockPoint();
                 BaseBlock applied = primary.apply(blockPoint);
                 if (applied.getBlockType().getMaterial().isAir()) {
