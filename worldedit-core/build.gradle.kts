@@ -53,7 +53,7 @@ dependencies {
     implementation("com.github.luben:zstd-jni:1.4.9-2")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
-    api("com.plotsquared:PlotSquared-Core:5.13.3") { isTransitive = false }
+    api("com.plotsquared:PlotSquared-Core:5.13.11") { isTransitive = false }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
 }
 
