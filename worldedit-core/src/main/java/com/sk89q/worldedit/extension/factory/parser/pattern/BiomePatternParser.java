@@ -63,7 +63,7 @@ public class BiomePatternParser extends RichParser<Pattern> {
     @Override
     protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 1) {
-            throw new InputParseException("Invalid amount of arguments. Expected: #biome[<biome>]");
+            throw new InputParseException(TranslatableComponent.of("fawe.error.invalid-arguments", TextComponent.of("#biome[<biome>]")));
         }
         BiomeType biomeType = BiomeTypes.get(arguments[0]);
         if (biomeType == null) {

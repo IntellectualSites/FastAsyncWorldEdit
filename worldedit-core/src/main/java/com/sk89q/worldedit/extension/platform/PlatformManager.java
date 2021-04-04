@@ -47,6 +47,7 @@ import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
@@ -408,8 +409,8 @@ public class PlatformManager {
         if (faweException != null) {
             actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
         } else {
-            actor.printError("Please report this error: [See console]");
-            actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
+            actor.printError(TranslatableComponent.of("worldedit.command.error.report"));
+            actor.print(TranslatableComponent.of(e.getClass().getName(), TextComponent.of(": "), TextComponent.of(e.getMessage())));
             e.printStackTrace();
         }
     }
@@ -463,8 +464,8 @@ public class PlatformManager {
             if (faweException != null) {
                 player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
             } else {
-                player.printError("Please report this error: [See console]");
-                player.printRaw(e.getClass().getName() + ": " + e.getMessage());
+                player.printError(TranslatableComponent.of("worldedit.command.error.report"));
+                player.print(TranslatableComponent.of(e.getClass().getName() + ": " + e.getMessage()));
                 e.printStackTrace();
             }
         } finally {

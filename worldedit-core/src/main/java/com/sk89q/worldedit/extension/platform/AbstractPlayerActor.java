@@ -86,7 +86,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 throwable = throwable.getCause();
             }
             if (throwable instanceof WorldEditException) {
-                printError(throwable.getLocalizedMessage());
+                printError(TranslatableComponent.of(throwable.getLocalizedMessage()));
             } else {
                 FaweException fe = FaweException.get(throwable);
                 if (fe != null) {

@@ -42,7 +42,7 @@ public class ProvideBindings extends Bindings {
         if (actor.isPlayer()) {
             return (Player) actor;
         }
-        throw new InputParseException("This command must be used with a player.");
+        throw new InputParseException(TranslatableComponent.of("worldedit.command.player-only"));
     }
 
     @Binding

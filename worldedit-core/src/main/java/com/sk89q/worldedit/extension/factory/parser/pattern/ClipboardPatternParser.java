@@ -30,6 +30,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -78,11 +80,11 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
             String coords = offsetParts[1];
             if (coords.length() < 7  // min length of `[x,y,z]`
                 || coords.charAt(0) != '[' || coords.charAt(coords.length() - 1) != ']') {
-                throw new InputParseException("Offset specified with @ but no offset given. Use '#copy@[x,y,z]'.");
+                throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.clipboard.missing-offset"));
             }
             String[] offsetSplit = coords.substring(1, coords.length() - 1).split(",");
             if (offsetSplit.length != 3) {
-                throw new InputParseException("Clipboard offset needs x,y,z coordinates.");
+                throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.clipboard.missing-coordinates"));
             }
             offset = BlockVector3.at(
                     Integer.valueOf(offsetSplit[0]),
@@ -97,10 +99,10 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
                 Clipboard clipboard = holder.getClipboard();
                 return new ClipboardPattern(clipboard, offset);
             } catch (EmptyClipboardException e) {
-                throw new InputParseException("To use #clipboard, please first copy something to your clipboard");
+                throw new InputParseException(TranslatableComponent.of("fawe.error.empty-clipboard", TextComponent.of("#clipboard")));
             }
         } else {
-            throw new InputParseException("No session is available, so no clipboard is available");
+            throw new InputParseException(TranslatableComponent.of("fawe.error.no-session"));
         }
     }
 

@@ -240,11 +240,11 @@ public class EditSessionBuilder {
             }
             if (Settings.IMP.EXTENT.DEBUG) {
                 if (event.getActor() != null) {
-                    event.getActor().printDebug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
-                    event.getActor().printDebug(" - For area restrictions, it is recommended to use the FaweAPI");
-                    event.getActor().printDebug(" - For block logging, it is recommended to use BlocksHub");
-                    event.getActor().printDebug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
-                    event.getActor().printDebug(" - To hide this message set `debug` to false in the FAWE config.yml");
+                    event.getActor().printDebug(TranslatableComponent.of("Potentially unsafe extent blocked: " + toReturn.getClass().getName()));
+                    event.getActor().printDebug(TranslatableComponent.of(" - For area restrictions, it is recommended to use the FaweAPI"));
+                    event.getActor().printDebug(TranslatableComponent.of(" - For block logging, it is recommended to use BlocksHub"));
+                    event.getActor().printDebug(TranslatableComponent.of(" - To allow this plugin add it to the FAWE `allowed-plugins` list"));
+                    event.getActor().printDebug(TranslatableComponent.of(" - To hide this message set `debug` to false in the FAWE config.yml"));
                 } else {
                     LOGGER.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
                     LOGGER.debug(" - For area restrictions, it is recommended to use the FaweAPI");

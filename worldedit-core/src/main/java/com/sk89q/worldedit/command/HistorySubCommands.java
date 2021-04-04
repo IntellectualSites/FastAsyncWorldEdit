@@ -341,10 +341,10 @@ public class HistorySubCommands {
             return;
         }
         if (other == null && radius == 0 && timeDiff == 0) {
-            throw new InsufficientArgumentsException("User must be provided");
+            throw new InsufficientArgumentsException(TranslatableComponent.of("fawe.error.invalid-user"));
         }
-        checkCommandArgument(radius > 0, "Radius must be >= 0");
-        checkCommandArgument(timeDiff > 0, "Time must be >= 0");
+        checkCommandArgument(radius > 0, TranslatableComponent.of("fawe.error.radius-too-small"));
+        checkCommandArgument(timeDiff > 0, TranslatableComponent.of("fawe.error.time-too-less"));
 
         Location origin = player.getLocation();
         String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();

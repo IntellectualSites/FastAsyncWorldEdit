@@ -26,6 +26,8 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockType;
 
@@ -58,13 +60,13 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> {
 
         BlockCategory category = BlockCategory.REGISTRY.get(tag);
         if (category == null) {
-            throw new InputParseException("Unknown block tag: " + tag);
+            throw new InputParseException(TranslatableComponent.of("fawe.error.unknown-block-tag", TextComponent.of(tag)));
         }
         RandomPattern randomPattern = new RandomPattern();
 
         Set<BlockType> blocks = category.getAll();
         if (blocks.isEmpty()) {
-            throw new InputParseException("Block tag " + category.getId() + " had no blocks!");
+            throw new InputParseException(TranslatableComponent.of("fawe.error.block-tag-no-blocks", TextComponent.of(category.getId())));
         }
 
         if (anyState) {

@@ -46,6 +46,8 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -429,12 +431,12 @@ public interface Player extends Entity, Actor {
                 getSession().setClipboard(holder);
             }
         } catch (Exception event) {
-            printError("====== INVALID CLIPBOARD ======");
+            printError(TranslatableComponent.of("====== INVALID CLIPBOARD ======"));
             event.printStackTrace();
-            printError("===============---=============");
-            printError("This shouldn't result in any failure");
-            printError("File: " + file.getName() + " (len:" + file.length() + ")");
-            printError("===============---=============");
+            printError(TranslatableComponent.of("fawe.error.stacktrace"));
+            printError(TranslatableComponent.of("fawe.error.no-failure"));
+            printError(TranslatableComponent.of("File: ", TextComponent.of(file.getName()), TextComponent.of(" (len:"), TextComponent.of(file.length()), TextComponent.of(")")));
+            printError(TranslatableComponent.of("fawe.error.stacktrace"));
         }
     }
 }

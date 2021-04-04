@@ -29,6 +29,8 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -56,7 +58,7 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                 String[] split = input.split(":");
                 ItemType type;
                 if (split.length == 0) {
-                    throw new InputParseException("Invalid colon.");
+                    throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.invalid-colon"));
                 } else if (split.length == 1) {
                     type = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(split[0]));
                 } else {
@@ -83,7 +85,7 @@ public class DefaultItemParser extends InputParser<BaseItem> {
         }
 
         if (item == null) {
-            throw new InputParseException("'" + input + "' did not match any item");
+            throw new InputParseException(TranslatableComponent.of("worldedit.error.unknown-item", TextComponent.of(input)));
         } else {
             return item;
         }
@@ -93,7 +95,10 @@ public class DefaultItemParser extends InputParser<BaseItem> {
         if (actor instanceof Player) {
             return ((Player) actor).getItemInHand(handSide);
         } else {
-            throw new InputParseException("The user is not a player!");
+            throw new InputParseException(TranslatableComponent.of(
+                    "worldedit.error.parser.player-only",
+                    TextComponent.of(handSide == HandSide.MAIN_HAND ? "hand" : "offhand")
+            ));
         }
     }
 

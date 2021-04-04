@@ -47,6 +47,7 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -163,13 +164,11 @@ public class WorldEditCommands {
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
         for (Map.Entry<Thread, StackTraceElement[]> entry : stacks.entrySet()) {
             Thread thread = entry.getKey();
-            actor.printDebug(
-                "--------------------------------------------------------------------------------------------");
-            actor.printDebug(
-                "Thread: " + thread.getName() + " | Id: " + thread.getId() + " | Alive: " + thread
-                    .isAlive());
+            actor.printDebug(TranslatableComponent.of(
+                "--------------------------------------------------------------------------------------------"));
+            actor.printDebug("Thread: " + thread.getName() + " | Id: " + thread.getId() + " | Alive: " + thread.isAlive());
             for (StackTraceElement elem : entry.getValue()) {
-                actor.printDebug(elem.toString());
+                actor.printDebug(TranslatableComponent.of(elem.toString()));
             }
         }
     }

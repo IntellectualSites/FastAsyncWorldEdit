@@ -204,7 +204,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void print(Component component) {
         component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
-        TextAdapter.sendComponent(player, component);
+        TextAdapter.sendMessage(player, WorldEditText.format(component, getLocale()));
     }
 
     @Override

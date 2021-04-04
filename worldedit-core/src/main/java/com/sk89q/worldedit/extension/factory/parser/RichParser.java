@@ -5,6 +5,8 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -141,7 +143,7 @@ public abstract class RichParser<E> extends InputParser<E> {
             arguments.add(input.substring(openIndex + 1));
         }
         if (requireClosing && open != 0) {
-            throw new InputParseException("Invalid bracketing, are you missing a '[' or ']'?");
+            throw new InputParseException(TranslatableComponent.of("fawe.error.invalid-bracketing", TextComponent.of("'[' or ']'?")));
         }
         return arguments.toArray(new String[0]);
     }

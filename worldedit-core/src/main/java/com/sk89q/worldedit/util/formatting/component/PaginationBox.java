@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -94,7 +95,7 @@ public abstract class PaginationBox extends MessageBox {
         }
         int pageCount = (int) Math.ceil(getComponentsSize() / (double) componentsPerPage);
         if (page < 1 || page > pageCount) {
-            throw new InvalidComponentException("Invalid page number.");
+            throw new InvalidComponentException(TranslatableComponent.of("worldedit.error.invalid-page"));
         }
         currentPage = page;
         final int lastComp = Math.min(page * componentsPerPage, getComponentsSize());

@@ -10,6 +10,8 @@ import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.registry.state.PropertyKeySet;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -125,7 +127,7 @@ public class BlockMaskBuilder {
                     }
                 }
                 if (blockTypeList.isEmpty()) {
-                    throw new InputParseException("No block found for " + input);
+                    throw new InputParseException(TranslatableComponent.of("fawe.error.no-block-found", TextComponent.of(input)));
                 }
                 if (blockTypeList.size() == 1) {
                     type = blockTypeList.get(0);

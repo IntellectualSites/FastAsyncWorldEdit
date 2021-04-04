@@ -50,6 +50,7 @@ import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.auth.AuthorizationException;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.SideEffectBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -323,7 +324,7 @@ public class GeneralCommands {
                               @Arg(desc = "The new draw selection state", def = "")
                                   Boolean drawSelection) throws WorldEditException {
         if (!WorldEdit.getInstance().getConfiguration().serverSideCUI) {
-            throw new DisallowedUsageException("This functionality is disabled in the configuration!");
+            throw new AuthorizationException(TranslatableComponent.of("worldedit.error.disabled"));
         }
         boolean useServerCui = session.shouldUseServerCUI();
         if (drawSelection != null && drawSelection == useServerCui) {
@@ -508,7 +509,7 @@ public class GeneralCommands {
                 int min = Integer.parseInt(arguments.get(0));
                 int max = Integer.parseInt(arguments.get(1));
                 if (min < 0 || max > 100) {
-                    throw new InputParseException("Complexity must be in the range 0-100");
+                    throw new InputParseException(TranslatableComponent.of("fawe.error.too-simple"));
                 }
                 if (min != 0 || max != 100) {
                     util = new CleanTextureUtil(util, min, max);

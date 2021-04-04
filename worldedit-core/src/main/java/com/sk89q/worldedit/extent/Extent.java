@@ -544,7 +544,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return the number of blocks that matched the mask
      */
     default int countBlocks(Region region, Mask searchMask) {
-        RegionVisitor visitor = new RegionVisitor(region, position -> searchMask.test(position));
+        RegionVisitor visitor = new RegionVisitor(region, searchMask::test);
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
