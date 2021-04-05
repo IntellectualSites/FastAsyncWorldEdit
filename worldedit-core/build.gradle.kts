@@ -48,8 +48,7 @@ dependencies {
     annotationProcessor("com.google.guava:guava:21.0")
     compileOnly("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
     annotationProcessor("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
-    testImplementation("ch.qos.logback:logback-core:${Versions.LOGBACK}")
-    testImplementation("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
+    "testRuntimeOnly"("org.apache.logging.log4j:log4j-core:2.8.1")
     implementation("com.github.luben:zstd-jni:1.4.9-2")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
