@@ -82,7 +82,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.logging.Level;
 
 import static com.boydti.fawe.bukkit.util.JavaVersionCheck.checkJvm;
 import static com.google.common.base.Preconditions.checkNotNull;

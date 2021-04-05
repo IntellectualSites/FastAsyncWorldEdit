@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -143,7 +144,7 @@ public abstract class RichParser<E> extends InputParser<E> {
             arguments.add(input.substring(openIndex + 1));
         }
         if (requireClosing && open != 0) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.invalid-bracketing", TextComponent.of("'[' or ']'?")));
+            throw new InputParseException(Caption.of("fawe.error.invalid-bracketing", TextComponent.of("'[' or ']'?")));
         }
         return arguments.toArray(new String[0]);
     }

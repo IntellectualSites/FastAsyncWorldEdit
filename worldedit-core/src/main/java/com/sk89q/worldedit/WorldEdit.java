@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -58,7 +59,6 @@ import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
 import com.sk89q.worldedit.util.io.file.FilenameException;
@@ -315,7 +315,7 @@ public final class WorldEdit {
             }
 
             if (f == null) {
-                throw new FileSelectionAbortedException(TranslatableComponent.of("worldedit.error.no-file-selected"));
+                throw new FileSelectionAbortedException(Caption.of("worldedit.error.no-file-selected"));
             }
         } else {
             List<String> exts = extensions == null ? ImmutableList.of(defaultExt) : Lists.asList(defaultExt, extensions);
@@ -334,12 +334,12 @@ public final class WorldEdit {
 
             boolean isSym = existingParent != null && !existingParent.toRealPath().equals(existingParent);
             if (!inDir || (!getConfiguration().allowSymlinks && isSym)) {
-                throw new FilenameResolutionException(filename, TranslatableComponent.of("worldedit.error.file-resolution.outside-root"));
+                throw new FilenameResolutionException(filename, Caption.of("worldedit.error.file-resolution.outside-root"));
             }
 
             return filePath.toFile();
         } catch (IOException e) {
-            throw new FilenameResolutionException(filename, TranslatableComponent.of("worldedit.error.file-resolution.resolve-failed"));
+            throw new FilenameResolutionException(filename, Caption.of("worldedit.error.file-resolution.resolve-failed"));
         }
     }
 
@@ -366,7 +366,7 @@ public final class WorldEdit {
             result = getSafeFileWithExtension(dir, filename, iter.next());
         }
         if (result == null) {
-            throw new InvalidFilenameException(filename, TranslatableComponent.of("worldedit.error.invalid-filename.invalid-characters"));
+            throw new InvalidFilenameException(filename, Caption.of("worldedit.error.invalid-filename.invalid-characters"));
         }
         return result;
     }
@@ -717,7 +717,7 @@ public final class WorldEdit {
         String ext = filename.substring(index + 1);
 
         if (!ext.equalsIgnoreCase("js")) {
-            player.printError(TranslatableComponent.of("worldedit.script.unsupported"));
+            player.print(Caption.of("worldedit.script.unsupported"));
             return;
         }
 
@@ -730,7 +730,7 @@ public final class WorldEdit {
                 file = WorldEdit.class.getResourceAsStream("craftscripts/" + filename);
 
                 if (file == null) {
-                    player.printError(TranslatableComponent.of("worldedit.script.file-not-found", TextComponent.of(filename)));
+                    player.print(Caption.of("worldedit.script.file-not-found", TextComponent.of(filename)));
                     return;
                 }
             } else {
@@ -743,7 +743,7 @@ public final class WorldEdit {
             in.close();
             script = new String(data, 0, data.length, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            player.printError(TranslatableComponent.of("worldedit.script.read-error", TextComponent.of(e.getMessage())));
+            player.print(Caption.of("worldedit.script.read-error", TextComponent.of(e.getMessage())));
             return;
         }
 
@@ -756,7 +756,7 @@ public final class WorldEdit {
         try {
             engine = new RhinoCraftScriptEngine();
         } catch (NoClassDefFoundError ignored) {
-            player.printError(TranslatableComponent.of("worldedit.script.no-script-engine"));
+            player.print(Caption.of("worldedit.script.no-script-engine"));
             return;
         }
 
@@ -772,13 +772,13 @@ public final class WorldEdit {
         } catch (ScriptException e) {
             // non-exceptional return check
             if (!(Throwables.getRootCause(e) instanceof ReturnException)) {
-                player.printError(TranslatableComponent.of("worldedit.script.failed", TextComponent.of(e.getMessage(), TextColor.WHITE)));
+                player.print(Caption.of("worldedit.script.failed", TextComponent.of(e.getMessage(), TextColor.WHITE)));
                 logger.warn("Failed to execute script", e);
             }
         } catch (NumberFormatException | WorldEditException e) {
             throw e;
         } catch (Throwable e) {
-            player.printError(TranslatableComponent.of("worldedit.script.failed-console", TextComponent.of(e.getClass().getCanonicalName(),
+            player.print(Caption.of("worldedit.script.failed-console", TextComponent.of(e.getClass().getCanonicalName(),
                     TextColor.WHITE)));
             logger.warn("Failed to execute script", e);
         } finally {

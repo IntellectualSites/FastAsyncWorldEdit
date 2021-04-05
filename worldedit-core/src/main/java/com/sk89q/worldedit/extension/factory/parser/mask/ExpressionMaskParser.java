@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -68,7 +69,7 @@ public class ExpressionMaskParser extends InputParser<Mask> {
             }
             return new ExpressionMask(exp);
         } catch (ExpressionException e) {
-            throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.invalid-expression", TextComponent.of(e.getMessage())));
+            throw new InputParseException(Caption.of("worldedit.error.parser.invalid-expression", TextComponent.of(e.getMessage())));
         }
     }
 }

@@ -116,7 +116,7 @@ public class ConsumeBindings extends Bindings {
             uuid = Fawe.imp().getUUID(argument);
         }
         if (uuid == null) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.player.not.found", TextComponent.of(argument)));
+            throw new InputParseException(Caption.of("fawe.error.player.not.found", TextComponent.of(argument)));
         }
         return uuid;
     }
@@ -156,7 +156,7 @@ public class ConsumeBindings extends Bindings {
         try {
             return getWorldEdit().getBlockFactory().parseFromInput(argument, parserContext);
         } catch (NoMatchException e) {
-            throw new InputParseException(TranslatableComponent.of(e.getMessage()));
+            throw new InputParseException(Caption.of(e.getMessage()));
         }
     }
 }

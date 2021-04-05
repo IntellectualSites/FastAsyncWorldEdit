@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.cli;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.cli.data.FileRegistries;
 import com.sk89q.worldedit.cli.schematic.ClipboardWorld;
@@ -33,7 +34,6 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -238,13 +238,13 @@ public class CLIWorldEdit {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 if (line.equals("stop")) {
-                    commandSender.printInfo(TranslatableComponent.of("worldedit.cli.stopping"));
+                    commandSender.print(Caption.of("worldedit.cli.stopping"));
                     break;
                 }
                 CommandEvent event = new CommandEvent(commandSender, line);
                 WorldEdit.getInstance().getEventBus().post(event);
                 if (!event.isCancelled()) {
-                    commandSender.printError(TranslatableComponent.of("worldedit.cli.unknown-command"));
+                    commandSender.print(Caption.of("worldedit.cli.unknown-command"));
                 } else {
                     saveAllWorlds(false);
                 }

@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.boydti.fawe.command.SuggestInputParseException;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
@@ -127,7 +128,7 @@ public class BlockMaskBuilder {
                     }
                 }
                 if (blockTypeList.isEmpty()) {
-                    throw new InputParseException(TranslatableComponent.of("fawe.error.no-block-found", TextComponent.of(input)));
+                    throw new InputParseException(Caption.of("fawe.error.no-block-found", TextComponent.of(input)));
                 }
                 if (blockTypeList.size() == 1) {
                     type = blockTypeList.get(0);

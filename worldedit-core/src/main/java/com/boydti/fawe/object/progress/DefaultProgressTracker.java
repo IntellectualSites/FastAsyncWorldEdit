@@ -7,7 +7,6 @@ import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.function.BiConsumer;
 
@@ -104,7 +103,7 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
     }
 
     public void doneTask() {
-        sendTile(TextComponent.empty(), TranslatableComponent.of("fawe.progress.progress.finished"));
+        sendTile(TextComponent.empty(), Caption.of("fawe.progress.progress.finished"));
     }
 
     public void sendTask() {

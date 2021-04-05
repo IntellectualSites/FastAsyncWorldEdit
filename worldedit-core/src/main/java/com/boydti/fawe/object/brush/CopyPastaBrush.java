@@ -45,7 +45,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     @Override
     public boolean reset() {
         session.setClipboard(null);
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.reset"));
+        player.print(Caption.of("fawe.worldedit.brush.brush.reset"));
         return true;
     }
 

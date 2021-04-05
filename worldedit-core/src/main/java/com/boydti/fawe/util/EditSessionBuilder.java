@@ -10,6 +10,7 @@ import com.boydti.fawe.beta.implementation.lighting.RelightProcessor;
 import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.beta.implementation.processors.LimitExtent;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweLimit;
@@ -40,6 +41,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.eventbus.EventBus;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
@@ -240,11 +242,11 @@ public class EditSessionBuilder {
             }
             if (Settings.IMP.EXTENT.DEBUG) {
                 if (event.getActor() != null) {
-                    event.getActor().printDebug(TranslatableComponent.of("Potentially unsafe extent blocked: " + toReturn.getClass().getName()));
-                    event.getActor().printDebug(TranslatableComponent.of(" - For area restrictions, it is recommended to use the FaweAPI"));
-                    event.getActor().printDebug(TranslatableComponent.of(" - For block logging, it is recommended to use BlocksHub"));
-                    event.getActor().printDebug(TranslatableComponent.of(" - To allow this plugin add it to the FAWE `allowed-plugins` list"));
-                    event.getActor().printDebug(TranslatableComponent.of(" - To hide this message set `debug` to false in the FAWE config.yml"));
+                    event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn.getClass().getName()));
+                    event.getActor().printDebug(TextComponent.of(" - For area restrictions, it is recommended to use the FaweAPI"));
+                    event.getActor().printDebug(TextComponent.of(" - For block logging, it is recommended to use BlocksHub"));
+                    event.getActor().printDebug(TextComponent.of(" - To allow this plugin add it to the FAWE `allowed-plugins` list"));
+                    event.getActor().printDebug(TextComponent.of(" - To hide this message set `debug` to false in the FAWE config.yml"));
                 } else {
                     LOGGER.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
                     LOGGER.debug(" - For area restrictions, it is recommended to use the FaweAPI");
@@ -300,7 +302,7 @@ public class EditSessionBuilder {
         if (checkMemory) {
             if (MemUtil.isMemoryLimitedSlow()) {
                 if (Permission.hasPermission(player, "worldedit.fast")) {
-                    player.print(TranslatableComponent.of("fawe.info.worldedit.oom.admin"));
+                    player.print(Caption.of("fawe.info.worldedit.oom.admin"));
                 }
                 throw FaweCache.LOW_MEMORY;
             }

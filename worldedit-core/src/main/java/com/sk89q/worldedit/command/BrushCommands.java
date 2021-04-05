@@ -106,7 +106,6 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.block.BlockID;
@@ -315,7 +314,7 @@ public class BrushCommands {
     public void sweepBrush(Player player, InjectedValueAccess context,
                            @Arg(desc = "int", def = "-1")
                                int copies) throws WorldEditException {
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline"));
+        player.print(Caption.of("fawe.worldedit.brush.brush.spline"));
         set(context, new SweepBrush(copies));
     }
 
@@ -428,7 +427,7 @@ public class BrushCommands {
                     case BlockID.SAND:
                     case BlockID.GRAVEL:
                         player.print(
-                            TranslatableComponent.of("fawe.worldedit.brush.brush.try.other"));
+                                Caption.of("fawe.worldedit.brush.brush.try.other"));
                         falling = true;
                         break;
                     default:
@@ -1111,7 +1110,7 @@ public class BrushCommands {
             }
             player.print(Caption.of("fawe.worldedit.schematic.schematic.saved", name));
         } else {
-            player.printError(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
         }
     }
 
@@ -1145,7 +1144,7 @@ public class BrushCommands {
                 player.print(Caption.of("fawe.worldedit.brush.brush.equipped", name));
             } catch (Throwable e) {
                 e.printStackTrace();
-                player.printError(TranslatableComponent.of("fawe.error.brush.incompatible"));
+                player.print(Caption.of("fawe.error.brush.incompatible"));
             }
         } */
 
@@ -1273,7 +1272,7 @@ public class BrushCommands {
         tool.setFill(null);
         tool.setBrush(new OperationFactoryBrush(factory, shape, session), permission);
 
-        player.printInfo(TranslatableComponent.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
+        player.print(Caption.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
         ToolCommands.sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
 }

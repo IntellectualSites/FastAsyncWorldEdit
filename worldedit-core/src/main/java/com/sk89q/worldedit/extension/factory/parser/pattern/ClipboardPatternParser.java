@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -80,11 +81,11 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
             String coords = offsetParts[1];
             if (coords.length() < 7  // min length of `[x,y,z]`
                 || coords.charAt(0) != '[' || coords.charAt(coords.length() - 1) != ']') {
-                throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.clipboard.missing-offset"));
+                throw new InputParseException(Caption.of("worldedit.error.parser.clipboard.missing-offset"));
             }
             String[] offsetSplit = coords.substring(1, coords.length() - 1).split(",");
             if (offsetSplit.length != 3) {
-                throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.clipboard.missing-coordinates"));
+                throw new InputParseException(Caption.of("worldedit.error.parser.clipboard.missing-coordinates"));
             }
             offset = BlockVector3.at(
                     Integer.valueOf(offsetSplit[0]),
@@ -99,10 +100,10 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
                 Clipboard clipboard = holder.getClipboard();
                 return new ClipboardPattern(clipboard, offset);
             } catch (EmptyClipboardException e) {
-                throw new InputParseException(TranslatableComponent.of("fawe.error.empty-clipboard", TextComponent.of("#clipboard")));
+                throw new InputParseException(Caption.of("fawe.error.empty-clipboard", TextComponent.of("#clipboard")));
             }
         } else {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.no-session"));
+            throw new InputParseException(Caption.of("fawe.error.no-session"));
         }
     }
 

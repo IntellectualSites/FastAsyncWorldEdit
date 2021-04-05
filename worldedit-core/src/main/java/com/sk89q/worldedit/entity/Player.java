@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.entity;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
@@ -47,14 +48,13 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 
-import java.io.File;
 import javax.annotation.Nullable;
+import java.io.File;
 
 /**
  * Represents a player.
@@ -431,12 +431,12 @@ public interface Player extends Entity, Actor {
                 getSession().setClipboard(holder);
             }
         } catch (Exception event) {
-            printError(TranslatableComponent.of("====== INVALID CLIPBOARD ======"));
+            printError(TextComponent.of("====== INVALID CLIPBOARD ======"));
             event.printStackTrace();
-            printError(TranslatableComponent.of("fawe.error.stacktrace"));
-            printError(TranslatableComponent.of("fawe.error.no-failure"));
-            printError(TranslatableComponent.of("File: ", TextComponent.of(file.getName()), TextComponent.of(" (len:"), TextComponent.of(file.length()), TextComponent.of(")")));
-            printError(TranslatableComponent.of("fawe.error.stacktrace"));
+            printError(Caption.of("fawe.error.stacktrace"));
+            printError(Caption.of("fawe.error.no-failure"));
+            printError(Caption.of("File: ", TextComponent.of(file.getName()), TextComponent.of(" (len:"), TextComponent.of(file.length()), TextComponent.of(")")));
+            printError(Caption.of("fawe.error.stacktrace"));
         }
     }
 }

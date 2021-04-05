@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.brush.sweep;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.brush.ResettableTool;
 import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
@@ -18,7 +19,6 @@ import com.sk89q.worldedit.math.interpolation.Node;
 import com.sk89q.worldedit.math.interpolation.ReparametrisingInterpolation;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +53,13 @@ public class SweepBrush implements Brush, ResettableTool {
             return;
         }
         if (newPos) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.spline.primary.2"));
+            player.print(Caption.of("fawe.worldedit.brush.spline.primary.2"));
             positions.add(position);
             return;
         }
 
         if (positions.size() < 2) {
-            player.printError(TranslatableComponent.of("fawe.worldedit.brush.brush.spline.secondary.error"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.spline.secondary.error"));
             return;
         }
 
@@ -111,7 +111,7 @@ public class SweepBrush implements Brush, ResettableTool {
                 break;
             }
         }
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.spline.secondary"));
+        player.print(Caption.of("fawe.worldedit.brush.spline.secondary"));
         reset();
     }
 

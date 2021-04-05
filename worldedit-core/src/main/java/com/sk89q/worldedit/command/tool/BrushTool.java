@@ -446,7 +446,7 @@ public class BrushTool
 
             if (target == null) {
                 editSession.cancel();
-                player.printError(TranslatableComponent.of("worldedit.tool.no-block"));
+                player.print(Caption.of("worldedit.tool.no-block"));
                 return true;
             }
             BlockBag bag = session.getBlockBag(player);
@@ -481,7 +481,7 @@ public class BrushTool
                 WorldEdit.getInstance().checkMaxBrushRadius(size);
                 brush.build(editSession, target.toBlockPoint(), current.getMaterial(), size);
             } catch (MaxChangedBlocksException e) {
-                player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
+                player.print(Caption.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);
                 if (bag != null) {

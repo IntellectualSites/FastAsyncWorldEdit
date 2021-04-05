@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
@@ -407,10 +408,10 @@ public class PlatformManager {
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);
         if (faweException != null) {
-            actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
+            actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
         } else {
-            actor.printError(TranslatableComponent.of("worldedit.command.error.report"));
-            actor.print(TranslatableComponent.of(e.getClass().getName(), TextComponent.of(": "), TextComponent.of(e.getMessage())));
+            actor.print(Caption.of("worldedit.command.error.report"));
+            actor.print(Caption.of(e.getClass().getName(), TextComponent.of(": "), TextComponent.of(e.getMessage())));
             e.printStackTrace();
         }
     }
@@ -462,10 +463,10 @@ public class PlatformManager {
         } catch (Throwable e) {
             FaweException faweException = FaweException.get(e);
             if (faweException != null) {
-                player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
+                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
             } else {
-                player.printError(TranslatableComponent.of("worldedit.command.error.report"));
-                player.print(TranslatableComponent.of(e.getClass().getName() + ": " + e.getMessage()));
+                player.print(Caption.of("worldedit.command.error.report"));
+                player.print(Caption.of(e.getClass().getName() + ": " + e.getMessage()));
                 e.printStackTrace();
             }
         } finally {

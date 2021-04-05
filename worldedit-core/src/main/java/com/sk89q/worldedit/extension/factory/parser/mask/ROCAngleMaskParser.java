@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.mask.ROCAngleMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
@@ -40,7 +41,7 @@ public class ROCAngleMaskParser extends RichParser<Mask> {
         String maxArg = arguments[1];
         boolean degree = minArg.endsWith("d");
         if (degree ^ maxArg.endsWith("d")) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.mask.angle"));
+            throw new InputParseException(Caption.of("fawe.error.mask.angle"));
         }
         double min;
         double max;
@@ -51,7 +52,7 @@ public class ROCAngleMaskParser extends RichParser<Mask> {
                 if (flag.equals("-o")) {
                     overlay = true;
                 } else {
-                    throw new InputParseException(TranslatableComponent.of("fawe.error.invalid-flag",
+                    throw new InputParseException(Caption.of("fawe.error.invalid-flag",
                             TextComponent.of(flag)));
                 }
             }

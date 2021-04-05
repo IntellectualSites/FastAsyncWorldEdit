@@ -14,7 +14,6 @@ import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectAnnotation;
 import org.enginehub.piston.inject.InjectedValueAccess;
@@ -102,7 +101,7 @@ public @interface Confirm {
                 if (checkExisting(context)) {
                     return true;
                 }
-                actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm"));
+                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm"));
                 return confirm(actor, context);
             }
         };

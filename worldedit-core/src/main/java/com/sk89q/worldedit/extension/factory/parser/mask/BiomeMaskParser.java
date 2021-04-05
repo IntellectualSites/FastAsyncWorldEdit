@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.base.Splitter;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
@@ -74,7 +75,7 @@ public class BiomeMaskParser extends InputParser<Mask> {
         for (String biomeName : Splitter.on(",").split(input.substring(1))) {
             BiomeType biome = BiomeType.REGISTRY.get(biomeName);
             if (biome == null) {
-                throw new NoMatchException(TranslatableComponent.of("worldedit.error.unknown-biome", TextComponent.of(biomeName)));
+                throw new NoMatchException(Caption.of("worldedit.error.unknown-biome", TextComponent.of(biomeName)));
             }
             biomes.add(biome);
         }

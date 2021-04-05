@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -81,7 +82,7 @@ public class RandomPatternParser extends InputParser<Pattern> {
                 String[] p = token.split("%", 2);
 
                 if (p.length < 2) {
-                    throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.missing-random-type", TextComponent.of(input)));
+                    throw new InputParseException(Caption.of("worldedit.error.parser.missing-random-type", TextComponent.of(input)));
                 } else {
                     chance = Double.parseDouble(p[0]);
                     innerPattern = worldEdit.getPatternFactory().parseFromInput(p[1], context);

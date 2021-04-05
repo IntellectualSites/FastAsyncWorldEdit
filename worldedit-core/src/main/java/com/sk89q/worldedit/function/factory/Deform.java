@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.factory;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -198,8 +199,8 @@ public class Deform implements Contextual<Operation> {
 
         @Override
         public Iterable<Component> getStatusMessages() {
-            return ImmutableList.of(TranslatableComponent.of("worldedit.operation.deform.expression",
-                    TextComponent.of(expression).color(TextColor.LIGHT_PURPLE)));
+            return ImmutableList.of(Caption.of("worldedit.operation.deform.expression",
+                    TextComponent.of(expression)));
         }
 
     }

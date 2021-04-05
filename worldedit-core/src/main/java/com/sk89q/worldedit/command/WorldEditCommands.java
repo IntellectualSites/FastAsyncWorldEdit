@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweVersion;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.intellectualsites.paster.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
@@ -92,7 +93,7 @@ public class WorldEditCommands {
             TextComponent buildArg = TextComponent.of(version.build);
             TextComponent platformArg = TextComponent.of(Settings.IMP.PLATFORM);
 
-            actor.printInfo(TranslatableComponent.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
+            actor.print(Caption.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
         }
 
         actor.printInfo(TextComponent.of("Wiki: https://wiki.intellectualsites.com/FastAsyncWorldEdit/index"));
@@ -132,7 +133,7 @@ public class WorldEditCommands {
         we.getPlatformManager().queryCapability(Capability.CONFIGURATION).reload();
         we.getEventBus().post(new ConfigurationLoadEvent(we.getPlatformManager().queryCapability(Capability.CONFIGURATION).getConfiguration()));
         Fawe.get().setupConfigs();
-        actor.printInfo(TranslatableComponent.of("worldedit.reload.config"));
+        actor.print(Caption.of("worldedit.reload.config"));
     }
 
     @Command(
@@ -151,7 +152,7 @@ public class WorldEditCommands {
             actor.printInfo(TextComponent.of(e.getMessage()));
             return;
         }
-        actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest).clickEvent(
+        actor.print(Caption.of("worldedit.report.written", TextComponent.of(dest).clickEvent(
             ClickEvent.openUrl(dest))));
     }
 
@@ -164,7 +165,7 @@ public class WorldEditCommands {
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
         for (Map.Entry<Thread, StackTraceElement[]> entry : stacks.entrySet()) {
             Thread thread = entry.getKey();
-            actor.printDebug(TranslatableComponent.of(
+            actor.printDebug(TextComponent.of(
                 "--------------------------------------------------------------------------------------------"));
             actor.printDebug("Thread: " + thread.getName() + " | Id: " + thread.getId() + " | Alive: " + thread.isAlive());
             for (StackTraceElement elem : entry.getValue()) {
@@ -194,13 +195,13 @@ public class WorldEditCommands {
         try {
             ZoneId tz = ZoneId.of(timezone);
             session.setTimezone(tz);
-            actor.printInfo(TranslatableComponent.of("worldedit.timezone.set", TextComponent.of(tz.getDisplayName(
+            actor.print(Caption.of("worldedit.timezone.set", TextComponent.of(tz.getDisplayName(
                     TextStyle.FULL, actor.getLocale()
             ))));
-            actor.printInfo(TranslatableComponent.of("worldedit.timezone.current",
+            actor.print(Caption.of("worldedit.timezone.current",
                     TextComponent.of(dateFormat.withLocale(actor.getLocale()).format(ZonedDateTime.now(tz)))));
         } catch (ZoneRulesException e) {
-            actor.printError(TranslatableComponent.of("worldedit.timezone.invalid"));
+            actor.print(Caption.of("worldedit.timezone.invalid"));
         }
     }
 

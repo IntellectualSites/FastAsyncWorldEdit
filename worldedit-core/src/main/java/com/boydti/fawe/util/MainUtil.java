@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
@@ -880,7 +881,7 @@ public class MainUtil {
             long age = now - file.lastModified();
             if (age > timeDiff) {
                 pool.submit(file::delete);
-                Component msg = TranslatableComponent.of("worldedit.schematic.delete.deleted");
+                Component msg = Caption.of("worldedit.schematic.delete.deleted");
                 if (printDebug) {
                     LOGGER.debug(msg.toString());
                 }

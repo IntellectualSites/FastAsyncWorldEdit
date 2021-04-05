@@ -1,6 +1,7 @@
 package com.boydti.fawe.util.image;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.MainUtil;
 import com.boydti.fawe.util.MathMan;
@@ -175,7 +176,7 @@ public class ImageUtil {
         try {
             return MainUtil.readImage(getInputStream(uri));
         } catch (IOException e) {
-            throw new InputParseException(TranslatableComponent.of(e.getMessage()));
+            throw new InputParseException(Caption.of(e.getMessage()));
         }
     }
 
@@ -188,7 +189,7 @@ public class ImageUtil {
             }
             return new URL(uriStr).openStream();
         } catch (IOException e) {
-            throw new InputParseException(TranslatableComponent.of(e.getMessage()));
+            throw new InputParseException(Caption.of(e.getMessage()));
         }
     }
 
@@ -211,9 +212,9 @@ public class ImageUtil {
                     Settings.IMP.PATHS.HEIGHTMAP), arg);
                 return MainUtil.readImage(file);
             }
-            throw new InputParseException(TranslatableComponent.of("fawe.error.invalid-image", TextComponent.of(arg)));
+            throw new InputParseException(Caption.of("fawe.error.invalid-image", TextComponent.of(arg)));
         } catch (IOException e) {
-            throw new InputParseException(TranslatableComponent.of(e.getMessage()));
+            throw new InputParseException(Caption.of(e.getMessage()));
         }
     }
 
@@ -230,16 +231,16 @@ public class ImageUtil {
                 File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(),
                     Settings.IMP.PATHS.HEIGHTMAP), arg);
                 if (!file.exists()) {
-                    throw new InputParseException(TranslatableComponent.of("fawe.error.file-not-found", TextComponent.of(String.valueOf(file))));
+                    throw new InputParseException(Caption.of("fawe.error.file-not-found", TextComponent.of(String.valueOf(file))));
                 }
                 if (file.isDirectory()) {
-                    throw new InputParseException(TranslatableComponent.of("fawe.error.file-is-invalid-directory", TextComponent.of(String.valueOf(file))));
+                    throw new InputParseException(Caption.of("fawe.error.file-is-invalid-directory", TextComponent.of(String.valueOf(file))));
                 }
                 return file.toURI();
             }
-            throw new InputParseException(TranslatableComponent.of("fawe.error.invalid-image", TextComponent.of(arg)));
+            throw new InputParseException(Caption.of("fawe.error.invalid-image", TextComponent.of(arg)));
         } catch (IOException | URISyntaxException e) {
-            throw new InputParseException(TranslatableComponent.of(e.getMessage()));
+            throw new InputParseException(Caption.of(e.getMessage()));
         }
     }
 }

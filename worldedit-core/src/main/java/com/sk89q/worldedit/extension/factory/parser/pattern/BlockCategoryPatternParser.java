@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -60,13 +61,13 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> {
 
         BlockCategory category = BlockCategory.REGISTRY.get(tag);
         if (category == null) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.unknown-block-tag", TextComponent.of(tag)));
+            throw new InputParseException(Caption.of("fawe.error.unknown-block-tag", TextComponent.of(tag)));
         }
         RandomPattern randomPattern = new RandomPattern();
 
         Set<BlockType> blocks = category.getAll();
         if (blocks.isEmpty()) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.block-tag-no-blocks", TextComponent.of(category.getId())));
+            throw new InputParseException(Caption.of("fawe.error.block-tag-no-blocks", TextComponent.of(category.getId())));
         }
 
         if (anyState) {

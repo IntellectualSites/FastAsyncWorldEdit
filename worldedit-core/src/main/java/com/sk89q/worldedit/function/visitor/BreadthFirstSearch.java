@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
@@ -281,10 +282,10 @@ public abstract class BreadthFirstSearch implements Operation {
 
     @Override
     public Iterable<Component> getStatusMessages() {
-        return ImmutableList.of(TranslatableComponent.of(
+        return ImmutableList.of(Caption.of(
                 "worldedit.operation.affected.block",
                 TextComponent.of(getAffected())
-        ).color(TextColor.GRAY));
+        ));
     }
 
 }

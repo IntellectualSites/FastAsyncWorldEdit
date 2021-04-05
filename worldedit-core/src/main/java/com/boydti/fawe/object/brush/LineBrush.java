@@ -34,7 +34,7 @@ public class LineBrush implements Brush, ResettableTool {
         }
         editSession.drawLine(pattern, pos1, position, size, !shell, flat);
         if (!visual) {
-            editSession.getPlayer().print(TranslatableComponent.of("fawe.worldedit.brush.brush.line.secondary"));
+            editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
             if (!select) {
                 pos1 = null;
             } else {

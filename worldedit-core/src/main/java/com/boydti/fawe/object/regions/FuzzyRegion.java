@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.regions;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
@@ -9,7 +10,6 @@ import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 
@@ -106,12 +106,12 @@ public class FuzzyRegion extends AbstractRegion {
 
     @Override
     public void expand(BlockVector3... changes) throws RegionOperationException {
-        throw new RegionOperationException(TranslatableComponent.of("fawe.error.selection-expand"));
+        throw new RegionOperationException(Caption.of("fawe.error.selection-expand"));
     }
 
     @Override
     public void contract(BlockVector3... changes) throws RegionOperationException {
-        throw new RegionOperationException(TranslatableComponent.of("fawe.error.selection-contract"));
+        throw new RegionOperationException(Caption.of("fawe.error.selection-contract"));
     }
 
     @Override
@@ -121,7 +121,7 @@ public class FuzzyRegion extends AbstractRegion {
 
     @Override
     public void shift(BlockVector3 change) throws RegionOperationException {
-        throw new RegionOperationException(TranslatableComponent.of("fawe.error.selection-shift"));
+        throw new RegionOperationException(Caption.of("fawe.error.selection-shift"));
     }
 
     public void setExtent(EditSession extent) {

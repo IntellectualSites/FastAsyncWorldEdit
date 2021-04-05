@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 /**
  * Thrown if the world has been unloaded.
@@ -31,6 +31,6 @@ class WorldUnloadedException extends WorldEditException {
      * Create a new instance.
      */
     WorldUnloadedException() {
-        super(TranslatableComponent.of("worldedit.error.world-unloaded"));
+        super(Caption.of("worldedit.error.world-unloaded"));
     }
 }

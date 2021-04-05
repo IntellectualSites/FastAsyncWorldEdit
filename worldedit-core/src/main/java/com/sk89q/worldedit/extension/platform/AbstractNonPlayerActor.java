@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.boydti.fawe.util.TaskManager;
@@ -71,7 +72,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
             throwable = throwable.getCause();
         }
         if (throwable instanceof WorldEditException) {
-            printError(TranslatableComponent.of(throwable.getLocalizedMessage()));
+            printError(Caption.of(throwable.getLocalizedMessage()));
         } else {
             FaweException fe = FaweException.get(throwable);
             if (fe != null) {

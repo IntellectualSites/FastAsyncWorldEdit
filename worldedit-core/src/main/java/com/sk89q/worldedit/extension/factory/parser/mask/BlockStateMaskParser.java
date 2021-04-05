@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.base.Splitter;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -58,7 +59,7 @@ public class BlockStateMaskParser extends InputParser<Mask> {
                     Splitter.on(',').omitEmptyStrings().trimResults().withKeyValueSeparator('=').split(states),
                     strict);
         } catch (Exception e) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.invalid-states", TextComponent.of(String.valueOf(e))));
+            throw new InputParseException(Caption.of("fawe.error.invalid-states", TextComponent.of(String.valueOf(e))));
         }
     }
 }

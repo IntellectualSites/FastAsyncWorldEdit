@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -55,7 +56,7 @@ public class NegateMaskParser extends InputParser<Mask> {
         if (input.length() > 1) {
             return Masks.negate(worldEdit.getMaskFactory().parseFromInput(input.substring(1), context));
         } else {
-            throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.negate-nothing"));
+            throw new InputParseException(Caption.of("worldedit.error.parser.negate-nothing"));
         }
     }
 }

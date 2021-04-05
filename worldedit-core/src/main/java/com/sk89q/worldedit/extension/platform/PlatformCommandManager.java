@@ -354,7 +354,7 @@ public final class PlatformCommandManager {
             additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
-            cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
+            cmd.addPart(SubCommandPart.builder(Caption.of("worldedit.argument.action"),
                 TextComponent.of("Sub-command to run."))
                 .withCommands(subCommands)
                 .required()
@@ -384,7 +384,7 @@ public final class PlatformCommandManager {
             additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
-            cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
+            cmd.addPart(SubCommandPart.builder(Caption.of("worldedit.argument.action"),
                     TextComponent.of("Sub-command to run."))
                     .withCommands(subCommands)
                     .required()
@@ -724,16 +724,16 @@ public final class PlatformCommandManager {
                 actor.print(e.getRichMessage());
             }
         } catch (FaweException e) {
-            actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", e.getComponent()));
+            actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", e.getComponent()));
         } catch (UsageException e) {
             ImmutableList<Command> cmd = e.getCommands();
             if (!cmd.isEmpty()) {
-                actor.printError(TranslatableComponent.of("fawe.error.command.syntax", HelpGenerator.create(e.getCommandParseResult()).getFullHelp()));
+                actor.print(Caption.of("fawe.error.command.syntax", HelpGenerator.create(e.getCommandParseResult()).getFullHelp()));
             }
             actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {
             if (e.getCause() instanceof FaweException) {
-                actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", ((FaweException)e.getCause()).getComponent()));
+                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", ((FaweException)e.getCause()).getComponent()));
             } else {
                 handleUnknownException(actor, e.getCause());
             }
@@ -741,7 +741,6 @@ public final class PlatformCommandManager {
             Component msg = e.getRichMessage();
             if (msg != TextComponent.empty()) {
                 actor.print(TextComponent.builder("")
-                        .color(TextColor.RED)
                         .append(e.getRichMessage())
                         .build());
                 List<String> argList = parseArgs(event.getArguments()).map(Substring::getSubstring).collect(Collectors.toList());
@@ -765,7 +764,7 @@ public final class PlatformCommandManager {
                 int changed = editSession.getBlockChangeCount();
                 double throughput = timeS == 0 ? changed : changed / timeS;
                 if (time > 1000) {
-                    actor.printDebug(TranslatableComponent.of(
+                    actor.print(Caption.of(
                             "worldedit.command.time-elapsed",
                             TextComponent.of(timeS),
                             TextComponent.of(changed),
@@ -807,7 +806,7 @@ public final class PlatformCommandManager {
             store.injectValue(Key.of(Player.class), ValueProvider.constant((Player) actor));
         } else {
             store.injectValue(Key.of(Player.class), context -> {
-                throw new CommandException(TranslatableComponent.of("worldedit.command.player-only"), ImmutableList.of());
+                throw new CommandException(Caption.of("worldedit.command.player-only"), ImmutableList.of());
             });
         }
         store.injectValue(Key.of(Arguments.class), ValueProvider.constant(arguments));
@@ -826,7 +825,7 @@ public final class PlatformCommandManager {
     }
 
     private void handleUnknownException(Actor actor, Throwable t) {
-        actor.printError(TranslatableComponent.of("worldedit.command.error.report"));
+        actor.print(Caption.of("worldedit.command.error.report"));
         actor.print(TextComponent.of(t.getClass().getName() + ": " + t.getMessage()));
         LOGGER.error("An unexpected error while handling a WorldEdit command", t);
     }

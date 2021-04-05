@@ -22,6 +22,7 @@ package com.sk89q.worldedit.regions;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.config.Caption;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -118,13 +119,13 @@ public class RegionIntersection extends AbstractRegion {
     @Override
     public void expand(BlockVector3... changes) throws RegionOperationException {
         checkNotNull(changes);
-        throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.intersection.error.cannot-expand"));
+        throw new RegionOperationException(Caption.of("worldedit.selection.intersection.error.cannot-expand"));
     }
 
     @Override
     public void contract(BlockVector3... changes) throws RegionOperationException {
         checkNotNull(changes);
-        throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.intersection.error.cannot-contract"));
+        throw new RegionOperationException(Caption.of("worldedit.selection.intersection.error.cannot-contract"));
     }
 
     @Override

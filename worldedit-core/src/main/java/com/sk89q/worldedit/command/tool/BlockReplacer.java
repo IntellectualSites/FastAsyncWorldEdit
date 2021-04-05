@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -78,7 +79,7 @@ public class BlockReplacer implements DoubleActionBlockTool {
 
         if (targetBlock != null) {
             pattern = targetBlock;
-            player.printInfo(TranslatableComponent.of("worldedit.tool.repl.switched", targetBlock.getBlockType().getRichName()));
+            player.print(Caption.of("worldedit.tool.repl.switched", targetBlock.getBlockType().getRichName()));
         }
 
         return true;

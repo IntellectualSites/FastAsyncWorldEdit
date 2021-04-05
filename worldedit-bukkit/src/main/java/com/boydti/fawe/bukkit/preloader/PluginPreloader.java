@@ -3,7 +3,6 @@ package com.boydti.fawe.bukkit.preloader;
 import com.boydti.fawe.Fawe;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -19,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.InputStream;
-import java.lang.ref.PhantomReference;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;

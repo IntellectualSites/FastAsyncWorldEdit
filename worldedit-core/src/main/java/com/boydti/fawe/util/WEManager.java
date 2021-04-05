@@ -1,5 +1,6 @@
 package com.boydti.fawe.util;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.exception.FaweException;
@@ -89,7 +90,7 @@ public class WEManager {
                                 backupRegions.add(region);
                             }
                         } else {
-                            player.printDebug(TextComponent.of("Invalid Mask"));
+                            player.print(Caption.of("Invalid Mask"));
                             removed = true;
                             iterator.remove();
                         }

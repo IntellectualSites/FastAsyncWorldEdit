@@ -19,13 +19,12 @@
 
 package com.sk89q.worldedit.util.formatting.component;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import com.sk89q.worldedit.history.changeset.ChangeSet;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -33,7 +32,6 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public abstract class PaginationBox extends MessageBox {
@@ -95,7 +93,7 @@ public abstract class PaginationBox extends MessageBox {
         }
         int pageCount = (int) Math.ceil(getComponentsSize() / (double) componentsPerPage);
         if (page < 1 || page > pageCount) {
-            throw new InvalidComponentException(TranslatableComponent.of("worldedit.error.invalid-page"));
+            throw new InvalidComponentException(Caption.of("worldedit.error.invalid-page"));
         }
         currentPage = page;
         final int lastComp = Math.min(page * componentsPerPage, getComponentsSize());

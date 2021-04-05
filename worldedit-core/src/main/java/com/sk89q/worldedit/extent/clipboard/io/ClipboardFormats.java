@@ -35,8 +35,8 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +58,6 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -210,7 +209,7 @@ public class ClipboardFormats {
             f = player.openFileOpenDialog(extensions);
             if (f == null || !f.exists()) {
                 if (message) {
-                    player.printError(TranslatableComponent.of("worldedit.schematic.load.does-not-exist", TextComponent.of(input)));
+                    player.print(Caption.of("worldedit.schematic.load.does-not-exist", TextComponent.of(input)));
                 }
                 return null;
             }

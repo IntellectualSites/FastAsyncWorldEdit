@@ -1086,9 +1086,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
                 player.print(Caption.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null) {
-                player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
+                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
             } else {
-                player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.level"));
+                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason.outside.level"));
             }
         }
         if (wnaMode) {
@@ -1112,7 +1112,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
             }
         } catch (Throwable e) {
-            player.printError(TranslatableComponent.of("fawe.error.lighting"));
+            player.print(Caption.of("fawe.error.lighting"));
             e.printStackTrace();
         }
         // Enqueue it
