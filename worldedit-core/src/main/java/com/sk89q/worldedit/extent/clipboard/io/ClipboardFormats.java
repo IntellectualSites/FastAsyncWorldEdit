@@ -195,7 +195,7 @@ public class ClipboardFormats {
             player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
             return null;
         }
-        File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
         File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
             ? new File(working, player.getUniqueId().toString()) : working;
         File f;
@@ -230,7 +230,7 @@ public class ClipboardFormats {
         }
         if (f == null || !f.exists()) {
             if (!input.contains("../")) {
-                dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+                dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
                 f = MainUtil.resolve(dir, input, format, true);
             }
         }

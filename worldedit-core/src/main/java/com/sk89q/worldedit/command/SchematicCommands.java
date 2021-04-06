@@ -189,7 +189,7 @@ public class SchematicCommands {
             uri = URI.create(fileName);
         } else {
             final LocalConfiguration config = this.worldEdit.getConfiguration();
-            File working = this.worldEdit.getWorkingDirectoryFile(config.saveDir);
+            File working = this.worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
             File root = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
             uri = new File(root, fileName).toURI();
         }
@@ -248,7 +248,7 @@ public class SchematicCommands {
                 in = Channels.newInputStream(byteChannel);
                 uri = url.toURI();
             } else {
-                File saveDir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+                File saveDir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
                 File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(saveDir, actor.getUniqueId().toString()) : saveDir;
                 File file;
                 if (filename.startsWith("#")) {
@@ -279,7 +279,7 @@ public class SchematicCommands {
                 }
                 if (file == null || !file.exists()) {
                     if (!filename.contains("../")) {
-                        dir = this.worldEdit.getWorkingDirectoryFile(config.saveDir);
+                        dir = this.worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
                         file = MainUtil.resolve(dir, filename, format, false);
                     }
                 }
@@ -330,7 +330,7 @@ public class SchematicCommands {
                          boolean global) throws WorldEditException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
-        File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
 
         if (!global && Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS) {
             dir = new File(dir, actor.getUniqueId().toString());
@@ -350,7 +350,7 @@ public class SchematicCommands {
                 return;
             }
             if (filename.startsWith("../")) {
-                dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+                dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
                 filename = filename.substring(3);
             }
         }
@@ -402,7 +402,7 @@ public class SchematicCommands {
     @CommandPermissions({"worldedit.schematic.move", "worldedit.schematic.move.other"})
     public void move(Player player, LocalSession session, String directory) throws WorldEditException, IOException {
         LocalConfiguration config = worldEdit.getConfiguration();
-        File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
         File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
         File destDir = new File(dir, directory);
         if (!MainUtil.isInSubDirectory(working, destDir)) {
@@ -510,7 +510,7 @@ public class SchematicCommands {
         }
         String pageCommand = "/" + arguments.get();
         LocalConfiguration config = worldEdit.getConfiguration();
-        File dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
 
         String schemCmd = "//schematic";
         String loadSingle = schemCmd + " load";
@@ -628,7 +628,7 @@ public class SchematicCommands {
                        @Arg(desc = "File name.")
                            String filename) throws WorldEditException, IOException {
         LocalConfiguration config = worldEdit.getConfiguration();
-        File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
         File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, actor.getUniqueId().toString()) : working;
         List<File> files = new ArrayList<>();
 
