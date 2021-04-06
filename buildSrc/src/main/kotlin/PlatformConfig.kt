@@ -124,7 +124,7 @@ fun Project.applyShadowConfiguration() {
 
 val CLASSPATH = listOf("truezip", "truevfs", "js")
     .map { "$it.jar" }
-    .flatMap { listOf(it, "WorldEdit/$it") }
+    .flatMap { listOf(it, "FastAsyncWorldEdit/$it") }
     .joinToString(separator = " ")
 
 sealed class WorldEditKind(
