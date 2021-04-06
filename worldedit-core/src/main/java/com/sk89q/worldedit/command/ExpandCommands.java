@@ -111,7 +111,7 @@ public class ExpandCommands {
             long newSize = region.getVolume();
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
             long changeSize = newSize - oldSize;
-            actor.printInfo(
+            actor.print(
                     Caption.of("worldedit.expand.expanded.vert", TextComponent.of(changeSize))
             );
         } catch (RegionOperationException e) {

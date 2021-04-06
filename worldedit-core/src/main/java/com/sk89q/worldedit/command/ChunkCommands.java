@@ -102,8 +102,8 @@ public class ChunkCommands {
                             @ArgFlag(name = 'p', desc = "Page number.", def = "1") int page) throws WorldEditException {
         final Region region = session.getSelection(world);
 
-        actor.print(Caption.of("worldedit.listchunks.listfor", TextComponent.of(actor.getName())));
         actor.print(new ChunkListPaginationBox(region).create(page));
+        actor.print(Caption.of("worldedit.listchunks.listfor", TextComponent.of(actor.getName())));
     }
 
     @Command(
@@ -177,10 +177,11 @@ public class ChunkCommands {
 
     private static class ChunkListPaginationBox extends PaginationBox {
         //private final Region region;
-        private final List<BlockVector2> chunks = null;
+        private final List<BlockVector2> chunks;
 
         ChunkListPaginationBox(Region region) {
             super("Selected Chunks", "/listchunks -p %page%");
+            this.chunks = new ArrayList<>(region.getChunks());
         }
 
         @Override

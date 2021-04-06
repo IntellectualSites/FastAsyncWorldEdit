@@ -772,14 +772,13 @@ public final class WorldEdit {
         } catch (ScriptException e) {
             // non-exceptional return check
             if (!(Throwables.getRootCause(e) instanceof ReturnException)) {
-                player.print(Caption.of("worldedit.script.failed", TextComponent.of(e.getMessage(), TextColor.WHITE)));
+                player.print(Caption.of("worldedit.script.failed", TextComponent.of(e.getMessage())));
                 logger.warn("Failed to execute script", e);
             }
         } catch (NumberFormatException | WorldEditException e) {
             throw e;
         } catch (Throwable e) {
-            player.print(Caption.of("worldedit.script.failed-console", TextComponent.of(e.getClass().getCanonicalName(),
-                    TextColor.WHITE)));
+            player.print(Caption.of("worldedit.script.failed-console", TextComponent.of(e.getClass().getCanonicalName())));
             logger.warn("Failed to execute script", e);
         } finally {
             for (EditSession editSession : scriptContext.getEditSessions()) {

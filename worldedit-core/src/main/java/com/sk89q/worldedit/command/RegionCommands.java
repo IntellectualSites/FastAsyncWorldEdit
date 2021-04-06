@@ -212,7 +212,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Player player, EditSession editSession, @Selection Region region) {
-        player.print(TextComponent.of("Temporarily not working"));
+        player.print(Caption.of("fawe.info.temporarily-not-working"));
     }
 
     @Command(
@@ -221,7 +221,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Player player, @Selection Region region) {
-        player.printInfo(TextComponent.of("Temporarily not working"));
+        player.print(Caption.of("fawe.info.temporarily-not-working"));
     }
 
     @Command(

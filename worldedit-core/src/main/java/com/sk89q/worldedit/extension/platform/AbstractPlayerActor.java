@@ -667,13 +667,13 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public File openFileOpenDialog(String[] extensions) {
-        printError(Caption.of("worldedit.platform.no-file-dialog"));
+        print(Caption.of("worldedit.platform.no-file-dialog"));
         return null;
     }
 
     @Override
     public File openFileSaveDialog(String[] extensions) {
-        printError(Caption.of("worldedit.platform.no-file-dialog"));
+        print(Caption.of("worldedit.platform.no-file-dialog"));
         return null;
     }
 

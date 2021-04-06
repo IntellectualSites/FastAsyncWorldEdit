@@ -53,6 +53,7 @@ import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -93,7 +94,6 @@ import java.util.regex.Pattern;
 import static com.boydti.fawe.util.ReflectionUtils.as;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-
 
 /**
  * Commands that work with schematic files.
@@ -300,9 +300,9 @@ public class SchematicCommands {
             format.hold(actor, uri, in);
             actor.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
         } catch (IllegalArgumentException e) {
-            actor.printError("Unknown filename: " + filename);
+            actor.print(Caption.of("worldedit.schematic.unknown-filename", TextComponent.of(filename)));
         } catch (URISyntaxException | IOException e) {
-            actor.printError("File could not be read or it does not exist: " + e.getMessage());
+            actor.print(TranslatableComponent.of("worldedit.schematic.file-not-exist", TextComponent.of(e.getMessage())));
             LOGGER.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {
@@ -316,7 +316,7 @@ public class SchematicCommands {
 
     @Command(
         name = "save",
-        desc = "Save a schematic into your clipboard"
+        desc = "Save your clipboard into a schematic file"
     )
     @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other"})
     public void save(Actor actor, LocalSession session,
@@ -326,7 +326,7 @@ public class SchematicCommands {
                          String formatName,
                      @Switch(name = 'f', desc = "Overwrite an existing file.")
                          boolean allowOverwrite,
-                     @Switch(name = 'g', desc = "//TODO")
+                     @Switch(name = 'g', desc = "Bypasses per-player-schematic folders")
                          boolean global) throws WorldEditException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
@@ -360,7 +360,7 @@ public class SchematicCommands {
         boolean overwrite = f.exists();
         if (overwrite) {
             if (!actor.hasPermission("worldedit.schematic.delete")) {
-                throw new StopExecutionException(TextComponent.of("That schematic already exists!"));
+                throw new StopExecutionException(TranslatableComponent.of("worldedit.schematic.already-exists"));
             }
             if (other) {
                 if (!actor.hasPermission("worldedit.schematic.delete.other")) {
@@ -390,7 +390,7 @@ public class SchematicCommands {
             .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
             .sendMessageAfterDelay(Caption.of("worldedit.schematic.save.saving"))
             .onSuccess(filename + " saved" + (overwrite ? " (overwriting previous file)." : "."), null)
-            .onFailure("Failed to save schematic", worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
+            .onFailure(TranslatableComponent.of("worldedit.schematic.failed-to-save"), worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
             .buildAndExec(worldEdit.getExecutorService());
     }
 
@@ -406,7 +406,7 @@ public class SchematicCommands {
         File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;
         File destDir = new File(dir, directory);
         if (!MainUtil.isInSubDirectory(working, destDir)) {
-            player.printError("Directory " + destDir + " does not exist!");
+            player.print(Caption.of("worldedit.schematic.directory-does-not-exist", TextComponent.of(String.valueOf(destDir))));
             return;
         }
         if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS && !MainUtil.isInSubDirectory(dir, destDir) && !player.hasPermission("worldedit.schematic.move.other")) {
@@ -420,7 +420,7 @@ public class SchematicCommands {
             return;
         }
         if (!destDir.exists() && !destDir.mkdirs()) {
-            player.printError("Creation of " + destDir + " failed! (check file permissions)");
+            player.print(Caption.of("worldedit.schematic.file-perm-fail", TextComponent.of(String.valueOf(destDir))));
             return;
         }
         for (File source : sources) {
@@ -483,7 +483,7 @@ public class SchematicCommands {
                 first = false;
             }
             first = true;
-            actor.printInfo(TextComponent.of(builder.toString()));
+            actor.print(TextComponent.of(builder.toString()));
         }
     }
 
@@ -506,7 +506,7 @@ public class SchematicCommands {
                      @Arg(name = "filter", desc = "Filter for schematics", def = "all")
                          String filter, Arguments arguments) throws WorldEditException {
         if (oldFirst && newFirst) {
-            throw new StopExecutionException(TextComponent.of("Cannot sort by oldest and newest."));
+            throw new StopExecutionException(Caption.of("worldedit.schematic.sorting-old-new"));
         }
         String pageCommand = "/" + arguments.get();
         LocalConfiguration config = worldEdit.getConfiguration();
@@ -536,50 +536,37 @@ public class SchematicCommands {
 
         List<Component> components = UtilityCommands.entryToComponent(dir, entries, isLoaded,
             (name, path, type, loaded) -> {
-                TextColor color = TextColor.GRAY;
-                switch (type) {
-                    case URL:
-                        color = TextColor.DARK_GRAY;
-                        break;
-                    case FILE:
-                        color = TextColor.GREEN;
-                        break;
-                    case DIRECTORY:
-                        color = TextColor.GOLD;
-                        break;
-                }
-
                 TextComponentProducer msg = new TextComponentProducer();
 
-                msg.append(TextComponent.of(" - ", color));
+                msg.append(Caption.of("worldedit.schematic.dash.symbol"));
 
                 if (loaded) {
-                    msg.append(TextComponent.of("[-]", TextColor.RED)
+                    msg.append(Caption.of("worldedit.schematic.minus.symbol")
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, unload + " " + path))
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Unload"))));
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, Caption.of("worldedit.schematic.unload"))));
                 } else {
-                    msg.append(TextComponent.of("[+]", TextColor.GREEN)
+                    msg.append(Caption.of("worldedit.schematic.plus.symbol")
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadMulti + " " + path))
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Add to clipboard"))));
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, Caption.of("worldedit.schematic.clipboard"))));
                 }
                 if (type != UtilityCommands.URIType.DIRECTORY) {
-                    msg.append(TextComponent.of("[X]", TextColor.DARK_RED)
+                    msg.append(Caption.of("worldedit.schematic.x.symbol")
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, delete + " " + path))
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("delete")))
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, Caption.of("worldedit.schematic.delete")))
                     );
                 } else if (hasShow) {
-                    msg.append(TextComponent.of("[O]", TextColor.DARK_AQUA)
+                    msg.append(Caption.of("worldedit.schematic.0.symbol")
                         .clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, showCmd + " " + path))
-                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("visualize")))
+                        .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, Caption.of("worldedit.schematic.visualize")))
                     );
                 }
-                TextComponent msgElem = TextComponent.of(name, color);
+                TextComponent msgElem = TextComponent.of(name);
                 if (type != UtilityCommands.URIType.DIRECTORY) {
                     msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, loadSingle + " " + path));
-                    msgElem = msgElem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Load")));
+                    msgElem = msgElem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, Caption.of("worldedit.schematic.load")));
                 } else {
                     msgElem = msgElem.clickEvent(ClickEvent.of(ClickEvent.Action.SUGGEST_COMMAND, list + " " + path));
-                    msgElem = msgElem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("List")));
+                    msgElem = msgElem.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, Caption.of("worldedit.schematic.list")));
                 }
                 msg.append(msgElem);
 
@@ -929,7 +916,7 @@ public class SchematicCommands {
         private final File[] files;
 
         SchematicPaginationBox(String rootDir, File[] files, String pageCommand) {
-            super("Available schematics", pageCommand);
+            super("worldedit.schematic.available", pageCommand);
             this.prefix = rootDir == null ? "" : rootDir;
             this.files = files;
         }
@@ -947,14 +934,12 @@ public class SchematicCommands {
 
             return TextComponent.builder()
                 .content("")
-                .append(TextComponent.of("[L]")
-                    .color(TextColor.GOLD)
+                .append(TranslatableComponent.of("worldedit.schematic.load.symbol")
                     .clickEvent(ClickEvent
                         .of(ClickEvent.Action.RUN_COMMAND, "/schem load \"" + path + "\""))
-                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to load"))))
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TranslatableComponent.of("worldedit.schematic.click-to-load"))))
                 .append(TextComponent.space())
                 .append(TextComponent.of(path)
-                    .color(TextColor.DARK_GREEN)
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of(format))))
                 .build();
         }

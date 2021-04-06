@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.internal.command;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -26,9 +27,9 @@ import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.NoInputCommandParameters;
@@ -50,14 +51,13 @@ import static java.util.stream.Collectors.toList;
 
 public class CommandUtil {
 
-    private static final Component DEPRECATION_MARKER = TextComponent.of("This command is deprecated.");
+    private static final Component DEPRECATION_MARKER = Caption.of("worldedit.command.deprecation");
 
     private static Component makeDeprecatedFooter(String reason, Component replacement) {
         return TextComponent.builder()
             .append(DEPRECATION_MARKER)
             .append(" " + reason + ".")
             .append(TextComponent.newline())
-            .append(replacement.color(TextColor.GOLD).decoration(TextDecoration.ITALIC, true))
             .build();
     }
 
@@ -85,11 +85,9 @@ public class CommandUtil {
     }
 
     public static Component createNewCommandReplacementText(String suggestedCommand) {
-        return TextComponent.builder("Please use ", TextColor.GOLD)
+        return TranslatableComponent.builder("worldedit.command.deprecation-message")
             .append(TextComponent.of(suggestedCommand)
-                .decoration(TextDecoration.UNDERLINED, true)
                 .clickEvent(ClickEvent.suggestCommand(suggestedCommand)))
-            .append(" instead.")
             .build();
     }
 

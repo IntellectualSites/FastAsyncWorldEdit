@@ -433,10 +433,10 @@ public interface Player extends Entity, Actor {
         } catch (Exception event) {
             printError(TextComponent.of("====== INVALID CLIPBOARD ======"));
             event.printStackTrace();
-            printError(Caption.of("fawe.error.stacktrace"));
-            printError(Caption.of("fawe.error.no-failure"));
-            printError(Caption.of("File: ", TextComponent.of(file.getName()), TextComponent.of(" (len:"), TextComponent.of(file.length()), TextComponent.of(")")));
-            printError(Caption.of("fawe.error.stacktrace"));
+            print(Caption.of("fawe.error.stacktrace"));
+            print(Caption.of("fawe.error.no-failure"));
+            print(Caption.of("File: ", TextComponent.of(file.getName()), TextComponent.of(" (len:"), TextComponent.of(file.length()), TextComponent.of(")")));
+            print(Caption.of("fawe.error.stacktrace"));
         }
     }
 }

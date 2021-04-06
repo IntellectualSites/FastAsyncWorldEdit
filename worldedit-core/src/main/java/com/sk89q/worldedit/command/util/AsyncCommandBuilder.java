@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.util;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -29,6 +30,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.task.FutureForwardingTask;
 import com.sk89q.worldedit.util.task.Supervisor;
@@ -162,18 +164,18 @@ public final class AsyncCommandBuilder<T> {
 
                         if (message == null) {
                             if (Strings.isNullOrEmpty(converted.getMessage())) {
-                                message = TextComponent.of("Unknown error.");
+                                message = TranslatableComponent.of("worldedit.error.unknown");
                             } else {
                                 message = converted.getRichMessage();
                             }
                         }
-                        sender.printError(failure.append(TextComponent.of(": ")).append(message));
+                        sender.print(failure.append(TextComponent.of(": ")).append(message));
                     }
                 } else {
                     throw orig;
                 }
             } catch (Throwable unknown) {
-                sender.printError(failure.append(TextComponent.of(": Unknown error. Please see console.")));
+                sender.print(failure.append(Caption.of("worldedit.command.error.report")));
                 LOGGER.error("Uncaught exception occurred in task: " + description, orig);
             }
         }

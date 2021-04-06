@@ -178,11 +178,11 @@ public class GeneralCommands {
         }
 
         session.setBlockChangeLimit(limit);
-        Component component = TextComponent.empty().append(TranslatableComponent.of("worldedit.limit.set", TextComponent.of(limit)));
+        Component component = TextComponent.empty().append(Caption.of("worldedit.limit.set", TextComponent.of(limit)));
         if (limit != config.defaultChangeLimit) {
-            component.append(TextComponent.space()).append(TranslatableComponent.of("worldedit.limit.return-to-default", TextColor.GRAY));
+            component.append(TextComponent.space()).append(Caption.of("worldedit.limit.return-to-default"));
         }
-        actor.printInfo(component);
+        actor.print(component);
     }
 
     @Command(
@@ -205,11 +205,11 @@ public class GeneralCommands {
         }
 
         session.setTimeout(limit);
-        Component component = TextComponent.empty().append(TranslatableComponent.of("worldedit.timeout.set", TextComponent.of(limit)));
+        Component component = TextComponent.empty().append(Caption.of("worldedit.timeout.set", TextComponent.of(limit)));
         if (limit != config.calculationTimeout) {
-            component.append(TranslatableComponent.of("worldedit.timeout.return-to-default", TextColor.GRAY));
+            component.append(TranslatableComponent.of("worldedit.timeout.return-to-default"));
         }
-        actor.printInfo(component);
+        actor.print(component);
     }
 
     @Command(
@@ -439,7 +439,7 @@ public class GeneralCommands {
         }
 
         WorldEditAsyncCommandBuilder.createAndSendMessage(actor, new ItemSearcher(search, blocksOnly, itemsOnly, page),
-                TranslatableComponent.of("worldedit.searchitem.searching"));
+                Caption.of("worldedit.searchitem.searching"));
     }
 
     private static class ItemSearcher implements Callable<Component> {

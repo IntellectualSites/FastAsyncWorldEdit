@@ -312,14 +312,14 @@ public class SelectionCommands {
     )
     @CommandPermissions("worldedit.wand.toggle")
     public void toggleWand(Player player) {
-        player.printInfo(
+        player.print(
                 Caption.of(
                         "worldedit.wand.selwand.now.tool",
-                        TextComponent.of("/tool none", TextColor.AQUA).clickEvent(
+                        TextComponent.of("/tool none").clickEvent(
                                 ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/tool none")),
-                        TextComponent.of("/tool selwand", TextColor.AQUA).clickEvent(
+                        TextComponent.of("/tool selwand").clickEvent(
                                 ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "/tool selwand")),
-                        TextComponent.of("//wand", TextColor.AQUA).clickEvent(
+                        TextComponent.of("//wand").clickEvent(
                                 ClickEvent.of(ClickEvent.Action.RUN_COMMAND, "//wand"))
                 )
         );
@@ -654,8 +654,8 @@ public class SelectionCommands {
                 box.appendCommand("sphere", Caption.of("worldedit.select.sphere.description"), "//sel sphere");
                 box.appendCommand("cyl", Caption.of("worldedit.select.cyl.description"), "//sel cyl");
                 box.appendCommand("convex", Caption.of("worldedit.select.convex.description"), "//sel convex");
-                box.appendCommand("polyhedral", "Select a hollow polyhedral", "//sel polyhedral");
-                box.appendCommand("fuzzy[=<mask>]", "Select all connected blocks (magic wand)", "//sel fuzzy[=<mask>]");
+                box.appendCommand("polyhedral", Caption.of("fawe.selection.sel.polyhedral"), "//sel polyhedral");
+                box.appendCommand("fuzzy[=<mask>]", Caption.of("fawe.selection.sel.fuzzy-instruction"), "//sel fuzzy[=<mask>]");
 
                 actor.print(box.create(1));
                 return;
@@ -718,13 +718,13 @@ public class SelectionCommands {
 
             final BlockState state = c.getID();
             final BlockType blockType = state.getBlockType();
-            Component blockName = blockType.getRichName().color(TextColor.LIGHT_PURPLE);
+            Component blockName = blockType.getRichName();
             TextComponent toolTip;
             if (separateStates && state != blockType.getDefaultState()) {
-                toolTip = TextComponent.of(state.getAsString(), TextColor.GRAY);
-                blockName = blockName.append(TextComponent.of("*", TextColor.LIGHT_PURPLE));
+                toolTip = TextComponent.of(state.getAsString());
+                blockName = blockName.append(TextComponent.of("*"));
             } else {
-                toolTip = TextComponent.of(blockType.getId(), TextColor.GRAY);
+                toolTip = TextComponent.of(blockType.getId());
             }
             blockName = blockName.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, toolTip));
             line.append(blockName);
