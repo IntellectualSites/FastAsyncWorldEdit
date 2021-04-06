@@ -279,7 +279,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         config.load();
         // Create schematics folder
         WorldEdit worldEdit = WorldEdit.getInstance();
-        File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().saveDir);
+        File dir = worldEdit.getWorkingDirectoryPath(worldEdit.getConfiguration().saveDir).toFile();
         dir.mkdirs();
     }
 
