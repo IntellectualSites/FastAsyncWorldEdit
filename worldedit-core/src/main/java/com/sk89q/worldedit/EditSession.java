@@ -1985,8 +1985,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         double threshold = 0.5;
 
-        LocalBlockVectorSet set = new LocalBlockVectorSet();
-
         double nextXn = 0;
         double dx;
         double dy;

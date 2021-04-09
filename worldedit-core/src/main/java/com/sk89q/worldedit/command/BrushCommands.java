@@ -221,13 +221,16 @@ public class BrushCommands {
         desc = "Creates a circle, which revolves around your facing direction"
     )
     @CommandPermissions("worldedit.brush.sphere")
-    public void circleBrush(Player player, InjectedValueAccess context,
+    public void circleBrush(InjectedValueAccess context,
                             @Arg(desc = "Pattern")
                                 Pattern fill,
                             @Arg(desc = "The radius to sample for blending", def = "5")
-                                Expression radius) throws WorldEditException {
+                                Expression radius,
+                            @Arg(name = "filled", desc = "Whether the circle should be filled", def = "false")
+                                boolean filled
+                            ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        set(context, new CircleBrush(player)).setSize(radius).setFill(fill);
+        set(context, new CircleBrush(filled)).setSize(radius).setFill(fill);
     }
 
     @Command(

@@ -10,16 +10,22 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 public class CircleBrush implements Brush {
-    private final Player player;
 
-    public CircleBrush(Player player) {
-        this.player = player;
+    private final boolean filled;
+
+    public CircleBrush(boolean filled) {
+
+        this.filled = filled;
     }
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+        Player player = editSession.getPlayer();
+        if (player == null) {
+            return;
+        }
         Vector3 normal = position.toVector3().subtract(player.getLocation());
-        editSession.makeCircle(position, pattern, size, size, size, false, normal);
+        editSession.makeCircle(position, pattern, size, size, size, filled, normal);
     }
 
     private Vector3 any90Rotate(Vector3 normal) {
