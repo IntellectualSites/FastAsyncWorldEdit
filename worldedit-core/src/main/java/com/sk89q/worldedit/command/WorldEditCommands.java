@@ -144,7 +144,7 @@ public class WorldEditCommands {
     public void report(Actor actor) throws WorldEditException {
         String dest;
         try {
-            final File logFile = new File(Fawe.imp().getDirectory(), "../../logs/latest.log");
+            final File logFile = new File("logs/latest.log");
             final File config = new File(Fawe.imp().getDirectory(), "config.yml");
             final File legacyConfig = new File(Fawe.imp().getDirectory(), "config-legacy.yml");
             dest = IncendoPaster.debugPaste(logFile, Fawe.imp().getDebugInfo(), config, legacyConfig);
