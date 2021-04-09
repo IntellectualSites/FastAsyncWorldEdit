@@ -223,6 +223,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final Extent bypassHistory;
     private Extent bypassAll;
 
+    private final int minY;
     private final int maxY;
     private final List<WatchdogTickingExtent> watchdogExtents = new ArrayList<>(2);
 
@@ -263,6 +264,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.limit = builder.getLimit().copy();
         this.player = builder.getPlayer();
         this.changeSet = builder.getChangeTask();
+        this.minY = world.getMinY();
         this.maxY = world.getMaxY();
         this.blockBag = builder.getBlockBag();
         this.history = changeSet != null;
@@ -796,12 +798,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        if (position.getY() < this.minY || position.getY() > this.maxY) {
+            return false;
+        }
         this.changes++;
         return this.getExtent().setBiome(position, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        if (y < this.minY || y > this.maxY) {
+            return false;
+        }
         this.changes++;
         return this.getExtent().setBiome(x, y, z, biome);
     }
@@ -859,7 +867,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, Stage stage) throws WorldEditException {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -885,7 +893,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public <B extends BlockStateHolder<B>> boolean rawSetBlock(BlockVector3 position, B block) {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -905,7 +913,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return whether the block changed
      */
     public <B extends BlockStateHolder<B>> boolean smartSetBlock(BlockVector3 position, B block) {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -920,7 +928,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Override
     @Deprecated
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -937,7 +945,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
-        if (y < 0 || y > 255) {
+        if (y < this.minY || y > this.maxY) {
             return false;
         }
 
@@ -960,7 +968,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public boolean setBlock(int x, int y, int z, Pattern pattern) {
-        if (y < 0 || y > 255) {
+        if (y < this.minY || y > this.maxY) {
             return false;
         }
 
@@ -982,7 +990,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public boolean setBlock(BlockVector3 position, Pattern pattern) throws MaxChangedBlocksException {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
