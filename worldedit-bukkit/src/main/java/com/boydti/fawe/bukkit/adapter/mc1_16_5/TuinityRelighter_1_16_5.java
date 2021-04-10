@@ -55,8 +55,9 @@ public class TuinityRelighter_1_16_5 implements Relighter {
         TaskManager.IMP.task(() ->
                 {
                     try {
-                        relight.invoke(world.getChunkProvider().getLightEngine(),
-                                new HashSet<>(chunks),
+                        // cast is required for invokeExact
+                        int unused = (int) relight.invokeExact(world.getChunkProvider().getLightEngine(),
+                                (Set<?>) new HashSet<>(chunks), // explicit cast to make invokeExact work
                                 (Consumer<?>) coord -> sendChunk(cx, cz), // send chunk after lighting was done
                                 nothingIntConsumer
                                 );
