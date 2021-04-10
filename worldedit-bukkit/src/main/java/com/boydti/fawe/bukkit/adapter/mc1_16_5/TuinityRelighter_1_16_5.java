@@ -8,6 +8,7 @@ import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.util.TaskManager;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R3.LightEngineThreaded;
 import net.minecraft.server.v1_16_R3.MCUtil;
 import net.minecraft.server.v1_16_R3.WorldServer;
 
@@ -24,28 +25,31 @@ import java.util.function.IntConsumer;
 public class TuinityRelighter_1_16_5 implements Relighter {
 
     private static final IntConsumer nothingIntConsumer = i -> {};
+    private static final MethodHandle relight;
 
     private final WorldServer world;
-    private final MethodHandle relight;
     private final ReentrantLock lock = new ReentrantLock();
 
     private final IQueueExtent<IQueueChunk> queue;
 
-    public TuinityRelighter_1_16_5(WorldServer world, IQueueExtent<IQueueChunk> queue) {
-        this.queue = queue;
-        MethodHandle methodHandle = null;
+    static {
+        MethodHandle tmp = null;
         try {
-            Method relightMethod = world.getChunkProvider().getLightEngine().getClass().getMethod(
+            Method relightMethod = LightEngineThreaded.class.getMethod(
                     "relight",
                     Set.class,
                     Consumer.class,
                     IntConsumer.class
-                    );
-            methodHandle = MethodHandles.lookup().unreflect(relightMethod);
+            );
+            tmp = MethodHandles.lookup().unreflect(relightMethod);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             e.printStackTrace();
         }
-        this.relight = methodHandle;
+        relight = tmp;
+    }
+
+    public TuinityRelighter_1_16_5(WorldServer world, IQueueExtent<IQueueChunk> queue) {
+        this.queue = queue;
         this.world = world;
     }
 
