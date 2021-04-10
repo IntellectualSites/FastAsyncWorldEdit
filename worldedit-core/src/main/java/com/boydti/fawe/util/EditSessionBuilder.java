@@ -4,10 +4,10 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
 import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
 import com.boydti.fawe.beta.implementation.lighting.RelightProcessor;
 import com.boydti.fawe.beta.implementation.lighting.Relighter;
+import com.boydti.fawe.beta.implementation.processors.HeightmapProcessor;
 import com.boydti.fawe.beta.implementation.processors.LimitExtent;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.Caption;
@@ -35,7 +35,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -43,14 +42,13 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -412,6 +410,10 @@ public class EditSessionBuilder {
                 extent.addProcessor(new RelightProcessor(relighter));
             } else {
                 relighter = NullRelighter.INSTANCE;
+            }
+            // TODO dirty workaround, NMSRelighter and HeightmapProcessor don't work well together
+            if (Settings.IMP.LIGHTING.MODE == 0 || relighter.getClass().getSimpleName().startsWith("Tuinity")) {
+                extent.addProcessor(new HeightmapProcessor(world));
             }
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
