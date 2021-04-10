@@ -274,7 +274,7 @@
     "worldedit.setbiome.changed": "Biomes were changed in {0} columns. You may have to rejoin your game (or close and reopen your world) to see a change.",
 
     "worldedit.drawsel.disabled": "Server CUI disabled.",
-    "worldedit.drawsel.enabled": "Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32.",
+    "worldedit.drawsel.enabled": "Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32 on versions lower than 1.16, otherwise 48x48x48.",
     "worldedit.drawsel.disabled.already": "Server CUI already disabled.",
     "worldedit.drawsel.enabled.already": "Server CUI already enabled.",
     "worldedit.limit.too-high": "Your maximum allowable limit is {0}.",
@@ -297,6 +297,7 @@
     "worldedit.gmask.set": "Global mask set.",
     "worldedit.toggleplace.pos1": "Now placing at pos #1.",
     "worldedit.toggleplace.player": "Now placing at the block you stand in.",
+    "worldedit.toggleplace.not-locatable": "Cannot toggle placing in this context.",
     "worldedit.searchitem.too-short": "Enter a longer search string (len > 2).",
     "worldedit.searchitem.either-b-or-i": "You cannot use both the 'b' and 'i' flags simultaneously.",
     "worldedit.searchitem.searching": "(Please wait... searching items.)",

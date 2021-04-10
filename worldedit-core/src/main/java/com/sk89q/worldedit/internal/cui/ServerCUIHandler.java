@@ -28,6 +28,7 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.RegionSelector;
@@ -62,6 +63,8 @@ public class ServerCUIHandler {
     public static BaseBlock createStructureBlock(Player player) {
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
         RegionSelector regionSelector = session.getRegionSelector(player.getWorld());
+
+        int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
 
         int posX;
         int posY;
@@ -112,9 +115,16 @@ public class ServerCUIHandler {
             return null;
         }
 
-        if (width > 32 || length > 32 || height > 32) {
-            // Structure blocks have a limit of 32x32x32
-            return null;
+        if (dataVersion >= 2526) {
+            if (width > 48 || length > 48 || height > 48) {
+                // 20w16a+ allows structure blocks up to 48 per axis
+                return null;
+            } else {
+                if (width > 32 || length > 32 || height > 32) {
+                    // Structure blocks on versions <= 20w16a have a limit of 32x32x32
+                    return null;
+                }
+            }
         }
 
         // Borrowed this math from FAWE
@@ -132,9 +142,16 @@ public class ServerCUIHandler {
         posY -= y;
         posZ -= z;
 
-        if (Math.abs(posX) > 32 || Math.abs(posY) > 32 || Math.abs(posZ) > 32) {
-            // Structure blocks have a limit
-            return null;
+        if (dataVersion >= 2526) {
+            if (Math.abs(posX) > 48 || Math.abs(posY) > 48 || Math.abs(posZ) > 48) {
+                // 20w16a+ allows structure blocks up to 48 per axis
+                return null;
+            } else {
+                if (Math.abs(posX) > 32 || Math.abs(posY) > 32 || Math.abs(posZ) > 32) {
+                    // Structure blocks on versions <= 20w16a have a limit of 32x32x32
+                    return null;
+                }
+            }
         }
 
         structureTag.put("name", new StringTag("worldedit:" + player.getName()));
