@@ -34,6 +34,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -405,8 +406,9 @@ public class EditSessionBuilder {
             }
             // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks
             if (placeChunks && ((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.IMP.LIGHTING.MODE > 0))) {
-                relighter = new NMSRelighter(queue, Settings.IMP.LIGHTING.DO_HEIGHTMAPS,
-                    relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE));
+                relighter = WorldEdit.getInstance().getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getRelighterFactory().createRelighter(relightMode, world, queue);
                 extent.addProcessor(new RelightProcessor(relighter));
             } else {
                 relighter = NullRelighter.INSTANCE;

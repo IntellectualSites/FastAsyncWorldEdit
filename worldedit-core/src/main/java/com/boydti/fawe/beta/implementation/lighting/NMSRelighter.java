@@ -823,7 +823,8 @@ public class NMSRelighter implements Relighter {
         }
     }
 
-    public synchronized void flush() {
+    @Override
+    public synchronized void close() {
         Iterator<Map.Entry<Long, Integer>> iter = chunksToSend.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<Long, Integer> entry = iter.next();

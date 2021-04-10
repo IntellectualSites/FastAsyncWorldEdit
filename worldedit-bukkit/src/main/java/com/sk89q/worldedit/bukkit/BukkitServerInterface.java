@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
+import com.boydti.fawe.bukkit.NMSRelighterFactory;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.TuinityRelighterFactory_1_16_5;
 import com.google.common.collect.Sets;
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;
@@ -60,6 +63,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     public final WorldEditPlugin plugin;
     private final CommandRegistration dynamicCommands;
     private final LazyReference<Watchdog> watchdog;
+    private final RelighterFactory religherFactory;
     private boolean hookingEvents;
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
@@ -74,6 +78,14 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
             }
             return null;
         });
+        RelighterFactory tempFactory;
+        try {
+            Class.forName("com.tuinity.tuinity.config.TuinityConfig");
+            tempFactory = new TuinityRelighterFactory_1_16_5();
+        } catch (ClassNotFoundException e) {
+            tempFactory = new NMSRelighterFactory();
+        }
+        this.religherFactory = tempFactory;
     }
 
     CommandRegistration getDynamicCommands() {
@@ -242,6 +254,11 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
             return plugin.getBukkitImplAdapter().getSupportedSideEffects();
         }
         return SUPPORTED_SIDE_EFFECTS;
+    }
+
+    @Override
+    public RelighterFactory getRelighterFactory() {
+        return this.religherFactory;
     }
 
     public void unregisterCommands() {

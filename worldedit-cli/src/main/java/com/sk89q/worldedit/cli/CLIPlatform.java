@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.cli;
 
+import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
+import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
@@ -158,6 +160,11 @@ class CLIPlatform extends AbstractPlatform {
     @Override
     public Set<SideEffect> getSupportedSideEffects() {
         return ImmutableSet.of();
+    }
+
+    @Override
+    public RelighterFactory getRelighterFactory() {
+        return (_a, _b, _c) -> NullRelighter.INSTANCE;
     }
 
     public void addWorld(World world) {

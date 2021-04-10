@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -206,4 +207,6 @@ public interface Platform extends Keyed {
      * @return A set of supported side effects
      */
     Set<SideEffect> getSupportedSideEffects();
+
+    RelighterFactory getRelighterFactory();
 }
