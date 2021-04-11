@@ -211,7 +211,7 @@ public interface Platform extends Keyed {
 
     /**
      * Get the {@link RelighterFactory} that can be used to obtain
-     * {@link com.boydti.fawe.beta.implementation.lighting.Relighter}s.     *
+     * {@link com.boydti.fawe.beta.implementation.lighting.Relighter}s.
      *
      * @return the relighter factory to be used.
      */
