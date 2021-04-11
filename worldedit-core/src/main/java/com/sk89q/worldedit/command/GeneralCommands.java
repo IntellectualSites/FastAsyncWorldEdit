@@ -44,6 +44,7 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
@@ -405,11 +406,15 @@ public class GeneralCommands {
         desc = "Switch between your position and pos1 for placement"
     )
     @CommandPermissions("worldedit.toggleplace")
-    public void togglePlace(Player player, LocalSession session) {
+    public void togglePlace(Actor actor, LocalSession session) {
+        if (!(actor instanceof Locatable)) {
+            actor.print(Caption.of("worldedit.toggleplace.not-locatable"));
+            return;
+        }
         if (session.togglePlacementPosition()) {
-            player.print(Caption.of("worldedit.toggleplace.pos1"));
+            actor.print(Caption.of("worldedit.toggleplace.pos1"));
         } else {
-            player.print(Caption.of("worldedit.toggleplace.player"));
+            actor.print(Caption.of("worldedit.toggleplace.player"));
         }
     }
 
