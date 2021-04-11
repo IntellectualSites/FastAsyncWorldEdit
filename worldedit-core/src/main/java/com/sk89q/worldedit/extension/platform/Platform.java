@@ -30,6 +30,7 @@ import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Locale;
@@ -208,5 +209,12 @@ public interface Platform extends Keyed {
      */
     Set<SideEffect> getSupportedSideEffects();
 
+    /**
+     * Get the {@link RelighterFactory} that can be used to obtain
+     * {@link com.boydti.fawe.beta.implementation.lighting.Relighter}s.     *
+     *
+     * @return the relighter factory to be used.
+     */
+    @NotNull
     RelighterFactory getRelighterFactory();
 }

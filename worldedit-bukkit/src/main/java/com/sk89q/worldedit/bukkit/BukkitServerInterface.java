@@ -35,15 +35,18 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
 import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.extension.platform.Watchdog;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.registry.Registries;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.enginehub.piston.CommandManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,6 +61,8 @@ import javax.annotation.Nullable;
 import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 public class BukkitServerInterface extends AbstractPlatform implements MultiUserPlatform {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public final Server server;
     public final WorldEditPlugin plugin;
@@ -82,8 +87,10 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         try {
             Class.forName("com.tuinity.tuinity.config.TuinityConfig");
             tempFactory = new TuinityRelighterFactory_1_16_5();
+            LOGGER.info("Using Tuinity internals for relighting");
         } catch (ClassNotFoundException e) {
             tempFactory = new NMSRelighterFactory();
+            LOGGER.info("Using FAWE for relighting");
         }
         this.religherFactory = tempFactory;
     }
@@ -257,7 +264,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     }
 
     @Override
-    public RelighterFactory getRelighterFactory() {
+    public @NotNull RelighterFactory getRelighterFactory() {
         return this.religherFactory;
     }
 

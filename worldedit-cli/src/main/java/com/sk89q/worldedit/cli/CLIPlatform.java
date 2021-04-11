@@ -32,6 +32,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -163,7 +164,7 @@ class CLIPlatform extends AbstractPlatform {
     }
 
     @Override
-    public RelighterFactory getRelighterFactory() {
+    public @NotNull RelighterFactory getRelighterFactory() {
         return (_a, _b, _c) -> NullRelighter.INSTANCE;
     }
 

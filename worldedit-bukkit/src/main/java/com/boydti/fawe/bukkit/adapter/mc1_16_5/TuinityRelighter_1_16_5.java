@@ -6,11 +6,13 @@ import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import net.minecraft.server.v1_16_R3.BlockPosition;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.LightEngineThreaded;
 import net.minecraft.server.v1_16_R3.MCUtil;
 import net.minecraft.server.v1_16_R3.WorldServer;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -23,6 +25,8 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 public class TuinityRelighter_1_16_5 implements Relighter {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final IntConsumer nothingIntConsumer = i -> {};
     private static final MethodHandle relight;
@@ -43,7 +47,8 @@ public class TuinityRelighter_1_16_5 implements Relighter {
             );
             tmp = MethodHandles.lookup().unreflect(relightMethod);
         } catch (NoSuchMethodException | IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed to locate relight method in LightEngineThreaded on Tuinity. " +
+                    "Is everything up to date?", e);
         }
         relight = tmp;
     }
@@ -66,7 +71,7 @@ public class TuinityRelighter_1_16_5 implements Relighter {
                                 nothingIntConsumer
                                 );
                     } catch (Throwable throwable) {
-                        throwable.printStackTrace();
+                        LOGGER.error("Error occurred on relighting", throwable);
                     }
                 }
         );

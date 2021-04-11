@@ -29,11 +29,13 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -55,6 +57,8 @@ import java.util.UUID;
  * FaweAPI.[some method]
  */
 public class FaweAPI {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     /**
      * Offers a lot of options for building an EditSession.
@@ -364,8 +368,8 @@ public class FaweAPI {
             } else {
                 relighter.removeLighting();
             }
-        } catch (Exception ignored) {
-
+        } catch (Exception e) {
+            LOGGER.error("Error occurred on fix lighting", e);
         }
         return count;
     }
