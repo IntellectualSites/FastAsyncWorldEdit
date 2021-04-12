@@ -169,7 +169,7 @@ public class WorldEditCommands {
                 "--------------------------------------------------------------------------------------------"));
             actor.printDebug("Thread: " + thread.getName() + " | Id: " + thread.getId() + " | Alive: " + thread.isAlive());
             for (StackTraceElement elem : entry.getValue()) {
-                actor.printDebug(TranslatableComponent.of(elem.toString()));
+                actor.printDebug(TextComponent.of(elem.toString()));
             }
         }
     }
