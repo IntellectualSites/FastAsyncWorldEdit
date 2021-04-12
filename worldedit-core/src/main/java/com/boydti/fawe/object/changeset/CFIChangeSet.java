@@ -11,7 +11,11 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 public class CFIChangeSet extends AbstractChangeSet {
 
