@@ -11,18 +11,27 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.UUID;
+import java.util.*;
 
 public class CFIChangeSet extends AbstractChangeSet {
+
+    private static final Map<UUID, Map<String, Integer>> NEXT_INDEX = new HashMap<>();
 
     private final File file;
 
     public CFIChangeSet(HeightMapMCAGenerator hmmg, UUID uuid) throws IOException {
         super(hmmg);
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + uuid + File.separator + "CFI" + File.separator + hmmg.getId());
-        int max = MainUtil.getMaxFileId(folder);
+        final String hmmgId = hmmg.getId();
+        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + uuid + File.separator + "CFI" + File.separator + hmmgId);
+
+        final Map<String, Integer> hmmgMap = NEXT_INDEX.getOrDefault(uuid, new HashMap<>());
+        int max = hmmgMap.getOrDefault(hmmgId, -1);
+        if (max == -1) {
+            max = MainUtil.getMaxFileId(folder);
+        }
+        hmmgMap.put(hmmgId, max + 1);
+        NEXT_INDEX.putIfAbsent(uuid, hmmgMap);
+
         this.file = new File(folder, max + ".cfi");
         File parent = this.file.getParentFile();
         if (!parent.exists()) {
