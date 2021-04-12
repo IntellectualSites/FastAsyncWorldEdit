@@ -19,6 +19,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -29,6 +31,8 @@ import java.util.UUID;
  * - Slow
  */
 public class DiskStorageHistory extends FaweStreamChangeSet {
+
+    private static final Map<String, Map<UUID, Integer>> NEXT_INDEX = new HashMap<>();
 
     private UUID uuid;
     private File bdFile;
@@ -67,8 +71,16 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     private void init(UUID uuid, String worldName) {
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
-        int max = MainUtil.getMaxFileId(folder);
+        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
+
+        final Map<UUID, Integer> playerMap = NEXT_INDEX.getOrDefault(worldName, new HashMap<>());
+        int max = playerMap.getOrDefault(uuid, -1);
+        if (max == -1) {
+            max = MainUtil.getMaxFileId(folder);
+        }
+        playerMap.put(uuid, max + 1);
+        NEXT_INDEX.putIfAbsent(worldName, playerMap);
+
         init(uuid, max);
     }
 
