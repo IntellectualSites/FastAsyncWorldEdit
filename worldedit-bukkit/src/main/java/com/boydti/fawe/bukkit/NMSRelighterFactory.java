@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class NMSRelighterFactory implements RelighterFactory {
     @Override
     public @NotNull Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue) {
-        return new NMSRelighter(queue, Settings.IMP.LIGHTING.DO_HEIGHTMAPS,
+        return new NMSRelighter(queue,
                 relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE));
     }
 }

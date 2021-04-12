@@ -411,10 +411,7 @@ public class EditSessionBuilder {
             } else {
                 relighter = NullRelighter.INSTANCE;
             }
-            // TODO dirty workaround, NMSRelighter and HeightmapProcessor don't work well together
-            if (Settings.IMP.LIGHTING.MODE == 0 || relighter.getClass().getSimpleName().startsWith("Tuinity")) {
-                extent.addProcessor(new HeightmapProcessor(world));
-            }
+            extent.addProcessor(new HeightmapProcessor(world));
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
             } else if (limit != null && !limit.isUnlimited()) {
