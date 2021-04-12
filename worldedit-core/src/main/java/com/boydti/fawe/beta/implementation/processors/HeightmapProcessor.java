@@ -8,6 +8,8 @@ import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.BitSet;
@@ -15,7 +17,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class HeightmapProcessor implements IBatchProcessor {
-    private static final HeightMapType[] types = HeightMapType.values();
+    private static final HeightMapType[] TYPES = HeightMapType.values();
+    private static final BlockType RESERVED = BlockTypes.__RESERVED__;
+    private static final int SECTION_SIDE_LENGTH = 16;
+    private static final int BLOCKS_PER_Y_LEVEL = SECTION_SIDE_LENGTH * SECTION_SIDE_LENGTH;
 
     private final World world;
 
@@ -27,49 +32,53 @@ public class HeightmapProcessor implements IBatchProcessor {
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int max = world.getMaxY();
         int min = world.getMinY();
-        int[][] heightmaps = new int[types.length][256];
-        BitSet[] bitSets = new BitSet[types.length];
-        for (int i = 0; i < bitSets.length; i++) {
-            bitSets[i] = new BitSet(256);
+        // each heightmap gets one 16*16 array
+        int[][] heightmaps = new int[TYPES.length][BLOCKS_PER_Y_LEVEL];
+        BitSet[] updated = new BitSet[TYPES.length];
+        for (int i = 0; i < updated.length; i++) {
+            updated[i] = new BitSet(BLOCKS_PER_Y_LEVEL);
         }
-        boolean[] skip = new boolean[types.length];
-        yLoop:
+        int skip = 0;
+        int allSkipped = (1 << TYPES.length) - 1; // lowest types.length bits are set
         for (int y = max; y >= min; y--) {
             if (!(set.hasSection(y >> 4) || get.hasSection(y >> 4))) {
-                y -= 16;
+                y -= (SECTION_SIDE_LENGTH - 1); // - 1, as we do y-- in the loop head
                 continue;
             }
-            for (int z = 0; z < 16; z++) {
-                for (int x = 0; x < 16; x++) {
-                    BlockState block;
+            for (int z = 0; z < SECTION_SIDE_LENGTH; z++) {
+                for (int x = 0; x < SECTION_SIDE_LENGTH; x++) {
+                    BlockState block = null;
                     if (set.hasSection(y >> 4)) {
                         block = set.getBlock(x, y, z);
-                    } else {
+                    }
+                    if (block == null || block.getBlockType() == RESERVED) {
                         block = get.getBlock(x, y, z);
                     }
-                    for (int i = 0; i < types.length; i++) {
-                        if (skip[i]) continue;
-                        HeightMapType type = types[i];
+                    // fast skip if block isn't relevant for any height map
+                    if (block.isAir()) continue;
+                    for (int i = 0; i < TYPES.length; i++) {
+                        if ((skip & (1 << i)) != 0) continue; // skip finished height map
+                        HeightMapType type = TYPES[i];
                         int index = (z << 4) | x;
-                        if (heightmaps[i][index] == 0 && type.blocks(block)) {
-                            heightmaps[i][index] = y + 1;
-                            bitSets[i].set(index);
+                        if (!updated[i].get(index) // ignore if that position was already set
+                                && type.blocks(block)) {
+                            heightmaps[i][index] = y + 1; // mc requires + 1
+                            updated[i].set(index); // mark as updated
                         }
                     }
                 }
             }
-            for (int i = 0; i < bitSets.length; i++) {
-                if (bitSets[i].cardinality() == 256) {
-                    skip[i] = true;
+            for (int i = 0; i < updated.length; i++) {
+                if ((skip & (1 << i)) == 0 // if already true, skip cardinality calculation
+                        && updated[i].cardinality() == BLOCKS_PER_Y_LEVEL) {
+                    skip |= 1 << i;
                 }
             }
-            for (boolean skipIt : skip) {
-                if (!skipIt) continue yLoop;
-            }
-            break;
+            if (skip != allSkipped) continue;
+            break; // all maps are processed
         }
-        for (int i = 0; i < types.length; i++) {
-            set.setHeightMap(types[i], heightmaps[i]);
+        for (int i = 0; i < TYPES.length; i++) {
+            set.setHeightMap(TYPES[i], heightmaps[i]);
         }
         return set;
     }
