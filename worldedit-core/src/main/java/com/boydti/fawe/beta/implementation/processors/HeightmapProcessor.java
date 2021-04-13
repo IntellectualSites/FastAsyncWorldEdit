@@ -41,17 +41,20 @@ public class HeightmapProcessor implements IBatchProcessor {
         int skip = 0;
         int allSkipped = (1 << TYPES.length) - 1; // lowest types.length bits are set
         for (int y = max; y >= min; y--) {
-            if (!(set.hasSection(y >> 4) || get.hasSection(y >> 4))) {
+            boolean hasSectionSet = set.hasSection(y >> 4);
+            boolean hasSectionGet = get.hasSection(y >> 4);
+            if (!(hasSectionSet || hasSectionGet)) {
                 y -= (SECTION_SIDE_LENGTH - 1); // - 1, as we do y-- in the loop head
                 continue;
             }
             for (int z = 0; z < SECTION_SIDE_LENGTH; z++) {
                 for (int x = 0; x < SECTION_SIDE_LENGTH; x++) {
                     BlockState block = null;
-                    if (set.hasSection(y >> 4)) {
+                    if (hasSectionSet) {
                         block = set.getBlock(x, y, z);
                     }
                     if (block == null || block.getBlockType() == RESERVED) {
+                        if (!hasSectionGet) continue;
                         block = get.getBlock(x, y, z);
                     }
                     // fast skip if block isn't relevant for any height map

@@ -1,16 +1,18 @@
 package com.boydti.fawe.bukkit.adapter.mc1_16_5;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
 import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.beta.implementation.lighting.Relighter;
+import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
-import net.minecraft.server.v1_16_R3.BlockPosition;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
 import net.minecraft.server.v1_16_R3.LightEngineThreaded;
-import net.minecraft.server.v1_16_R3.MCUtil;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.apache.logging.log4j.Logger;
 
@@ -18,11 +20,11 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
+import java.util.stream.Collectors;
 
 public class TuinityRelighter_1_16_5 implements Relighter {
 
@@ -35,6 +37,9 @@ public class TuinityRelighter_1_16_5 implements Relighter {
     private final ReentrantLock lock = new ReentrantLock();
 
     private final IQueueExtent<IQueueChunk> queue;
+
+    private final ReentrantLock lightLock = new ReentrantLock();
+    private final LongList chunks = new LongArrayList();
 
     static {
         MethodHandle tmp = null;
@@ -60,27 +65,13 @@ public class TuinityRelighter_1_16_5 implements Relighter {
 
     @Override
     public boolean addChunk(int cx, int cz, byte[] skipReason, int bitmask) {
-        List<ChunkCoordIntPair> chunks = MCUtil.getSpiralOutChunks(new BlockPosition(cx << 4, 0, cz << 4), 1);
-        TaskManager.IMP.task(() ->
-                {
-                    try {
-                        // cast is required for invokeExact
-                        int unused = (int) relight.invokeExact(world.getChunkProvider().getLightEngine(),
-                                (Set<?>) new HashSet<>(chunks), // explicit cast to make invokeExact work
-                                (Consumer<?>) coord -> sendChunk(cx, cz), // send chunk after lighting was done
-                                nothingIntConsumer
-                                );
-                    } catch (Throwable throwable) {
-                        LOGGER.error("Error occurred on relighting", throwable);
-                    }
-                }
-        );
+        lightLock.lock();
+        try {
+            chunks.add(ChunkCoordIntPair.pair(cx, cz));
+        } finally {
+            lightLock.unlock();
+        }
         return true;
-    }
-
-    private void sendChunk(int cx, int cz) {
-        ChunkHolder<?> chunk = (ChunkHolder<?>) queue.getOrCreateChunk(cx, cz);
-        Fawe.imp().getPlatformAdapter().sendChunk(chunk.getOrCreateGet(), -1, false);
     }
 
     @Override
@@ -90,7 +81,32 @@ public class TuinityRelighter_1_16_5 implements Relighter {
 
     @Override
     public void fixLightingSafe(boolean sky) {
-
+        Set<ChunkCoordIntPair> chunks = this.chunks.stream().map(ChunkCoordIntPair::new).collect(Collectors.toSet());
+        TaskManager.IMP.task(() ->
+                {
+                    try {
+                        // cast is required for invokeExact
+                        int unused = (int) relight.invokeExact(world.getChunkProvider().getLightEngine(),
+                                (Set<?>) new HashSet<>(chunks), // explicit cast to make invokeExact work
+                                (Consumer<?>) coord -> {}, // no callback
+                                nothingIntConsumer
+                        );
+                    } catch (Throwable throwable) {
+                        LOGGER.error("Error occurred on relighting", throwable);
+                    }
+                }
+        );
+        if (Settings.IMP.LIGHTING.DELAY_PACKET_SENDING) {
+            for (long key : this.chunks) {
+                int x = ChunkCoordIntPair.getX(key);
+                int z = ChunkCoordIntPair.getZ(key);
+                ChunkHolder<?> chunk = (ChunkHolder<?>) queue.getOrCreateChunk(x, z);
+                IChunkGet toSend = chunk.getOrCreateGet();
+                TaskManager.IMP.async(() -> {
+                    Fawe.imp().getPlatformAdapter().sendChunk(toSend, -1, false);
+                });
+            }
+        }
     }
 
     @Override
@@ -125,7 +141,7 @@ public class TuinityRelighter_1_16_5 implements Relighter {
 
     @Override
     public boolean isFinished() {
-        return true;
+        return false;
     }
 
     @Override
