@@ -126,11 +126,11 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
-    public synchronized BlockState getBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return BlockTypesCache.states[get(x, y, z)];
     }
 
-    public synchronized char get(int x, @Range(from = 0, to = 255) int y, int z) {
+    public char get(int x, @Range(from = 0, to = 255) int y, int z) {
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         if (layer >= sections.length || layer < 0) {
@@ -156,7 +156,7 @@ public abstract class CharBlocks implements IBlocks {
         Section
      */
 
-    public synchronized final char get(@Range(from = 0, to = 15) int layer, int index) {
+    public final char get(@Range(from = 0, to = 15) int layer, int index) {
         return sections[layer].get(this, layer, index);
     }
 
