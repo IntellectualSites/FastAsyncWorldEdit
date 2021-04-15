@@ -171,7 +171,8 @@ public abstract class CharBlocks implements IBlocks {
         public abstract boolean isFull();
 
         public final char get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index) {
-            return get(blocks, layer)[index];
+            char[] section = get(blocks, layer);
+            return section[index];
         }
 
         public final void set(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index, char value) {
