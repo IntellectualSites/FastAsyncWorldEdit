@@ -840,6 +840,14 @@ public class NMSRelighter implements Relighter {
         }
     }
 
+    public void flush() {
+        try {
+            close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public synchronized void sendChunks() {
         RunnableVal<Object> runnable = new RunnableVal<Object>() {
             @Override
