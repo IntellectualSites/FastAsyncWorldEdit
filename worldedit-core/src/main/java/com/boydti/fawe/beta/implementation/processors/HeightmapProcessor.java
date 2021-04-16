@@ -4,7 +4,6 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.blocks.CharBlocks;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
@@ -56,10 +55,6 @@ public class HeightmapProcessor implements IBatchProcessor {
                     }
                     if (block == null || block.getBlockType() == RESERVED) {
                         if (!hasSectionGet) continue;
-                        // TODO this is only a workaround to avoid large stacktraces
-                        // and needs to be fixed in CharBlocks/BukkitGetBlocks
-                        if (((CharBlocks) get).blocks[y >> 4] == null) continue;
-
                         block = get.getBlock(x, y, z);
                     }
                     // fast skip if block isn't relevant for any height map
