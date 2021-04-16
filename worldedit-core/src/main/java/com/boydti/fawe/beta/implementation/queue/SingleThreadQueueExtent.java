@@ -336,8 +336,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                 Future next = submissions.peek();
                 while (next != null) {
                     if (next.isDone()) {
+                        Future after = null;
                         try {
-                            next = (Future) next.get();
+                            after = (Future) next.get();
                         } catch (FaweException messageOnly) {
                             LOGGER.warn(messageOnly.getMessage());
                         } catch (ExecutionException e) {
@@ -350,6 +351,13 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                             e.getCause().printStackTrace();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
+                        } finally {
+                            /*
+                             * If the execution failed, namely next.get() threw an exception,
+                             * we don't want to process that Future again. Instead, we just drop
+                             * it and set it to null, otherwise to the returned next Future.
+                             */
+                            next = after;
                         }
                     } else {
                         return;
