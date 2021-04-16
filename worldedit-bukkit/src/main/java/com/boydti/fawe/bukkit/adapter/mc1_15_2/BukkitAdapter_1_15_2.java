@@ -9,6 +9,7 @@ import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
+import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -29,6 +30,7 @@ import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.LightEngineStorage;
 import net.minecraft.server.v1_15_R1.NibbleArray;
 import net.minecraft.server.v1_15_R1.PacketPlayOutLightUpdate;
+import net.minecraft.server.v1_15_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_15_R1.PlayerChunk;
 import net.minecraft.server.v1_15_R1.PlayerChunkMap;
 import net.minecraft.server.v1_15_R1.World;
@@ -44,6 +46,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -189,32 +192,23 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
         if (playerChunk == null) {
             return;
         }
-        if (playerChunk.hasBeenLoaded()) {
-            try {
-                int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                if (dirtyBits == 0) {
-                    nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
-                }
-                if (mask == 0) {
-                    dirtyBits = 65535;
-                } else {
-                    dirtyBits |= mask;
-                }
-
-                fieldDirtyBits.set(playerChunk, dirtyBits);
-                fieldDirtyCount.set(playerChunk, 64);
-
-                if (lighting) {
-                    ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-                    PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine());
-                    playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                        p.playerConnection.sendPacket(packet);
-                    });
-                }
-
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
+        Chunk chunk = optional.orElseGet(() ->
+                nmsWorld.getChunkProvider().getChunkAtIfLoadedImmediately(chunkX, chunkZ));
+        if (chunk == null)  {
+            return;
+        }
+        PacketPlayOutMapChunk chunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
+        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+            p.playerConnection.sendPacket(chunkPacket);
+        });
+        if (lighting) {
+            PacketPlayOutLightUpdate packet =
+                    new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine());
+            playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                p.playerConnection.sendPacket(packet);
+            });
         }
     }
 
