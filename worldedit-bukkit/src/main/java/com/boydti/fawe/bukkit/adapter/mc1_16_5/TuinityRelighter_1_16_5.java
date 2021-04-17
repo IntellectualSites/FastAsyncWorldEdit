@@ -158,9 +158,7 @@ public class TuinityRelighter_1_16_5 implements Relighter {
             int x = pos.x;
             int z = pos.z;
             if (delay) { // we still need to send the block changes of that chunk
-                ChunkHolder<?> chunk = (ChunkHolder<?>) queue.getOrCreateChunk(x, z);
-                IChunkGet toSend = chunk.getOrCreateGet();
-                Fawe.imp().getPlatformAdapter().sendChunk(toSend, -1, false);
+                BukkitAdapter_1_16_5.sendChunk(world, x, z, -1, false);
             }
             world.getChunkProvider().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
         }
