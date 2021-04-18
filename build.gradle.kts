@@ -15,41 +15,25 @@ logger.lifecycle("""
 *******************************************
 """)
 
-//TODO FIX THIS WHEN I FEEL LIKE IT
 var rootVersion by extra("1.16")
 var revision: String by extra("")
 var buildNumber by extra("")
 var date: String by extra("")
 ext {
     val git: Grgit = Grgit.open {
-        dir = File("$rootDir/.git");
+        dir = File("$rootDir/.git")
     }
-    date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"));
-    revision = "-${git.head().abbreviatedId}";
-    var parents: MutableList<String>? = git.head().parentIds;
-    if (project.hasProperty("buildnumber")) {
-        buildNumber = project.properties["buildnumber"] as String;
+    date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
+    revision = "-${git.head().abbreviatedId}"
+    val commit: String? = Grgit.open().head().abbreviatedId
+    buildNumber = if (project.hasProperty("buildnumber")) {
+        project.properties["buildnumber"] as String
     } else {
-        var index = -2109;  // Offset to match CI
-        while (parents != null && parents.isNotEmpty()) {
-            parents = git.resolve.toCommit(parents[0]).parentIds
-            index++;
-        }
-        buildNumber = index.toString();
-    }
-}
-
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile::class) {
-            options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
-        }
+        commit.toString()
     }
 }
 
 version = String.format("%s-%s", rootVersion, buildNumber)
-
-applyCommonConfiguration()
 
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
@@ -61,3 +45,13 @@ if (!project.hasProperty("gitCommitHash")) {
         "no.git.id"
     }
 }
+
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile::class) {
+            options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
+        }
+    }
+}
+
+applyCommonConfiguration()
