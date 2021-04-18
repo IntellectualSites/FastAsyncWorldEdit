@@ -25,7 +25,7 @@ ext {
     }
     date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
     revision = "-${git.head().abbreviatedId}"
-    val commit: String? = Grgit.open().head().abbreviatedId
+    val commit: String? = git.head().abbreviatedId
     buildNumber = if (project.hasProperty("buildnumber")) {
         project.properties["buildnumber"] as String
     } else {
