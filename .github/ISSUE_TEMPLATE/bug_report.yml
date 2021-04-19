@@ -3,7 +3,6 @@ description: Create a report to help us improve
 title: ''
 labels: 'Requires Testing'
 assignees: []
-issue_body: true
 
 body:
   - type: markdown
@@ -97,6 +96,7 @@ body:
         - label: I am using the newest build from https://ci.athion.net/job/FastAsyncWorldEdit-1.16/ and the issue still persists.
           required: true
 
-  - type: markdown
+  - type: textarea
     attributes:
-      value: Add any additional context you can provide below.   
+      label: Anything else?
+      description: You can provide additional context below.
