@@ -109,7 +109,7 @@ dependencies {
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.6.0") { isTransitive = false }
-    implementation("de.notmyfault:serverlib:1.0.1")
+    implementation("org.incendo.serverlib:ServerLib:2.0.0")
 }
 
 tasks.named<Copy>("processResources") {
@@ -155,8 +155,8 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
-        relocate("de.notmyfault", "com.boydti.fawe") {
-            include(dependency("de.notmyfault:serverlib:1.0.1"))
+        relocate("org.incendo.serverlib", "com.boydti.fawe.serverlib") {
+            include(dependency("org.incendo.serverlib:ServerLib:2.0.0"))
         }
         relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
