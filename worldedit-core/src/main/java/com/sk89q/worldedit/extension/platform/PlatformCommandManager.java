@@ -460,14 +460,15 @@ public final class PlatformCommandManager {
                 WorldEditCommandsRegistration.builder(),
                 new WorldEditCommands(worldEdit)
             );
-            // TODO: Ping @MattBDev to reimplement 2020-02-04
-//            registerSubCommands(
-//                "cfi",
-//                ImmutableList.of("/cfi"),
-//                "CFI commands",
-//                CFICommandsRegistration.builder(),
-//                new CFICommands(worldEdit)
-//            );
+            /*
+            TODO: Ping @MattBDev to reimplement 2020-02-04
+            registerSubCommands(
+                "cfi",
+                ImmutableList.of("/cfi"),
+                "CFI commands",
+                CFICommandsRegistration.builder(),
+                new CFICommands(worldEdit)
+            );
             registerSubCommands(
                 "/anvil",
                 ImmutableList.of(),
@@ -475,6 +476,7 @@ public final class PlatformCommandManager {
                 AnvilCommandsRegistration.builder(),
                 new AnvilCommands(worldEdit)
             );
+             */
             this.registration.register(
                 commandManager,
                 BiomeCommandsRegistration.builder(),
