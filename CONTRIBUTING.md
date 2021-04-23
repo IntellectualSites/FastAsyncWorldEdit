@@ -31,6 +31,11 @@ ask that you make note of the following guidelines.
   complicated algorithms.
 
 
+Additional Notes
+----------------
+If you're submitting a feature, base your code on `main` and PR against the
+`main` branch.
+
 Checklist
 ---------
 
