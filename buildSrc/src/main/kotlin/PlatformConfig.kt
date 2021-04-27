@@ -25,8 +25,12 @@ fun Project.applyPlatformAndCoreConfiguration() {
 //    apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
 
-    ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
-
+    if (project.hasProperty("buildnumber")) {
+        ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
+    } else {
+        ext["internalVersion"] = "$version"
+    }
+    
     tasks
         .withType<JavaCompile>()
         .matching { it.name == "compileJava" || it.name == "compileTestJava" }
