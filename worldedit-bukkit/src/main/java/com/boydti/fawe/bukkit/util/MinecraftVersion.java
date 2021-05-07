@@ -130,8 +130,8 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
     }
 
     /**
-     * Determines the server version based on the package path, e.g. {@code org.bukkit.craftbukkit.v1_8_R3},
-     * where v1_8_R3 is the resolved version.
+     * Determines the server version based on the package path, e.g. {@code org.bukkit.craftbukkit.v1_16_R3},
+     * where v1_16_R3 is the resolved version.
      *
      * @return The package version.
      */

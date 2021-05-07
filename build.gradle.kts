@@ -1,7 +1,7 @@
 import org.ajoberstar.grgit.Grgit
 import java.time.format.DateTimeFormatter
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat.*
-import org.gradle.api.tasks.testing.logging.TestLogEvent.*
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 
 logger.lifecycle("""
 *******************************************
