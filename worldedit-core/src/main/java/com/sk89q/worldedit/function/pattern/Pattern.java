@@ -23,21 +23,25 @@ import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 /**
- * Returns a {@link BlockStateHolder} for a given position.
+ * Returns a {@link BaseBlock} for a given position.
  */
+// FAWE Start
 public interface Pattern extends Filter {
 
     /**
-     * Return a {@link BlockStateHolder} for the given position.
+     * Return a {@link BaseBlock} for the given position.
      *
      * @param position the position
      * @return a block
+     * @deprecated use {@link Pattern#applyBlock(BlockVector3)}
      */
+    @Deprecated
     BaseBlock apply(BlockVector3 position);
 
     default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
@@ -47,5 +51,25 @@ public interface Pattern extends Filter {
     @Override
     default void applyBlock(final FilterBlock block) {
         apply(block, block, block);
+    }
+
+    // FAWE End
+
+    /**
+     * Return a {@link BaseBlock} for the given position.
+     *
+     * @param position the position
+     * @return a block
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
+     */
+    @NonAbstractForCompatibility(
+            delegateName = "apply",
+            delegateParams = { BlockVector3.class }
+    )
+    default BaseBlock applyBlock(BlockVector3 position) {
+        DeprecationUtil.checkDelegatingOverride(getClass());
+
+        return apply(position);
     }
 }
