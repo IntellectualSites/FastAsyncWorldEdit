@@ -84,7 +84,6 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api")
     compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:20.1.0")
-    testCompileOnly("org.jetbrains:annotations:20.1.0")
     implementation("io.papermc:paperlib:1.0.6")
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
@@ -97,7 +96,9 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
     compileOnly("net.kyori:adventure-api:4.7.0")
-    testCompileOnly("net.kyori:adventure-api:4.7.0")
+    testImplementation("net.kyori:adventure-api:4.7.0")
+    testImplementation("org.checkerframework:checker-qual:3.13.0")
+    testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
