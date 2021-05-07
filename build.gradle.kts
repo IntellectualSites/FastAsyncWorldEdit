@@ -1,5 +1,7 @@
 import org.ajoberstar.grgit.Grgit
 import java.time.format.DateTimeFormatter
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.*
+import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
 logger.lifecycle("""
 *******************************************
@@ -50,6 +52,15 @@ allprojects {
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile::class) {
             options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
+        }
+        tasks.withType(Test::class) {
+            testLogging {
+                events(FAILED)
+                exceptionFormat = FULL
+                showExceptions = true
+                showCauses = true
+                showStackTraces = true
+            }
         }
     }
 }

@@ -59,6 +59,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
         "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
         "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
+        "testImplementation"("net.bytebuddy:byte-buddy:1.11.0")
         "testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
     }
 
