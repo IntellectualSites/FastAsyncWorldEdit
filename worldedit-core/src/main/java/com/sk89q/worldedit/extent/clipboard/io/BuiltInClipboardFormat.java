@@ -104,7 +104,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            throw new IOException("This format does not support saving");
+            throw new IOException("The formats `.schematic`, `.mcedit` and `.mce` are discontinued on versions newer than 1.12 and superseded by the sponge schematic implementation known for `.schem` files.");
         }
 
         @Override
