@@ -36,7 +36,7 @@ public class SignBlock extends BaseBlock {
 
     private String[] text;
 
-    private static String EMPTY =  "{\"text\":\"\"}";
+    private static final String EMPTY =  "{\"text\":\"\"}";
 
     /**
      * Construct the sign with text.
@@ -94,10 +94,9 @@ public class SignBlock extends BaseBlock {
     @Override
     public CompoundTag getNbtData() {
         Map<String, Tag> values = new HashMap<>();
-        values.put("Text1", new StringTag(text[0]));
-        values.put("Text2", new StringTag(text[1]));
-        values.put("Text3", new StringTag(text[2]));
-        values.put("Text4", new StringTag(text[3]));
+        for(int i = 0; i < 4; i++) {
+            values.put("Text" + (i + 1), new StringTag(text[i]));
+        }
         return new CompoundTag(values);
     }
 
@@ -107,35 +106,20 @@ public class SignBlock extends BaseBlock {
             return;
         }
 
-        Map<String, Tag> values = rootTag.getValue();
-
-        Tag t;
-
         text = new String[] { EMPTY, EMPTY, EMPTY, EMPTY };
 
-        t = values.get("id");
-        if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals(getNbtId())) {
+        Tag idTag = values.get("id");
+        if (!(idTag instanceof StringTag) || !((StringTag) idTag).getValue().equals(getNbtId())) {
             throw new RuntimeException(String.format("'%s' tile entity expected", getNbtId()));
         }
-
-        t = values.get("Text1");
-        if (t instanceof StringTag) {
-            text[0] = ((StringTag) t).getValue();
-        }
-
-        t = values.get("Text2");
-        if (t instanceof StringTag) {
-            text[1] = ((StringTag) t).getValue();
-        }
-
-        t = values.get("Text3");
-        if (t instanceof StringTag) {
-            text[2] = ((StringTag) t).getValue();
-        }
-
-        t = values.get("Text4");
-        if (t instanceof StringTag) {
-            text[3] = ((StringTag) t).getValue();
+        
+        Map<String, Tag> values = rootTag.getValue();
+        
+        for(int i = 0; i < 4; i++) {
+            Tag tag = values.get("Text" + (i + 1));
+            if (tag instanceof StringTag) {
+            text[i] = ((StringTag) tag).getValue();
+            }
         }
     }
 
