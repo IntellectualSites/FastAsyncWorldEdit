@@ -23,12 +23,12 @@ You can do that by either running Spigot's [BuildTools](https://www.spigotmc.org
 ### On Windows
 
 1. Shift + right click the folder with FastAsyncWorldEdit's files and click "Open command prompt".
-2. `gradlew build -x test`
+2. `gradlew clean build`
 
 ### On Linux, BSD, or Mac OS X
 
 1. In your terminal, navigate to the folder with FastAsyncWorldEdit's files (`cd /folder/of/fawe/files`)
-2. `./gradlew build -x test`
+2. `./gradlew clean build`
 
 ## Then you will find...
 
@@ -45,8 +45,6 @@ If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-1.16-<commitH
 ## Other commands
 
 * `gradlew idea` will generate an [IntelliJ IDEA](http://www.jetbrains.com/idea/) module for each folder.
-
-* `gradlew build -x test` skips JUnit tests for compiling.
 
 _Possibly broken_:
 * `gradlew eclipse` will generate an [Eclipse](https://www.eclipse.org/downloads/) project for each folder.

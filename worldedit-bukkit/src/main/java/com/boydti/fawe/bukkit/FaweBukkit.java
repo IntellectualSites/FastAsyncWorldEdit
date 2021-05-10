@@ -19,6 +19,7 @@ import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
 import com.boydti.fawe.bukkit.util.BukkitTaskManager;
 import com.boydti.fawe.bukkit.util.ItemUtil;
+import com.boydti.fawe.bukkit.util.MinecraftVersion;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -80,8 +81,7 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getServer().shutdown();
         }
 
-        chunksStretched =
-            Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]) >= 16;
+        chunksStretched = new MinecraftVersion().isEqualOrHigher(MinecraftVersion.NETHER);
 
         platformAdapter = new NMSAdapter();
 
