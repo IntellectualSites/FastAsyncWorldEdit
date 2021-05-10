@@ -1,10 +1,7 @@
 package com.boydti.fawe.bukkit.adapter.mc1_16_5;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
 import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.config.Settings;
@@ -26,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +37,7 @@ public class TuinityRelighter_1_16_5 implements Relighter {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private static final MethodHandle relight;
+    private static final MethodHandle RELIGHT;
 
     private static final int CHUNKS_PER_BATCH = 1024; // 32 * 32
     private static final int CHUNKS_PER_BATCH_SQRT_LOG2 = 5; // for shifting
@@ -51,8 +48,6 @@ public class TuinityRelighter_1_16_5 implements Relighter {
     private final WorldServer world;
     private final ReentrantLock lock = new ReentrantLock();
 
-    private final IQueueExtent<IQueueChunk> queue;
-
     private final Long2ObjectLinkedOpenHashMap<LongSet> regions = new Long2ObjectLinkedOpenHashMap<>();
 
     private final ReentrantLock areaLock = new ReentrantLock();
@@ -61,22 +56,25 @@ public class TuinityRelighter_1_16_5 implements Relighter {
     static {
         MethodHandle tmp = null;
         try {
-            Method relightMethod = LightEngineThreaded.class.getMethod(
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            tmp = lookup.findVirtual(LightEngineThreaded.class,
                     "relight",
-                    Set.class,
-                    Consumer.class,
-                    IntConsumer.class
+                    MethodType.methodType(
+                            int.class, // return type
+                            // params
+                            Set.class,
+                            Consumer.class,
+                            IntConsumer.class
+                    )
             );
-            tmp = MethodHandles.lookup().unreflect(relightMethod);
         } catch (NoSuchMethodException | IllegalAccessException e) {
             LOGGER.error("Failed to locate relight method in LightEngineThreaded on Tuinity. " +
                     "Is everything up to date?", e);
         }
-        relight = tmp;
+        RELIGHT = tmp;
     }
 
     public TuinityRelighter_1_16_5(WorldServer world, IQueueExtent<IQueueChunk> queue) {
-        this.queue = queue;
         this.world = world;
         this.delegate = new NMSRelighter(queue, false);
     }
@@ -100,6 +98,11 @@ public class TuinityRelighter_1_16_5 implements Relighter {
         delegate.addLightUpdate(x, y, z);
     }
 
+    /*
+     * This method is called "recursively", iterating and removing elements
+     * from the regions linked map. This way, chunks are loaded in batches to avoid
+     * OOMEs.
+     */
     @Override
     public void fixLightingSafe(boolean sky) {
         this.areaLock.lock();
@@ -112,27 +115,43 @@ public class TuinityRelighter_1_16_5 implements Relighter {
         }
     }
 
+    /*
+     * Processes a set of chunks and runs an action afterwards.
+     * The action is run async, the chunks are partly processed on the main thread
+     * (as required by the server).
+     */
     private void fixLighting(LongSet chunks, Runnable andThen) {
+        // convert from long keys to ChunkCoordIntPairs
         Set<ChunkCoordIntPair> coords = new HashSet<>();
         LongIterator iterator = chunks.iterator();
         while (iterator.hasNext()) {
             coords.add(new ChunkCoordIntPair(iterator.nextLong()));
         }
         TaskManager.IMP.task(() -> {
+            // trigger chunk load and apply ticket on main thread
             List<CompletableFuture<?>> futures = new ArrayList<>();
             for (ChunkCoordIntPair pos : coords) {
                 futures.add(world.getWorld().getChunkAtAsync(pos.x, pos.z)
-                        .thenAccept(c -> world.getChunkProvider().addTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE)));
+                        .thenAccept(c -> world.getChunkProvider().addTicketAtLevel(
+                                FAWE_TICKET,
+                                pos,
+                                LIGHT_LEVEL,
+                                Unit.INSTANCE))
+                );
             }
+            // collect futures and trigger relight once all chunks are loaded
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(v ->
-                    invokeRelight(coords, c -> {
-                    }, i -> {
-                        if (i != coords.size()) {
-                            LOGGER.warn("Processed " + i + " chunks instead of " + coords.size());
-                        }
-                        TaskManager.IMP.task(() -> postProcessChunks(coords));
-                        TaskManager.IMP.laterAsync(andThen, 0);
-                    })
+                    invokeRelight(coords,
+                            c -> { }, // no callback for single chunks required
+                            i -> {
+                                if (i != coords.size()) {
+                                    LOGGER.warn("Processed " + i + " chunks instead of " + coords.size());
+                                }
+                                // post process chunks on main thread
+                                TaskManager.IMP.task(() -> postProcessChunks(coords));
+                                // call callback on our own threads
+                                TaskManager.IMP.async(andThen);
+                            })
             );
         });
     }
@@ -141,8 +160,7 @@ public class TuinityRelighter_1_16_5 implements Relighter {
                                Consumer<ChunkCoordIntPair> chunkCallback,
                                IntConsumer processCallback) {
         try {
-            // cast is required for invokeExact
-            int unused = (int) relight.invokeExact(world.getChunkProvider().getLightEngine(),
+            int unused = (int) RELIGHT.invokeExact(world.getChunkProvider().getLightEngine(),
                     coords,
                     chunkCallback, // callback per chunk
                     processCallback // callback for all chunks
@@ -152,6 +170,10 @@ public class TuinityRelighter_1_16_5 implements Relighter {
         }
     }
 
+    /*
+     * Allow the server to unload the chunks again.
+     * Also, if chunk packets are sent delayed, we need to do that here
+     */
     private void postProcessChunks(Set<ChunkCoordIntPair> coords) {
         boolean delay = Settings.IMP.LIGHTING.DELAY_PACKET_SENDING;
         for (ChunkCoordIntPair pos : coords) {
