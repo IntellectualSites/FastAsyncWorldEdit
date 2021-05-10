@@ -22,16 +22,16 @@ public class HeightmapProcessor implements IBatchProcessor {
     private static final int SECTION_SIDE_LENGTH = 16;
     private static final int BLOCKS_PER_Y_LEVEL = SECTION_SIDE_LENGTH * SECTION_SIDE_LENGTH;
 
-    private final World world;
+    private final int maxY;
+    private final int minY;
 
     public HeightmapProcessor(World world) {
-        this.world = world;
+        this.maxY = world.getMaxY();
+        this.minY = world.getMinY();
     }
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        int max = world.getMaxY();
-        int min = world.getMinY();
         // each heightmap gets one 16*16 array
         int[][] heightmaps = new int[TYPES.length][BLOCKS_PER_Y_LEVEL];
         BitSet[] updated = new BitSet[TYPES.length];
@@ -40,7 +40,7 @@ public class HeightmapProcessor implements IBatchProcessor {
         }
         int skip = 0;
         int allSkipped = (1 << TYPES.length) - 1; // lowest types.length bits are set
-        for (int y = max; y >= min; y--) {
+        for (int y = maxY; y >= minY; y--) {
             boolean hasSectionSet = set.hasSection(y >> 4);
             boolean hasSectionGet = get.hasSection(y >> 4);
             if (!(hasSectionSet || hasSectionGet)) {
