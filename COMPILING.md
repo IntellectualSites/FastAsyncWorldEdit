@@ -18,11 +18,11 @@ The build process uses Gradle, which you do *not* need to download. FastAsyncWor
 
 ### NMS
 FastAsyncWorldEdit uses NMS (net.minecraft.server) code in a variety of spots. NMS is not distributed via maven and therefore FastAsyncWorldEdit may not build without errors if you didn't install it into your local repository beforehand.
-You can do that by either running Spigot's [BuildTools](https://www.spigotmc.org/wiki/buildtools/) targetting the versions needed or using Paper's paperclip with `java -Dpaperclip.install=true -jar paperclip.jar`.
+You can do that by either running Spigot's [BuildTools](https://www.spigotmc.org/wiki/buildtools/) targeting the versions needed or using Paper's paperclip with `java -Dpaperclip.install=true -jar paperclip.jar`.
 
 ### On Windows
 
-1. Shift + right click the folder with FastAsyncWorldEdit's files and click "Open command prompt".
+1. Shift + right-click the folder with FastAsyncWorldEdit's files and click "Open command prompt".
 2. `gradlew clean build`
 
 ### On Linux, BSD, or Mac OS X

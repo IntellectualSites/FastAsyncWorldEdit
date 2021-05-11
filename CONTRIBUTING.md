@@ -66,7 +66,7 @@ This is **GOOD:**
         // do things
     }
 
-This is **EXTREMELY BAD:**
+This is **VERY BAD:**
 
     if(var.func( param1, param2 ))
     {
