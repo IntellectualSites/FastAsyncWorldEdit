@@ -410,11 +410,6 @@ public class Settings extends Config {
 
     public static class WEB {
         @Comment({
-                "Should download urls be shortened?",
-                " - Links are less secure as they could be brute forced"
-        })
-        public boolean SHORTEN_URLS = false;
-        @Comment({
                 "The web interface for clipboards",
                 " - All schematics are anonymous and private",
                 " - Downloads can be deleted by the user",
@@ -430,7 +425,7 @@ public class Settings extends Config {
         })
         public List<String> ALLOWED_PLUGINS = new ArrayList<>();
         @Comment("Should debug messages be sent when third party extents are used?")
-        public boolean DEBUG = false;
+        public boolean DEBUG = true;
     }
 
     @Comment("Generic tick limiter (not necessarily WorldEdit related, but useful to stop abuse)")
