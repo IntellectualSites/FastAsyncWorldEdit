@@ -188,7 +188,7 @@ public class FaweAPI {
         if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".bd")) {
             throw new IllegalArgumentException("Not a BD file!");
         }
-        String[] path = file.getPath().split(File.separator);
+        String[] path = file.getPath().split(File.separatorChar=='\\' ? "\\\\" : File.separator);
         if (path.length < 3) {
             throw new IllegalArgumentException("Not in history directory!");
         }

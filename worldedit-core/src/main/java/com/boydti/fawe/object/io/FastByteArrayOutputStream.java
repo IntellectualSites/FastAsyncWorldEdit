@@ -77,11 +77,9 @@ public class FastByteArrayOutputStream extends OutputStream {
         // Check if we have a list of buffers
         int pos = 0;
 
-        if (buffers != null) {
-            for (byte[] bytes : buffers) {
-                System.arraycopy(bytes, 0, data, pos, bytes.length);
-                pos += bytes.length;
-            }
+        for (byte[] bytes : buffers) {
+            System.arraycopy(bytes, 0, data, pos, bytes.length);
+            pos += bytes.length;
         }
 
         // write the internal buffer directly
