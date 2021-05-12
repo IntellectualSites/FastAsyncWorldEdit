@@ -73,7 +73,7 @@ public class PrimitiveBindings extends Bindings {
     public Boolean getBoolean(String argument) {
         switch (argument.toLowerCase(Locale.ROOT)) {
             case "":
-                return null;
+                throw new InputParseException("Invalid empty string instead of boolean");
             case "true":
             case "yes":
             case "on":
