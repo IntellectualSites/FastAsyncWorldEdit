@@ -162,6 +162,9 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
         }
+        relocate("com.github.luben", "com.boydti.fawe.zstd") {
+            include(dependency("com.github.luben:zstd-jni:1.4.9-5"))
+        }
     }
 }
 
