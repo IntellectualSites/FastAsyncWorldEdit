@@ -175,7 +175,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         // Check whether the server runs on 11 or greater
         ServerLib.checkJavaLTS();
-        ServerLib.checkJavaMinor();
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
     }
