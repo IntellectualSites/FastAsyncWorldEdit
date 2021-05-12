@@ -123,11 +123,7 @@ public class YAMLNode {
     @SuppressWarnings("unchecked")
     public Object getProperty(String path) {
         if (!path.contains(".")) {
-            Object val = root.get(path);
-            if (val == null) {
-                return null;
-            }
-            return val;
+            return root.get(path);
         }
 
         String[] parts = path.split("\\.");
