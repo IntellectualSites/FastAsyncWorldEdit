@@ -160,8 +160,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             // register this so we can load world-dependent data right as the first world is loading
             getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
         } else {
-            LOGGER.warn("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins.");
-            LOGGER.warn("For more information, see https://matthewmiller.dev/blog/problem-with-reload/");
+            LOGGER.warn("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins. Reloading the server is not advised.");
+            LOGGER.warn("For more information why reloading is bad, see https://madelinemiller.dev/blog/problem-with-reload/");
             try {
                 setupPreWorldData();
                 // since worlds are loaded already, we can do this now
