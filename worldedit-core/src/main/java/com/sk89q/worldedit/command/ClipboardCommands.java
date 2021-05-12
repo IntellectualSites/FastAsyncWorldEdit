@@ -90,7 +90,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
@@ -100,7 +99,6 @@ import java.util.zip.ZipOutputStream;
 
 import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-
 
 /**
  * Clipboard commands.
@@ -386,13 +384,6 @@ public class ClipboardCommands {
             player.print(Caption.of("fawe.web.generating.link.failed"));
         } else {
             String urlText = url.toString();
-            if (Settings.IMP.WEB.SHORTEN_URLS) {
-                try {
-                    urlText = MainUtil.getText("https://athion.net/s/?" + URLEncoder.encode(url.toString(), "UTF-8"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
             player.print(Caption.of("fawe.web.download.link", urlText).clickEvent(ClickEvent.openUrl(urlText)));
         }
     }

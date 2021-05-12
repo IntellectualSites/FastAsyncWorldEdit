@@ -242,16 +242,12 @@ public class EditSessionBuilder {
             if (Settings.IMP.EXTENT.DEBUG) {
                 if (event.getActor() != null) {
                     event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn.getClass().getName()));
-                    event.getActor().printDebug(TextComponent.of(" - For area restrictions, it is recommended to use the FaweAPI"));
-                    event.getActor().printDebug(TextComponent.of(" - For block logging, it is recommended to use BlocksHub"));
-                    event.getActor().printDebug(TextComponent.of(" - To allow this plugin add it to the FAWE `allowed-plugins` list"));
-                    event.getActor().printDebug(TextComponent.of(" - To hide this message set `debug` to false in the FAWE config.yml"));
+                    event.getActor().printDebug(TextComponent.of(" - For area restrictions and block logging, it is recommended to use the FaweAPI"));
+                    event.getActor().printDebug(TextComponent.of(" - To allow this plugin add it to the FAWE `allowed-plugins` list in config.yml"));
                 } else {
                     LOGGER.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
-                    LOGGER.debug(" - For area restrictions, it is recommended to use the FaweAPI");
-                    LOGGER.debug(" - For block logging, it is recommended to use BlocksHub");
-                    LOGGER.debug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
-                    LOGGER.debug(" - To hide this message set `debug` to false in the FAWE config.yml");
+                    LOGGER.debug(" - For area restrictions and block logging, it is recommended to use the FaweAPI");
+                    LOGGER.debug(" - To allow this plugin, add it to the FAWE `allowed-plugins` list in config.yml");
                 }
             }
         }
