@@ -198,53 +198,26 @@ public final class BukkitAdapter_1_16_5 extends NMSAdapter {
         if (playerChunk == null) {
             return;
         }
-        if (playerChunk.hasBeenLoaded()) {
-            ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-            Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
-            if (optional.isPresent()) {
-                PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(optional.get(), 65535);
-                playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                    p.playerConnection.sendPacket(chunkpacket);
-                });
-
-                if (lighting) {
-                    //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
-                    boolean trustEdges = true;
-                    PacketPlayOutLightUpdate packet =
-                        new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(),
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
+        Chunk chunk = optional.orElseGet(() ->
+                nmsWorld.getChunkProvider().getChunkAtIfLoadedImmediately(chunkX, chunkZ));
+        if (chunk == null)  {
+            return;
+        }
+        PacketPlayOutMapChunk chunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
+        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+            p.playerConnection.sendPacket(chunkPacket);
+        });
+        if (lighting) {
+            //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
+            boolean trustEdges = true;
+            PacketPlayOutLightUpdate packet =
+                    new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(),
                             trustEdges);
-                    playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                        p.playerConnection.sendPacket(packet);
-                    });
-                }
-            } else if (PaperLib.isPaper()) {
-                //Require generic here to work with multiple dependencies trying to take control.
-                PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<?> objects =
-                    nmsWorld.getChunkProvider().playerChunkMap.playerViewDistanceNoTickMap
-                        .getObjectsInRange(chunkX, chunkZ);
-                if (objects == null) {
-                    return;
-                }
-                for (Object obj : objects.getBackingSet()) {
-                    if (obj == null) {
-                        continue;
-                    }
-                    EntityPlayer p = (EntityPlayer) obj;
-                    Chunk chunk = nmsWorld.getChunkProvider().getChunkAtIfLoadedImmediately(chunkX, chunkZ);
-                    if (chunk != null) {
-                        PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(chunk, 65535);
-                        p.playerConnection.sendPacket(chunkpacket);
-
-                        if (lighting) {
-                            //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
-                            boolean trustEdges = true;
-                            PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair,
-                                nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                            p.playerConnection.sendPacket(packet);
-                        }
-                    }
-                }
-            }
+            playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                p.playerConnection.sendPacket(packet);
+            });
         }
     }
 
