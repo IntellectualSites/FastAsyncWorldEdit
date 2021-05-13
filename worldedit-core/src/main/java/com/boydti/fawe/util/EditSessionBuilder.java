@@ -4,10 +4,10 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
 import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
 import com.boydti.fawe.beta.implementation.lighting.RelightProcessor;
 import com.boydti.fawe.beta.implementation.lighting.Relighter;
+import com.boydti.fawe.beta.implementation.processors.HeightmapProcessor;
 import com.boydti.fawe.beta.implementation.processors.LimitExtent;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.Caption;
@@ -34,7 +34,7 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
-import com.sk89q.worldedit.extent.AbstractDelegateExtent;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -42,14 +42,13 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -401,12 +400,14 @@ public class EditSessionBuilder {
             }
             // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks
             if (placeChunks && ((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.IMP.LIGHTING.MODE > 0))) {
-                relighter = new NMSRelighter(queue, Settings.IMP.LIGHTING.DO_HEIGHTMAPS,
-                    relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE));
+                relighter = WorldEdit.getInstance().getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getRelighterFactory().createRelighter(relightMode, world, queue);
                 extent.addProcessor(new RelightProcessor(relighter));
             } else {
                 relighter = NullRelighter.INSTANCE;
             }
+            extent.addProcessor(new HeightmapProcessor(world));
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
             } else if (limit != null && !limit.isUnlimited()) {

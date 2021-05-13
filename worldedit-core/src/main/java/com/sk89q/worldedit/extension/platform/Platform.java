@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -29,6 +30,7 @@ import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Locale;
@@ -206,4 +208,13 @@ public interface Platform extends Keyed {
      * @return A set of supported side effects
      */
     Set<SideEffect> getSupportedSideEffects();
+
+    /**
+     * Get the {@link RelighterFactory} that can be used to obtain
+     * {@link com.boydti.fawe.beta.implementation.lighting.Relighter}s.
+     *
+     * @return the relighter factory to be used.
+     */
+    @NotNull
+    RelighterFactory getRelighterFactory();
 }

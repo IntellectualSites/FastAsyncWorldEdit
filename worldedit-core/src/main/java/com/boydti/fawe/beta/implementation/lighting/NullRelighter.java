@@ -58,4 +58,9 @@ public class NullRelighter implements Relighter {
     public boolean isFinished() {
         return true;
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
 }

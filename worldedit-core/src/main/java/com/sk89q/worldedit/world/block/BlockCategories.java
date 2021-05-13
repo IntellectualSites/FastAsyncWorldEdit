@@ -123,7 +123,9 @@ public final class BlockCategories {
     public static BlockCategory get(String id) {
         BlockCategory entry = BlockCategory.REGISTRY.get(id);
         if (entry == null) {
-            return new BlockCategory(id);
+            BlockCategory blockCategory = new BlockCategory(id);
+            blockCategory.load();
+            return blockCategory;
         }
         return entry;
     }
