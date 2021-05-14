@@ -1,6 +1,7 @@
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.repositories
@@ -50,7 +51,8 @@ fun Project.applyCommonConfiguration() {
 
     plugins.withId("java") {
         the<JavaPluginExtension>().toolchain {
-            languageVersion.set(JavaLanguageVersion.of(8))
+            languageVersion.set(JavaLanguageVersion.of(11))
+            vendor.set(JvmVendorSpec.ADOPTOPENJDK)
         }
     }
 

@@ -30,7 +30,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
     } else {
         ext["internalVersion"] = "$version"
     }
-    
+
     tasks
         .withType<JavaCompile>()
         .matching { it.name == "compileJava" || it.name == "compileTestJava" }
@@ -60,7 +60,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
         "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
         "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
         "testImplementation"("net.bytebuddy:byte-buddy:1.11.0")
-        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
     }
 
     // Java 8 turns on doclint which we fail
