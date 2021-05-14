@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
 import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
@@ -57,9 +56,6 @@ public class CopyPastaBrush implements Brush, ResettableTool {
         }
         ClipboardHolder clipboard = session.getExistingClipboard();
         if (clipboard == null) {
-            if (editSession.getExtent() instanceof VisualExtent) {
-                return;
-            }
             Mask mask = editSession.getMask();
             if (mask == null) {
                 mask = Masks.alwaysTrue();

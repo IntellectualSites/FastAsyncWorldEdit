@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extension.platform;
 
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.pattern.PatternTraverser;
 import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
@@ -348,18 +347,6 @@ public class PlatformManager {
         try {
             Vector3 vector = location.toVector();
 
-            VirtualWorld virtual = session.getVirtualWorld();
-            if (virtual != null) {
-                if (Settings.IMP.EXPERIMENTAL.OTHER) {
-                    LOGGER.info("virtualWorld was not null in handlePlayerInput()");
-                }
-
-                virtual.handleBlockInteract(player, vector.toBlockPoint(), event);
-                if (event.isCancelled()) {
-                    return;
-                }
-            }
-
             if (event.getType() == Interaction.HIT) {
                 // superpickaxe is special because its primary interaction is a left click, not a right click
                 // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
@@ -422,16 +409,6 @@ public class PlatformManager {
         // making changes to the world
         Player player = createProxyActor(event.getPlayer());
         LocalSession session = worldEdit.getSessionManager().get(player);
-        VirtualWorld virtual = session.getVirtualWorld();
-        if (virtual != null) {
-            if (Settings.IMP.EXPERIMENTAL.OTHER) {
-                LOGGER.info("virtualWorld was not null in handlePlayerInput()");
-            }
-            virtual.handlePlayerInput(player,  event);
-            if (event.isCancelled()) {
-                return;
-            }
-        }
 
         try {
             switch (event.getInputType()) {

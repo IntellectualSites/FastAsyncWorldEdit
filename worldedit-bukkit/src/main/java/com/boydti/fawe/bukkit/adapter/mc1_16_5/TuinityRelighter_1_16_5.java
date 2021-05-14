@@ -180,7 +180,7 @@ public class TuinityRelighter_1_16_5 implements Relighter {
             int x = pos.x;
             int z = pos.z;
             if (delay) { // we still need to send the block changes of that chunk
-                BukkitAdapter_1_16_5.sendChunk(world, x, z, -1, false);
+                BukkitAdapter_1_16_5.sendChunk(world, x, z, false);
             }
             world.getChunkProvider().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
         }

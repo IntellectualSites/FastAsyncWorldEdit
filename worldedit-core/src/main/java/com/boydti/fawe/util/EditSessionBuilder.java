@@ -18,7 +18,6 @@ import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.NullChangeSet;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RelightMode;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
@@ -379,7 +378,7 @@ public class EditSessionBuilder {
                 }
             }
             if (allowedRegions == null) {
-                if (player != null && !player.hasPermission("fawe.bypass") && !player.hasPermission("fawe.bypass.regions") && !(root instanceof VirtualWorld)) {
+                if (player != null && !player.hasPermission("fawe.bypass") && !player.hasPermission("fawe.bypass.regions")) {
                     allowedRegions = player.getCurrentRegions();
                 }
             }

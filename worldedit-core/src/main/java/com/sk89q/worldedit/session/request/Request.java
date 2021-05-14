@@ -26,7 +26,11 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 /**
@@ -34,7 +38,9 @@ import javax.annotation.Nullable;
  */
 public final class Request {
 
-    private static final CleanableThreadLocal<Request> threadLocal = new CleanableThreadLocal<>(Request::new);
+    private static final ThreadLocal<Request> threadLocal = ThreadLocal.withInitial(Request::new);
+    // TODO any better way to deal with this?
+    private static final Map<Thread, Request> requests = new WeakHashMap<>();
 
     @Nullable
     private World world;
@@ -49,10 +55,11 @@ public final class Request {
     private boolean valid;
 
     private Request() {
+        requests.put(Thread.currentThread(), this);
     }
 
-    public static List<Request> getAll() {
-        return threadLocal.getAll();
+    public static Collection<Request> getAll() {
+        return requests.values();
     }
 
     /**
@@ -154,6 +161,7 @@ public final class Request {
     public static void reset() {
         request().invalidate();
         threadLocal.remove();
+        requests.remove(Thread.currentThread());
     }
 
     /**
