@@ -6,8 +6,8 @@ plugins {
 }
 
 repositories {
-    jcenter()
     gradlePluginPortal()
+//    jcenter()
     maven {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
@@ -23,5 +23,5 @@ val properties = Properties().also { props ->
 dependencies {
     implementation(gradleApi())
     implementation("org.ajoberstar.grgit:grgit-gradle:4.1.0")
-    implementation("com.github.jengelman.gradle.plugins:shadow:6.1.0")
+    implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
 }

@@ -61,7 +61,7 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:bukkit"))
-    compile(":worldedit-adapters:")
+    implementation(":worldedit-adapters:")
     // Paper-patched NMS jars
     compileOnly("com.destroystokyo.paperv1_15_r1:paperv1_15_r1:1_15_r1")
     compileOnly("com.destroystokyo.paperv1_16_r1:paperv1_16_r1:1_16_r1")
