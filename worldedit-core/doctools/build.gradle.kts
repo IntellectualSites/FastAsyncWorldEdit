@@ -8,7 +8,7 @@ plugins {
 applyCommonConfiguration()
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.11"
+    kotlinOptions.jvmTarget = "11"
 }
 
 application.mainClass.set("com.sk89q.worldedit.internal.util.DocumentationPrinter")
