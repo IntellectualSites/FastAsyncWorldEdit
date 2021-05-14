@@ -175,7 +175,7 @@ public final class BukkitAdapter_1_16_5 extends NMSAdapter {
         }
     }
 
-    public static void sendChunk(WorldServer nmsWorld, int chunkX, int chunkZ, int mask, boolean lighting) {
+    public static void sendChunk(WorldServer nmsWorld, int chunkX, int chunkZ, boolean lighting) {
         PlayerChunk playerChunk = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (playerChunk == null) {
             return;

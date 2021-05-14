@@ -9,7 +9,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.boydti.fawe.object.collection.CleanableThreadLocal;
-import com.boydti.fawe.object.collection.VariableThreadLocal;
 import com.boydti.fawe.object.exception.FaweBlockBagException;
 import com.boydti.fawe.object.exception.FaweChunkLoadException;
 import com.boydti.fawe.object.exception.FaweException;
@@ -34,7 +33,6 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -81,23 +79,19 @@ public enum FaweCache implements Trimable {
 
     @Override
     public synchronized boolean trim(boolean aggressive) {
-        if (aggressive) {
-            CleanableThreadLocal.cleanAll();
-        } else {
-            CHUNK_FLAG.clean();
-            BYTE_BUFFER_8192.clean();
-            BLOCK_TO_PALETTE.clean();
-            PALETTE_TO_BLOCK.clean();
-            BLOCK_STATES.clean();
-            SECTION_BLOCKS.clean();
-            PALETTE_CACHE.clean();
-            PALETTE_TO_BLOCK_CHAR.clean();
-            INDEX_STORE.clean();
+        CHUNK_FLAG.clean();
+        BYTE_BUFFER_8192.clean();
+        BLOCK_TO_PALETTE.clean();
+        PALETTE_TO_BLOCK.clean();
+        BLOCK_STATES.clean();
+        SECTION_BLOCKS.clean();
+        PALETTE_CACHE.clean();
+        PALETTE_TO_BLOCK_CHAR.clean();
+        INDEX_STORE.clean();
 
-            MUTABLE_VECTOR3.clean();
-            MUTABLE_BLOCKVECTOR3.clean();
-            SECTION_BITS_TO_CHAR.clean();
-        }
+        MUTABLE_VECTOR3.clean();
+        MUTABLE_BLOCKVECTOR3.clean();
+        SECTION_BITS_TO_CHAR.clean();
         for (Entry<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> entry : REGISTERED_POOLS.entrySet()) {
             Pool<? extends IChunkSet> pool = entry.getValue();
             pool.clear();
@@ -159,11 +153,8 @@ public enum FaweCache implements Trimable {
      */
     public final CleanableThreadLocal<AtomicBoolean> CHUNK_FLAG = new CleanableThreadLocal<>(AtomicBoolean::new); // resets to false
 
-    public final CleanableThreadLocal<long[]> LONG_BUFFER_1024 = new CleanableThreadLocal<>(() -> new long[1024]);
 
     public final CleanableThreadLocal<byte[]> BYTE_BUFFER_8192 = new CleanableThreadLocal<>(() -> new byte[8192]);
-
-    public final VariableThreadLocal BYTE_BUFFER_VAR = new VariableThreadLocal();
 
     public final CleanableThreadLocal<int[]> BLOCK_TO_PALETTE = new CleanableThreadLocal<>(() -> {
         int[] result = new int[BlockTypesCache.states.length];
@@ -186,8 +177,6 @@ public enum FaweCache implements Trimable {
     public final CleanableThreadLocal<int[]> SECTION_BLOCKS = new CleanableThreadLocal<>(() -> new int[4096]);
 
     public final CleanableThreadLocal<int[]> INDEX_STORE = new CleanableThreadLocal<>(() -> new int[256]);
-
-    public final CleanableThreadLocal<int[]> HEIGHT_STORE = new CleanableThreadLocal<>(() -> new int[256]);
 
     /**
      * Holds data for a palette used in a chunk section
@@ -313,14 +302,6 @@ public enum FaweCache implements Trimable {
      */
     public Palette toPaletteUnstretched(int layerOffset, char[] blocks) {
         return toPaletteUnstretched(layerOffset, null, blocks);
-    }
-
-    /**
-     * Convert raw int array to unstretched palette (1.16)
-     * @return palette
-     */
-    public Palette toPaletteUnstretched(int layerOffset, int[] blocks) {
-        return toPaletteUnstretched(layerOffset, blocks, null);
     }
 
     private Palette toPaletteUnstretched(int layerOffset, int[] blocksInts, char[] blocksChars) {
