@@ -7,7 +7,6 @@ plugins {
 
 repositories {
     gradlePluginPortal()
-//    jcenter()
     maven {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
