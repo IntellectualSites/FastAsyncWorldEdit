@@ -56,16 +56,20 @@ fun Project.applyCommonConfiguration() {
 
     dependencies {
         constraints {
-            for (conf in configurations.names) {
-                add(conf, "com.google.guava:guava") {
+            for (conf in configurations) {
+                if (conf.isCanBeConsumed || conf.isCanBeResolved) {
+                    // dependencies don't get declared in these
+                    continue
+                }
+                add(conf.name, "com.google.guava:guava") {
                     version { strictly(Versions.GUAVA) }
                     because("Mojang provides Guava")
                 }
-                add(conf, "com.google.code.gson:gson") {
+                add(conf.name, "com.google.code.gson:gson") {
                     version { strictly(Versions.GSON) }
                     because("Mojang provides Gson")
                 }
-                add(conf, "it.unimi.dsi:fastutil") {
+                add(conf.name, "it.unimi.dsi:fastutil") {
                     version { strictly(Versions.FAST_UTIL) }
                     because("Mojang provides FastUtil")
                 }

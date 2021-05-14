@@ -2,10 +2,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
 plugins {
-    id("java-library")
-    id("net.ltgt.apt-eclipse")
-    id("net.ltgt.apt-idea")
-    id("antlr")
+    `java-library`
+    antlr
 }
 
 repositories {
@@ -74,6 +72,10 @@ tasks.named<AntlrTask>("generateGrammarSource").configure {
     )
 }
 
+tasks.named("sourcesJar") {
+    mustRunAfter("generateGrammarSource")
+}
+
 // Give intellij info about where ANTLR code comes from
 plugins.withId("idea") {
     configure<IdeaModel> {
@@ -87,11 +89,7 @@ plugins.withId("idea") {
 
 sourceSets.named("main") {
     java {
-        srcDir("src/main/java")
         srcDir("src/legacy/java")
-    }
-    resources {
-        srcDir("src/main/resources")
     }
 }
 
