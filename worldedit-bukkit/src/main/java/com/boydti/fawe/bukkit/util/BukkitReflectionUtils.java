@@ -41,33 +41,6 @@ public class BukkitReflectionUtils {
         }
     }
 
-
-    /**
-     * Get class for name. Replace {nms} to net.minecraft.server.V*. Replace {cb} to org.bukkit.craftbukkit.V*. Replace
-     * {nm} to net.minecraft
-     *
-     * @param classes possible class paths
-     * @return RefClass object
-     * @throws RuntimeException if no class found
-     */
-    public static ReflectionUtils.RefClass getRefClass(final String... classes)
-        throws RuntimeException {
-        if (preClassM == null) {
-            init();
-        }
-        for (String className : classes) {
-            try {
-                className = className.replace("{cb}", preClassB).replace("{nms}", preClassM)
-                    .replace("{nm}", "net.minecraft");
-                return ReflectionUtils.getRefClass(Class.forName(className));
-            } catch (final ClassNotFoundException ignored) {
-            }
-        }
-        throw new RuntimeException(
-            "no class found: " + classes[0].replace("{cb}", preClassB).replace("{nms}", preClassM)
-                .replace("{nm}", "net.minecraft"));
-    }
-
     public static Class<?> getNmsClass(final String name) {
         final String className = "net.minecraft.server." + getVersion() + "." + name;
         return ReflectionUtils.getClass(className);
