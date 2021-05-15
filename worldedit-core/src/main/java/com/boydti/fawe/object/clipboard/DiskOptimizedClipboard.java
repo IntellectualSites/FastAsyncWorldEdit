@@ -22,6 +22,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import net.jpountz.util.UnsafeUtils;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -31,8 +32,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
@@ -280,27 +279,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         if (cb == null || !cb.isDirect()) {
             return;
         }
-        // we could use this type cast and call functions without reflection code,
-        // but static import from sun.* package is risky for non-SUN virtual machine.
-        //try { ((sun.nio.ch.DirectBuffer)cb).cleaner().clean(); } catch (Exception ex) { }
-        try {
-            Method cleaner = cb.getClass().getMethod("cleaner");
-            cleaner.setAccessible(true);
-            Method clean = Class.forName("sun.misc.Cleaner").getMethod("clean");
-            clean.setAccessible(true);
-            clean.invoke(cleaner.invoke(cb));
-        } catch (Exception ex) {
-            try {
-                final Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-                final Field theUnsafeField = unsafeClass.getDeclaredField("theUnsafe");
-                theUnsafeField.setAccessible(true);
-                final Object theUnsafe = theUnsafeField.get(null);
-                final Method invokeCleanerMethod = unsafeClass.getMethod("invokeCleaner", ByteBuffer.class);
-                invokeCleanerMethod.invoke(theUnsafe, cb);
-            } catch (Exception e) {
-                System.gc();
-            }
-        }
+        UnsafeUtils.getUNSAFE().invokeCleaner(cb);
     }
 
     @Override
