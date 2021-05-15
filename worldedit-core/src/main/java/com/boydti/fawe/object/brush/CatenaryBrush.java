@@ -69,7 +69,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
             e.printStackTrace();
         }
         if (!visual) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.line.secondary"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
             if (!select) {
                 pos1 = null;
                 return;

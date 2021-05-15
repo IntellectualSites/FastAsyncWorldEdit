@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
@@ -82,10 +83,10 @@ public class EntityVisitor implements Operation {
 
     @Override
     public Iterable<Component> getStatusMessages() {
-        return ImmutableList.of(TranslatableComponent.of(
+        return ImmutableList.of(Caption.of(
                 "worldedit.operation.affected.entity",
                 TextComponent.of(getAffected())
-        ).color(TextColor.GRAY));
+        ));
     }
 
 }

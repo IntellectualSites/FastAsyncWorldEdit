@@ -6,13 +6,13 @@ import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.collection.YieldIterable;
 import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.boydti.fawe.util.MainUtil;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import org.apache.logging.log4j.Logger;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import java.util.stream.IntStream;
 
 public class RollbackDatabase extends AsyncNotifyQueue {
 
-    private static final Logger log = LoggerFactory.getLogger(RollbackDatabase.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final String prefix;
     private final File dbLocation;
@@ -309,7 +309,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 dbLocation.createNewFile();
             } catch (IOException e) {
                 e.printStackTrace();
-                log.debug("Unable to create the database!");
+                LOGGER.error("Unable to create the database!");
             }
         }
         Class.forName("org.sqlite.JDBC");

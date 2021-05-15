@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -63,7 +64,6 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
 
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
             try {
-                editSession.disableBuffering();
                 BlockVector3 blockPoint = pos.toVector().toBlockPoint();
                 BaseBlock applied = secondary.apply(blockPoint);
                 if (applied.getBlockType().getMaterial().isAir()) {
@@ -93,7 +93,6 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
 
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
             try {
-                editSession.disableBuffering();
                 BlockVector3 blockPoint = pos.toVector().toBlockPoint();
                 BaseBlock applied = primary.apply(blockPoint);
                 if (applied.getBlockType().getMaterial().isAir()) {
@@ -123,7 +122,7 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         }
 
         if (target == null) {
-            player.printError(TranslatableComponent.of("worldedit.tool.no-block"));
+            player.print(Caption.of("worldedit.tool.no-block"));
             return null;
         }
 

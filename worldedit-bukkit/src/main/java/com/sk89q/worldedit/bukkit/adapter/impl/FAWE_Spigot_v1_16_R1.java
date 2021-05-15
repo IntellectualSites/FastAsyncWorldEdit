@@ -42,6 +42,7 @@ import com.sk89q.worldedit.bukkit.adapter.impl.regen.Regen_v1_16_R1;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
@@ -80,6 +81,7 @@ import net.minecraft.server.v1_16_R1.PlayerChunk;
 import net.minecraft.server.v1_16_R1.TileEntity;
 import net.minecraft.server.v1_16_R1.World;
 import net.minecraft.server.v1_16_R1.WorldServer;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
@@ -101,9 +103,10 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private final Spigot_v1_16_R1 parent;
     private char[] ibdToStateOrdinal;
     private int[] ordinalToIbdID;
@@ -343,9 +346,8 @@ public final class FAWE_Spigot_v1_16_R1 extends CachedBukkitAdapter implements I
                 init();
                 return adaptToChar(ibd);
             } catch (ArrayIndexOutOfBoundsException e1) {
-                getLogger(FAWE_Spigot_v1_16_R1.class)
-                    .error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
-                           ibd.getBlock(), Block.REGISTRY_ID.getId(ibd), ibdToStateOrdinal.length, e1);
+                LOGGER.error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
+                        ibd.getBlock(), Block.REGISTRY_ID.getId(ibd), ibdToStateOrdinal.length, e1);
                 return 0;
             }
         }

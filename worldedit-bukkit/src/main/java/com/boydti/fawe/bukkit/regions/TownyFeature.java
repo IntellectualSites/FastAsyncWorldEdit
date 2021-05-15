@@ -10,25 +10,26 @@ import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyUniverse;
 import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class TownyFeature extends BukkitMaskManager implements Listener {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Plugin towny;
 
     public TownyFeature(Plugin townyPlugin) {
         super(townyPlugin.getName());
         this.towny = townyPlugin;
-        getLogger(TownyFeature.class).debug("Plugin 'Towny' found. Using it now.");
-
+        LOGGER.debug("Plugin 'Towny' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, TownBlock block) {

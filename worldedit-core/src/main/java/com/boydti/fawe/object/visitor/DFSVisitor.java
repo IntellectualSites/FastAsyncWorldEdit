@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.visitor;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.IntTriple;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
@@ -9,8 +10,6 @@ import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -144,10 +143,10 @@ public abstract class DFSVisitor implements Operation {
     }
 
     public Iterable<Component> getStatusMessages() {
-        return Lists.newArrayList(TranslatableComponent.of(
+        return Lists.newArrayList(Caption.of(
             "fawe.worldedit.visitor.visitor.block",
             TextComponent.of(getAffected())
-        ).color(TextColor.GRAY));
+        ));
     }
 
     public int getAffected() {

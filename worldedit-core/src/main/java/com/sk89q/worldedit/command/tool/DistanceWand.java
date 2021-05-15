@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
@@ -79,7 +80,7 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
         }
 
         if (target == null) {
-            player.printError(TranslatableComponent.of("worldedit.tool.no-block"));
+            player.print(Caption.of("worldedit.tool.no-block"));
             return null;
         }
 

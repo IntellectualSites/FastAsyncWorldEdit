@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -75,17 +76,17 @@ public class NullRegion implements Region {
 
     @Override
     public void expand(BlockVector3... changes) throws RegionOperationException {
-        throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.null.error.immutable"));
+        throw new RegionOperationException(Caption.of("worldedit.selection.null.error.immutable"));
     }
 
     @Override
     public void contract(BlockVector3... changes) throws RegionOperationException {
-        throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.null.error.immutable"));
+        throw new RegionOperationException(Caption.of("worldedit.selection.null.error.immutable"));
     }
 
     @Override
     public void shift(BlockVector3 change) throws RegionOperationException {
-        throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.null.error.immutable"));
+        throw new RegionOperationException(Caption.of("worldedit.selection.null.error.immutable"));
     }
 
     @Override

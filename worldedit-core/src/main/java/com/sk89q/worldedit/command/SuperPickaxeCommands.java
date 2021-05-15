@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -51,7 +52,7 @@ public class SuperPickaxeCommands {
     public void single(Player player, LocalSession session) throws WorldEditException {
         session.setSuperPickaxe(new SinglePickaxe());
         session.enableSuperPickAxe();
-        player.printInfo(TranslatableComponent.of("worldedit.tool.superpickaxe.mode.single"));
+        player.print(Caption.of("worldedit.tool.superpickaxe.mode.single"));
     }
 
     @Command(
@@ -66,12 +67,12 @@ public class SuperPickaxeCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (range > config.maxSuperPickaxeSize) {
-            player.printError(TranslatableComponent.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
+            player.print(Caption.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
             return;
         }
         session.setSuperPickaxe(new AreaPickaxe(range));
         session.enableSuperPickAxe();
-        player.printInfo(TranslatableComponent.of("worldedit.tool.superpickaxe.mode.area"));
+        player.print(Caption.of("worldedit.tool.superpickaxe.mode.area"));
     }
 
     @Command(
@@ -87,12 +88,12 @@ public class SuperPickaxeCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (range > config.maxSuperPickaxeSize) {
-            player.printError(TranslatableComponent.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
+            player.print(Caption.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
             return;
         }
 
         session.setSuperPickaxe(new RecursivePickaxe(range));
         session.enableSuperPickAxe();
-        player.printInfo(TranslatableComponent.of("worldedit.tool.superpickaxe.mode.recursive"));
+        player.print(Caption.of("worldedit.tool.superpickaxe.mode.recursive"));
     }
 }

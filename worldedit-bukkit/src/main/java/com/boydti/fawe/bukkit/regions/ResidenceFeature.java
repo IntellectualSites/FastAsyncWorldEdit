@@ -6,15 +6,18 @@ import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.boydti.fawe.regions.FaweMask;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class ResidenceFeature extends BukkitMaskManager implements Listener {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private FaweBukkit plugin;
     private Plugin residence;
 
@@ -22,7 +25,7 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
         super(residencePlugin.getName());
         this.residence = residencePlugin;
         this.plugin = p3;
-        getLogger(ResidenceFeature.class).debug("Plugin 'Residence' found. Using it now.");
+        LOGGER.debug("Plugin 'Residence' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, ClaimedResidence residence, MaskType type) {

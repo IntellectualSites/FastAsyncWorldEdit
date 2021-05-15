@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 public interface IBatchProcessor {
 

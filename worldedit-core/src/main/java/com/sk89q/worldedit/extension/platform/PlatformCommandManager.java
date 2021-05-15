@@ -121,6 +121,7 @@ import com.sk89q.worldedit.internal.command.ConfirmHandler;
 import com.sk89q.worldedit.internal.command.MethodInjector;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.SessionKey;
@@ -133,6 +134,7 @@ import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.logging.DynamicStreamHandler;
 import com.sk89q.worldedit.util.logging.LogFormat;
 import com.sk89q.worldedit.world.World;
+import org.apache.logging.log4j.Logger;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.converter.ArgumentConverter;
@@ -155,8 +157,6 @@ import org.enginehub.piston.suggestion.Suggestion;
 import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -185,7 +185,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public final class PlatformCommandManager {
 
     public static final Pattern COMMAND_CLEAN_PATTERN = Pattern.compile("^[/]+");
-    private static final Logger log = LoggerFactory.getLogger(PlatformCommandManager.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final java.util.logging.Logger COMMAND_LOG =
         java.util.logging.Logger.getLogger("com.sk89q.worldedit.CommandLog");
 
@@ -354,7 +354,7 @@ public final class PlatformCommandManager {
             additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
-            cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
+            cmd.addPart(SubCommandPart.builder(Caption.of("worldedit.argument.action"),
                 TextComponent.of("Sub-command to run."))
                 .withCommands(subCommands)
                 .required()
@@ -384,7 +384,7 @@ public final class PlatformCommandManager {
             additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
-            cmd.addPart(SubCommandPart.builder(TranslatableComponent.of("worldedit.argument.action"),
+            cmd.addPart(SubCommandPart.builder(Caption.of("worldedit.argument.action"),
                     TextComponent.of("Sub-command to run."))
                     .withCommands(subCommands)
                     .required()
@@ -460,14 +460,15 @@ public final class PlatformCommandManager {
                 WorldEditCommandsRegistration.builder(),
                 new WorldEditCommands(worldEdit)
             );
-            // TODO: Ping @MattBDev to reimplement 2020-02-04
-//            registerSubCommands(
-//                "cfi",
-//                ImmutableList.of("/cfi"),
-//                "CFI commands",
-//                CFICommandsRegistration.builder(),
-//                new CFICommands(worldEdit)
-//            );
+            /*
+            TODO: Ping @MattBDev to reimplement 2020-02-04
+            registerSubCommands(
+                "cfi",
+                ImmutableList.of("/cfi"),
+                "CFI commands",
+                CFICommandsRegistration.builder(),
+                new CFICommands(worldEdit)
+            );
             registerSubCommands(
                 "/anvil",
                 ImmutableList.of(),
@@ -475,6 +476,7 @@ public final class PlatformCommandManager {
                 AnvilCommandsRegistration.builder(),
                 new AnvilCommands(worldEdit)
             );
+             */
             this.registration.register(
                 commandManager,
                 BiomeCommandsRegistration.builder(),
@@ -567,7 +569,7 @@ public final class PlatformCommandManager {
     }
 
     void registerCommandsWith(Platform platform) {
-        log.info("Registering commands with " + platform.getClass().getCanonicalName());
+        LOGGER.info("Registering commands with " + platform.getClass().getCanonicalName());
 
 
         LocalConfiguration config = platform.getConfiguration();
@@ -582,12 +584,12 @@ public final class PlatformCommandManager {
             File file = new File(config.getWorkingDirectory(), path);
             COMMAND_LOG.setLevel(Level.ALL);
 
-            log.info("Logging WorldEdit commands to " + file.getAbsolutePath());
+            LOGGER.info("Logging WorldEdit commands to " + file.getAbsolutePath());
 
             try {
                 dynamicHandler.setHandler(new FileHandler(file.getAbsolutePath(), true));
             } catch (IOException e) {
-                log.warn("Could not use command log file " + path + ": " + e.getMessage());
+                LOGGER.warn("Could not use command log file " + path + ": " + e.getMessage());
             }
 
             dynamicHandler.setFormatter(new LogFormat(config.logFormat));
@@ -724,16 +726,16 @@ public final class PlatformCommandManager {
                 actor.print(e.getRichMessage());
             }
         } catch (FaweException e) {
-            actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", e.getComponent()));
+            actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", e.getComponent()));
         } catch (UsageException e) {
             ImmutableList<Command> cmd = e.getCommands();
             if (!cmd.isEmpty()) {
-                actor.printError(TranslatableComponent.of("fawe.error.command.syntax", HelpGenerator.create(e.getCommandParseResult()).getFullHelp()));
+                actor.print(Caption.of("fawe.error.command.syntax", HelpGenerator.create(e.getCommandParseResult()).getFullHelp()));
             }
             actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {
             if (e.getCause() instanceof FaweException) {
-                actor.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", ((FaweException)e.getCause()).getComponent()));
+                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", ((FaweException)e.getCause()).getComponent()));
             } else {
                 handleUnknownException(actor, e.getCause());
             }
@@ -741,7 +743,6 @@ public final class PlatformCommandManager {
             Component msg = e.getRichMessage();
             if (msg != TextComponent.empty()) {
                 actor.print(TextComponent.builder("")
-                        .color(TextColor.RED)
                         .append(e.getRichMessage())
                         .build());
                 List<String> argList = parseArgs(event.getArguments()).map(Substring::getSubstring).collect(Collectors.toList());
@@ -765,7 +766,7 @@ public final class PlatformCommandManager {
                 int changed = editSession.getBlockChangeCount();
                 double throughput = timeS == 0 ? changed : changed / timeS;
                 if (time > 1000) {
-                    actor.printDebug(TranslatableComponent.of(
+                    actor.print(Caption.of(
                             "worldedit.command.time-elapsed",
                             TextComponent.of(timeS),
                             TextComponent.of(changed),
@@ -807,7 +808,7 @@ public final class PlatformCommandManager {
             store.injectValue(Key.of(Player.class), ValueProvider.constant((Player) actor));
         } else {
             store.injectValue(Key.of(Player.class), context -> {
-                throw new CommandException(TranslatableComponent.of("worldedit.command.player-only"), ImmutableList.of());
+                throw new CommandException(Caption.of("worldedit.command.player-only"), ImmutableList.of());
             });
         }
         store.injectValue(Key.of(Arguments.class), ValueProvider.constant(arguments));
@@ -826,9 +827,9 @@ public final class PlatformCommandManager {
     }
 
     private void handleUnknownException(Actor actor, Throwable t) {
-        actor.printError(TranslatableComponent.of("worldedit.command.error.report"));
+        actor.print(Caption.of("worldedit.command.error.report"));
         actor.print(TextComponent.of(t.getClass().getName() + ": " + t.getMessage()));
-        log.error("An unexpected error while handling a WorldEdit command", t);
+        LOGGER.error("An unexpected error while handling a WorldEdit command", t);
     }
 
     @Subscribe
@@ -848,7 +849,7 @@ public final class PlatformCommandManager {
                 suggestions = commandManager.getSuggestions(access, argStrings);
             } catch (Throwable t) { // catch errors which are *not* command exceptions generated by parsers/suggesters
                 if (!(t instanceof CommandException)) {
-                    log.debug("Unexpected error occurred while generating suggestions for input: " + arguments, t);
+                    LOGGER.debug("Unexpected error occurred while generating suggestions for input: " + arguments, t);
                     return;
                 }
                 throw t;

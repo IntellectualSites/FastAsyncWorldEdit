@@ -2,13 +2,16 @@ package com.boydti.fawe.jnbt.streamer;
 
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import java.io.DataInputStream;
 import java.io.IOException;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class StreamDelegate {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private static final byte[][] ZERO_KEYS = new byte[0][];
     private static final StreamDelegate[] ZERO_VALUES = new StreamDelegate[0];
 
@@ -41,7 +44,7 @@ public class StreamDelegate {
 
     private StreamDelegate add(String name, StreamDelegate scope) {
         if (valueReader != null) {
-            getLogger(StreamDelegate.class).warn("Scope {} | {} may not run, as the stream is only read once, and a value reader is already set", name, scope);
+            LOGGER.warn("Scope {} | {} may not run, as the stream is only read once, and a value reader is already set", name, scope);
         }
         byte[] bytes = name.getBytes(NBTConstants.CHARSET);
         int maxSize = bytes.length;
@@ -169,7 +172,7 @@ public class StreamDelegate {
 
     public StreamDelegate withValue(ValueReader valueReader) {
         if (keys.length != 0) {
-            getLogger(StreamDelegate.class).warn("Reader {} may not run, as the stream is only read once, and a value reader is already set", valueReader);
+            LOGGER.warn("Reader {} may not run, as the stream is only read once, and a value reader is already set", valueReader);
         }
         this.valueReader = valueReader;
         return this;

@@ -1,9 +1,9 @@
 package com.boydti.fawe.object.exception;
 
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.boydti.fawe.config.Caption;
 
 public class FaweChunkLoadException extends FaweException {
     public FaweChunkLoadException() {
-        super(TranslatableComponent.of("fawe.cancel.worldedit.failed.load.chunk"));
+        super(Caption.of("fawe.cancel.worldedit.failed.load.chunk"));
     }
 }

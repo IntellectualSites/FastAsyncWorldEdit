@@ -1,7 +1,6 @@
 package com.boydti.fawe.bukkit.regions;
 
 import com.boydti.fawe.regions.FaweMaskManager;
-import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 
 public abstract class BukkitMaskManager extends FaweMaskManager {

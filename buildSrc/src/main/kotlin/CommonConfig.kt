@@ -1,7 +1,9 @@
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.the
 
@@ -15,19 +17,10 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "IntellectualSites"
             url = uri("https://mvn.intellectualsites.com/content/groups/public/")
-            content {
-                includeGroup("com.plotsquared")
-                includeGroup("com.intellectualsites.paster")
-                includeGroup("com.github.intellectualsites.plotsquared")
-            }
         }
         maven {
             name = "EngineHub"
             url = uri("https://maven.enginehub.org/repo/")
-            content {
-                includeGroupByRegex("org.enginehub.*")
-                includeGroupByRegex("com.sk89q.*")
-            }
         }
         maven {
             name = "OSS Sonatype Snapshots"
@@ -40,13 +33,6 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "Athion"
             url = uri("https://ci.athion.net/plugin/repository/tools/")
-            content {
-                includeGroup("com.massivecraft")
-                includeGroup("com.thevoxelbox.voxelsniper")
-                includeGroup("com.palmergames.bukkit")
-                includeGroup("net.fabiozumbi12")
-                includeGroupByRegex("com.destroystokyo.*")
-            }
         }
     }
 
@@ -56,24 +42,37 @@ fun Project.applyCommonConfiguration() {
         }
     }
 
+    configurations.findByName("compileClasspath")?.apply {
+        resolutionStrategy.componentSelection {
+            withModule("org.slf4j:slf4j-api") {
+                reject("No SLF4J allowed on compile classpath")
+            }
+        }
+    }
+
     plugins.withId("java") {
         the<JavaPluginExtension>().toolchain {
-            languageVersion.set(JavaLanguageVersion.of(8))
+            languageVersion.set(JavaLanguageVersion.of(11))
+            vendor.set(JvmVendorSpec.ADOPTOPENJDK)
         }
     }
 
     dependencies {
         constraints {
-            for (conf in configurations.names) {
-                add(conf, "com.google.guava:guava") {
+            for (conf in configurations) {
+                if (conf.isCanBeConsumed || conf.isCanBeResolved) {
+                    // dependencies don't get declared in these
+                    continue
+                }
+                add(conf.name, "com.google.guava:guava") {
                     version { strictly(Versions.GUAVA) }
                     because("Mojang provides Guava")
                 }
-                add(conf, "com.google.code.gson:gson") {
+                add(conf.name, "com.google.code.gson:gson") {
                     version { strictly(Versions.GSON) }
                     because("Mojang provides Gson")
                 }
-                add(conf, "it.unimi.dsi:fastutil") {
+                add(conf.name, "it.unimi.dsi:fastutil") {
                     version { strictly(Versions.FAST_UTIL) }
                     because("Mojang provides FastUtil")
                 }

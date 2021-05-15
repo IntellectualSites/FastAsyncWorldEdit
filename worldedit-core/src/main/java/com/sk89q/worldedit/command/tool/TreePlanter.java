@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -63,10 +64,10 @@ public class TreePlanter implements BlockTool {
                 }
 
                 if (!successful) {
-                    player.printError(TranslatableComponent.of("worldedit.tool.tree.obstructed"));
+                    player.print(Caption.of("worldedit.tool.tree.obstructed"));
                 }
             } catch (MaxChangedBlocksException e) {
-                player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
+                player.print(Caption.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);
             }

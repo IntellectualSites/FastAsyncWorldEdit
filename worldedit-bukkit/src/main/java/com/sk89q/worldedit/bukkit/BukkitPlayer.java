@@ -205,7 +205,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void print(Component component) {
         component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
-        TextAdapter.sendComponent(player, component);
+        TextAdapter.sendMessage(player, WorldEditText.format(component, getLocale()));
     }
 
     @Override
@@ -330,7 +330,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void sendAnnouncements() {
         if (WorldEditPlugin.getInstance().getBukkitImplAdapter() == null) {
-            printError(TranslatableComponent.of("worldedit.version.bukkit.unsupported-adapter",
+            print(Caption.of("worldedit.version.bukkit.unsupported-adapter",
                     TextComponent.of("https://intellectualsites.github.io/download/fawe.html", TextColor.AQUA)
                         .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
         }

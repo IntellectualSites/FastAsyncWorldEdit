@@ -3,8 +3,8 @@ package com.boydti.fawe.config;
 import com.boydti.fawe.configuration.MemorySection;
 import com.boydti.fawe.configuration.file.YamlConfiguration;
 import com.boydti.fawe.util.StringMan;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class Config {
 
-    private final Logger log = LoggerFactory.getLogger(Config.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public Config() {
         save(new PrintWriter(new ByteArrayOutputStream(0)), getClass(), this, 0);
@@ -48,7 +48,7 @@ public class Config {
                 }
             }
         }
-        log.debug("Failed to get config option: " + key);
+        LOGGER.debug("Failed to get config option: " + key);
         return null;
     }
 
@@ -79,7 +79,7 @@ public class Config {
                 }
             }
         }
-        log.debug("Failed to set config option: " + key + ": " + value + " | " + instance + " | " + root.getSimpleName() + ".yml");
+        LOGGER.debug("Failed to set config option: " + key + ": " + value + " | " + instance + " | " + root.getSimpleName() + ".yml");
     }
 
     public boolean load(File file) {
@@ -333,7 +333,7 @@ public class Config {
             setAccessible(field);
             return field;
         } catch (Throwable ignored) {
-            log.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance.getClass().getSimpleName()));
+            LOGGER.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance.getClass().getSimpleName()));
             return null;
         }
     }

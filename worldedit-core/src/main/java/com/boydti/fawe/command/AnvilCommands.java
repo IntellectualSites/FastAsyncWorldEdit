@@ -20,6 +20,14 @@ import java.io.IOException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ *
+ * @deprecated Anvil classes were used on versions prior to 1.13 to trim chunks.
+ * The way how it's been done was unsafe and led to issues back the years, hence it
+ * hasn't been implemented in any modern version. Therefore the current
+ * implementation is deprecated for removal without replacement.
+ */
+@Deprecated
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class AnvilCommands {
 

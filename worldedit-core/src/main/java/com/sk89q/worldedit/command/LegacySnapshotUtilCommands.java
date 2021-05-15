@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -58,7 +59,7 @@ class LegacySnapshotUtilCommands {
             try {
                 snapshot = config.snapshotRepo.getSnapshot(snapshotName);
             } catch (InvalidSnapshotException e) {
-                actor.printError(TranslatableComponent.of("worldedit.restore.not-available"));
+                actor.print(Caption.of("worldedit.restore.not-available"));
                 return;
             }
         } else {
@@ -71,7 +72,7 @@ class LegacySnapshotUtilCommands {
                 snapshot = config.snapshotRepo.getDefaultSnapshot(world.getName());
 
                 if (snapshot == null) {
-                    actor.printError(TranslatableComponent.of("worldedit.restore.none-found-console"));
+                    actor.print(Caption.of("worldedit.restore.none-found-console"));
 
                     // Okay, let's toss some debugging information!
                     File dir = config.snapshotRepo.getDirectory();
@@ -88,7 +89,7 @@ class LegacySnapshotUtilCommands {
                     return;
                 }
             } catch (MissingWorldException ex) {
-                actor.printError(TranslatableComponent.of("worldedit.restore.none-for-world"));
+                actor.print(Caption.of("worldedit.restore.none-for-world"));
                 return;
             }
         }
@@ -98,9 +99,9 @@ class LegacySnapshotUtilCommands {
         // Load chunk store
         try {
             chunkStore = snapshot.getChunkStore();
-            actor.printInfo(TranslatableComponent.of("worldedit.restore.loaded", TextComponent.of(snapshot.getName())));
+            actor.print(Caption.of("worldedit.restore.loaded", TextComponent.of(snapshot.getName())));
         } catch (DataException | IOException e) {
-            actor.printError(TranslatableComponent.of("worldedit.restore.failed", TextComponent.of(e.getMessage())));
+            actor.print(Caption.of("worldedit.restore.failed", TextComponent.of(e.getMessage())));
             return;
         }
 
@@ -114,15 +115,15 @@ class LegacySnapshotUtilCommands {
             if (restore.hadTotalFailure()) {
                 String error = restore.getLastErrorMessage();
                 if (!restore.getMissingChunks().isEmpty()) {
-                    actor.printError(TranslatableComponent.of("worldedit.restore.chunk-not-present"));
+                    actor.print(Caption.of("worldedit.restore.chunk-not-present"));
                 } else if (error != null) {
-                    actor.printError(TranslatableComponent.of("worldedit.restore.block-place-failed"));
-                    actor.printError(TranslatableComponent.of("worldedit.restore.block-place-error", TextComponent.of(error)));
+                    actor.print(Caption.of("worldedit.restore.block-place-failed"));
+                    actor.print(Caption.of("worldedit.restore.block-place-error", TextComponent.of(error)));
                 } else {
-                    actor.printError(TranslatableComponent.of("worldedit.restore.chunk-load-failed"));
+                    actor.print(Caption.of("worldedit.restore.chunk-load-failed"));
                 }
             } else {
-                actor.printInfo(TranslatableComponent.of("worldedit.restore.restored",
+                actor.print(Caption.of("worldedit.restore.restored",
                     TextComponent.of(restore.getMissingChunks().size()),
                     TextComponent.of(restore.getErrorChunks().size())));
             }

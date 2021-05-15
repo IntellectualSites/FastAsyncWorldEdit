@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -192,8 +193,8 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     public List<Component> getSelectionInfoLines() {
         List<Component> ret = new ArrayList<>();
 
-        ret.add(TranslatableComponent.of("worldedit.selection.convex.info.vertices", TextComponent.of(region.getVertices().size())));
-        ret.add(TranslatableComponent.of("worldedit.selection.convex.info.triangles", TextComponent.of(region.getTriangles().size())));
+        ret.add(Caption.of("worldedit.selection.convex.info.vertices", TextComponent.of(region.getVertices().size())));
+        ret.add(Caption.of("worldedit.selection.convex.info.triangles", TextComponent.of(region.getTriangles().size())));
 
         return ret;
     }
@@ -206,7 +207,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
         session.describeCUI(player);
 
-        player.printInfo(TranslatableComponent.of("worldedit.selection.convex.explain.primary", TextComponent.of(pos.toString())));
+        player.print(Caption.of("worldedit.selection.convex.explain.primary", TextComponent.of(pos.toString())));
     }
 
     @Override
@@ -217,7 +218,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
         session.describeCUI(player);
 
-        player.printInfo(TranslatableComponent.of("worldedit.selection.convex.explain.secondary", TextComponent.of(pos.toString())));
+        player.print(Caption.of("worldedit.selection.convex.explain.secondary", TextComponent.of(pos.toString())));
     }
 
     @Override

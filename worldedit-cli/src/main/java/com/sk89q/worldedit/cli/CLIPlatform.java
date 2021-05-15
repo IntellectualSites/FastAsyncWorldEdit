@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.cli;
 
+import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
+import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
@@ -30,6 +32,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -38,7 +41,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import javax.annotation.Nullable;
 
 class CLIPlatform extends AbstractPlatform {
@@ -145,13 +147,6 @@ class CLIPlatform extends AbstractPlatform {
         return app.getInternalVersion();
     }
 
-    // FAWE start
-    @Override
-    public String getId() {
-        return "intellectualsites:cli";
-    }
-    // FAWE end
-
     @Override
     public Map<Capability, Preference> getCapabilities() {
         Map<Capability, Preference> capabilities = new EnumMap<>(Capability.class);
@@ -166,6 +161,11 @@ class CLIPlatform extends AbstractPlatform {
     @Override
     public Set<SideEffect> getSupportedSideEffects() {
         return ImmutableSet.of();
+    }
+
+    @Override
+    public @NotNull RelighterFactory getRelighterFactory() {
+        return (_a, _b, _c) -> NullRelighter.INSTANCE;
     }
 
     public void addWorld(World world) {

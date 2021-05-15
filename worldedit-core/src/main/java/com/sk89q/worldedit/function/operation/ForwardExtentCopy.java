@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.operation;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.extent.BlockTranslateExtent;
 import com.boydti.fawe.object.extent.PositionTransformExtent;
 import com.boydti.fawe.object.function.block.BiomeCopy;
@@ -425,12 +426,12 @@ public class ForwardExtentCopy implements Operation {
     @Override
     public Iterable<Component> getStatusMessages() {
         return ImmutableList.of(
-                TranslatableComponent.of("worldedit.operation.affected.block",
-                        TextComponent.of(affectedBlocks)).color(TextColor.LIGHT_PURPLE),
-                TranslatableComponent.of("worldedit.operation.affected.biome",
-                        TextComponent.of(affectedBiomeCols)).color(TextColor.LIGHT_PURPLE),
-                TranslatableComponent.of("worldedit.operation.affected.entity",
-                        TextComponent.of(affectedEntities)).color(TextColor.LIGHT_PURPLE)
+                Caption.of("worldedit.operation.affected.block",
+                        TextComponent.of(affectedBlocks)),
+                Caption.of("worldedit.operation.affected.biome",
+                        TextComponent.of(affectedBiomeCols)),
+                Caption.of("worldedit.operation.affected.entity",
+                        TextComponent.of(affectedEntities))
         );
     }
 

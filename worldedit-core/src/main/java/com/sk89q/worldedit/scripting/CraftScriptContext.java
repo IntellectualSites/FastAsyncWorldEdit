@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.scripting;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -149,7 +150,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     public void checkArgs(int min, int max, String usage)
             throws InsufficientArgumentsException {
         if (args.length <= min || (max != -1 && args.length - 1 > max)) {
-            throw new InsufficientArgumentsException(TranslatableComponent.of("worldedit.error.incorrect-usage", TextComponent.of(usage)));
+            throw new InsufficientArgumentsException(Caption.of("worldedit.error.incorrect-usage", TextComponent.of(usage)));
         }
     }
 

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.exception.FaweException;
@@ -41,15 +42,16 @@ import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.event.platform.PlatformInitializeEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
 import com.sk89q.worldedit.event.platform.PlayerInputEvent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,7 +73,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class PlatformManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlatformManager.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final WorldEdit worldEdit;
     private final PlatformCommandManager platformCommandManager;
@@ -104,7 +106,7 @@ public class PlatformManager {
     public synchronized void register(Platform platform) {
         checkNotNull(platform);
 
-        logger.info("Got request to register " + platform.getClass() + " with WorldEdit [" + super.toString() + "]");
+        LOGGER.info("Got request to register " + platform.getClass() + " with WorldEdit [" + super.toString() + "]");
 
         // Just add the platform to the list of platforms: we'll pick favorites
         // once all the platforms have been loaded
@@ -113,7 +115,7 @@ public class PlatformManager {
         // Make sure that versions are in sync
         if (firstSeenVersion != null) {
             if (!firstSeenVersion.equals(platform.getVersion())) {
-                logger.warn("Multiple ports of WorldEdit are installed but they report different versions ({} and {}). "
+                LOGGER.warn("Multiple ports of WorldEdit are installed but they report different versions ({} and {}). "
                                 + "If these two versions are truly different, then you may run into unexpected crashes and errors.", firstSeenVersion, platform.getVersion());
             }
         } else {
@@ -135,7 +137,7 @@ public class PlatformManager {
         boolean removed = platforms.remove(platform);
 
         if (removed) {
-            logger.info("Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
+            LOGGER.info("Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
 
             boolean choosePreferred = false;
 
@@ -349,7 +351,7 @@ public class PlatformManager {
             VirtualWorld virtual = session.getVirtualWorld();
             if (virtual != null) {
                 if (Settings.IMP.EXPERIMENTAL.OTHER) {
-                    logger.info("virtualWorld was not null in handlePlayerInput()");
+                    LOGGER.info("virtualWorld was not null in handlePlayerInput()");
                 }
 
                 virtual.handleBlockInteract(player, vector.toBlockPoint(), event);
@@ -406,10 +408,10 @@ public class PlatformManager {
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);
         if (faweException != null) {
-            actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
+            actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
         } else {
-            actor.printError("Please report this error: [See console]");
-            actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
+            actor.print(Caption.of("worldedit.command.error.report"));
+            actor.print(Caption.of(e.getClass().getName(), TextComponent.of(": "), TextComponent.of(e.getMessage())));
             e.printStackTrace();
         }
     }
@@ -423,7 +425,7 @@ public class PlatformManager {
         VirtualWorld virtual = session.getVirtualWorld();
         if (virtual != null) {
             if (Settings.IMP.EXPERIMENTAL.OTHER) {
-                logger.info("virtualWorld was not null in handlePlayerInput()");
+                LOGGER.info("virtualWorld was not null in handlePlayerInput()");
             }
             virtual.handlePlayerInput(player,  event);
             if (event.isCancelled()) {
@@ -461,10 +463,10 @@ public class PlatformManager {
         } catch (Throwable e) {
             FaweException faweException = FaweException.get(e);
             if (faweException != null) {
-                player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
+                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
             } else {
-                player.printError("Please report this error: [See console]");
-                player.printRaw(e.getClass().getName() + ": " + e.getMessage());
+                player.print(Caption.of("worldedit.command.error.report"));
+                player.print(Caption.of(e.getClass().getName() + ": " + e.getMessage()));
                 e.printStackTrace();
             }
         } finally {

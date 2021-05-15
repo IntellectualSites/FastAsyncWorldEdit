@@ -13,13 +13,13 @@ import com.boydti.fawe.bukkit.listener.BukkitImageListener;
 import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
-import com.boydti.fawe.bukkit.regions.FreeBuildRegion;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
 import com.boydti.fawe.bukkit.util.BukkitTaskManager;
 import com.boydti.fawe.bukkit.util.ItemUtil;
+import com.boydti.fawe.bukkit.util.MinecraftVersion;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -29,7 +29,9 @@ import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import io.papermc.lib.PaperLib;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,8 +41,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,7 +51,7 @@ import java.util.function.Supplier;
 
 public class FaweBukkit implements IFawe, Listener {
 
-    private static final Logger log = LoggerFactory.getLogger(FaweBukkit.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Plugin plugin;
     private ItemUtil itemUtil;
@@ -71,7 +71,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 new BrushListener(plugin);
             } catch (Throwable e) {
-                log.error("Brush Listener Failed", e);
+                LOGGER.error("Brush Listener Failed", e);
             }
             if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
@@ -81,8 +81,7 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getServer().shutdown();
         }
 
-        chunksStretched =
-            Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].split("\\.")[1]) >= 16;
+        chunksStretched = new MinecraftVersion().isEqualOrHigher(MinecraftVersion.NETHER);
 
         platformAdapter = new NMSAdapter();
 
@@ -163,7 +162,7 @@ public class FaweBukkit implements IFawe, Listener {
                 this.itemUtil = tmp = new ItemUtil();
             } catch (Throwable e) {
                 Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES = false;
-                log.error("Persistent Brushes Failed", e);
+                LOGGER.error("Persistent Brushes Failed", e);
             }
         }
         return tmp;
@@ -209,7 +208,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (worldguardPlugin != null && worldguardPlugin.isEnabled()) {
             try {
                 managers.add(new Worldguard(worldguardPlugin));
-                log.debug("Attempting to use plugin 'WorldGuard'");
+                LOGGER.info("Attempting to use plugin 'WorldGuard'");
             } catch (Throwable ignored) {
             }
         }
@@ -217,7 +216,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (townyPlugin != null && townyPlugin.isEnabled()) {
             try {
                 managers.add(new TownyFeature(townyPlugin));
-                log.debug("Attempting to use plugin 'Towny'");
+                LOGGER.info("Attempting to use plugin 'Towny'");
             } catch (Throwable ignored) {
             }
         }
@@ -225,7 +224,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (residencePlugin != null && residencePlugin.isEnabled()) {
             try {
                 managers.add(new ResidenceFeature(residencePlugin, this));
-                log.debug("Attempting to use plugin 'Residence'");
+                LOGGER.info("Attempting to use plugin 'Residence'");
             } catch (Throwable ignored) {
             }
         }
@@ -234,15 +233,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (griefpreventionPlugin != null && griefpreventionPlugin.isEnabled()) {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
-                log.debug("Attempting to use plugin 'GriefPrevention'");
-            } catch (Throwable ignored) {
-            }
-        }
-
-        if (Settings.IMP.EXPERIMENTAL.FREEBUILD) {
-            try {
-                managers.add(new FreeBuildRegion());
-                log.debug("Attempting to use plugin '<internal.freebuild>'");
+                LOGGER.debug("Attempting to use plugin 'GriefPrevention'");
             } catch (Throwable ignored) {
             }
         }
@@ -316,6 +307,6 @@ public class FaweBukkit implements IFawe, Listener {
             WEManager.IMP.managers
                 .add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
         }
-        log.info("Plugin 'PlotSquared' found. Using it now.");
+        LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
     }
 }

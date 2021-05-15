@@ -6,16 +6,16 @@ jobs:
   build:
     strategy:
       matrix:
-        java: ["1.8", "11"]
         os: ["ubuntu-latest"]
     runs-on: "${{ matrix.os }}"
     steps:
     - name: "Checkout Repository"
       uses: "actions/checkout@v2.3.4"
-    - name: "Setup JDK ${{ matrix.java }}"
-      uses: "actions/setup-java@v1.4.3"
+    - name: "Setup JDK 11"
+      uses: "actions/setup-java@v2"
       with:
-          java-version: "${{ matrix.java }}"
+          distribution: "adopt"
+          java-version: "11"
     - name: "Cache Gradle"
       uses: "actions/cache@v2.1.4"
       with:
@@ -29,9 +29,9 @@ jobs:
       uses: "actions/cache@v2.1.4"
       with:
         path: "~/.m2/repository"
-        key: "${{ runner.os }}-${{ matrix.java }}-maven-${{ hashFiles('**/pom.xml') }}"
+        key: "${{ runner.os }}-11-maven-${{ hashFiles('**/pom.xml') }}"
         restore-keys: |
-          "${{ runner.os }}-${{ matrix.java }}-maven-"
+          "${{ runner.os }}-11-maven-"
     - name: "Cache BuildTools Decompiled Code"
       uses: "actions/cache@v2.1.4"
       with:
@@ -39,19 +39,17 @@ jobs:
         key: "${{ runner.os }}-buildtools"
         restore-keys: |
           "${{ runner.os }}-buildtools"
-    - name: "Test Enviornment"
+    - name: "Test Environment"
       run: "echo $GITHUB_WORKSPACE"
     - name: "Download BuildTools"
       run: "wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar"
     - name: "Run BuildTools"
       run: "java -jar BuildTools.jar --rev 1.16.5"
     - name: "Clean Build"
-      run: "./gradlew clean build -x test sourcesJar javadocJar"
+      run: "./gradlew clean build sourcesJar javadocJar"
     - name: Cleanup Gradle Cache
       # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
       # Restoring these files from a GitHub Actions cache might cause problems for future builds.
       run: |
         rm -f ~/.gradle/caches/modules-2/modules-2.lock
         rm -f ~/.gradle/caches/modules-2/gc.properties
-
-      

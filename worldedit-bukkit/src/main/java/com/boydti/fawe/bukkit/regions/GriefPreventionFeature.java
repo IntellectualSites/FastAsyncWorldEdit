@@ -4,23 +4,25 @@ import com.boydti.fawe.bukkit.filter.GriefPreventionFilter;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class GriefPreventionFeature extends BukkitMaskManager implements Listener {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public GriefPreventionFeature(final Plugin griefpreventionPlugin) {
         super(griefpreventionPlugin.getName());
-        getLogger(GriefPreventionFeature.class).debug("Plugin 'GriefPrevention' found. Using it now.");
+        LOGGER.debug("Plugin 'GriefPrevention' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, Claim claim, MaskType type) {

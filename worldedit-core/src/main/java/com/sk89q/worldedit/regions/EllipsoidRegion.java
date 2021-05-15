@@ -25,6 +25,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -126,7 +127,7 @@ public class EllipsoidRegion extends AbstractRegion {
         BlockVector3 diff = BlockVector3.ZERO.add(changes);
 
         if ((diff.getBlockX() & 1) + (diff.getBlockY() & 1) + (diff.getBlockZ() & 1) != 0) {
-            throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.ellipsoid.error.even-horizontal"));
+            throw new RegionOperationException(Caption.of("worldedit.selection.ellipsoid.error.even-horizontal"));
         }
 
         return diff.divide(2).floor();

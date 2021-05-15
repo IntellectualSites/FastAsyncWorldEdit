@@ -1,5 +1,6 @@
 package com.boydti.fawe.util;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.exception.FaweException;
@@ -10,12 +11,12 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
@@ -24,14 +25,14 @@ import java.util.Set;
 
 public class WEManager {
 
-    private static final Logger log = LoggerFactory.getLogger(WEManager.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static final WEManager IMP = new WEManager();
 
     public final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
 
     public void cancelEditSafe(AbstractDelegateExtent parent, FaweException reason) throws FaweException {
-        log.warn("CancelEditSafe was hit. Please ignore this message.");
+        LOGGER.warn("CancelEditSafe was hit. Please ignore this message.");
         Extent currentExtent = parent.getExtent();
         if (!(currentExtent instanceof NullExtent)) {
             parent.extent = new NullExtent(parent.extent, reason);
@@ -89,7 +90,7 @@ public class WEManager {
                                 backupRegions.add(region);
                             }
                         } else {
-                            player.printDebug(TextComponent.of("Invalid Mask"));
+                            player.print(Caption.of("Invalid Mask"));
                             removed = true;
                             iterator.remove();
                         }
@@ -123,10 +124,10 @@ public class WEManager {
                 player.printError(TextComponent.of("Missing permission " +  "fawe." + manager.getKey()));
             }
         }
-        log.debug("Region info for " + player.getName());
-        log.debug("There are " + backupRegions.size() + " backupRegions being added to Regions. Regions has " + regions.size() + " before backupRegions are added");
+        LOGGER.debug("Region info for " + player.getName());
+        LOGGER.debug("There are " + backupRegions.size() + " backupRegions being added to Regions. Regions has " + regions.size() + " before backupRegions are added");
         regions.addAll(backupRegions);
-        log.debug("Finished adding regions for " + player.getName());
+        LOGGER.debug("Finished adding regions for " + player.getName());
         if (!masks.isEmpty()) {
             player.setMeta("lastMask", masks);
         } else {

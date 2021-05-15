@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.google.gson.JsonIOException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -86,9 +87,9 @@ public class ChunkCommands {
         int chunkZ = (int) Math.floor(pos.getBlockZ() / 16.0);
 
         final BlockVector2 chunkPos = BlockVector2.at(chunkX, chunkZ);
-        player.printInfo(TranslatableComponent.of("worldedit.chunkinfo.chunk", TextComponent.of(chunkX), TextComponent.of(chunkZ)));
-        player.printInfo(TranslatableComponent.of("worldedit.chunkinfo.old-filename", TextComponent.of(LegacyChunkStore.getFilename(chunkPos))));
-        player.printInfo(TranslatableComponent.of("worldedit.chunkinfo.mcregion-filename", TextComponent.of(McRegionChunkStore.getFilename(chunkPos))));
+        player.print(Caption.of("worldedit.chunkinfo.chunk", TextComponent.of(chunkX), TextComponent.of(chunkZ)));
+        player.print(Caption.of("worldedit.chunkinfo.old-filename", TextComponent.of(LegacyChunkStore.getFilename(chunkPos))));
+        player.print(Caption.of("worldedit.chunkinfo.mcregion-filename", TextComponent.of(McRegionChunkStore.getFilename(chunkPos))));
     }
 
     @Command(
@@ -101,8 +102,8 @@ public class ChunkCommands {
                             @ArgFlag(name = 'p', desc = "Page number.", def = "1") int page) throws WorldEditException {
         final Region region = session.getSelection(world);
 
-        actor.print(TranslatableComponent.of("worldedit.listchunks.listfor", TextComponent.of(actor.getName())));
         actor.print(new ChunkListPaginationBox(region).create(page));
+        actor.print(Caption.of("worldedit.listchunks.listfor", TextComponent.of(actor.getName())));
     }
 
     @Command(
@@ -120,12 +121,11 @@ public class ChunkCommands {
             throw new StopExecutionException(TextComponent.of("Couldn't find world folder for this world."));
         }
 
-        File chunkFile = worldEdit.getWorkingDirectoryFile(DELCHUNKS_FILE_NAME);
-        Path chunkPath = chunkFile.toPath();
+        Path chunkPath = worldEdit.getWorkingDirectoryPath(DELCHUNKS_FILE_NAME);
         ChunkDeletionInfo currentInfo = null;
         if (Files.exists(chunkPath)) {
             try {
-                currentInfo = ChunkDeleter.readInfo(chunkFile.toPath());
+                currentInfo = ChunkDeleter.readInfo(chunkPath);
             } catch (IOException e) {
                 throw new StopExecutionException(TextComponent.of("Error reading existing chunk file."));
             }
@@ -176,10 +176,11 @@ public class ChunkCommands {
 
     private static class ChunkListPaginationBox extends PaginationBox {
         //private final Region region;
-        private final List<BlockVector2> chunks = null;
+        private final List<BlockVector2> chunks;
 
         ChunkListPaginationBox(Region region) {
             super("Selected Chunks", "/listchunks -p %page%");
+            this.chunks = new ArrayList<>(region.getChunks());
         }
 
         @Override

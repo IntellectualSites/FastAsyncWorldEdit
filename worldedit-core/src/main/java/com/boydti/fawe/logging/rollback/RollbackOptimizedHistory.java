@@ -4,17 +4,20 @@ import com.boydti.fawe.database.DBHandler;
 import com.boydti.fawe.database.RollbackDatabase;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class RollbackOptimizedHistory extends DiskStorageHistory {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private long time;
 
     private int minX;
@@ -47,7 +50,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.blockSize = (int) size;
         this.command = command;
         this.closed = true;
-        getLogger(RollbackOptimizedHistory.class).debug("Size {}", size);
+        LOGGER.debug("Size: {}", size);
     }
 
     public long getTime() {

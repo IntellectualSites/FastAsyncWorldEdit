@@ -2,7 +2,6 @@ package com.boydti.fawe.bukkit.adapter;
 
 import com.boydti.fawe.FAWEPlatformAdapterImpl;
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.chunk.ChunkHolder;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;

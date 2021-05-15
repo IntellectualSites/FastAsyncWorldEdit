@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -175,7 +176,7 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.printInfo(TranslatableComponent.of("worldedit.selection.cylinder.explain.primary", TextComponent.of(pos.toString())));
+        player.print(Caption.of("worldedit.selection.cylinder.explain.primary", TextComponent.of(pos.toString())));
 
         session.describeCUI(player);
     }
@@ -185,14 +186,14 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         Vector3 center = region.getCenter();
 
         if (!center.equals(Vector3.ZERO)) {
-            player.printInfo(TranslatableComponent.of(
+            player.print(Caption.of(
                     "worldedit.selection.cylinder.explain.secondary",
                     TextComponent.of(NUMBER_FORMAT.format(region.getRadius().getX())),
                     TextComponent.of(NUMBER_FORMAT.format(region.getRadius().getZ())),
                     TextComponent.of(region.getVolume())
             ));
         } else {
-            player.printError(TranslatableComponent.of("worldedit.selection.cylinder.explain.secondary-missing"));
+            player.print(Caption.of("worldedit.selection.cylinder.explain.secondary-missing"));
             return;
         }
 
@@ -252,12 +253,12 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
         if (!region.getCenter().equals(Vector3.ZERO)) {
             Vector3 center = region.getCenter();
-            lines.add(TranslatableComponent.of("worldedit.selection.cylinder.info.center", TextComponent.of(center.toString())
+            lines.add(Caption.of("worldedit.selection.cylinder.info.center", TextComponent.of(center.toString())
                     .clickEvent(ClickEvent.of(ClickEvent.Action.COPY_TO_CLIPBOARD, center.toParserString()))
                     .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to copy")))));
         }
         if (!region.getRadius().equals(Vector2.ZERO)) {
-            lines.add(TranslatableComponent.of("worldedit.selection.cylinder.info.radius", TextComponent.of(region.getRadius().toString())));
+            lines.add(Caption.of("worldedit.selection.cylinder.info.radius", TextComponent.of(region.getRadius().toString())));
         }
 
         return lines;

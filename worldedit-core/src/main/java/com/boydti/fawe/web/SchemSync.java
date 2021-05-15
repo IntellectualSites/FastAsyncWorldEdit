@@ -46,7 +46,7 @@ public class SchemSync implements Runnable {
             .getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.TOKENS, "tokens.txt");
         this.worldEdit = WorldEdit.getInstance();
         LocalConfiguration config = worldEdit.getConfiguration();
-        this.working = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        this.working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
     }
 
     private void loadTokens() {

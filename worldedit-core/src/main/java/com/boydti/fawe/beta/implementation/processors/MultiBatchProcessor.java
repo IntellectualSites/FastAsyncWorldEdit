@@ -10,8 +10,6 @@ import com.boydti.fawe.util.StringMan;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.extent.Extent;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,8 +25,6 @@ import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 public class MultiBatchProcessor implements IBatchProcessor {
-
-    private static final Logger log = LoggerFactory.getLogger(MultiBatchProcessor.class);
 
     private IBatchProcessor[] processors;
     private final LoadingCache<Class<?>, Map<Long, Filter>> classToThreadIdToFilter =

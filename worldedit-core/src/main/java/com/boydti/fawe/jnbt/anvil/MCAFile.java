@@ -12,11 +12,13 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,14 +40,14 @@ import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 /**
  * Chunk format: http://minecraft.gamepedia.com/Chunk_format#Entity_format
  * e.g., `.Level.Entities.#` (Starts with a . as the root tag is unnamed)
  * Note: This class isn't thread safe. You can use it in an async thread, but not multiple at the same time
  */
 public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, IChunkExtent {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static Field fieldBuf2;
 
@@ -294,7 +296,7 @@ public class MCAFile extends ExtentBatchProcessorHolder implements Trimable, ICh
                     if (offset < offsets.length) {
                         offsets[offset] = i;
                     } else {
-                        getLogger(MCAFile.class).debug("Ignoring invalid offset " + offset);
+                        LOGGER.debug("Ignoring invalid offset " + offset);
                     }
                 }
             }

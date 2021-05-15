@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -26,6 +27,8 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.BlockCategoryMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockCategory;
 
 import java.util.Locale;
@@ -51,7 +54,7 @@ public class BlockCategoryMaskParser extends InputParser<Mask> {
         // This means it's a tag mask.
         BlockCategory category = BlockCategory.REGISTRY.get(input.substring(2).toLowerCase(Locale.ROOT));
         if (category == null) {
-            throw new InputParseException("Unrecognised tag '" + input.substring(2) + '\'');
+            throw new InputParseException(Caption.of("fawe.error.unrecognised-tag", TextComponent.of(input.substring(2)), TextComponent.of("\\")));
         } else {
             return new BlockCategoryMask(context.requireExtent(), category);
         }

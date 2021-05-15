@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.random.NoiseRandom;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
@@ -49,7 +50,7 @@ public abstract class NoisePatternParser extends RichParser<Pattern> {
     @Override
     protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) {
         if (arguments.length != 2) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.command.syntax",
+            throw new InputParseException(Caption.of("fawe.error.command.syntax",
                     TextComponent.of(getPrefix() + "[scale][pattern] (e.g. " + getPrefix() + "[5][dirt,stone])")));
         }
         double scale = parseScale(arguments[0]);

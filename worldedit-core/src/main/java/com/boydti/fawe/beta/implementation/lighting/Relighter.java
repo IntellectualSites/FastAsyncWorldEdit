@@ -2,7 +2,7 @@ package com.boydti.fawe.beta.implementation.lighting;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-public interface Relighter {
+public interface Relighter extends AutoCloseable {
 
     /**
      * Add a chunk to be relit when {@link Relighter#removeLighting} etc are called.

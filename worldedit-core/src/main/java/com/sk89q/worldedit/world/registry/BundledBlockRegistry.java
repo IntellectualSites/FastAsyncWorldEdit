@@ -19,18 +19,18 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.translation.TranslationManager;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.OptionalInt;
-import javax.annotation.Nullable;
 
 /**
  * A block registry that uses {@link BundledBlockData} to serve information
@@ -48,7 +48,7 @@ public class BundledBlockRegistry implements BlockRegistry {
             // too much!
             return TextComponent.of(blockEntry.localizedName);
         }
-        return TranslatableComponent.of(
+        return Caption.of(
             TranslationManager.makeTranslationKey("block", blockType.getId())
         );
     }

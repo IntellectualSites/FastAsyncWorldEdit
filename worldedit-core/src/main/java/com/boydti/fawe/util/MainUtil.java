@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
@@ -21,6 +22,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
@@ -32,6 +34,7 @@ import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.jpountz.lz4.LZ4InputStream;
 import net.jpountz.lz4.LZ4Utils;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -89,9 +92,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static java.lang.System.arraycopy;
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class MainUtil {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static List<String> filter(String prefix, List<String> suggestions) {
         if (prefix.isEmpty()) {
@@ -438,7 +441,7 @@ public class MainUtil {
                 content = scanner.next().trim();
             }
             if (!content.startsWith("<")) {
-                getLogger(MainUtil.class).debug(content);
+                LOGGER.debug(content);
             }
             if (responseCode == 200) {
                 return url;
@@ -638,7 +641,7 @@ public class MainUtil {
                 return newFile;
             }
         } catch (IOException e) {
-            getLogger(MainUtil.class).debug("Could not save " + resource, e);
+            LOGGER.debug("Could not save " + resource, e);
         }
         return null;
     }
@@ -878,9 +881,9 @@ public class MainUtil {
             long age = now - file.lastModified();
             if (age > timeDiff) {
                 pool.submit(file::delete);
-                Component msg = TranslatableComponent.of("worldedit.schematic.delete.deleted");
+                Component msg = Caption.of("worldedit.schematic.delete.deleted");
                 if (printDebug) {
-                    getLogger(MainUtil.class).debug(msg.toString());
+                    LOGGER.debug(msg.toString());
                 }
             }
         });

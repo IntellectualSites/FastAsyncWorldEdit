@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.cli;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.cli.data.FileRegistries;
 import com.sk89q.worldedit.cli.schematic.ClipboardWorld;
@@ -31,8 +32,8 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -44,8 +45,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -67,7 +67,7 @@ import java.util.Scanner;
  */
 public class CLIWorldEdit {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CLIWorldEdit.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static CLIWorldEdit inst;
 
@@ -86,6 +86,7 @@ public class CLIWorldEdit {
 
     private void setupPlatform() {
         WorldEdit.getInstance().getPlatformManager().register(platform);
+
         this.fileRegistries = new FileRegistries(this);
         this.fileRegistries.loadDataFiles();
     }
@@ -95,27 +96,27 @@ public class CLIWorldEdit {
         for (Map.Entry<String, FileRegistries.BlockManifest> manifestEntry : fileRegistries.getDataFile().blocks.entrySet()) {
             if (BlockType.REGISTRY.get(manifestEntry.getKey()) == null) {
                 BlockType.REGISTRY.register(manifestEntry.getKey(), new BlockType(manifestEntry.getKey(), input -> {
-                            ParserContext context = new ParserContext();
-                            context.setPreferringWildcard(true);
-                            context.setTryLegacy(false);
-                            context.setRestricted(false);
-                            try {
-                                FuzzyBlockState state = (FuzzyBlockState) WorldEdit.getInstance().getBlockFactory().parseFromInput(
-                                        manifestEntry.getValue().defaultstate,
-                                        context
-                                ).toImmutableState();
-                                BlockState defaultState = input.getBlockType().getAllStates().get(0);
-                                for (Map.Entry<Property<?>, Object> propertyObjectEntry : state.getStates().entrySet()) {
-                                    @SuppressWarnings("unchecked")
-                                    Property<Object> prop = (Property<Object>) propertyObjectEntry.getKey();
-                                    defaultState = defaultState.with(prop, propertyObjectEntry.getValue());
-                                }
-                                return defaultState;
-                            } catch (InputParseException e) {
-                                LOGGER.warn("Error loading block state for " + manifestEntry.getKey(), e);
-                                return input;
-                            }
-                        }));
+                    ParserContext context = new ParserContext();
+                    context.setPreferringWildcard(true);
+                    context.setTryLegacy(false);
+                    context.setRestricted(false);
+                    try {
+                        FuzzyBlockState state = (FuzzyBlockState) WorldEdit.getInstance().getBlockFactory().parseFromInput(
+                                manifestEntry.getValue().defaultstate,
+                                context
+                        ).toImmutableState();
+                        BlockState defaultState = input.getBlockType().getAllStates().get(0);
+                        for (Map.Entry<Property<?>, Object> propertyObjectEntry : state.getStates().entrySet()) {
+                            @SuppressWarnings("unchecked")
+                            Property<Object> prop = (Property<Object>) propertyObjectEntry.getKey();
+                            defaultState = defaultState.with(prop, propertyObjectEntry.getValue());
+                        }
+                        return defaultState;
+                    } catch (InputParseException e) {
+                        LOGGER.warn("Error loading block state for " + manifestEntry.getKey(), e);
+                        return input;
+                    }
+                }));
             }
         }
         // Items
@@ -237,13 +238,13 @@ public class CLIWorldEdit {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 if (line.equals("stop")) {
-                    commandSender.printInfo(TranslatableComponent.of("worldedit.cli.stopping"));
+                    commandSender.print(Caption.of("worldedit.cli.stopping"));
                     break;
                 }
                 CommandEvent event = new CommandEvent(commandSender, line);
                 WorldEdit.getInstance().getEventBus().post(event);
                 if (!event.isCancelled()) {
-                    commandSender.printError(TranslatableComponent.of("worldedit.cli.unknown-command"));
+                    commandSender.print(Caption.of("worldedit.cli.unknown-command"));
                 } else {
                     saveAllWorlds(false);
                 }

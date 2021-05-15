@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.pattern.BiomeApplyingPattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
@@ -34,7 +35,7 @@ public class BiomePatternParser extends RichParser<Pattern> {
             String biomeId = input.substring(1);
             BiomeType biomeType = BiomeTypes.get(biomeId);
             if (biomeType == null) {
-                throw new NoMatchException(TranslatableComponent.of("worldedit.error.unknown-biome", TextComponent.of(biomeId)));
+                throw new NoMatchException(Caption.of("worldedit.error.unknown-biome", TextComponent.of(biomeId)));
             }
             return new BiomeApplyingPattern(context.requireExtent(), biomeType);
         } else {
@@ -63,11 +64,11 @@ public class BiomePatternParser extends RichParser<Pattern> {
     @Override
     protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 1) {
-            throw new InputParseException("Invalid amount of arguments. Expected: #biome[<biome>]");
+            throw new InputParseException(Caption.of("fawe.error.invalid-arguments", TextComponent.of("#biome[<biome>]")));
         }
         BiomeType biomeType = BiomeTypes.get(arguments[0]);
         if (biomeType == null) {
-            throw new NoMatchException(TranslatableComponent.of("worldedit.error.unknown-biome", TextComponent.of(arguments[0])));
+            throw new NoMatchException(Caption.of("worldedit.error.unknown-biome", TextComponent.of(arguments[0])));
         }
         return new BiomeApplyingPattern(context.requireExtent(), biomeType);
     }

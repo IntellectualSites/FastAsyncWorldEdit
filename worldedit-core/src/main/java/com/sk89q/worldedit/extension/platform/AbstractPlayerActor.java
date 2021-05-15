@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.boydti.fawe.regions.FaweMaskManager;
@@ -86,7 +87,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                 throwable = throwable.getCause();
             }
             if (throwable instanceof WorldEditException) {
-                printError(throwable.getLocalizedMessage());
+                printError(Caption.of(throwable.getLocalizedMessage()));
             } else {
                 FaweException fe = FaweException.get(throwable);
                 if (fe != null) {
@@ -666,13 +667,13 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public File openFileOpenDialog(String[] extensions) {
-        printError(TranslatableComponent.of("worldedit.platform.no-file-dialog"));
+        print(Caption.of("worldedit.platform.no-file-dialog"));
         return null;
     }
 
     @Override
     public File openFileSaveDialog(String[] extensions) {
-        printError(TranslatableComponent.of("worldedit.platform.no-file-dialog"));
+        print(Caption.of("worldedit.platform.no-file-dialog"));
         return null;
     }
 

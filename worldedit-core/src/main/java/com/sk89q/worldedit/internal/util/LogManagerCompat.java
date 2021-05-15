@@ -17,22 +17,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.scripting.compat;
+package com.sk89q.worldedit.internal.util;
 
-import java.io.IOException;
-import java.io.Reader;
+import com.google.common.base.Throwables;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- * Transpile a script from one (version) of a language to another.
- */
-public interface ScriptTranspiler {
+import java.util.List;
 
-    /**
-     * Given input {@code script}, return the transpiled script.
-     *
-     * @param script the script to transpile
-     * @return the new script
-     */
-    Reader transpile(Reader script) throws IOException;
+public class LogManagerCompat {
 
+    public static Logger getLogger() {
+        return LogManager.getLogger(getCallerCallerClassName());
+    }
+
+    private static String getCallerCallerClassName() {
+        List<StackTraceElement> lazyStack = Throwables.lazyStackTrace(new Throwable());
+        // 0 - this method
+        // 1 - caller
+        // 2 - caller caller
+        return lazyStack.get(2).getClassName();
+    }
+
+    private LogManagerCompat() {
+    }
 }

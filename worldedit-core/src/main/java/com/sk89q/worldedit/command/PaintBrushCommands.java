@@ -130,7 +130,7 @@ public class PaintBrushCommands {
                      @Arg(desc = "The direction in which the item will be applied", def = "up")
                      @Direction(includeDiagonals = true)
                          com.sk89q.worldedit.util.Direction direction) throws WorldEditException {
-        player.print(TextComponent.builder().append("WARNING: ", TextColor.RED, TextDecoration.BOLD)
+        player.print(TextComponent.builder().append("WARNING: ")
                 .append(TranslatableComponent.of("worldedit.brush.paint.item.warning")).build());
         setPaintBrush(parameters, player, localSession, new ItemUseFactory(item, direction));
     }

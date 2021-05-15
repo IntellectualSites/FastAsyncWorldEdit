@@ -42,7 +42,7 @@ public class ProvideBindings extends Bindings {
         if (actor.isPlayer()) {
             return (Player) actor;
         }
-        throw new InputParseException("This command must be used with a player.");
+        throw new InputParseException(TranslatableComponent.of("worldedit.command.player-only"));
     }
 
     @Binding
@@ -86,7 +86,7 @@ public class ProvideBindings extends Bindings {
     public Region[] regions(Player player, FaweMaskManager.MaskType type) {
         Region[] regions = player.getCurrentRegions(type);
         if (regions == null) {
-            throw new IllegalArgumentException(Caption.toString(TranslatableComponent.of("fawe.error.no.region")));
+            throw new IllegalArgumentException(Caption.toString(Caption.of("fawe.error.no.region")));
         }
         return regions;
     }

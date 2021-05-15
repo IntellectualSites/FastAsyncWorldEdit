@@ -24,6 +24,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -234,7 +235,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         }
 
         if ((diff.getBlockX() & 1) + (diff.getBlockZ() & 1) != 0) {
-            throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.cylinder.error.even-horizontal"));
+            throw new RegionOperationException(Caption.of("worldedit.selection.cylinder.error.even-horizontal"));
         }
 
         return diff.divide(2).floor();

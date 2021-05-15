@@ -14,6 +14,7 @@ import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
@@ -24,15 +25,16 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class InspectBrush extends BrushTool {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     /**
      * Construct the tool.
@@ -64,13 +66,13 @@ public class InspectBrush extends BrushTool {
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
         if (!player.hasPermission("worldedit.tool.inspect")) {
             player.print(Caption.of("", "worldedit.tool.inspect"));
-            getLogger(InspectBrush.class).debug("No tool control");
+            LOGGER.debug("No tool control");
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
             player.print(Caption.of("fawe.error.setting.disable",
                 "history.use-database (Import with /history import )"));
-            getLogger(InspectBrush.class).debug("No db");
+            LOGGER.debug("No db");
             return false;
         }
         try {
@@ -113,7 +115,7 @@ public class InspectBrush extends BrushTool {
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (Throwable e) {
-            getLogger(InspectBrush.class).error("E throw", e);
+            LOGGER.error("E throw", e);
         }
         return true;
     }

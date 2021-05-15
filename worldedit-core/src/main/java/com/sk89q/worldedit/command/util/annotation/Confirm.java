@@ -14,14 +14,11 @@ import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectAnnotation;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.inject.MemoizingValueAccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -104,7 +101,7 @@ public @interface Confirm {
                 if (checkExisting(context)) {
                     return true;
                 }
-                actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.confirm"));
+                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm"));
                 return confirm(actor, context);
             }
         };
@@ -160,7 +157,6 @@ public @interface Confirm {
                     final MemoizingValueAccess memoizingValueAccess;
                     if (!(context instanceof MemoizingValueAccess)) {
                         if (!context.getClass().getSimpleName().contains("AutoValue_CommandParametersImpl")) {
-                            LoggerFactory.getLogger(Confirm.class).warn("InjectedValueAccess " + context.getClass().getName() + " given to Confirm");
                             return true;
                         }
                         memoizingValueAccess = (MemoizingValueAccess) Reflect.injectedValues.get(context);

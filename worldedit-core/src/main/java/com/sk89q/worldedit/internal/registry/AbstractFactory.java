@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.internal.registry;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
@@ -81,7 +82,7 @@ public abstract class AbstractFactory<E> {
             }
         }
 
-        throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(input)));
+        throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
     }
 
     public List<String> getSuggestions(String input) {

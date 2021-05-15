@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -30,11 +31,8 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -66,7 +64,7 @@ public class DefaultItemParser extends InputParser<BaseItem> {
             try {
                 String[] split = input.split(":");
                 if (split.length == 0) {
-                    throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.invalid-colon"));
+                    throw new InputParseException(Caption.of("worldedit.error.parser.invalid-colon"));
                 } else if (split.length == 1) {
                     itemType = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(split[0]));
                 } else {
@@ -143,7 +141,7 @@ public class DefaultItemParser extends InputParser<BaseItem> {
         if (actor instanceof Player) {
             return ((Player) actor).getItemInHand(handSide);
         } else {
-            throw new InputParseException(TranslatableComponent.of(
+            throw new InputParseException(Caption.of(
                     "worldedit.error.parser.player-only",
                     TextComponent.of(handSide == HandSide.MAIN_HAND ? "hand" : "offhand")
             ));

@@ -17,6 +17,7 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
@@ -30,6 +31,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,9 +46,10 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class MCAChunk implements IChunk {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     public final boolean[] hasSections = new boolean[16];
 
     public boolean hasBiomes = false;
@@ -310,7 +313,7 @@ public class MCAChunk implements IChunk {
                                 Object value = state.getState(property);
                                 String valueStr = value.toString();
                                 if (Character.isUpperCase(valueStr.charAt(0))) {
-                                    getLogger(MCAChunk.class).warn("Invalid uppercase value {}", value);
+                                    LOGGER.warn("Invalid uppercase value {}", value);
                                     valueStr = valueStr.toLowerCase(Locale.ROOT);
                                 }
                                 out.writeNamedTag(key, valueStr);

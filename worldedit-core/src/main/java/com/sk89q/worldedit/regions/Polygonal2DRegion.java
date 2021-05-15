@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.iterator.FlatRegion3DIterator;
@@ -246,7 +247,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     public void expand(BlockVector3... changes) throws RegionOperationException {
         for (BlockVector3 change : changes) {
             if (change.getBlockX() != 0 || change.getBlockZ() != 0) {
-                throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.polygon2d.error.expand-only-vertical"));
+                throw new RegionOperationException(Caption.of("worldedit.selection.polygon2d.error.expand-only-vertical"));
             }
             int changeY = change.getBlockY();
             if (changeY > 0) {
@@ -262,7 +263,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     public void contract(BlockVector3... changes) throws RegionOperationException {
         for (BlockVector3 change : changes) {
             if (change.getBlockX() != 0 || change.getBlockZ() != 0) {
-                throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.polygon2d.error.contract-only-vertical"));
+                throw new RegionOperationException(Caption.of("worldedit.selection.polygon2d.error.contract-only-vertical"));
             }
             int changeY = change.getBlockY();
             if (changeY > 0) {

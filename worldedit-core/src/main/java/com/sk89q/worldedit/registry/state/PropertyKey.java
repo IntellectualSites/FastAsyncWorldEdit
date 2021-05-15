@@ -1,96 +1,106 @@
 package com.sk89q.worldedit.registry.state;
 
-import com.boydti.fawe.util.ReflectionUtils;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 
 /**
  * This class will be generated at runtime - these are just example values.
  */
-public enum PropertyKey {
-    // TODO FIXME Generate this at runtime
-    AGE,
-    ATTACHED,
-    AXIS,
-    BITES,
-    CONDITIONAL,
-    DELAY,
-    DISARMED,
-    DISTANCE,
-    DOWN,
-    DRAG,
-    EAST,
-    EGGS,
-    ENABLED,
-    EXTENDED,
-    EYE,
-    FACE,
-    FACING,
-    HALF,
-    HAS_BOTTLE_0,
-    HAS_BOTTLE_1,
-    HAS_BOTTLE_2,
-    HAS_RECORD,
-    HATCH,
-    HINGE,
-    IN_WALL,
-    INSTRUMENT,
-    INVERTED,
-    LAYERS,
-    LEVEL,
-    LIT,
-    LOCKED,
-    MODE,
-    MOISTURE,
-    NORTH,
-    NOTE,
-    OCCUPIED,
-    OPEN,
-    PART,
-    PERSISTENT,
-    PICKLES,
-    POWER,
-    POWERED,
-    ROTATION,
-    SHAPE,
-    SHORT,
-    SNOWY,
-    SOUTH,
-    STAGE,
-    TRIGGERED,
-    TYPE,
-    UP,
-    WATERLOGGED,
-    WEST,
-    UNSTABLE,
-    LEAVES,
-    ATTACHMENT,
-    SIGNAL_FIRE,
-    HANGING,
-    HAS_BOOK,
-    BOTTOM;
+public class PropertyKey implements Comparable<PropertyKey> {
 
-    private final String id;
+    // needs to be declared before constants
+    private static final Map<CharSequence, PropertyKey> keys = new HashMap<>();
+    private static final List<PropertyKey> keyList = new ArrayList<>();
 
-    PropertyKey() {
-        this.id = name().toLowerCase(Locale.ROOT);
+    // constants
+    public static final PropertyKey AGE = getOrCreate("age");
+    public static final PropertyKey ATTACHED = getOrCreate("attached");
+    public static final PropertyKey AXIS = getOrCreate("axis");
+    public static final PropertyKey BITES = getOrCreate("bites");
+    public static final PropertyKey CONDITIONAL = getOrCreate("conditional");
+    public static final PropertyKey DELAY = getOrCreate("delay");
+    public static final PropertyKey DISARMED = getOrCreate("disarmed");
+    public static final PropertyKey DISTANCE = getOrCreate("distance");
+    public static final PropertyKey DOWN = getOrCreate("down");
+    public static final PropertyKey DRAG = getOrCreate("drag");
+    public static final PropertyKey EAST = getOrCreate("east");
+    public static final PropertyKey EGGS = getOrCreate("eggs");
+    public static final PropertyKey ENABLED = getOrCreate("enabled");
+    public static final PropertyKey EXTENDED = getOrCreate("extended");
+    public static final PropertyKey EYE = getOrCreate("eye");
+    public static final PropertyKey FACE = getOrCreate("face");
+    public static final PropertyKey FACING = getOrCreate("facing");
+    public static final PropertyKey HALF = getOrCreate("half");
+    public static final PropertyKey HAS_BOTTLE_0 = getOrCreate("has_bottle_0");
+    public static final PropertyKey HAS_BOTTLE_1 = getOrCreate("has_bottle_1");
+    public static final PropertyKey HAS_BOTTLE_2 = getOrCreate("has_bottle_2");
+    public static final PropertyKey HAS_RECORD = getOrCreate("has_record");
+    public static final PropertyKey HATCH = getOrCreate("hatch");
+    public static final PropertyKey HINGE = getOrCreate("hinge");
+    public static final PropertyKey IN_WALL = getOrCreate("in_wall");
+    public static final PropertyKey INSTRUMENT = getOrCreate("instrument");
+    public static final PropertyKey INVERTED = getOrCreate("inverted");
+    public static final PropertyKey LAYERS = getOrCreate("layers");
+    public static final PropertyKey LEVEL = getOrCreate("level");
+    public static final PropertyKey LIT = getOrCreate("lit");
+    public static final PropertyKey LOCKED = getOrCreate("locked");
+    public static final PropertyKey MODE = getOrCreate("mode");
+    public static final PropertyKey MOISTURE = getOrCreate("moisture");
+    public static final PropertyKey NORTH = getOrCreate("north");
+    public static final PropertyKey NOTE = getOrCreate("note");
+    public static final PropertyKey OCCUPIED = getOrCreate("occupied");
+    public static final PropertyKey OPEN =getOrCreate("open");
+    public static final PropertyKey PART = getOrCreate("part");
+    public static final PropertyKey PERSISTENT = getOrCreate("persistent");
+    public static final PropertyKey PICKLES = getOrCreate("pickles");
+    public static final PropertyKey POWER = getOrCreate("power");
+    public static final PropertyKey POWERED = getOrCreate("powered");
+    public static final PropertyKey ROTATION = getOrCreate("rotation");
+    public static final PropertyKey SHAPE = getOrCreate("shape");
+    public static final PropertyKey SHORT = getOrCreate("short");
+    public static final PropertyKey SNOWY = getOrCreate("snowy");
+    public static final PropertyKey SOUTH = getOrCreate("south");
+    public static final PropertyKey STAGE = getOrCreate("stage");
+    public static final PropertyKey TRIGGERED = getOrCreate("triggered");
+    public static final PropertyKey TYPE = getOrCreate("type");
+    public static final PropertyKey UP = getOrCreate("up");
+    public static final PropertyKey WATERLOGGED = getOrCreate("waterlogged");
+    public static final PropertyKey WEST = getOrCreate("west");
+    public static final PropertyKey UNSTABLE = getOrCreate("unstable");
+    public static final PropertyKey LEAVES = getOrCreate("leaves");
+    public static final PropertyKey ATTACHMENT = getOrCreate("attachement");
+    public static final PropertyKey SIGNAL_FIRE = getOrCreate("signal_fire");
+    public static final PropertyKey HANGING = getOrCreate("hanging");
+    public static final PropertyKey HAS_BOOK = getOrCreate("has_book");
+    public static final PropertyKey BOTTOM = getOrCreate("bottom");
+
+    private final String name;
+    private final int id;
+
+
+    private PropertyKey(String name, int ordinal) {
+        this.name = name;
+        this.id = ordinal;
     }
 
-    private static final Map<String, PropertyKey> keys = new HashMap<>();
-    static {
-        for (PropertyKey key : values()) {
-            keys.put(key.name().toLowerCase(Locale.ROOT), key);
-        }
+    public static int getCount() {
+        return keyList.size();
     }
 
-    public final String getId() {
-        return this.id;
+    public final String getName() {
+        return this.name;
     }
 
-    public static final PropertyKey get(CharSequence name) {
+    public static PropertyKey getByName(CharSequence name) {
         return keys.get(name);
+    }
+
+    public static PropertyKey getById(int id) {
+        return keyList.get(id);
     }
 
     /**
@@ -99,18 +109,19 @@ public enum PropertyKey {
      * @return PropertyKey enum
      */
     public static PropertyKey getOrCreate(String id) {
-        PropertyKey property = PropertyKey.get(id);
-        if (property == null) {
-            property = ReflectionUtils.addEnum(PropertyKey.class, id.toUpperCase(Locale.ROOT));
-            if (property.getId() == null) {
-                try {
-                    ReflectionUtils.setFailsafeFieldValue(PropertyKey.class.getDeclaredField("id"), property, property.name().toLowerCase());
-                } catch (Throwable e) {
-                    throw new RuntimeException("Could not register property with an id of " + id , e);
-                }
-            }
-            keys.put(property.name().toLowerCase(Locale.ROOT), property);
-        }
-        return property;
+        return keys.computeIfAbsent(id, k -> {
+            PropertyKey key = new PropertyKey(id, keyList.size());
+            keyList.add(key);
+            return key;
+        });
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public int compareTo(@NotNull PropertyKey o) {
+        return Integer.compare(this.id, o.id);
     }
 }

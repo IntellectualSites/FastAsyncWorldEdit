@@ -1,5 +1,6 @@
 package com.boydti.fawe.object.regions;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
@@ -105,12 +106,12 @@ public class FuzzyRegion extends AbstractRegion {
 
     @Override
     public void expand(BlockVector3... changes) throws RegionOperationException {
-        throw new RegionOperationException("Selection cannot expand");
+        throw new RegionOperationException(Caption.of("fawe.error.selection-expand"));
     }
 
     @Override
     public void contract(BlockVector3... changes) throws RegionOperationException {
-        throw new RegionOperationException("Selection cannot contract");
+        throw new RegionOperationException(Caption.of("fawe.error.selection-contract"));
     }
 
     @Override
@@ -120,7 +121,7 @@ public class FuzzyRegion extends AbstractRegion {
 
     @Override
     public void shift(BlockVector3 change) throws RegionOperationException {
-        throw new RegionOperationException("Selection cannot be shifted");
+        throw new RegionOperationException(Caption.of("fawe.error.selection-shift"));
     }
 
     public void setExtent(EditSession extent) {

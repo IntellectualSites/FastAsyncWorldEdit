@@ -19,13 +19,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class BlockTypesCache {
     /*
@@ -59,18 +58,19 @@ public class BlockTypesCache {
                 // Ensure the properties are registered
                 int maxOrdinal = 0;
                 for (String key : properties.keySet()) {
-                    maxOrdinal = Math.max(PropertyKey.getOrCreate(key).ordinal(), maxOrdinal);
+                    maxOrdinal = Math.max(PropertyKey.getOrCreate(key).getId(), maxOrdinal);
                 }
                 this.propertiesMapArr = new AbstractProperty[maxOrdinal + 1];
                 int prop_arr_i = 0;
                 this.propertiesArr = new AbstractProperty[properties.size()];
-                HashMap<String, AbstractProperty<?>> propMap = new HashMap<>();
+                // Preserve properties order with LinkedHashMap
+                HashMap<String, AbstractProperty<?>> propMap = new LinkedHashMap<>();
 
                 int bitOffset = 0;
                 for (Map.Entry<String, ? extends Property<?>> entry : properties.entrySet()) {
                     PropertyKey key = PropertyKey.getOrCreate(entry.getKey());
                     AbstractProperty<?> property = ((AbstractProperty) entry.getValue()).withOffset(bitOffset);
-                    this.propertiesMapArr[key.ordinal()] = property;
+                    this.propertiesMapArr[key.getId()] = property;
                     this.propertiesArr[prop_arr_i++] = property;
                     propMap.put(entry.getKey(), property);
 

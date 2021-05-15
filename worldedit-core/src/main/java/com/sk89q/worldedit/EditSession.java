@@ -95,6 +95,7 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.internal.expression.ExpressionTimeoutException;
 import com.sk89q.worldedit.internal.expression.LocalSlot.Variable;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
@@ -134,10 +135,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -170,7 +170,7 @@ import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
 @SuppressWarnings({"FieldCanBeLocal"})
 public class EditSession extends PassthroughExtent implements AutoCloseable {
 
-    private static final Logger log = LoggerFactory.getLogger(EditSession.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     /**
      * Used by {@link EditSession#setBlock(BlockVector3, BlockStateHolder, Stage)} to
@@ -223,6 +223,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final Extent bypassHistory;
     private Extent bypassAll;
 
+    private final int minY;
     private final int maxY;
     private final List<WatchdogTickingExtent> watchdogExtents = new ArrayList<>(2);
 
@@ -263,6 +264,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.limit = builder.getLimit().copy();
         this.player = builder.getPlayer();
         this.changeSet = builder.getChangeTask();
+        this.minY = world.getMinY();
         this.maxY = world.getMaxY();
         this.blockBag = builder.getBlockBag();
         this.history = changeSet != null;
@@ -796,12 +798,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        if (position.getY() < this.minY || position.getY() > this.maxY) {
+            return false;
+        }
         this.changes++;
         return this.getExtent().setBiome(position, biome);
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        if (y < this.minY || y > this.maxY) {
+            return false;
+        }
         this.changes++;
         return this.getExtent().setBiome(x, y, z, biome);
     }
@@ -859,7 +867,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, Stage stage) throws WorldEditException {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -885,7 +893,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Deprecated
     public <B extends BlockStateHolder<B>> boolean rawSetBlock(BlockVector3 position, B block) {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -905,7 +913,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return whether the block changed
      */
     public <B extends BlockStateHolder<B>> boolean smartSetBlock(BlockVector3 position, B block) {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -920,7 +928,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Override
     @Deprecated
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -937,7 +945,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
-        if (y < 0 || y > 255) {
+        if (y < this.minY || y > this.maxY) {
             return false;
         }
 
@@ -960,7 +968,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public boolean setBlock(int x, int y, int z, Pattern pattern) {
-        if (y < 0 || y > 255) {
+        if (y < this.minY || y > this.maxY) {
             return false;
         }
 
@@ -982,7 +990,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     public boolean setBlock(BlockVector3 position, Pattern pattern) throws MaxChangedBlocksException {
-        if (position.getBlockY() < 0 || position.getBlockY() > 255) {
+        if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
         }
 
@@ -1086,9 +1094,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
                 player.print(Caption.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null) {
-                player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
+                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
             } else {
-                player.printError(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.outside.level"));
+                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason.outside.level"));
             }
         }
         if (wnaMode) {
@@ -1112,7 +1120,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
             }
         } catch (Throwable e) {
-            player.printError(TranslatableComponent.of("fawe.error.lighting"));
+            player.print(Caption.of("fawe.error.lighting"));
             e.printStackTrace();
         }
         // Enqueue it
@@ -1977,8 +1985,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         double threshold = 0.5;
 
-        LocalBlockVectorSet set = new LocalBlockVectorSet();
-
         double nextXn = 0;
         double dx;
         double dy;
@@ -2555,7 +2561,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     timedOut[0] = timedOut[0] + 1;
                     return null;
                 } catch (Exception e) {
-                    log.warn("Failed to create shape", e);
+                    LOGGER.warn("Failed to create shape", e);
                     return null;
                 }
             }
@@ -3091,7 +3097,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     timedOut.getAndIncrement();
                     return null;
                 } catch (Exception e) {
-                    log.warn("Failed to create shape", e);
+                    LOGGER.warn("Failed to create shape", e);
                     return null;
                 }
             }

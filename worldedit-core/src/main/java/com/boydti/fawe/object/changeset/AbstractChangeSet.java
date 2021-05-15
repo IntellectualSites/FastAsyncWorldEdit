@@ -38,7 +38,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 

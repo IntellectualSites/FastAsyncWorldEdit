@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.pattern.Linear2DBlockPattern;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.WorldEdit;
@@ -44,7 +45,7 @@ public class Linear2DPatternParser extends RichParser<Pattern> {
     @Override
     protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length == 0 || arguments.length > 3) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.command.syntax",
+            throw new InputParseException(Caption.of("fawe.error.command.syntax",
                     TextComponent.of(getPrefix() + "[pattern] (e.g. " + getPrefix() + "[stone,dirt])")));
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(arguments[0], context);

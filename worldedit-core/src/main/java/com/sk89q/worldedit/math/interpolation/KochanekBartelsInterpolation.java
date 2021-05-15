@@ -21,7 +21,6 @@
 
 package com.sk89q.worldedit.math.interpolation;
 
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 

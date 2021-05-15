@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
@@ -43,7 +44,7 @@ public enum NavigationWand implements DoubleActionTraceTool {
       if (pos != null) {
           player.findFreePosition(pos);
       } else {
-          player.printError(TranslatableComponent.of("worldedit.jumpto.none"));
+          player.print(Caption.of("worldedit.jumpto.none"));
       }
       return true;
   }
@@ -59,7 +60,7 @@ public enum NavigationWand implements DoubleActionTraceTool {
         }
 
         if (!player.passThroughForwardWall(Math.max(1, maxDist - 10))) {
-            player.printError(TranslatableComponent.of("worldedit.thru.obstructed"));
+            player.print(Caption.of("worldedit.thru.obstructed"));
         }
         return true;
     }

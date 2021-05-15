@@ -186,7 +186,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                         stateId = property.modifyIndex(stateId, index);
                     } else {
                         // suggest
-                        PropertyKey key = PropertyKey.get(charSequence);
+                        PropertyKey key = PropertyKey.getByName(charSequence);
                         if (key == null || !type.hasProperty(key)) {
                             // Suggest property
                             String input = charSequence.toString();

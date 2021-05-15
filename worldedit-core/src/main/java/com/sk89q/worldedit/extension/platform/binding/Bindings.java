@@ -2,8 +2,10 @@ package com.sk89q.worldedit.extension.platform.binding;
 
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import org.apache.logging.log4j.Logger;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ConversionResult;
@@ -20,9 +22,9 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class Bindings {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final WorldEdit worldEdit;
 
@@ -57,7 +59,7 @@ public class Bindings {
             Annotation annotation = annotations[0] == binding ? annotations[1] : annotations[0];
             key = Key.of(ret, annotation);
         } else {
-            getLogger(Bindings.class).debug("Cannot annotate: " + method + " with " + StringMan.getString(annotations));
+            LOGGER.debug("Cannot annotate: " + method + " with " + StringMan.getString(annotations));
             return false;
         }
 
