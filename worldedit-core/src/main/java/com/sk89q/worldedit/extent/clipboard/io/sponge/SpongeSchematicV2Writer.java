@@ -17,10 +17,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.extent.clipboard.io;
+package com.sk89q.worldedit.extent.clipboard.io.sponge;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntArrayTag;
@@ -31,12 +31,12 @@ import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Capability;
+import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
@@ -46,20 +46,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * Writes schematic files using the Sponge schematic format.
+ * Writes schematic files using the Sponge Schematic Specification (Version 2).
  *
  * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
  *         {@link com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter}.
  *         Avoid using large clipboards to create schematics with this writer.
  */
 @Deprecated
-public class SpongeSchematicWriter implements ClipboardWriter {
+public class SpongeSchematicV2Writer implements ClipboardWriter {
 
     private static final int CURRENT_VERSION = 2;
 
@@ -71,7 +69,7 @@ public class SpongeSchematicWriter implements ClipboardWriter {
      *
      * @param outputStream the output stream to write to
      */
-    public SpongeSchematicWriter(NBTOutputStream outputStream) {
+    public SpongeSchematicV2Writer(NBTOutputStream outputStream) {
         checkNotNull(outputStream);
         this.outputStream = outputStream;
     }
@@ -121,6 +119,24 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         metadata.put("WEOffsetY", new IntTag(offset.y()));
         metadata.put("WEOffsetZ", new IntTag(offset.z()));
         metadata.put("FAWEVersion", new IntTag(Fawe.instance().getVersion().build));
+
+        Map<String, Tag> worldEditSection = new HashMap<>();
+        worldEditSection.put("Version", new StringTag(WorldEdit.getVersion()));
+        worldEditSection.put("EditingPlatform", new StringTag(WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getId()));
+        worldEditSection.put("Offset", new IntArrayTag(new int[] {
+                offset.getBlockX(), offset.getBlockY(), offset.getBlockZ()
+        }));
+
+        Map<String, Tag> platformsSection = new HashMap<>();
+        for (Platform platform : WorldEdit.getInstance().getPlatformManager().getPlatforms()) {
+            platformsSection.put(platform.getId(), new CompoundTag(ImmutableMap.of(
+                    "Name", new StringTag(platform.getPlatformName()),
+                    "Version", new StringTag(platform.getPlatformVersion())
+            )));
+        }
+        worldEditSection.put("Platforms", new CompoundTag(platformsSection));
+
+        metadata.put("WorldEdit", new CompoundTag(worldEditSection));
 
         schematic.put("Metadata", new CompoundTag(metadata));
 
@@ -200,7 +216,10 @@ public class SpongeSchematicWriter implements ClipboardWriter {
         }
 
         if (!clipboard.getEntities().isEmpty()) {
-            writeEntities(clipboard, schematic);
+            ListTag value = WriterUtil.encodeEntities(clipboard, false);
+            if (value != null) {
+                schematic.put("Entities", value);
+            }
         }
 
         return schematic;
@@ -248,31 +267,6 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
         schematic.put("BiomePalette", new CompoundTag(paletteTag));
         schematic.put("BiomeData", new ByteArrayTag(buffer.toByteArray()));
-    }
-
-    private void writeEntities(Clipboard clipboard, Map<String, Tag> schematic) {
-        List<CompoundTag> entities = clipboard.getEntities().stream().map(e -> {
-            BaseEntity state = e.getState();
-            if (state == null) {
-                return null;
-            }
-            Map<String, Tag> values = Maps.newHashMap();
-            CompoundTag rawData = state.getNbtData();
-            if (rawData != null) {
-                values.putAll(rawData.getValue());
-            }
-            values.remove("id");
-            values.put("Id", new StringTag(state.getType().getId()));
-            final Location location = e.getLocation();
-            values.put("Pos", writeVector(location.toVector()));
-            values.put("Rotation", writeRotation(location));
-
-            return new CompoundTag(values);
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-        if (entities.isEmpty()) {
-            return;
-        }
-        schematic.put("Entities", new ListTag(CompoundTag.class, entities));
     }
 
     @Override
