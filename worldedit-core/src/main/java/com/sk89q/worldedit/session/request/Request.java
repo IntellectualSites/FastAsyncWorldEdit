@@ -19,19 +19,16 @@
 
 package com.sk89q.worldedit.session.request;
 
-import com.boydti.fawe.object.collection.CleanableThreadLocal;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Describes the current request using a {@link ThreadLocal}.
@@ -40,7 +37,7 @@ public final class Request {
 
     private static final ThreadLocal<Request> threadLocal = ThreadLocal.withInitial(Request::new);
     // TODO any better way to deal with this?
-    private static final Map<Thread, Request> requests = new WeakHashMap<>();
+    private static final Map<Thread, Request> requests = new ConcurrentHashMap<>();
 
     @Nullable
     private World world;
