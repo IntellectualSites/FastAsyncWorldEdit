@@ -28,3 +28,6 @@ docs/
 # i18n
 worldedit-core/src/main/resources/lang/*
 !worldedit-core/src/main/resources/lang/strings.json
+**/*.eml
+/worldedit-core/FastAsyncWorldEdit.worldedit-core.eml
+/worldedit-core/.factorypath

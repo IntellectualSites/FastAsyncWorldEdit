@@ -97,9 +97,9 @@ public class CavesGen extends GenBase {
 
             if (!isLargeCave && angle == j && paramdouble1 > 1.0F && maxAngle > 0) {
                 generateCaveNode(ThreadLocalRandom.current().nextLong(), chunkPos, chunk, x, y, z, ThreadLocalRandom
-                    .current().nextDouble() * 0.5F + 0.5F, paramdouble2 - 1.570796F, paramdouble3 / 3.0F, angle, maxAngle, 1.0D);
+                    .current().nextDouble() * 0.5F + 0.5F, paramdouble2 - (Math.PI/2), paramdouble3 / 3.0F, angle, maxAngle, 1.0D);
                 generateCaveNode(ThreadLocalRandom.current().nextLong(), chunkPos, chunk, x, y, z, ThreadLocalRandom
-                    .current().nextDouble() * 0.5F + 0.5F, paramdouble2 + 1.570796F, paramdouble3 / 3.0F, angle, maxAngle, 1.0D);
+                    .current().nextDouble() * 0.5F + 0.5F, paramdouble2 + (Math.PI/2), paramdouble3 / 3.0F, angle, maxAngle, 1.0D);
                 return;
             }
             if (!isLargeCave && ThreadLocalRandom.current().nextInt(4) == 0) {
@@ -273,7 +273,7 @@ public class CavesGen extends GenBase {
             }
             while (count > 0) {
                 count--;
-                double f1 = ThreadLocalRandom.current().nextDouble() * 3.141593F * 2.0F;
+                double f1 = ThreadLocalRandom.current().nextDouble() * Math.PI * 2.0F;
                 double f2 = (ThreadLocalRandom.current().nextDouble() - 0.5F) * 2.0F / 8.0F;
                 double f3 = ThreadLocalRandom.current().nextDouble() * 2.0F + ThreadLocalRandom
                     .current().nextDouble();

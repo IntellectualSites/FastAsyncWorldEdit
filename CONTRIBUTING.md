@@ -8,7 +8,7 @@ ask that you make note of the following guidelines.
 * **Follow the [Oracle coding conventions](http://www.oracle.com/technetwork/java/codeconv-138413.html).**
   We can't stress this enough; if your code has notable issues, it may delay
   the process significantly.
-* **Target Java 8 for source and compilation.** Make sure to mark methods with
+* **Target Java 11 for source and compilation.** Make sure to mark methods with
   ` @Override` that override methods of parent classes, or that implement
   methods of interfaces.
 * **Use only spaces for indentation.** Our indents are 4-spaces long, and tabs
@@ -30,6 +30,11 @@ ask that you make note of the following guidelines.
 * **Write unit tests.** While this is strictly optional, we recommend it for
   complicated algorithms.
 
+
+Additional Notes
+----------------
+If you're submitting a feature, base your code on `main` and PR against the
+`main` branch.
 
 Checklist
 ---------
@@ -61,7 +66,7 @@ This is **GOOD:**
         // do things
     }
 
-This is **EXTREMELY BAD:**
+This is **VERY BAD:**
 
     if(var.func( param1, param2 ))
     {

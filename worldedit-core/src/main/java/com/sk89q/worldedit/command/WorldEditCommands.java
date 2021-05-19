@@ -96,7 +96,7 @@ public class WorldEditCommands {
             actor.print(Caption.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
         }
 
-        actor.printInfo(TextComponent.of("Wiki: https://wiki.intellectualsites.com/FastAsyncWorldEdit/index"));
+        actor.printInfo(TextComponent.of("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit/wiki"));
 
         PlatformManager pm = we.getPlatformManager();
 

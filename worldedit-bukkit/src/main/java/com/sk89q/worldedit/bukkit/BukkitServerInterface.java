@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
+import com.boydti.fawe.bukkit.NMSRelighterFactory;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.TuinityRelighterFactory_1_16_5;
 import com.google.common.collect.Sets;
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;
@@ -32,15 +35,18 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
 import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.extension.platform.Watchdog;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.registry.Registries;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.enginehub.piston.CommandManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,10 +62,13 @@ import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 public class BukkitServerInterface extends AbstractPlatform implements MultiUserPlatform {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     public final Server server;
     public final WorldEditPlugin plugin;
     private final CommandRegistration dynamicCommands;
     private final LazyReference<Watchdog> watchdog;
+    private final RelighterFactory religherFactory;
     private boolean hookingEvents;
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
@@ -74,6 +83,16 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
             }
             return null;
         });
+        RelighterFactory tempFactory;
+        try {
+            Class.forName("com.tuinity.tuinity.config.TuinityConfig");
+            tempFactory = new TuinityRelighterFactory_1_16_5();
+            LOGGER.info("Using Tuinity internals for relighting");
+        } catch (ClassNotFoundException e) {
+            tempFactory = new NMSRelighterFactory();
+            LOGGER.info("Using FAWE for relighting");
+        }
+        this.religherFactory = tempFactory;
     }
 
     CommandRegistration getDynamicCommands() {
@@ -242,6 +261,11 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
             return plugin.getBukkitImplAdapter().getSupportedSideEffects();
         }
         return SUPPORTED_SIDE_EFFECTS;
+    }
+
+    @Override
+    public @NotNull RelighterFactory getRelighterFactory() {
+        return this.religherFactory;
     }
 
     public void unregisterCommands() {

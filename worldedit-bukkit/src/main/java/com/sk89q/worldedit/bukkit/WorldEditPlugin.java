@@ -50,7 +50,6 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemCategory;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
-import de.notmyfault.serverlib.ServerLib;
 import io.papermc.lib.PaperLib;
 import org.apache.logging.log4j.Logger;
 import org.bstats.bukkit.Metrics;
@@ -69,6 +68,7 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.incendo.serverlib.ServerLib;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -83,7 +83,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import static com.boydti.fawe.bukkit.util.JavaVersionCheck.checkJvm;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAME;
 
@@ -161,8 +160,8 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             // register this so we can load world-dependent data right as the first world is loading
             getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
         } else {
-            LOGGER.warn("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins.");
-            LOGGER.warn("For more information, see https://matthewmiller.dev/blog/problem-with-reload/");
+            LOGGER.warn("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins. Reloading the server is not advised.");
+            LOGGER.warn("For more information why reloading is bad, see https://madelinemiller.dev/blog/problem-with-reload/");
             try {
                 setupPreWorldData();
                 // since worlds are loaded already, we can do this now
@@ -175,7 +174,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         new Metrics(this, 1403);
 
         // Check whether the server runs on 11 or greater
-        checkJvm();
+        ServerLib.checkJavaLTS();
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
     }

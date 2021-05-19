@@ -2,10 +2,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
 plugins {
-    id("java-library")
-    id("net.ltgt.apt-eclipse")
-    id("net.ltgt.apt-idea")
-    id("antlr")
+    `java-library`
+    antlr
 }
 
 repositories {
@@ -48,8 +46,8 @@ dependencies {
     annotationProcessor("com.google.guava:guava:21.0")
     compileOnly("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
     annotationProcessor("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
-    "testRuntimeOnly"("org.apache.logging.log4j:log4j-core:2.8.1")
-    implementation("com.github.luben:zstd-jni:1.4.9-2")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.8.1")
+    implementation("com.github.luben:zstd-jni:1.4.9-5")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
     api("com.plotsquared:PlotSquared-Core:5.13.11") { isTransitive = false }
@@ -74,6 +72,10 @@ tasks.named<AntlrTask>("generateGrammarSource").configure {
     )
 }
 
+tasks.named("sourcesJar") {
+    mustRunAfter("generateGrammarSource")
+}
+
 // Give intellij info about where ANTLR code comes from
 plugins.withId("idea") {
     configure<IdeaModel> {
@@ -87,11 +89,7 @@ plugins.withId("idea") {
 
 sourceSets.named("main") {
     java {
-        srcDir("src/main/java")
         srcDir("src/legacy/java")
-    }
-    resources {
-        srcDir("src/main/resources")
     }
 }
 
@@ -100,11 +98,5 @@ tasks.named<Copy>("processResources") {
         expand("version" to "$version",
                 "commit" to "${rootProject.ext["revision"]}",
                 "date" to "${rootProject.ext["date"]}")
-    }
-}
-tasks.named<ShadowJar>("shadowJar") {
-    dependencies {
-        include(dependency("com.github.luben:zstd-jni:1.4.9-2"))
-
     }
 }

@@ -1,16 +1,13 @@
 name: Bug report
 description: Create a report to help us improve
-title: ''
 labels: 'Requires Testing'
-assignees: []
-issue_body: true
 
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report for FastAsyncWorldEdit! Fill out the following form to your best ability to help us fix the problem.
-        Only use this if you're absolutely sure that you found a bug and can reproduce it. For anything else, use: [our Discord server](https://discord.gg/intellectualsites) or [the wiki](https://wiki.intellectualsites.com/FastAsyncWorldEdit).
+        Only use this if you're absolutely sure that you found a bug and can reproduce it. For anything else, use: [our Discord server](https://discord.gg/intellectualsites) or [the wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit/wiki).
 
   - type: dropdown
     attributes:
@@ -70,7 +67,7 @@ body:
   - type: input
     attributes:
       label: Error log (if applicable)
-      description: If you are reporting a console error, upload any relevant log excerpts to either https://haste.athion.net/ or https://gist.github.com, save and the paste the link in this box.
+      description: If you are reporting a console error, upload any relevant log excerpts to either https://paste.gg/ or https://gist.github.com, save and the paste the link in this box.
 
   - type: input
     attributes:
@@ -97,6 +94,7 @@ body:
         - label: I am using the newest build from https://ci.athion.net/job/FastAsyncWorldEdit-1.16/ and the issue still persists.
           required: true
 
-  - type: markdown
+  - type: textarea
     attributes:
-      value: Add any additional context you can provide below.   
+      label: Anything else?
+      description: You can provide additional context below.

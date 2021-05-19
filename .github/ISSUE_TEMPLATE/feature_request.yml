@@ -1,16 +1,13 @@
 name: Feature request
 description: Suggest an idea for this project
-title: ''
 labels: 'Enhancement'
-assignees: []
-issue_body: true
 
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this feature request for FastAsyncWorldEdit! Fill out the following form to your best ability to help us understand your feature request and greately improve the change of it getting added.
-        For anything else than a feature request, use: [our Discord server](https://discord.gg/intellectualsites) or [the wiki](https://wiki.intellectualsites.com/FastAsyncWorldEdit).
+        For anything else than a feature request, use: [our Discord server](https://discord.gg/intellectualsites) or [the wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit/wiki).
 
   - type: textarea
     attributes:
@@ -26,6 +23,7 @@ body:
     validations:
       required: true
 
-  - type: markdown
+  - type: textarea
     attributes:
-      value: Add any additional context you can provide below.
+      label: Anything else?
+      description: You can provide additional context below.

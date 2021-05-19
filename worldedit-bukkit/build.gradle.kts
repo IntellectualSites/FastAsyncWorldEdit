@@ -61,7 +61,7 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:bukkit"))
-    compile(":worldedit-adapters:")
+    implementation(":worldedit-adapters:")
     // Paper-patched NMS jars
     compileOnly("com.destroystokyo.paperv1_15_r1:paperv1_15_r1:1_15_r1")
     compileOnly("com.destroystokyo.paperv1_16_r1:paperv1_16_r1:1_16_r1")
@@ -84,12 +84,11 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api")
     compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:20.1.0")
-    testCompileOnly("org.jetbrains:annotations:20.1.0")
     implementation("io.papermc:paperlib:1.0.6")
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    testImplementation("org.mockito:mockito-core:3.8.0")
+    testImplementation("org.mockito:mockito-core:3.10.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
@@ -97,7 +96,9 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
     compileOnly("net.kyori:adventure-api:4.7.0")
-    testCompileOnly("net.kyori:adventure-api:4.7.0")
+    testImplementation("net.kyori:adventure-api:4.7.0")
+    testImplementation("org.checkerframework:checker-qual:3.13.0")
+    testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
@@ -109,7 +110,7 @@ dependencies {
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.6.0") { isTransitive = false }
-    implementation("de.notmyfault:serverlib:1.0.1")
+    implementation("org.incendo.serverlib:ServerLib:2.2.0")
 }
 
 tasks.named<Copy>("processResources") {
@@ -155,11 +156,14 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
-        relocate("de.notmyfault", "com.boydti.fawe") {
-            include(dependency("de.notmyfault:serverlib:1.0.1"))
+        relocate("org.incendo.serverlib", "com.boydti.fawe.serverlib") {
+            include(dependency("org.incendo.serverlib:ServerLib:2.2.0"))
         }
         relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
+        }
+        relocate("com.github.luben", "com.boydti.fawe.zstd") {
+            include(dependency("com.github.luben:zstd-jni:1.4.9-5"))
         }
     }
 }

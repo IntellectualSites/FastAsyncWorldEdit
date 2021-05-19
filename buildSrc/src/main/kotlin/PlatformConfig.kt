@@ -25,7 +25,11 @@ fun Project.applyPlatformAndCoreConfiguration() {
 //    apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
 
-    ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
+    if (project.hasProperty("buildnumber")) {
+        ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
+    } else {
+        ext["internalVersion"] = "$version"
+    }
 
     tasks
         .withType<JavaCompile>()
@@ -55,7 +59,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
         "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
         "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
-        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
+        "testImplementation"("net.bytebuddy:byte-buddy:1.11.0")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
     }
 
     // Java 8 turns on doclint which we fail

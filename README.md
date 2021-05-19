@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="fawe-logo.png" width="300">
+  <img src="fawe-logo.png" width="150">
 </p>
 
 ---
 
-FAWE is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
+FastAsyncWorldEdit is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
 
 **A Minecraft Map Editor... that runs in-game!**
 
@@ -12,61 +12,30 @@ FAWE is a fork of WorldEdit that has huge speed and memory improvements and cons
 * Use it in creative, survival in single player or on your server.
 * Use it on your Minecraft server to fix grieving and mistakes.
 
-Java Edition required. WorldEdit is compatible with Forge, Fabric, Bukkit, Spigot, Paper, and Sponge.
+Java Edition required. FastAsyncWorldEdit is compatible with Bukkit, Spigot, Paper, and Tuinity.
 
 ## Download FastAsyncWorldEdit
-### 1.15+
-* [Download](https://www.spigotmc.org/resources/fast-async-worldedit.13932/)
-* [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
-
-Looking builds for older versions? Download them [here](https://intellectualsites.github.io/download/).
+* Spigot: https://www.spigotmc.org/resources/fast-async-worldedit.13932/
+* Older, unsupported, versions: https://intellectualsites.github.io/download/fawe.html
 
 ## Links
 
-* [Spigot Page](https://www.spigotmc.org/threads/fast-async-worldedit.100104/)
 * [Discord](https://discord.gg/intellectualsites)
-* [Wiki](https://wiki.intellectualsites.com/FastAsyncWorldEdit/index)
+* [Wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit/wiki)
 * [Report Issue](https://github.com/IntellectualSites/FastAsyncWorldEdit/issues)
-* [Crowdin](https://intellectualsites.crowdin.com/fastasyncworldedit)
+* [Crowdin (Translations)](https://intellectualsites.crowdin.com/fastasyncworldedit)
 * [JavaDocs](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/javadoc/)
 
-Edit the Code
----------
+## Edit The Code
 
-Want to add new features to WorldEdit or fix bugs yourself? You can get the game running, with WorldEdit, from the code here, without any additional outside steps, by doing the following *four* things:
+Want to add new features to FastAsyncWorldEdit or fix bugs yourself? You can get the game running, with FastAsyncWorldEdit, from the code here:
 
-1. Download WorldEdit's source code and put it somewhere. We recommend you use something called Git if you already know how to use it, but [you can also just download a .zip file](https://github.com/EngineHub/WorldEdit/archive/master.zip). (If you plan on contributing the changes, you will need to figure out Git.)
-2. Install any version of Java greater than or equal to 8.
-   * Note that if you do _not_ install JDK 8 exactly, Gradle will download it for you on first run. However, it is still required to have some form of Java installed for Gradle to start at all.
-3. Open terminal / command prompt / bash and navigate to the directory where you put the source code.
-4. Run **one** of these following commands:
-   * Mac OS X / Linux: `./gradlew :worldedit-fabric:runClient`
-   * Windows - Command Prompt: `gradlew :worldedit-fabric:runClient`
-   * Windows - PowerShell: `.\gradlew :worldedit-fabric:runClient`
+For additional information about compiling FastAsyncWorldEdit, see [COMPILING.md](COMPILING.md).
 
-🎉 That's it. 🎉 It takes a long time to actually transform WorldEdit into a mod. If it succeeds, **the Minecraft game will open and you can create a single player world with WorldEdit**.
+## Submitting Your Changes
+FastAsyncWorldEdit is open source (specifically licensed under GPL v3), so note that your contributions will also be open source. The best way to submit a change is to create a fork on GitHub, put your changes there, and then create a "pull request" on our FastAsyncWorldEdit repository.
 
----
-
-For additional information about compiling WorldEdit, see [COMPILING.md](COMPILING.md).
-FAWE is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
-
-## Building
-FAWE uses gradle to build  
-You can safely ignore `gradlew setupDecompWorkspace` if you are not planning to work on the forge side of FAWE.
-
-```
-$ gradlew setupDecompWorkspace
-$ gradlew build
-```
-
-The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.16-###.jar`
-
-## Contributing
-Have an idea for an optimization, or a cool feature?
- - We will accept most PR's
- - Let us know what you've tested / what may need further testing
- - If you need any help, create a ticket or discuss on [Discord](https://discord.gg/intellectualsites)
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for important guidelines to follow.
 
 ## YourKit
 <a href="https://www.yourkit.com">
