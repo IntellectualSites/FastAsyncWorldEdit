@@ -16,13 +16,6 @@ public abstract class CharBlocks implements IBlocks {
     protected static final Section FULL = new Section() {
         @Override
         public final char[] get(CharBlocks blocks, int layer) {
-            if (blocks.blocks[layer] == null) {
-                if (blocks.sections[layer].isFull()) {
-                    throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
-                } else {
-                    blocks.EMPTY.get(blocks, layer);
-                }
-            }
             return blocks.blocks[layer];
         }
 
@@ -172,6 +165,12 @@ public abstract class CharBlocks implements IBlocks {
 
         public final char get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index) {
             char[] section = get(blocks, layer);
+            if (section == null) {
+                synchronized (blocks) {
+                    blocks.reset(layer);
+                    section = blocks.EMPTY.get(blocks, layer);
+                }
+            }
             return section[index];
         }
 
