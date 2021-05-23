@@ -1,7 +1,6 @@
 package com.boydti.fawe.command;
 
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

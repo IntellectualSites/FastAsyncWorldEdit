@@ -2,7 +2,6 @@ package com.sk89q.worldedit.registry.state;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
