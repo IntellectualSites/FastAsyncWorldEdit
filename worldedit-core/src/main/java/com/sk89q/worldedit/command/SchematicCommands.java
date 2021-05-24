@@ -302,7 +302,7 @@ public class SchematicCommands {
         } catch (IllegalArgumentException e) {
             actor.print(Caption.of("worldedit.schematic.unknown-filename", TextComponent.of(filename)));
         } catch (URISyntaxException | IOException e) {
-            actor.print(TranslatableComponent.of("worldedit.schematic.file-not-exist", TextComponent.of(e.getMessage())));
+            actor.print(Caption.of("worldedit.schematic.file-not-exist", TextComponent.of(e.getMessage())));
             LOGGER.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {
@@ -360,7 +360,7 @@ public class SchematicCommands {
         boolean overwrite = f.exists();
         if (overwrite) {
             if (!actor.hasPermission("worldedit.schematic.delete")) {
-                throw new StopExecutionException(TranslatableComponent.of("worldedit.schematic.already-exists"));
+                throw new StopExecutionException(Caption.of("worldedit.schematic.already-exists"));
             }
             if (other) {
                 if (!actor.hasPermission("worldedit.schematic.delete.other")) {
@@ -390,7 +390,7 @@ public class SchematicCommands {
             .registerWithSupervisor(worldEdit.getSupervisor(), "Saving schematic " + filename)
             .sendMessageAfterDelay(Caption.of("worldedit.schematic.save.saving"))
             .onSuccess(filename + " saved" + (overwrite ? " (overwriting previous file)." : "."), null)
-            .onFailure(TranslatableComponent.of("worldedit.schematic.failed-to-save"), worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
+            .onFailure(Caption.of("worldedit.schematic.failed-to-save"), worldEdit.getPlatformManager().getPlatformCommandManager().getExceptionConverter())
             .buildAndExec(worldEdit.getExecutorService());
     }
 

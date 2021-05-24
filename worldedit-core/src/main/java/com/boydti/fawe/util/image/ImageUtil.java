@@ -8,8 +8,6 @@ import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import org.w3c.dom.Text;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;

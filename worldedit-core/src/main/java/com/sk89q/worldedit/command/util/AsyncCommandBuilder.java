@@ -30,7 +30,6 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.task.FutureForwardingTask;
 import com.sk89q.worldedit.util.task.Supervisor;
@@ -164,7 +163,7 @@ public final class AsyncCommandBuilder<T> {
 
                         if (message == null) {
                             if (Strings.isNullOrEmpty(converted.getMessage())) {
-                                message = TranslatableComponent.of("worldedit.error.unknown");
+                                message = Caption.of("worldedit.error.unknown");
                             } else {
                                 message = converted.getRichMessage();
                             }

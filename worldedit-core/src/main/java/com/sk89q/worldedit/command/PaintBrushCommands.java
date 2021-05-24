@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.LocalSession;
@@ -59,24 +60,24 @@ import static org.enginehub.piston.part.CommandParts.arg;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class PaintBrushCommands {
 
-    private static final CommandArgument REGION_FACTORY = arg(TranslatableComponent.of("shape") , TranslatableComponent.of("worldedit.brush.paint.shape"))
+    private static final CommandArgument REGION_FACTORY = arg(TranslatableComponent.of("shape") , Caption.of("worldedit.brush.paint.shape"))
         .defaultsTo(ImmutableList.of())
         .ofTypes(ImmutableList.of(Key.of(RegionFactory.class)))
         .build();
 
-    private static final CommandArgument RADIUS = arg(TranslatableComponent.of("radius") , TranslatableComponent.of("worldedit.brush.paint.size"))
+    private static final CommandArgument RADIUS = arg(TranslatableComponent.of("radius") , Caption.of("worldedit.brush.paint.size"))
         .defaultsTo(ImmutableList.of("5"))
         .ofTypes(ImmutableList.of(Key.of(double.class)))
         .build();
 
-    private static final CommandArgument DENSITY = arg(TranslatableComponent.of("density") , TranslatableComponent.of("worldedit.brush.paint.density"))
+    private static final CommandArgument DENSITY = arg(TranslatableComponent.of("density") , Caption.of("worldedit.brush.paint.density"))
         .defaultsTo(ImmutableList.of("20"))
         .ofTypes(ImmutableList.of(Key.of(double.class)))
         .build();
 
     public static void register(CommandManagerService service, CommandManager commandManager, CommandRegistrationHandler registration) {
         commandManager.register("paint", builder -> {
-            builder.description(TranslatableComponent.of("worldedit.brush.paint.description"));
+            builder.description(Caption.of("worldedit.brush.paint.description"));
             builder.action(org.enginehub.piston.Command.Action.NULL_ACTION);
 
             CommandManager manager = service.newCommandManager();
@@ -89,7 +90,7 @@ public class PaintBrushCommands {
             builder.condition(new PermissionCondition(ImmutableSet.of("worldedit.brush.paint")));
 
             builder.addParts(REGION_FACTORY, RADIUS, DENSITY);
-            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type") , TranslatableComponent.of("worldedit.brush.paint.type"))
+            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type") , Caption.of("worldedit.brush.paint.type"))
                 .withCommands(manager.getAllCommands().collect(Collectors.toList()))
                 .required()
                 .build());
@@ -129,7 +130,7 @@ public class PaintBrushCommands {
                      @Direction(includeDiagonals = true)
                          com.sk89q.worldedit.util.Direction direction) throws WorldEditException {
         player.print(TextComponent.builder().append("WARNING: ")
-                .append(TranslatableComponent.of("worldedit.brush.paint.item.warning")).build());
+                .append(Caption.of("worldedit.brush.paint.item.warning")).build());
         setPaintBrush(parameters, player, localSession, new ItemUseFactory(item, direction));
     }
 
