@@ -52,6 +52,7 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
 
     protected transient EllipsoidRegion region;
     protected transient boolean started = false;
+    protected transient boolean selectedRadius = false;
 
     /**
      * Create a new selector with a {@code null} world.
@@ -81,6 +82,7 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
 
             region = new EllipsoidRegion(ellipsoidRegionSelector.getIncompleteRegion());
             started = ellipsoidRegionSelector.started;
+            selectedRadius = ellipsoidRegionSelector.selectedRadius;
         } else {
             Region oldRegion;
             try {
@@ -96,6 +98,7 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
             region.setCenter(center);
             region.setRadius(pos2.subtract(center).toVector3());
             started = true;
+            selectedRadius = true;
         }
     }
 
@@ -111,6 +114,9 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
 
         region.setCenter(center);
         region.setRadius(radius);
+
+        started = true;
+        selectedRadius = true;
     }
 
     @Nullable
@@ -126,13 +132,14 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public boolean selectPrimary(BlockVector3 position, SelectorLimits limits) {
-        if (position.equals(region.getCenter().toBlockPoint()) && region.getRadius().lengthSq() == 0) {
+        if (started && position.equals(region.getCenter().toBlockPoint()) && !selectedRadius) {
             return false;
         }
 
         region.setCenter(position);
         region.setRadius(Vector3.ZERO);
         started = true;
+        selectedRadius = false;
 
         return true;
     }
@@ -146,6 +153,9 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
         final Vector3 diff = position.toVector3().subtract(region.getCenter());
         final Vector3 minRadius = diff.getMaximum(diff.multiply(-1.0));
         region.extendRadius(minRadius);
+
+        selectedRadius = true;
+
         return true;
     }
 
@@ -192,7 +202,8 @@ public class EllipsoidRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public boolean isDefined() {
-        return started && region.getRadius().lengthSq() > 0;
+        // started implied by selectedRadius
+        return selectedRadius;
     }
 
     @Override
