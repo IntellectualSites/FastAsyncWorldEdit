@@ -25,7 +25,6 @@ import com.boydti.fawe.object.task.AsyncNotifyQueue;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.io.File;
 import java.util.Map;

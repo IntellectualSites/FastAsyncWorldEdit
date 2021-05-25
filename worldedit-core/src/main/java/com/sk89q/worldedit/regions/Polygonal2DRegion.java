@@ -24,7 +24,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.iterator.FlatRegion3DIterator;
 import com.sk89q.worldedit.regions.iterator.FlatRegionIterator;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import java.math.BigDecimal;

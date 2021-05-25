@@ -29,8 +29,6 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

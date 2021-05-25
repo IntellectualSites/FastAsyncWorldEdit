@@ -26,7 +26,6 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.internal.registry.InputParser;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.stream.Stream;
 

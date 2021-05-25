@@ -63,7 +63,6 @@ import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -467,10 +466,10 @@ public class RegionCommands {
     public void wer(Player player) throws WorldEditException {
         final Region region = player.getLargestRegion();
         if (region == null) {
-            player.print(TranslatableComponent.of("fawe.error.no.region"));
+            player.print(Caption.of("fawe.error.no.region"));
         } else {
             player.setSelection(region);
-            player.print(TranslatableComponent.of("fawe.info.set.region"));
+            player.print(Caption.of("fawe.info.set.region"));
         }
     }
 

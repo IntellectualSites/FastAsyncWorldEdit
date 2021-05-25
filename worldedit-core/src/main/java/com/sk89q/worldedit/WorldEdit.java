@@ -425,7 +425,7 @@ public final class WorldEdit {
 
     public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
         double val = radius.evaluate();
-        checkArgument(val >= 0);
+        checkArgument(val >= 0, "Radius must be a positive number.");
         if (getConfiguration().maxBrushRadius > 0) {
             if (val > getConfiguration().maxBrushRadius) {
                 throw new MaxBrushRadiusException();

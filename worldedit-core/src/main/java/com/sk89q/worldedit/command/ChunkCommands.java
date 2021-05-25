@@ -38,7 +38,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
@@ -49,7 +48,6 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.exception.StopExecutionException;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

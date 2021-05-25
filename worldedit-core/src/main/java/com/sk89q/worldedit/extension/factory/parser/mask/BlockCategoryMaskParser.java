@@ -28,7 +28,6 @@ import com.sk89q.worldedit.function.mask.BlockCategoryMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BlockCategory;
 
 import java.util.Locale;

@@ -14,7 +14,7 @@
 	"fawe.info.worldedit.bypassed": "Currently bypassing FAWE restriction.",
 	"fawe.info.worldedit.restricted": "Your FAWE edits are now restricted.",
 	"fawe.info.worldedit.oom.admin": "Possible options:\n - //fast\n - Do smaller edits\n - Allocate more memory\n - Disable `max-memory-percent`",
-    "fawe.info.temporarily-not-working": "Temporarily not working",
+    	"fawe.info.temporarily-not-working": "Temporarily not working",
 
 	"fawe.web.generating.link": "Uploading {0}, please wait...",
 	"fawe.web.generating.link.failed": "Failed to generate download link!",
@@ -131,6 +131,8 @@
     "fawe.error.no-failure": "This shouldn't result in any failure",
     "fawe.error.invalid-bracketing": "Invalid bracketing, are you missing a '{0}'.",
     "fawe.error.too-simple": "Complexity must be in the range 0-100",
+    "fawe.error.input-parser-exception": "Invalid empty string instead of boolean.",
+    "fawe.error.invalid-boolean": "Invalid boolean {0}",
 
     "fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {2}",
