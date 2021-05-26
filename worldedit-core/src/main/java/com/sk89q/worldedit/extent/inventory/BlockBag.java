@@ -59,11 +59,12 @@ public abstract class BlockBag {
             }
             fetchBlock(blockState);
         } catch (OutOfBlocksException e) {
-            if (blockState.getBlockType().getMaterial().isAir()) {
+            BlockState placed = blockState; // TODO BlockType.getBlockBagItem(id, data);
+            if (placed.getBlockType().getMaterial().isAir()) {
                 throw e; // TODO: check
             }
 
-            fetchBlock(blockState);
+            fetchBlock(placed);
         }
     }
 

@@ -27,7 +27,6 @@ import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import java.util.ArrayList;

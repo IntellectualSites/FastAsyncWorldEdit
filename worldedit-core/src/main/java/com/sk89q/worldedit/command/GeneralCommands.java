@@ -39,7 +39,6 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.HookMode;
 import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.extension.input.DisallowedUsageException;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -57,7 +56,6 @@ import com.sk89q.worldedit.util.formatting.component.SideEffectBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.item.ItemType;
 import org.enginehub.piston.CommandManager;
@@ -208,7 +206,7 @@ public class GeneralCommands {
         session.setTimeout(limit);
         Component component = TextComponent.empty().append(Caption.of("worldedit.timeout.set", TextComponent.of(limit)));
         if (limit != config.calculationTimeout) {
-            component.append(TranslatableComponent.of("worldedit.timeout.return-to-default"));
+            component.append(Caption.of("worldedit.timeout.return-to-default"));
         }
         actor.print(component);
     }
@@ -325,7 +323,7 @@ public class GeneralCommands {
                               @Arg(desc = "The new draw selection state", def = "")
                                   Boolean drawSelection) throws WorldEditException {
         if (!WorldEdit.getInstance().getConfiguration().serverSideCUI) {
-            throw new AuthorizationException(TranslatableComponent.of("worldedit.error.disabled"));
+            throw new AuthorizationException(Caption.of("worldedit.error.disabled"));
         }
         boolean useServerCui = session.shouldUseServerCUI();
         if (drawSelection != null && drawSelection == useServerCui) {
@@ -501,7 +499,7 @@ public class GeneralCommands {
         // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
         if (arguments.isEmpty()) {
             session.setTextureUtil(null);
-            player.print(TranslatableComponent.of("fawe.worldedit.general.texture.disabled"));
+            player.print(Caption.of("fawe.worldedit.general.texture.disabled"));
         } else {
             String arg = arguments.get(0);
             String argLower = arg.toLowerCase(Locale.ROOT);
@@ -514,7 +512,7 @@ public class GeneralCommands {
                 int min = Integer.parseInt(arguments.get(0));
                 int max = Integer.parseInt(arguments.get(1));
                 if (min < 0 || max > 100) {
-                    throw new InputParseException(TranslatableComponent.of("fawe.error.too-simple"));
+                    throw new InputParseException(Caption.of("fawe.error.too-simple"));
                 }
                 if (min != 0 || max != 100) {
                     util = new CleanTextureUtil(util, min, max);
@@ -568,9 +566,9 @@ public class GeneralCommands {
     public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
         session.setSourceMask(maskOpt);
         if (maskOpt == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.general.source.mask.disabled"));
+            player.print(Caption.of("fawe.worldedit.general.source.mask.disabled"));
         } else {
-            player.print(TranslatableComponent.of("fawe.worldedit.general.source.mask"));
+            player.print(Caption.of("fawe.worldedit.general.source.mask"));
         }
     }
 
@@ -584,9 +582,9 @@ public class GeneralCommands {
     public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws WorldEditException {
         session.setTransform(transform);
         if (transform == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.general.transform.disabled"));
+            player.print(Caption.of("fawe.worldedit.general.transform.disabled"));
         } else {
-            player.print(TranslatableComponent.of("fawe.worldedit.general.transform"));
+            player.print(Caption.of("fawe.worldedit.general.transform"));
         }
     }
 
@@ -598,9 +596,9 @@ public class GeneralCommands {
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
         if (player.togglePermission("fawe.tips")) {
-            player.print(TranslatableComponent.of("fawe.info.worldedit.toggle.tips.on"));
+            player.print(Caption.of("fawe.info.worldedit.toggle.tips.on"));
         } else {
-            player.print(TranslatableComponent.of("fawe.info.worldedit.toggle.tips.off"));
+            player.print(Caption.of("fawe.info.worldedit.toggle.tips.off"));
         }
     }
 }

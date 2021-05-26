@@ -21,6 +21,8 @@ package com.sk89q.worldedit.function.entity;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompoundTagBuilder;
+import com.sk89q.jnbt.FloatTag;
+import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -36,12 +38,10 @@ import com.sk89q.worldedit.util.Direction.Flag;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import com.sk89q.jnbt.FloatTag;
-import com.sk89q.jnbt.ListTag;
-import java.util.Arrays;
 
 /**
  * Copies entities provided to the function to the provided destination

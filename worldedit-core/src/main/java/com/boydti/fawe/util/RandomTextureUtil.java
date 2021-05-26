@@ -1,6 +1,5 @@
 package com.boydti.fawe.util;
 
-import com.plotsquared.core.util.PseudoRandom;
 import com.sk89q.worldedit.world.block.BlockType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
