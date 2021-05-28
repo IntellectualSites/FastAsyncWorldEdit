@@ -2,7 +2,6 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.VisualQueue;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FaweTimer;
@@ -82,7 +81,6 @@ public class Fawe {
      */
     private final FaweTimer timer;
     private FaweVersion version;
-    private VisualQueue visualQueue;
     private TextureUtil textures;
 
 
@@ -148,7 +146,6 @@ public class Fawe {
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
-                visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.implementation.getMaskManagers());
             } catch (Throwable ignored) {
             }
@@ -206,13 +203,6 @@ public class Fawe {
      */
     public FaweTimer getTimer() {
         return timer;
-    }
-
-    /**
-     * Get the visual queue.
-     */
-    public VisualQueue getVisualQueue() {
-        return visualQueue;
     }
 
     /**

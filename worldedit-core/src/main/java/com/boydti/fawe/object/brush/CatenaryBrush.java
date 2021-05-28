@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -35,16 +34,13 @@ public class CatenaryBrush implements Brush, ResettableTool {
 
     @Override
     public void build(EditSession editSession, BlockVector3 pos2, final Pattern pattern, double size) throws MaxChangedBlocksException {
-        boolean visual = editSession.getExtent() instanceof VisualExtent;
         Player player = editSession.getPlayer();
         if (player == null) {
             return; //todo throw error
         }
         if (pos1 == null || pos2.equals(pos1)) {
-            if (!visual) {
-                pos1 = pos2;
-                player.print(Caption.of("fawe.worldedit.brush.brush.line.primary", pos2));
-            }
+            pos1 = pos2;
+            player.print(Caption.of("fawe.worldedit.brush.brush.line.primary", pos2));
             return;
         }
         if (this.vertex == null) {
@@ -67,14 +63,12 @@ public class CatenaryBrush implements Brush, ResettableTool {
         } catch (WorldEditException e) {
             e.printStackTrace();
         }
-        if (!visual) {
-            player.print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
-            if (!select) {
-                pos1 = null;
-                return;
-            }
-            pos1 = pos2;
+        player.print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
+        if (!select) {
+            pos1 = null;
+            return;
         }
+        pos1 = pos2;
     }
 
     @Override

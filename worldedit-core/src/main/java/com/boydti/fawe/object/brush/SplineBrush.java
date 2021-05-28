@@ -2,7 +2,6 @@ package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.mask.IdMask;
 import com.boydti.fawe.object.visitor.DFSRecursiveVisitor;
 import com.sk89q.worldedit.EditSession;
@@ -53,11 +52,6 @@ public class SplineBrush implements Brush, ResettableTool {
         } else {
             mask = new MaskIntersection(mask, new IdMask(editSession));
         }
-        boolean visualization = editSession.getExtent() instanceof VisualExtent;
-        if (visualization && positionSets.isEmpty()) {
-            return;
-        }
-        int originalSize = numSplines;
         boolean newPos = !position.equals(this.position);
         this.position = position;
         if (newPos) {
@@ -94,9 +88,7 @@ public class SplineBrush implements Brush, ResettableTool {
             }
             this.positionSets.add(points);
             player.print(Caption.of("fawe.worldedit.brush.spline.primary.2"));
-            if (!visualization) {
-                return;
-            }
+            return;
         }
         if (positionSets.size() < 2) {
             player.print(Caption.of("fawe.worldedit.brush.brush.spline.secondary.error"));
@@ -110,7 +102,6 @@ public class SplineBrush implements Brush, ResettableTool {
         double tension = 0;
         double bias = 0;
         double continuity = 0;
-        double quality = 10;
 
         final List<Node> nodes = new ArrayList<>(centroids.size());
 
@@ -121,7 +112,6 @@ public class SplineBrush implements Brush, ResettableTool {
             n.setContinuity(continuity);
             nodes.add(n);
         }
-        int samples = numSplines;
         for (int i = 0; i < numSplines; i++) {
             List<BlockVector3> currentSpline = new ArrayList<>();
             for (ArrayList<BlockVector3> points : positionSets) {
@@ -132,13 +122,8 @@ public class SplineBrush implements Brush, ResettableTool {
             editSession.drawSpline(pattern, currentSpline, 0, 0, 0, 10, 0, true);
         }
         player.print(Caption.of("fawe.worldedit.brush.spline.secondary"));
-        if (visualization) {
-            numSplines = originalSize;
-            positionSets.remove(positionSets.size() - 1);
-        } else {
-            positionSets.clear();
-            numSplines = 0;
-        }
+        positionSets.clear();
+        numSplines = 0;
     }
 
     private Vector3 getCentroid(Collection<BlockVector3> points) {

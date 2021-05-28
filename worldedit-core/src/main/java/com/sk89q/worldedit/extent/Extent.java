@@ -507,6 +507,10 @@ public interface Extent extends InputExtent, OutputExtent {
         return true;
     }
 
+    default int getMinY() {
+        return 0;
+    }
+
     default int getMaxY() {
         return 255;
     }
