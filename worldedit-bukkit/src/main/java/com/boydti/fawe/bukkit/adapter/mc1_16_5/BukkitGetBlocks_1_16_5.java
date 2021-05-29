@@ -699,7 +699,7 @@ public class BukkitGetBlocks_1_16_5 extends CharGetBlocks implements BukkitGetBl
 
     @Override
     public synchronized void send(int mask, boolean lighting) {
-        BukkitAdapter_1_16_5.sendChunk(world, chunkX, chunkZ, mask, lighting);
+        BukkitAdapter_1_16_5.sendChunk(world, chunkX, chunkZ, lighting);
     }
 
     @Override

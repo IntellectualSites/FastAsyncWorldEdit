@@ -7,7 +7,6 @@ import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -63,9 +62,6 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
 
-    private static final Field fieldDirtyCount;
-    private static final Field fieldDirtyBits;
-
     private static final Field fieldBiomeArray;
 
     private final static MethodHandle methodGetVisibleChunk;
@@ -76,6 +72,7 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     private static final int CHUNKSECTION_SHIFT;
 
     private static final Field fieldLock;
+    private static final long fieldLockOffset;
 
     static {
         try {
@@ -93,11 +90,6 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldDirtyCount = PlayerChunk.class.getDeclaredField("dirtyCount");
-            fieldDirtyCount.setAccessible(true);
-            fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
-            fieldDirtyBits.setAccessible(true);
-
             fieldBiomeArray = BiomeStorage.class.getDeclaredField("g");
             fieldBiomeArray.setAccessible(true);
 
@@ -109,12 +101,10 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
             declaredSetLightNibbleArray.setAccessible(true);
             methodSetLightNibbleArray = MethodHandles.lookup().unreflect(declaredSetLightNibbleArray);
 
-            Field tmp = DataPaletteBlock.class.getDeclaredField("j");
-            ReflectionUtils.setAccessibleNonFinal(tmp);
-            fieldLock = tmp;
-            fieldLock.setAccessible(true);
-
             Unsafe unsafe = UnsafeUtils.getUNSAFE();
+            fieldLock = DataPaletteBlock.class.getDeclaredField("j");
+            fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
+
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
             int scale = unsafe.arrayIndexScale(ChunkSection[].class);
             if ((scale & (scale - 1)) != 0) {
@@ -141,16 +131,17 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
         //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which acquires the lock in NMS?
         try {
             synchronized (section) {
+                Unsafe unsafe = UnsafeUtils.getUNSAFE();
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                ReentrantLock currentLock = (ReentrantLock) fieldLock.get(blocks);
+                ReentrantLock currentLock = (ReentrantLock) unsafe.getObject(blocks, fieldLockOffset);
                 if (currentLock instanceof DelegateLock) {
                     return (DelegateLock) currentLock;
                 }
                 DelegateLock newLock = new DelegateLock(currentLock);
-                fieldLock.set(blocks, newLock);
+                unsafe.putObject(blocks, fieldLockOffset, newLock);
                 return newLock;
             }
-        } catch (IllegalAccessException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }

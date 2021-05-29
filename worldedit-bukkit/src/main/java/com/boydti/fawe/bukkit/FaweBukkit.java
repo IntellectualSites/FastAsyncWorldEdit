@@ -9,8 +9,6 @@ import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.BukkitQueueHandler;
 import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.bukkit.listener.BrushListener;
-import com.boydti.fawe.bukkit.listener.BukkitImageListener;
-import com.boydti.fawe.bukkit.listener.CFIPacketListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
@@ -57,8 +55,6 @@ public class FaweBukkit implements IFawe, Listener {
     private ItemUtil itemUtil;
 
     private boolean listeningImages;
-    private BukkitImageListener imageListener;
-    private CFIPacketListener packetListener;
     private final boolean chunksStretched;
     private final FAWEPlatformAdapterImpl platformAdapter;
 
@@ -102,26 +98,14 @@ public class FaweBukkit implements IFawe, Listener {
         });
     }
 
-    @Override // Please don't delete this again, it's WIP
-    public void registerPacketListener() {
-        PluginManager manager = Bukkit.getPluginManager();
-        if (packetListener == null && manager.getPlugin("ProtocolLib") != null) {
-            packetListener = new CFIPacketListener(plugin);
-        }
-    }
-
     @Override public QueueHandler getQueueHandler() {
         return new BukkitQueueHandler();
     }
 
     @Override
     public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player player) {
-        if (listeningImages && imageListener == null) {
-            return null;
-        }
         try {
             listeningImages = true;
-            registerPacketListener();
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
@@ -140,11 +124,7 @@ public class FaweBukkit implements IFawe, Listener {
                     fos.write(jarData);
                 }
             }
-            BukkitImageViewer viewer = new BukkitImageViewer(BukkitAdapter.adapt(player));
-            if (imageListener == null) {
-                this.imageListener = new BukkitImageListener(plugin);
-            }
-            return viewer;
+            return new BukkitImageViewer(BukkitAdapter.adapt(player));
         } catch (Throwable ignored) {
         }
         return null;

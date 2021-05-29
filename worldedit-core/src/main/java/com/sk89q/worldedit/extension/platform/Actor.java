@@ -22,7 +22,6 @@ package com.sk89q.worldedit.extension.platform;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.util.task.InterruptableCondition;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.MapMetadatable;
@@ -239,22 +238,6 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
                 if (equals(player)) {
                     editSession.cancel();
                     cancelled++;
-                }
-            }
-        }
-        VirtualWorld world = getSession().getVirtualWorld();
-        if (world != null) {
-            if (close) {
-                try {
-                    world.close(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                try {
-                    world.close(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
         }

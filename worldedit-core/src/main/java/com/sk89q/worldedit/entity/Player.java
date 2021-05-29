@@ -22,7 +22,6 @@ package com.sk89q.worldedit.entity;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.MainUtil;
@@ -385,14 +384,6 @@ public interface Player extends Entity, Actor {
      * @return Editing world
      */
     default World getWorldForEditing() {
-        VirtualWorld virtual = getSession().getVirtualWorld();
-        if (virtual != null) {
-            return virtual;
-        }
-//        CFICommands.CFISettings cfi = getMeta("CFISettings");
-//        if (cfi != null && cfi.hasGenerator() && cfi.getGenerator().hasPacketViewer()) {
-//            return cfi.getGenerator();
-//        }
         return WorldEdit.getInstance().getPlatformManager().getWorldForEditing(getWorld());
     }
 
@@ -404,7 +395,6 @@ public interface Player extends Entity, Actor {
         getSession().setClipboard(null);
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
             getSession().clearHistory();
-            getSession().unregisterTools(this);
         }
     }
 
