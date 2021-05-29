@@ -19,6 +19,12 @@ public abstract class CharBlocks implements IBlocks {
             return blocks.blocks[layer];
         }
 
+        // Ignore aggressive switch here.
+        @Override
+        public char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, boolean aggressive) {
+            return blocks.blocks[layer];
+        }
+
         @Override
         public final boolean isFull() {
             return true;
@@ -27,14 +33,20 @@ public abstract class CharBlocks implements IBlocks {
     protected final Section EMPTY = new Section() {
         @Override
         public final synchronized char[] get(CharBlocks blocks, int layer) {
+            // Defaults to aggressive as it should only be avoided where we know we've reset a chunk during an edit
+            return get(blocks, layer, true);
+        }
+
+        @Override
+        public char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, boolean aggressive) {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
-                arr = blocks.blocks[layer] = blocks.update(layer, null);
+                arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
                 if (arr == null) {
                     throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
                 }
             } else {
-                blocks.blocks[layer] = blocks.update(layer, arr);
+                blocks.blocks[layer] = blocks.update(layer, arr, aggressive);
                 if (blocks.blocks[layer] == null) {
                     throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
                 }
@@ -97,7 +109,7 @@ public abstract class CharBlocks implements IBlocks {
         sections[layer] = EMPTY;
     }
 
-    public synchronized char[] update(int layer, char[] data) {
+    public synchronized char[] update(int layer, char[] data, boolean aggressive) {
         if (data == null) {
             return new char[4096];
         }
@@ -161,15 +173,15 @@ public abstract class CharBlocks implements IBlocks {
 
         public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer);
 
+        public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, boolean aggressive);
+
         public abstract boolean isFull();
 
         public final char get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index) {
             char[] section = get(blocks, layer);
             if (section == null) {
-                synchronized (blocks) {
-                    blocks.reset(layer);
-                    section = blocks.EMPTY.get(blocks, layer);
-                }
+                blocks.reset(layer);
+                section = blocks.EMPTY.get(blocks, layer, false);
             }
             return section[index];
         }

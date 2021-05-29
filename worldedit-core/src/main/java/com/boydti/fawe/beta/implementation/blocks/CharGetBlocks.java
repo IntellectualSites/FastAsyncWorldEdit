@@ -25,7 +25,8 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
         return true;
     }
 
-    public char[] update(int layer, char[] data) {
+    @Override
+    public char[] update(int layer, char[] data, boolean aggressive) {
         if (data == null) {
             data = new char[4096];
         }
