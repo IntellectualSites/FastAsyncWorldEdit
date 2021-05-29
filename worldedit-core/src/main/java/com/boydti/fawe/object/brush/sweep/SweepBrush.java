@@ -2,7 +2,6 @@ package com.boydti.fawe.object.brush.sweep;
 
 import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.brush.ResettableTool;
-import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
@@ -40,10 +39,6 @@ public class SweepBrush implements Brush, ResettableTool {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-        boolean visualization = editSession.getExtent() instanceof VisualExtent;
-        if (visualization && positions.isEmpty()) {
-            return;
-        }
 
         boolean newPos = !position.equals(this.position);
         this.position = position;

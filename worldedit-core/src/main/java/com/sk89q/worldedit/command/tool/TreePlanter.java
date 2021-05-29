@@ -30,7 +30,6 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 /**
  * Plants a tree.

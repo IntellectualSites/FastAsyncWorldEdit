@@ -32,7 +32,6 @@ import com.sk89q.worldedit.function.pattern.StateApplyingPattern;
 import com.sk89q.worldedit.function.pattern.TypeApplyingPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.HashMap;
 import java.util.Map;

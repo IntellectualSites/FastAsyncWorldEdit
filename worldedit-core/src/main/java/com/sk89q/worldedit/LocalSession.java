@@ -24,7 +24,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.collection.SparseBitSet;
@@ -81,6 +80,8 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -101,8 +102,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -161,7 +160,6 @@ public class LocalSession implements TextureHolder {
     private transient UUID uuid;
     private transient volatile long historySize = 0;
 
-    private transient VirtualWorld virtual;
     private transient BlockVector3 cuiTemporaryBlock;
     @SuppressWarnings("unused")
     private transient EditSession.ReorderMode reorderMode = EditSession.ReorderMode.MULTI_STAGE;
@@ -754,35 +752,6 @@ public class LocalSession implements TextureHolder {
         return selector.getRegion();
     }
 
-    @Nullable
-    public VirtualWorld getVirtualWorld() {
-        synchronized (dirty) {
-            return virtual;
-        }
-    }
-
-    public void setVirtualWorld(@Nullable VirtualWorld world) {
-        VirtualWorld tmp;
-        synchronized (dirty) {
-            tmp = this.virtual;
-            if (tmp == world) {
-                return;
-            }
-            this.virtual = world;
-        }
-        if (tmp != null) {
-            try {
-                tmp.close(world == null);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (world != null) {
-            Fawe.imp().registerPacketListener();
-            world.update();
-        }
-    }
-
     /**
      * Get the selection world.
      *
@@ -1235,10 +1204,6 @@ public class LocalSession implements TextureHolder {
                     this.tools.remove(type.getInternalId());
                 }
             }
-        }
-        if (player != null && previous instanceof BrushTool) {
-            BrushTool brushTool = (BrushTool) previous;
-            brushTool.clear(player);
         }
     }
 
@@ -1725,16 +1690,6 @@ public class LocalSession implements TextureHolder {
 
     public void setTransform(ResettableExtent transform) {
         this.transform = transform;
-    }
-
-    public void unregisterTools(Player player) {
-        synchronized (tools) {
-            for (Tool tool : tools.values()) {
-                if (tool instanceof BrushTool) {
-                    ((BrushTool) tool).clear(player);
-                }
-            }
-        }
     }
 
 }

@@ -1,13 +1,11 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 public class LineBrush implements Brush, ResettableTool {
 
@@ -24,22 +22,17 @@ public class LineBrush implements Brush, ResettableTool {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
-        boolean visual = editSession.getExtent() instanceof VisualExtent;
         if (pos1 == null) {
-            if (!visual) {
-                pos1 = position;
-                editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.primary", position));
-            }
+            pos1 = position;
+            editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.primary", position));
             return;
         }
         editSession.drawLine(pattern, pos1, position, size, !shell, flat);
-        if (!visual) {
-            editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
-            if (!select) {
-                pos1 = null;
-            } else {
-                pos1 = position;
-            }
+        editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
+        if (!select) {
+            pos1 = null;
+        } else {
+            pos1 = position;
         }
     }
 

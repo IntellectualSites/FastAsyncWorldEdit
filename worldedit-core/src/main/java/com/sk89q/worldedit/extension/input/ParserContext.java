@@ -24,7 +24,6 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.inject.InjectedValueAccess;
 

@@ -14,7 +14,7 @@
 	"fawe.info.worldedit.bypassed": "Currently bypassing FAWE restriction.",
 	"fawe.info.worldedit.restricted": "Your FAWE edits are now restricted.",
 	"fawe.info.worldedit.oom.admin": "Possible options:\n - //fast\n - Do smaller edits\n - Allocate more memory\n - Disable `max-memory-percent`",
-    "fawe.info.temporarily-not-working": "Temporarily not working",
+    	"fawe.info.temporarily-not-working": "Temporarily not working",
 
 	"fawe.web.generating.link": "Uploading {0}, please wait...",
 	"fawe.web.generating.link.failed": "Failed to generate download link!",
@@ -131,6 +131,8 @@
     "fawe.error.no-failure": "This shouldn't result in any failure",
     "fawe.error.invalid-bracketing": "Invalid bracketing, are you missing a '{0}'.",
     "fawe.error.too-simple": "Complexity must be in the range 0-100",
+    "fawe.error.input-parser-exception": "Invalid empty string instead of boolean.",
+    "fawe.error.invalid-boolean": "Invalid boolean {0}",
 
     "fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {2}",
@@ -240,8 +242,8 @@
     "worldedit.error.unknown-block": "Block name '{0}' was not recognized.",
     "worldedit.error.disallowed-block": "Block '{0}' not allowed (see WorldEdit configuration).",
     "worldedit.error.max-changes": "Max blocks changed in an operation reached ({0}).",
-    "worldedit.error.max-brush-radius": "Maximum brush radius (in configuration): {0}",
-    "worldedit.error.max-radius": "Maximum radius (in configuration): {0}",
+    "worldedit.error.max-brush-radius": "Maximum brush radius (in config-legacy.yml): {0}",
+    "worldedit.error.max-radius": "Maximum radius (in config-legacy.yml): {0}",
     "worldedit.error.empty-clipboard": "Your clipboard is empty. Use //copy first.",
     "worldedit.error.invalid-filename": "Filename '{0}' invalid: {1}",
     "worldedit.error.file-resolution": "File '{0}' resolution error: {1}",

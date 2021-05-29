@@ -75,12 +75,12 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 
     @Override
     default BlockVector3 getMinimumPoint() {
-        return BlockVector3.at(-30000000, 0, -30000000);
+        return BlockVector3.at(-30000000, getMinY(), -30000000);
     }
 
     @Override
     default BlockVector3 getMaximumPoint() {
-        return BlockVector3.at(30000000, FaweCache.IMP.WORLD_MAX_Y, 30000000);
+        return BlockVector3.at(30000000, getMaxY(), 30000000);
     }
 
     void setFastMode(boolean fastMode);

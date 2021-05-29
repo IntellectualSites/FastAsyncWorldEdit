@@ -4,7 +4,6 @@ import com.boydti.fawe.configuration.Configuration;
 import com.boydti.fawe.configuration.ConfigurationSection;
 import com.boydti.fawe.configuration.InvalidConfigurationException;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
-import com.sk89q.worldedit.util.YAMLConfiguration;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;

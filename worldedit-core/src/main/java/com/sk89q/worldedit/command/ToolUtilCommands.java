@@ -23,7 +23,6 @@ import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.TargetMode;
 import com.boydti.fawe.object.brush.scroll.Scroll;
-import com.boydti.fawe.object.brush.visualization.VisualMode;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.Iterables;
@@ -229,31 +228,6 @@ public class ToolUtilCommands {
         if (newTool != null && tool != null) {
             newTool.setPrimary(tool.getPrimary());
         }
-    }
-
-    @Command(
-        name = "visualize",
-        aliases = {"visual", "vis", "/visualize", "/visual", "/vis"},
-        desc = "Toggle between different visualization modes",
-        descFooter = "Toggle between different visualization modes\n"
-            + "0 = No visualization\n"
-            + "1 = Single block at target position\n"
-            + "2 = Glass showing what blocks will be changed"
-    )
-    @CommandPermissions("worldedit.brush.visualize")
-    public void visual(Player player, LocalSession session,
-                       @Arg(name = "mode", desc = "int", def = "0")
-                       @Range(from = 0, to = 2)
-                           int mode) throws WorldEditException {
-        BrushTool tool = session.getBrushTool(player, false);
-        if (tool == null) {
-            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
-            return;
-        }
-        VisualMode[] modes = VisualMode.values();
-        VisualMode newMode = modes[MathMan.wrap(mode, 0, modes.length - 1)];
-        tool.setVisualMode(player, newMode);
-        player.print(Caption.of("fawe.worldedit.brush.brush.visual.mode.set", newMode));
     }
 
     @Command(
