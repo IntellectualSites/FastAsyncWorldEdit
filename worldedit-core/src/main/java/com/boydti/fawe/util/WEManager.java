@@ -7,6 +7,7 @@ import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.object.extent.NullExtent;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
+import com.boydti.fawe.regions.FaweMaskMultipleRegions;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -82,12 +83,24 @@ public class WEManager {
                     while (iterator.hasNext()) {
                         FaweMask mask = iterator.next();
                         if (mask.isValid(player, type)) {
-                            Region region = mask.getRegion();
-                            if (region.contains(loc.toBlockPoint())) {
-                                regions.add(region);
-                            } else {
+                            if (mask instanceof FaweMaskMultipleRegions) {
                                 removed = true;
-                                backupRegions.add(region);
+                                for (Region region : ((FaweMaskMultipleRegions) mask).getRegions()) {
+                                    if (region.contains(loc.toBlockPoint())) {
+                                        regions.add(region);
+                                        removed = false;
+                                    } else {
+                                        backupRegions.add(region);
+                                    }
+                                }
+                            } else { // Normal FaweMask
+                                Region region = mask.getRegion();
+                                if (region.contains(loc.toBlockPoint())) {
+                                    regions.add(region);
+                                } else {
+                                    removed = true;
+                                    backupRegions.add(region);
+                                }
                             }
                         } else {
                             player.print(Caption.of("Invalid Mask"));
