@@ -5,6 +5,7 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.jnbt.streamer.IntValueReader;
 import com.boydti.fawe.object.IntTriple;
 import com.boydti.fawe.util.MainUtil;
+import com.boydti.fawe.util.UnsafeUtility;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
@@ -22,7 +23,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import net.jpountz.util.UnsafeUtils;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -279,7 +279,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         if (cb == null || !cb.isDirect()) {
             return;
         }
-        UnsafeUtils.getUNSAFE().invokeCleaner(cb);
+        UnsafeUtility.getUNSAFE().invokeCleaner(cb);
     }
 
     @Override

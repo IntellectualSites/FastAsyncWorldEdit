@@ -32,7 +32,6 @@ import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.jpountz.lz4.LZ4InputStream;
-import net.jpountz.lz4.LZ4Utils;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -254,7 +253,7 @@ public class MainUtil {
     private static final LZ4FastDecompressor DECOMPRESSOR = FACTORY.fastDecompressor();
 
     public static int getMaxCompressedLength(int size) {
-        return LZ4Utils.maxCompressedLength(size);
+        return COMPRESSOR.maxCompressedLength(size);
     }
 
     public static int compress(byte[] bytes, int length, byte[] buffer, OutputStream out, Deflater deflate) throws IOException {
