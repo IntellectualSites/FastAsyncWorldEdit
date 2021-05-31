@@ -577,11 +577,6 @@
     "worldedit.operation.affected.entity": "{0} entities affected",
     "worldedit.operation.deform.expression": "deformed using {0}",
 
-    "worldedit.error.parser.invalid-colon": "Invalid colon.",
-    "worldedit.error.parser.hanging-lbracket": "Invalid format. Hanging bracket at '{0}'.",
-    "worldedit.error.parser.missing-rbracket": "State is missing trailing ']'",
-    "worldedit.error.parser.player-only": "Input '{0}' requires a player!",
-    "worldedit.error.unknown-item": "Item name '{0}' was not recognized.",
     "worldedit.error.parser.invalid-nbt": "Invalid NBT Data in input: '{0}'. Error: {1}",
 
     "worldedit.selection.convex.info.vertices": "Vertices: {0}",

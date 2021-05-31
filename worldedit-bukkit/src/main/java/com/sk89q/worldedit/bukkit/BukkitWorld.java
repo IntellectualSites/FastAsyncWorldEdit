@@ -143,7 +143,7 @@ public class BukkitWorld extends AbstractWorld {
         return list;
     }
 
-    //createEntity was moved to IChunkExtent to prevent issues with Async Entitiy Add.
+    //createEntity was moved to IChunkExtent to prevent issues with Async Entity Add.
 
     /**
      * Get the world handle.
@@ -464,7 +464,7 @@ public class BukkitWorld extends AbstractWorld {
                 return worldNativeAccess.setBlock(position, block, sideEffects);
             } catch (Exception e) {
                 if (block instanceof BaseBlock && ((BaseBlock) block).getNbt() != null) {
-                    logger.warn("Tried to set a corrupt tile entity at " + position.toString()
+                    LOGGER.warn("Tried to set a corrupt tile entity at " + position.toString()
                         + ": " + ((BaseBlock) block).getNbt(), e);
                 } else {
                     LOGGER.warn("Failed to set block via adapter, falling back to generic", e);

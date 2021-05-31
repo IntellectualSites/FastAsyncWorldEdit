@@ -97,6 +97,7 @@ dependencies {
     }
     compileOnly("net.kyori:adventure-api:4.7.0")
     testImplementation("net.kyori:adventure-api:4.7.0")
+    api("net.kyori:adventure-nbt:4.7.0")
     testImplementation("org.checkerframework:checker-qual:3.13.0")
     testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
@@ -164,6 +165,9 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate("com.github.luben", "com.boydti.fawe.zstd") {
             include(dependency("com.github.luben:zstd-jni:1.4.9-5"))
+        }
+        relocate("net.kyori", "com.boydti.fawe.adventure") {
+            include(dependency("net.kyori:adventure-nbt:4.7.0"))
         }
     }
 }

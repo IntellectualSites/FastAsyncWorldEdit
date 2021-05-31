@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.function.block;
 
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.CompoundTagBuilder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -30,10 +28,10 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.NumberBinaryTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.NumberBinaryTag;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

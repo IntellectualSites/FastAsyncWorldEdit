@@ -34,11 +34,12 @@ dependencies {
         because("Mojang provides Log4J 2.8.1")
     }
     implementation("it.unimi.dsi:fastutil")
+    compileOnly("net.kyori:adventure-nbt:4.7.0")
+    testImplementation("net.kyori:adventure-nbt:4.7.0")
 
     val antlrVersion = "4.9.1"
     antlr("org.antlr:antlr4:$antlrVersion")
     implementation("org.antlr:antlr4-runtime:$antlrVersion")
-
     implementation("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
     compileOnly(project(":worldedit-libs:core:ap"))
     annotationProcessor(project(":worldedit-libs:core:ap"))

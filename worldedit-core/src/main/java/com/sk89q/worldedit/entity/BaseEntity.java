@@ -23,10 +23,10 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 import javax.annotation.Nullable;
 
@@ -50,6 +50,7 @@ public class BaseEntity implements NbtValued {
     private final EntityType type;
     @Nullable
     private LazyReference<CompoundBinaryTag> nbtData;
+    private CompoundTag faweNbtData;
 
     /**
      * Create a new base entity.
@@ -121,7 +122,7 @@ public class BaseEntity implements NbtValued {
     }
 
     public Location getLocation(Extent extent) {
-        return nbtData.getEntityLocation(extent);
+        return faweNbtData.getEntityLocation(extent);
     }
     // FAWE end
 

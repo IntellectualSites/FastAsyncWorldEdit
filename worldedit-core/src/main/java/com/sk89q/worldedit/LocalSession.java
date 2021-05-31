@@ -71,7 +71,6 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.SideEffectSet;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -79,6 +78,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

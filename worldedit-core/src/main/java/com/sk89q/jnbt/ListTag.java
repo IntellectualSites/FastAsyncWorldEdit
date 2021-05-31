@@ -19,10 +19,10 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.BinaryTagLike;
-import com.sk89q.worldedit.util.nbt.ListBinaryTag;
-import com.sk89q.worldedit.util.nbt.NumberBinaryTag;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagLike;
+import net.kyori.adventure.nbt.ListBinaryTag;
+import net.kyori.adventure.nbt.NumberBinaryTag;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -31,12 +31,11 @@ import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The {@code TAG_List} tag.
  *
- * @deprecated Use {@link com.sk89q.worldedit.util.nbt.ListBinaryTag}.
+ * @deprecated Use {@link net.kyori.adventure.nbt.ListBinaryTag}.
  */
 @Deprecated
 public final class ListTag extends Tag {

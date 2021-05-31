@@ -44,6 +44,7 @@ import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.SideEffect;
@@ -60,6 +61,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
@@ -416,7 +418,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
-        weStack.setNbtData(((CompoundTag) toNative(nmsStack.getTag())));
+        weStack.setNbt(((CompoundBinaryTag) toNative(nmsStack.getTag())));
         return weStack;
     }
 

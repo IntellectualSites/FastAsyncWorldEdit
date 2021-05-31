@@ -19,9 +19,9 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.BinaryTagType;
-import com.sk89q.worldedit.util.nbt.ListBinaryTag;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagType;
+import net.kyori.adventure.nbt.ListBinaryTag;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Helps create list tags.
  *
- * @deprecated Use {@link com.sk89q.worldedit.util.nbt.ListBinaryTag.Builder}.
+ * @deprecated Use {@link net.kyori.adventure.nbt.ListBinaryTag.Builder}.
  */
 @Deprecated
 public class ListTagBuilder {

@@ -20,7 +20,7 @@
 package com.sk89q.jnbt;
 
 import com.sk89q.jnbt.fawe.NumberTag;
-import com.sk89q.worldedit.util.nbt.FloatBinaryTag;
+import net.kyori.adventure.nbt.FloatBinaryTag;
 
 /**
  * The {@code TAG_Float} tag.

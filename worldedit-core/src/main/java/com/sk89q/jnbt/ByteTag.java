@@ -20,7 +20,7 @@
 package com.sk89q.jnbt;
 
 import com.sk89q.jnbt.fawe.NumberTag;
-import com.sk89q.worldedit.util.nbt.ByteBinaryTag;
+import net.kyori.adventure.nbt.ByteBinaryTag;
 
 /**
  * The {@code TAG_Byte} tag.

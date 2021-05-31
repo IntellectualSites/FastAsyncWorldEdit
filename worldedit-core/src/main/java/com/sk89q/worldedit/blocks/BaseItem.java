@@ -22,10 +22,10 @@ package com.sk89q.worldedit.blocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.item.ItemType;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.TagStringIO;
 
 import javax.annotation.Nullable;
 

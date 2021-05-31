@@ -20,7 +20,7 @@
 package com.sk89q.jnbt;
 
 import com.sk89q.jnbt.fawe.NumberTag;
-import com.sk89q.worldedit.util.nbt.LongBinaryTag;
+import net.kyori.adventure.nbt.LongBinaryTag;
 
 /**
  * The {@code TAG_Long} tag.

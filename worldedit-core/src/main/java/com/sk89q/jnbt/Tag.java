@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.worldedit.util.nbt.BinaryTagLike;
+import net.kyori.adventure.nbt.BinaryTagLike;
 
 /**
  * Represents a NBT tag.

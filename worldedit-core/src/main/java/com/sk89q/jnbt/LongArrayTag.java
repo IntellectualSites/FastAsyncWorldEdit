@@ -19,9 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.worldedit.util.nbt.LongArrayBinaryTag;
-
-import java.util.Locale;
+import net.kyori.adventure.nbt.LongArrayBinaryTag;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

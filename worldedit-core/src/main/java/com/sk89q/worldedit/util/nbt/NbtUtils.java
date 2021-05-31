@@ -20,6 +20,9 @@
 package com.sk89q.worldedit.util.nbt;
 
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagType;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 public class NbtUtils {
 

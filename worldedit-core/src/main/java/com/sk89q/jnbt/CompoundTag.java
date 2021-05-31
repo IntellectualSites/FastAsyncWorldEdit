@@ -25,10 +25,10 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.BinaryTagLike;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.NumberBinaryTag;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagLike;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.NumberBinaryTag;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import java.util.UUID;
 /**
  * The {@code TAG_Compound} tag.
  *
- * @deprecated Use {@link com.sk89q.worldedit.util.nbt.CompoundBinaryTag}.
+ * @deprecated Use {@link net.kyori.adventure.nbt.CompoundBinaryTag}.
  */
 @Deprecated
 public class CompoundTag extends Tag {

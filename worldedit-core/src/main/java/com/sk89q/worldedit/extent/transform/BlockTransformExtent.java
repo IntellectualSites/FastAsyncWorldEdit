@@ -38,15 +38,13 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.registry.state.PropertyKeySet;
 import com.sk89q.worldedit.util.Direction;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.NumberBinaryTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -337,11 +335,10 @@ public class BlockTransformExtent extends ResettableExtent {
         return directional.contains(property.getKey());
     }
 
-    private static BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundBinaryTag tag, Transform transform) {
+    private static BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundTag tag, Transform transform) {
         if (tag != null) {
-            BinaryTag rotTag = tag.get("Rot");
-            if (rotTag instanceof NumberBinaryTag) {
-                int rot = ((NumberBinaryTag) rotTag).intValue();
+            if (tag.containsKey("Rot")) {
+                int rot = tag.asInt("Rot");
 
                 Direction direction = MCDirections.fromRotation(rot);
 
@@ -355,9 +352,9 @@ public class BlockTransformExtent extends ResettableExtent {
                     Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
-                        return transformed.toBaseBlock(
-                                tag.putByte("Rot", (byte) MCDirections.toRotation(newDirection))
-                        );
+                        Map<String, Tag> values = new HashMap<>(tag.getValue());
+                        values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
+                        tag = new CompoundTag(values);
                     }
                 }
             }

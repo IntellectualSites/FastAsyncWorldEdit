@@ -22,9 +22,9 @@ package com.sk89q.jnbt;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
-import com.sk89q.worldedit.util.nbt.BinaryTag;
-import com.sk89q.worldedit.util.nbt.BinaryTagType;
-import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
+import net.kyori.adventure.nbt.BinaryTag;
+import net.kyori.adventure.nbt.BinaryTagType;
+import net.kyori.adventure.nbt.BinaryTagTypes;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

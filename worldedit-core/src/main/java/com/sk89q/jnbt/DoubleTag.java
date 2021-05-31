@@ -20,8 +20,7 @@
 package com.sk89q.jnbt;
 
 import com.sk89q.jnbt.fawe.NumberTag;
-import com.sk89q.worldedit.util.nbt.DoubleBinaryTag;
-
+import net.kyori.adventure.nbt.DoubleBinaryTag;
 
 /**
  * The {@code TAG_Double} tag.

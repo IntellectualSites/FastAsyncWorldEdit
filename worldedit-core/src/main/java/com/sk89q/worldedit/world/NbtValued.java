@@ -23,7 +23,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 import javax.annotation.Nullable;
 

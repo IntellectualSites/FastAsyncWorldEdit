@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.world.block;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
@@ -31,10 +29,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
-import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import net.kyori.adventure.nbt.CompoundBinaryTag;
+import net.kyori.adventure.nbt.TagStringIO;
 
 import java.io.IOException;
 import java.util.Map;
@@ -118,7 +116,6 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         }
         return blockState;
     }
-
     /**
      * Gets a map of state to state values.
      *
