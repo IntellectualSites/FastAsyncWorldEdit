@@ -242,11 +242,15 @@ public class EditSessionBuilder {
                 if (event.getActor() != null) {
                     event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn.getClass().getName()));
                     event.getActor().printDebug(TextComponent.of(" - For area restrictions and block logging, it is recommended to use the FaweAPI"));
-                    event.getActor().printDebug(TextComponent.of(" - To allow this plugin add it to the FAWE `allowed-plugins` list in config.yml"));
+                    event.getActor().printDebug(TextComponent.of(" - To allow " + toReturn.getClass().getName() + ", add it to the FAWE `allowed-plugins` list in config.yml"));
+                    event.getActor().printDebug(TextComponent.of(" - If you are unsure which plugin tries to use the extent, you can find some additional information below:"));
+                    event.getActor().printDebug(TextComponent.of(" - " + toReturn.getClass().getClassLoader()));
                 } else {
                     LOGGER.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
                     LOGGER.debug(" - For area restrictions and block logging, it is recommended to use the FaweAPI");
-                    LOGGER.debug(" - To allow this plugin, add it to the FAWE `allowed-plugins` list in config.yml");
+                    LOGGER.debug(" - To allow " + toReturn.getClass().getName() + ", add it to the FAWE `allowed-plugins` list in config.yml");
+                    LOGGER.debug(" - If you are unsure which plugin tries to use the extent, you can find some additional information below:");
+                    LOGGER.debug(" - " + toReturn.getClass().getClassLoader());
                 }
             }
         }
