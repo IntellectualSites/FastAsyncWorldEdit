@@ -360,7 +360,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                 values.remove("Id");
                 values.remove("Pos");
 
-                clipboard.setTile(x, y, z, AdventureNBTConverter.fromAdventure(fixBlockEntity(new CompoundTag(values))));
+                clipboard.setTile(x, y, z, (CompoundTag) AdventureNBTConverter.fromAdventure(fixBlockEntity(new CompoundTag(values))));
             }
         }
 
@@ -380,7 +380,7 @@ public class FastSchematicReader extends NBTSchematicReader {
 
                 EntityType type = EntityTypes.parse(id.getValue());
                 if (type != null) {
-                    final CompoundTag ent = AdventureNBTConverter.fromAdventure(fixEntity(new CompoundTag(value)));
+                    final CompoundTag ent = (CompoundTag) AdventureNBTConverter.fromAdventure(fixEntity(new CompoundTag(value)));
                     BaseEntity state = new BaseEntity(type, ent);
                     Location loc = ent.getEntityLocation(clipboard);
                     if (brokenEntities) {

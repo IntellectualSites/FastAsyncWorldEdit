@@ -72,7 +72,6 @@ public final class NBTInputStream implements Closeable {
         is.reset();
     }
 
-    //TODO readNamedTag was changed in upstream so the code below this comment may not work anymore.
     /**
      * Reads an NBT tag from the stream.
      *
