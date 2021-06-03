@@ -19,23 +19,22 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.BinaryTag;
-import net.kyori.adventure.nbt.BinaryTagLike;
-import net.kyori.adventure.nbt.ListBinaryTag;
-import net.kyori.adventure.nbt.NumberBinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTagLike;
+import com.sk89q.worldedit.util.nbt.ListBinaryTag;
+import com.sk89q.worldedit.util.nbt.NumberBinaryTag;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
+import javax.annotation.Nullable;
 
 /**
  * The {@code TAG_List} tag.
  *
- * @deprecated Use {@link net.kyori.adventure.nbt.ListBinaryTag}.
+ * @deprecated Use {@link com.sk89q.worldedit.util.nbt.ListBinaryTag}.
  */
 @Deprecated
 public final class ListTag extends Tag {
@@ -50,8 +49,8 @@ public final class ListTag extends Tag {
      */
     public ListTag(Class<? extends Tag> type, List<? extends Tag> value) {
         this(ListBinaryTag.of(
-                AdventureNBTConverter.getAdventureType(type),
-                value.stream().map(BinaryTagLike::asBinaryTag).collect(Collectors.toList())
+            AdventureNBTConverter.getAdventureType(type),
+            value.stream().map(BinaryTagLike::asBinaryTag).collect(Collectors.toList())
         ));
     }
 
@@ -76,8 +75,8 @@ public final class ListTag extends Tag {
     @Override
     public List<Tag> getValue() {
         return this.innerTag.stream()
-                .map(AdventureNBTConverter::fromAdventure)
-                .collect(Collectors.toList());
+            .map(AdventureNBTConverter::fromAdventure)
+            .collect(Collectors.toList());
     }
 
     /**
@@ -106,9 +105,9 @@ public final class ListTag extends Tag {
     @Nullable
     public Tag getIfExists(int index) {
         return accessIfExists(
-                index,
-                () -> null,
-                i -> AdventureNBTConverter.fromAdventure(this.innerTag.get(i))
+            index,
+            () -> null,
+            i -> AdventureNBTConverter.fromAdventure(this.innerTag.get(i))
         );
     }
 
@@ -123,9 +122,9 @@ public final class ListTag extends Tag {
      */
     public byte[] getByteArray(int index) {
         return accessIfExists(
-                index,
-                () -> new byte[0],
-                this.innerTag::getByteArray
+            index,
+            () -> new byte[0],
+            this.innerTag::getByteArray
         );
     }
 
@@ -140,9 +139,9 @@ public final class ListTag extends Tag {
      */
     public byte getByte(int index) {
         return accessIfExists(
-                index,
-                () -> (byte) 0,
-                this.innerTag::getByte
+            index,
+            () -> (byte) 0,
+            this.innerTag::getByte
         );
     }
 
@@ -157,9 +156,9 @@ public final class ListTag extends Tag {
      */
     public double getDouble(int index) {
         return accessIfExists(
-                index,
-                () -> 0.0,
-                this.innerTag::getDouble
+            index,
+            () -> 0.0,
+            this.innerTag::getDouble
         );
     }
 
@@ -175,15 +174,15 @@ public final class ListTag extends Tag {
      */
     public double asDouble(int index) {
         return accessIfExists(
-                index,
-                () -> 0.0,
-                i -> {
-                    BinaryTag tag = this.innerTag.get(i);
-                    if (tag instanceof NumberBinaryTag) {
-                        return ((NumberBinaryTag) tag).doubleValue();
-                    }
-                    return 0.0;
+            index,
+            () -> 0.0,
+            i -> {
+                BinaryTag tag = this.innerTag.get(i);
+                if (tag instanceof NumberBinaryTag) {
+                    return ((NumberBinaryTag) tag).doubleValue();
                 }
+                return 0.0;
+            }
         );
     }
 
@@ -198,9 +197,9 @@ public final class ListTag extends Tag {
      */
     public float getFloat(int index) {
         return accessIfExists(
-                index,
-                () -> 0.0f,
-                this.innerTag::getFloat
+            index,
+            () -> 0.0f,
+            this.innerTag::getFloat
         );
     }
 
@@ -215,9 +214,9 @@ public final class ListTag extends Tag {
      */
     public int[] getIntArray(int index) {
         return accessIfExists(
-                index,
-                () -> new int[0],
-                this.innerTag::getIntArray
+            index,
+            () -> new int[0],
+            this.innerTag::getIntArray
         );
     }
 
@@ -232,9 +231,9 @@ public final class ListTag extends Tag {
      */
     public int getInt(int index) {
         return accessIfExists(
-                index,
-                () -> 0,
-                this.innerTag::getInt
+            index,
+            () -> 0,
+            this.innerTag::getInt
         );
     }
 
@@ -250,15 +249,15 @@ public final class ListTag extends Tag {
      */
     public int asInt(int index) {
         return accessIfExists(
-                index,
-                () -> 0,
-                i -> {
-                    BinaryTag tag = this.innerTag.get(i);
-                    if (tag instanceof NumberBinaryTag) {
-                        return ((NumberBinaryTag) tag).intValue();
-                    }
-                    return 0;
+            index,
+            () -> 0,
+            i -> {
+                BinaryTag tag = this.innerTag.get(i);
+                if (tag instanceof NumberBinaryTag) {
+                    return ((NumberBinaryTag) tag).intValue();
                 }
+                return 0;
+            }
         );
     }
 
@@ -286,9 +285,9 @@ public final class ListTag extends Tag {
      */
     public ListTag getListTag(int index) {
         return new ListTag(accessIfExists(
-                index,
-                ListBinaryTag::empty,
-                this.innerTag::getList
+            index,
+            ListBinaryTag::empty,
+            this.innerTag::getList
         ));
     }
 
@@ -326,9 +325,9 @@ public final class ListTag extends Tag {
      */
     public long getLong(int index) {
         return accessIfExists(
-                index,
-                () -> 0L,
-                this.innerTag::getLong
+            index,
+            () -> 0L,
+            this.innerTag::getLong
         );
     }
 
@@ -344,15 +343,15 @@ public final class ListTag extends Tag {
      */
     public long asLong(int index) {
         return accessIfExists(
-                index,
-                () -> 0L,
-                i -> {
-                    BinaryTag tag = this.innerTag.get(i);
-                    if (tag instanceof NumberBinaryTag) {
-                        return ((NumberBinaryTag) tag).longValue();
-                    }
-                    return 0L;
+            index,
+            () -> 0L,
+            i -> {
+                BinaryTag tag = this.innerTag.get(i);
+                if (tag instanceof NumberBinaryTag) {
+                    return ((NumberBinaryTag) tag).longValue();
                 }
+                return 0L;
+            }
         );
     }
 
@@ -367,9 +366,9 @@ public final class ListTag extends Tag {
      */
     public short getShort(int index) {
         return accessIfExists(
-                index,
-                () -> (short) 0,
-                this.innerTag::getShort
+            index,
+            () -> (short) 0,
+            this.innerTag::getShort
         );
     }
 
@@ -384,9 +383,9 @@ public final class ListTag extends Tag {
      */
     public String getString(int index) {
         return accessIfExists(
-                index,
-                () -> "",
-                this.innerTag::getString
+            index,
+            () -> "",
+            this.innerTag::getString
         );
     }
 
@@ -395,6 +394,5 @@ public final class ListTag extends Tag {
     public int getTypeCode() {
         return NBTConstants.TYPE_LIST;
     }
-    // FAWE End
 
 }

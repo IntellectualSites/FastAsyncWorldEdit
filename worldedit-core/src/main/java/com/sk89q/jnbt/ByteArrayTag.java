@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.ByteArrayBinaryTag;
+import com.sk89q.worldedit.util.nbt.ByteArrayBinaryTag;
 
 /**
  * The {@code TAG_Byte_Array} tag.

@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.IntArrayBinaryTag;
+import com.sk89q.worldedit.util.nbt.IntArrayBinaryTag;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

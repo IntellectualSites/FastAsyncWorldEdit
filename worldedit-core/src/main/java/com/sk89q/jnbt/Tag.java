@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.BinaryTagLike;
+import com.sk89q.worldedit.util.nbt.BinaryTagLike;
 
 /**
  * Represents a NBT tag.
@@ -28,7 +28,6 @@ import net.kyori.adventure.nbt.BinaryTagLike;
  */
 @Deprecated
 public abstract class Tag implements BinaryTagLike {
-
 
     /**
      * Gets the value of this tag.

@@ -23,7 +23,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 
 import javax.annotation.Nullable;
 
@@ -59,6 +59,7 @@ public interface NbtValued {
      * @return compound tag, or null
      * @deprecated See {@link #getNbt()}
      */
+    @Deprecated
     @Nullable
     default CompoundTag getNbtData() {
         CompoundBinaryTag tag = getNbt();
@@ -89,8 +90,8 @@ public interface NbtValued {
      *          for details
      */
     @NonAbstractForCompatibility(
-            delegateName = "getNbtData",
-            delegateParams = { }
+        delegateName = "getNbtData",
+        delegateParams = { }
     )
     @Nullable
     default LazyReference<CompoundBinaryTag> getNbtReference() {
@@ -121,8 +122,8 @@ public interface NbtValued {
      *          for details
      */
     @NonAbstractForCompatibility(
-            delegateName = "setNbtData",
-            delegateParams = { CompoundTag.class }
+        delegateName = "setNbtData",
+        delegateParams = { CompoundTag.class }
     )
     default void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
         DeprecationUtil.checkDelegatingOverride(getClass());

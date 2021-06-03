@@ -20,10 +20,10 @@
 package com.sk89q.worldedit.world.chunk;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 /**
  * The chunk format for Minecraft 1.16 and newer

@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.StringBinaryTag;
+import com.sk89q.worldedit.util.nbt.StringBinaryTag;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,6 +42,11 @@ public final class StringTag extends Tag {
         super();
         checkNotNull(value);
         this.innerTag = StringBinaryTag.of(value);
+    }
+
+    public StringTag(StringBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
     }
 
     @Override

@@ -19,12 +19,12 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.EndBinaryTag;
+import com.sk89q.worldedit.util.nbt.EndBinaryTag;
 
 /**
  * The {@code TAG_End} tag.
  *
- * @deprecated Use {@link net.kyori.adventure.nbt.EndBinaryTag}.
+ * @deprecated Use {@link com.sk89q.worldedit.util.nbt.EndBinaryTag}.
  */
 @Deprecated
 public final class EndTag extends Tag {

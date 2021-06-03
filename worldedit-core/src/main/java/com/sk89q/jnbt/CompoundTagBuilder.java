@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 
 import java.util.Map;
 import java.util.Objects;
@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Helps create compound tags.
  *
- * @deprecated Use {@link net.kyori.adventure.nbt.CompoundBinaryTag.Builder}.
+ * @deprecated Use {@link com.sk89q.worldedit.util.nbt.CompoundBinaryTag.Builder}.
  */
 @Deprecated
 public class CompoundTagBuilder {

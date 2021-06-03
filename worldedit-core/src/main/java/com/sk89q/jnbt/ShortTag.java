@@ -19,8 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
-import net.kyori.adventure.nbt.ShortBinaryTag;
+import com.sk89q.worldedit.util.nbt.ShortBinaryTag;
 
 /**
  * The {@code TAG_Short} tag.
@@ -28,7 +27,7 @@ import net.kyori.adventure.nbt.ShortBinaryTag;
  * @deprecated Use {@link ShortBinaryTag}.
  */
 @Deprecated
-public final class ShortTag extends NumberTag {
+public final class ShortTag extends Tag {
 
     private final ShortBinaryTag innerTag;
 

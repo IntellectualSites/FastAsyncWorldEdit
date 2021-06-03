@@ -25,10 +25,10 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import net.kyori.adventure.nbt.BinaryTag;
-import net.kyori.adventure.nbt.BinaryTagLike;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.nbt.NumberBinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTagLike;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.NumberBinaryTag;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +39,7 @@ import java.util.UUID;
 /**
  * The {@code TAG_Compound} tag.
  *
- * @deprecated Use {@link net.kyori.adventure.nbt.CompoundBinaryTag}.
+ * @deprecated Use {@link com.sk89q.worldedit.util.nbt.CompoundBinaryTag}.
  */
 @Deprecated
 public class CompoundTag extends Tag {
@@ -53,8 +53,8 @@ public class CompoundTag extends Tag {
      */
     public CompoundTag(Map<String, Tag> value) {
         this(CompoundBinaryTag.builder()
-                .put(Maps.transformValues(value, BinaryTagLike::asBinaryTag))
-                .build());
+            .put(Maps.transformValues(value, BinaryTagLike::asBinaryTag))
+            .build());
     }
 
     public CompoundTag(CompoundBinaryTag adventureTag) {
@@ -78,6 +78,16 @@ public class CompoundTag extends Tag {
             map.put(key, AdventureNBTConverter.fromAdventure(innerTag.get(key)));
         }
         return map.build();
+    }
+
+    /**
+     * Return a new compound tag with the given values.
+     *
+     * @param value the value
+     * @return the new compound tag
+     */
+    public CompoundTag setValue(Map<String, Tag> value) {
+        return new CompoundTag(value);
     }
 
     /**
@@ -156,7 +166,7 @@ public class CompoundTag extends Tag {
      * @return a float
      */
     public float getFloat(String key) {
-            return this.innerTag.getFloat(key);
+        return this.innerTag.getFloat(key);
     }
 
     /**
@@ -169,7 +179,7 @@ public class CompoundTag extends Tag {
      * @return an int array
      */
     public int[] getIntArray(String key) {
-            return this.innerTag.getIntArray(key);
+        return this.innerTag.getIntArray(key);
     }
 
     /**
@@ -182,7 +192,7 @@ public class CompoundTag extends Tag {
      * @return an int
      */
     public int getInt(String key) {
-            return this.innerTag.getInt(key);
+        return this.innerTag.getInt(key);
     }
 
     /**
@@ -213,7 +223,7 @@ public class CompoundTag extends Tag {
      * @return a list of tags
      */
     public List<Tag> getList(String key) {
-                return getListTag(key).getValue();
+        return getListTag(key).getValue();
     }
 
     /**
@@ -226,7 +236,7 @@ public class CompoundTag extends Tag {
      * @return a tag list instance
      */
     public ListTag getListTag(String key) {
-                return new ListTag(this.innerTag.getList(key));
+        return new ListTag(this.innerTag.getList(key));
     }
 
     /**
@@ -244,9 +254,9 @@ public class CompoundTag extends Tag {
      */
     @SuppressWarnings("unchecked")
     public <T extends Tag> List<T> getList(String key, Class<T> listType) {
-                ListTag listTag = getListTag(key);
-                if (listTag.getType().equals(listType)) {
-                    return (List<T>) listTag.getValue();
+        ListTag listTag = getListTag(key);
+        if (listTag.getType().equals(listType)) {
+            return (List<T>) listTag.getValue();
         } else {
             return Collections.emptyList();
         }
@@ -262,7 +272,7 @@ public class CompoundTag extends Tag {
      * @return an int array
      */
     public long[] getLongArray(String key) {
-                return this.innerTag.getLongArray(key);
+        return this.innerTag.getLongArray(key);
     }
 
     /**
@@ -275,7 +285,7 @@ public class CompoundTag extends Tag {
      * @return a long
      */
     public long getLong(String key) {
-                return this.innerTag.getLong(key);
+        return this.innerTag.getLong(key);
     }
 
     /**
@@ -305,7 +315,7 @@ public class CompoundTag extends Tag {
      * @param key the key
      * @return a short
      */
-    public short getShort (String key){
+    public short getShort(String key) {
         return this.innerTag.getShort(key);
     }
 
@@ -318,7 +328,7 @@ public class CompoundTag extends Tag {
      * @param key the key
      * @return a string
      */
-    public String getString (String key) {
+    public String getString(String key) {
         return this.innerTag.getString(key);
     }
 

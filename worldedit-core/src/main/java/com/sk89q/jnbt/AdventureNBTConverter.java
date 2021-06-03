@@ -22,9 +22,9 @@ package com.sk89q.jnbt;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
-import net.kyori.adventure.nbt.BinaryTag;
-import net.kyori.adventure.nbt.BinaryTagType;
-import net.kyori.adventure.nbt.BinaryTagTypes;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTagType;
+import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -40,27 +40,27 @@ import java.util.function.Function;
 @Deprecated
 public class AdventureNBTConverter {
     private static final BiMap<Class<? extends Tag>, BinaryTagType<?>> TAG_TYPES =
-            new ImmutableBiMap.Builder<Class<? extends Tag>, BinaryTagType<?>>()
-                    .put(ByteArrayTag.class, BinaryTagTypes.BYTE_ARRAY)
-                    .put(ByteTag.class, BinaryTagTypes.BYTE)
-                    .put(CompoundTag.class, BinaryTagTypes.COMPOUND)
-                    .put(DoubleTag.class, BinaryTagTypes.DOUBLE)
-                    .put(EndTag.class, BinaryTagTypes.END)
-                    .put(FloatTag.class, BinaryTagTypes.FLOAT)
-                    .put(IntArrayTag.class, BinaryTagTypes.INT_ARRAY)
-                    .put(IntTag.class, BinaryTagTypes.INT)
-                    .put(ListTag.class, BinaryTagTypes.LIST)
-                    .put(LongArrayTag.class, BinaryTagTypes.LONG_ARRAY)
-                    .put(LongTag.class, BinaryTagTypes.LONG)
-                    .put(ShortTag.class, BinaryTagTypes.SHORT)
-                    .put(StringTag.class, BinaryTagTypes.STRING)
-                    .build();
+        new ImmutableBiMap.Builder<Class<? extends Tag>, BinaryTagType<?>>()
+            .put(ByteArrayTag.class, BinaryTagTypes.BYTE_ARRAY)
+            .put(ByteTag.class, BinaryTagTypes.BYTE)
+            .put(CompoundTag.class, BinaryTagTypes.COMPOUND)
+            .put(DoubleTag.class, BinaryTagTypes.DOUBLE)
+            .put(EndTag.class, BinaryTagTypes.END)
+            .put(FloatTag.class, BinaryTagTypes.FLOAT)
+            .put(IntArrayTag.class, BinaryTagTypes.INT_ARRAY)
+            .put(IntTag.class, BinaryTagTypes.INT)
+            .put(ListTag.class, BinaryTagTypes.LIST)
+            .put(LongArrayTag.class, BinaryTagTypes.LONG_ARRAY)
+            .put(LongTag.class, BinaryTagTypes.LONG)
+            .put(ShortTag.class, BinaryTagTypes.SHORT)
+            .put(StringTag.class, BinaryTagTypes.STRING)
+            .build();
 
     private static final Map<BinaryTagType<?>, Function<BinaryTag, Tag>> CONVERSION;
 
     static {
         ImmutableMap.Builder<BinaryTagType<?>, Function<BinaryTag, Tag>> conversion =
-                ImmutableMap.builder();
+            ImmutableMap.builder();
 
         for (Map.Entry<Class<? extends Tag>, BinaryTagType<?>> tag : TAG_TYPES.entrySet()) {
             Constructor<?>[] constructors = tag.getKey().getConstructors();

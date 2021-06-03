@@ -34,11 +34,11 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.nbt.TagStringIO;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -99,7 +99,6 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                 nbtString = input.substring(nbtStart);
             }
 
-
             if ("hand".equalsIgnoreCase(typeString)) {
                 BaseItemStack heldItem = getItemInHand(context.requireActor(), HandSide.MAIN_HAND);
                 itemType = heldItem.getType();
@@ -128,15 +127,16 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                     }
                 } catch (IOException e) {
                     throw new NoMatchException(TranslatableComponent.of(
-                            "worldedit.error.invalid-nbt",
-                            TextComponent.of(input),
-                            TextComponent.of(e.getMessage())
+                        "worldedit.error.invalid-nbt",
+                        TextComponent.of(input),
+                        TextComponent.of(e.getMessage())
                     ));
                 }
             }
 
             item = new BaseItem(itemType, itemNbtData == null ? null : LazyReference.computed(itemNbtData));
         }
+
         return item;
     }
 

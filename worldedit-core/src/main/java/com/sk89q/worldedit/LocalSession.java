@@ -39,8 +39,6 @@ import com.sk89q.jchronic.Chronic;
 import com.sk89q.jchronic.Options;
 import com.sk89q.jchronic.utils.Span;
 import com.sk89q.jchronic.utils.Time;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.command.tool.BlockTool;
@@ -71,6 +69,7 @@ import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -78,10 +77,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -95,13 +91,14 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -115,12 +112,14 @@ public class LocalSession implements TextureHolder {
     // Non-session related fields
     private transient LocalConfiguration config;
     private final transient AtomicBoolean dirty = new AtomicBoolean();
+
+    // Single-connection lifetime fields
     private transient int failedCuiAttempts = 0;
 
     // Session related
     private transient RegionSelector selector = new CuboidRegionSelector();
     private transient boolean placeAtPos1 = false;
-    private final transient List<Object> history = Collections.synchronizedList(new LinkedList<Object>() {
+    private final transient List<Object> history = Collections.synchronizedList(new LinkedList<>() {
         @Override
         public Object get(int index) {
             Object value = super.get(index);
@@ -1294,12 +1293,12 @@ public class LocalSession implements TextureHolder {
         BaseBlock block = ServerCUIHandler.createStructureBlock(player);
         if (block != null) {
             CompoundBinaryTag tags = Objects.requireNonNull(
-                    block.getNbt(), "createStructureBlock should return nbt"
+                block.getNbt(), "createStructureBlock should return nbt"
             );
             BlockVector3 tempCuiTemporaryBlock = BlockVector3.at(
-                    tags.getInt("x"),
-                    tags.getInt("y"),
-                    tags.getInt("z")
+                tags.getInt("x"),
+                tags.getInt("y"),
+                tags.getInt("z")
             );
             // If it's null, we don't need to do anything. The old was already removed.
             if (cuiTemporaryBlock != null && !tempCuiTemporaryBlock.equals(cuiTemporaryBlock)) {

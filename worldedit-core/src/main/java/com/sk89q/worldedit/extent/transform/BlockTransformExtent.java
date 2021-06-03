@@ -44,7 +44,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 

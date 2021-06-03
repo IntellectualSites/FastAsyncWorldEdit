@@ -19,21 +19,19 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.BinaryTag;
-import net.kyori.adventure.nbt.BinaryTagType;
-import net.kyori.adventure.nbt.ListBinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTagType;
+import com.sk89q.worldedit.util.nbt.ListBinaryTag;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Helps create list tags.
  *
- * @deprecated Use {@link net.kyori.adventure.nbt.ListBinaryTag.Builder}.
+ * @deprecated Use {@link com.sk89q.worldedit.util.nbt.ListBinaryTag.Builder}.
  */
 @Deprecated
 public class ListTagBuilder {
@@ -45,11 +43,12 @@ public class ListTagBuilder {
      *
      * @param type of tag contained in this list
      */
+    @SuppressWarnings("unchecked")
     ListTagBuilder(Class<? extends Tag> type) {
         checkNotNull(type);
         this.builder = type != EndTag.class
-                ? ListBinaryTag.builder((BinaryTagType<BinaryTag>) AdventureNBTConverter.getAdventureType(type))
-                : ListBinaryTag.builder();
+            ? ListBinaryTag.builder((BinaryTagType<BinaryTag>) AdventureNBTConverter.getAdventureType(type))
+            : ListBinaryTag.builder();
     }
 
     /**

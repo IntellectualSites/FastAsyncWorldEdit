@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import net.kyori.adventure.nbt.LongArrayBinaryTag;
+import com.sk89q.worldedit.util.nbt.LongArrayBinaryTag;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,6 +42,11 @@ public class LongArrayTag extends Tag {
         super();
         checkNotNull(value);
         this.innerTag = LongArrayBinaryTag.of(value);
+    }
+
+    public LongArrayTag(LongArrayBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
     }
 
     @Override

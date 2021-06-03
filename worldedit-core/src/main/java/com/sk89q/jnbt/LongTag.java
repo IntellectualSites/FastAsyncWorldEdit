@@ -19,8 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
-import net.kyori.adventure.nbt.LongBinaryTag;
+import com.sk89q.worldedit.util.nbt.LongBinaryTag;
 
 /**
  * The {@code TAG_Long} tag.
@@ -28,7 +27,7 @@ import net.kyori.adventure.nbt.LongBinaryTag;
  * @deprecated Use {@link LongBinaryTag}.
  */
 @Deprecated
-public final class LongTag extends NumberTag {
+public final class LongTag extends Tag {
 
     private final LongBinaryTag innerTag;
 

@@ -19,8 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
-import net.kyori.adventure.nbt.FloatBinaryTag;
+import com.sk89q.worldedit.util.nbt.FloatBinaryTag;
 
 /**
  * The {@code TAG_Float} tag.
@@ -28,7 +27,7 @@ import net.kyori.adventure.nbt.FloatBinaryTag;
  * @deprecated Use {@link FloatBinaryTag}.
  */
 @Deprecated
-public final class FloatTag extends NumberTag {
+public final class FloatTag extends Tag {
 
     private final FloatBinaryTag innerTag;
 

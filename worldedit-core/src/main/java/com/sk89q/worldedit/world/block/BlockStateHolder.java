@@ -31,7 +31,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 
 import java.util.Locale;
 import java.util.Map;
@@ -163,8 +163,8 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      *          for details
      */
     @NonAbstractForCompatibility(
-            delegateName = "toBaseBlock",
-            delegateParams = { CompoundTag.class }
+        delegateName = "toBaseBlock",
+        delegateParams = { CompoundTag.class }
     )
     default BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
         DeprecationUtil.checkDelegatingOverride(getClass());

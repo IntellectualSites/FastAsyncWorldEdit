@@ -29,10 +29,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.nbt.TagStringIO;
 
 import java.io.IOException;
 import java.util.Map;
@@ -53,6 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     private final BlockState blockState;
+    @Nullable
     private final LazyReference<CompoundBinaryTag> nbtData;
 
     /**
@@ -85,6 +86,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     protected BaseBlock(BlockState state, CompoundTag nbtData) {
         this(state, LazyReference.from(checkNotNull(nbtData)::asBinaryTag));
     }
+
 
     /**
      * Construct a block with the given ID, data value and NBT data structure.

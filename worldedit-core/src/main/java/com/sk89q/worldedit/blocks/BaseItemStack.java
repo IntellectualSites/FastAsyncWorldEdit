@@ -24,8 +24,8 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.item.ItemType;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
 
 /**
  * Represents a stack of BaseItems.
@@ -84,7 +84,7 @@ public class BaseItemStack extends BaseItem {
 
     /**
      * Get the number of items in the stack.
-     * 
+     *
      * @return the amount
      */
     public int getAmount() {
@@ -93,7 +93,7 @@ public class BaseItemStack extends BaseItem {
 
     /**
      * Set the amount of items in the stack.
-     * 
+     *
      * @param amount the amount to set
      */
     public void setAmount(int amount) {

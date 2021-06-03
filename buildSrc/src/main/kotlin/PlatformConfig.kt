@@ -133,8 +133,8 @@ val CLASSPATH = listOf("truezip", "truevfs", "js")
     .joinToString(separator = " ")
 
 sealed class WorldEditKind(
-        val name: String,
-        val mainClass: String = "com.sk89q.worldedit.internal.util.InfoEntryPoint"
+    val name: String,
+    val mainClass: String = "com.sk89q.worldedit.internal.util.InfoEntryPoint"
 ) {
     class Standalone(mainClass: String) : WorldEditKind("STANDALONE", mainClass)
     object Mod : WorldEditKind("MOD")
@@ -146,10 +146,10 @@ fun Project.addJarManifest(kind: WorldEditKind, includeClasspath: Boolean = fals
         val version = project(":worldedit-core").version
         inputs.property("version", version)
         val attributes = mutableMapOf(
-                "Implementation-Version" to version,
-                "WorldEdit-Version" to version,
-                "WorldEdit-Kind" to kind.name,
-                "Main-Class" to kind.mainClass
+            "Implementation-Version" to version,
+            "WorldEdit-Version" to version,
+            "WorldEdit-Kind" to kind.name,
+            "Main-Class" to kind.mainClass
         )
         if (includeClasspath) {
             attributes["Class-Path"] = CLASSPATH

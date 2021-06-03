@@ -19,8 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
-import net.kyori.adventure.nbt.DoubleBinaryTag;
+import com.sk89q.worldedit.util.nbt.DoubleBinaryTag;
 
 /**
  * The {@code TAG_Double} tag.
@@ -28,7 +27,7 @@ import net.kyori.adventure.nbt.DoubleBinaryTag;
  * @deprecated Use {@link DoubleBinaryTag}.
  */
 @Deprecated
-public final class DoubleTag extends NumberTag {
+public final class DoubleTag extends Tag {
 
     private final DoubleBinaryTag innerTag;
 

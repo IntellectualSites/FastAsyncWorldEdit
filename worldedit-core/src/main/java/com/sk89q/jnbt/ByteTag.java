@@ -19,8 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
-import net.kyori.adventure.nbt.ByteBinaryTag;
+import com.sk89q.worldedit.util.nbt.ByteBinaryTag;
 
 /**
  * The {@code TAG_Byte} tag.
@@ -28,7 +27,7 @@ import net.kyori.adventure.nbt.ByteBinaryTag;
  * @deprecated Use {@link ByteBinaryTag}.
  */
 @Deprecated
-public final class ByteTag extends NumberTag {
+public final class ByteTag extends Tag {
 
     private final ByteBinaryTag innerTag;
 

@@ -19,12 +19,6 @@
 
 package com.sk89q.worldedit.util.concurrency;
 
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.util.Location;
-import net.kyori.adventure.nbt.CompoundBinaryTag;
-import net.kyori.adventure.nbt.NumberBinaryTag;
-
-import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
