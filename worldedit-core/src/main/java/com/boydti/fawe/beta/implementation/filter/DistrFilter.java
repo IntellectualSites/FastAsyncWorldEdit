@@ -95,7 +95,7 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
     }
 
     public void print(Actor actor, long size) {
-        for (Countable c : getDistribution()) {
+        for (Countable<BlockState> c : getDistribution()) {
             final String name = c.getID().toString();
             final String str = String.format("%-7s (%.3f%%) %s",
                 c.getAmount(),

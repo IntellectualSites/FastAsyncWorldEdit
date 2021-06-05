@@ -8,12 +8,12 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArray;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.UnsafeUtility;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
-import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_15_R1.BiomeBase;
 import net.minecraft.server.v1_15_R1.BiomeStorage;
 import net.minecraft.server.v1_15_R1.Block;
@@ -101,7 +101,7 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
             declaredSetLightNibbleArray.setAccessible(true);
             methodSetLightNibbleArray = MethodHandles.lookup().unreflect(declaredSetLightNibbleArray);
 
-            Unsafe unsafe = UnsafeUtils.getUNSAFE();
+            Unsafe unsafe = UnsafeUtility.getUNSAFE();
             fieldLock = DataPaletteBlock.class.getDeclaredField("j");
             fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
 
@@ -122,7 +122,7 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
     protected static boolean setSectionAtomic(ChunkSection[] sections, ChunkSection expected, ChunkSection value, int layer) {
         long offset = ((long) layer << CHUNKSECTION_SHIFT) + CHUNKSECTION_BASE;
         if (layer >= 0 && layer < sections.length) {
-            return UnsafeUtils.getUNSAFE().compareAndSwapObject(sections, offset, expected, value);
+            return UnsafeUtility.getUNSAFE().compareAndSwapObject(sections, offset, expected, value);
         }
         return false;
     }
@@ -131,7 +131,7 @@ public final class BukkitAdapter_1_15_2 extends NMSAdapter {
         //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which acquires the lock in NMS?
         try {
             synchronized (section) {
-                Unsafe unsafe = UnsafeUtils.getUNSAFE();
+                Unsafe unsafe = UnsafeUtility.getUNSAFE();
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();
                 ReentrantLock currentLock = (ReentrantLock) unsafe.getObject(blocks, fieldLockOffset);
                 if (currentLock instanceof DelegateLock) {

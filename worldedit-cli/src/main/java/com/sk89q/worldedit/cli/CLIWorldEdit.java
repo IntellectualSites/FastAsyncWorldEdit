@@ -175,7 +175,7 @@ public class CLIWorldEdit {
         config = new CLIConfiguration(this);
         config.load();
 
-        WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent());
+        WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
     public void onStopped() {
