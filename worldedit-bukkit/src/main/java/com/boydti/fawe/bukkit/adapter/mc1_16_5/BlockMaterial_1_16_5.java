@@ -12,6 +12,9 @@ import net.minecraft.server.v1_16_R3.ITileEntity;
 import net.minecraft.server.v1_16_R3.Material;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+
 public class BlockMaterial_1_16_5 implements BlockMaterial {
     private final Block block;
     private final IBlockData defaultState;
@@ -31,7 +34,7 @@ public class BlockMaterial_1_16_5 implements BlockMaterial {
         this.material = defaultState.getMaterial();
         this.craftBlockData = CraftBlockData.fromData(defaultState);
         this.craftMaterial = craftBlockData.getMaterial();
-        BlockBase.Info blockInfo = ReflectionUtil.getField(Block.class, block, "aB");
+        BlockBase.Info blockInfo = ReflectionUtil.getField(BlockBase.class, block, "aB");
         this.isTranslucent = !(boolean)ReflectionUtil.getField(BlockBase.Info.class, blockInfo, "n");
         opacity = defaultState.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
     }
