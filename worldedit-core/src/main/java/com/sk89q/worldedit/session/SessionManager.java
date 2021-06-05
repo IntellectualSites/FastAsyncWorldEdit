@@ -30,6 +30,7 @@ import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
+import com.sk89q.worldedit.event.platform.SessionIdleEvent;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.session.request.Request;
@@ -132,6 +133,9 @@ public class SessionManager {
         checkNotNull(owner);
         SessionHolder stored = sessions.get(getKey(owner));
         if (stored != null) {
+            if (stored.sessionIdle && stored.key.isActive()) {
+                stored.sessionIdle = false;
+            }
             return stored.session;
         } else {
             return null;
@@ -350,6 +354,18 @@ public class SessionManager {
         store = new JsonFileSessionStore(dir);
     }
 
+    @Subscribe
+    public void onSessionIdle(final SessionIdleEvent event) {
+        SessionHolder holder = this.sessions.get(getKey(event.getKey()));
+        if (holder != null && !holder.sessionIdle) {
+            holder.sessionIdle = true;
+            LocalSession session = holder.session;
+
+            // Perform any session cleanup for data that should not be persisted.
+            session.onIdle();
+        }
+    }
+
     /**
      * Stores the owner of a session, the session, and the last active time.
      */
@@ -357,6 +373,7 @@ public class SessionManager {
         private final SessionKey key;
         private final LocalSession session;
         private long lastActive = System.currentTimeMillis();
+        private boolean sessionIdle = false;
 
         private SessionHolder(SessionKey key, LocalSession session) {
             this.key = key;
