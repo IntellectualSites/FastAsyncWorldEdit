@@ -30,12 +30,13 @@ class BlockMapTest {
     static void setupFakePlatform() {
         when(MOCKED_PLATFORM.getRegistries()).thenReturn(new BundledRegistries() {
         });
-        when(MOCKED_PLATFORM.getCapabilities()).thenReturn(ImmutableMap.of(
-            Capability.WORLD_EDITING, Preference.PREFERRED,
-            Capability.GAME_HOOKS, Preference.PREFERRED
-        ));
+        when(MOCKED_PLATFORM.getCapabilities()).thenReturn(
+            Stream.of(Capability.values())
+                .collect(Collectors.toMap(Function.identity(), __ -> Preference.NORMAL))
+        );
         PlatformManager platformManager = WorldEdit.getInstance().getPlatformManager();
         platformManager.register(MOCKED_PLATFORM);
+        WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
 
         registerBlock("minecraft:air");
         registerBlock("minecraft:oak_wood");

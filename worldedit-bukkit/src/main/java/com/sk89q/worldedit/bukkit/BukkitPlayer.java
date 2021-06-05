@@ -62,6 +62,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.PermissionAttachment;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -283,7 +284,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         if (params.length > 0) {
             send = send + "|" + StringUtil.joinString(params, "|");
         }
-        player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
+        player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(StandardCharsets.UTF_8));
     }
 
     public Player getPlayer() {
@@ -328,7 +329,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void sendAnnouncements() {
-        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() == null) {
+        if (WorldEditPlugin.getInstance().getLifecycledBukkitImplAdapter() == null) {
             print(Caption.of("worldedit.version.bukkit.unsupported-adapter",
                     TextComponent.of("https://intellectualsites.github.io/download/fawe.html", TextColor.AQUA)
                         .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
@@ -343,18 +344,18 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public SessionKey getSessionKey() {
-        return new SessionKeyImpl(this.player.getUniqueId(), player.getName());
+        return new SessionKeyImpl(this.player);
     }
 
-    private static class SessionKeyImpl implements SessionKey {
+    static class SessionKeyImpl implements SessionKey {
         // If not static, this will leak a reference
 
         private final UUID uuid;
         private final String name;
 
-        private SessionKeyImpl(UUID uuid, String name) {
-            this.uuid = uuid;
-            this.name = name;
+        SessionKeyImpl(Player player) {
+            this.uuid = player.getUniqueId();
+            this.name = player.getName();
         }
 
         @Override

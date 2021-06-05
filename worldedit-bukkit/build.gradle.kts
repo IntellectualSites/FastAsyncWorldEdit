@@ -88,7 +88,7 @@ dependencies {
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    testImplementation("org.mockito:mockito-core:3.10.0")
+    testImplementation("org.mockito:mockito-core:3.11.0")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
@@ -97,9 +97,11 @@ dependencies {
     }
     compileOnly("net.kyori:adventure-api:4.7.0")
     testImplementation("net.kyori:adventure-api:4.7.0")
-    testImplementation("org.checkerframework:checker-qual:3.13.0")
+    testImplementation("org.checkerframework:checker-qual:3.14.0")
     testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
+    api("org.lz4:lz4-java:1.7.1")
+    api("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
@@ -164,6 +166,12 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate("com.github.luben", "com.boydti.fawe.zstd") {
             include(dependency("com.github.luben:zstd-jni:1.4.9-5"))
+        }
+        relocate("net.jpountz", "com.boydti.fawe.jpountz") {
+            include(dependency("net.jpountz:lz4-java-stream:1.0.0"))
+        }
+        relocate("org.lz4", "com.boydti.fawe.lz4") {
+            include(dependency("org.lz4:lz4-java:1.7.1"))
         }
     }
 }

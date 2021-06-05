@@ -19,13 +19,27 @@
 
 package com.sk89q.worldedit.event.platform;
 
-import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.event.Event;
+import com.sk89q.worldedit.session.SessionKey;
 
 /**
- * Raised when a platform has finished loading its data.
+ * An event fired when a session becomes idle.
+ *
+ * <p>This can happen when a player leaves the server.</p>
  */
-public class PlatformReadyEvent extends PlatformEvent {
-    public PlatformReadyEvent(Platform platform) {
-        super(platform);
+public final class SessionIdleEvent extends Event {
+    private final SessionKey key;
+
+    public SessionIdleEvent(SessionKey key) {
+        this.key = key;
+    }
+
+    /**
+     * Get a key identifying the session that has become idle.
+     *
+     * @return the key for the session
+     */
+    public SessionKey getKey() {
+        return this.key;
     }
 }
