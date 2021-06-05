@@ -328,7 +328,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void sendAnnouncements() {
-        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() == null) {
+        if (WorldEditPlugin.getInstance().getLifecycledBukkitImplAdapter() == null) {
             print(Caption.of("worldedit.version.bukkit.unsupported-adapter",
                     TextComponent.of("https://intellectualsites.github.io/download/fawe.html", TextColor.AQUA)
                         .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
