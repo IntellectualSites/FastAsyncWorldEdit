@@ -71,6 +71,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.incendo.serverlib.ServerLib;
 
@@ -107,6 +109,19 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
     @Override
     public void onLoad() {
+
+        // FAWE start
+        // This is already covered by Spigot, however, a more pesky warning with a proper explanation over "Ambiguous plugin name..." can't hurt.
+        Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
+        for (Plugin p : plugins) {
+            if (p.getName().equals("WorldEdit")) {
+                LOGGER.warn("You installed WorldEdit alongside FastAsyncWorldEdit. That is unneeded and will cause unforeseen issues, " +
+                        "because FastAsyncWorldEdit already provides WorldEdit. " +
+                        "Stop your server and delete the 'worldedit-bukkit' jar from your plugins folder.");
+            }
+        }
+        // FAWE end
+
         INSTANCE = this;
 
         //noinspection ResultOfMethodCallIgnored
