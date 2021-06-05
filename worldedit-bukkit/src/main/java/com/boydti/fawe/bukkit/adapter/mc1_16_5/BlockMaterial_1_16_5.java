@@ -12,9 +12,6 @@ import net.minecraft.server.v1_16_R3.ITileEntity;
 import net.minecraft.server.v1_16_R3.Material;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-
 public class BlockMaterial_1_16_5 implements BlockMaterial {
     private final Block block;
     private final IBlockData defaultState;
