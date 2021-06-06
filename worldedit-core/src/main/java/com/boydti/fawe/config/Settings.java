@@ -20,7 +20,7 @@ public class Settings extends Config {
     @Final // Indicates that this value isn't configurable
     public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues";
     @Final
-    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit/wiki";
+    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki";
     @Final
     public String DATE; // These values are set from FAWE before loading
     @Final
