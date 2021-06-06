@@ -31,7 +31,6 @@ import java.nio.charset.StandardCharsets;
  */
 public class CUIChannelListener implements PluginMessageListener {
 
-    public static final Charset UTF_8_CHARSET = StandardCharsets.UTF_8;
     private final WorldEditPlugin plugin;
 
     public CUIChannelListener(WorldEditPlugin plugin) {
@@ -41,10 +40,9 @@ public class CUIChannelListener implements PluginMessageListener {
     @Override
     public void onPluginMessageReceived(String channel, Player player, byte[] message) {
         LocalSession session = plugin.getSession(player);
-        String text = new String(message, UTF_8_CHARSET);
+        String text = new String(message, StandardCharsets.UTF_8);
         final BukkitPlayer actor = plugin.wrapPlayer(player);
         session.handleCUIInitializationMessage(text, actor);
-        session.describeCUI(actor);
     }
 
 }
