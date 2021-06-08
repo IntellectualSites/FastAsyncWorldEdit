@@ -51,7 +51,8 @@ public class FaweDelegateRegionManager {
                               final @NonNull Set<CuboidRegion> regions,
                               final @NonNull Pattern blocks,
                               int minY,
-                              int maxY) {
+                              int maxY,
+                              Runnable whenDone) {
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
@@ -71,6 +72,8 @@ public class FaweDelegateRegionManager {
                     }
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
+                } finally {
+                    TaskManager.IMP.task(whenDone);
                 }
             }
         });
