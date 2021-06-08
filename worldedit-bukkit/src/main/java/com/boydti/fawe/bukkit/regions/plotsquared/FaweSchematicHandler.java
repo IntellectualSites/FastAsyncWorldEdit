@@ -140,7 +140,7 @@ public class FaweSchematicHandler extends SchematicHandler {
     @Override
     public boolean save(CompoundTag tag, String path) {
         if (tag == null) {
-            logger.debug("&cCannot save empty tag");
+            logger.warn("Cannot save empty tag");
             return false;
         }
         try {
@@ -181,7 +181,7 @@ public class FaweSchematicHandler extends SchematicHandler {
     @Override
     public void upload(final CompoundTag tag, final UUID uuid, final String file, final RunnableVal<URL> whenDone) {
         if (tag == null) {
-            logger.debug("&cCannot save empty tag");
+            logger.warn("Cannot save empty tag");
             com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
             return;
         }
