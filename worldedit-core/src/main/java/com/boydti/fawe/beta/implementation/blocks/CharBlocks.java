@@ -38,7 +38,7 @@ public abstract class CharBlocks implements IBlocks {
         }
 
         @Override
-        public char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, boolean aggressive) {
+        public synchronized char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, boolean aggressive) {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
                 arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
@@ -126,8 +126,10 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
-    public synchronized char[] load(@Range(from = 0, to = 15) int layer) {
-        return sections[layer].get(this, layer);
+    public char[] load(@Range(from = 0, to = 15) int layer) {
+        synchronized (sections[layer]) {
+            return sections[layer].get(this, layer);
+        }
     }
 
     @Override
