@@ -30,7 +30,7 @@ public abstract class CharBlocks implements IBlocks {
             return true;
         }
     };
-    protected final Section EMPTY = new Section() {
+    protected final Section empty = new Section() {
         @Override
         public final synchronized char[] get(CharBlocks blocks, int layer) {
             // Defaults to aggressive as it should only be avoided where we know we've reset a chunk during an edit
@@ -69,7 +69,7 @@ public abstract class CharBlocks implements IBlocks {
         blocks = new char[16][];
         sections = new Section[16];
         for (int i = 0; i < 16; i++) {
-            sections[i] = EMPTY;
+            sections[i] = empty;
         }
     }
 
@@ -100,13 +100,13 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public synchronized IChunkSet reset() {
         for (int i = 0; i < 16; i++) {
-            sections[i] = EMPTY;
+            sections[i] = empty;
         }
         return null;
     }
 
     public synchronized void reset(@Range(from = 0, to = 15) int layer) {
-        sections[layer] = EMPTY;
+        sections[layer] = empty;
     }
 
     public synchronized char[] update(int layer, char[] data, boolean aggressive) {
@@ -181,7 +181,7 @@ public abstract class CharBlocks implements IBlocks {
             char[] section = get(blocks, layer);
             if (section == null) {
                 blocks.reset(layer);
-                section = blocks.EMPTY.get(blocks, layer, false);
+                section = blocks.empty.get(blocks, layer, false);
             }
             return section[index];
         }
