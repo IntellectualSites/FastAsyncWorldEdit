@@ -352,17 +352,20 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
         };
     }
 
-    private void updateGet(BukkitGetBlocks_1_16_2 get, Chunk nmsChunk, ChunkSection[] sections, ChunkSection section, char[] arr, int layer) {
+    private void updateGet(BukkitGetBlocks_1_16_2 get, Chunk nmsChunk, ChunkSection[] chunkSections, ChunkSection section, char[] arr, int layer) {
         synchronized (get) {
             if (this.getChunk() != nmsChunk) {
                 this.nmsChunk = nmsChunk;
-                this.sections = sections.clone();
+                this.sections = new ChunkSection[chunkSections.length];
+                System.arraycopy(chunkSections, 0, this.sections, 0, chunkSections.length);
                 this.reset();
             }
             if (this.sections == null) {
-                this.sections = sections.clone();
+                this.sections = new ChunkSection[chunkSections.length];
+                System.arraycopy(chunkSections, 0, this.sections, 0, chunkSections.length);
             }
             if (this.sections[layer] != section) {
+                // Not sure why it's funky, but it's what I did in commit fda7d00747abe97d7891b80ed8bb88d97e1c70d1 and I don't want to touch it >dords
                 this.sections[layer] = new ChunkSection[]{section}.clone()[0];
             }
             this.blocks[layer] = arr;
@@ -424,9 +427,14 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
 
                     bitMask |= 1 << layer;
 
-                    char[] setArr = set.load(layer).clone();
+                    char[] tmp = set.load(layer);
+                    char[] setArr = new char[4096];
+                    System.arraycopy(tmp, 0, setArr, 0, 4096);
                     if (createCopy) {
-                        copy.storeSection(layer, loadPrivately(layer).clone());
+                        char[] tmpLoad = loadPrivately(layer);
+                        char[] copyArr = new char[4096];
+                        System.arraycopy(tmpLoad, 0, copyArr, 0, 4096);
+                        copy.storeSection(layer, copyArr);
                     }
 
                     ChunkSection newSection;
@@ -460,7 +468,7 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
                             } else if (existingSection != getSections(false)[layer]) {
                                 this.sections[layer] = existingSection;
                                 this.reset();
-                            } else if (!Arrays.equals(update(layer, new char[4096]), loadPrivately(layer))) {
+                            } else if (!Arrays.equals(update(layer, new char[4096], true), loadPrivately(layer))) {
                                 this.reset(layer);
                             } else if (lock.isModified()) {
                                 this.reset(layer);
@@ -679,11 +687,13 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
         }
     }
 
-    private char[] loadPrivately(int layer) {
-        if (super.sections[layer].isFull()) {
-            return super.blocks[layer];
+    private synchronized char[] loadPrivately(int layer) {
+        if (super.blocks[layer] != null) {
+            char[] blocks = new char[4096];
+            System.arraycopy(super.blocks[layer], 0, blocks, 0, 4096);
+            return blocks;
         } else {
-            return BukkitGetBlocks_1_16_2.this.update(layer, null);
+            return BukkitGetBlocks_1_16_2.this.update(layer, null, true);
         }
     }
 
@@ -693,8 +703,8 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
     }
 
     @Override
-    public synchronized char[] update(int layer, char[] data) {
-        ChunkSection section = getSections(true)[layer];
+    public synchronized char[] update(int layer, char[] data, boolean aggressive) {
+        ChunkSection section = getSections(aggressive)[layer];
         // Section is null, return empty array
         if (section == null) {
             data = new char[4096];
@@ -811,15 +821,20 @@ public class BukkitGetBlocks_1_16_2 extends CharGetBlocks implements BukkitGetBl
 
     public ChunkSection[] getSections(boolean force) {
         if (force && forceLoadSections) {
-            return sections = getChunk().getSections().clone();
+            ChunkSection[] sections = getChunk().getSections();
+            ChunkSection[] copy = new ChunkSection[sections.length];
+            System.arraycopy(sections, 0, copy, 0, sections.length);
+            return copy;
         }
         ChunkSection[] tmp = sections;
         if (tmp == null) {
             synchronized (this) {
                 tmp = sections;
                 if (tmp == null) {
-                    Chunk chunk = getChunk();
-                    sections = tmp = chunk.getSections().clone();
+                    ChunkSection[] chunkSections = getChunk().getSections();
+                    tmp = new ChunkSection[chunkSections.length];
+                    System.arraycopy(chunkSections, 0, tmp, 0, chunkSections.length);
+                    sections = tmp;
                 }
             }
         }
