@@ -288,7 +288,7 @@ public class FaweBukkit implements IFawe, Listener {
             WEManager.IMP.managers.add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
         } else {
-            LOGGER.error("Incompatible version of PlotSquared found. Please use P2 v6.");
+            LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");
         }
     }
 }

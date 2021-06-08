@@ -33,12 +33,12 @@ import com.sk89q.worldedit.extent.clipboard.io.FastSchematicReader;
 import com.sk89q.worldedit.extent.clipboard.io.FastSchematicWriter;
 import com.sk89q.worldedit.extent.clipboard.io.MCEditSchematicReader;
 import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicReader;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import net.jpountz.lz4.LZ4BlockInputStream;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -56,13 +56,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
 public class FaweSchematicHandler extends SchematicHandler {
-    private static final Logger logger = LoggerFactory.getLogger("P2/" + FaweSchematicHandler.class.getSimpleName());
 
     private static final AtomicBoolean exportingAll = new AtomicBoolean();
 
     public FaweSchematicHandler(@NotNull WorldUtil worldUtil, @NotNull ProgressSubscriberFactory subscriberFactory) {
         super(worldUtil, subscriberFactory);
     }
+    private static final Logger logger = LogManagerCompat.getLogger();
 
     @Override
     public boolean restoreTile(QueueCoordinator queue, CompoundTag tag, int x, int y, int z) {

@@ -23,7 +23,7 @@ public class FaweTrim extends SubCommand {
     @Override
     public boolean onCommand(final PlotPlayer plotPlayer, final String[] strings) {
         if (ran) {
-            plotPlayer.sendMessage(StaticCaption.of("Already running!"));
+            plotPlayer.sendMessage(TranslatableCaption.of("error.task_in_process"));
             return false;
         }
         if (strings.length != 2) {
