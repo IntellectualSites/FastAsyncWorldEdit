@@ -75,9 +75,10 @@ public class Settings extends Config {
         public boolean COMMANDS = true;
         @Comment({
             "Disable the FAWE-PlotSquared hook to take over most intense P2 queueing",
-            "Specific aspects can be turned on and off further below"
+            "Specific aspects can be turned on and off further below",
+            "Only disables/enables the hook with v4. For v6, see PlotSquared settings.yml"
         })
-        public boolean PLOTSQUARED_HOOK = true;
+        public boolean PLOTSQUARED_v4_HOOK = true;
     }
 
     @Comment("Paths for various directories")
@@ -402,10 +403,12 @@ public class Settings extends Config {
     }
 
     public static class PLOTSQUARED_INTEGRATION {
+        @Comment({
+            "Only disables/enables the components with PlotSquared v4.",
+            "For v6, see PlotSquared settings.yml"
+        })
         public boolean CLEAR = true;
-        public boolean CUBOIDS = true;
         public boolean COPY_AND_SWAP = true;
-        public boolean SET_BIOME = true;
     }
 
     public static class WEB {

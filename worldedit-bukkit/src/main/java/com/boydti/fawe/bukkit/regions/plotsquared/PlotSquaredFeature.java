@@ -38,7 +38,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
         LOGGER.debug("Optimizing PlotSquared");
-        if (com.boydti.fawe.config.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_HOOK) {
+        if (com.boydti.fawe.config.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_v4_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
                 new FaweTrim();

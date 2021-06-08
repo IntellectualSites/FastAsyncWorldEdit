@@ -78,9 +78,6 @@ public class FaweRegionManager {
     }
 
     public boolean notifyClear(PlotManager manager) {
-        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
-            return false;
-        }
         final HybridPlotWorld hpw = ((HybridPlotManager) manager).getHybridPlotWorld();
         return hpw.getType() != PlotAreaType.AUGMENTED || hpw.getTerrain() == PlotAreaTerrainType.NONE;
     }
@@ -88,9 +85,6 @@ public class FaweRegionManager {
     public boolean handleClear(@NotNull Plot plot,
                                @Nullable Runnable whenDone,
                                @NotNull PlotManager manager) {
-        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
-            return false;
-        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 final HybridPlotWorld hybridPlotWorld = ((HybridPlotManager) manager).getHybridPlotWorld();
