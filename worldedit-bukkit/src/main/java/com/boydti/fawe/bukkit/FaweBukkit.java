@@ -21,10 +21,11 @@ import com.boydti.fawe.bukkit.util.MinecraftVersion;
 import com.boydti.fawe.bukkit.util.image.BukkitImageViewer;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.regions.FaweMaskManager;
-import com.boydti.fawe.util.ThirdPartyManager;
 import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.ThirdPartyManager;
 import com.boydti.fawe.util.WEManager;
 import com.boydti.fawe.util.image.ImageViewer;
+import com.plotsquared.core.PlotSquared;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -281,14 +282,13 @@ public class FaweBukkit implements IFawe, Listener {
             return;
         }
         if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
-            WEManager.IMP.managers
-                .add(new com.boydti.fawe.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
-        } else if (plotSquared.getClass().getSimpleName().equals("BukkitPlatform")) {
-            System.out.println("woo");
-        }else{
-            WEManager.IMP.managers
-                .add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
+            WEManager.IMP.managers.add(new com.boydti.fawe.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
+            LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
+        } else if (PlotSquared.get().getVersion().version[0] == 6){
+            WEManager.IMP.managers.add(new com.boydti.fawe.bukkit.regions.plotsquared.PlotSquaredFeature());
+            LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
+        } else {
+            LOGGER.error("Incompatible version of PlotSquared found. Please use P2 v6.");
         }
-        LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
     }
 }
