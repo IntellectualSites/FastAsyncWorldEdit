@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.bukkit.Bukkit.getWorld;
 
@@ -166,13 +167,18 @@ public class FaweDelegateRegionManager {
                 EditSession sessionA = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 EditSession sessionB = new EditSessionBuilder(pos3World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 CuboidRegion regionA = new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3());
-                CuboidRegion regionB = new CuboidRegion(swapPos.getBlockVector3(),
-                    BlockVector3.at(swapPos.getX() + pos2.getX() - pos1.getX(), 0, swapPos.getZ() + pos2.getZ() - pos1.getZ()));
-                ForwardExtentCopy copyA = new ForwardExtentCopy(sessionA, regionA, sessionB, regionB.getMinimumPoint());
-                ForwardExtentCopy copyB = new ForwardExtentCopy(sessionB, regionB, sessionA, regionA.getMinimumPoint());
+                CuboidRegion regionB = new CuboidRegion(swapPos.getBlockVector3(), swapPos.getBlockVector3().add(pos2.getBlockVector3()).subtract(pos1.getBlockVector3()));
+                regionA.setWorld(pos1World);
+                regionB.setWorld(pos3World);
+                Clipboard clipA = Clipboard.create(regionA, UUID.randomUUID());
+                Clipboard clipB = Clipboard.create(regionB, UUID.randomUUID());
+                ForwardExtentCopy copyA = new ForwardExtentCopy(sessionA, regionA, clipA, clipA.getMinimumPoint());
+                ForwardExtentCopy copyB = new ForwardExtentCopy(sessionB, regionB, clipB, clipB.getMinimumPoint());
                 try {
                     Operations.completeLegacy(copyA);
                     Operations.completeLegacy(copyB);
+                    clipA.paste(sessionB, swapPos.getBlockVector3(), true);
+                    clipB.paste(sessionA, pos1.getBlockVector3(), true);
                     sessionA.flushQueue();
                     sessionB.flushQueue();
                 } catch (MaxChangedBlocksException e) {
