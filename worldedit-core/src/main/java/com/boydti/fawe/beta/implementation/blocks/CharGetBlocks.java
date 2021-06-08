@@ -19,13 +19,14 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     @Override
     public boolean trim(boolean aggressive) {
         for (int i = 0; i < 16; i++) {
-            sections[i] = EMPTY;
+            sections[i] = empty;
             blocks[i] = null;
         }
         return true;
     }
 
-    public char[] update(int layer, char[] data) {
+    @Override
+    public char[] update(int layer, char[] data, boolean aggressive) {
         if (data == null) {
             data = new char[4096];
         }
@@ -34,8 +35,8 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     }
 
     @Override
-    public boolean trim(boolean aggressive, int layer) {
-        sections[layer] = EMPTY;
+    public synchronized boolean trim(boolean aggressive, int layer) {
+        sections[layer] = empty;
         blocks[layer] = null;
         return true;
     }

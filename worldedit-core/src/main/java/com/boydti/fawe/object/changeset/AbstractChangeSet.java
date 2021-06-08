@@ -162,11 +162,15 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 continue;
             }
             // add each block and tile
-            char[] blocksGet = get.load(layer);
-            if (blocksGet == null) {
+            char[] blocksGet;
+            char[] tmp = get.load(layer);
+            if (tmp == null) {
                 blocksGet = FaweCache.IMP.EMPTY_CHAR_4096;
+            } else {
+                System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
             }
-            char[] blocksSet = set.load(layer);
+            char[] blocksSet;
+            System.arraycopy(set.load(layer), 0, (blocksSet = new char[4096]), 0, 4096);
 
             int by = layer << 4;
             for (int y = 0, index = 0; y < 16; y++) {
