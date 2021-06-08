@@ -17,7 +17,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("1.16")
+var rootVersion by extra("p2v6")
 var revision: String by extra("")
 var buildNumber by extra("")
 var date: String by extra("")
