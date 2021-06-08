@@ -30,7 +30,9 @@ import com.sk89q.worldedit.command.tool.InvalidToolBindException;
 import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
+import com.sk89q.worldedit.event.platform.SessionIdleEvent;
 import com.sk89q.worldedit.extension.platform.Locatable;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.session.storage.JsonFileSessionStore;
 import com.sk89q.worldedit.session.storage.SessionStore;
@@ -40,8 +42,7 @@ import com.sk89q.worldedit.util.eventbus.Subscribe;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +70,7 @@ public class SessionManager {
     private static final int FLUSH_PERIOD = 1000 * 30;
     private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
             EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5, "WorldEdit Session Saver - %s"));
-    private static final Logger log = LoggerFactory.getLogger(SessionManager.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static boolean warnedInvalidTool;
 
     private final Timer timer = new Timer("WorldEdit Session Manager");
@@ -132,6 +133,9 @@ public class SessionManager {
         checkNotNull(owner);
         SessionHolder stored = sessions.get(getKey(owner));
         if (stored != null) {
+            if (stored.sessionIdle && stored.key.isActive()) {
+                stored.sessionIdle = false;
+            }
             return stored.session;
         } else {
             return null;
@@ -157,7 +161,7 @@ public class SessionManager {
                 session = store.load(getKey(sessionKey));
                 session.postLoad();
             } catch (IOException e) {
-                log.warn("Failed to load saved session", e);
+                LOGGER.warn("Failed to load saved session", e);
                 session = new LocalSession();
             }
             Request.request().setSession(session);
@@ -252,7 +256,7 @@ public class SessionManager {
                     try {
                         store.save(getKey(key), entry.getValue());
                     } catch (IOException e) {
-                        log.warn("Failed to write session for UUID " + getKey(key), e);
+                        LOGGER.warn("Failed to write session for UUID " + getKey(key), e);
                         exception = e;
                     }
                 }
@@ -350,6 +354,18 @@ public class SessionManager {
         store = new JsonFileSessionStore(dir);
     }
 
+    @Subscribe
+    public void onSessionIdle(final SessionIdleEvent event) {
+        SessionHolder holder = this.sessions.get(getKey(event.getKey()));
+        if (holder != null && !holder.sessionIdle) {
+            holder.sessionIdle = true;
+            LocalSession session = holder.session;
+
+            // Perform any session cleanup for data that should not be persisted.
+            session.onIdle();
+        }
+    }
+
     /**
      * Stores the owner of a session, the session, and the last active time.
      */
@@ -357,6 +373,7 @@ public class SessionManager {
         private final SessionKey key;
         private final LocalSession session;
         private long lastActive = System.currentTimeMillis();
+        private boolean sessionIdle = false;
 
         private SessionHolder(SessionKey key, LocalSession session) {
             this.key = key;

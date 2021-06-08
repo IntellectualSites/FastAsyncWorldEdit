@@ -50,8 +50,6 @@ public interface IChunkSet extends IBlocks, OutputExtent {
 
     void setSkyLightLayer(int layer, char[] toSet);
 
-    void removeSectionLighting(int layer, boolean sky);
-
     void setFullBright(int layer);
 
     void setEntity(CompoundTag tag);

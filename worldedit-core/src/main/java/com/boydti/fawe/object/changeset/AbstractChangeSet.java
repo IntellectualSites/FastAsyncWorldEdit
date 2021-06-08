@@ -6,6 +6,7 @@ import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.MainUtil;
@@ -37,7 +38,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
@@ -137,7 +138,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         }
         if (!tilesTo.isEmpty()) {
             for (Map.Entry<BlockVector3, CompoundTag> entry : tilesTo.entrySet()) {
-                addTileCreate(entry.getValue());
+                BlockVector3 pos = entry.getKey();
+                addTileCreate(MainUtil.setPosition(entry.getValue(), pos.getX() + bx, pos.getY(), pos.getZ() + bz));
             }
         }
         Set<UUID> entRemoves = set.getEntityRemoves();
@@ -173,11 +175,12 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                     int zz = z + bz;
                     for (int x = 0; x < 16; x++, index++) {
                         int xx = bx + x;
-                        int combinedFrom = blocksGet[index];
-                        if (combinedFrom == 0) {
-                            combinedFrom = BlockID.AIR;
+                        int from = blocksGet[index];
+                        if (from == 0) {
+                            from = BlockID.AIR;
                         }
-                        int combinedTo = blocksSet[index];
+                        final int combinedFrom = from;
+                        final int combinedTo = blocksSet[index];
                         if (combinedTo != 0) {
                             add(xx, yy, zz, combinedFrom, combinedTo);
                         }
@@ -208,6 +211,11 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     @Override
     public Future<IChunkSet> postProcessSet(final IChunk chunk, final IChunkGet get,final  IChunkSet set) {
         return (Future<IChunkSet>) addWriteTask(() -> processSet(chunk, get, set));
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.READING_SET_BLOCKS;
     }
 
     public abstract void addTileCreate(CompoundTag tag);
@@ -246,14 +254,12 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public void add(EntityCreate change) {
         CompoundTag tag = change.state.getNbtData();
-        MainUtil.setEntityInfo(tag, change.getEntity());
-        addEntityCreate(tag);
+        addEntityCreate(MainUtil.setEntityInfo(tag, change.getEntity()));
     }
 
     public void add(EntityRemove change) {
         CompoundTag tag = change.state.getNbtData();
-        MainUtil.setEntityInfo(tag, change.getEntity());
-        addEntityRemove(tag);
+        addEntityRemove(MainUtil.setEntityInfo(tag, change.getEntity()));
     }
 
     @Override
@@ -296,14 +302,12 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             if (from.hasNbtData()) {
                 CompoundTag nbt = from.getNbtData();
                 assert nbt != null;
-                MainUtil.setPosition(nbt, x, y, z);
-                addTileRemove(nbt);
+                addTileRemove(MainUtil.setPosition(nbt, x, y, z));
             }
             if (to.hasNbtData()) {
                 CompoundTag nbt = to.getNbtData();
                 assert nbt != null;
-                MainUtil.setPosition(nbt, x, y, z);
-                addTileCreate(nbt);
+                addTileCreate(MainUtil.setPosition(nbt, x, y, z));
             }
             int combinedFrom = from.getOrdinal();
             int combinedTo = to.getOrdinal();
@@ -319,8 +323,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             if (to.hasNbtData()) {
                 CompoundTag nbt = to.getNbtData();
                 assert nbt != null;
-                MainUtil.setPosition(nbt, x, y, z);
-                addTileCreate(nbt);
+                addTileCreate(MainUtil.setPosition(nbt, x, y, z));
             }
             int combinedTo = to.getInternalId();
             add(x, y, z, combinedFrom, combinedTo);
@@ -354,7 +357,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             wrappedTask.run();
             return Futures.immediateCancelledFuture();
         } else {
-            return Fawe.get().getQueueHandler().async(wrappedTask);
+            return Fawe.get().getQueueHandler().submit(wrappedTask);
         }
     }
 }

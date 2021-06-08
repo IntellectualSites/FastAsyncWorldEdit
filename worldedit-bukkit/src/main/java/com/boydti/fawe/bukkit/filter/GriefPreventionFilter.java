@@ -1,6 +1,5 @@
 package com.boydti.fawe.bukkit.filter;
 
-import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.regions.general.CuboidRegionFilter;
 import com.boydti.fawe.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector2;

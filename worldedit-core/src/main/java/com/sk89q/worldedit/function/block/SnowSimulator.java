@@ -23,11 +23,22 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.registry.state.BooleanProperty;
+import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.Locale;
+import java.util.Map;
+
 public class SnowSimulator implements LayerFunction {
+
+    public static final BooleanProperty snowy = (BooleanProperty) (Property<?>) BlockTypes.GRASS_BLOCK.getProperty("snowy");
+    private static final EnumProperty slab = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_SLAB.getProperty("type");
+    private static final EnumProperty stair = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("half");
+    private static final EnumProperty trapdoor = (EnumProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty("half");
+    private static final BooleanProperty trapdoorOpen = (BooleanProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty("open");
 
     private final BlockState ice = BlockTypes.ICE.getDefaultState();
     private final BlockState snow = BlockTypes.SNOW.getDefaultState();
@@ -42,6 +53,7 @@ public class SnowSimulator implements LayerFunction {
     private int affected;
 
     public SnowSimulator(Extent extent, boolean stack) {
+
         this.extent = extent;
         this.stack = stack;
 
@@ -66,9 +78,8 @@ public class SnowSimulator implements LayerFunction {
             return true;
         }
 
-        // Can only place on full solid blocks
-        return block.getBlockType().getMaterial().isFullCube()
-                && block.getBlockType().getMaterial().isSolid();
+        // Stop searching when we hit a movement blocker
+        return block.getBlockType().getMaterial().isMovementBlocker();
     }
 
     @Override
@@ -89,6 +100,7 @@ public class SnowSimulator implements LayerFunction {
             return false;
         }
 
+
         // Can't put snow this far up
         if (position.getBlockY() == this.extent.getMaximumPoint().getBlockY()) {
             return false;
@@ -100,6 +112,22 @@ public class SnowSimulator implements LayerFunction {
         // Can only replace air (or snow in stack mode)
         if (!above.getBlockType().getMaterial().isAir() && (!stack || above.getBlockType() != BlockTypes.SNOW)) {
             return false;
+        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmmittedLight(abovePosition) > 10) {
+            return false;
+        } else if (!block.getBlockType().getMaterial().isFullCube()) {
+            Map<Property<?>, Object> states = block.getStates();
+            if (states.containsKey(slab) && block.getState(slab).equalsIgnoreCase("bottom")) {
+                return false;
+            } else if (states.containsKey(trapdoorOpen) && states.containsKey(trapdoor) && (block.getState(trapdoorOpen)
+                || block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
+                return false;
+            } else if (states.containsKey(stair) && block.getState(stair).equalsIgnoreCase("bottom")) {
+                return false;
+            } else {
+                return false;
+            }
+        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && block.getBlockType().getMaterial().isTranslucent()) {
+            return false;
         }
 
         if (stack && above.getBlockType() == BlockTypes.SNOW) {
@@ -107,16 +135,25 @@ public class SnowSimulator implements LayerFunction {
             // We've hit the highest layer (If it doesn't contain current + 2 it means it's 1 away from full)
             if (!snowLayersProperty.getValues().contains(currentHeight + 2)) {
                 if (this.extent.setBlock(abovePosition, snowBlock)) {
+                    if (block.getStates().containsKey(snowy)) {
+                        this.extent.setBlock(position, block.with(snowy, true));
+                    }
                     this.affected++;
                 }
             } else {
                 if (this.extent.setBlock(abovePosition, above.with(snowLayersProperty, currentHeight + 1))) {
+                    if (block.getStates().containsKey(snowy)) {
+                        this.extent.setBlock(position, block.with(snowy, true));
+                    }
                     this.affected++;
                 }
             }
             return false;
         }
         if (this.extent.setBlock(abovePosition, snow)) {
+            if (block.getStates().containsKey(snowy)) {
+                this.extent.setBlock(position, block.with(snowy, true));
+            }
             this.affected++;
         }
         return false;

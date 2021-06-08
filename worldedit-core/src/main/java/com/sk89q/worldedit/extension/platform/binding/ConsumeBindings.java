@@ -20,6 +20,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -114,7 +115,7 @@ public class ConsumeBindings extends Bindings {
             uuid = Fawe.imp().getUUID(argument);
         }
         if (uuid == null) {
-            throw new InputParseException(Caption.toString(Caption.of("fawe.error.player.not.found", argument)));
+            throw new InputParseException(Caption.of("fawe.error.player.not.found", TextComponent.of(argument)));
         }
         return uuid;
     }
@@ -154,7 +155,7 @@ public class ConsumeBindings extends Bindings {
         try {
             return getWorldEdit().getBlockFactory().parseFromInput(argument, parserContext);
         } catch (NoMatchException e) {
-            throw new InputParseException(e.getMessage());
+            throw new InputParseException(Caption.of(e.getMessage()));
         }
     }
 }

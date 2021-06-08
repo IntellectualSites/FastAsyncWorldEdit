@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.pattern.BufferedPattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
@@ -7,7 +8,6 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
@@ -34,7 +34,7 @@ public class BufferedPatternParser extends RichParser<Pattern> {
     @Override
     protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 1) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.command.syntax",
+            throw new InputParseException(Caption.of("fawe.error.command.syntax",
                     TextComponent.of(getPrefix() + "[pattern] (e.g. " + getPrefix() + "[stone,dirt])")));
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(arguments[0], context);

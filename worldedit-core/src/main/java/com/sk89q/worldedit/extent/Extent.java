@@ -23,6 +23,7 @@ import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.Filter;
 import com.boydti.fawe.beta.IBatchProcessor;
 import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
@@ -506,6 +507,10 @@ public interface Extent extends InputExtent, OutputExtent {
         return true;
     }
 
+    default int getMinY() {
+        return 0;
+    }
+
     default int getMaxY() {
         return 255;
     }
@@ -543,7 +548,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return the number of blocks that matched the mask
      */
     default int countBlocks(Region region, Mask searchMask) {
-        RegionVisitor visitor = new RegionVisitor(region, position -> searchMask.test(position));
+        RegionVisitor visitor = new RegionVisitor(region, searchMask::test);
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
@@ -707,11 +712,14 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default Extent addPostProcessor(IBatchProcessor processor) {
+        if (processor.getScope() == ProcessorScope.READING_SET_BLOCKS) {
+            throw new IllegalArgumentException("You cannot alter blocks in a PostProcessor");
+        }
         return processor.construct(this);
     }
 
     default Extent enableHistory(AbstractChangeSet changeSet) {
-        if (Settings.IMP.EXPERIMENTAL.SEND_BEFORE_HISTORY) {
+        if (Settings.IMP.HISTORY.SEND_BEFORE_HISTORY) {
             return addPostProcessor(changeSet);
         } else {
             return addProcessor(changeSet);

@@ -2,12 +2,16 @@ package com.sk89q.worldedit.extension.platform.binding;
 
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import org.apache.logging.log4j.Logger;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.converter.ArgumentConverter;
 import org.enginehub.piston.converter.ConversionResult;
+import org.enginehub.piston.converter.FailedConversion;
 import org.enginehub.piston.converter.SuccessfulConversion;
+import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
@@ -18,9 +22,9 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class Bindings {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final WorldEdit worldEdit;
 
@@ -55,7 +59,7 @@ public class Bindings {
             Annotation annotation = annotations[0] == binding ? annotations[1] : annotations[0];
             key = Key.of(ret, annotation);
         } else {
-            getLogger(Bindings.class).debug("Cannot annotate: " + method + " with " + StringMan.getString(annotations));
+            LOGGER.debug("Cannot annotate: " + method + " with " + StringMan.getString(annotations));
             return false;
         }
 
@@ -97,7 +101,11 @@ public class Bindings {
 
                 @Override
                 public ConversionResult<Object> convert(String s, InjectedValueAccess access) {
-                    return SuccessfulConversion.fromSingle(invoke(s, argsFunc, access, method));
+                    Object o = invoke(s, argsFunc, access, method);
+                    if (o == null) {
+                        return FailedConversion.from(new NullPointerException());
+                    }
+                    return SuccessfulConversion.fromSingle(o);
                 }
             });
         }
@@ -118,7 +126,10 @@ public class Bindings {
             }
             return method.invoke(this, args);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException(e);
+            if (!(e.getCause() instanceof StopExecutionException)) {
+                throw new RuntimeException(e);
+            }
+            return null;
         }
     }
 }

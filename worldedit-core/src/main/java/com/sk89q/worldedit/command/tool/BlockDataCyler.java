@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -32,7 +33,6 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 
@@ -65,12 +65,12 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         if (!config.allowedDataCycleBlocks.isEmpty()
                 && !player.hasPermission("worldedit.override.data-cycler")
                 && !config.allowedDataCycleBlocks.contains(block.getBlockType().getId())) {
-            player.printError(TranslatableComponent.of("worldedit.tool.data-cycler.block-not-permitted"));
+            player.print(Caption.of("worldedit.tool.data-cycler.block-not-permitted"));
             return true;
         }
 
         if (block.getStates().keySet().isEmpty()) {
-            player.printError(TranslatableComponent.of("worldedit.tool.data-cycler.cant-cycle"));
+            player.print(Caption.of("worldedit.tool.data-cycler.cant-cycle"));
         } else {
             Property<?> currentProperty = selectedProperties.get(player.getUniqueId());
 
@@ -92,13 +92,13 @@ public class BlockDataCyler implements DoubleActionBlockTool {
 
                     try {
                         editSession.setBlock(blockPoint, newBlock);
-                        player.printInfo(TranslatableComponent.of(
+                        player.print(Caption.of(
                                 "worldedit.tool.data-cycler.new-value",
                                 TextComponent.of(currentProperty.getName()),
                                 TextComponent.of(String.valueOf(currentProperty.getValues().get(index)))
                         ));
                     } catch (MaxChangedBlocksException e) {
-                        player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
+                        player.print(Caption.of("worldedit.tool.max-block-changes"));
                     } finally {
                         session.remember(editSession);
                     }
@@ -109,7 +109,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
                 index = (index + 1) % properties.size();
                 currentProperty = properties.get(index);
                 selectedProperties.put(player.getUniqueId(), currentProperty);
-                player.printInfo(TranslatableComponent.of("worldedit.tool.data-cycler.cycling", TextComponent.of(currentProperty.getName())));
+                player.print(Caption.of("worldedit.tool.data-cycler.cycling", TextComponent.of(currentProperty.getName())));
             }
         }
 

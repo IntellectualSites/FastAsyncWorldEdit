@@ -177,6 +177,15 @@ public final class NullChunk implements IQueueChunk {
         return false;
     }
 
+    @Override
+    public void setLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setSkyLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {}
+
     @Nullable
     public <T extends Future<T>> T call(@Nullable IChunkSet set, @Nullable Runnable finalize) {
         return null;

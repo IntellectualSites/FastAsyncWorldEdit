@@ -19,16 +19,15 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.bekvon.bukkit.residence.commands.material;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
-import com.boydti.fawe.bukkit.adapter.mc1_16_4.BlockMaterial_1_16_4;
-import com.boydti.fawe.bukkit.adapter.mc1_16_4.BukkitAdapter_1_16_4;
-import com.boydti.fawe.bukkit.adapter.mc1_16_4.BukkitGetBlocks_1_16_4;
-import com.boydti.fawe.bukkit.adapter.mc1_16_4.FAWEWorldNativeAccess_1_16;
-import com.boydti.fawe.bukkit.adapter.mc1_16_4.MapChunkUtil_1_16_4;
-import com.boydti.fawe.bukkit.adapter.mc1_16_4.nbt.LazyCompoundTag_1_16_4;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.BlockMaterial_1_16_5;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitAdapter_1_16_5;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitGetBlocks_1_16_5;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.FAWEWorldNativeAccess_1_16_R3;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.MapChunkUtil_1_16_5;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.nbt.LazyCompoundTag_1_16_5;
 import com.google.common.base.Preconditions;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
@@ -43,6 +42,7 @@ import com.sk89q.worldedit.bukkit.adapter.impl.regen.Regen_v1_16_R3;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.Property;
@@ -82,6 +82,7 @@ import net.minecraft.server.v1_16_R3.PlayerChunk;
 import net.minecraft.server.v1_16_R3.TileEntity;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.data.BlockData;
@@ -96,17 +97,20 @@ import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<NBTBase> {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private final Spigot_v1_16_R3 parent;
     private char[] ibdToStateOrdinal;
+    private int[] ordinalToIbdID;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -125,12 +129,15 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
         if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
             return false;
         }
-        ibdToStateOrdinal = new char[Block.REGISTRY_ID.a()]; // size
+        ibdToStateOrdinal = new char[BlockTypesCache.states.length]; // size
+        ordinalToIbdID = new int[ibdToStateOrdinal.length]; // size
         for (int i = 0; i < ibdToStateOrdinal.length; i++) {
             BlockState state = BlockTypesCache.states[i];
-            BlockMaterial_1_16_4 material = (BlockMaterial_1_16_4) state.getMaterial();
+            BlockMaterial_1_16_5 material = (BlockMaterial_1_16_5) state.getMaterial();
             int id = Block.REGISTRY_ID.getId(material.getState());
-            ibdToStateOrdinal[id] = state.getOrdinalChar();
+            char ordinal = state.getOrdinalChar();
+            ibdToStateOrdinal[id] = ordinal;
+            ordinalToIbdID[ordinal] = id;
         }
         return true;
     }
@@ -138,13 +145,13 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
         Block block = getBlock(blockType);
-        return new BlockMaterial_1_16_4(block);
+        return new BlockMaterial_1_16_5(block);
     }
 
     @Override
-    public BlockMaterial getMaterial(BlockState state) {
+    public synchronized BlockMaterial getMaterial(BlockState state) {
         IBlockData bs = ((CraftBlockData) Bukkit.createBlockData(state.getAsString())).getState();
-        return new BlockMaterial_1_16_4(bs.getBlock(), bs);
+        return new BlockMaterial_1_16_5(bs.getBlock(), bs);
     }
 
     public Block getBlock(BlockType blockType) {
@@ -191,14 +198,14 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
         World nmsWorld = nmsChunk.getWorld();
 
         BlockPosition blockPos = new BlockPosition(x, y, z);
-        IBlockData blockData = ((BlockMaterial_1_16_4) state.getMaterial()).getState();
+        IBlockData blockData = ((BlockMaterial_1_16_5) state.getMaterial()).getState();
         ChunkSection[] sections = nmsChunk.getSections();
         int y4 = y >> 4;
         ChunkSection section = sections[y4];
 
         IBlockData existing;
         if (section == null) {
-            existing = ((BlockMaterial_1_16_4) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
+            existing = ((BlockMaterial_1_16_5) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
         } else {
             existing = section.getType(x & 15, y & 15, z & 15);
         }
@@ -242,7 +249,7 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
 
     @Override
     public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
-        return new FAWEWorldNativeAccess_1_16(this,
+        return new FAWEWorldNativeAccess_1_16_R3(this,
                 new WeakReference<>(((CraftWorld)world).getHandle()));
     }
 
@@ -268,13 +275,13 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
         if (id != null) {
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
             Supplier<CompoundTag> saveTag = () -> {
-                NBTTagCompound tag = new NBTTagCompound();
-                readEntityIntoTag(mcEntity, tag);
-
+                final NBTTagCompound minecraftTag = new NBTTagCompound();
+                readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
-                CompoundTag natve = (CompoundTag) toNative(tag);
-                natve.getValue().put("Id", new StringTag(id));
-                return natve;
+                final CompoundTag tag = (CompoundTag) toNative(minecraftTag);
+                final Map<String, Tag> tags = new HashMap<>(tag.getValue());
+                tags.put("Id", new StringTag(id));
+                return new CompoundTag(tags);
             };
             return new LazyBaseEntity(type, saveTag);
         } else {
@@ -299,7 +306,7 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
 
     @Override
     public OptionalInt getInternalBlockStateId(BlockState state) {
-        BlockMaterial_1_16_4 material = (BlockMaterial_1_16_4) state.getMaterial();
+        BlockMaterial_1_16_5 material = (BlockMaterial_1_16_5) state.getMaterial();
         IBlockData mcState = material.getCraftBlockData().getState();
         return OptionalInt.of(Block.REGISTRY_ID.getId(mcState));
     }
@@ -341,26 +348,36 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
                 init();
                 return adaptToChar(ibd);
             } catch (ArrayIndexOutOfBoundsException e1) {
-                getLogger(FAWE_Spigot_v1_16_R3.class)
-                    .error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
-                           ibd.getBlock(), Block.REGISTRY_ID.getId(ibd), ibdToStateOrdinal.length, e1);
+                LOGGER.error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
+                        ibd.getBlock(), Block.REGISTRY_ID.getId(ibd), ibdToStateOrdinal.length, e1);
                 return 0;
+            }
+        }
+    }
+
+    public int ordinalToIbdID(char ordinal) {
+        synchronized (this) {
+            try {
+                return ordinalToIbdID[ordinal];
+            } catch (NullPointerException e) {
+                init();
+                return ordinalToIbdID(ordinal);
             }
         }
     }
 
     @Override
     public <B extends BlockStateHolder<B>> BlockData adapt(B state) {
-        BlockMaterial_1_16_4 material = (BlockMaterial_1_16_4) state.getMaterial();
+        BlockMaterial_1_16_5 material = (BlockMaterial_1_16_5) state.getMaterial();
         return material.getCraftBlockData();
     }
 
-    private MapChunkUtil_1_16_4 mapUtil = new MapChunkUtil_1_16_4();
+    private MapChunkUtil_1_16_5 mapUtil = new MapChunkUtil_1_16_5();
 
     @Override
     public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket packet) {
         WorldServer nmsWorld = ((CraftWorld) world).getHandle();
-        PlayerChunk map = BukkitAdapter_1_16_4.getPlayerChunk(nmsWorld, packet.getChunkX(), packet.getChunkZ());
+        PlayerChunk map = BukkitAdapter_1_16_5.getPlayerChunk(nmsWorld, packet.getChunkX(), packet.getChunkZ());
         if (map != null && map.hasBeenLoaded()) {
             boolean flag = false;
             PlayerChunk.d players = map.players;
@@ -413,8 +430,8 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
 
     @Override
     public NBTBase fromNative(Tag foreign) {
-        if (foreign instanceof LazyCompoundTag_1_16_4) {
-            return ((LazyCompoundTag_1_16_4) foreign).get();
+        if (foreign instanceof LazyCompoundTag_1_16_5) {
+            return ((LazyCompoundTag_1_16_5) foreign).get();
         }
         return parent.fromNative(foreign);
     }
@@ -426,7 +443,7 @@ public final class FAWE_Spigot_v1_16_R3 extends CachedBukkitAdapter implements I
 
     @Override
     public IChunkGet get(org.bukkit.World world, int chunkX, int chunkZ) {
-        return new BukkitGetBlocks_1_16_4(world, chunkX, chunkZ);
+        return new BukkitGetBlocks_1_16_5(world, chunkX, chunkZ);
     }
 
     @Override

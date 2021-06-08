@@ -1,7 +1,6 @@
 package com.boydti.fawe.object.brush;
 
 import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.visualization.VisualExtent;
 import com.boydti.fawe.object.clipboard.ResizableClipboardBuilder;
 import com.boydti.fawe.object.function.NullRegionFunction;
 import com.boydti.fawe.object.function.mask.AbstractDelegateMask;
@@ -21,7 +20,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -45,7 +43,7 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     @Override
     public boolean reset() {
         session.setClipboard(null);
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.reset"));
+        player.print(Caption.of("fawe.worldedit.brush.brush.reset"));
         return true;
     }
 
@@ -57,9 +55,6 @@ public class CopyPastaBrush implements Brush, ResettableTool {
         }
         ClipboardHolder clipboard = session.getExistingClipboard();
         if (clipboard == null) {
-            if (editSession.getExtent() instanceof VisualExtent) {
-                return;
-            }
             Mask mask = editSession.getMask();
             if (mask == null) {
                 mask = Masks.alwaysTrue();

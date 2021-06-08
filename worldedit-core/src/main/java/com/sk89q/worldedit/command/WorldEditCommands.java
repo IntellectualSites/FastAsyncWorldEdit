@@ -21,8 +21,9 @@ package com.sk89q.worldedit.command;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweVersion;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.util.IncendoPaster;
+import com.intellectualsites.paster.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -38,8 +39,8 @@ import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.util.formatting.component.MessageBox;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
@@ -47,6 +48,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -89,10 +91,10 @@ public class WorldEditCommands {
             TextComponent buildArg = TextComponent.of(version.build);
             TextComponent platformArg = TextComponent.of(Settings.IMP.PLATFORM);
 
-            actor.printInfo(TranslatableComponent.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
+            actor.print(Caption.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
         }
 
-        actor.printInfo(TextComponent.of("Wiki: https://wiki.intellectualsites.com/FastAsyncWorldEdit/index"));
+        actor.printInfo(TextComponent.of("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki"));
 
         PlatformManager pm = we.getPlatformManager();
 
@@ -100,7 +102,8 @@ public class WorldEditCommands {
         for (Platform platform : pm.getPlatforms()) {
             producer.append(
                     TextComponent.of("* ", TextColor.GRAY)
-                    .append(TextComponent.of(platform.getPlatformName()))
+                            .append(TextComponent.of(platform.getPlatformName())
+                                    .hoverEvent(HoverEvent.showText(TextComponent.of(platform.getId()))))
                     .append(TextComponent.of("(" + platform.getPlatformVersion() + ")"))
             ).newline();
         }
@@ -112,7 +115,7 @@ public class WorldEditCommands {
             producer.append(
                 TextComponent.of(capability.name(), TextColor.GRAY)
                     .append(TextComponent.of(": ")
-                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "NONE")))
+                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "none")))
             ).newline();
         }
         actor.print(new MessageBox("Capabilities", producer, TextColor.GRAY).create());
@@ -128,7 +131,7 @@ public class WorldEditCommands {
         we.getPlatformManager().queryCapability(Capability.CONFIGURATION).reload();
         we.getEventBus().post(new ConfigurationLoadEvent(we.getPlatformManager().queryCapability(Capability.CONFIGURATION).getConfiguration()));
         Fawe.get().setupConfigs();
-        actor.printInfo(TranslatableComponent.of("worldedit.reload.config"));
+        actor.print(Caption.of("worldedit.reload.config"));
     }
 
     @Command(
@@ -139,12 +142,15 @@ public class WorldEditCommands {
     public void report(Actor actor) throws WorldEditException {
         String dest;
         try {
-            dest = IncendoPaster.debugPaste();
+            final File logFile = new File("logs/latest.log");
+            final File config = new File(Fawe.imp().getDirectory(), "config.yml");
+            final File legacyConfig = new File(Fawe.imp().getDirectory(), "config-legacy.yml");
+            dest = IncendoPaster.debugPaste(logFile, Fawe.imp().getDebugInfo(), config, legacyConfig);
         } catch (IOException e) {
             actor.printInfo(TextComponent.of(e.getMessage()));
             return;
         }
-        actor.printInfo(TranslatableComponent.of("worldedit.report.written", TextComponent.of(dest).clickEvent(
+        actor.print(Caption.of("worldedit.report.written", TextComponent.of(dest).clickEvent(
             ClickEvent.openUrl(dest))));
     }
 
@@ -157,13 +163,11 @@ public class WorldEditCommands {
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
         for (Map.Entry<Thread, StackTraceElement[]> entry : stacks.entrySet()) {
             Thread thread = entry.getKey();
-            actor.printDebug(
-                "--------------------------------------------------------------------------------------------");
-            actor.printDebug(
-                "Thread: " + thread.getName() + " | Id: " + thread.getId() + " | Alive: " + thread
-                    .isAlive());
+            actor.printDebug(TextComponent.of(
+                "--------------------------------------------------------------------------------------------"));
+            actor.printDebug("Thread: " + thread.getName() + " | Id: " + thread.getId() + " | Alive: " + thread.isAlive());
             for (StackTraceElement elem : entry.getValue()) {
-                actor.printDebug(elem.toString());
+                actor.printDebug(TextComponent.of(elem.toString()));
             }
         }
     }
@@ -172,7 +176,7 @@ public class WorldEditCommands {
         name = "cui",
         desc = "Complete CUI handshake (internal usage)"
     )
-    @CommandPermissions()
+    @CommandPermissions(value = "worldedit.cui", queued = false)
     public void cui(Player player, LocalSession session) {
         session.setCUISupport(true);
         session.dispatchCUISetup(player);
@@ -182,19 +186,20 @@ public class WorldEditCommands {
         name = "tz",
         desc = "Set your timezone for snapshots"
     )
+    @CommandPermissions(value = "worldedit.timezone", queued = false)
     public void tz(Actor actor, LocalSession session,
                    @Arg(desc = "The timezone to set")
                        String timezone) {
         try {
             ZoneId tz = ZoneId.of(timezone);
             session.setTimezone(tz);
-            actor.printInfo(TranslatableComponent.of("worldedit.timezone.set", TextComponent.of(tz.getDisplayName(
+            actor.print(Caption.of("worldedit.timezone.set", TextComponent.of(tz.getDisplayName(
                     TextStyle.FULL, actor.getLocale()
             ))));
-            actor.printInfo(TranslatableComponent.of("worldedit.timezone.current",
+            actor.print(Caption.of("worldedit.timezone.current",
                     TextComponent.of(dateFormat.withLocale(actor.getLocale()).format(ZonedDateTime.now(tz)))));
         } catch (ZoneRulesException e) {
-            actor.printError(TranslatableComponent.of("worldedit.timezone.invalid"));
+            actor.print(Caption.of("worldedit.timezone.invalid"));
         }
     }
 

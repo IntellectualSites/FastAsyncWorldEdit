@@ -22,9 +22,8 @@ package com.sk89q.wepif;
 import com.sk89q.util.yaml.YAMLProcessor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -38,7 +37,7 @@ import java.util.Set;
 
 public class FlatFilePermissionsResolver implements PermissionsResolver {
 
-    private static final Logger log = LoggerFactory.getLogger(FlatFilePermissionsResolver.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private Map<String, Set<String>> userPermissionsCache;
     private Set<String> defaultPermissionsCache;
@@ -99,7 +98,7 @@ public class FlatFilePermissionsResolver implements PermissionsResolver {
                 }
             }
         } catch (IOException e) {
-            log.warn("Failed to load permissions", e);
+            LOGGER.warn("Failed to load permissions", e);
         } finally {
             try {
                 if (buff != null) {
@@ -165,7 +164,7 @@ public class FlatFilePermissionsResolver implements PermissionsResolver {
                 }
             }
         } catch (IOException e) {
-            log.warn("Failed to load permissions", e);
+            LOGGER.warn("Failed to load permissions", e);
         } finally {
             try {
                 if (buff != null) {

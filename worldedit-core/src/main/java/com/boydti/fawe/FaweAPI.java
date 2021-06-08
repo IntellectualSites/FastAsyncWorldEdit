@@ -2,7 +2,7 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
-import com.boydti.fawe.beta.implementation.lighting.NMSRelighter;
+import com.boydti.fawe.beta.implementation.lighting.Relighter;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RegionWrapper;
@@ -29,12 +29,15 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
+import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -45,7 +48,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 /**
  * The FaweAPI class offers a few useful functions.<br>
@@ -55,6 +57,8 @@ import javax.annotation.Nullable;
  * FaweAPI.[some method]
  */
 public class FaweAPI {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     /**
      * Offers a lot of options for building an EditSession.
@@ -188,7 +192,7 @@ public class FaweAPI {
         if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".bd")) {
             throw new IllegalArgumentException("Not a BD file!");
         }
-        String[] path = file.getPath().split(File.separator);
+        String[] path = file.getPath().split(File.separatorChar=='\\' ? "\\\\" : File.separator);
         if (path.length < 3) {
             throw new IllegalArgumentException("Not in history directory!");
         }
@@ -344,24 +348,29 @@ public class FaweAPI {
             }
         }
 
-        NMSRelighter relighter = new NMSRelighter(queue, Settings.IMP.LIGHTING.DO_HEIGHTMAPS);
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                relighter.addChunk(x, z, null, 65535);
-                count++;
+        try (Relighter relighter = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING)
+                .getRelighterFactory()
+                .createRelighter(mode, world, queue)) {
+
+            for (int x = minX; x <= maxX; x++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    relighter.addChunk(x, z, null, 65535);
+                    count++;
+                }
             }
-        }
-        if (mode != RelightMode.NONE) {
-            if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
-                relighter.removeAndRelight(true);
+            if (mode != RelightMode.NONE) {
+                if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                    relighter.removeAndRelight(true);
+                } else {
+                    relighter.fixSkyLighting();
+                    relighter.fixBlockLighting();
+                }
             } else {
-                relighter.fixSkyLighting();
-                relighter.fixBlockLighting();
+                relighter.removeLighting();
             }
-        } else {
-            relighter.removeLighting();
+        } catch (Exception e) {
+            LOGGER.error("Error occurred on fix lighting", e);
         }
-        relighter.sendChunks();
         return count;
     }
 

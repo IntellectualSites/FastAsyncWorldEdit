@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
@@ -28,7 +29,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 /**
  * A wand that can be used at a distance.
@@ -79,7 +79,7 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
         }
 
         if (target == null) {
-            player.printError(TranslatableComponent.of("worldedit.tool.no-block"));
+            player.print(Caption.of("worldedit.tool.no-block"));
             return null;
         }
 

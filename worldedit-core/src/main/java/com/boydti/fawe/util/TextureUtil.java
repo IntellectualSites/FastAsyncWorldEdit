@@ -9,7 +9,10 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.PropertiesConfiguration;
+import com.sk89q.worldedit.util.report.Unreported;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -18,17 +21,22 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
+import org.apache.logging.log4j.Logger;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,10 +51,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 // TODO FIXME
 public class TextureUtil implements TextureHolder {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final int[] FACTORS = new int[766];
 
@@ -344,8 +354,26 @@ public class TextureUtil implements TextureHolder {
     public TextureUtil(File folder) throws FileNotFoundException {
         this.folder = folder;
         if (!folder.exists()) {
-            throw new FileNotFoundException(
-                "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+            try {
+                LOGGER.info("Downloading asset jar from Mojang, please wait...");
+                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
+                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
+                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
+                    byte[] dataBuffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                    }
+                    LOGGER.info("Asset jar down has been downloaded successfully.");
+                } catch (IOException e) {
+                    LOGGER.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar in it.");
+                    LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
+                }
+            } catch (AccessControlException e) {
+                LOGGER.error("Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
+                LOGGER.error("Please create the following folder manually: `FastAsyncWorldEdit/textures` with `.minecraft/versions` jar in it.");
+
+            }
         }
     }
 
@@ -606,8 +634,18 @@ public class TextureUtil implements TextureHolder {
                 }
             }
             if (files.length == 0) {
-                getLogger(TextureUtil.class).debug(
-                    "Please create a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions/1.15.jar` jar or mods in it. If the file exists, please make sure the server has read access to the directory");
+                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
+                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
+                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
+                    byte[] dataBuffer = new byte[1024];
+                    int bytesRead;
+                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+                    LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
+                }
             } else {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);
@@ -629,7 +667,6 @@ public class TextureUtil implements TextureHolder {
                                 mods.add(modId);
                             }
                         }
-                        continue;
                     }
                     String modelsDir = "assets/%1$s/models/block/%2$s.json";
                     String texturesDir = "assets/%1$s/textures/%2$s.png";
@@ -638,14 +675,14 @@ public class TextureUtil implements TextureHolder {
                     }.getType();
 
                     for (BlockType blockType : BlockTypesCache.values) {
-                        if (!blockType.getMaterial().isFullCube()) {
+                        if (!blockType.getMaterial().isFullCube() || blockType.getId().toLowerCase().contains("shulker")) {
                             continue;
                         }
                         int combined = blockType.getInternalId();
                         String id = blockType.getId();
                         String[] split = id.split(":", 2);
                         String name = split.length == 1 ? id : split[1];
-                        String nameSpace = split.length == 1 ? "minecraft" : split[0];
+                        String nameSpace = split.length == 1 ? "" : split[0];
 
                         Map<String, String> texturesMap = new ConcurrentHashMap<>();
                         // Read models
@@ -684,8 +721,11 @@ public class TextureUtil implements TextureHolder {
                                 continue;
                             }
 
+                            String[] texSplit = models.iterator().next().split(":");
+                            String texture = texSplit[texSplit.length - 1];
+
                             textureFileName =
-                                String.format(texturesDir, nameSpace, models.iterator().next());
+                                String.format(texturesDir, nameSpace, texture);
                         }
 
                         BufferedImage image = readImage(zipFile, textureFileName);

@@ -4,8 +4,13 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.IQueueChunk;
 import com.boydti.fawe.beta.IQueueExtent;
+import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
+import com.boydti.fawe.beta.implementation.lighting.RelightProcessor;
+import com.boydti.fawe.beta.implementation.lighting.Relighter;
+import com.boydti.fawe.beta.implementation.processors.HeightmapProcessor;
 import com.boydti.fawe.beta.implementation.processors.LimitExtent;
 import com.boydti.fawe.beta.implementation.queue.ParallelQueueExtent;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
 import com.boydti.fawe.object.FaweLimit;
@@ -13,7 +18,6 @@ import com.boydti.fawe.object.HistoryExtent;
 import com.boydti.fawe.object.NullChangeSet;
 import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.object.RelightMode;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.AbstractChangeSet;
 import com.boydti.fawe.object.changeset.BlockBagChangeSet;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
@@ -29,22 +33,28 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.eventbus.EventBus;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class EditSessionBuilder {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     @NotNull
     private World world;
     private Player player;
@@ -58,10 +68,11 @@ public class EditSessionBuilder {
     @NotNull
     private EventBus eventBus = WorldEdit.getInstance().getEventBus();
     private BlockBag blockBag;
-    private boolean threaded = true;
     private EditSessionEvent event;
     private String command;
     private RelightMode relightMode;
+    private Relighter relighter;
+    private Boolean wnaMode;
 
     /**
      * An EditSession builder<br>
@@ -198,6 +209,11 @@ public class EditSessionBuilder {
         return setDirty();
     }
 
+    public EditSessionBuilder forceWNA() {
+        this.wnaMode = true;
+        return setDirty();
+    }
+
     private EditSessionBuilder setDirty() {
         compiled = false;
         return this;
@@ -222,16 +238,19 @@ public class EditSessionBuilder {
                     return toReturn;
                 }
             }
-            if (Settings.IMP.EXTENT.DEBUG && event.getActor() != null) {
-                event.getActor().printDebug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
-                event.getActor().printDebug(" - For area restrictions, it is recommended to use the FaweAPI");
-                event.getActor().printDebug(" - For block logging, it is recommended to use BlocksHub");
-                event.getActor().printDebug(" - To allow this plugin add it to the FAWE `allowed-plugins` list");
-                event.getActor().printDebug(" - To hide this message set `debug` to false in the FAWE config.yml");
-                if (toReturn.getClass().getName().contains("CoreProtect")) {
-                    event.getActor().printDebug("Note on CoreProtect: ");
-                    event.getActor().printDebug(" - If you disable CP's WE logger (CP config) and this still shows, please update CP");
-                    event.getActor().printDebug(" - Use BlocksHub and set `debug` false in the FAWE config");
+            if (Settings.IMP.EXTENT.DEBUG) {
+                if (event.getActor() != null) {
+                    event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn.getClass().getName()));
+                    event.getActor().printDebug(TextComponent.of(" - For area restrictions and block logging, it is recommended to use the FaweAPI"));
+                    event.getActor().printDebug(TextComponent.of(" - To allow " + toReturn.getClass().getName() + ", add it to the FAWE `allowed-plugins` list in config.yml"));
+                    event.getActor().printDebug(TextComponent.of(" - If you are unsure which plugin tries to use the extent, you can find some additional information below:"));
+                    event.getActor().printDebug(TextComponent.of(" - " + toReturn.getClass().getClassLoader()));
+                } else {
+                    LOGGER.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
+                    LOGGER.debug(" - For area restrictions and block logging, it is recommended to use the FaweAPI");
+                    LOGGER.debug(" - To allow " + toReturn.getClass().getName() + ", add it to the FAWE `allowed-plugins` list in config.yml");
+                    LOGGER.debug(" - If you are unsure which plugin tries to use the extent, you can find some additional information below:");
+                    LOGGER.debug(" - " + toReturn.getClass().getClassLoader());
                 }
             }
         }
@@ -281,7 +300,7 @@ public class EditSessionBuilder {
         if (checkMemory) {
             if (MemUtil.isMemoryLimitedSlow()) {
                 if (Permission.hasPermission(player, "worldedit.fast")) {
-                    player.print(TranslatableComponent.of("fawe.info.worldedit.oom.admin"));
+                    player.print(Caption.of("fawe.info.worldedit.oom.admin"));
                 }
                 throw FaweCache.LOW_MEMORY;
             }
@@ -295,10 +314,11 @@ public class EditSessionBuilder {
             World unwrapped = WorldWrapper.unwrap(world);
             boolean placeChunks = this.fastmode || this.limit.FAST_PLACEMENT;
 
-            if (placeChunks) {
+            if (placeChunks && (wnaMode == null || !wnaMode)) {
+                wnaMode = false;
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
-                } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && threaded) {
+                } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
                     ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, fastmode);
                     queue = parallel.getExtent();
                     extent = parallel;
@@ -306,6 +326,7 @@ public class EditSessionBuilder {
                     extent = queue = Fawe.get().getQueueHandler().getQueue(world);
                 }
             } else {
+                wnaMode = true;
                 extent = world;
             }
             Extent root = extent;
@@ -361,7 +382,7 @@ public class EditSessionBuilder {
                 }
             }
             if (allowedRegions == null) {
-                if (player != null && !player.hasPermission("fawe.bypass") && !player.hasPermission("fawe.bypass.regions") && !(root instanceof VirtualWorld)) {
+                if (player != null && !player.hasPermission("fawe.bypass") && !player.hasPermission("fawe.bypass.regions")) {
                     allowedRegions = player.getCurrentRegions();
                 }
             }
@@ -377,8 +398,19 @@ public class EditSessionBuilder {
                     }
                 }
             } else {
+                allowedRegions = new Region[]{RegionWrapper.GLOBAL()};
 //                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
             }
+            // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks
+            if (placeChunks && ((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.IMP.LIGHTING.MODE > 0))) {
+                relighter = WorldEdit.getInstance().getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getRelighterFactory().createRelighter(relightMode, world, queue);
+                extent.addProcessor(new RelightProcessor(relighter));
+            } else {
+                relighter = NullRelighter.INSTANCE;
+            }
+            extent.addProcessor(new HeightmapProcessor(world));
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
             } else if (limit != null && !limit.isUnlimited()) {
@@ -437,4 +469,16 @@ public class EditSessionBuilder {
         return blockBag;
     }
 
+    public Relighter getRelighter() {
+        return relighter;
+    }
+
+    public boolean isWNAMode() {
+        return wnaMode;
+    }
+
+    @Nullable
+    public Region[] getAllowedRegions() {
+        return allowedRegions;
+    }
 }

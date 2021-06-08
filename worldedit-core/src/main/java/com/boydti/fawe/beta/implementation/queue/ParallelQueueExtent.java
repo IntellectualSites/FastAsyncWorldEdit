@@ -140,7 +140,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         return
             // Apply a filter over a region
             apply(region, searchMask
-                .toFilter(new CountFilter()), false) // Adapt the mask to a filter which counts
+                .toFilter(new CountFilter()), searchMask.replacesAir()) // Adapt the mask to a filter which counts
                 .getParent() // Get the counter of this mask
                 .getTotal(); // Get the total from the counter
     }

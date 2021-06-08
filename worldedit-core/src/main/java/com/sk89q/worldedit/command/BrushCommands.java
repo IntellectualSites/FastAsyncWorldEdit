@@ -85,7 +85,6 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.CreatureButcher;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.Contextual;
@@ -105,8 +104,9 @@ import com.sk89q.worldedit.regions.factory.RegionFactory;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -130,6 +130,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.FileSystems;
 import java.util.List;
 
@@ -142,6 +143,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BrushCommands {
 
     private final WorldEdit worldEdit;
+
+    private static final Component UNBIND_COMMAND_COMPONENT = TextComponent.builder("/brush unbind")
+            .clickEvent(ClickEvent.suggestCommand("/brush unbind"))
+            .build();
 
     /**
      * Create a new instance.
@@ -215,13 +220,16 @@ public class BrushCommands {
         desc = "Creates a circle, which revolves around your facing direction"
     )
     @CommandPermissions("worldedit.brush.sphere")
-    public void circleBrush(Player player, InjectedValueAccess context,
+    public void circleBrush(InjectedValueAccess context,
                             @Arg(desc = "Pattern")
                                 Pattern fill,
                             @Arg(desc = "The radius to sample for blending", def = "5")
-                                Expression radius) throws WorldEditException {
+                                Expression radius,
+                            @Arg(name = "filled", desc = "Whether the circle should be filled", def = "false")
+                                boolean filled
+                            ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        set(context, new CircleBrush(player)).setSize(radius).setFill(fill);
+        set(context, new CircleBrush(filled)).setSize(radius).setFill(fill);
     }
 
     @Command(
@@ -308,7 +316,7 @@ public class BrushCommands {
     public void sweepBrush(Player player, InjectedValueAccess context,
                            @Arg(desc = "int", def = "-1")
                                int copies) throws WorldEditException {
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.spline"));
+        player.print(Caption.of("fawe.worldedit.brush.brush.spline"));
         set(context, new SweepBrush(copies));
     }
 
@@ -337,7 +345,6 @@ public class BrushCommands {
                               @Switch(name = 'd', desc = "sags the catenary toward the facing direction")
                                   boolean facingDirection) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        Brush brush = new CatenaryBrush(shell, select, facingDirection, lengthFactor);
         set(context, new CatenaryBrush(shell, select, facingDirection, lengthFactor))
             .setSize(radius).setFill(fill);
     }
@@ -422,7 +429,7 @@ public class BrushCommands {
                     case BlockID.SAND:
                     case BlockID.GRAVEL:
                         player.print(
-                            TranslatableComponent.of("fawe.worldedit.brush.brush.try.other"));
+                                Caption.of("fawe.worldedit.brush.brush.try.other"));
                         falling = true;
                         break;
                     default:
@@ -498,22 +505,23 @@ public class BrushCommands {
         set(context, brush).setSize(radius).setFill(fill);
     }
 
-    @Command(
-        name = "image",
+    @Command(name = "image",
         desc = "Use a height map to paint a surface",
-        descFooter = "Use a height map to paint any surface.\n"
-    )
-    @CommandPermissions("worldedit.brush.stencil")
-    public void imageBrush(LocalSession session, InjectedValueAccess context,
-                           @Arg(desc = "The size of the brush", def = "5")
-                               Expression radius, ProvideBindings.ImageUri imageUri,
-                           @Arg(def = "1", desc = "scale height")
-                               double yscale,
-                           @Switch(name = 'a', desc = "Use image Alpha")
-                               boolean alpha,
-                           @Switch(name = 'f', desc = "Blend the image with existing terrain")
-                               boolean fadeOut) throws WorldEditException, IOException {
-        BufferedImage image = imageUri.load();
+        descFooter = "Use a height map to paint any surface.\n")
+    @CommandPermissions("worldedit.brush.image")
+    public void imageBrush(LocalSession session,
+                           InjectedValueAccess context,
+                           @Arg(desc = "Image URL (imgur only)") String imageURL,
+                           @Arg(desc = "The size of the brush", def = "5") Expression radius,
+                           @Arg(def = "1", desc = "scale height") double yscale,
+                           @Switch(name = 'a', desc = "Use image Alpha") boolean alpha,
+                           @Switch(name = 'f', desc = "Blend the image with existing terrain") boolean fadeOut)
+        throws WorldEditException, IOException {
+        URL url = new URL(imageURL);
+        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
+            throw new IOException("Only i.imgur.com links are allowed!");
+        }
+        BufferedImage image = MainUtil.readImage(url);
         worldEdit.checkMaxBrushRadius(radius);
         if (yscale != 1) {
             ImageUtil.scaleAlpha(image, yscale);
@@ -921,7 +929,7 @@ public class BrushCommands {
     }
 
     private InputStream getHeightmapStream(String filename) throws FileNotFoundException {
-        if (filename == null) {
+        if (filename == null || "none".equalsIgnoreCase(filename)) {
             return null;
         }
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
@@ -1033,6 +1041,7 @@ public class BrushCommands {
 
             player.print(
                 Caption.of("fawe.worldedit.brush.brush.equipped", arguments.get().split(" ")[1]));
+            ToolCommands.sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
         }
         return settings;
     }
@@ -1103,7 +1112,7 @@ public class BrushCommands {
             }
             player.print(Caption.of("fawe.worldedit.schematic.schematic.saved", name));
         } else {
-            player.printError(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
         }
     }
 
@@ -1137,7 +1146,7 @@ public class BrushCommands {
                 player.print(Caption.of("fawe.worldedit.brush.brush.equipped", name));
             } catch (Throwable e) {
                 e.printStackTrace();
-                player.printError(TranslatableComponent.of("fawe.error.brush.incompatible"));
+                player.print(Caption.of("fawe.error.brush.incompatible"));
             }
         } */
 
@@ -1265,6 +1274,7 @@ public class BrushCommands {
         tool.setFill(null);
         tool.setBrush(new OperationFactoryBrush(factory, shape, session), permission);
 
-        player.printInfo(TranslatableComponent.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
+        player.print(Caption.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
+        ToolCommands.sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
 }

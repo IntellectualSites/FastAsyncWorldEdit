@@ -19,16 +19,21 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
+import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.io.ResourceLoader;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -39,7 +44,7 @@ import javax.annotation.Nullable;
  * <p>It is strongly recommended that implementations extend from
  * {@link AbstractPlatform}.</p>
  */
-public interface Platform {
+public interface Platform extends Keyed {
 
     /**
      * Return the resource loader.
@@ -133,14 +138,28 @@ public interface Platform {
     /**
      * Register the commands contained within the given command manager.
      *
+     * <p>
+     *     This method should be ignored if the platform offers a command registration event.
+     * </p>
+     *
      * @param commandManager the command manager
      */
     void registerCommands(CommandManager commandManager);
 
     /**
      * Register game hooks.
+     *
+     * @deprecated Call {@link #setGameHooksEnabled(boolean)} with {@code true} instead
      */
-    void registerGameHooks();
+    @Deprecated
+    default void registerGameHooks() {
+        setGameHooksEnabled(true);
+    }
+
+    /**
+     * Set if the game hooks are enabled for this platform.
+     */
+    void setGameHooksEnabled(boolean enabled);
 
     /**
      * Get the configuration from this platform.
@@ -177,6 +196,18 @@ public interface Platform {
     String getPlatformVersion();
 
     /**
+     * {@inheritDoc}
+     * @return an id
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
+     */
+    @NonAbstractForCompatibility(delegateName = "getPlatformName", delegateParams = {})
+    @Override
+    default String getId() {
+        return "legacy:" + getPlatformName().toLowerCase(Locale.ROOT).replaceAll("[^a-z_.-]", "_");
+    }
+
+    /**
      * Get a map of advertised capabilities of this platform, where each key
      * in the given map is a supported capability and the respective value
      * indicates the preference for this platform for that given capability.
@@ -191,4 +222,13 @@ public interface Platform {
      * @return A set of supported side effects
      */
     Set<SideEffect> getSupportedSideEffects();
+
+    /**
+     * Get the {@link RelighterFactory} that can be used to obtain
+     * {@link com.boydti.fawe.beta.implementation.lighting.Relighter}s.
+     *
+     * @return the relighter factory to be used.
+     */
+    @NotNull
+    RelighterFactory getRelighterFactory();
 }

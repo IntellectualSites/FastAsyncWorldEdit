@@ -23,7 +23,6 @@ import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.brush.BrushSettings;
 import com.boydti.fawe.object.brush.TargetMode;
 import com.boydti.fawe.object.brush.scroll.Scroll;
-import com.boydti.fawe.object.brush.visualization.VisualMode;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.StringMan;
 import com.google.common.collect.Iterables;
@@ -43,7 +42,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.util.HandSide;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -77,11 +75,11 @@ public class ToolUtilCommands {
                          Mask maskOpt, Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         if (maskOpt == null) {
-            player.printInfo(TranslatableComponent.of("worldedit.tool.mask.disabled"));
+            player.print(Caption.of("worldedit.tool.mask.disabled"));
             tool.setMask(null);
         } else {
             BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
@@ -90,7 +88,7 @@ public class ToolUtilCommands {
             settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
             settings.setMask(maskOpt);
             tool.update();
-            player.printInfo(TranslatableComponent.of("worldedit.tool.mask.set"));
+            player.print(Caption.of("worldedit.tool.mask.set"));
         }
     }
 
@@ -107,7 +105,7 @@ public class ToolUtilCommands {
                              boolean offHand, Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.printInfo(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         if (pattern == null) {
@@ -119,7 +117,7 @@ public class ToolUtilCommands {
             settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
             tool.update();
         }
-        player.printInfo(TranslatableComponent.of("worldedit.tool.material.set"));
+        player.print(Caption.of("worldedit.tool.material.set"));
     }
 
     @Command(
@@ -132,7 +130,7 @@ public class ToolUtilCommands {
                       @Arg(desc = "The range of the brush")
                           int range) throws WorldEditException {
         session.getBrushTool(player, false).setRange(range);
-        player.printInfo(TranslatableComponent.of("worldedit.tool.range.set"));
+        player.print(Caption.of("worldedit.tool.range.set"));
     }
 
     @Command(
@@ -146,7 +144,7 @@ public class ToolUtilCommands {
         we.checkMaxBrushRadius(size);
 
         session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(size);
-        player.printInfo(TranslatableComponent.of("worldedit.tool.size.set"));
+        player.print(Caption.of("worldedit.tool.size.set"));
     }
 
     @Command(
@@ -160,9 +158,9 @@ public class ToolUtilCommands {
                              Mask maskOpt) throws WorldEditException {
         session.getBrushTool(player, false).setTraceMask(maskOpt);
         if (maskOpt == null) {
-            player.printInfo(TranslatableComponent.of("worldedit.tool.tracemask.disabled"));
+            player.print(Caption.of("worldedit.tool.tracemask.disabled"));
         } else {
-            player.printInfo(TranslatableComponent.of("worldedit.tool.tracemask.set"));
+            player.print(Caption.of("worldedit.tool.tracemask.set"));
         }
     }
 
@@ -177,15 +175,15 @@ public class ToolUtilCommands {
                                   Boolean superPickaxe) {
         boolean hasSuperPickAxe = session.hasSuperPickAxe();
         if (superPickaxe != null && superPickaxe == hasSuperPickAxe) {
-            player.printError(TranslatableComponent.of(superPickaxe ? "worldedit.tool.superpickaxe.enabled.already" : "worldedit.tool.superpickaxe.disabled.already"));
+            player.print(Caption.of(superPickaxe ? "worldedit.tool.superpickaxe.enabled.already" : "worldedit.tool.superpickaxe.disabled.already"));
             return;
         }
         if (hasSuperPickAxe) {
             session.disableSuperPickAxe();
-            player.printInfo(TranslatableComponent.of("worldedit.tool.superpickaxe.disabled"));
+            player.print(Caption.of("worldedit.tool.superpickaxe.disabled"));
         } else {
             session.enableSuperPickAxe();
-            player.printInfo(TranslatableComponent.of("worldedit.tool.superpickaxe.enabled"));
+            player.print(Caption.of("worldedit.tool.superpickaxe.enabled"));
         }
     }
 
@@ -233,31 +231,6 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "visualize",
-        aliases = {"visual", "vis", "/visualize", "/visual", "/vis"},
-        desc = "Toggle between different visualization modes",
-        descFooter = "Toggle between different visualization modes\n"
-            + "0 = No visualization\n"
-            + "1 = Single block at target position\n"
-            + "2 = Glass showing what blocks will be changed"
-    )
-    @CommandPermissions("worldedit.brush.visualize")
-    public void visual(Player player, LocalSession session,
-                       @Arg(name = "mode", desc = "int", def = "0")
-                       @Range(from = 0, to = 2)
-                           int mode) throws WorldEditException {
-        BrushTool tool = session.getBrushTool(player, false);
-        if (tool == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
-            return;
-        }
-        VisualMode[] modes = VisualMode.values();
-        VisualMode newMode = modes[MathMan.wrap(mode, 0, modes.length - 1)];
-        tool.setVisualMode(player, newMode);
-        player.print(Caption.of("fawe.worldedit.brush.brush.visual.mode.set", newMode));
-    }
-
-    @Command(
         name = "target",
         aliases = {"tar", "/target", "/tar"},
         desc = "Toggle between different target modes"
@@ -268,7 +241,7 @@ public class ToolUtilCommands {
                            int mode) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         TargetMode[] modes = TargetMode.values();
@@ -284,10 +257,10 @@ public class ToolUtilCommands {
     )
     @CommandPermissions("worldedit.brush.targetoffset")
     public void targetOffset(Player player, EditSession editSession, LocalSession session,
-                             int offset) throws WorldEditException {
+                             @Arg(name = "offset", desc = "offset", def = "0") int offset) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         tool.setTargetOffset(offset);
@@ -308,7 +281,7 @@ public class ToolUtilCommands {
                            List<String> commandStr) throws WorldEditException {
         BrushTool bt = session.getBrushTool(player, false);
         if (bt == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
             return;
         }
 
@@ -316,7 +289,7 @@ public class ToolUtilCommands {
         Scroll action = Scroll.fromArguments(bt, player, session, mode, commandStr, true);
         settings.setScrollAction(action);
         if (mode == Scroll.Action.NONE) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.scroll.action.unset"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.scroll.action.unset"));
         } else if (action != null) {
             String full = (mode.name().toLowerCase(Locale.ROOT) + " " + StringMan.join(commandStr, " ")).trim();
             settings.addSetting(BrushSettings.SettingType.SCROLL_ACTION, full);
@@ -342,11 +315,11 @@ public class ToolUtilCommands {
                       Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
             return;
         }
         if (maskArg == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.source.mask.disabled"));
+            player.print(Caption.of("fawe.worldedit.brush.brush.source.mask.disabled"));
             tool.setSourceMask(null);
             return;
         }
@@ -355,7 +328,7 @@ public class ToolUtilCommands {
         settings.addSetting(BrushSettings.SettingType.SOURCE_MASK, lastArg);
         settings.setSourceMask(maskArg);
         tool.update();
-        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.source.mask"));
+        player.print(Caption.of("fawe.worldedit.brush.brush.source.mask"));
     }
 
     // TODO: Ping @MattBDev to reimplement 2020-02-04

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.operation;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.extent.BlockTranslateExtent;
 import com.boydti.fawe.object.extent.PositionTransformExtent;
 import com.boydti.fawe.object.function.block.BiomeCopy;
@@ -49,13 +50,9 @@ import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -425,12 +422,12 @@ public class ForwardExtentCopy implements Operation {
     @Override
     public Iterable<Component> getStatusMessages() {
         return ImmutableList.of(
-                TranslatableComponent.of("worldedit.operation.affected.block",
-                        TextComponent.of(affectedBlocks)).color(TextColor.LIGHT_PURPLE),
-                TranslatableComponent.of("worldedit.operation.affected.biome",
-                        TextComponent.of(affectedBiomeCols)).color(TextColor.LIGHT_PURPLE),
-                TranslatableComponent.of("worldedit.operation.affected.entity",
-                        TextComponent.of(affectedEntities)).color(TextColor.LIGHT_PURPLE)
+                Caption.of("worldedit.operation.affected.block",
+                        TextComponent.of(affectedBlocks)),
+                Caption.of("worldedit.operation.affected.biome",
+                        TextComponent.of(affectedBiomeCols)),
+                Caption.of("worldedit.operation.affected.entity",
+                        TextComponent.of(affectedEntities))
         );
     }
 

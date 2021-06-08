@@ -55,6 +55,9 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -66,13 +69,14 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
+import com.sk89q.worldedit.regions.NullRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.annotation.Command;
@@ -86,7 +90,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.List;
@@ -96,7 +99,6 @@ import java.util.zip.ZipOutputStream;
 
 import static com.sk89q.worldedit.command.util.Logging.LogMode.PLACEMENT;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
-
 
 /**
  * Clipboard commands.
@@ -140,14 +142,24 @@ public class ClipboardCommands {
         copy.setCopyingBiomes(copyBiomes);
 
         Mask sourceMask = editSession.getSourceMask();
+        Region[] regions = editSession.getAllowedRegions();
+        Region allowedRegion;
+        if (regions == null || regions.length == 0) {
+            allowedRegion = new NullRegion();
+        } else {
+            allowedRegion = new RegionIntersection(regions);
+        }
+        final Mask firstSourceMask = mask != null ? mask : sourceMask;
+        final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
+        if (finalMask != Masks.alwaysTrue()) {
+            copy.setSourceMask(finalMask);
+        }
         if (sourceMask != null) {
+            editSession.setSourceMask(null);
             new MaskTraverser(sourceMask).reset(editSession);
-            copy.setSourceMask(sourceMask);
             editSession.setSourceMask(null);
         }
-        if (mask != null) {
-            copy.setSourceMask(mask);
-        }
+
         Operations.completeLegacy(copy);
         saveDiskClipboard(clipboard);
         session.setClipboard(new ClipboardHolder(clipboard));
@@ -170,7 +182,7 @@ public class ClipboardCommands {
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min.getZ() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.max.checks"));
+            throw new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.checks"));
         }
         session.setClipboard(null);
         ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
@@ -209,7 +221,7 @@ public class ClipboardCommands {
         ReadOnlyClipboard lazyClipboard = new WorldCutClipboard(editSession, region, !skipEntities, copyBiomes);
         clipboard.setOrigin(session.getPlacementPosition(actor));
         session.setClipboard(new ClipboardHolder(lazyClipboard));
-        actor.print(TranslatableComponent.of("fawe.worldedit.cut.command.cut.lazy", region.getArea()));
+        actor.print(Caption.of("fawe.worldedit.cut.command.cut.lazy", region.getArea()));
     }*/
 
     @Command(
@@ -252,20 +264,29 @@ public class ClipboardCommands {
         copy.setRemovingEntities(true);
         copy.setCopyingBiomes(copyBiomes);
         Mask sourceMask = editSession.getSourceMask();
-        if (sourceMask != null) {
-            new MaskTraverser(sourceMask).reset(editSession);
-            copy.setSourceMask(sourceMask);
-            editSession.setSourceMask(null);
+        Region[] regions = editSession.getAllowedRegions();
+        Region allowedRegion;
+        if (regions == null || regions.length == 0) {
+            allowedRegion = new NullRegion();
+        } else {
+            allowedRegion = new RegionIntersection(regions);
         }
-        if (mask != null) {
-            copy.setSourceMask(mask);
+        final Mask firstSourceMask = mask != null ? mask : sourceMask;
+        final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
+        if (finalMask != Masks.alwaysTrue()) {
+            copy.setSourceMask(finalMask);
+        }
+        if (sourceMask != null) {
+            editSession.setSourceMask(null);
+            new MaskTraverser(sourceMask).reset(editSession);
+            editSession.setSourceMask(null);
         }
         Operations.completeLegacy(copy);
         saveDiskClipboard(clipboard);
         session.setClipboard(new ClipboardHolder(clipboard));
 
         if (!actor.hasPermission("fawe.tips")) {
-            actor.print(TranslatableComponent.of("fawe.tips.tip.lazycut"));
+            actor.print(Caption.of("fawe.tips.tip.lazycut"));
         }
         copy.getStatusMessages().forEach(actor::print);
     }
@@ -277,7 +298,7 @@ public class ClipboardCommands {
     )
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.download"})
-    public void download(final Player player, final LocalSession session, @Arg(name = "format", desc = "String", def = "schem") final String formatName) throws WorldEditException {
+    public void download(final Player player, final LocalSession session, @Arg(name = "format", desc = "String", def = "fast") final String formatName) throws WorldEditException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
             player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format", formatName));
@@ -360,16 +381,9 @@ public class ClipboardCommands {
             }
         }
         if (url == null) {
-            player.printError(TranslatableComponent.of("fawe.web.generating.link.failed"));
+            player.print(Caption.of("fawe.web.generating.link.failed"));
         } else {
             String urlText = url.toString();
-            if (Settings.IMP.WEB.SHORTEN_URLS) {
-                try {
-                    urlText = MainUtil.getText("https://athion.net/s/?" + URLEncoder.encode(url.toString(), "UTF-8"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
             player.print(Caption.of("fawe.web.download.link", urlText).clickEvent(ClickEvent.openUrl(urlText)));
         }
     }
@@ -435,9 +449,9 @@ public class ClipboardCommands {
         }
 
         if (onlySelect) {
-            actor.printInfo(TranslatableComponent.of("worldedit.paste.selected"));
+            actor.print(Caption.of("worldedit.paste.selected"));
         } else {
-            actor.printInfo(TranslatableComponent.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
+            actor.print(Caption.of("worldedit.paste.pasted", TextComponent.of(to.toString())));
         }
         messages.forEach(actor::print);
     }
@@ -450,7 +464,7 @@ public class ClipboardCommands {
         PasteEvent event = new PasteEvent(player, clipboard, uri, editSession, to);
         WorldEdit.getInstance().getEventBus().post(event);
         if (event.isCancelled()) {
-            throw new FaweException(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason.manual"));
+            throw new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.manual"));
         }
     }
 
@@ -492,7 +506,7 @@ public class ClipboardCommands {
         actor.print(Caption.of("fawe.worldedit.paste.command.paste", to));
 
         if (!actor.hasPermission("fawe.tips")) {
-            actor.print(TranslatableComponent.of("fawe.tips.tip.copypaste"));
+            actor.print(Caption.of("fawe.tips.tip.copypaste"));
         }
     }
 
@@ -516,8 +530,8 @@ public class ClipboardCommands {
         transform = transform.rotateY(-rotateY);
         transform = transform.rotateX(-rotateX);
         transform = transform.rotateZ(-rotateZ);
-        holder.setTransform(holder.getTransform().combine(transform));
-        actor.printInfo(TranslatableComponent.of("worldedit.rotate.rotated"));
+        holder.setTransform(transform.combine(holder.getTransform()));
+        actor.print(Caption.of("worldedit.rotate.rotated"));
     }
 
     @Command(
@@ -531,8 +545,8 @@ public class ClipboardCommands {
         ClipboardHolder holder = session.getClipboard();
         AffineTransform transform = new AffineTransform();
         transform = transform.scale(direction.abs().multiply(-2).add(1, 1, 1).toVector3());
-        holder.setTransform(holder.getTransform().combine(transform));
-        actor.printInfo(TranslatableComponent.of("worldedit.flip.flipped"));
+        holder.setTransform(transform.combine(holder.getTransform()));
+        actor.print(Caption.of("worldedit.flip.flipped"));
     }
 
     @Command(
@@ -543,7 +557,7 @@ public class ClipboardCommands {
     @CommandPermissions("worldedit.clipboard.clear")
     public void clearClipboard(Actor actor, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
-        actor.printInfo(TranslatableComponent.of("worldedit.clearclipboard.cleared"));
+        actor.print(Caption.of("worldedit.clearclipboard.cleared"));
     }
     
     private void saveDiskClipboard(Clipboard clipboard) {

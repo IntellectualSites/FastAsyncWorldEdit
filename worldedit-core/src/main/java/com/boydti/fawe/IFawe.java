@@ -23,8 +23,6 @@ public interface IFawe {
         return null;
     }
 
-    public default void registerPacketListener() {}
-
     String getPlatform();
 
     UUID getUUID(String name);
@@ -42,5 +40,7 @@ public interface IFawe {
     default boolean isChunksStretched() {
         return true;
     }
+
+    FAWEPlatformAdapterImpl getPlatformAdapter();
 
 }

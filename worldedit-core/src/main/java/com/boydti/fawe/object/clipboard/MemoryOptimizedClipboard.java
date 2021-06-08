@@ -37,9 +37,9 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     private static final int BLOCK_MASK = 1048575;
     private static final int BLOCK_SHIFT = 20;
 
-    private byte[][] states;
+    private final byte[][] states;
 
-    private byte[] buffer = new byte[MainUtil.getMaxCompressedLength(BLOCK_SIZE)];
+    private final byte[] buffer = new byte[MainUtil.getMaxCompressedLength(BLOCK_SIZE)];
     private byte[] biomes = null;
 
     private final HashMap<IntTriple, CompoundTag> nbtMap;
@@ -77,14 +77,14 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        setBiome(getIndex(x, 0, z), biome);
+        setBiome(getBiomeIndex(x, y, z), biome);
         return true;
     }
 
     @Override
     public void setBiome(int index, BiomeType biome) {
         if (biomes == null) {
-            biomes = new byte[getArea()];
+            biomes = new byte[((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)];
         }
         biomes[index] = (byte) biome.getInternalId();
     }
@@ -95,10 +95,11 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
             return;
         }
         try {
-            int index = 0;
-            for (int z = 0; z < getLength(); z++) {
-                for (int x = 0; x < getWidth(); x++, index++) {
-                    task.applyInt(index, biomes[index] & 0xFF);
+            for (int y = 0; y < getHeight(); y ++) {
+                for (int z = 0; z < getLength(); z++) {
+                    for (int x = 0; x < getWidth(); x++) {
+                        task.applyInt(getIndex(x, y, z), biomes[getBiomeIndex(x, y, z)] & 0xFF);
+                    }
                 }
             }
         } catch (IOException e) {
@@ -117,15 +118,15 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        return getBiome(getIndex(x, 0, z));
+        return getBiome(getBiomeIndex(x, y, z));
     }
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        return getBiome(getIndex(position.getX(), 0, position.getZ()));
+        return getBiome(getBiomeIndex(position.getX(), position.getY(), position.getZ()));
     }
 
-    public int getOrdinal(int index) {
+    private int getOrdinal(int index) {
         int i = index >> BLOCK_SHIFT;
         int li = (index & BLOCK_MASK) << 1;
         if (i != lastOrdinalsI) {
@@ -155,7 +156,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     private int lastIMin;
     private int lastIMax;
 
-    public int getLocalIndex(int index) {
+    private int getLocalIndex(int index) {
         if (index < lastIMin || index > lastIMax) {
             lastI = index >> BLOCK_SHIFT;
             lastIMin = lastI << BLOCK_SHIFT;
@@ -164,7 +165,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         return lastI;
     }
 
-    public void setOrdinal(int index, int v) {
+    private void setOrdinal(int index, int v) {
         int i = getLocalIndex(index);
         if (i != lastOrdinalsI) {
             saveOrdinals();
@@ -195,6 +196,10 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     public int getIndex(int x, int y, int z) {
         return x + y * getArea() + z * getWidth();
+    }
+
+    public int getBiomeIndex(int x, int y, int z) {
+        return (x >> 2) + (y >> 2) * (getWidth() >> 2) * (getLength() >> 2) + (z >> 2) * (getWidth() >> 2);
     }
 
     @Override
@@ -257,11 +262,11 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMap.put(new IntTriple(x, y, z), tag);
-        Map<String, Tag> values = tag.getValue();
+        final Map<String, Tag> values = new HashMap<>(tag.getValue());
         values.put("x", new IntTag(x));
         values.put("y", new IntTag(y));
         values.put("z", new IntTag(z));
+        nbtMap.put(new IntTriple(x, y, z), new CompoundTag(values));
         return true;
     }
 

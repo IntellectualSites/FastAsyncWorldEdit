@@ -34,7 +34,9 @@ import com.google.common.io.Files;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +58,6 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -194,7 +195,7 @@ public class ClipboardFormats {
             player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
             return null;
         }
-        File working = worldEdit.getWorkingDirectoryFile(config.saveDir);
+        File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
         File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
             ? new File(working, player.getUniqueId().toString()) : working;
         File f;
@@ -208,7 +209,7 @@ public class ClipboardFormats {
             f = player.openFileOpenDialog(extensions);
             if (f == null || !f.exists()) {
                 if (message) {
-                    player.printError("Schematic " + input + " does not exist! (" + f + ")");
+                    player.print(Caption.of("worldedit.schematic.load.does-not-exist", TextComponent.of(input)));
                 }
                 return null;
             }
@@ -229,7 +230,7 @@ public class ClipboardFormats {
         }
         if (f == null || !f.exists()) {
             if (!input.contains("../")) {
-                dir = worldEdit.getWorkingDirectoryFile(config.saveDir);
+                dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
                 f = MainUtil.resolve(dir, input, format, true);
             }
         }

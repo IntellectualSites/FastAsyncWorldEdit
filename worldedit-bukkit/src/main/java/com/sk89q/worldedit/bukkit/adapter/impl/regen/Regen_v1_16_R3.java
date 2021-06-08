@@ -3,7 +3,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.regen;
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkCache;
 import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.bukkit.adapter.mc1_16_4.BukkitGetBlocks_1_16_4;
+import com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitGetBlocks_1_16_5;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -70,6 +70,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -303,6 +304,12 @@ public class Regen_v1_16_R3 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             public boolean generateFlatBedrock() {
                 return generateFlatBedrock;
             }
+
+            // no one will ever see the entities!
+            @Override
+            public List<NBTTagCompound> y() {
+                return Collections.emptyList();
+            }
         };
     }
 
@@ -328,7 +335,7 @@ public class Regen_v1_16_R3 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
     @Override
     protected IChunkCache<IChunkGet> initSourceQueueCache() {
-        return (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_4(freshNMSWorld, chunkX, chunkZ) {
+        return (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_5(freshNMSWorld, chunkX, chunkZ) {
             @Override
             public Chunk ensureLoaded(World nmsWorld, int x, int z) {
                 return getChunkAt(x, z);

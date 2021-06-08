@@ -21,15 +21,14 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "java")
     apply(plugin = "eclipse")
     apply(plugin = "idea")
-    apply(plugin = "maven")
+    apply(plugin = "maven-publish")
 //    apply(plugin = "checkstyle")
     apply(plugin = "com.github.johnrengelman.shadow")
 
-    ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
-
-    configure<JavaPluginConvention> {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    if (project.hasProperty("buildnumber")) {
+        ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
+    } else {
+        ext["internalVersion"] = "$version"
     }
 
     tasks
@@ -42,6 +41,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
             //options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
             options.isDeprecation = false
             options.encoding = "UTF-8"
+            options.compilerArgs.add("-parameters")
         }
 
 //    configure<CheckstyleExtension> {
@@ -59,7 +59,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
         "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
         "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
-        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
+        "testImplementation"("net.bytebuddy:byte-buddy:1.11.0")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
     }
 
     // Java 8 turns on doclint which we fail
@@ -112,13 +113,12 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
 fun Project.applyShadowConfiguration() {
     tasks.named<ShadowJar>("shadowJar") {
-//        archiveClassifier.set("dist")
         dependencies {
             include(project(":worldedit-libs:core"))
             include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
             include(project(":worldedit-core"))
+            exclude("com.google.code.findbugs:jsr305")
         }
-        archiveFileName.set("FastAsyncWorldEdit-${project.version}.jar")
         exclude("GradleStart**")
         exclude(".cache")
         exclude("LICENSE*")
@@ -129,5 +129,31 @@ fun Project.applyShadowConfiguration() {
 
 val CLASSPATH = listOf("truezip", "truevfs", "js")
     .map { "$it.jar" }
-    .flatMap { listOf(it, "WorldEdit/$it") }
+    .flatMap { listOf(it, "FastAsyncWorldEdit/$it") }
     .joinToString(separator = " ")
+
+sealed class WorldEditKind(
+        val name: String,
+        val mainClass: String = "com.sk89q.worldedit.internal.util.InfoEntryPoint"
+) {
+    class Standalone(mainClass: String) : WorldEditKind("STANDALONE", mainClass)
+    object Mod : WorldEditKind("MOD")
+    object Plugin : WorldEditKind("PLUGIN")
+}
+
+fun Project.addJarManifest(kind: WorldEditKind, includeClasspath: Boolean = false) {
+    tasks.named<Jar>("jar") {
+        val version = project(":worldedit-core").version
+        inputs.property("version", version)
+        val attributes = mutableMapOf(
+                "Implementation-Version" to version,
+                "WorldEdit-Version" to version,
+                "WorldEdit-Kind" to kind.name,
+                "Main-Class" to kind.mainClass
+        )
+        if (includeClasspath) {
+            attributes["Class-Path"] = CLASSPATH
+        }
+        manifest.attributes(attributes)
+    }
+}

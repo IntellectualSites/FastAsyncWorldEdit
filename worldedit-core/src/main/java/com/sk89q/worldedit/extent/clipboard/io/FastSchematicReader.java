@@ -34,27 +34,30 @@ import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -68,11 +71,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FastSchematicReader extends NBTSchematicReader {
 
-    private static final Logger log = LoggerFactory.getLogger(FastSchematicReader.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final NBTInputStream inputStream;
-    private DataFixer fixer = null;
+    private DataFixer fixer;
     private int dataVersion = -1;
     private int version = -1;
+    private int faweWritten = -1;
 
     private FastByteArrayOutputStream blocksOut;
     private FaweOutputStream blocks;
@@ -92,6 +96,8 @@ public class FastSchematicReader extends NBTSchematicReader {
     private char[] palette;
     private char[] biomePalette;
     private BlockVector3 min = BlockVector3.ZERO;
+    private boolean brokenEntities = false;
+    private boolean isWorldEdit = false;
 
 
     /**
@@ -103,6 +109,10 @@ public class FastSchematicReader extends NBTSchematicReader {
         checkNotNull(inputStream);
         this.inputStream = inputStream;
         this.fixer = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataFixer();
+    }
+
+    public void setBrokenEntities(boolean brokenEntities) {
+        this.brokenEntities = brokenEntities;
     }
 
     private String fix(String palettePart) {
@@ -133,7 +143,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         return fixer.fixUp(DataFixer.FixTypes.BIOME, biomePalettePart, dataVersion);
     }
 
-    public StreamDelegate createDelegate() {
+    public StreamDelegate createVersionDelegate() {
         StreamDelegate root = new StreamDelegate();
         StreamDelegate schematic = root.add("Schematic");
         schematic.add("DataVersion").withInt((i, v) -> dataVersion = v);
@@ -143,6 +153,12 @@ public class FastSchematicReader extends NBTSchematicReader {
                 dataVersion = Constants.DATA_VERSION_MC_1_13_2;
             }
         });
+        return root;
+    }
+
+    public StreamDelegate createDelegate() {
+        StreamDelegate root = new StreamDelegate();
+        StreamDelegate schematic = root.add("Schematic");
         schematic.add("Width").withInt((i, v) -> width = v);
         schematic.add("Height").withInt((i, v) -> height = v);
         schematic.add("Length").withInt((i, v) -> length = v);
@@ -152,17 +168,23 @@ public class FastSchematicReader extends NBTSchematicReader {
         metadata.add("WEOffsetX").withInt((i, v) -> offsetX = v);
         metadata.add("WEOffsetY").withInt((i, v) -> offsetY = v);
         metadata.add("WEOffsetZ").withInt((i, v) -> offsetZ = v);
+        metadata.add("FAWEVersion").withInt((i, v) -> faweWritten = v);
+
+        StreamDelegate worldEditSection = metadata.add("WorldEdit");
+        worldEditSection.withValue((ValueReader<String>) (index, v) -> isWorldEdit = true);
+
 
         StreamDelegate paletteDelegate = schematic.add("Palette");
         paletteDelegate.withValue((ValueReader<Map<String, Object>>) (ignore, v) -> {
             palette = new char[v.size()];
             for (Entry<String, Object> entry : v.entrySet()) {
-                BlockState state = null;
+                BlockState state;
+                String palettePart = fix(entry.getKey());
                 try {
-                    String palettePart = fix(entry.getKey());
                     state = BlockState.get(palettePart);
-                } catch (InputParseException e) {
-                    e.printStackTrace();
+                } catch (InputParseException ignored) {
+                    LOGGER.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
+                    state = BlockTypes.AIR.getDefaultState();
                 }
                 int index = (int) entry.getValue();
                 palette[index] = (char) state.getOrdinal();
@@ -224,10 +246,14 @@ public class FastSchematicReader extends NBTSchematicReader {
     @Override
     public Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
         StreamDelegate root = createDelegate();
+        StreamDelegate versions = createVersionDelegate();
+        inputStream.mark(Integer.MAX_VALUE);
+        inputStream.readNamedTagLazy(versions);
+        inputStream.reset();
         inputStream.readNamedTagLazy(root);
 
         if (version != 1 && version != 2) {
-            throw new IOException("This schematic version is currently not supported");
+            throw new IOException("This schematic version is not supported; Version: " + version + ", DataVersion: " + dataVersion + ". It's very likely your schematic has an invalid file extension, if the schematic has been created on a version lower than 1.13.2, the extension MUST be `.schematic`, elsewise the schematic can't be read properly.");
         }
 
         if (blocks != null) {
@@ -240,9 +266,11 @@ public class FastSchematicReader extends NBTSchematicReader {
         biomes = null;
 
         BlockVector3 dimensions = BlockVector3.at(width, height, length);
-        BlockVector3 origin = BlockVector3.ZERO;
+        BlockVector3 origin;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
             origin = BlockVector3.at(-offsetX, -offsetY, -offsetZ);
+        } else {
+            origin = BlockVector3.ZERO;
         }
 
         Clipboard clipboard = createOutput.apply(dimensions);
@@ -288,18 +316,11 @@ public class FastSchematicReader extends NBTSchematicReader {
         }
         if (biomesOut != null && biomesOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
-                if (clipboard instanceof LinearClipboard) {
-                    LinearClipboard linear = (LinearClipboard) clipboard;
-                    int volume = width * length;
-                    for (int index = 0; index < volume; index++) {
+                for (int z = 0; z < length; z++) {
+                    for (int x = 0; x < width; x++) {
                         BiomeType biome = getBiomeType(fis);
-                        linear.setBiome(index, biome);
-                    }
-                } else {
-                    for (int z = 0; z < length; z++) {
-                        for (int x = 0; x < width; x++) {
-                            BiomeType biome = getBiomeType(fis);
-                            clipboard.setBiome(x, 0, z, biome);
+                        for (int y = 0; y < height; y ++) {
+                            clipboard.setBiome(x, y, z, biome);
                         }
                     }
                 }
@@ -326,7 +347,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                     y = pos[1];
                     z = pos[2];
                 }
-                Map<String, Tag> values = tile.getValue();
+                Map<String, Tag> values = new HashMap<>(tile.getValue());
                 Tag id = values.get("Id");
                 if (id != null) {
                     values.put("x", new IntTag(x));
@@ -337,22 +358,19 @@ public class FastSchematicReader extends NBTSchematicReader {
                 values.remove("Id");
                 values.remove("Pos");
 
-                tile = fixBlockEntity(tile);
-                clipboard.setTile(x, y, z, tile);
+                clipboard.setTile(x, y, z, fixBlockEntity(new CompoundTag(values)));
             }
         }
 
         // entities
         if (entities != null && !entities.isEmpty()) {
             for (Map<String, Object> entRaw : entities) {
-                CompoundTag ent = FaweCache.IMP.asTag(entRaw);
-
-                Map<String, Tag> value = ent.getValue();
+                Map<String, Tag> value = new HashMap<>(FaweCache.IMP.asTag(entRaw).getValue());
                 StringTag id = (StringTag) value.get("Id");
                 if (id == null) {
                     id = (StringTag) value.get("id");
                     if (id == null) {
-                        return null;
+                        continue;
                     }
                 }
                 value.put("id", id);
@@ -360,19 +378,38 @@ public class FastSchematicReader extends NBTSchematicReader {
 
                 EntityType type = EntityTypes.parse(id.getValue());
                 if (type != null) {
-                    ent = fixEntity(ent);
+                    final CompoundTag ent = fixEntity(new CompoundTag(value));
                     BaseEntity state = new BaseEntity(type, ent);
                     Location loc = ent.getEntityLocation(clipboard);
-                    clipboard.createEntity(loc, state);
+                    if (brokenEntities) {
+                        clipboard.createEntity(loc, state);
+                        continue;
+                    }
+                    if (!isWorldEdit && faweWritten == -1) {
+                        int locX = loc.getBlockX();
+                        int locY = loc.getBlockY();
+                        int locZ = loc.getBlockZ();
+                        BlockVector3 max = min.add(dimensions).subtract(BlockVector3.ONE);
+                        if (locX < min.getX() || locY < min.getY() || locZ < min.getZ()
+                            || locX > max.getX() || locY > max.getY() || locZ > max.getZ()) {
+                            for (Entity e : clipboard.getEntities()) {
+                                clipboard.removeEntity(e);
+                            }
+                            LOGGER.error("Detected schematic entity outside clipboard region. FAWE will not load entities. "
+                                + "Please try loading the schematic with the format \"legacyentity\"");
+                            break;
+                        }
+                    }
+                    clipboard.createEntity(loc.setPosition(loc.subtract(min.toVector3())), state);
                 } else {
-                    log.debug("Invalid entity: " + id);
+                    LOGGER.debug("Invalid entity: " + id);
                 }
             }
         }
         clipboard.setOrigin(origin);
 
         if (!min.equals(BlockVector3.ZERO)) {
-            new BlockArrayClipboard(clipboard, min);
+            clipboard = new BlockArrayClipboard(clipboard, min);
         }
 
         return clipboard;

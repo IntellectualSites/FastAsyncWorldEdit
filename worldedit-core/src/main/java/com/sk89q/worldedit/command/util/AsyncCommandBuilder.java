@@ -19,23 +19,24 @@
 
 package com.sk89q.worldedit.command.util;
 
+import com.boydti.fawe.config.Caption;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.task.FutureForwardingTask;
 import com.sk89q.worldedit.util.task.Supervisor;
+import org.apache.logging.log4j.Logger;
 import org.enginehub.piston.exception.CommandException;
 import org.enginehub.piston.exception.CommandExecutionException;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -45,7 +46,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class AsyncCommandBuilder<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AsyncCommandBuilder.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Callable<T> callable;
     private final Actor sender;
@@ -162,19 +163,19 @@ public final class AsyncCommandBuilder<T> {
 
                         if (message == null) {
                             if (Strings.isNullOrEmpty(converted.getMessage())) {
-                                message = TextComponent.of("Unknown error.");
+                                message = Caption.of("worldedit.error.unknown");
                             } else {
                                 message = converted.getRichMessage();
                             }
                         }
-                        sender.printError(failure.append(TextComponent.of(": ")).append(message));
+                        sender.print(failure.append(TextComponent.of(": ")).append(message));
                     }
                 } else {
                     throw orig;
                 }
             } catch (Throwable unknown) {
-                sender.printError(failure.append(TextComponent.of(": Unknown error. Please see console.")));
-                logger.error("Uncaught exception occurred in task: " + description, orig);
+                sender.print(failure.append(Caption.of("worldedit.command.error.report")));
+                LOGGER.error("Uncaught exception occurred in task: " + description, orig);
             }
         }
         return result;

@@ -1,5 +1,7 @@
 package com.boydti.fawe.bukkit.adapter;
 
+import com.boydti.fawe.FAWEPlatformAdapterImpl;
+import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.config.Settings;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -10,7 +12,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import java.util.Map;
 import java.util.function.Function;
 
-public class NMSAdapter {
+public class NMSAdapter implements FAWEPlatformAdapterImpl {
     public static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy,
         int[] num_palette_buffer, char[] set, Map<BlockVector3, Integer> ticking_blocks, boolean fastmode) {
         int air = 0;
@@ -181,5 +183,13 @@ public class NMSAdapter {
 
         num_palette_buffer[0] = num_palette;
         return air;
+    }
+
+    @Override
+    public void sendChunk(IChunkGet chunk, int mask, boolean lighting) {
+        if (!(chunk instanceof BukkitGetBlocks)) {
+            throw new IllegalArgumentException("(IChunkGet) chunk not of type BukkitGetBlocks");
+        }
+        ((BukkitGetBlocks) chunk).send(mask, lighting);
     }
 }

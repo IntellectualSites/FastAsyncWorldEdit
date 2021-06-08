@@ -24,7 +24,6 @@ import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.changeset.DiskStorageHistory;
 import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
 import com.boydti.fawe.object.collection.SparseBitSet;
@@ -80,6 +79,8 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -92,15 +93,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -109,12 +107,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LocalSession implements TextureHolder {
 
+    private static final transient int CUI_VERSION_UNINITIALIZED = -1;
     public static transient int MAX_HISTORY_SIZE = 15;
 
     // Non-session related fields
     private transient LocalConfiguration config;
     private final transient AtomicBoolean dirty = new AtomicBoolean();
+
+    // Single-connection lifetime fields
     private transient int failedCuiAttempts = 0;
+    private transient boolean hasCUISupport = false;
+    private transient int cuiVersion = CUI_VERSION_UNINITIALIZED;
 
     // Session related
     private transient RegionSelector selector = new CuboidRegionSelector();
@@ -147,8 +150,6 @@ public class LocalSession implements TextureHolder {
     private transient boolean useInventory;
     private transient com.sk89q.worldedit.world.snapshot.Snapshot snapshot;
     private transient Snapshot snapshotExperimental;
-    private transient boolean hasCUISupport = false;
-    private transient int cuiVersion = -1;
     private transient SideEffectSet sideEffectSet = SideEffectSet.defaults();
     private transient Mask mask;
     private transient Mask sourceMask;
@@ -159,7 +160,6 @@ public class LocalSession implements TextureHolder {
     private transient UUID uuid;
     private transient volatile long historySize = 0;
 
-    private transient VirtualWorld virtual;
     private transient BlockVector3 cuiTemporaryBlock;
     @SuppressWarnings("unused")
     private transient EditSession.ReorderMode reorderMode = EditSession.ReorderMode.MULTI_STAGE;
@@ -714,17 +714,34 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the selection region. If you change the region, you should
-     * call learnRegionChanges().  If the selection is defined in
-     * a different world, the {@code IncompleteRegionException}
-     * exception will be thrown.
+     * call learnRegionChanges(). If the selection is not fully defined,
+     * the {@code IncompleteRegionException} exception will be thrown.
+     *
+     * <p>Note that this method will return a region in the current selection world,
+     * which is not guaranteed to be the player's world or even the current world
+     * override. If you require a specific world, use the
+     * {@link LocalSession#getSelection(World)} overload instead.
+     *
+     * @return the selected region
+     * @throws IncompleteRegionException if the region is not fully defined
+     */
+    public Region getSelection() throws IncompleteRegionException {
+        return getSelection(getSelectionWorld());
+    }
+
+    /**
+     * Get the selection region. If you change the region, you should
+     * call learnRegionChanges(). If the selection is defined in
+     * a different world, or the selection isn't fully defined,
+     * the {@code IncompleteRegionException} exception will be thrown.
      *
      * @param world the world
      * @return a region
-     * @throws IncompleteRegionException if no region is selected
+     * @throws IncompleteRegionException if no region is selected, or the provided world is null
      */
-    public Region getSelection(World world) throws IncompleteRegionException {
-        checkNotNull(world);
-        if (selector.getIncompleteRegion().getWorld() == null || !selector.getIncompleteRegion().getWorld().equals(world)) {
+    public Region getSelection(@Nullable World world) throws IncompleteRegionException {
+        if (world == null || selector.getIncompleteRegion().getWorld() == null
+                || !selector.getIncompleteRegion().getWorld().equals(world)) {
             throw new IncompleteRegionException() {
                 @Override
                 public synchronized Throwable fillInStackTrace() {
@@ -735,40 +752,12 @@ public class LocalSession implements TextureHolder {
         return selector.getRegion();
     }
 
-    @Nullable
-    public VirtualWorld getVirtualWorld() {
-        synchronized (dirty) {
-            return virtual;
-        }
-    }
-
-    public void setVirtualWorld(@Nullable VirtualWorld world) {
-        VirtualWorld tmp;
-        synchronized (dirty) {
-            tmp = this.virtual;
-            if (tmp == world) {
-                return;
-            }
-            this.virtual = world;
-        }
-        if (tmp != null) {
-            try {
-                tmp.close(world == null);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (world != null) {
-            Fawe.imp().registerPacketListener();
-            world.update();
-        }
-    }
-
     /**
      * Get the selection world.
      *
      * @return the the world of the selection
      */
+    @Nullable
     public World getSelectionWorld() {
         World world = selector.getIncompleteRegion().getWorld();
         if (world instanceof WorldWrapper) {
@@ -1216,10 +1205,6 @@ public class LocalSession implements TextureHolder {
                 }
             }
         }
-        if (player != null && previous instanceof BrushTool) {
-            BrushTool brushTool = (BrushTool) previous;
-            brushTool.clear(player);
-        }
     }
 
     /**
@@ -1416,7 +1401,12 @@ public class LocalSession implements TextureHolder {
      */
     public void handleCUIInitializationMessage(String text, Actor actor) {
         checkNotNull(text);
-        if (this.hasCUISupport || this.failedCuiAttempts > 3) {
+        if (this.hasCUISupport) {
+            // WECUI is a bit aggressive about re-initializing itself
+            // the last attempt to touch handshakes didn't go well, so this will do... for now
+            dispatchCUISelection(actor);
+            return;
+        } else if (this.failedCuiAttempts > 3) {
             return;
         }
 
@@ -1474,6 +1464,10 @@ public class LocalSession implements TextureHolder {
      * @param cuiVersion the CUI version
      */
     public void setCUIVersion(int cuiVersion) {
+        if (cuiVersion < 0) {
+            throw new IllegalArgumentException("CUI protocol version must be non-negative, but '" + cuiVersion + "' was received.");
+        }
+
         this.cuiVersion = cuiVersion;
     }
 
@@ -1705,14 +1699,15 @@ public class LocalSession implements TextureHolder {
         this.transform = transform;
     }
 
-    public void unregisterTools(Player player) {
-        synchronized (tools) {
-            for (Tool tool : tools.values()) {
-                if (tool instanceof BrushTool) {
-                    ((BrushTool) tool).clear(player);
-                }
-            }
-        }
-    }
 
+    /**
+     * Call when this session has become inactive.
+     *
+     * <p>This is for internal use only.</p>
+     */
+    public void onIdle() {
+        this.cuiVersion = CUI_VERSION_UNINITIALIZED;
+        this.hasCUISupport = false;
+        this.failedCuiAttempts = 0;
+    }
 }

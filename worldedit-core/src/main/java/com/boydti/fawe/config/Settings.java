@@ -20,7 +20,7 @@ public class Settings extends Config {
     @Final // Indicates that this value isn't configurable
     public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues";
     @Final
-    public String WIKI = "https://wiki.intellectualsites.com/FastAsyncWorldEdit/index";
+    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki";
     @Final
     public String DATE; // These values are set from FAWE before loading
     @Final
@@ -192,6 +192,12 @@ public class Settings extends Config {
                 " - Slightly worse compression since dispatch order is different",
         })
         public boolean COMBINE_STAGES = true;
+        @Comment({
+            "Do not wait for a chunk's history to save before sending it",
+            " - Undo/redo commands will wait until the history has been written to disk before executing",
+            " - Requires combine-stages = true"
+        })
+        public boolean SEND_BEFORE_HISTORY = true;
         @Comment({
                 "Higher compression reduces the size of history at the expense of CPU",
                 "0 = Uncompressed byte array (fastest)",
@@ -366,13 +372,6 @@ public class Settings extends Config {
         public boolean KEEP_ENTITIES_IN_BLOCKS = false;
 
         @Comment({
-                "[SAFE] Experimental freebuild region restrictions",
-                " - PERM: fawe.freebuild",
-                " - PERM: fawe.freebuild.<plugin>"
-        })
-        public boolean FREEBUILD = false;
-
-        @Comment({
                 "Other experimental features"
         })
         public boolean OTHER = false;
@@ -388,12 +387,6 @@ public class Settings extends Config {
             "This will increase time taken slightly."
         })
         public boolean ALLOW_TICK_EXISTING = true;
-        @Comment({
-            "Do not wait for a chunk's history to save before sending it",
-            " - Undo/redo commands will wait until the history has been written to disk before executing",
-            " - Requires combine_stages = true"
-        })
-        public boolean SEND_BEFORE_HISTORY = false;
 
         @Comment({
                 "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",
@@ -417,11 +410,6 @@ public class Settings extends Config {
 
     public static class WEB {
         @Comment({
-                "Should download urls be shortened?",
-                " - Links are less secure as they could be brute forced"
-        })
-        public boolean SHORTEN_URLS = false;
-        @Comment({
                 "The web interface for clipboards",
                 " - All schematics are anonymous and private",
                 " - Downloads can be deleted by the user",
@@ -437,7 +425,7 @@ public class Settings extends Config {
         })
         public List<String> ALLOWED_PLUGINS = new ArrayList<>();
         @Comment("Should debug messages be sent when third party extents are used?")
-        public boolean DEBUG = false;
+        public boolean DEBUG = true;
     }
 
     @Comment("Generic tick limiter (not necessarily WorldEdit related, but useful to stop abuse)")
@@ -494,8 +482,6 @@ public class Settings extends Config {
         public int MODE = 1;
         @Comment({"If existing lighting should be removed before relighting"})
         public boolean REMOVE_FIRST = true;
-        @Comment({"Calculate and set heightmaps when relighting"})
-        public boolean DO_HEIGHTMAPS = true;
     }
 
     public void reload(File file) {

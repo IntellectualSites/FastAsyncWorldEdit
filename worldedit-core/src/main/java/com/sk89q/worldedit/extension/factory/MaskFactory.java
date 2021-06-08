@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.mask.AdjacentMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.AirMaskParser;
@@ -55,7 +56,6 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -138,14 +138,14 @@ public final class MaskFactory extends AbstractFactory<Mask> {
                 }
             }
             if (match == null) {
-                throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(component)));
+                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
             }
             masks.add(match);
         }
 
         switch (masks.size()) {
             case 0:
-                throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(input)));
+                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
             case 1:
                 return masks.get(0).optimize();
             default:

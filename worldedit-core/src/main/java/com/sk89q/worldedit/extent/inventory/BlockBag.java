@@ -60,7 +60,7 @@ public abstract class BlockBag {
             fetchBlock(blockState);
         } catch (OutOfBlocksException e) {
             BlockState placed = blockState; // TODO BlockType.getBlockBagItem(id, data);
-            if (placed == null || placed.getBlockType().getMaterial().isAir()) {
+            if (placed.getBlockType().getMaterial().isAir()) {
                 throw e; // TODO: check
             }
 

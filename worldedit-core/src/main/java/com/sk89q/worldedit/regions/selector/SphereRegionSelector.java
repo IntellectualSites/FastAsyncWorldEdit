@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -26,7 +27,6 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
@@ -59,9 +59,11 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
      */
     public SphereRegionSelector(RegionSelector oldSelector) {
         super(oldSelector);
-        final Vector3 radius = region.getRadius();
-        final double radiusScalar = Math.max(Math.max(radius.getX(), radius.getY()), radius.getZ());
-        region.setRadius(Vector3.at(radiusScalar, radiusScalar, radiusScalar));
+        if (selectedRadius) {
+            final Vector3 radius = region.getRadius();
+            final double radiusScalar = Math.max(Math.max(radius.getX(), radius.getY()), radius.getZ());
+            region.setRadius(Vector3.at(radiusScalar, radiusScalar, radiusScalar));
+        }
     }
 
     /**
@@ -84,19 +86,21 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
         final double radiusScalar = Math.ceil(position.toVector3().distance(region.getCenter()));
         region.setRadius(Vector3.at(radiusScalar, radiusScalar, radiusScalar));
 
+        selectedRadius = true;
+
         return true;
     }
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
         if (isDefined()) {
-            player.printInfo(TranslatableComponent.of(
+            player.print(Caption.of(
                     "worldedit.selection.sphere.explain.secondary-defined",
                     TextComponent.of(region.getRadius().getX()),
                     TextComponent.of(region.getVolume())
             ));
         } else {
-            player.printInfo(TranslatableComponent.of("worldedit.selection.sphere.explain.secondary", TextComponent.of(region.getRadius().getX())));
+            player.print(Caption.of("worldedit.selection.sphere.explain.secondary", TextComponent.of(region.getRadius().getX())));
         }
 
         session.describeCUI(player);

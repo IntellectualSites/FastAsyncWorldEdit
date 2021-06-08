@@ -18,7 +18,6 @@ import com.sk89q.worldedit.internal.annotation.AllowedRegion;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.request.Request;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.InjectedValueStore;
@@ -42,7 +41,7 @@ public class ProvideBindings extends Bindings {
         if (actor.isPlayer()) {
             return (Player) actor;
         }
-        throw new InputParseException("This command must be used with a player.");
+        throw new InputParseException(Caption.of("worldedit.command.player-only"));
     }
 
     @Binding
@@ -86,7 +85,7 @@ public class ProvideBindings extends Bindings {
     public Region[] regions(Player player, FaweMaskManager.MaskType type) {
         Region[] regions = player.getCurrentRegions(type);
         if (regions == null) {
-            throw new IllegalArgumentException(Caption.toString(TranslatableComponent.of("fawe.error.no.region")));
+            throw new IllegalArgumentException(Caption.toString(Caption.of("fawe.error.no.region")));
         }
         return regions;
     }

@@ -3,6 +3,7 @@ package com.boydti.fawe.beta;
 import com.boydti.fawe.FaweCache;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
 import com.boydti.fawe.beta.implementation.processors.MultiBatchProcessor;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -13,7 +14,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
-import static org.slf4j.LoggerFactory.getLogger;
+import static org.apache.logging.log4j.LogManager.getLogger;
 
 public interface IBatchProcessor {
 
@@ -125,5 +126,12 @@ public interface IBatchProcessor {
             return EmptyBatchProcessor.getInstance();
         }
         return this;
+    }
+
+    /**
+     * Default to CUSTOM ProcessorScope as we want custom processors people add to be before we write history, but after FAWE does it's own stuff.
+     */
+    default ProcessorScope getScope() {
+        return ProcessorScope.CUSTOM;
     }
 }

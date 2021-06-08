@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
@@ -9,6 +10,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 import java.util.Locale;
 import javax.annotation.Nullable;
@@ -73,7 +75,7 @@ public class PrimitiveBindings extends Bindings {
     public Boolean getBoolean(String argument) {
         switch (argument.toLowerCase(Locale.ROOT)) {
             case "":
-                return null;
+                throw new InputParseException(Caption.of("fawe.error.input-parser-exception"));
             case "true":
             case "yes":
             case "on":
@@ -89,7 +91,7 @@ public class PrimitiveBindings extends Bindings {
             case "0":
                 return false;
             default:
-                throw new InputParseException("Invalid boolean " + argument);
+                throw new InputParseException(Caption.of("fawe.error.invalid-boolean", TextComponent.of(argument)));
         }
     }
 

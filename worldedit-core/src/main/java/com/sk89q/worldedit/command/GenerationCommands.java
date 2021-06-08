@@ -49,7 +49,6 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 import org.enginehub.piston.annotation.Command;
@@ -58,7 +57,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.jetbrains.annotations.Range;
 
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -131,20 +130,26 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.image")
     @Logging(PLACEMENT)
-    public void image(Actor actor, LocalSession session, EditSession editSession, String argStr, @Arg(desc = "boolean", def = "true") boolean randomize,
-                      @Arg(desc = "TODO", def = "100") int threshold, @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
+    public void image(Actor actor,
+                      LocalSession session,
+                      EditSession editSession,
+                      @Arg(desc = "Image URL (imgur only)") String imageURL,
+                      @Arg(desc = "boolean", def = "true") boolean randomize,
+                      @Arg(desc = "TODO", def = "100") int threshold,
+                      @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
         TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
-        URL url = new URL(argStr);
+        URL url = new URL(imageURL);
         if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
             throw new IOException("Only i.imgur.com links are allowed!");
         }
         BufferedImage image = MainUtil.readImage(url);
         if (dimensions != null) {
-            image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(), RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
+            image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
+                RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
         }
 
-      BlockVector3 pos1 = session.getPlacementPosition(actor);
-      BlockVector3 pos2 = pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1);
+        BlockVector3 pos1 = session.getPlacementPosition(actor);
+        BlockVector3 pos2 = pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1);
         CuboidRegion region = new CuboidRegion(pos1, pos2);
         int[] count = new int[1];
         final BufferedImage finalImage = image;
@@ -168,14 +173,21 @@ public class GenerationCommands {
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
 
-    @Command(
-        name = "/ore",
-        desc = "Generates ores"
-    )
+    @Command(name = "/ore", desc = "Generates ores")
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     @Confirm(Confirm.Processor.REGION)
-    public void ore(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask, @Arg(desc = "Pattern") Pattern material, @Arg(desc="Ore vein size") @Range(from = 0, to=Integer.MAX_VALUE) int size, int freq, @Range(from=0, to=100) int rarity, @Range(from=0, to=255) int minY, @Range(from=0, to=255) int maxY) throws WorldEditException {
+    public void ore(Actor actor,
+                    LocalSession session,
+                    EditSession editSession,
+                    @Selection Region region,
+                    @Arg(desc = "Mask") Mask mask,
+                    @Arg(desc = "Pattern") Pattern material,
+                    @Arg(desc = "Ore vein size") @Range(from = 0, to = Integer.MAX_VALUE) int size,
+                    @Arg(desc = "Ore vein frequency (number of times to attempt to place ore)", def = "10") @Range(from = 0, to = Integer.MAX_VALUE) int freq,
+                    @Arg(desc = "Ore vein rarity (% chance each attempt is placed)", def = "100") @Range(from = 0, to = 100) int rarity,
+                    @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
+                    @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY) throws WorldEditException {
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
@@ -226,7 +238,7 @@ public class GenerationCommands {
                 break;
 
             default:
-                actor.printError(TranslatableComponent.of("worldedit.cyl.invalid-radius"));
+                actor.print(Caption.of("worldedit.cyl.invalid-radius"));
                 return 0;
         }
 
@@ -236,7 +248,7 @@ public class GenerationCommands {
 
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, height, !hollow);
-        actor.printInfo(TranslatableComponent.of("worldedit.cyl.created", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.cyl.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -288,7 +300,7 @@ public class GenerationCommands {
                 break;
 
             default:
-                actor.printError(TranslatableComponent.of("worldedit.sphere.invalid-radius"));
+                actor.print(Caption.of("worldedit.sphere.invalid-radius"));
                 return 0;
         }
 
@@ -304,7 +316,7 @@ public class GenerationCommands {
         if (actor instanceof Player) {
             ((Player) actor).findFreePosition();
         }
-        actor.printInfo(TranslatableComponent.of("worldedit.sphere.created", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.sphere.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -326,7 +338,7 @@ public class GenerationCommands {
         worldEdit.checkMaxRadius(size);
         density /= 100;
         int affected = editSession.makeForest(session.getPlacementPosition(actor), size, density, type);
-        actor.printInfo(TranslatableComponent.of("worldedit.forestgen.created", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.forestgen.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -345,7 +357,7 @@ public class GenerationCommands {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), size, density);
-        actor.printInfo(TranslatableComponent.of("worldedit.pumpkins.created", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.pumpkins.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -382,7 +394,7 @@ public class GenerationCommands {
         if (actor instanceof Player) {
             ((Player) actor).findFreePosition();
         }
-        actor.printInfo(TranslatableComponent.of("worldedit.pyramid.created", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.pyramid.created", TextComponent.of(affected)));
         return affected;
     }
 
@@ -450,7 +462,7 @@ public class GenerationCommands {
             if (actor instanceof Player) {
                 ((Player) actor).findFreePosition();
             }
-            actor.printInfo(TranslatableComponent.of("worldedit.generate.created", TextComponent.of(affected)));
+            actor.print(Caption.of("worldedit.generate.created", TextComponent.of(affected)));
             return affected;
         } catch (ExpressionException e) {
             actor.printError(TextComponent.of(e.getMessage()));
@@ -519,7 +531,7 @@ public class GenerationCommands {
         final Vector3 unit1 = unit;
         try {
             final int affected = editSession.makeBiomeShape(region, zero, unit1, target, String.join(" ", expression), hollow, session.getTimeout());
-            actor.printInfo(TranslatableComponent.of("worldedit.generatebiome.changed", TextComponent.of(affected)));
+            actor.print(Caption.of("worldedit.generatebiome.changed", TextComponent.of(affected)));
             return affected;
         } catch (ExpressionException e) {
             actor.printError(TextComponent.of(e.getMessage()));

@@ -2,6 +2,10 @@ package com.boydti.fawe.bukkit.adapter.mc1_15_2;
 
 
 import com.boydti.fawe.FaweCache;
+import com.boydti.fawe.beta.IBlocks;
+import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.IChunkSet;
+import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
@@ -21,22 +25,25 @@ import net.minecraft.server.v1_15_R1.TileEntity;
 import net.minecraft.server.v1_15_R1.WorldServer;
 import org.bukkit.craftbukkit.v1_15_R1.block.CraftBlock;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Future;
 
-public class BukkitGetBlocks_1_15_2_Copy extends BukkitGetBlocks_1_15_2 {
+public class BukkitGetBlocks_1_15_2_Copy implements IChunkGet {
 
     private final Map<BlockVector3, CompoundTag> tiles = new HashMap<>();
     private final Set<CompoundTag> entities = new HashSet<>();
     private BiomeStorage biomeStorage;
-    private final char[][] blocks = new char[16][4096];
+    private final char[][] blocks = new char[16][];
+    private final WorldServer world;
 
-    protected BukkitGetBlocks_1_15_2_Copy(WorldServer world, int X, int Z) {
-        super(world, X, Z);
+    protected BukkitGetBlocks_1_15_2_Copy(WorldServer world) {
+        this.world = world;
     }
 
     protected void storeTile(TileEntity tile) {
@@ -87,6 +94,25 @@ public class BukkitGetBlocks_1_15_2_Copy extends BukkitGetBlocks_1_15_2 {
         return null;
     }
 
+    @Override
+    public void setCreateCopy(boolean createCopy) {
+
+    }
+
+    @Override
+    public boolean isCreateCopy() {
+        return false;
+    }
+
+    @Override
+    public void setLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setSkyLightingToGet(char[][] lighting) {}
+
+    @Override
+    public void setHeightmapToGet(HeightMapType type, int[] data) {}
+
     protected void storeBiomes(BiomeStorage biomeStorage) {
         this.biomeStorage = new BiomeStorage(BukkitAdapter_1_15_2.getBiomeArray(biomeStorage).clone());
     }
@@ -105,8 +131,21 @@ public class BukkitGetBlocks_1_15_2_Copy extends BukkitGetBlocks_1_15_2 {
         return base != null ? BukkitAdapter.adapt(CraftBlock.biomeBaseToBiome(base)) : null;
     }
 
-    protected void storeSection(int layer) {
-        blocks[layer] = update(layer, null).clone();
+    @Override
+    public void removeSectionLighting(int layer, boolean sky) {}
+
+    @Override
+    public boolean trim(boolean aggressive, int layer) {
+        return false;
+    }
+
+    @Override
+    public IBlocks reset() {
+        return null;
+    }
+
+    protected void storeSection(int layer, char[] data) {
+        blocks[layer] = data;
     }
 
     @Override
@@ -116,14 +155,49 @@ public class BukkitGetBlocks_1_15_2_Copy extends BukkitGetBlocks_1_15_2 {
     }
 
     @Override
+    public boolean hasSection(@Range(from = 0, to = 15) int layer) {
+        return blocks[layer] != null;
+    }
+
+    @Override
+    public char[] load(int layer) {
+        return blocks[layer];
+    }
+
+    @Override
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypesCache.states[get(x, y, z)];
     }
 
     @Override
+    public int getSkyLight(int x, int y, int z) {
+        return 0;
+    }
+
+    @Override
+    public int getEmmittedLight(int x, int y, int z) {
+        return 0;
+    }
+
+    @Override
+    public int[] getHeightMap(HeightMapType type) {
+        return new int[0];
+    }
+
+    @Override
+    public <T extends Future<T>> T call(IChunkSet set, Runnable finalize) {
+        return null;
+    }
+
     public char get(int x, int y, int z) {
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         return blocks[layer][index];
+    }
+
+
+    @Override
+    public boolean trim(boolean aggressive) {
+        return false;
     }
 }

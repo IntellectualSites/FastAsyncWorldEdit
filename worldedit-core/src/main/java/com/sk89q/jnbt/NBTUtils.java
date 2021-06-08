@@ -49,7 +49,7 @@ public final class NBTUtils {
             return "TAG_Byte_Array";
         } else if (clazz.equals(ByteTag.class)) {
             return "TAG_Byte";
-        } else if (CompoundTag.class.isAssignableFrom(clazz)) {
+        } else if (clazz.equals(CompoundTag.class)) {
             return "TAG_Compound";
         } else if (clazz.equals(DoubleTag.class)) {
             return "TAG_Double";

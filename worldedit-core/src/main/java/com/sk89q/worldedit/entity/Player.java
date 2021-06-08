@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.entity;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
 import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.util.MainUtil;
@@ -46,13 +46,14 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 
-import java.io.File;
 import javax.annotation.Nullable;
+import java.io.File;
 
 /**
  * Represents a player.
@@ -383,14 +384,6 @@ public interface Player extends Entity, Actor {
      * @return Editing world
      */
     default World getWorldForEditing() {
-        VirtualWorld virtual = getSession().getVirtualWorld();
-        if (virtual != null) {
-            return virtual;
-        }
-//        CFICommands.CFISettings cfi = getMeta("CFISettings");
-//        if (cfi != null && cfi.hasGenerator() && cfi.getGenerator().hasPacketViewer()) {
-//            return cfi.getGenerator();
-//        }
         return WorldEdit.getInstance().getPlatformManager().getWorldForEditing(getWorld());
     }
 
@@ -402,7 +395,6 @@ public interface Player extends Entity, Actor {
         getSession().setClipboard(null);
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
             getSession().clearHistory();
-            getSession().unregisterTools(this);
         }
     }
 
@@ -429,12 +421,12 @@ public interface Player extends Entity, Actor {
                 getSession().setClipboard(holder);
             }
         } catch (Exception event) {
-            printError("====== INVALID CLIPBOARD ======");
+            printError(TextComponent.of("====== INVALID CLIPBOARD ======"));
             event.printStackTrace();
-            printError("===============---=============");
-            printError("This shouldn't result in any failure");
-            printError("File: " + file.getName() + " (len:" + file.length() + ")");
-            printError("===============---=============");
+            print(Caption.of("fawe.error.stacktrace"));
+            print(Caption.of("fawe.error.no-failure"));
+            print(Caption.of("File: ", TextComponent.of(file.getName()), TextComponent.of(" (len:"), TextComponent.of(file.length()), TextComponent.of(")")));
+            print(Caption.of("fawe.error.stacktrace"));
         }
     }
 }

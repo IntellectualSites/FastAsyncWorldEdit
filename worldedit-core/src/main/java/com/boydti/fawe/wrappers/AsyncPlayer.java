@@ -143,23 +143,27 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void floatAt(int x, int y, int z, boolean alwaysGlass) {
-        RuntimeException caught = null;
-        try {
-            EditSession edit = new EditSessionBuilder(WorldWrapper.unwrap(getWorld()))
-                .player(unwrap(getBasePlayer())).build();
-            edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
-            edit.flushQueue();
-            LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);
-            if (session != null) {
-                session.remember(edit, true, getBasePlayer().getLimit().MAX_HISTORY);
+        if (alwaysGlass || !isAllowedToFly()) {
+            RuntimeException caught = null;
+            try {
+                EditSession edit =
+                    new EditSessionBuilder(WorldWrapper.unwrap(getWorld())).player(unwrap(getBasePlayer())).build();
+                edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
+                edit.flushQueue();
+                LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);
+                if (session != null) {
+                    session.remember(edit, true, getBasePlayer().getLimit().MAX_HISTORY);
+                }
+            } catch (RuntimeException e) {
+                caught = e;
             }
-        } catch (RuntimeException e) {
-            caught = e;
+            if (caught != null) {
+                throw caught;
+            }
+        } else {
+            setFlying(true);
         }
-        setPosition(Vector3.at(x + 0.5, y, z + 0.5));
-        if (caught != null) {
-            throw caught;
-        }
+        trySetPosition(Vector3.at(x + 0.5, y, z + 0.5));
     }
 
     @Override

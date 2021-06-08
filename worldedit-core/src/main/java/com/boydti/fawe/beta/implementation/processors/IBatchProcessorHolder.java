@@ -18,7 +18,7 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
     IBatchProcessor getPostProcessor();
 
     /**
-     * set the held processor
+     * Set the held processor
      * @param set
      */
     void setProcessor(IBatchProcessor set);

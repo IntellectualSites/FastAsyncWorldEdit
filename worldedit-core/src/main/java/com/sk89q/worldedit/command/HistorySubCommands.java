@@ -221,7 +221,7 @@ public class HistorySubCommands {
                                              Integer index) throws WorldEditException, ExecutionException, InterruptedException {
         RollbackOptimizedHistory edit = database.getEdit(other, index).get();
         if (edit == null) {
-            player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.none"));
+            player.print(Caption.of("fawe.worldedit.schematic.schematic.none"));
             return;
         }
         Location origin = player.getLocation();
@@ -341,10 +341,10 @@ public class HistorySubCommands {
             return;
         }
         if (other == null && radius == 0 && timeDiff == 0) {
-            throw new InsufficientArgumentsException("User must be provided");
+            throw new InsufficientArgumentsException(Caption.of("fawe.error.invalid-user"));
         }
-        checkCommandArgument(radius > 0, "Radius must be >= 0");
-        checkCommandArgument(timeDiff > 0, "Time must be >= 0");
+        checkCommandArgument(radius > 0, Caption.of("fawe.error.radius-too-small"));
+        checkCommandArgument(timeDiff > 0, Caption.of("fawe.error.time-too-less"));
 
         Location origin = player.getLocation();
         String pageCommand = "/" + arguments.get().replaceAll("-p [0-9]+", "").trim();

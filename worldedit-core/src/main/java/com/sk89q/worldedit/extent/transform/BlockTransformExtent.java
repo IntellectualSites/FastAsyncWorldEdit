@@ -20,12 +20,14 @@
 package com.sk89q.worldedit.extent.transform;
 
 import com.boydti.fawe.object.extent.ResettableExtent;
+import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.helper.MCDirections;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -34,6 +36,7 @@ import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.registry.state.PropertyKeySet;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -41,14 +44,17 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -69,7 +75,6 @@ import static com.sk89q.worldedit.util.Direction.UP;
 import static com.sk89q.worldedit.util.Direction.WEST;
 import static com.sk89q.worldedit.util.Direction.findClosest;
 import static com.sk89q.worldedit.util.Direction.values;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Transforms blocks themselves (but not their position) according to a
@@ -77,13 +82,34 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class BlockTransformExtent extends ResettableExtent {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
+    private static final Set<PropertyKey> directional = PropertyKeySet.of(
+            PropertyKey.HALF,
+            PropertyKey.ROTATION,
+            PropertyKey.AXIS,
+            PropertyKey.FACING,
+            PropertyKey.SHAPE,
+            PropertyKey.NORTH,
+            PropertyKey.EAST,
+            PropertyKey.SOUTH,
+            PropertyKey.WEST
+    );
+
+    private static final Map<Direction, PropertyKey> directionMap = ImmutableMap.of(
+            NORTH, PropertyKey.NORTH,
+            EAST, PropertyKey.EAST,
+            SOUTH, PropertyKey.SOUTH,
+            WEST, PropertyKey.WEST
+    );
+
     private Transform transform;
 
     private Transform transformInverse;
     private int[] BLOCK_ROTATION_BITMASK;
     private int[][] BLOCK_TRANSFORM;
     private int[][] BLOCK_TRANSFORM_INVERSE;
-    private int[] ALL = new int[0];
+    private final int[] ALL = new int[0];
 
     public BlockTransformExtent(Extent parent) {
         this(parent, new AffineTransform());
@@ -133,101 +159,103 @@ public class BlockTransformExtent extends ResettableExtent {
             return adapt(directional.getValues().toArray(new Direction[0]));
         } else {
             List values = property.getValues();
-            switch (property.getKey()) {
-                case HALF:
-                    return adapt(UP, DOWN);
-                case ROTATION: {
-                    List<Direction> directions = new ArrayList<>();
-                    for (Object value : values) {
-                        directions.add(Direction.fromRotationIndex((Integer) value).get());
-                    }
-                    return adapt(directions.toArray(new Direction[0]));
+            PropertyKey key = property.getKey();
+            if (key == PropertyKey.HALF) {
+                return adapt(UP, DOWN);
+            }
+            if (key == PropertyKey.ROTATION) {
+                List<Direction> directions = new ArrayList<>();
+                for (Object value : values) {
+                    directions.add(Direction.fromRotationIndex((Integer) value).get());
                 }
-                case AXIS:
-                    switch (property.getValues().size()) {
-                        case 3:
-                            return adapt(combine(EAST, WEST), combine(UP, DOWN), combine(SOUTH, NORTH));
-                        case 2:
-                            return adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
-                        default:
-                            getLogger(BlockTransformExtent.class).error("Invalid {} {}", property.getName(), property.getValues());
-                            return null;
-                    }
-                case FACING: {
-                    List<Direction> directions = new ArrayList<>();
-                    for (Object value : values) {
-                        directions.add(Direction.valueOf(value.toString().toUpperCase(Locale.ROOT)));
-                    }
-                    return adapt(directions.toArray(new Direction[0]));
+                return adapt(directions.toArray(new Direction[0]));
+            }
+            if (key == PropertyKey.AXIS) {
+                switch (property.getValues().size()) {
+                    case 3:
+                        return adapt(combine(EAST, WEST), combine(UP, DOWN), combine(SOUTH, NORTH));
+                    case 2:
+                        return adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
+                    default:
+                        LOGGER.error("Invalid {} {}", property.getName(), property.getValues());
+                        return null;
                 }
-                case SHAPE:
-                    if (values.contains("straight")) {
-                        ArrayList<Long> result = new ArrayList<>();
-                        for (Object value : values) {
-                            // [straight, inner_left, inner_right, outer_left, outer_right]
-                            switch (value.toString()) {
-                                case "straight":
-                                    result.add(combine(NORTH, EAST, SOUTH, WEST));
-                                    continue;
-                                case "inner_left":
-                                    result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
-                                    continue;
-                                case "inner_right":
-                                    result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
-                                    continue;
-                                case "outer_left":
-                                    result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
-                                    continue;
-                                case "outer_right":
-                                    result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
-                                    continue;
-                                default:
-                                    getLogger(BlockTransformExtent.class).warn("Unknown direction {}", value);
-                                    result.add(0L);
-                            }
+            }
+            if (key == PropertyKey.FACING) {
+                List<Direction> directions = new ArrayList<>();
+                for (Object value : values) {
+                    directions.add(Direction.valueOf(value.toString().toUpperCase(Locale.ROOT)));
+                }
+                return adapt(directions.toArray(new Direction[0]));
+            }
+            if (key == PropertyKey.SHAPE) {
+                if (values.contains("straight")) {
+                    ArrayList<Long> result = new ArrayList<>();
+                    for (Object value : values) {
+                        // [straight, inner_left, inner_right, outer_left, outer_right]
+                        switch (value.toString()) {
+                            case "straight":
+                                result.add(combine(NORTH, EAST, SOUTH, WEST));
+                                continue;
+                            case "inner_left":
+                                result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
+                                continue;
+                            case "inner_right":
+                                result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
+                                continue;
+                            case "outer_left":
+                                result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
+                                continue;
+                            case "outer_right":
+                                result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
+                                continue;
+                            default:
+                                LOGGER.warn("Unknown direction {}", value);
+                                result.add(0L);
                         }
-                        return adapt(result.toArray(new Long[0]));
-                    } else {
-                        List<Long> directions = new ArrayList<>();
-                        for (Object value : values) {
-                            switch (value.toString()) {
-                                case "north_south":
-                                    directions.add(combine(NORTH, SOUTH));
-                                    break;
-                                case "east_west":
-                                    directions.add(combine(EAST, WEST));
-                                    break;
-                                case "ascending_east":
-                                    directions.add(combine(ASCENDING_EAST));
-                                    break;
-                                case "ascending_west":
-                                    directions.add(combine(ASCENDING_WEST));
-                                    break;
-                                case "ascending_north":
-                                    directions.add(combine(ASCENDING_NORTH));
-                                    break;
-                                case "ascending_south":
-                                    directions.add(combine(ASCENDING_SOUTH));
-                                    break;
-                                case "south_east":
-                                    directions.add(combine(SOUTHEAST));
-                                    break;
-                                case "south_west":
-                                    directions.add(combine(SOUTHWEST));
-                                    break;
-                                case "north_west":
-                                    directions.add(combine(NORTHWEST));
-                                    break;
-                                case "north_east":
-                                    directions.add(combine(NORTHEAST));
-                                    break;
-                                default:
-                                    getLogger(BlockTransformExtent.class).warn("Unknown direction {}", value);
-                                    directions.add(0L);
-                            }
-                        }
-                        return adapt(directions.toArray(new Long[0]));
                     }
+                    return adapt(result.toArray(new Long[0]));
+                } else {
+                    List<Long> directions = new ArrayList<>();
+                    for (Object value : values) {
+                        switch (value.toString()) {
+                            case "north_south":
+                                directions.add(combine(NORTH, SOUTH));
+                                break;
+                            case "east_west":
+                                directions.add(combine(EAST, WEST));
+                                break;
+                            case "ascending_east":
+                                directions.add(combine(ASCENDING_EAST));
+                                break;
+                            case "ascending_west":
+                                directions.add(combine(ASCENDING_WEST));
+                                break;
+                            case "ascending_north":
+                                directions.add(combine(ASCENDING_NORTH));
+                                break;
+                            case "ascending_south":
+                                directions.add(combine(ASCENDING_SOUTH));
+                                break;
+                            case "south_east":
+                                directions.add(combine(SOUTHEAST));
+                                break;
+                            case "south_west":
+                                directions.add(combine(SOUTHWEST));
+                                break;
+                            case "north_west":
+                                directions.add(combine(NORTHWEST));
+                                break;
+                            case "north_east":
+                                directions.add(combine(NORTHEAST));
+                                break;
+                            default:
+                                LOGGER.warn("Unknown direction {}", value);
+                                directions.add(0L);
+                        }
+                    }
+                    return adapt(directions.toArray(new Long[0]));
+                }
             }
         }
         return null;
@@ -303,20 +331,7 @@ public class BlockTransformExtent extends ResettableExtent {
         if (property instanceof DirectionalProperty) {
             return true;
         }
-        switch (property.getKey()) {
-            case HALF:
-            case ROTATION:
-            case AXIS:
-            case FACING:
-            case SHAPE:
-            case NORTH:
-            case EAST:
-            case SOUTH:
-            case WEST:
-                return true;
-            default:
-                return false;
-        }
+        return directional.contains(property.getKey());
     }
 
     private static BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundTag tag, Transform transform) {
@@ -336,8 +351,9 @@ public class BlockTransformExtent extends ResettableExtent {
                     Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
 
                     if (newDirection != null) {
-                        Map<String, Tag> values = tag.getValue();
+                        Map<String, Tag> values = new HashMap<>(tag.getValue());
                         values.put("Rot", new ByteTag((byte) MCDirections.toRotation(newDirection)));
+                        tag = new CompoundTag(values);
                     }
                 }
             }
@@ -364,10 +380,10 @@ public class BlockTransformExtent extends ResettableExtent {
             Object southState = tmp.getState(PropertyKey.SOUTH);
             Object westState = tmp.getState(PropertyKey.WEST);
 
-            tmp = tmp.with(PropertyKey.valueOf(newNorth.name().toUpperCase(Locale.ROOT)), northState);
-            tmp = tmp.with(PropertyKey.valueOf(newEast.name().toUpperCase(Locale.ROOT)), eastState);
-            tmp = tmp.with(PropertyKey.valueOf(newSouth.name().toUpperCase(Locale.ROOT)), southState);
-            tmp = tmp.with(PropertyKey.valueOf(newWest.name().toUpperCase(Locale.ROOT)), westState);
+            tmp = tmp.with(directionMap.get(newNorth), northState);
+            tmp = tmp.with(directionMap.get(newEast), eastState);
+            tmp = tmp.with(directionMap.get(newSouth), southState);
+            tmp = tmp.with(directionMap.get(newWest), westState);
 
             newMaskedId = tmp.getInternalId();
         }
@@ -435,13 +451,28 @@ public class BlockTransformExtent extends ResettableExtent {
     }
 
     @Override
+    public BlockState getBlock(int x, int y, int z) {
+        return transformBlock(super.getBlock(x, y, z), false);
+    }
+
+    @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
         return transformBlock(super.getFullBlock(position), false);
     }
 
     @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        return transformBlock(super.getFullBlock(x, y, z), false);
+    }
+
+    @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return super.setBlock(location, transformBlock(block, true));
+    }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
+        return super.setBlock(x, y, z, transformInverse(block));
     }
 
     public void setTransform(Transform affine) {
@@ -518,15 +549,5 @@ public class BlockTransformExtent extends ResettableExtent {
 
     private BlockState transformInverse(BlockState block) {
         return transform(block, BLOCK_TRANSFORM_INVERSE, transformInverse);
-    }
-
-    @Override
-    public BlockState getBlock(int x, int y, int z) {
-        return transform(super.getBlock(x, y, z));
-    }
-
-    @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        return super.setBlock(x, y, z, transformInverse(block));
     }
 }

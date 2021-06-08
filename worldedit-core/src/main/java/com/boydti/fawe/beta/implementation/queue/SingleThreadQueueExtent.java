@@ -14,12 +14,16 @@ import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
 import com.boydti.fawe.beta.implementation.processors.EmptyBatchProcessor;
 import com.boydti.fawe.beta.implementation.processors.ExtentBatchProcessorHolder;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.config.Settings;
+import com.boydti.fawe.object.exception.FaweException;
 import com.boydti.fawe.util.MathMan;
 import com.boydti.fawe.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -33,6 +37,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * This queue is reusable {@link #init(Extent, IChunkCache, IChunkCache)} }
  */
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     // Pool discarded chunks for reuse (can safely be cleared by another thread)
     // private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
@@ -107,7 +113,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             for (IChunk chunk : this.chunks.values()) {
                 chunk.recycle();
             }
+            getChunkLock.lock();
             this.chunks.clear();
+            getChunkLock.unlock();
         }
         this.enabledQueue = true;
         this.lastChunk = null;
@@ -156,7 +164,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             lastChunk = null;
         }
         final long index = MathMan.pairInt(chunk.getX(), chunk.getZ());
+        getChunkLock.lock();
         chunks.remove(index, chunk);
+        getChunkLock.unlock();
         V future = submitUnchecked(chunk);
         submissions.add(future);
         return future;
@@ -290,7 +300,15 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                         while (future != null) {
                             future = (Future) future.get();
                         }
-                    } catch (InterruptedException | ExecutionException e) {
+                    } catch (FaweException messageOnly) {
+                        LOGGER.warn(messageOnly.getMessage());
+                    } catch (ExecutionException e) {
+                        if (e.getCause() instanceof FaweException) {
+                            LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
+                        } else {
+                            e.printStackTrace();
+                        }
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
@@ -301,7 +319,15 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     while (first != null) {
                         first = (Future) first.get();
                     }
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (FaweException messageOnly) {
+                    LOGGER.warn(messageOnly.getMessage());
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof FaweException) {
+                        LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
+                    } else {
+                        e.printStackTrace();
+                    }
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -310,10 +336,28 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                 Future next = submissions.peek();
                 while (next != null) {
                     if (next.isDone()) {
+                        Future after = null;
                         try {
-                            next = (Future) next.get();
-                        } catch (InterruptedException | ExecutionException e) {
+                            after = (Future) next.get();
+                        } catch (FaweException messageOnly) {
+                            LOGGER.warn(messageOnly.getMessage());
+                        } catch (ExecutionException e) {
+                            if (e.getCause() instanceof FaweException) {
+                                LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
+                            } else {
+                                e.printStackTrace();
+                            }
+                            LOGGER.error("Please report this error on our issue tracker: https://github.com/IntellectualSites/FastAsyncWorldEdit/issues");
+                            e.getCause().printStackTrace();
+                        } catch (InterruptedException e) {
                             e.printStackTrace();
+                        } finally {
+                            /*
+                             * If the execution failed, namely next.get() threw an exception,
+                             * we don't want to process that Future again. Instead, we just drop
+                             * it and set it to null, otherwise to the returned next Future.
+                             */
+                            next = after;
                         }
                     } else {
                         return;
@@ -343,7 +387,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     }
                 }
             }
+            getChunkLock.lock();
             chunks.clear();
+            getChunkLock.unlock();
         }
         pollSubmissions(0, true);
     }
@@ -351,5 +397,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     @Override
     public ChunkFilterBlock initFilterBlock() {
         return new CharFilterBlock(this);
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.ADDING_BLOCKS;
     }
 }

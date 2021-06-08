@@ -21,10 +21,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.UUID;
 
-/**
- * Best used when clipboard selections are small, or using legacy formats
- * (Small being < Integer.MAX_VALUE/BLOCK_SIZE_BYTES blocks)
- */
 public abstract class LinearClipboard extends SimpleClipboard {
 
     protected final HashSet<ClipboardEntity> entities = new HashSet<>();
@@ -33,6 +29,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
         super(dimensions);
     }
 
+    // We shouldn't expose methods that directly reference the index as people cannot be trusted to use it properly.
     public abstract <B extends BlockStateHolder<B>> boolean setBlock(int i, B block);
 
     public abstract BaseBlock getFullBlock(int i);

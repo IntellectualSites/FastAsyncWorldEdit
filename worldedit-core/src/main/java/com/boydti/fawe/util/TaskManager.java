@@ -4,6 +4,8 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.RunnableVal;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -15,9 +17,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public abstract class TaskManager {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static TaskManager IMP;
 
@@ -257,7 +259,7 @@ public abstract class TaskManager {
                     running.wait(timeout);
                     if (running.get() && System.currentTimeMillis() - start > Settings.IMP.QUEUE.DISCARD_AFTER_MS) {
                         new RuntimeException("FAWE is taking a long time to execute a task (might just be a symptom): ").printStackTrace();
-                        getLogger(TaskManager.class).debug("For full debug information use: /fawe threads");
+                        LOGGER.info("For full debug information use: /fawe threads");
                     }
                 }
             }

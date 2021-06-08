@@ -75,7 +75,6 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
      * @deprecated Magic Numbers
      * @return BlockState
      */
-
     @Deprecated
     public static BlockState getFromInternalId(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
@@ -186,7 +185,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                         stateId = property.modifyIndex(stateId, index);
                     } else {
                         // suggest
-                        PropertyKey key = PropertyKey.get(charSequence);
+                        PropertyKey key = PropertyKey.getByName(charSequence);
                         if (key == null || !type.hasProperty(key)) {
                             // Suggest property
                             String input = charSequence.toString();
@@ -408,11 +407,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     public boolean isAir() {
-        try {
-            return material.isAir();
-        } catch (NullPointerException ignored) {
-            return getMaterial().isAir();
-        }
+        return blockType.getMaterial().isAir();
     }
 
     @Override

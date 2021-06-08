@@ -14,7 +14,7 @@ public abstract class SimpleClipboard implements Clipboard {
     SimpleClipboard(BlockVector3 dimensions) {
         this.size = dimensions;
         long longVolume = (long) getWidth() * (long) getHeight() * (long) getLength();
-        if (longVolume >= Integer.MAX_VALUE >> 2) {
+        if (longVolume >= Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Dimensions are too large for this clipboard format.");
         }
         this.area = getWidth() * getLength();

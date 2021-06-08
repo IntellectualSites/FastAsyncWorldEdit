@@ -19,7 +19,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Store the change on disk
@@ -29,6 +31,8 @@ import java.util.UUID;
  * - Slow
  */
 public class DiskStorageHistory extends FaweStreamChangeSet {
+
+    private static final Map<String, Map<UUID, Integer>> NEXT_INDEX = new ConcurrentHashMap<>();
 
     private UUID uuid;
     private File bdFile;
@@ -67,8 +71,11 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     private void init(UUID uuid, String worldName) {
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
-        int max = MainUtil.getMaxFileId(folder);
+        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
+
+        final int max = NEXT_INDEX.computeIfAbsent(worldName, _worldName -> new ConcurrentHashMap<>())
+                .compute(uuid, (_uuid, id) -> (id == null ? MainUtil.getMaxFileId(folder) : id) + 1) - 1;
+
         init(uuid, max);
     }
 

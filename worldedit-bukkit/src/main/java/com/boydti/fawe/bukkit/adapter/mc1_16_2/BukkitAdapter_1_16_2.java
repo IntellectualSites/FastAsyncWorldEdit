@@ -7,15 +7,13 @@ import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
-import com.destroystokyo.paper.util.misc.PooledLinkedHashSets;
+import com.boydti.fawe.util.UnsafeUtility;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
-import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_16_R2.BiomeBase;
 import net.minecraft.server.v1_16_R2.BiomeStorage;
 import net.minecraft.server.v1_16_R2.Block;
@@ -26,7 +24,6 @@ import net.minecraft.server.v1_16_R2.DataBits;
 import net.minecraft.server.v1_16_R2.DataPalette;
 import net.minecraft.server.v1_16_R2.DataPaletteBlock;
 import net.minecraft.server.v1_16_R2.DataPaletteLinear;
-import net.minecraft.server.v1_16_R2.EntityPlayer;
 import net.minecraft.server.v1_16_R2.GameProfileSerializer;
 import net.minecraft.server.v1_16_R2.IBlockData;
 import net.minecraft.server.v1_16_R2.PacketPlayOutLightUpdate;
@@ -65,9 +62,6 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
 
-    private static final Field fieldDirty;
-    private static final Field fieldDirtyBlocks;
-
     private static final Field fieldBiomeArray;
 
     private static final MethodHandle methodGetVisibleChunk;
@@ -76,6 +70,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     private static final int CHUNKSECTION_SHIFT;
 
     private static final Field fieldLock;
+    private static final long fieldLockOffset;
 
     static {
         try {
@@ -96,11 +91,6 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldDirty = PlayerChunk.class.getDeclaredField("p");
-            fieldDirty.setAccessible(true);
-            fieldDirtyBlocks = PlayerChunk.class.getDeclaredField("dirtyBlocks");
-            fieldDirtyBlocks.setAccessible(true);
-
             fieldBiomeArray = BiomeStorage.class.getDeclaredField("h");
             fieldBiomeArray.setAccessible(true);
 
@@ -108,25 +98,16 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
             declaredGetVisibleChunk.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
 
-            Field tmp = DataPaletteBlock.class.getDeclaredField("j");
-            ReflectionUtils.setAccessibleNonFinal(tmp);
-            fieldLock = tmp;
-            fieldLock.setAccessible(true);
+            Unsafe unsafe = UnsafeUtility.getUNSAFE();
+            fieldLock = DataPaletteBlock.class.getDeclaredField("j");
+            fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
 
-            Unsafe unsafe = UnsafeUtils.getUNSAFE();
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
             int scale = unsafe.arrayIndexScale(ChunkSection[].class);
             if ((scale & (scale - 1)) != 0) {
                 throw new Error("data type scale not a power of two");
             }
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
-
-            Class<?> clsShortArraySet;
-            try { //paper
-                clsShortArraySet = Class.forName(new String(new char[]{'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l', '.', 's', 'h', 'o', 'r', 't', 's', '.', 'S', 'h', 'o', 'r', 't', 'A', 'r', 'r', 'a', 'y', 'S', 'e', 't'}));
-            } catch (Throwable t) { // still using spigot boo
-                clsShortArraySet = Class.forName(new String(new char[]{'o', 'r', 'g', '.', 'b', 'u', 'k', 'k', 'i', 't', '.', 'c', 'r', 'a', 'f', 't', 'b', 'u', 'k', 'k', 'i', 't', '.', 'l', 'i', 'b', 's', '.', 'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l', '.', 's', 'h', 'o', 'r', 't', 's', '.', 'S', 'h', 'o', 'r', 't', 'A', 'r', 'r', 'a', 'y', 'S', 'e', 't'}));
-            }
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -138,7 +119,7 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
     protected static boolean setSectionAtomic(ChunkSection[] sections, ChunkSection expected, ChunkSection value, int layer) {
         long offset = ((long) layer << CHUNKSECTION_SHIFT) + CHUNKSECTION_BASE;
         if (layer >= 0 && layer < sections.length) {
-            return UnsafeUtils.getUNSAFE().compareAndSwapObject(sections, offset, expected, value);
+            return UnsafeUtility.getUNSAFE().compareAndSwapObject(sections, offset, expected, value);
         }
         return false;
     }
@@ -147,16 +128,17 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which acquires the lock in NMS?
         try {
             synchronized (section) {
+                Unsafe unsafe = UnsafeUtility.getUNSAFE();
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                ReentrantLock currentLock = (ReentrantLock) fieldLock.get(blocks);
+                ReentrantLock currentLock = (ReentrantLock) unsafe.getObject(blocks, fieldLockOffset);
                 if (currentLock instanceof DelegateLock) {
                     return (DelegateLock) currentLock;
                 }
                 DelegateLock newLock = new DelegateLock(currentLock);
-                fieldLock.set(blocks, newLock);
+                unsafe.putObject(blocks, fieldLockOffset, newLock);
                 return newLock;
             }
-        } catch (IllegalAccessException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
@@ -198,51 +180,25 @@ public final class BukkitAdapter_1_16_2 extends NMSAdapter {
         if (playerChunk == null) {
             return;
         }
-        if (playerChunk.hasBeenLoaded()) {
-            TaskManager.IMP.sync(() -> {
-                ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-                Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
-                if (optional.isPresent()) {
-                    PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(optional.get(), 65535);
-                    playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                        p.playerConnection.sendPacket(chunkpacket);
-                    });
-
-                    if (lighting) {
-                        boolean trustEdges = true; //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
-                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                            p.playerConnection.sendPacket(packet);
-                        });
-                    }
-                } else if (PaperLib.isPaper()) {
-                    //Require generic here to work with multiple dependencies trying to take control.
-                    PooledLinkedHashSets.PooledObjectLinkedOpenHashSet<?> objects =
-                        nmsWorld.getChunkProvider().playerChunkMap.playerViewDistanceNoTickMap.getObjectsInRange(chunkX, chunkZ);
-                    if (objects == null) {
-                        return null;
-                    }
-                    for (Object obj : objects.getBackingSet()) {
-                        if (obj == null) {
-                            continue;
-                        }
-                        EntityPlayer p = (EntityPlayer) obj;
-                        Chunk chunk = nmsWorld.getChunkProvider().getChunkAtIfLoadedImmediately(chunkX, chunkZ);
-                        if (chunk != null) {
-                            PacketPlayOutMapChunk chunkpacket = new PacketPlayOutMapChunk(chunk, 65535);
-                            p.playerConnection.sendPacket(chunkpacket);
-
-                            if (lighting) {
-                                boolean trustEdges =
-                                    true; //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
-                                PacketPlayOutLightUpdate packet =
-                                    new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                                p.playerConnection.sendPacket(packet);
-                            }
-                        }
-                    }
-                }
-                return null;
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
+        Chunk chunk = optional.orElseGet(() ->
+                nmsWorld.getChunkProvider().getChunkAtIfLoadedImmediately(chunkX, chunkZ));
+        if (chunk == null)  {
+            return;
+        }
+        PacketPlayOutMapChunk chunkPacket = new PacketPlayOutMapChunk(chunk, 65535);
+        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+            p.playerConnection.sendPacket(chunkPacket);
+        });
+        if (lighting) {
+            //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
+            boolean trustEdges = true;
+            PacketPlayOutLightUpdate packet =
+                    new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(),
+                            trustEdges);
+            playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                p.playerConnection.sendPacket(packet);
             });
         }
     }

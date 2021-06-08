@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.util.paste;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.command.util.AsyncCommandBuilder;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -71,7 +72,7 @@ public final class ActorCallbackPaste {
 
         AsyncCommandBuilder.wrap(task, sender)
                 .registerWithSupervisor(supervisor, "Submitting content to a pastebin service.")
-                .sendMessageAfterDelay(TranslatableComponent.of("worldedit.pastebin.uploading"))
+                .sendMessageAfterDelay(Caption.of("worldedit.pastebin.uploading"))
                 .onSuccess((String) null, url -> sender.printInfo(successMessage.args(TextComponent.of(url.toString())).build()))
                 .onFailure("Failed to submit paste", null)
                 .buildAndExec(Pasters.getExecutor());

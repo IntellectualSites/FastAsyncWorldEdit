@@ -6,6 +6,7 @@ import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.command.MainCommand;
 import com.plotsquared.core.configuration.Settings;
 import com.plotsquared.core.database.DBFunc;
 import com.plotsquared.core.player.PlotPlayer;
@@ -16,30 +17,76 @@ import com.plotsquared.core.plot.flag.implementations.NoWorldeditFlag;
 import com.plotsquared.core.util.WEManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.world.World;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PlotSquaredFeature extends FaweMaskManager {
 
-    private static final Logger log = LoggerFactory.getLogger(PlotSquaredFeature.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public PlotSquaredFeature() {
         super("PlotSquared");
-        log.debug("Optimizing PlotSquared");
+        LOGGER.debug("Optimizing PlotSquared");
+        if (com.boydti.fawe.config.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_HOOK) {
+            Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
+            try {
+                setupBlockQueue();
+                setupSchematicHandler();
+                setupRegionManager();
+            } catch (Throwable ignored) {
+                LOGGER.debug("Please update PlotSquared: https://www.spigotmc.org/resources/77506/");
+            }
+            if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
+                new FaweTrim();
+            }
+            if (MainCommand.getInstance().getCommand("generatebiome") == null) {
+                new PlotSetBiome();
+            }
+        }
+        // TODO: revisit this later on
+        /*
+        try {
+            if (Settings.Enabled_Components.WORLDS) {
+                new ReplaceAll();
+            }
+        } catch (Throwable e) {
+            log.debug("You need to update PlotSquared to access the CFI and REPLACEALL commands");
+        }
+        */
     }
 
     public static String getName(UUID uuid) {
         return UUIDHandler.getName(uuid);
+    }
+
+    private void setupBlockQueue() throws RuntimeException {
+        // If it's going to fail, throw an error now rather than later
+        //QueueProvider provider = QueueProvider.of(FaweLocalBlockQueue.class, null);
+        //GlobalBlockQueue.IMP.setProvider(provider);
+        //HybridPlotManager.REGENERATIVE_CLEAR = false;
+        //log.debug(" - QueueProvider: " + FaweLocalBlockQueue.class);
+        //log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
+    }
+
+    private void setupRegionManager() throws RuntimeException {
+        RegionManager.manager = new FaweRegionManager(RegionManager.manager);
+        LOGGER.debug(" - RegionManager: " + RegionManager.manager);
+    }
+
+    private void setupSchematicHandler() throws RuntimeException {
+        SchematicHandler.manager = new FaweSchematicHandler(PlotSquared.platform().worldUtil());
+        LOGGER.debug(" - SchematicHandler: " + SchematicHandler.manager);
     }
 
     public boolean isAllowed(Player player, Plot plot, MaskType type) {

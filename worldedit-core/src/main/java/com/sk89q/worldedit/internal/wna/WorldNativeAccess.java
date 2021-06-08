@@ -186,4 +186,6 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         onBlockStateChange(pos, oldState, newState);
     }
 
+    void flush();
+
 }

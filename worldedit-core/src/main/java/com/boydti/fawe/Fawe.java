@@ -2,7 +2,6 @@ package com.boydti.fawe;
 
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.VisualQueue;
 import com.boydti.fawe.util.CachedTextureUtil;
 import com.boydti.fawe.util.CleanTextureUtil;
 import com.boydti.fawe.util.FaweTimer;
@@ -14,8 +13,8 @@ import com.boydti.fawe.util.TextureUtil;
 import com.boydti.fawe.util.WEManager;
 import com.github.luben.zstd.util.Native;
 import com.sk89q.worldedit.WorldEdit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -73,7 +72,7 @@ import javax.management.NotificationEmitter;
  */
 public class Fawe {
 
-    private static final Logger log = LoggerFactory.getLogger(Fawe.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static Fawe instance;
 
@@ -82,7 +81,6 @@ public class Fawe {
      */
     private final FaweTimer timer;
     private FaweVersion version;
-    private VisualQueue visualQueue;
     private TextureUtil textures;
 
 
@@ -148,7 +146,6 @@ public class Fawe {
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
-                visualQueue = new VisualQueue(3);
                 WEManager.IMP.managers.addAll(Fawe.this.implementation.getMaskManagers());
             } catch (Throwable ignored) {
             }
@@ -209,13 +206,6 @@ public class Fawe {
     }
 
     /**
-     * Get the visual queue.
-     */
-    public VisualQueue getVisualQueue() {
-        return visualQueue;
-    }
-
-    /**
      * The FAWE version.
      *
      * @apiNote Unofficial jars may be lacking version information
@@ -235,8 +225,8 @@ public class Fawe {
         // Setting up config.yml
         File file = new File(this.implementation.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = implementation.getPlatform().replace("\"", "");
-        try (InputStream stream = getClass().getResourceAsStream(File.separator + "fawe.properties");
-             BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
+        try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
             String commitString = br.readLine();
             String dateString = br.readLine();
@@ -250,7 +240,7 @@ public class Fawe {
         try {
             Settings.IMP.reload(file);
         } catch (Throwable e) {
-            log.error("Failed to load config.", e);
+            LOGGER.error("Failed to load config.", e);
         }
     }
 
@@ -272,14 +262,14 @@ public class Fawe {
                 if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.IMP.HISTORY.COMPRESSION_LEVEL > 6) {
                     Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
                     Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
-                    log.error("ZSTD Compression Binding Not Found.\n"
+                    LOGGER.error("ZSTD Compression Binding Not Found.\n"
                                   + "FAWE will still work but compression won't work as well.\n", e);
                 }
             }
             try {
                 net.jpountz.util.Native.load();
             } catch (Throwable e) {
-                log.error("LZ4 Compression Binding Not Found.\n"
+                LOGGER.error("LZ4 Compression Binding Not Found.\n"
                               + "FAWE will still work but compression will be slower.\n", e);
             }
         }
@@ -288,7 +278,7 @@ public class Fawe {
         boolean x86OS = System.getProperty("sun.arch.data.model").contains("32");
         boolean x86JVM = System.getProperty("os.arch").contains("32");
         if (x86OS != x86JVM) {
-            log.info("You are running 32-bit Java on a 64-bit machine. Please upgrade to 64-bit Java.");
+            LOGGER.info("You are running 32-bit Java on a 64-bit machine. Please upgrade to 64-bit Java.");
         }
     }
 
@@ -322,7 +312,7 @@ public class Fawe {
                 }
             }
         } catch (Throwable ignored) {
-            log.error("FAWE encountered an error trying to listen to JVM memory.\n"
+            LOGGER.error("FAWE encountered an error trying to listen to JVM memory.\n"
                           + "Please change your Java security settings or disable this message by"
                           + "changing 'max-memory-percent' in the config files to '-1'.");
         }

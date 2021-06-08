@@ -33,6 +33,7 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
@@ -44,8 +45,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.URL;
@@ -56,7 +56,7 @@ import javax.annotation.Nullable;
 
 public final class LegacyMapper {
 
-    private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static LegacyMapper INSTANCE;
     private final ResourceLoader resourceLoader;
 
@@ -79,7 +79,7 @@ public final class LegacyMapper {
         try {
             loadFromResource();
         } catch (Throwable e) {
-            log.warn("Failed to load the built-in legacy id registry", e);
+            LOGGER.warn("Failed to load the built-in legacy id registry", e);
         }
     }
 
@@ -140,7 +140,7 @@ public final class LegacyMapper {
 
                 // if it's still null, both fixer and default failed
                 if (state == null) {
-                    log.debug("Unknown block: " + value);
+                    LOGGER.debug("Unknown block: " + value);
                 } else {
                     // it's not null so one of them succeeded, now use it
                     blockToStringMap.put(state, id);
@@ -174,7 +174,7 @@ public final class LegacyMapper {
                 type = ItemTypes.get(value);
             }
             if (type == null) {
-                log.debug("Unknown item: " + value);
+                LOGGER.debug("Unknown item: " + value);
             } else {
                 try {
                     itemMap.put(getCombinedId(id), type);

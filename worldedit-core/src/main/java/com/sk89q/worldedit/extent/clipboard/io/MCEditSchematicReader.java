@@ -42,6 +42,7 @@ import com.sk89q.worldedit.extent.clipboard.io.legacycompat.NoteBlockCompatibili
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.Pre13HangingCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.SignCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.SkullBlockCompatibilityHandler;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -52,8 +53,7 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.storage.NBTConversions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,26 +68,24 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads schematic files that are compatible with MCEdit and other editors.
- * @deprecated Use SchematicStreamer
  */
-@Deprecated
 public class MCEditSchematicReader extends NBTSchematicReader {
 
-    private static final Logger log = LoggerFactory.getLogger(MCEditSchematicReader.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final NBTInputStream inputStream;
     private final DataFixer fixer;
     private static final ImmutableList<NBTCompatibilityHandler> COMPATIBILITY_HANDLERS
-            = ImmutableList.of(
-                new SignCompatibilityHandler(),
-                new FlowerPotCompatibilityHandler(),
-                new NoteBlockCompatibilityHandler(),
-                new SkullBlockCompatibilityHandler(),
-                new BannerBlockCompatibilityHandler(),
-                new BedBlockCompatibilityHandler()
+        = ImmutableList.of(
+        new SignCompatibilityHandler(),
+        new FlowerPotCompatibilityHandler(),
+        new NoteBlockCompatibilityHandler(),
+        new SkullBlockCompatibilityHandler(),
+        new BannerBlockCompatibilityHandler(),
+        new BedBlockCompatibilityHandler()
     );
     private static final ImmutableList<EntityNBTCompatibilityHandler> ENTITY_COMPATIBILITY_HANDLERS
-            = ImmutableList.of(
-                    new Pre13HangingCompatibilityHandler()
+        = ImmutableList.of(
+        new Pre13HangingCompatibilityHandler()
     );
 
     /**
@@ -99,8 +97,8 @@ public class MCEditSchematicReader extends NBTSchematicReader {
         checkNotNull(inputStream);
         this.inputStream = inputStream;
         this.fixer = null;
-                //com.sk89q.worldedit.WorldEdit.getInstance().getPlatformManager().queryCapability(
-                        //com.sk89q.worldedit.extension.platform.Capability.WORLD_EDITING).getDataFixer();
+        //com.sk89q.worldedit.WorldEdit.getInstance().getPlatformManager().queryCapability(
+        //com.sk89q.worldedit.extension.platform.Capability.WORLD_EDITING).getDataFixer();
     }
 
     @Override
@@ -207,7 +205,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             if (newBlock != null) {
                 for (NBTCompatibilityHandler handler : COMPATIBILITY_HANDLERS) {
                     if (handler.isAffectedBlock(newBlock)) {
-                        newBlock = handler.updateNBT(block, values);
+                        newBlock = handler.updateNBT(block, values).toImmutableState();
                         if (newBlock == null || values.isEmpty()) {
                             break;
                         }
@@ -255,8 +253,8 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                             byte data = blockData[index];
                             int combined = block << 8 | data;
                             if (unknownBlocks.add(combined)) {
-                                log.warn("Unknown block when loading schematic: "
-                                        + block + ":" + data + ". This is most likely a bad schematic.");
+                                LOGGER.warn("Unknown block when loading schematic: "
+                                    + block + ":" + data + ". This is most likely a bad schematic.");
                             }
                         }
                     } catch (WorldEditException ignored) { // BlockArrayClipboard won't throw this
@@ -291,7 +289,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                             BaseEntity state = new BaseEntity(entityType, compound);
                             clipboard.createEntity(location, state);
                         } else {
-                            log.warn("Unknown entity when pasting schematic: " + id.toLowerCase(Locale.ROOT));
+                            LOGGER.warn("Unknown entity when pasting schematic: " + id.toLowerCase(Locale.ROOT));
                         }
                     }
                 }
@@ -302,7 +300,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
     }
 
     private String convertEntityId(String id) {
-        switch(id) {
+        switch (id) {
             case "AreaEffectCloud": return "area_effect_cloud";
             case "ArmorStand": return "armor_stand";
             case "CaveSpider": return "cave_spider";

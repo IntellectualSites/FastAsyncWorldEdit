@@ -19,10 +19,9 @@
 
 package com.sk89q.jnbt;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,11 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * The {@code TAG_List} tag.
  */
 public final class ListTag extends Tag {
-
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_LIST;
-    }
 
     private final Class<? extends Tag> type;
     private final List<Tag> value;
@@ -422,18 +416,6 @@ public final class ListTag extends Tag {
     }
 
     @Override
-    public ArrayList toRaw() {
-        ArrayList<Object> raw = new ArrayList<>();
-        if (this.value.isEmpty()) {
-            return raw;
-        }
-        for (Tag elem : this.value) {
-            raw.add(elem.toRaw());
-        }
-        return raw;
-    }
-
-    @Override
     public String toString() {
         StringBuilder bldr = new StringBuilder();
         bldr.append("TAG_List").append(": ").append(value.size()).append(" entries of type ").append(NBTUtils.getTypeName(type)).append("\r\n{\r\n");
@@ -443,5 +425,12 @@ public final class ListTag extends Tag {
         bldr.append("}");
         return bldr.toString();
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_LIST;
+    }
+    // FAWE End
 
 }

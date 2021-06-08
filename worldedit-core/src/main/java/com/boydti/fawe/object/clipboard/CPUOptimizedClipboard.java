@@ -27,7 +27,7 @@ import java.util.Map;
 public class CPUOptimizedClipboard extends LinearClipboard {
 
     private BiomeType[] biomes = null;
-    private char[] states;
+    private final char[] states;
 
     private final HashMap<IntTriple, CompoundTag> nbtMapLoc;
     private final HashMap<Integer, CompoundTag> nbtMapIndex;
@@ -52,14 +52,14 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        setBiome(getIndex(x, 0, z), biome);
+        setBiome(getBiomeIndex(x, y, z), biome);
         return true;
     }
 
     @Override
     public void setBiome(int index, BiomeType biome) {
         if (biomes == null) {
-            biomes = new BiomeType[getArea()];
+            biomes = new BiomeType[((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)];
         }
         biomes[index] = biome;
     }
@@ -69,11 +69,12 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         if (!hasBiomes()) {
             return;
         }
-        int index = 0;
         try {
-            for (int z = 0; z < getLength(); z++) {
-                for (int x = 0; x < getWidth(); x++, index++) {
-                    task.applyInt(index, biomes[index].getInternalId());
+            for (int y = 0; y < getHeight(); y ++) {
+                for (int z = 0; z < getLength(); z++) {
+                    for (int x = 0; x < getWidth(); x++) {
+                        task.applyInt(getIndex(x, y, z), biomes[getBiomeIndex(x, y, z)].getInternalId());
+                    }
                 }
             }
         } catch (IOException e) {
@@ -92,12 +93,12 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        return getBiome(getIndex(x, 0, z));
+        return getBiome(getBiomeIndex(x, y, z));
     }
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        return getBiome(getIndex(position.getX(), 0, position.getZ()));
+        return getBiome(getBiomeIndex(position.getX(), position.getY(), position.getZ()));
     }
 
     public void convertTilesToIndex() {
@@ -114,6 +115,10 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     private CompoundTag getTag(int index) {
         convertTilesToIndex();
         return nbtMapIndex.get(index);
+    }
+
+    public int getBiomeIndex(int x, int y, int z) {
+        return (x >> 2) + (y >> 2) * (getWidth() >> 2) * (getLength() >> 2) + (z >> 2) * (getWidth() >> 2);
     }
 
     public int getIndex(int x, int y, int z) {
@@ -152,10 +157,8 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     @Override
     public Collection<CompoundTag> getTileEntities() {
         convertTilesToIndex();
-        for (Map.Entry<Integer, CompoundTag> entry : nbtMapIndex.entrySet()) {
-            int index = entry.getKey();
-            CompoundTag tag = entry.getValue();
-            Map<String, Tag> values = tag.getValue();
+        nbtMapIndex.replaceAll((index, tag) -> {
+            Map<String, Tag> values = new HashMap<>(tag.getValue());
             if (!values.containsKey("x")) {
                 int y = index / getArea();
                 index -= y * getArea();
@@ -164,23 +167,26 @@ public class CPUOptimizedClipboard extends LinearClipboard {
                 values.put("x", new IntTag(x));
                 values.put("y", new IntTag(y));
                 values.put("z", new IntTag(z));
+                return new CompoundTag(values);
+            } else {
+                return tag;
             }
-        }
+        });
         return nbtMapIndex.values();
     }
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMapLoc.put(new IntTriple(x, y, z), tag);
+        nbtMapLoc.put(new IntTriple(x, y, z),  new CompoundTag(tag.getValue()));
         return true;
     }
 
-    public boolean setTile(int index, CompoundTag tag) {
-        nbtMapIndex.put(index, tag);
-        Map<String, Tag> values = tag.getValue();
+    private boolean setTile(int index, CompoundTag tag) {
+        final Map<String, Tag> values = new HashMap<>(tag.getValue());
         values.remove("x");
         values.remove("y");
         values.remove("z");
+        nbtMapIndex.put(index, new CompoundTag(values));
         return true;
     }
 

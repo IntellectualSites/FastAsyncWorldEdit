@@ -13,6 +13,7 @@ import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -55,11 +56,11 @@ public class StripNBTExtent extends AbstractDelegateExtent {
             return block;
         }
         CompoundTag nbt = localBlock.getNbtData();
-        Map<String, Tag> value = nbt.getValue();
+        Map<String, Tag> value = new HashMap<>(nbt.getValue());
         for (String key : strip) {
             value.remove(key);
         }
-        return (B) localBlock;
+        return (B) localBlock.toBaseBlock(new CompoundTag(value));
     }
 
     public <T extends NbtValued> T stripEntityNBT(T entity) {
@@ -67,10 +68,11 @@ public class StripNBTExtent extends AbstractDelegateExtent {
             return entity;
         }
         CompoundTag nbt = entity.getNbtData();
-        Map<String, Tag> value = nbt.getValue();
+        Map<String, Tag> value = new HashMap<>(nbt.getValue());
         for (String key : strip) {
             value.remove(key);
         }
+        entity.setNbtData(new CompoundTag(value));
         return entity;
     }
 }

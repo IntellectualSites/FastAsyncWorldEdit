@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
@@ -131,7 +131,7 @@ public class ExtendingCuboidRegionSelector extends CuboidRegionSelector {
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.printInfo(TranslatableComponent.of(
+        player.print(Caption.of(
                 "worldedit.selection.extend.explain.primary",
                 TextComponent.of(pos.toString()),
                 TextComponent.of(region.getVolume())
@@ -142,7 +142,7 @@ public class ExtendingCuboidRegionSelector extends CuboidRegionSelector {
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.printInfo(TranslatableComponent.of(
+        player.print(Caption.of(
                 "worldedit.selection.extend.explain.secondary",
                 TextComponent.of(pos.toString()),
                 TextComponent.of(region.getVolume())

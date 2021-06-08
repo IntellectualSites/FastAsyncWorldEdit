@@ -1,6 +1,7 @@
 package com.boydti.fawe.util;
 
 import com.boydti.fawe.Fawe;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.FaweInputStream;
 import com.boydti.fawe.object.FaweOutputStream;
@@ -21,9 +22,9 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
@@ -31,9 +32,12 @@ import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.jpountz.lz4.LZ4InputStream;
-import net.jpountz.lz4.LZ4Utils;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -66,6 +70,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -83,13 +88,11 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.annotation.Nullable;
-import javax.imageio.ImageIO;
 
 import static java.lang.System.arraycopy;
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class MainUtil {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public static List<String> filter(String prefix, List<String> suggestions) {
         if (prefix.isEmpty()) {
@@ -250,7 +253,7 @@ public class MainUtil {
     private static final LZ4FastDecompressor DECOMPRESSOR = FACTORY.fastDecompressor();
 
     public static int getMaxCompressedLength(int size) {
-        return LZ4Utils.maxCompressedLength(size);
+        return COMPRESSOR.maxCompressedLength(size);
     }
 
     public static int compress(byte[] bytes, int length, byte[] buffer, OutputStream out, Deflater deflate) throws IOException {
@@ -436,7 +439,7 @@ public class MainUtil {
                 content = scanner.next().trim();
             }
             if (!content.startsWith("<")) {
-                getLogger(MainUtil.class).debug(content);
+                LOGGER.debug(content);
             }
             if (responseCode == 200) {
                 return url;
@@ -448,24 +451,44 @@ public class MainUtil {
         }
     }
 
-    public static void setPosition(CompoundTag tag, int x, int y, int z) {
-        Map<String, Tag> value = tag.getValue();
+    /**
+     * Create a copy of the tag and modify the (x, y, z) coordinates
+     *
+     * @param tag Tag to copy
+     * @param x   New X coordinate
+     * @param y   New Y coordinate
+     * @param z   New Z coordinate
+     * @return New tag
+     */
+    public static @NotNull CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
+        Map<String, Tag> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
         value.put("z", new IntTag(z));
+        return new CompoundTag(value);
     }
 
-    public static void setEntityInfo(CompoundTag tag, Entity entity) {
-        Map<String, Tag> map = tag.getValue();
+    /**
+     * Create a copy of the tag and modify the entity inf
+     *
+     * @param tag    Tag to copy
+     * @param entity Entity
+     * @return New tag
+     */
+    public static @NotNull CompoundTag setEntityInfo(@NotNull CompoundTag tag, @NotNull Entity entity) {
+        Map<String, Tag> map = new HashMap<>(tag.getValue());
         map.put("Id", new StringTag(entity.getState().getType().getId()));
         ListTag pos = (ListTag) map.get("Pos");
         if (pos != null) {
             Location loc = entity.getLocation();
-            List<Tag> posList = ReflectionUtils.getList(pos.getValue());
+            // Create a copy, because the list is immutable...
+            List<Tag> posList = new ArrayList<>(pos.getValue());
             posList.set(0, new DoubleTag(loc.getX()));
             posList.set(1, new DoubleTag(loc.getY()));
             posList.set(2, new DoubleTag(loc.getZ()));
+            map.put("Pos", new ListTag(pos.getType(), posList));
         }
+        return new CompoundTag(map);
     }
 
     public static String getText(String url) throws IOException {
@@ -616,7 +639,7 @@ public class MainUtil {
                 return newFile;
             }
         } catch (IOException e) {
-            getLogger(MainUtil.class).debug("Could not save " + resource, e);
+            LOGGER.debug("Could not save " + resource, e);
         }
         return null;
     }
@@ -856,9 +879,9 @@ public class MainUtil {
             long age = now - file.lastModified();
             if (age > timeDiff) {
                 pool.submit(file::delete);
-                Component msg = TranslatableComponent.of("worldedit.schematic.delete.deleted");
+                Component msg = Caption.of("worldedit.schematic.delete.deleted");
                 if (printDebug) {
-                    getLogger(MainUtil.class).debug(msg.toString());
+                    LOGGER.debug(msg.toString());
                 }
             }
         });

@@ -1,6 +1,6 @@
 package com.boydti.fawe.object.brush;
 
-import com.boydti.fawe.object.brush.visualization.VisualExtent;
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.collection.LocalBlockVectorSet;
 import com.boydti.fawe.util.MathMan;
 import com.sk89q.worldedit.EditSession;
@@ -13,7 +13,6 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +35,14 @@ public class SurfaceSpline implements Brush {
     @Override
     public void build(EditSession editSession, BlockVector3 pos, Pattern pattern, double radius) throws MaxChangedBlocksException {
         int maxY = editSession.getMaxY();
-        boolean vis = editSession.getExtent() instanceof VisualExtent;
         if (path.isEmpty() || !pos.equals(path.get(path.size() - 1))) {
             int max = editSession.getNearestSurfaceTerrainBlock(pos.getBlockX(), pos.getBlockZ(), pos.getBlockY(), 0, editSession.getMaxY());
             if (max == -1) {
                 return;
             }
             path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
-            editSession.getPlayer().printInfo(TranslatableComponent.of("fawe.worldedit.brush.spline.primary.2"));
-            if (!vis) {
-                return;
-            }
+            editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.spline.primary.2"));
+            return;
         }
         final List<Node> nodes = new ArrayList<>(path.size());
         final KochanekBartelsInterpolation interpol = new KochanekBartelsInterpolation();
@@ -103,10 +99,8 @@ public class SurfaceSpline implements Brush {
                 }
             }
             editSession.setBlocks(newSet, pattern);
-            if (!vis) {
-                path.clear();
-            }
+            path.clear();
         }
-        editSession.getPlayer().printInfo(TranslatableComponent.of("fawe.worldedit.brush.spline.secondary"));
+        editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.spline.secondary"));
     }
 }

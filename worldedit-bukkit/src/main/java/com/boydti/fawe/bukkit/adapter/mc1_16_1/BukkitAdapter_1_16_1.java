@@ -7,13 +7,13 @@ import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArrayUnstretched;
 import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.ReflectionUtils;
 import com.boydti.fawe.util.TaskManager;
+import com.boydti.fawe.util.UnsafeUtility;
+import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
-import net.jpountz.util.UnsafeUtils;
 import net.minecraft.server.v1_16_R1.BiomeBase;
 import net.minecraft.server.v1_16_R1.BiomeStorage;
 import net.minecraft.server.v1_16_R1.Block;
@@ -27,6 +27,7 @@ import net.minecraft.server.v1_16_R1.DataPaletteLinear;
 import net.minecraft.server.v1_16_R1.GameProfileSerializer;
 import net.minecraft.server.v1_16_R1.IBlockData;
 import net.minecraft.server.v1_16_R1.PacketPlayOutLightUpdate;
+import net.minecraft.server.v1_16_R1.PacketPlayOutMapChunk;
 import net.minecraft.server.v1_16_R1.PlayerChunk;
 import net.minecraft.server.v1_16_R1.PlayerChunkMap;
 import net.minecraft.server.v1_16_R1.World;
@@ -42,6 +43,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -60,9 +62,6 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
 
-    private static final Field fieldDirtyCount;
-    private static final Field fieldDirtyBits;
-
     private static final Field fieldBiomeArray;
 
     private final static MethodHandle methodGetVisibleChunk;
@@ -71,6 +70,7 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
     private static final int CHUNKSECTION_SHIFT;
 
     private static final Field fieldLock;
+    private static final long fieldLockOffset;
 
     static {
         try {
@@ -91,11 +91,6 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldDirtyCount = PlayerChunk.class.getDeclaredField("dirtyCount");
-            fieldDirtyCount.setAccessible(true);
-            fieldDirtyBits = PlayerChunk.class.getDeclaredField("r");
-            fieldDirtyBits.setAccessible(true);
-
             fieldBiomeArray = BiomeStorage.class.getDeclaredField("g");
             fieldBiomeArray.setAccessible(true);
 
@@ -103,12 +98,10 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
             declaredGetVisibleChunk.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
 
-            Field tmp = DataPaletteBlock.class.getDeclaredField("j");
-            ReflectionUtils.setAccessibleNonFinal(tmp);
-            fieldLock = tmp;
-            fieldLock.setAccessible(true);
+            Unsafe unsafe = UnsafeUtility.getUNSAFE();
+            fieldLock = DataPaletteBlock.class.getDeclaredField("j");
+            fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
 
-            Unsafe unsafe = UnsafeUtils.getUNSAFE();
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
             int scale = unsafe.arrayIndexScale(ChunkSection[].class);
             if ((scale & (scale - 1)) != 0) {
@@ -126,7 +119,7 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
     protected static boolean setSectionAtomic(ChunkSection[] sections, ChunkSection expected, ChunkSection value, int layer) {
         long offset = ((long) layer << CHUNKSECTION_SHIFT) + CHUNKSECTION_BASE;
         if (layer >= 0 && layer < sections.length) {
-            return UnsafeUtils.getUNSAFE().compareAndSwapObject(sections, offset, expected, value);
+            return UnsafeUtility.getUNSAFE().compareAndSwapObject(sections, offset, expected, value);
         }
         return false;
     }
@@ -135,16 +128,17 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
         //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which acquires the lock in NMS?
         try {
             synchronized (section) {
+                Unsafe unsafe = UnsafeUtility.getUNSAFE();
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                ReentrantLock currentLock = (ReentrantLock) fieldLock.get(blocks);
+                ReentrantLock currentLock = (ReentrantLock) unsafe.getObject(blocks, fieldLockOffset);
                 if (currentLock instanceof DelegateLock) {
                     return (DelegateLock) currentLock;
                 }
                 DelegateLock newLock = new DelegateLock(currentLock);
-                fieldLock.set(blocks, newLock);
+                unsafe.putObject(blocks, fieldLockOffset, newLock);
                 return newLock;
             }
-        } catch (IllegalAccessException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
@@ -186,35 +180,25 @@ public final class BukkitAdapter_1_16_1 extends NMSAdapter {
         if (playerChunk == null) {
             return;
         }
-        if (playerChunk.hasBeenLoaded()) {
-            TaskManager.IMP.sync(() -> {
-                try {
-                    int dirtyBits = fieldDirtyBits.getInt(playerChunk);
-                    if (dirtyBits == 0) {
-                        nmsWorld.getChunkProvider().playerChunkMap.a(playerChunk);
-                    }
-                    if (mask == 0) {
-                        dirtyBits = 65535;
-                    } else {
-                        dirtyBits |= mask;
-                    }
-
-                    fieldDirtyBits.set(playerChunk, dirtyBits);
-                    fieldDirtyCount.set(playerChunk, 64);
-
-                    if (lighting) {
-                        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
-                        boolean trustEdges = false; //Added in 1.16.1 Not sure what it does.
-                        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(), trustEdges);
-                        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
-                            p.playerConnection.sendPacket(packet);
-                        });
-                    }
-
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-                return null;
+        ChunkCoordIntPair chunkCoordIntPair = new ChunkCoordIntPair(chunkX, chunkZ);
+        Optional<Chunk> optional = ((Either) playerChunk.a().getNow(PlayerChunk.UNLOADED_CHUNK)).left();
+        Chunk chunk = optional.orElseGet(() ->
+                nmsWorld.getChunkProvider().getChunkAtIfLoadedImmediately(chunkX, chunkZ));
+        if (chunk == null)  {
+            return;
+        }
+        PacketPlayOutMapChunk chunkPacket = new PacketPlayOutMapChunk(chunk, 65535, true);
+        playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+            p.playerConnection.sendPacket(chunkPacket);
+        });
+        if (lighting) {
+            //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
+            boolean trustEdges = true;
+            PacketPlayOutLightUpdate packet =
+                    new PacketPlayOutLightUpdate(chunkCoordIntPair, nmsWorld.getChunkProvider().getLightEngine(),
+                            trustEdges);
+            playerChunk.players.a(chunkCoordIntPair, false).forEach(p -> {
+                p.playerConnection.sendPacket(packet);
             });
         }
     }

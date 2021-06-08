@@ -59,11 +59,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public void recycle() {
+    public synchronized void recycle() {
         delegate = NULL;
     }
 
-    public IBlockDelegate getDelegate() {
+    public synchronized IBlockDelegate getDelegate() {
         return delegate;
     }
 
@@ -98,11 +98,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return delegate.set(this).getBiomes();
     }
 
-    @Override public char[][] getLight() {
+    @Override
+    public char[][] getLight() {
         return delegate.set(this).getLight();
     }
 
-    @Override public char[][] getSkyLight() {
+    @Override
+    public char[][] getSkyLight() {
         return delegate.set(this).getSkyLight();
     }
 
@@ -139,16 +141,37 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public CompoundTag getEntity(UUID uuid) {
+    public synchronized CompoundTag getEntity(UUID uuid) {
         return delegate.get(this).getEntity(uuid);
     }
 
-    @Override public void setCreateCopy(boolean createCopy) {
+    @Override
+    public void setCreateCopy(boolean createCopy) {
         this.createCopy = createCopy;
     }
 
-    @Override public boolean isCreateCopy() {
+    @Override
+    public boolean isCreateCopy() {
         return createCopy;
+    }
+
+    @Override
+    public synchronized void setLightingToGet(char[][] lighting) {
+        delegate.setLightingToGet(this, lighting);
+    }
+
+    @Override
+    public synchronized void setSkyLightingToGet(char[][] lighting) {
+        delegate.setSkyLightingToGet(this, lighting);
+    }
+
+    @Override
+    public synchronized void setHeightmapToGet(HeightMapType type, int[] data) {
+        delegate.setHeightmapToGet(this, type, data);
+    }
+
+    public synchronized void flushLightToGet(boolean heightmaps) {
+        delegate.flushLightToGet(this, heightmaps);
     }
 
     private static final IBlockDelegate BOTH = new IBlockDelegate() {
@@ -187,6 +210,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
             chunk.chunkSet.removeSectionLighting(layer, sky);
+            chunk.chunkExisting.removeSectionLighting(layer, sky);
         }
 
         @Override
@@ -263,6 +287,27 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
             return chunk.chunkExisting.getHeightMap(type);
+        }
+
+        @Override
+        public void flushLightToGet(ChunkHolder chunk, boolean heightmaps) {
+            chunk.chunkExisting.setLightingToGet(chunk.chunkSet.getLight());
+            chunk.chunkExisting.setSkyLightingToGet(chunk.chunkSet.getSkyLight());
+        }
+
+        @Override
+        public void setLightingToGet(ChunkHolder chunk, char[][] lighting) {
+            chunk.chunkExisting.setLightingToGet(lighting);
+        }
+
+        @Override
+        public void setSkyLightingToGet(ChunkHolder chunk, char[][] lighting) {
+            chunk.chunkExisting.setSkyLightingToGet(lighting);
+        }
+
+        @Override
+        public void setHeightmapToGet(ChunkHolder chunk, HeightMapType type, int[] data) {
+            chunk.chunkExisting.setHeightmapToGet(type, data);
         }
     };
 
@@ -382,6 +427,26 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
             return chunk.chunkExisting.getHeightMap(type);
         }
+
+        @Override
+        public void flushLightToGet(ChunkHolder chunk, boolean heightmaps) {
+            // Do nothing as no lighting to flush to GET
+        }
+
+        @Override
+        public void setLightingToGet(ChunkHolder chunk, char[][] lighting) {
+            chunk.chunkExisting.setLightingToGet(lighting);
+        }
+
+        @Override
+        public void setSkyLightingToGet(ChunkHolder chunk, char[][] lighting) {
+            chunk.chunkExisting.setSkyLightingToGet(lighting);
+        }
+
+        @Override
+        public void setHeightmapToGet(ChunkHolder chunk, HeightMapType type, int[] data) {
+            chunk.chunkExisting.setHeightmapToGet(type, data);
+        }
     };
 
     private static final IBlockDelegate SET = new IBlockDelegate() {
@@ -421,7 +486,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         @Override
         public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
-            chunk.chunkSet.removeSectionLighting(layer, sky);
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            chunk.removeSectionLighting(layer, sky);
         }
 
         @Override
@@ -524,6 +591,39 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.chunkExisting.trim(false);
             return chunk.getHeightMap(type);
         }
+
+        @Override
+        public void flushLightToGet(ChunkHolder chunk, boolean heightmaps) {
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
+            chunk.chunkExisting.setLightingToGet(chunk.chunkSet.getLight());
+            chunk.chunkExisting.setSkyLightingToGet(chunk.chunkSet.getSkyLight());
+        }
+
+        @Override
+        public void setLightingToGet(ChunkHolder chunk, char[][] lighting) {
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
+            chunk.chunkExisting.setLightingToGet(lighting);
+        }
+
+        @Override
+        public void setSkyLightingToGet(ChunkHolder chunk, char[][] lighting) {
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
+            chunk.chunkExisting.setSkyLightingToGet(lighting);
+        }
+
+        @Override
+        public void setHeightmapToGet(ChunkHolder chunk, HeightMapType type, int[] data) {
+            chunk.getOrCreateGet();
+            chunk.delegate = BOTH;
+            chunk.chunkExisting.trim(false);
+            chunk.chunkExisting.setHeightmapToGet(type, data);
+        }
     };
 
     private static final IBlockDelegate NULL = new IBlockDelegate() {
@@ -597,8 +697,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         @Override
         public void removeSectionLighting(ChunkHolder chunk, int layer, boolean sky) {
+            chunk.getOrCreateGet();
             chunk.getOrCreateSet();
-            chunk.delegate = SET;
+            chunk.delegate = BOTH;
             chunk.removeSectionLighting(layer, sky);
         }
 
@@ -667,25 +768,54 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.chunkExisting.trim(false);
             return chunk.getHeightMap(type);
         }
+
+        @Override
+        public void flushLightToGet(ChunkHolder chunk, boolean heightmaps) {
+            // Do nothing as no light to flush
+        }
+
+        @Override
+        public void setLightingToGet(ChunkHolder chunk, char[][] lighting) {
+            chunk.getOrCreateGet();
+            chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
+            chunk.setLightingToGet(lighting);
+        }
+
+        @Override
+        public void setSkyLightingToGet(ChunkHolder chunk, char[][] lighting) {
+            chunk.getOrCreateGet();
+            chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
+            chunk.setSkyLightingToGet(lighting);
+        }
+
+        @Override
+        public void setHeightmapToGet(ChunkHolder chunk, HeightMapType type, int[] data) {
+            chunk.getOrCreateGet();
+            chunk.delegate = GET;
+            chunk.chunkExisting.trim(false);
+            chunk.setHeightmapToGet(type, data);
+        }
     };
 
     @Override
-    public Map<BlockVector3, CompoundTag> getTiles() {
+    public synchronized Map<BlockVector3, CompoundTag> getTiles() {
         return delegate.get(this).getTiles();
     }
 
     @Override
-    public Set<CompoundTag> getEntities() {
+    public synchronized Set<CompoundTag> getEntities() {
         return delegate.get(this).getEntities();
     }
 
     @Override
-    public boolean hasSection(int layer) {
+    public synchronized boolean hasSection(int layer) {
         return chunkExisting != null && chunkExisting.hasSection(layer);
     }
 
     @Override
-    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
+    public synchronized void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         set.setFastMode(fastmode);
@@ -697,7 +827,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public boolean trim(boolean aggressive) {
+    public synchronized boolean trim(boolean aggressive) {
         if (chunkSet != null) {
             final boolean result = chunkSet.trim(aggressive);
             if (result) {
@@ -721,7 +851,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public boolean trim(boolean aggressive, int layer) {
+    public synchronized boolean trim(boolean aggressive, int layer) {
         return this.trim(aggressive);
     }
 
@@ -733,7 +863,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     /**
      * Get or create the existing part of this chunk.
      */
-    public final IChunkGet getOrCreateGet() {
+    public synchronized final IChunkGet getOrCreateGet() {
         if (chunkExisting == null) {
             chunkExisting = newWrappedGet();
         }
@@ -743,7 +873,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     /**
      * Get or create the settable part of this chunk.
      */
-    public final IChunkSet getOrCreateSet() {
+    public synchronized final IChunkSet getOrCreateSet() {
         if (chunkSet == null) {
             chunkSet = newWrappedSet();
         }
@@ -755,7 +885,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
      *  - e.g., caching, optimizations, filtering
      */
-    private IChunkSet newWrappedSet() {
+    private synchronized IChunkSet newWrappedSet() {
         return extent.getCachedSet(chunkX, chunkZ);
     }
 
@@ -764,12 +894,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
      *  - e.g., caching, optimizations, filtering
      */
-    private IChunkGet newWrappedGet() {
+    private synchronized IChunkGet newWrappedGet() {
         return extent.getCachedGet(chunkX, chunkZ);
     }
 
     @Override
-    public <V extends IChunk> void init(IQueueExtent<V> extent, int chunkX, int chunkZ) {
+    public synchronized <V extends IChunk> void init(IQueueExtent<V> extent, int chunkX, int chunkZ) {
         this.extent = extent;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
@@ -787,13 +917,17 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public synchronized T call() {
         if (chunkSet != null) {
             chunkSet.setBitMask(bitMask);
-            return this.call(chunkSet, this::recycle);
+            return this.call(chunkSet, () -> {
+                synchronized (this) {
+                    this.recycle();
+                }
+            });
         }
         return null;
     }
 
     @Override
-    public T call(IChunkSet set, Runnable finalize) {
+    public synchronized T call(IChunkSet set, Runnable finalize) {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
             get.trim(false);
@@ -829,79 +963,82 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+    public synchronized boolean setBiome(int x, int y, int z, BiomeType biome) {
         return delegate.setBiome(this, x, y, z, biome);
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
+    public synchronized <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return delegate.setBlock(this, x, y, z, block);
     }
 
     @Override
-    public BiomeType getBiomeType(int x, int y, int z) {
+    public synchronized BiomeType getBiomeType(int x, int y, int z) {
         return delegate.getBiome(this, x, y, z);
     }
 
     @Override
-    public BlockState getBlock(int x, int y, int z) {
+    public synchronized BlockState getBlock(int x, int y, int z) {
         return delegate.getBlock(this, x, y, z);
     }
 
     @Override
-    public BaseBlock getFullBlock(int x, int y, int z) {
+    public synchronized BaseBlock getFullBlock(int x, int y, int z) {
         return delegate.getFullBlock(this, x, y, z);
     }
 
     @Override
-    public void setSkyLight(int x, int y, int z, int value) {
+    public synchronized void setSkyLight(int x, int y, int z, int value) {
         delegate.setSkyLight(this, x, y, z, value);
     }
 
-    @Override public void setHeightMap(HeightMapType type, int[] heightMap) {
+    @Override
+    public synchronized void setHeightMap(HeightMapType type, int[] heightMap) {
         delegate.setHeightMap(this, type, heightMap);
     }
 
-    @Override public void removeSectionLighting(int layer, boolean sky) {
+    @Override
+    public synchronized void removeSectionLighting(int layer, boolean sky) {
         delegate.removeSectionLighting(this, layer, sky);
     }
 
-    @Override public void setFullBright(int layer) {
+    @Override
+    public synchronized void setFullBright(int layer) {
         delegate.setFullBright(this, layer);
     }
 
     @Override
-    public void setBlockLight(int x, int y, int z, int value) {
+    public synchronized void setBlockLight(int x, int y, int z, int value) {
         delegate.setBlockLight(this, x, y, z, value);
     }
 
     @Override
-    public void setLightLayer(int layer, char[] toSet) {
+    public synchronized void setLightLayer(int layer, char[] toSet) {
         delegate.setLightLayer(this, layer, toSet);
     }
 
     @Override
-    public void setSkyLightLayer(int layer, char[] toSet) {
+    public synchronized void setSkyLightLayer(int layer, char[] toSet) {
         delegate.setSkyLightLayer(this, layer, toSet);
     }
 
     @Override
-    public int getSkyLight(int x, int y, int z) {
+    public synchronized int getSkyLight(int x, int y, int z) {
         return delegate.getSkyLight(this, x, y, z);
     }
 
     @Override
-    public int getEmmittedLight(int x, int y, int z) {
+    public synchronized int getEmmittedLight(int x, int y, int z) {
         return delegate.getEmmittedLight(this, x, y, z);
     }
 
     @Override
-    public int getBrightness(int x, int y, int z) {
+    public synchronized int getBrightness(int x, int y, int z) {
         return delegate.getBrightness(this, x, y, z);
     }
 
     @Override
-    public int getOpacity(int x, int y, int z) {
+    public synchronized int getOpacity(int x, int y, int z) {
         return delegate.getOpacity(this, x, y, z);
     }
 
@@ -947,5 +1084,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         int getOpacity(ChunkHolder chunk, int x, int y, int z);
 
         int[] getHeightMap(ChunkHolder chunk, HeightMapType type);
+
+        void flushLightToGet(ChunkHolder chunk, boolean heightmaps);
+
+        void setLightingToGet(ChunkHolder chunk, char[][] lighting);
+
+        void setSkyLightingToGet(ChunkHolder chunk, char[][] lighting);
+
+        void setHeightmapToGet(ChunkHolder chunk, HeightMapType type, int[] data);
     }
 }

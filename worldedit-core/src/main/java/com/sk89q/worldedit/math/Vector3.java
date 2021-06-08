@@ -83,14 +83,29 @@ public abstract class Vector3 {
         return YzxOrderComparator.YZX_ORDER;
     }
 
+    /**
+     * Gets the x coordinate rounded, accounting for negative coordinates
+     *
+     * @return the x coordinate
+     */
     public int getBlockX() {
         return MathMan.roundInt(getX());
     }
 
+    /**
+     * Gets the y coordinate rounded, accounting for negative coordinates
+     *
+     * @return the y coordinate
+     */
     public int getBlockY() {
         return MathMan.roundInt(getY());
     }
 
+    /**
+     * Gets the z coordinate rounded, accounting for negative coordinates
+     *
+     * @return the z coordinate
+     */
     public int getBlockZ() {
         return MathMan.roundInt(getZ());
     }
@@ -485,6 +500,15 @@ public abstract class Vector3 {
      */
     public Vector3 round() {
         return Vector3.at(Math.floor(getX() + 0.5), Math.floor(getY() + 0.5), Math.floor(getZ() + 0.5));
+    }
+
+    /**
+     * Rounds all components using {@link MathUtils#roundHalfUp(double)}
+     *
+     * @return a new vector
+     */
+    public Vector3 roundHalfUp() {
+        return Vector3.at(MathUtils.roundHalfUp(getX()), MathUtils.roundHalfUp(getY()), MathUtils.roundHalfUp(getZ()));
     }
 
     /**

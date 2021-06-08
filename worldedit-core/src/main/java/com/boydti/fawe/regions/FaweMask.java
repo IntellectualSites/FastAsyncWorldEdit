@@ -1,5 +1,6 @@
 package com.boydti.fawe.regions;
 
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.IDelegateRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -23,5 +24,10 @@ public class FaweMask implements IDelegateRegion {
     @Override
     public Region clone() {
         throw new UnsupportedOperationException("Clone not supported");
+    }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.REMOVING_BLOCKS;
     }
 }

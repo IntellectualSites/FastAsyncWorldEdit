@@ -1,71 +1,62 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.mendhak.gradlecrowdin.DownloadTranslationsTask
-import com.mendhak.gradlecrowdin.UploadSourceFileTask
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
 plugins {
-    id("java-library")
-    id("net.ltgt.apt-eclipse")
-    id("net.ltgt.apt-idea")
-    id("antlr")
-    id("com.mendhak.gradlecrowdin")
+    `java-library`
+    antlr
 }
 
 repositories {
-    maven { url = uri("https://plotsquared.com/mvn") }
-    maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
-    maven { url = uri("https://mvn.intellectualsites.com/content/groups/snapshots/") }
-    mavenCentral()
-
+    maven {
+        name = "IntellectualSites"
+        url = uri("https://mvn.intellectualsites.com/content/groups/public/")
+    }
+    maven {
+        name = "IntellectualSites-Snapshots"
+        url = uri("https://mvn.intellectualsites.com/content/groups/snapshots/")
+    }
 }
 
 applyPlatformAndCoreConfiguration()
 
-configurations.all {
-    resolutionStrategy {
-        force("com.google.guava:guava:21.0")
-    }
-}
-
 dependencies {
-    "api"(project(":worldedit-libs:core"))
-    "implementation"("de.schlichtherle:truezip:6.8.3")
-    "implementation"("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
-    "implementation"("org.mozilla:rhino-runtime:1.7.12")
-    "implementation"("org.yaml:snakeyaml:1.23")
-    "implementation"("com.google.guava:guava:${Versions.GUAVA}")
-    "implementation"("com.google.code.findbugs:jsr305:3.0.2")
-    "implementation"("com.google.code.gson:gson:${Versions.GSON}")
-    "implementation"("org.slf4j:slf4j-api:1.7.27")
-    "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
+    constraints {
+        implementation( "org.yaml:snakeyaml") {
+            version { strictly("1.27") }
+            because("Bukkit provides SnakeYaml")
+        }
+    }
 
-    val antlrVersion = "4.7.2"
-    "antlr"("org.antlr:antlr4:$antlrVersion")
-    "implementation"("org.antlr:antlr4-runtime:$antlrVersion")
+    api(project(":worldedit-libs:core"))
+    implementation("de.schlichtherle:truezip:6.8.4")
+    implementation("org.mozilla:rhino-runtime:1.7.13")
+    implementation("org.yaml:snakeyaml")
+    implementation("com.google.guava:guava")
+    implementation("com.google.code.findbugs:jsr305:3.0.2")
+    implementation("com.google.code.gson:gson")
+    implementation("org.apache.logging.log4j:log4j-api:2.8.1") {
+        because("Mojang provides Log4J 2.8.1")
+    }
+    implementation("it.unimi.dsi:fastutil")
 
-    "implementation"("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
-    "compileOnly"(project(":worldedit-libs:core:ap"))
-    "annotationProcessor"(project(":worldedit-libs:core:ap"))
+    val antlrVersion = "4.9.1"
+    antlr("org.antlr:antlr4:$antlrVersion")
+    implementation("org.antlr:antlr4-runtime:$antlrVersion")
+
+    implementation("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
+    compileOnly(project(":worldedit-libs:core:ap"))
+    annotationProcessor(project(":worldedit-libs:core:ap"))
     // ensure this is on the classpath for the AP
-    "annotationProcessor"("com.google.guava:guava:21.0")
-    "compileOnly"("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
-    "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
-    "testImplementation"("ch.qos.logback:logback-core:${Versions.LOGBACK}")
-    "testImplementation"("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
-    "compile"("com.github.luben:zstd-jni:1.4.3-1")
-    "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")
-    "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
-        isTransitive = false
-    }
-    "compile"("com.plotsquared:PlotSquared-Core:6.0.0-SNAPSHOT") {
-        isTransitive = false
-    }
-    api("com.google.inject:guice:4.2.3") {
-        exclude(group = "com.google.guava")
-    }
-    api("com.google.inject.extensions:guice-assistedinject:4.2.3") {
-        exclude("com.google.inject", "guice")
-    }
+    annotationProcessor("com.google.guava:guava:21.0")
+    compileOnly("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
+    annotationProcessor("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
+    testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.8.1")
+    implementation("com.github.luben:zstd-jni:1.4.9-5")
+    compileOnly("net.fabiozumbi12:redprotect:1.9.6")
+    api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
+    api("com.plotsquared:PlotSquared-Core:6.0.0-SNAPSHOT") { isTransitive = false }
+    api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
+    compileOnly("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
+    compileOnly("org.lz4:lz4-java:1.7.1")
 }
 
 tasks.named<Test>("test") {
@@ -81,9 +72,13 @@ tasks.named<AntlrTask>("generateGrammarSource").configure {
     val pkg = "com.sk89q.worldedit.antlr"
     outputDirectory = file("build/generated-src/antlr/main/${pkg.replace('.', '/')}")
     arguments = listOf(
-        "-visitor", "-package", pkg,
-        "-Xexact-output-dir"
+            "-visitor", "-package", pkg,
+            "-Xexact-output-dir"
     )
+}
+
+tasks.named("sourcesJar") {
+    mustRunAfter("generateGrammarSource")
 }
 
 // Give intellij info about where ANTLR code comes from
@@ -99,11 +94,7 @@ plugins.withId("idea") {
 
 sourceSets.named("main") {
     java {
-        srcDir("src/main/java")
         srcDir("src/legacy/java")
-    }
-    resources {
-        srcDir("src/main/resources")
     }
 }
 
@@ -112,43 +103,5 @@ tasks.named<Copy>("processResources") {
         expand("version" to "$version",
                 "commit" to "${rootProject.ext["revision"]}",
                 "date" to "${rootProject.ext["date"]}")
-    }
-}
-tasks.named<ShadowJar>("shadowJar") {
-    dependencies {
-        include(dependency("com.github.luben:zstd-jni:1.4.3-1"))
-
-    }
-}
-
-val crowdinApiKey = "crowdin_apikey"
-
-if (project.hasProperty(crowdinApiKey) && !gradle.startParameter.isOffline) {
-    tasks.named<UploadSourceFileTask>("crowdinUpload") {
-        apiKey = "${project.property(crowdinApiKey)}"
-        projectId = "worldedit-core"
-        files = arrayOf(
-            object {
-                var name = "strings.json"
-                var source = "${file("src/main/resources/lang/strings.json")}"
-            }
-        )
-    }
-
-    val dlTranslationsTask = tasks.named<DownloadTranslationsTask>("crowdinDownload") {
-        apiKey = "${project.property(crowdinApiKey)}"
-        destination = "${buildDir.resolve("crowdin-i18n")}"
-        projectId = "worldedit-core"
-    }
-
-    tasks.named<Copy>("processResources") {
-        dependsOn(dlTranslationsTask)
-        from(dlTranslationsTask.get().destination) {
-            into("lang")
-        }
-    }
-
-    tasks.named("classes") {
-        dependsOn("crowdinDownload")
     }
 }

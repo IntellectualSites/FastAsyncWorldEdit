@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.collection.BlockVectorSet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
@@ -31,8 +32,6 @@ import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -281,10 +280,10 @@ public abstract class BreadthFirstSearch implements Operation {
 
     @Override
     public Iterable<Component> getStatusMessages() {
-        return ImmutableList.of(TranslatableComponent.of(
+        return ImmutableList.of(Caption.of(
                 "worldedit.operation.affected.block",
                 TextComponent.of(getAffected())
-        ).color(TextColor.GRAY));
+        ));
     }
 
 }

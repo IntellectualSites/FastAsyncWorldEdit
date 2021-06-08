@@ -19,14 +19,12 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.jnbt.fawe.NumberTag;
+
 /**
  * The {@code TAG_Short} tag.
  */
 public final class ShortTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_SHORT;
-    }
 
     private final short value;
 
@@ -49,5 +47,12 @@ public final class ShortTag extends NumberTag {
     public String toString() {
         return "TAG_Short(" + value + ")";
     }
+
+    // FAWE Start
+    @Override
+    public int getTypeCode() {
+        return NBTConstants.TYPE_SHORT;
+    }
+    // FAWE End
 
 }

@@ -5,6 +5,7 @@ import com.boydti.fawe.object.RegionWrapper;
 import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -21,20 +22,17 @@ import com.sk89q.worldguard.protection.regions.ProtectedCuboidRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedPolygonalRegion;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import com.sk89q.worldguard.protection.regions.RegionContainer;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.slf4j.Logger;
-
 import java.util.Locale;
-
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class Worldguard extends BukkitMaskManager implements Listener {
     private final WorldGuardPlugin worldguard;
-    private static final Logger logger = getLogger(Worldguard.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private WorldGuardPlugin getWorldGuard() {
         final Plugin plugin = Bukkit.getPluginManager().getPlugin("WorldGuard");
@@ -50,19 +48,19 @@ public class Worldguard extends BukkitMaskManager implements Listener {
     public Worldguard(Plugin p2) {
         super(p2.getName());
         this.worldguard = this.getWorldGuard();
-        logger.debug("Plugin 'WorldGuard' found. Using it now.");
+        LOGGER.debug("Plugin 'WorldGuard' found. Using it now.");
 
     }
 
     public ProtectedRegion getRegion(LocalPlayer player, Location location) {
         RegionContainer container = WorldGuard.getInstance().getPlatform().getRegionContainer();
         if (container == null) {
-            logger.info("Region capability is not enabled for WorldGuard.");
+            LOGGER.info("Region capability is not enabled for WorldGuard.");
             return null;
         }
         RegionManager manager = container.get(BukkitAdapter.adapt(location.getWorld()));
         if (manager == null) {
-            logger.info("Region capability is not enabled for that world.");
+            LOGGER.info("Region capability is not enabled for that world.");
             return null;
         }
         final ProtectedRegion global = manager.getRegion("__global__");

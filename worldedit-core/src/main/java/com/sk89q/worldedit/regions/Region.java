@@ -25,6 +25,7 @@ import com.boydti.fawe.beta.IChunk;
 import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.IChunkSet;
 import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
 import com.boydti.fawe.object.FaweLimit;
 import com.boydti.fawe.object.extent.SingleRegionExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -364,5 +365,10 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             return child;
         }
         return new SingleRegionExtent(child, FaweLimit.MAX, this);
+    }
+
+    @Override
+    default ProcessorScope getScope() {
+        return ProcessorScope.REMOVING_BLOCKS;
     }
 }

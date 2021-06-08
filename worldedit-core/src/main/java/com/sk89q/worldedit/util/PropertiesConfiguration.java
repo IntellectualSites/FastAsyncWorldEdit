@@ -24,10 +24,10 @@ package com.sk89q.worldedit.util;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.report.Unreported;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +39,7 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
 
@@ -48,7 +49,7 @@ import java.util.Set;
  */
 public class PropertiesConfiguration extends LocalConfiguration {
 
-    @Unreported private static final Logger log = LoggerFactory.getLogger(PropertiesConfiguration.class);
+    @Unreported private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     @Unreported protected Properties properties;
     @Unreported protected File path;
@@ -81,7 +82,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
             properties.load(stream);
         } catch (FileNotFoundException ignored) {
         } catch (IOException e) {
-            log.warn("Failed to read configuration", e);
+            LOGGER.warn("Failed to read configuration", e);
         }
 
         loadExtra();
@@ -107,7 +108,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
         logFile = getString("log-file", logFile);
         logFormat = getString("log-format", logFormat);
         registerHelp = getBool("register-help", registerHelp);
-        wandItem = getString("wand-item", wandItem);
+        wandItem = getString("wand-item", wandItem).toLowerCase(Locale.ROOT);
         try {
             wandItem = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(wandItem)).getId();
         } catch (Throwable ignored) {
@@ -117,7 +118,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
         useInventory = getBool("use-inventory", useInventory);
         useInventoryOverride = getBool("use-inventory-override", useInventoryOverride);
         useInventoryCreativeOverride = getBool("use-inventory-creative-override", useInventoryCreativeOverride);
-        navigationWand = getString("nav-wand-item", navigationWand);
+        navigationWand = getString("nav-wand-item", navigationWand).toLowerCase(Locale.ROOT);
         try {
             navigationWand = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(navigationWand)).getId();
         } catch (Throwable ignored) {
@@ -146,7 +147,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
         try (OutputStream output = new FileOutputStream(path)) {
             properties.store(output, "Don't put comments; they get removed");
         } catch (IOException e) {
-            log.warn("Failed to write configuration", e);
+            LOGGER.warn("Failed to write configuration", e);
         }
     }
 

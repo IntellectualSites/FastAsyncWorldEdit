@@ -40,6 +40,7 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -52,8 +53,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -68,10 +68,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Reads schematic files using the Sponge Schematic Specification.
  */
-@Deprecated // High mem usage + slow
 public class SpongeSchematicReader extends NBTSchematicReader {
 
-    private static final Logger log = LoggerFactory.getLogger(SpongeSchematicReader.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final NBTInputStream inputStream;
     private DataFixer fixer = null;
     private int schematicVersion = -1;
@@ -93,7 +92,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         Map<String, Tag> schematic = schematicTag.getValue();
 
         final Platform platform = WorldEdit.getInstance().getPlatformManager()
-                .queryCapability(Capability.WORLD_EDITING);
+            .queryCapability(Capability.WORLD_EDITING);
         int liveDataVersion = platform.getDataVersion();
 
         if (schematicVersion == 1) {
@@ -102,24 +101,30 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             return readVersion1(schematicTag);
         } else if (schematicVersion == 2) {
             dataVersion = requireTag(schematic, "DataVersion", IntTag.class).getValue();
+            if (dataVersion < 0) {
+                LOGGER.warn("Schematic has an unknown data version ({}). Data may be incompatible.",
+                    dataVersion);
+                // Do not DFU unknown data
+                dataVersion = liveDataVersion;
+            }
             if (dataVersion > liveDataVersion) {
-                log.warn("Schematic was made in a newer Minecraft version ({} > {}). Data may be incompatible.",
-                        dataVersion, liveDataVersion);
+                LOGGER.warn("Schematic was made in a newer Minecraft version ({} > {}). Data may be incompatible.",
+                    dataVersion, liveDataVersion);
             } else if (dataVersion < liveDataVersion) {
                 fixer = platform.getDataFixer();
                 if (fixer != null) {
-                    log.debug("Schematic was made in an older Minecraft version ({} < {}), will attempt DFU.",
-                            dataVersion, liveDataVersion);
+                    LOGGER.debug("Schematic was made in an older Minecraft version ({} < {}), will attempt DFU.",
+                        dataVersion, liveDataVersion);
                 } else {
-                    log.info("Schematic was made in an older Minecraft version ({} < {}), but DFU is not available. Data may be incompatible.",
-                            dataVersion, liveDataVersion);
+                    LOGGER.info("Schematic was made in an older Minecraft version ({} < {}), but DFU is not available. Data may be incompatible.",
+                        dataVersion, liveDataVersion);
                 }
             }
 
             BlockArrayClipboard clip = readVersion1(schematicTag);
             return readVersion2(clip, schematicTag);
         }
-        throw new IOException("This schematic version is currently not supported");
+        throw new IOException("This schematic version is not supported; Version: " + schematicVersion + ", DataVersion: " + dataVersion + ". It's very likely your schematic has an invalid file extension, if the schematic has been created on a version lower than 1.13.2, the extension MUST be `.schematic`, elsewise the schematic can't be read properly.");
     }
 
     @Override
@@ -130,7 +135,11 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             if (schematicVersion == 1) {
                 return OptionalInt.of(Constants.DATA_VERSION_MC_1_13_2);
             } else if (schematicVersion == 2) {
-                return OptionalInt.of(requireTag(schematic, "DataVersion", IntTag.class).getValue());
+                int dataVersion = requireTag(schematic, "DataVersion", IntTag.class).getValue();
+                if (dataVersion < 0) {
+                    return OptionalInt.empty();
+                }
+                return OptionalInt.of(dataVersion);
             }
             return OptionalInt.empty();
         } catch (IOException e) {
@@ -140,9 +149,6 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 
     private CompoundTag getBaseTag() throws IOException {
         NamedTag rootTag = inputStream.readNamedTag();
-        if (!rootTag.getName().equals("Schematic")) {
-            throw new IOException("Tag 'Schematic' does not exist or is not first");
-        }
         CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
 
         // Check
@@ -211,7 +217,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             try {
                 state = WorldEdit.getInstance().getBlockFactory().parseFromInput(palettePart, parserContext).toImmutableState();
             } catch (InputParseException e) {
-                log.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
+                LOGGER.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
                 state = BlockTypes.AIR.getDefaultState();
             }
             palette.put(id, state);
@@ -226,9 +232,9 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         }
         if (tileEntities != null) {
             List<Map<String, Tag>> tileEntityTags = tileEntities.getValue().stream()
-                    .map(tag -> (CompoundTag) tag)
-                    .map(CompoundTag::getValue)
-                    .collect(Collectors.toList());
+                .map(tag -> (CompoundTag) tag)
+                .map(CompoundTag::getValue)
+                .collect(Collectors.toList());
 
             for (Map<String, Tag> tileEntity : tileEntityTags) {
                 int[] pos = requireTag(tileEntity, "Pos", IntArrayTag.class).getValue();
@@ -321,8 +327,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             }
             BiomeType biome = BiomeTypes.get(key);
             if (biome == null) {
-                log.warn("Unknown biome type :" + key +
-                             " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
+                LOGGER.warn("Unknown biome type :" + key
+                    + " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
             }
             Tag idTag = palettePart.getValue();
             if (!(idTag instanceof IntTag)) {
@@ -385,12 +391,12 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             EntityType entityType = EntityTypes.get(id);
             if (entityType != null) {
                 Location location = NBTConversions.toLocation(clipboard,
-                        requireTag(tags, "Pos", ListTag.class),
-                        requireTag(tags, "Rotation", ListTag.class));
+                    requireTag(tags, "Pos", ListTag.class),
+                    requireTag(tags, "Rotation", ListTag.class));
                 BaseEntity state = new BaseEntity(entityType, entityTag);
                 clipboard.createEntity(location, state);
             } else {
-                log.warn("Unknown entity when pasting schematic: " + id);
+                LOGGER.warn("Unknown entity when pasting schematic: " + id);
             }
         }
     }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.boydti.fawe.object.brush.InspectBrush;
 import com.google.common.collect.Collections2;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -52,7 +53,8 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.CommandManagerService;
@@ -69,6 +71,10 @@ import java.util.stream.Collectors;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ToolCommands {
+
+    private static final Component UNBIND_COMMAND_COMPONENT = TextComponent.builder("/tool unbind", TextColor.AQUA)
+            .clickEvent(ClickEvent.suggestCommand("/tool unbind"))
+            .build();
 
     public static void register(CommandRegistrationHandler registration,
                                 CommandManager commandManager,
@@ -114,7 +120,7 @@ public class ToolCommands {
             .collect(Collectors.toSet());
         commandManager.register("tool", command -> {
             command.addPart(SubCommandPart.builder(
-                TranslatableComponent.of("tool"),
+                    Caption.of("tool"),
                 TextComponent.of("The tool to bind")
             )
                 .withCommands(nonGlobalCommands)
@@ -139,14 +145,19 @@ public class ToolCommands {
         throws InvalidToolBindException {
         isBrush = session.getTool(player) instanceof BrushTool;
         session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
-        player.printInfo(TranslatableComponent.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
+        player.print(Caption.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
+    }
+
+    static void sendUnbindInstruction(Player sender, Component commandComponent) {
+        sender.print(Caption.of("worldedit.tool.unbind-instruction", commandComponent));
     }
 
     private static void setTool(Player player, LocalSession session, Tool tool,
                                 String translationKey) throws InvalidToolBindException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(itemStack.getType(), tool);
-        player.printInfo(TranslatableComponent.of(translationKey, itemStack.getRichName()));
+        player.print(Caption.of(translationKey, itemStack.getRichName()));
+        sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
 
     private final WorldEdit we;
@@ -267,7 +278,7 @@ public class ToolCommands {
         LocalConfiguration config = we.getConfiguration();
 
         if (range > config.maxSuperPickaxeSize) {
-            player.printError(TranslatableComponent.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
+            player.print(Caption.of("worldedit.tool.superpickaxe.max-range", TextComponent.of(config.maxSuperPickaxeSize)));
             return;
         }
         setTool(player, session, new FloodFillTool(range, pattern), "worldedit.tool.floodfill.equip");
@@ -317,6 +328,6 @@ public class ToolCommands {
         } else {
             secondaryName = TextComponent.of("pattern");
         }
-        player.printInfo(TranslatableComponent.of("worldedit.tool.lrbuild.set", primaryName, secondaryName));
+        player.print(Caption.of("worldedit.tool.lrbuild.set", primaryName, secondaryName));
     }
 }

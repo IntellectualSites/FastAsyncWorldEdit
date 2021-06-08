@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.boydti.fawe.config.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -30,26 +31,20 @@ import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.function.FlatRegionFunction;
-import com.sk89q.worldedit.function.FlatRegionMaskingFilter;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.biome.BiomeReplace;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -124,7 +119,7 @@ public class BiomeCommands {
         if (useLineOfSight) {
             Location blockPosition = player.getBlockTrace(300);
             if (blockPosition == null) {
-                player.printError(TranslatableComponent.of("worldedit.raytrace.noblock"));
+                player.print(Caption.of("worldedit.raytrace.noblock"));
                 return;
             }
 
@@ -153,7 +148,7 @@ public class BiomeCommands {
                 HoverEvent.showText(TextComponent.of(biome.getId()))
             )
         ).collect(Collectors.toList());
-        player.printInfo(TranslatableComponent.of(messageKey, TextUtils.join(components, TextComponent.of(", "))));
+        player.print(Caption.of(messageKey, TextUtils.join(components, TextComponent.of(", "))));
     }
 
     @Command(
@@ -185,7 +180,7 @@ public class BiomeCommands {
         RegionVisitor visitor = new RegionVisitor(region, replace);
         Operations.completeLegacy(visitor);
 
-        player.printInfo(TranslatableComponent.of(
+        player.print(Caption.of(
                 "worldedit.setbiome.changed",
                 TextComponent.of(visitor.getAffected())
         ));
