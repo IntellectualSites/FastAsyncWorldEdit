@@ -52,7 +52,7 @@ import java.util.zip.GZIPInputStream;
 
 public class FaweSchematicHandler {
 
-    private static final Logger logger = LogManagerCompat.getLogger();
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final AtomicBoolean exportingAll = new AtomicBoolean();
 
@@ -124,7 +124,7 @@ public class FaweSchematicHandler {
 
     public boolean save(CompoundTag tag, String path) {
         if (tag == null) {
-            logger.warn("Cannot save empty tag");
+            LOGGER.warn("Cannot save empty tag");
             return false;
         }
         try {
@@ -164,7 +164,7 @@ public class FaweSchematicHandler {
 
     public void upload(final CompoundTag tag, final UUID uuid, final String file, final RunnableVal<URL> whenDone) {
         if (tag == null) {
-            logger.warn("Cannot save empty tag");
+            LOGGER.warn("Cannot save empty tag");
             com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
             return;
         }
@@ -218,7 +218,7 @@ public class FaweSchematicHandler {
                     return new Schematic(clip);
                 } catch (IOException e3) {
                     e.printStackTrace();
-                    logger.warn(
+                    LOGGER.warn(
                         is + " | " + is.getClass().getCanonicalName() + " is not in GZIP format : " + e
                             .getMessage());
                 }
