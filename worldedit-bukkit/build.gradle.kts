@@ -95,7 +95,7 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    compileOnly("net.kyori:adventure-api:4.7.0")
+    compileOnly("net.kyori:adventure-api:4.8.0")
     testImplementation("net.kyori:adventure-api:4.7.0")
     testImplementation("org.checkerframework:checker-qual:3.14.0")
     testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
