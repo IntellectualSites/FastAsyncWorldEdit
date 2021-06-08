@@ -7,18 +7,12 @@ import com.boydti.fawe.util.TaskManager;
 import com.plotsquared.core.configuration.Settings;
 import com.plotsquared.core.generator.HybridPlotManager;
 import com.plotsquared.core.generator.HybridPlotWorld;
-import com.plotsquared.core.inject.factory.ProgressSubscriberFactory;
 import com.plotsquared.core.location.Location;
-import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.PlotAreaTerrainType;
 import com.plotsquared.core.plot.PlotAreaType;
 import com.plotsquared.core.plot.PlotManager;
-import com.plotsquared.core.queue.GlobalBlockQueue;
-import com.plotsquared.core.queue.QueueCoordinator;
-import com.plotsquared.core.util.RegionManager;
-import com.plotsquared.core.util.WorldUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
@@ -51,43 +45,19 @@ import java.util.Set;
 
 import static org.bukkit.Bukkit.getWorld;
 
-public class FaweRegionManager extends RegionManager {
+public class FaweRegionManager {
 
-    private RegionManager parent;
-
-    public FaweRegionManager(@NotNull RegionManager parent,
-                             @NotNull WorldUtil worldUtil,
-                             @NotNull GlobalBlockQueue blockQueue,
-                             @NotNull ProgressSubscriberFactory subscriberFactory) {
-        super(worldUtil, blockQueue, subscriberFactory);
-        this.parent = parent;
-    }
-
-    @Override
-    public int[] countEntities(Plot plot) {
-        return parent.countEntities(plot);
-    }
-
-    @Override
-    public void clearAllEntities(Location pos1, Location pos2) {
-        parent.clearAllEntities(pos1, pos2);
-    }
-
-    @Override
     public boolean setCuboids(final @NonNull PlotArea area,
                               final @NonNull Set<CuboidRegion> regions,
                               final @NonNull Pattern blocks,
                               int minY,
-                              int maxY,
-                              @Nullable PlotPlayer<?> actor,
-                              @Nullable QueueCoordinator queue) {
-        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CUBOIDS) {
-            return parent.setCuboids(area, regions, blocks, minY, maxY, actor, queue);
-        }
+                              int maxY) {
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
-                EditSession session = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+                EditSession session =
+                    new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull()
+                        .autoQueue(false).build();
                 for (CuboidRegion region : regions) {
                     region.setPos1(region.getPos1().withY(minY));
                     region.setPos2(region.getPos2().withY(maxY));
@@ -107,7 +77,6 @@ public class FaweRegionManager extends RegionManager {
         return true;
     }
 
-    @Override
     public boolean notifyClear(PlotManager manager) {
         if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
             return false;
@@ -116,11 +85,9 @@ public class FaweRegionManager extends RegionManager {
         return hpw.getType() != PlotAreaType.AUGMENTED || hpw.getTerrain() == PlotAreaTerrainType.NONE;
     }
 
-    @Override
     public boolean handleClear(@NotNull Plot plot,
                                @Nullable Runnable whenDone,
-                               @NotNull PlotManager manager,
-                               @Nullable PlotPlayer<?> actor) {
+                               @NotNull PlotManager manager) {
         if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
             return false;
         }
@@ -189,15 +156,10 @@ public class FaweRegionManager extends RegionManager {
         return true;
     }
 
-    @Override
     public void swap(Location pos1,
                      Location pos2,
                      Location swapPos,
-                     final @Nullable PlotPlayer<?> actor,
                      final Runnable whenDone) {
-        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
-            parent.swap(pos1, pos2, swapPos, actor, whenDone);
-        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 //todo because of the following code this should proably be in the Bukkit module
@@ -229,11 +191,7 @@ public class FaweRegionManager extends RegionManager {
         });
     }
 
-    @Override
     public void setBiome(CuboidRegion region, int extendBiome, BiomeType biome, String world, Runnable whenDone) {
-        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.SET_BIOME) {
-            parent.setBiome(region, extendBiome, biome, world, whenDone);
-        }
         region.expand(BlockVector3.at(extendBiome, 0, extendBiome));
         region.expand(BlockVector3.at(-extendBiome, 0, -extendBiome));
         TaskManager.IMP.async(() -> {
@@ -252,15 +210,10 @@ public class FaweRegionManager extends RegionManager {
         });
     }
 
-    @Override
     public boolean copyRegion(final @NonNull Location pos1,
                               final @NonNull Location pos2,
                               final @NonNull Location pos3,
-                              final @Nullable PlotPlayer<?> actor,
                               final @NonNull Runnable whenDone) {
-        if (!com.boydti.fawe.config.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
-            return parent.copyRegion(pos1, pos2, pos3, actor, whenDone);
-        }
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
@@ -284,7 +237,6 @@ public class FaweRegionManager extends RegionManager {
         return true;
     }
 
-    @Override
     public boolean regenerateRegion(final Location pos1, final Location pos2, boolean ignore, final Runnable whenDone) {
         TaskManager.IMP.async(() -> {
             synchronized (FaweRegionManager.class) {

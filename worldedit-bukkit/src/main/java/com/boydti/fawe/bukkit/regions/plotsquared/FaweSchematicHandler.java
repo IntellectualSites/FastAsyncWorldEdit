@@ -8,16 +8,11 @@ import com.boydti.fawe.util.EditSessionBuilder;
 import com.boydti.fawe.util.IOUtil;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.generator.ClassicPlotWorld;
-import com.plotsquared.core.inject.factory.ProgressSubscriberFactory;
-import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.schematic.Schematic;
-import com.plotsquared.core.queue.QueueCoordinator;
 import com.plotsquared.core.util.FileUtils;
-import com.plotsquared.core.util.MainUtil;
 import com.plotsquared.core.util.SchematicHandler;
-import com.plotsquared.core.util.WorldUtil;
 import com.plotsquared.core.util.task.RunnableVal;
 import com.plotsquared.core.util.task.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
@@ -55,28 +50,18 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
-public class FaweSchematicHandler extends SchematicHandler {
+public class FaweSchematicHandler {
+
+    private static final Logger logger = LogManagerCompat.getLogger();
 
     private static final AtomicBoolean exportingAll = new AtomicBoolean();
 
-    public FaweSchematicHandler(@NotNull WorldUtil worldUtil, @NotNull ProgressSubscriberFactory subscriberFactory) {
-        super(worldUtil, subscriberFactory);
-    }
-    private static final Logger logger = LogManagerCompat.getLogger();
-
-    @Override
-    public boolean restoreTile(QueueCoordinator queue, CompoundTag tag, int x, int y, int z) {
-        return false;
-    }
-
-    @Override
     public void paste(final Schematic schematic,
                       final Plot plot,
                       final int xOffset,
                       final int yOffset,
                       final int zOffset,
                       final boolean autoHeight,
-                      final PlotPlayer<?> actor,
                       final RunnableVal<Boolean> whenDone) {
         Runnable r = () -> {
             if (whenDone != null) {
@@ -137,7 +122,6 @@ public class FaweSchematicHandler extends SchematicHandler {
         }
     }
 
-    @Override
     public boolean save(CompoundTag tag, String path) {
         if (tag == null) {
             logger.warn("Cannot save empty tag");
@@ -178,7 +162,6 @@ public class FaweSchematicHandler extends SchematicHandler {
         return true;
     }
 
-    @Override
     public void upload(final CompoundTag tag, final UUID uuid, final String file, final RunnableVal<URL> whenDone) {
         if (tag == null) {
             logger.warn("Cannot save empty tag");
@@ -186,7 +169,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             return;
         }
         final CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
-        upload(uuid, file, "schem", new RunnableVal<>() {
+        SchematicHandler.upload(uuid, file, "schem", new RunnableVal<>() {
             @Override
             public void run(OutputStream output) {
                 if (weTag instanceof CompressedSchematicTag) {
@@ -207,7 +190,6 @@ public class FaweSchematicHandler extends SchematicHandler {
         }, whenDone);
     }
 
-    @Override
     public Schematic getSchematic(@NotNull InputStream is) {
         try {
             FastSchematicReader schematicReader = new FastSchematicReader(
@@ -236,7 +218,7 @@ public class FaweSchematicHandler extends SchematicHandler {
                     return new Schematic(clip);
                 } catch (IOException e3) {
                     e.printStackTrace();
-                    logger.debug(
+                    logger.warn(
                         is + " | " + is.getClass().getCanonicalName() + " is not in GZIP format : " + e
                             .getMessage());
                 }
