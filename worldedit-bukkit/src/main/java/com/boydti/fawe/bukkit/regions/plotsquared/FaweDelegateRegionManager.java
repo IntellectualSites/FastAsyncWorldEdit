@@ -45,7 +45,7 @@ import java.util.Set;
 
 import static org.bukkit.Bukkit.getWorld;
 
-public class FaweRegionManager {
+public class FaweDelegateRegionManager {
 
     public boolean setCuboids(final @NonNull PlotArea area,
                               final @NonNull Set<CuboidRegion> regions,
@@ -53,7 +53,7 @@ public class FaweRegionManager {
                               int minY,
                               int maxY) {
         TaskManager.IMP.async(() -> {
-            synchronized (FaweRegionManager.class) {
+            synchronized (FaweDelegateRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
                 EditSession session =
                     new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull()
@@ -86,7 +86,7 @@ public class FaweRegionManager {
                                @Nullable Runnable whenDone,
                                @NotNull PlotManager manager) {
         TaskManager.IMP.async(() -> {
-            synchronized (FaweRegionManager.class) {
+            synchronized (FaweDelegateRegionManager.class) {
                 final HybridPlotWorld hybridPlotWorld = ((HybridPlotManager) manager).getHybridPlotWorld();
                 World world = BukkitAdapter.adapt(getWorld(hybridPlotWorld.getWorldName()));
                 EditSession editSession = new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
@@ -155,7 +155,7 @@ public class FaweRegionManager {
                      Location swapPos,
                      final Runnable whenDone) {
         TaskManager.IMP.async(() -> {
-            synchronized (FaweRegionManager.class) {
+            synchronized (FaweDelegateRegionManager.class) {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 World pos3World = BukkitAdapter.adapt(getWorld(swapPos.getWorldName()));
@@ -189,7 +189,7 @@ public class FaweRegionManager {
         region.expand(BlockVector3.at(extendBiome, 0, extendBiome));
         region.expand(BlockVector3.at(-extendBiome, 0, -extendBiome));
         TaskManager.IMP.async(() -> {
-            synchronized (FaweRegionManager.class) {
+            synchronized (FaweDelegateRegionManager.class) {
                 EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(getWorld(world))).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                 FlatRegionFunction replace = new BiomeReplace(editSession, biome);
                 FlatRegionVisitor visitor = new FlatRegionVisitor(region, replace);
@@ -209,7 +209,7 @@ public class FaweRegionManager {
                               final @NonNull Location pos3,
                               final @NonNull Runnable whenDone) {
         TaskManager.IMP.async(() -> {
-            synchronized (FaweRegionManager.class) {
+            synchronized (FaweDelegateRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorldName()));
                 EditSession from = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
@@ -233,7 +233,7 @@ public class FaweRegionManager {
 
     public boolean regenerateRegion(final Location pos1, final Location pos2, boolean ignore, final Runnable whenDone) {
         TaskManager.IMP.async(() -> {
-            synchronized (FaweRegionManager.class) {
+            synchronized (FaweDelegateRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 try (EditSession editSession = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
                     CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
