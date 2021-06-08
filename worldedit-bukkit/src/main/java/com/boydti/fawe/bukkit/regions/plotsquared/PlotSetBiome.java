@@ -48,7 +48,7 @@ public class PlotSetBiome extends Command {
                                               String[] args,
                                               RunnableVal3<Command, Runnable, Runnable> confirm,
                                               RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
-        final Plot plot = check(player.getCurrentPlot(), TranslatableCaption.of("errors.not_in_plot"));
+/*        final Plot plot = check(player.getCurrentPlot(), TranslatableCaption.of("errors.not_in_plot"));
         checkTrue(plot.isOwner(player.getUUID()) || Permissions.hasPermission(player, "plots.admin.command.generatebiome"),
             TranslatableCaption.of("permission.no_plot_perms"));
         if (plot.getRunning() != 0) {
@@ -89,7 +89,7 @@ public class PlotSetBiome extends Command {
                 session.flushQueue();
                 plot.removeRunning();
             });
-        }, null);
+        }, null);*/
 
         return CompletableFuture.completedFuture(true);
     }

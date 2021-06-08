@@ -25,14 +25,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class FaweLocalBlockQueue extends QueueCoordinator {
+public class FaweQueueCoordinator extends QueueCoordinator {
 
     public final IQueueExtent<IQueueChunk> instance;
     private final World world;
     private BlockVector3 mutable = new MutableBlockVector3();
     private boolean setbiome = false;
 
-    public FaweLocalBlockQueue(World world) {
+    public FaweQueueCoordinator(World world) {
         super(world);
         this.world = world;
         instance = Fawe.get().getQueueHandler().getQueue(world);
@@ -184,6 +184,12 @@ public class FaweLocalBlockQueue extends QueueCoordinator {
     @Override
     public void regenChunk(int x, int z) {
         instance.regenerateChunk(x, z, null, null);
+    }
+
+    @Nullable
+    @Override
+    public World getWorld() {
+        return world;
     }
 
     @Override

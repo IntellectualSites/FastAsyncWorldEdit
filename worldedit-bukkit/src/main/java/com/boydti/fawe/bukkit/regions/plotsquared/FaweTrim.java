@@ -10,7 +10,6 @@ import com.plotsquared.core.configuration.caption.StaticCaption;
 import com.plotsquared.core.configuration.caption.Templates;
 import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.player.PlotPlayer;
-import com.plotsquared.core.util.WorldUtil;
 
 @CommandDeclaration(command = "trimchunks",
     permission = "plots.admin",
@@ -23,7 +22,7 @@ public class FaweTrim extends SubCommand {
 
     @Override
     public boolean onCommand(final PlotPlayer plotPlayer, final String[] strings) {
-        if (ran) {
+/*        if (ran) {
             plotPlayer.sendMessage(StaticCaption.of("Already running!"));
             return false;
         }
@@ -33,10 +32,10 @@ public class FaweTrim extends SubCommand {
             plotPlayer.sendMessage(StaticCaption.of("use /plot trimall <world> <boolean-delete-unowned>"));
             return false;
         }
-        if (!PlotSquared.platform().injector().getInstance(WorldUtil.class).isWorld(strings[0])) {
+        if (!PlotSquared.platform().worldUtil().isWorld(strings[0])) {
             plotPlayer.sendMessage(TranslatableCaption.of("errors.not_valid_plot_world"), Templates.of("value", strings[0]));
             return false;
-        }
+        }*/
         ran = true;
         TaskManager.IMP.async(() -> {
             try {

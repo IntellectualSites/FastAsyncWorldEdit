@@ -40,13 +40,13 @@ public class PlotSquaredFeature extends FaweMaskManager {
         LOGGER.debug("Optimizing PlotSquared");
         if (com.boydti.fawe.config.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
-            try {
+/*            try {
                 setupBlockQueue();
                 setupSchematicHandler();
                 setupRegionManager();
             } catch (Throwable ignored) {
                 LOGGER.debug("Please update PlotSquared: https://www.spigotmc.org/resources/77506/");
-            }
+            }*/
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
                 new FaweTrim();
             }
@@ -79,7 +79,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         //log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
     }
 
-    private void setupRegionManager() throws RuntimeException {
+/*    private void setupRegionManager() throws RuntimeException {
         RegionManager.manager = new FaweRegionManager(RegionManager.manager);
         LOGGER.debug(" - RegionManager: " + RegionManager.manager);
     }
@@ -87,7 +87,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     private void setupSchematicHandler() throws RuntimeException {
         SchematicHandler.manager = new FaweSchematicHandler(PlotSquared.platform().worldUtil());
         LOGGER.debug(" - SchematicHandler: " + SchematicHandler.manager);
-    }
+    }*/
 
     public boolean isAllowed(Player player, Plot plot, MaskType type) {
         if (plot == null) {
@@ -102,7 +102,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
     @Override
     public FaweMask getMask(Player player, MaskType type) {
-        final PlotPlayer pp = PlotPlayer.from(BukkitAdapter.adapt(player));
+        final PlotPlayer<org.bukkit.entity.Player> pp = PlotPlayer.from(BukkitAdapter.adapt(player));
         if (pp == null) {
             return null;
         }
