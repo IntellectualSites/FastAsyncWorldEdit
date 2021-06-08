@@ -22,7 +22,7 @@ public class FaweTrim extends SubCommand {
 
     @Override
     public boolean onCommand(final PlotPlayer plotPlayer, final String[] strings) {
-/*        if (ran) {
+        if (ran) {
             plotPlayer.sendMessage(StaticCaption.of("Already running!"));
             return false;
         }
@@ -35,7 +35,7 @@ public class FaweTrim extends SubCommand {
         if (!PlotSquared.platform().worldUtil().isWorld(strings[0])) {
             plotPlayer.sendMessage(TranslatableCaption.of("errors.not_valid_plot_world"), Templates.of("value", strings[0]));
             return false;
-        }*/
+        }
         ran = true;
         TaskManager.IMP.async(() -> {
             try {
