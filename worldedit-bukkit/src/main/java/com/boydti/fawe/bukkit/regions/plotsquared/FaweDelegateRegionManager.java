@@ -17,7 +17,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.FlatRegionFunction;
@@ -26,7 +25,6 @@ import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -108,30 +106,25 @@ public class FaweDelegateRegionManager {
                     final Pattern plotfloor = hybridPlotWorld.TOP_BLOCK.toPattern();
                     final BiomeType biome = hybridPlotWorld.getPlotBiome();
 
-                    BlockVector3 pos1 = BlockVector3.ZERO;
-                    BlockVector3 pos2 = BlockVector3.at(hybridPlotWorld.PLOT_WIDTH - 1, 255, hybridPlotWorld.PLOT_WIDTH - 1);
+                    BlockVector3 pos1 = plot.getBottomAbs().getBlockVector3().withY(0);
+                    BlockVector3 pos2 = pos1.add(BlockVector3.at(hybridPlotWorld.PLOT_WIDTH - 1, 255, hybridPlotWorld.PLOT_WIDTH - 1));
 
                     Region bedrockRegion = new CuboidRegion(pos1, pos2.withY(0));
                     Region fillingRegion = new CuboidRegion(pos1.withY(1), pos2.withY(hybridPlotWorld.PLOT_HEIGHT - 1));
                     Region floorRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT), pos2.withY(hybridPlotWorld.PLOT_HEIGHT));
                     Region airRegion = new CuboidRegion(pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1), pos2.withY(manager.getWorldHeight()));
 
-                    Clipboard clipboard = new BlockArrayClipboard(new CuboidRegion(pos1, pos2));
-
-                    clipboard.setBlocks(bedrockRegion, bedrock);
-                    clipboard.setBlocks(fillingRegion, filling);
-                    clipboard.setBlocks(floorRegion, plotfloor);
-                    clipboard.setBlocks(airRegion, air);
-                    for (int x = pos1.getX(); x <= pos2.getX(); x++) {
-                        for (int z = pos1.getZ(); z <= pos2.getZ(); z++) {
-                            clipboard.setBiome(BlockVector2.at(x, z), biome);
-                        }
-                    }
-
-                    clipboard.paste(editSession, plot.getBottomAbs().getBlockVector3().withY(0), true, false, true);
+                    editSession.setBlocks(bedrockRegion, bedrock);
+                    editSession.setBlocks(fillingRegion, filling);
+                    editSession.setBlocks(floorRegion, plotfloor);
+                    editSession.setBlocks(airRegion, air);
+                    editSession.flushQueue();
                 }
 
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {
+                    // We cannot reuse the editsession
+                    EditSession scheditsession = !Settings.Schematics.PASTE_ON_TOP ? editSession :
+                        new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
                     File schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schem");
                     if (!schematicFile.exists()) {
                         schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schematic");
@@ -139,12 +132,15 @@ public class FaweDelegateRegionManager {
                     BlockVector3 to = plot.getBottomAbs().getBlockVector3().withY(Settings.Schematics.PASTE_ON_TOP ? hybridPlotWorld.SCHEM_Y : 1);
                     try {
                         Clipboard clip = ClipboardFormats.findByFile(schematicFile).getReader(new FileInputStream(schematicFile)).read();
-                        clip.paste(editSession, to, true, true, true);
+                        clip.paste(scheditsession, to, true, true, true);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    // Be verbose in editsession flushing
+                    scheditsession.flushQueue();
                 }
 
+                // Be verbose in editsession flushing
                 editSession.flushQueue();
                 FaweAPI.fixLighting(world, new CuboidRegion(plot.getBottomAbs().getBlockVector3(), plot.getTopAbs().getBlockVector3()), null,
                     RelightMode.valueOf(com.boydti.fawe.config.Settings.IMP.LIGHTING.MODE));
