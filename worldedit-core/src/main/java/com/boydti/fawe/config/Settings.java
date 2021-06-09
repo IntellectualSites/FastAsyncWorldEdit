@@ -193,6 +193,12 @@ public class Settings extends Config {
         })
         public boolean COMBINE_STAGES = true;
         @Comment({
+            "Do not wait for a chunk's history to save before sending it",
+            " - Undo/redo commands will wait until the history has been written to disk before executing",
+            " - Requires combine-stages = true"
+        })
+        public boolean SEND_BEFORE_HISTORY = true;
+        @Comment({
                 "Higher compression reduces the size of history at the expense of CPU",
                 "0 = Uncompressed byte array (fastest)",
                 "1 = 1 pass fast compressor (default)",
@@ -381,12 +387,6 @@ public class Settings extends Config {
             "This will increase time taken slightly."
         })
         public boolean ALLOW_TICK_EXISTING = true;
-        @Comment({
-            "[SAFE] Do not wait for a chunk's history to save before sending it",
-            " - Undo/redo commands will wait until the history has been written to disk before executing",
-            " - Requires combine_stages = true"
-        })
-        public boolean SEND_BEFORE_HISTORY = false;
 
         @Comment({
                 "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",

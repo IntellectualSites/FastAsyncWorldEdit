@@ -43,7 +43,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void recycle() {
+    public synchronized void recycle() {
         POOL.offer(this);
     }
 
@@ -104,7 +104,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public void setBlocks(int layer, char[] data) {
         this.blocks[layer] = data;
-        this.sections[layer] = data == null ? EMPTY : FULL;
+        this.sections[layer] = data == null ? empty : FULL;
     }
 
     @Override

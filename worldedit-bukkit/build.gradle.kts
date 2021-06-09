@@ -89,14 +89,14 @@ dependencies {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
     testImplementation("org.mockito:mockito-core:3.11.0")
-    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.4") {
+    compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    compileOnly("net.kyori:adventure-api:4.7.0")
-    testImplementation("net.kyori:adventure-api:4.7.0")
+    compileOnly("net.kyori:adventure-api:4.8.0")
+    testImplementation("net.kyori:adventure-api:4.8.0")
     testImplementation("org.checkerframework:checker-qual:3.14.0")
     testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
@@ -165,7 +165,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
         }
         relocate("com.github.luben", "com.boydti.fawe.zstd") {
-            include(dependency("com.github.luben:zstd-jni:1.4.9-5"))
+            include(dependency("com.github.luben:zstd-jni:1.5.0-1"))
         }
         relocate("net.jpountz", "com.boydti.fawe.jpountz") {
             include(dependency("net.jpountz:lz4-java-stream:1.0.0"))

@@ -141,7 +141,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public synchronized CompoundTag getEntity(UUID uuid) {
+    public CompoundTag getEntity(UUID uuid) {
         return delegate.get(this).getEntity(uuid);
     }
 
@@ -156,21 +156,21 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public synchronized void setLightingToGet(char[][] lighting) {
+    public void setLightingToGet(char[][] lighting) {
         delegate.setLightingToGet(this, lighting);
     }
 
     @Override
-    public synchronized void setSkyLightingToGet(char[][] lighting) {
+    public void setSkyLightingToGet(char[][] lighting) {
         delegate.setSkyLightingToGet(this, lighting);
     }
 
     @Override
-    public synchronized void setHeightmapToGet(HeightMapType type, int[] data) {
+    public void setHeightmapToGet(HeightMapType type, int[] data) {
         delegate.setHeightmapToGet(this, type, data);
     }
 
-    public synchronized void flushLightToGet(boolean heightmaps) {
+    public void flushLightToGet(boolean heightmaps) {
         delegate.flushLightToGet(this, heightmaps);
     }
 
@@ -800,22 +800,22 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     };
 
     @Override
-    public synchronized Map<BlockVector3, CompoundTag> getTiles() {
+    public Map<BlockVector3, CompoundTag> getTiles() {
         return delegate.get(this).getTiles();
     }
 
     @Override
-    public synchronized Set<CompoundTag> getEntities() {
+    public Set<CompoundTag> getEntities() {
         return delegate.get(this).getEntities();
     }
 
     @Override
-    public synchronized boolean hasSection(int layer) {
+    public boolean hasSection(int layer) {
         return chunkExisting != null && chunkExisting.hasSection(layer);
     }
 
     @Override
-    public synchronized void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
+    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         set.setFastMode(fastmode);
@@ -863,7 +863,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     /**
      * Get or create the existing part of this chunk.
      */
-    public synchronized final IChunkGet getOrCreateGet() {
+    public final IChunkGet getOrCreateGet() {
         if (chunkExisting == null) {
             chunkExisting = newWrappedGet();
         }
@@ -873,7 +873,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     /**
      * Get or create the settable part of this chunk.
      */
-    public synchronized final IChunkSet getOrCreateSet() {
+    public final IChunkSet getOrCreateSet() {
         if (chunkSet == null) {
             chunkSet = newWrappedSet();
         }
@@ -885,7 +885,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
      *  - e.g., caching, optimizations, filtering
      */
-    private synchronized IChunkSet newWrappedSet() {
+    private IChunkSet newWrappedSet() {
         return extent.getCachedSet(chunkX, chunkZ);
     }
 
@@ -917,11 +917,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public synchronized T call() {
         if (chunkSet != null) {
             chunkSet.setBitMask(bitMask);
-            return this.call(chunkSet, () -> {
-                synchronized (this) {
-                    this.recycle();
-                }
-            });
+            return this.call(chunkSet, this::recycle);
         }
         return null;
     }
@@ -963,82 +959,82 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public synchronized boolean setBiome(int x, int y, int z, BiomeType biome) {
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return delegate.setBiome(this, x, y, z, biome);
     }
 
     @Override
-    public synchronized <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         return delegate.setBlock(this, x, y, z, block);
     }
 
     @Override
-    public synchronized BiomeType getBiomeType(int x, int y, int z) {
+    public BiomeType getBiomeType(int x, int y, int z) {
         return delegate.getBiome(this, x, y, z);
     }
 
     @Override
-    public synchronized BlockState getBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return delegate.getBlock(this, x, y, z);
     }
 
     @Override
-    public synchronized BaseBlock getFullBlock(int x, int y, int z) {
+    public BaseBlock getFullBlock(int x, int y, int z) {
         return delegate.getFullBlock(this, x, y, z);
     }
 
     @Override
-    public synchronized void setSkyLight(int x, int y, int z, int value) {
+    public void setSkyLight(int x, int y, int z, int value) {
         delegate.setSkyLight(this, x, y, z, value);
     }
 
     @Override
-    public synchronized void setHeightMap(HeightMapType type, int[] heightMap) {
+    public void setHeightMap(HeightMapType type, int[] heightMap) {
         delegate.setHeightMap(this, type, heightMap);
     }
 
     @Override
-    public synchronized void removeSectionLighting(int layer, boolean sky) {
+    public void removeSectionLighting(int layer, boolean sky) {
         delegate.removeSectionLighting(this, layer, sky);
     }
 
     @Override
-    public synchronized void setFullBright(int layer) {
+    public void setFullBright(int layer) {
         delegate.setFullBright(this, layer);
     }
 
     @Override
-    public synchronized void setBlockLight(int x, int y, int z, int value) {
+    public void setBlockLight(int x, int y, int z, int value) {
         delegate.setBlockLight(this, x, y, z, value);
     }
 
     @Override
-    public synchronized void setLightLayer(int layer, char[] toSet) {
+    public void setLightLayer(int layer, char[] toSet) {
         delegate.setLightLayer(this, layer, toSet);
     }
 
     @Override
-    public synchronized void setSkyLightLayer(int layer, char[] toSet) {
+    public void setSkyLightLayer(int layer, char[] toSet) {
         delegate.setSkyLightLayer(this, layer, toSet);
     }
 
     @Override
-    public synchronized int getSkyLight(int x, int y, int z) {
+    public int getSkyLight(int x, int y, int z) {
         return delegate.getSkyLight(this, x, y, z);
     }
 
     @Override
-    public synchronized int getEmmittedLight(int x, int y, int z) {
+    public int getEmmittedLight(int x, int y, int z) {
         return delegate.getEmmittedLight(this, x, y, z);
     }
 
     @Override
-    public synchronized int getBrightness(int x, int y, int z) {
+    public int getBrightness(int x, int y, int z) {
         return delegate.getBrightness(this, x, y, z);
     }
 
     @Override
-    public synchronized int getOpacity(int x, int y, int z) {
+    public int getOpacity(int x, int y, int z) {
         return delegate.getOpacity(this, x, y, z);
     }
 
