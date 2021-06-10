@@ -13,16 +13,19 @@ public final class ImmutableBaseBlock extends BaseBlock {
     public ImmutableBaseBlock(BlockState blockState) {
         super(blockState);
     }
+    public ImmutableBaseBlock(BlockState blockState, CompoundTag tile) {
+        super(blockState, tile);
+    }
 
     @Nullable
     @Override
     public CompoundTag getNbtData() {
-        return null;
+        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
     }
 
     @Override
     public boolean hasNbtData() {
-        return false;
+        return getBlockType().getMaterial().isTile();
     }
 
     @Override

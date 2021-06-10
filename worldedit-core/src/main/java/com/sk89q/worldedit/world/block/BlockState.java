@@ -62,12 +62,12 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     private final BaseBlock emptyBaseBlock;
     private CompoundInput compoundInput = CompoundInput.NULL;
 
-    protected BlockState(BlockType blockType, int internalId, int ordinal) {
+    protected BlockState(BlockType blockType, int internalId, int ordinal, CompoundTag tile) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
         this.ordinalChar = (char) ordinal;
-        this.emptyBaseBlock = new ImmutableBaseBlock(this);
+        this.emptyBaseBlock = new ImmutableBaseBlock(this, tile);
     }
 
     /**
@@ -308,7 +308,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                 newState = newState.with(key, other.getState(key));
             }
         }
-        return this;
+        return newState;
     }
 
     @Override

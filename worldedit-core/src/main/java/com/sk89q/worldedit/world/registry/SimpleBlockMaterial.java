@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.jnbt.CompoundTag;
+
 class SimpleBlockMaterial implements BlockMaterial {
 
     private boolean isAir;
@@ -42,6 +44,8 @@ class SimpleBlockMaterial implements BlockMaterial {
     private boolean hasContainer;
     private int lightOpacity;
     private int mapColor;
+    private boolean isTile;
+    private CompoundTag tile = null;
 
     @Override
     public boolean isAir() {
@@ -226,6 +230,24 @@ class SimpleBlockMaterial implements BlockMaterial {
     @Override
     public boolean hasContainer() {
         return this.hasContainer;
+    }
+
+    public void setIsTile(boolean isTile) {
+        this.isTile = isTile;
+    }
+
+    @Override
+    public boolean isTile() {
+        return isTile;
+    }
+
+    public void setDefaultTile(CompoundTag tile) {
+        this.tile = tile;
+    }
+
+    @Override
+    public CompoundTag getDefaultTile() {
+        return tile;
     }
 
     public void setHasContainer(boolean hasContainer) {

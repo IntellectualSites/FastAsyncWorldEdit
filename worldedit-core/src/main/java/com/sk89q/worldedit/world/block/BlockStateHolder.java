@@ -186,7 +186,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      */
     @Nullable
     default CompoundTag getNbtData() {
-        return null;
+        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
     }
 
     /**

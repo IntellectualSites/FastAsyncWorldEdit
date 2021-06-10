@@ -48,7 +48,7 @@ public class FuzzyBlockState extends BlockState {
     }
 
     private FuzzyBlockState(BlockState state, Map<Property<?>, Object> values) {
-        super(state.getBlockType(), state.getInternalId(), state.getOrdinal());
+        super(state.getBlockType(), state.getInternalId(), state.getOrdinal(), null);
         if (values == null || values.isEmpty()) {
             props = Collections.emptyMap();
             this.values = Collections.emptyMap();

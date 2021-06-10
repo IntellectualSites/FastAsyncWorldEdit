@@ -98,7 +98,7 @@ public class BlockTypesCache {
                     int ordinal = this.stateOrdinals[propId];
                     if (ordinal != -1) {
                         int stateId = internalId + (propId << BIT_OFFSET);
-                        BlockState state = new BlockState(type, stateId, ordinal);
+                        BlockState state = new BlockState(type, stateId, ordinal, blockMaterial.getDefaultTile());
                         states.add(state);
                     }
                 }
@@ -106,7 +106,7 @@ public class BlockTypesCache {
 
                 this.defaultState = states.get(this.stateOrdinals[defaultPropId]);
             } else {
-                this.defaultState = new BlockState(type, internalId, states.size());
+                this.defaultState = new BlockState(type, internalId, states.size(), blockMaterial.getDefaultTile());
                 states.add(this.defaultState);
             }
         }
