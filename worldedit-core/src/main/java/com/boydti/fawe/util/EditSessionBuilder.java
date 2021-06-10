@@ -94,7 +94,6 @@ public class EditSessionBuilder {
      * @param world A world must be provided for all EditSession(s)
      */
     public EditSessionBuilder(@NotNull World world) {
-        checkNotNull(world);
         this.world = world;
     }
 
@@ -113,7 +112,6 @@ public class EditSessionBuilder {
     }
 
     public EditSessionBuilder limitUnprocessed(@NotNull Player player) {
-        checkNotNull(player);
         limitUnlimited();
         FaweLimit tmp = player.getLimit();
         limit.INVENTORY_MODE = tmp.INVENTORY_MODE;
@@ -130,7 +128,6 @@ public class EditSessionBuilder {
     }
 
     public EditSessionBuilder world(@NotNull World world) {
-        checkNotNull(world);
         this.world = world;
         return setDirty();
     }
