@@ -308,7 +308,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                 newState = newState.with(key, other.getState(key));
             }
         }
-        return this;
+        return newState;
     }
 
     @Override
