@@ -41,6 +41,7 @@ import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +68,15 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.internalId = internalId;
         this.ordinal = ordinal;
         this.ordinalChar = (char) ordinal;
-        this.emptyBaseBlock = new ImmutableBaseBlock(this);
+        this.emptyBaseBlock = new BlanketBaseBlock(this);
+    }
+
+    protected BlockState(BlockType blockType, int internalId, int ordinal, @NotNull CompoundTag tile) {
+        this.blockType = blockType;
+        this.internalId = internalId;
+        this.ordinal = ordinal;
+        this.ordinalChar = (char) ordinal;
+        this.emptyBaseBlock = new BlanketBaseBlock(this, tile);
     }
 
     /**
@@ -308,7 +317,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                 newState = newState.with(key, other.getState(key));
             }
         }
-        return this;
+        return newState;
     }
 
     @Override

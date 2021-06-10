@@ -17,28 +17,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.extension.platform;
+package com.sk89q.worldedit.internal.annotation;
 
-import com.google.auto.value.AutoAnnotation;
-import com.sk89q.worldedit.internal.annotation.PatternList;
-import com.sk89q.worldedit.internal.annotation.Radii;
+import org.enginehub.piston.inject.InjectAnnotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Holder for generated annotation classes.
+ * Annotates a {@code List<BlockState>} parameter to inject a list of BlockStates.
  */
-class Annotations {
-
-    @AutoAnnotation
-    static Radii radii(int value) {
-        return new AutoAnnotation_Annotations_radii(value);
-    }
-
-    @AutoAnnotation
-    static PatternList patternList() {
-        return new AutoAnnotation_Annotations_patternList();
-    }
-
-    private Annotations() {
-    }
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+@InjectAnnotation
+public @interface PatternList {
 }

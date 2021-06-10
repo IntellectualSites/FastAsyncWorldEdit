@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.jnbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Describes the material for a block.
  */
@@ -164,6 +167,21 @@ public interface BlockMaterial {
      * @return If it has a container
      */
     boolean hasContainer();
+
+    /**
+     * Gets whether the block is a tile entity.
+     *
+     * @return If it is a tile entity
+     */
+    boolean isTile();
+
+    /**
+     * Gets the default (empty) tile entity data
+     *
+     * @return default tile entity data
+     */
+    @Nullable
+    CompoundTag getDefaultTile();
 
     /**
      * Get the map color.

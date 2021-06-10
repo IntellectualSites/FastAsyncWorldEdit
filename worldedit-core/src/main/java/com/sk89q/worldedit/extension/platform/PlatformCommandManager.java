@@ -261,6 +261,9 @@ public final class PlatformCommandManager {
         SideEffectConverter.register(commandManager);
         HeightConverter.register(commandManager);
         OffsetConverter.register(worldEdit, commandManager);
+        commandManager.registerConverter(Key.of(com.sk89q.worldedit.function.pattern.Pattern.class, Annotations.patternList()),
+            CommaSeparatedValuesConverter.wrap(commandManager.getConverter(Key.of(
+                com.sk89q.worldedit.function.pattern.Pattern.class)).get()));
 
         registerBindings(new ConsumeBindings(worldEdit, this));
         registerBindings(new PrimitiveBindings(worldEdit));
