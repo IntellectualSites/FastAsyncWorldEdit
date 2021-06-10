@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
 /**
  * A builder-style factory for {@link EditSession EditSessions}.
  */
-public final class EditSessionBuilder {
+public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBuilder{
 
     private final EventBus eventBus;
     private @Nullable World world;
@@ -77,6 +77,8 @@ public final class EditSessionBuilder {
         return this;
     }
 
+    //TODO: Actor may need to be changed to player unless major refactoring can be done. -Matt
+    
     public @Nullable Actor getActor() {
         return actor;
     }
