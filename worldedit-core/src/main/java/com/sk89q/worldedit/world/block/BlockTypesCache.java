@@ -2,6 +2,7 @@ package com.sk89q.worldedit.world.block;
 
 import com.boydti.fawe.util.MathMan;
 import com.google.common.primitives.Booleans;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -98,7 +99,9 @@ public class BlockTypesCache {
                     int ordinal = this.stateOrdinals[propId];
                     if (ordinal != -1) {
                         int stateId = internalId + (propId << BIT_OFFSET);
-                        BlockState state = new BlockState(type, stateId, ordinal, blockMaterial.getDefaultTile());
+                        CompoundTag defaultNBT = blockMaterial.getDefaultTile();
+                        BlockState state = defaultNBT != null ? new BlockState(type, stateId, ordinal, blockMaterial.getDefaultTile()) :
+                            new BlockState(type, stateId, ordinal);
                         states.add(state);
                     }
                 }
@@ -106,7 +109,9 @@ public class BlockTypesCache {
 
                 this.defaultState = states.get(this.stateOrdinals[defaultPropId]);
             } else {
-                this.defaultState = new BlockState(type, internalId, states.size(), blockMaterial.getDefaultTile());
+                CompoundTag defaultNBT = blockMaterial.getDefaultTile();
+                this.defaultState = defaultNBT != null ? new BlockState(type, internalId, states.size(), blockMaterial.getDefaultTile()) :
+                    new BlockState(type, internalId, states.size());
                 states.add(this.defaultState);
             }
         }

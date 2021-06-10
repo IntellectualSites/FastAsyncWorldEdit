@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.jnbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Describes the material for a block.
@@ -179,6 +180,7 @@ public interface BlockMaterial {
      *
      * @return default tile entity data
      */
+    @Nullable
     CompoundTag getDefaultTile();
 
     /**
