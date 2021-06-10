@@ -1,5 +1,8 @@
 package com.boydti.fawe.bukkit.adapter.mc1_15_2;
 
+import com.boydti.fawe.bukkit.adapter.mc1_15_2.nbt.LazyCompoundTag_1_15_2;
+import com.google.common.base.Suppliers;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.util.ReflectionUtil;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.server.v1_15_R1.Block;
@@ -9,6 +12,8 @@ import net.minecraft.server.v1_15_R1.EnumPistonReaction;
 import net.minecraft.server.v1_15_R1.IBlockData;
 import net.minecraft.server.v1_15_R1.ITileEntity;
 import net.minecraft.server.v1_15_R1.Material;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.TileEntity;
 import org.bukkit.craftbukkit.v1_15_R1.block.data.CraftBlockData;
 
 public class BlockMaterial_1_15_2 implements BlockMaterial {
@@ -19,6 +24,7 @@ public class BlockMaterial_1_15_2 implements BlockMaterial {
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
     private final int opacity;
+    private final CompoundTag tile;
 
     public BlockMaterial_1_15_2(Block block) {
         this(block, block.getBlockData());
@@ -32,6 +38,8 @@ public class BlockMaterial_1_15_2 implements BlockMaterial {
         this.craftMaterial = craftBlockData.getMaterial();
         this.isTranslucent = !(boolean) ReflectionUtil.getField(Block.class, block, "v");
         opacity = defaultState.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+        TileEntity tileEntity = !block.isTileEntity() ? null : ((ITileEntity)block).createTile(null);
+        tile = new LazyCompoundTag_1_15_2(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     }
 
     public Block getBlock() {
@@ -148,6 +156,16 @@ public class BlockMaterial_1_15_2 implements BlockMaterial {
     @Override
     public boolean hasContainer() {
         return block instanceof ITileEntity;
+    }
+
+    @Override
+    public boolean isTile() {
+        return block.isTileEntity();
+    }
+
+    @Override
+    public CompoundTag getDefaultTile() {
+        return tile;
     }
 
     @Override
