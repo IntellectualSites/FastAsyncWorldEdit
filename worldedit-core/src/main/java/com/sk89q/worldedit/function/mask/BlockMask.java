@@ -27,7 +27,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import com.sk89q.worldedit.world.block.ImmutableBaseBlock;
+import com.sk89q.worldedit.world.block.BlanketBaseBlock;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -155,7 +155,7 @@ public class BlockMask extends ABlockMask {
     public void add(Collection<BaseBlock> blocks) {
         checkNotNull(blocks);
         for (BaseBlock block : blocks) {
-            if (block instanceof ImmutableBaseBlock) {
+            if (block instanceof BlanketBaseBlock) {
                 for (BlockState state : block.getBlockType().getAllStates()) {
                     ordinals[state.getOrdinal()] = true;
                 }

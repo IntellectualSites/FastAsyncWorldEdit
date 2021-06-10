@@ -57,6 +57,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.FuzzyBlockState;
+import com.sk89q.worldedit.world.block.BlanketBaseBlock;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -417,7 +418,8 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
 
         if (nbt != null) {
-            return validate(context, state.toBaseBlock(nbt));
+            BaseBlock result = blockStates.size() > 0 ? state.toBaseBlock(nbt) : new BlanketBaseBlock(state, nbt);
+            return validate(context, result);
         }
 
         if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN
