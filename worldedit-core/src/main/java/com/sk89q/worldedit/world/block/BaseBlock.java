@@ -83,7 +83,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      * @param nbtData NBT data, which must be provided
      */
     @Deprecated
-    protected BaseBlock(BlockState state, CompoundTag nbtData) {
+    public BaseBlock(BlockState state, CompoundTag nbtData) {
         this(state, LazyReference.from(checkNotNull(nbtData)::asBinaryTag));
     }
 
