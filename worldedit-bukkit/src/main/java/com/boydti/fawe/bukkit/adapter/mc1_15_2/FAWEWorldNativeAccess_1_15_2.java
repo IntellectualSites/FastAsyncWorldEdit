@@ -4,6 +4,7 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.IntPair;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -126,7 +127,7 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
         if (tileEntity == null) {
             return false;
         }
-        NBTBase nativeTag = adapter.fromNative(tag);
+        NBTBase nativeTag = adapter.fromNative(AdventureNBTConverter.fromAdventure(tag));
         tileEntity.load((NBTTagCompound) nativeTag);
         return true;
     }

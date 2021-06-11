@@ -44,7 +44,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -498,7 +497,7 @@ public class BlockTransformExtent extends ResettableExtent {
         int transformedId = transformState(state, transform);
         BlockState transformed = BlockState.getFromInternalId(transformedId);
         if (block.hasNbtData()) {
-            return (B) transformBaseBlockNBT(transformed, (CompoundBinaryTag) block.getNbtData(), transform);
+            return (B) transformBaseBlockNBT(transformed, block.getNbtData(), transform);
         }
         return (B) (block instanceof BaseBlock ? transformed.toBaseBlock() : transformed);
     }
@@ -531,7 +530,7 @@ public class BlockTransformExtent extends ResettableExtent {
     public final BaseBlock transform(BlockStateHolder<BaseBlock> block) {
         BlockState transformed = transform(block.toImmutableState());
         if (block.hasNbtData()) {
-            return transformBaseBlockNBT(transformed, (CompoundBinaryTag) block.getNbtData(), transform);
+            return transformBaseBlockNBT(transformed, block.getNbtData(), transform);
         }
         return transformed.toBaseBlock();
     }
@@ -539,7 +538,7 @@ public class BlockTransformExtent extends ResettableExtent {
     protected final BlockStateHolder transformInverse(BlockStateHolder block) {
         BlockState transformed = transformInverse(block.toImmutableState());
         if (block.hasNbtData()) {
-            return transformBaseBlockNBT(transformed, (CompoundBinaryTag) block.getNbtData(), transformInverse);
+            return transformBaseBlockNBT(transformed, block.getNbtData(), transformInverse);
         }
         return transformed;
     }

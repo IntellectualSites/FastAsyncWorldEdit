@@ -4,13 +4,14 @@ import com.boydti.fawe.Fawe;
 import com.boydti.fawe.object.IntPair;
 import com.boydti.fawe.object.RunnableVal;
 import com.boydti.fawe.util.TaskManager;
-import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R3;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.block.BlockState;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockPosition;
@@ -28,13 +29,13 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 
 public class FAWEWorldNativeAccess_1_16_R3 implements WorldNativeAccess<Chunk, IBlockData, BlockPosition> {
     private static final int UPDATE = 1;
@@ -119,14 +120,14 @@ public class FAWEWorldNativeAccess_1_16_R3 implements WorldNativeAccess<Chunk, I
     }
 
     @Override
-    public boolean updateTileEntity(BlockPosition position, CompoundTag tag) {
+    public boolean updateTileEntity(BlockPosition position, CompoundBinaryTag tag) {
         // We will assume that the tile entity was created for us,
         // though we do not do this on the other versions
         TileEntity tileEntity = getWorld().getTileEntity(position);
         if (tileEntity == null) {
             return false;
         }
-        NBTBase nativeTag = adapter.fromNative(tag);
+        NBTBase nativeTag = adapter.fromNative(AdventureNBTConverter.fromAdventure(tag));
         tileEntity.load(tileEntity.getBlock(), (NBTTagCompound) nativeTag);
         return true;
     }
