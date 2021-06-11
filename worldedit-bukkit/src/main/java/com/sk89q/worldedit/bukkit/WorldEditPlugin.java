@@ -34,6 +34,7 @@ import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R1;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R2;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R3;
+import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_17_R1;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
@@ -304,6 +305,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             adapterLoader.addClass(FAWE_Spigot_v1_16_R1.class);
             adapterLoader.addClass(FAWE_Spigot_v1_16_R2.class);
             adapterLoader.addClass(FAWE_Spigot_v1_16_R3.class);
+            adapterLoader.addClass(FAWE_Spigot_v1_17_R1.class);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

@@ -57,6 +57,10 @@ configurations.all {
     }
 }
 
+the<JavaPluginExtension>().toolchain {
+    languageVersion.set(JavaLanguageVersion.of(16))
+}
+
 dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     api(project(":worldedit-core"))
@@ -82,7 +86,7 @@ dependencies {
         because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
     })
     implementation("org.apache.logging.log4j:log4j-api")
-    compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot:1.17-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:21.0.0")
     implementation("io.papermc:paperlib:1.0.6")
     compileOnly("com.sk89q:dummypermscompat:1.10") {
