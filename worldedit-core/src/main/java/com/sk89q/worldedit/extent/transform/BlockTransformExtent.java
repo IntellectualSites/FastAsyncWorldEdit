@@ -160,8 +160,11 @@ public class BlockTransformExtent extends ResettableExtent {
         } else {
             List values = property.getValues();
             PropertyKey key = property.getKey();
-            if (key == PropertyKey.HALF) {
+            if (key == PropertyKey.HALF || values.contains("top")) {
                 return adapt(UP, DOWN);
+            }
+            if (values.contains("left")) {
+                return adapt(0L, combine(EAST, WEST), combine(NORTH, SOUTH));
             }
             if (key == PropertyKey.ROTATION) {
                 List<Direction> directions = new ArrayList<>();
@@ -332,7 +335,11 @@ public class BlockTransformExtent extends ResettableExtent {
         if (property instanceof DirectionalProperty) {
             return true;
         }
-        return directional.contains(property.getKey());
+        if (directional.contains(property.getKey())) {
+            return true;
+        }
+        List<?> values = property.getValues();
+        return (values.contains("top") || values.contains("left"));
     }
 
     private static BaseBlock transformBaseBlockNBT(BlockState transformed, CompoundTag tag, Transform transform) {
