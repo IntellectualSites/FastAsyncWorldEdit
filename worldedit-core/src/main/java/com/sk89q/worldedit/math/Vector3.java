@@ -650,6 +650,30 @@ public abstract class Vector3 {
         return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
     }
 
+    /**
+     * Tests if vectors are equal, accounting for floating point errors
+     *
+     * @param other Another Vector3
+     * @return if the vectors are effectively equal
+     */
+    public boolean equalsFuzzy(Vector3 other) {
+        if (this.equals(other)) {
+            return true;
+        }
+
+        // Minecraft deals in whole blocks, thus any difference smaller than this is unnecessary
+        if (Math.abs(getX() - other.getX()) > 0.000001d) {
+            return false;
+        }
+        if (Math.abs(getY() - other.getY()) > 0.000001d) {
+            return false;
+        }
+        if (Math.abs(getZ() - other.getZ()) > 0.000001d) {
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public int hashCode() {
         return (int) getX() ^ (int) getZ() << 12 ^ (int) getY() << 24;
