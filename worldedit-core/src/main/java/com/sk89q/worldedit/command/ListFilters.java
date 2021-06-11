@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.util.StringMan;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.annotation.Command;

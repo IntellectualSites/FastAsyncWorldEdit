@@ -19,14 +19,14 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.clipboard.CPUOptimizedClipboard;
-import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
-import com.boydti.fawe.object.clipboard.MemoryOptimizedClipboard;
-import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
-import com.boydti.fawe.util.EditSessionBuilder;
-import com.boydti.fawe.util.MaskTraverser;
+import com.fastasyncworldedit.beta.Filter;
+import com.fastasyncworldedit.configuration.Settings;
+import com.fastasyncworldedit.object.clipboard.CPUOptimizedClipboard;
+import com.fastasyncworldedit.object.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.object.clipboard.MemoryOptimizedClipboard;
+import com.fastasyncworldedit.object.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.util.EditSessionBuilder;
+import com.fastasyncworldedit.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Entity;
@@ -41,7 +41,6 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;

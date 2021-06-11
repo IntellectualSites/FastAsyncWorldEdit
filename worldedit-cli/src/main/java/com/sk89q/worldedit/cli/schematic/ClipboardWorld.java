@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.cli.schematic;
 
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.beta.IChunkGet;
+import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;

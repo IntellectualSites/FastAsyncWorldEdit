@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.bukkit.FaweBukkit;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
@@ -72,7 +72,6 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.incendo.serverlib.ServerLib;
 

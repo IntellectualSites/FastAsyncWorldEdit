@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.configuration.Caption;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;

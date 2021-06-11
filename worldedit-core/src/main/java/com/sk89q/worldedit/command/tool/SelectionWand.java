@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.config.Settings;
+import com.fastasyncworldedit.configuration.Settings;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;

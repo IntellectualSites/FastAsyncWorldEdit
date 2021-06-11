@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.math.noise;
 
-import com.boydti.fawe.object.random.SimplexNoise;
+import com.fastasyncworldedit.object.random.SimplexNoise;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extent.transform;
 
-import com.boydti.fawe.object.extent.ResettableExtent;
+import com.fastasyncworldedit.object.extent.ResettableExtent;
 import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;

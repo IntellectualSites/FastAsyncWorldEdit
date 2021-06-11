@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.configuration.Settings;
+import com.fastasyncworldedit.object.RunnableVal;
+import com.fastasyncworldedit.util.TaskManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.VaultResolver;
 import com.sk89q.worldedit.WorldEdit;

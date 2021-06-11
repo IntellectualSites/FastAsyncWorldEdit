@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.configuration.Caption;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 /**

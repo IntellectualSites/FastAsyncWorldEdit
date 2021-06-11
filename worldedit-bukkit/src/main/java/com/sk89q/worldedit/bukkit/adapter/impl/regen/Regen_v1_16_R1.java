@@ -1,9 +1,9 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.regen;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IChunkCache;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.bukkit.adapter.mc1_16_1.BukkitGetBlocks_1_16_1;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.beta.IChunkCache;
+import com.fastasyncworldedit.beta.IChunkGet;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.BukkitGetBlocks_1_16_1;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;

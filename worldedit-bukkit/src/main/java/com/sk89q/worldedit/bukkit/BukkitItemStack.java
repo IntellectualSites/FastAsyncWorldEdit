@@ -1,8 +1,8 @@
 package com.sk89q.worldedit.bukkit;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.util.ItemUtil;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.world.item.ItemType;

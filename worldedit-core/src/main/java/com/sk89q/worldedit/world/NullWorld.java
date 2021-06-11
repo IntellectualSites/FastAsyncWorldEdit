@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.blocks.NullChunkGet;
-import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.beta.IChunkGet;
+import com.fastasyncworldedit.beta.implementation.blocks.NullChunkGet;
+import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -48,7 +48,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;

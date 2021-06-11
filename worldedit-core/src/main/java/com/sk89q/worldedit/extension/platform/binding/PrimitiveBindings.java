@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.configuration.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.internal.expression.EvaluationException;

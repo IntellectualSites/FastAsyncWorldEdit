@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.clipboard.LazyClipboardHolder;
-import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
-import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.util.MainUtil;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.configuration.Settings;
+import com.fastasyncworldedit.object.clipboard.LazyClipboardHolder;
+import com.fastasyncworldedit.object.clipboard.MultiClipboardHolder;
+import com.fastasyncworldedit.object.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.util.MainUtil;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;

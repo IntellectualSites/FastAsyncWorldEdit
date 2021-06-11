@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.entity;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.entity.EntityType;
 

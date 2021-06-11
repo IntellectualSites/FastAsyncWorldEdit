@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.beta.Filter;
+import com.fastasyncworldedit.beta.Filter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.world.item;
 
-import com.boydti.fawe.object.string.JoinedCharSequence;
+import com.fastasyncworldedit.object.string.JoinedCharSequence;
 import com.sk89q.worldedit.world.block.ItemTypesCache;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 

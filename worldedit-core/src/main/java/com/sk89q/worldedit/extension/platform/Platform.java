@@ -19,7 +19,8 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.beta.implementation.lighting.Relighter;
+import com.fastasyncworldedit.beta.implementation.lighting.RelighterFactory;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -225,7 +226,7 @@ public interface Platform extends Keyed {
 
     /**
      * Get the {@link RelighterFactory} that can be used to obtain
-     * {@link com.boydti.fawe.beta.implementation.lighting.Relighter}s.
+     * {@link Relighter}s.
      *
      * @return the relighter factory to be used.
      */

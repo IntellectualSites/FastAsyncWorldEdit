@@ -1,10 +1,10 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
-import com.boydti.fawe.beta.IChunkCache;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.queue.SingleThreadQueueExtent;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.util.MathMan;
+import com.fastasyncworldedit.beta.IChunkCache;
+import com.fastasyncworldedit.beta.IChunkGet;
+import com.fastasyncworldedit.beta.implementation.queue.SingleThreadQueueExtent;
+import com.fastasyncworldedit.configuration.Settings;
+import com.fastasyncworldedit.util.MathMan;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;

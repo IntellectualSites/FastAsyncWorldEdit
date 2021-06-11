@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.boydti.fawe.object.mask.SimplexMask;
+import com.fastasyncworldedit.object.mask.SimplexMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;

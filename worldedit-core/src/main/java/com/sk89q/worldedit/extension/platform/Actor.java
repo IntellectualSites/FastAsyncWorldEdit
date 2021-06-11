@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.util.task.InterruptableCondition;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.configuration.Settings;
+import com.fastasyncworldedit.object.FaweLimit;
+import com.fastasyncworldedit.util.task.InterruptableCondition;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.MapMetadatable;
 import com.sk89q.worldedit.entity.Player;
@@ -35,7 +35,6 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Locale;
 
 /**

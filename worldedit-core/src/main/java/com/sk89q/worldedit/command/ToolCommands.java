@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.InspectBrush;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.object.brush.InspectBrush;
 import com.google.common.collect.Collections2;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;

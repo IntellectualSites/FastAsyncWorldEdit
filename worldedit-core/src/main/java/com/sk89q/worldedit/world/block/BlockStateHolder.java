@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.ITileInput;
+import com.fastasyncworldedit.beta.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.OutputExtent;

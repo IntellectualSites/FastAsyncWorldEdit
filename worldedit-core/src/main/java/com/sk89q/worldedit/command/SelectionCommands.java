@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.mask.IdMask;
-import com.boydti.fawe.object.regions.selector.FuzzyRegionSelector;
-import com.boydti.fawe.object.regions.selector.PolyhedralRegionSelector;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.object.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.object.mask.IdMask;
+import com.fastasyncworldedit.object.regions.selector.FuzzyRegionSelector;
+import com.fastasyncworldedit.object.regions.selector.PolyhedralRegionSelector;
 import com.google.common.base.Strings;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;

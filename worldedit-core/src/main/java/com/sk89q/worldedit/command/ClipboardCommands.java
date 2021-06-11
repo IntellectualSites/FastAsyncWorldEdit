@@ -19,21 +19,21 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
-import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
-import com.boydti.fawe.object.clipboard.ReadOnlyClipboard;
-import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.util.ImgurUtility;
-import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.MaskTraverser;
+import com.fastasyncworldedit.FaweAPI;
+import com.fastasyncworldedit.FaweCache;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.configuration.Settings;
+import com.fastasyncworldedit.object.FaweLimit;
+import com.fastasyncworldedit.object.RunnableVal;
+import com.fastasyncworldedit.object.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.object.clipboard.MultiClipboardHolder;
+import com.fastasyncworldedit.object.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.object.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.object.exception.FaweException;
+import com.fastasyncworldedit.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.util.ImgurUtility;
+import com.fastasyncworldedit.util.MainUtil;
+import com.fastasyncworldedit.util.MaskTraverser;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;

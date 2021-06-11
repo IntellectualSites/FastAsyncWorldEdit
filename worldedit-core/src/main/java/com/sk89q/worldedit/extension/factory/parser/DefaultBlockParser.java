@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.extension.factory.parser;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.jnbt.JSON2NBT;
-import com.boydti.fawe.jnbt.NBTException;
-import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.jnbt.JSON2NBT;
+import com.fastasyncworldedit.jnbt.NBTException;
+import com.fastasyncworldedit.util.MathMan;
+import com.fastasyncworldedit.util.StringMan;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.IncompleteRegionException;

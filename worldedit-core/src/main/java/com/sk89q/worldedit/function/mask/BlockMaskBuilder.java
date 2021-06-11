@@ -1,10 +1,10 @@
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.command.SuggestInputParseException;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.collection.FastBitSet;
-import com.boydti.fawe.object.string.MutableCharSequence;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.command.SuggestInputParseException;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.object.collection.FastBitSet;
+import com.fastasyncworldedit.object.string.MutableCharSequence;
+import com.fastasyncworldedit.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.registry.state.AbstractProperty;

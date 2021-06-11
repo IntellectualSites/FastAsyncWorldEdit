@@ -19,15 +19,15 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
-import com.boydti.fawe.bukkit.adapter.mc1_16_5.BlockMaterial_1_16_5;
-import com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitAdapter_1_16_5;
-import com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitGetBlocks_1_16_5;
-import com.boydti.fawe.bukkit.adapter.mc1_16_5.FAWEWorldNativeAccess_1_16_R3;
-import com.boydti.fawe.bukkit.adapter.mc1_16_5.MapChunkUtil_1_16_5;
-import com.boydti.fawe.bukkit.adapter.mc1_16_5.nbt.LazyCompoundTag_1_16_5;
+import com.fastasyncworldedit.FaweCache;
+import com.fastasyncworldedit.beta.IChunkGet;
+import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_5.BlockMaterial_1_16_5;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_5.BukkitAdapter_1_16_5;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_5.BukkitGetBlocks_1_16_5;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_5.FAWEWorldNativeAccess_1_16_R3;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_5.MapChunkUtil_1_16_5;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_5.nbt.LazyCompoundTag_1_16_5;
 import com.google.common.base.Preconditions;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.configuration.Caption;
 import com.google.common.base.Splitter;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;

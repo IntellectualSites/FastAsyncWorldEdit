@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.boydti.fawe.object.io.PGZIPOutputStream;
-import com.boydti.fawe.object.io.ResettableFileInputStream;
-import com.boydti.fawe.object.schematic.MinecraftStructure;
-import com.boydti.fawe.object.schematic.PNGWriter;
+import com.fastasyncworldedit.object.io.PGZIPOutputStream;
+import com.fastasyncworldedit.object.io.ResettableFileInputStream;
+import com.fastasyncworldedit.object.schematic.MinecraftStructure;
+import com.fastasyncworldedit.object.schematic.PNGWriter;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;

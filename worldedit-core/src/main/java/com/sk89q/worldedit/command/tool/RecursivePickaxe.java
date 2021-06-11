@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.object.mask.IdMask;
+import com.fastasyncworldedit.object.mask.IdMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;

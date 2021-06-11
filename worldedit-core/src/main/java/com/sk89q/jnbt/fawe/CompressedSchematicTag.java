@@ -1,7 +1,7 @@
 package com.sk89q.jnbt.fawe;
 
-import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.io.FastByteArraysInputStream;
+import com.fastasyncworldedit.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.object.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.CompressedCompoundTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;

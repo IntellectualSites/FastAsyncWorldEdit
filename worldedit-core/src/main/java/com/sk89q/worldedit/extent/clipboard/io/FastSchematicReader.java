@@ -19,14 +19,14 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.jnbt.streamer.StreamDelegate;
-import com.boydti.fawe.jnbt.streamer.ValueReader;
-import com.boydti.fawe.object.FaweInputStream;
-import com.boydti.fawe.object.FaweOutputStream;
-import com.boydti.fawe.object.clipboard.LinearClipboard;
-import com.boydti.fawe.object.io.FastByteArrayOutputStream;
-import com.boydti.fawe.object.io.FastByteArraysInputStream;
+import com.fastasyncworldedit.FaweCache;
+import com.fastasyncworldedit.jnbt.streamer.StreamDelegate;
+import com.fastasyncworldedit.jnbt.streamer.ValueReader;
+import com.fastasyncworldedit.object.FaweInputStream;
+import com.fastasyncworldedit.object.FaweOutputStream;
+import com.fastasyncworldedit.object.clipboard.LinearClipboard;
+import com.fastasyncworldedit.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.object.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;

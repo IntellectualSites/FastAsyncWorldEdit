@@ -1,9 +1,9 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.image.ImageUtil;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.util.MainUtil;
+import com.fastasyncworldedit.util.image.ImageUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Entity;

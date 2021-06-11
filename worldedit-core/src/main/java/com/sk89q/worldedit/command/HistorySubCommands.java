@@ -1,16 +1,16 @@
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.database.DBHandler;
-import com.boydti.fawe.database.RollbackDatabase;
-import com.boydti.fawe.logging.rollback.RollbackOptimizedHistory;
-import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
-import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.FaweAPI;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.configuration.Settings;
+import com.fastasyncworldedit.database.DBHandler;
+import com.fastasyncworldedit.database.RollbackDatabase;
+import com.fastasyncworldedit.logging.RollbackOptimizedHistory;
+import com.fastasyncworldedit.object.RegionWrapper;
+import com.fastasyncworldedit.object.changeset.SimpleChangeSetSummary;
+import com.fastasyncworldedit.util.MainUtil;
+import com.fastasyncworldedit.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.LocalSession;

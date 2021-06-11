@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.math;
 
-import com.boydti.fawe.util.MathMan;
+import com.fastasyncworldedit.util.MathMan;
 import com.google.common.collect.ComparisonChain;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 

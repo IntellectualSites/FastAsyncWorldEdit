@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.task.AsyncNotifyQueue;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.object.exception.FaweException;
+import com.fastasyncworldedit.object.task.AsyncNotifyQueue;
+import com.fastasyncworldedit.util.TaskManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 

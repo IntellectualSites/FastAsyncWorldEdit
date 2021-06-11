@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.task.ThrowableSupplier;
-import com.boydti.fawe.util.StringMan;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.configuration.Settings;
+import com.fastasyncworldedit.object.exception.FaweException;
+import com.fastasyncworldedit.object.task.ThrowableSupplier;
+import com.fastasyncworldedit.util.StringMan;
+import com.fastasyncworldedit.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
