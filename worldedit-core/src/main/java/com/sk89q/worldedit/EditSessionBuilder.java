@@ -20,34 +20,34 @@
 package com.sk89q.worldedit;
 
 import com.google.common.base.Preconditions;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 /**
  * A builder-style factory for {@link EditSession EditSessions}.
  */
-public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBuilder{
+public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBuilder {
 
     private final EventBus eventBus;
     private @Nullable World world;
     private int maxBlocks = -1;
-    private @Nullable Actor actor;
-    private @Nullable BlockBag blockBag;
+    @Nullable private Actor actor;
+    @Nullable private BlockBag blockBag;
     private boolean tracing;
 
     EditSessionBuilder(EventBus eventBus) {
+        super(null); //TODO
         this.eventBus = eventBus;
     }
 
-    public @Nullable World getWorld() {
+    @Nullable public World getWorld() {
         return world;
     }
 
@@ -78,8 +78,9 @@ public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBu
     }
 
     //TODO: Actor may need to be changed to player unless major refactoring can be done. -Matt
-    
-    public @Nullable Actor getActor() {
+
+    @Nullable
+    public Actor getActor() {
         return actor;
     }
 
@@ -94,7 +95,8 @@ public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBu
         return this;
     }
 
-    public @Nullable BlockBag getBlockBag() {
+    @Nullable
+    public BlockBag getBlockBag() {
         return blockBag;
     }
 
@@ -147,7 +149,7 @@ public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBu
         com.boydti.fawe.util.EditSessionBuilder editSessionBuilder = new com.boydti.fawe.util.EditSessionBuilder(Objects.requireNonNull(world));
         editSessionBuilder.eventBus(eventBus)
                           .blockBag(blockBag)
-                          .player((Player) actor)
+                          .actor(actor)
                           .tracing(tracing);
         return new EditSession(editSessionBuilder);
     }
