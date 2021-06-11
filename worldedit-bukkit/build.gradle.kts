@@ -88,7 +88,7 @@ dependencies {
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    testImplementation("org.mockito:mockito-core:3.11.0")
+    testImplementation("org.mockito:mockito-core:3.11.1")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
