@@ -37,26 +37,26 @@ public class AffineTransform implements Transform, Serializable {
     /**
      * coefficients for x coordinate.
      */
-    private final double m00;
-    private final double m01;
-    private final double m02;
-    private final double m03;
+    private final double m00; // x-only
+    private final double m01; // x-y
+    private final double m02; // x-z
+    private final double m03; // translation
 
     /**
      * coefficients for y coordinate.
      */
-    private final double m10;
-    private final double m11;
-    private final double m12;
-    private final double m13;
+    private final double m10; // x-y
+    private final double m11; // y-only
+    private final double m12; // y-z
+    private final double m13; // translation
 
     /**
      * coefficients for z coordinate.
      */
-    private final double m20;
-    private final double m21;
-    private final double m22;
-    private final double m23;
+    private final double m20; // x-z
+    private final double m21; // y-z
+    private final double m22; // z-only
+    private final double m23; // translation
 
     // ===================================================================
     // constructors
@@ -295,10 +295,7 @@ public class AffineTransform implements Transform, Serializable {
     }
 
     public boolean isScaled(Vector3 vector) {
-        boolean flip = false;
-        if (vector.getX() != 0 && m00 < 0) {
-            flip = true;
-        }
+        boolean flip = vector.getX() != 0 && m00 < 0;
         if (vector.getY() != 0 && m11 < 0) {
             flip = !flip;
         }
@@ -308,13 +305,14 @@ public class AffineTransform implements Transform, Serializable {
         if (flip) {
             return true;
         }
-        if (vector.getX() != 0 && m01 != 0 && m01 == m10) {
+        // Check for flip-and-rotate
+        if (vector.getX() != 0 && vector.getY() != 0 &&  m01 != 0 && m10 != 0) {
             flip = true;
         }
-        if (vector.getY() != 0 && m02 != 0 && m02 == m20) {
+        if (vector.getX() != 0 && vector.getZ() != 0 &&  m02 != 0 && m20 != 0) {
             flip = !flip;
         }
-        if (vector.getZ() != 0 && m21 != 0 && m21 == m12) {
+        if (vector.getY() != 0 && vector.getZ() != 0 && m12 != 0 && m21 != 0) {
             flip = !flip;
         }
         return flip;

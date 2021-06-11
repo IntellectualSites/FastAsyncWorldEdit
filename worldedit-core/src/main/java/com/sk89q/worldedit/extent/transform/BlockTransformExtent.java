@@ -198,16 +198,16 @@ public class BlockTransformExtent extends ResettableExtent {
                                 result.add(combine(NORTH, EAST, SOUTH, WEST));
                                 continue;
                             case "inner_left":
-                                result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
+                                result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
                                 continue;
                             case "inner_right":
-                                result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
+                                result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
                                 continue;
                             case "outer_left":
-                                result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
+                                result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
                                 continue;
                             case "outer_right":
-                                result.add(notIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
+                                result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
                                 continue;
                             default:
                                 LOGGER.warn("Unknown direction {}", value);
@@ -265,7 +265,7 @@ public class BlockTransformExtent extends ResettableExtent {
         return (mask & (1L << dir.ordinal())) != 0;
     }
 
-    private static long notIndex(long mask, int... indexes) {
+    private static long orIndex(long mask, int... indexes) {
         for (int index : indexes) {
             mask = mask | (1L << (index + values().length));
         }
@@ -296,7 +296,8 @@ public class BlockTransformExtent extends ResettableExtent {
                 flip = ((AffineTransform) transform).isScaled(oldVector);
             }
 
-            if (oldVector.equals(newVector)) {
+            // If we're flipping, it is possible for the old and new vectors to be equal
+            if (!flip && oldVector.equalsFuzzy(newVector)) {
                 continue;
             }
 
@@ -304,6 +305,7 @@ public class BlockTransformExtent extends ResettableExtent {
             for (int i = 0; i < directions.length; i++) {
                 int j = (oldIndex + i) % directions.length;
                 long newDirMask = directions[j];
+                // Check if the old mask excludes it
                 if (!hasIndex(oldDirMask, j)) {
                     continue;
                 }
@@ -312,7 +314,6 @@ public class BlockTransformExtent extends ResettableExtent {
                     if (!hasDirection(newDirMask, v)) {
                         continue;
                     }
-                    // Check if the old mask excludes it
                     double dot = v.toVector().normalize().dot(newVector);
                     if (dot > closest || (flip && dot >= closest)) { //
                         closest = dot;
@@ -387,12 +388,13 @@ public class BlockTransformExtent extends ResettableExtent {
 
             newMaskedId = tmp.getInternalId();
         }
-
+        // True if relying on two different "directions" for the result, e.g. stairs with both facing and shape
         for (AbstractProperty property : (List<AbstractProperty<?>>) type.getProperties()) {
             if (isDirectional(property)) {
                 long[] directions = getDirections(property);
                 if (directions != null) {
-                    Integer newIndex = getNewStateIndex(transform, directions, property.getIndex(state.getInternalId()));
+                    int oldIndex = property.getIndex(newMaskedId);
+                    Integer newIndex = getNewStateIndex(transform, directions, oldIndex);
                     if (newIndex != null) {
                         newMaskedId = property.modifyIndex(newMaskedId, newIndex);
                     }
@@ -467,7 +469,7 @@ public class BlockTransformExtent extends ResettableExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
-        return super.setBlock(location, transformBlock(block, true));
+        return super.setBlock(location, transformInverse(block));
     }
 
     @Override
