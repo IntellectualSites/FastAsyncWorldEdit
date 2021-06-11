@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.jnbt.CompoundTag;
+
 import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
@@ -150,5 +152,15 @@ public class PassthroughBlockMaterial implements BlockMaterial {
     @Override
     public boolean hasContainer() {
         return blockMaterial.hasContainer();
+    }
+
+    @Override
+    public boolean isTile() {
+        return blockMaterial.isTile();
+    }
+
+    @Override
+    public CompoundTag getDefaultTile() {
+        return blockMaterial.getDefaultTile();
     }
 }

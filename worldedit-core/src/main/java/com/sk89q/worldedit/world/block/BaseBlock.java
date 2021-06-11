@@ -73,7 +73,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      */
     public BaseBlock(BlockState blockState) {
         this.blockState = blockState;
-        nbtData = null;
+        this.nbtData = null;
     }
 
     /**

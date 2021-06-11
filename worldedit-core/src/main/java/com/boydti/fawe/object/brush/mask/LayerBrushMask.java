@@ -4,11 +4,14 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
+
+import java.util.Arrays;
 
 public class LayerBrushMask extends AbstractExtentMask {
 
@@ -33,7 +36,7 @@ public class LayerBrushMask extends AbstractExtentMask {
 
     @Override
     public boolean test(BlockVector3 pos) {
-        int depth = visitor.getDepth() + 1;
+        int depth = (visitor.getDepth() + 1) % layers.length;
         if (depth > 1) {
             boolean found = false;
             BlockState previous = layers[depth - 1];

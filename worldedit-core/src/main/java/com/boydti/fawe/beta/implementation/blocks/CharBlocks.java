@@ -19,22 +19,34 @@ public abstract class CharBlocks implements IBlocks {
             return blocks.blocks[layer];
         }
 
+        // Ignore aggressive switch here.
+        @Override
+        public char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, boolean aggressive) {
+            return blocks.blocks[layer];
+        }
+
         @Override
         public final boolean isFull() {
             return true;
         }
     };
-    protected final Section EMPTY = new Section() {
+    protected final Section empty = new Section() {
         @Override
         public final synchronized char[] get(CharBlocks blocks, int layer) {
+            // Defaults to aggressive as it should only be avoided where we know we've reset a chunk during an edit
+            return get(blocks, layer, true);
+        }
+
+        @Override
+        public synchronized char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, boolean aggressive) {
             char[] arr = blocks.blocks[layer];
             if (arr == null) {
-                arr = blocks.blocks[layer] = blocks.update(layer, null);
+                arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
                 if (arr == null) {
                     throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
                 }
             } else {
-                blocks.blocks[layer] = blocks.update(layer, arr);
+                blocks.blocks[layer] = blocks.update(layer, arr, aggressive);
                 if (blocks.blocks[layer] == null) {
                     throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
                 }
@@ -57,7 +69,7 @@ public abstract class CharBlocks implements IBlocks {
         blocks = new char[16][];
         sections = new Section[16];
         for (int i = 0; i < 16; i++) {
-            sections[i] = EMPTY;
+            sections[i] = empty;
         }
     }
 
@@ -88,16 +100,16 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public synchronized IChunkSet reset() {
         for (int i = 0; i < 16; i++) {
-            sections[i] = EMPTY;
+            sections[i] = empty;
         }
         return null;
     }
 
     public synchronized void reset(@Range(from = 0, to = 15) int layer) {
-        sections[layer] = EMPTY;
+        sections[layer] = empty;
     }
 
-    public synchronized char[] update(int layer, char[] data) {
+    public synchronized char[] update(int layer, char[] data, boolean aggressive) {
         if (data == null) {
             return new char[4096];
         }
@@ -114,16 +126,18 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
-    public synchronized char[] load(@Range(from = 0, to = 15) int layer) {
-        return sections[layer].get(this, layer);
+    public char[] load(@Range(from = 0, to = 15) int layer) {
+        synchronized (sections[layer]) {
+            return sections[layer].get(this, layer);
+        }
     }
 
     @Override
-    public synchronized BlockState getBlock(int x, int y, int z) {
+    public BlockState getBlock(int x, int y, int z) {
         return BlockTypesCache.states[get(x, y, z)];
     }
 
-    public synchronized char get(int x, @Range(from = 0, to = 255) int y, int z) {
+    public char get(int x, @Range(from = 0, to = 255) int y, int z) {
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         if (layer >= sections.length || layer < 0) {
@@ -149,7 +163,7 @@ public abstract class CharBlocks implements IBlocks {
         Section
      */
 
-    public synchronized final char get(@Range(from = 0, to = 15) int layer, int index) {
+    public final char get(@Range(from = 0, to = 15) int layer, int index) {
         return sections[layer].get(this, layer, index);
     }
 
@@ -161,10 +175,17 @@ public abstract class CharBlocks implements IBlocks {
 
         public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer);
 
+        public abstract char[] get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, boolean aggressive);
+
         public abstract boolean isFull();
 
         public final char get(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index) {
-            return get(blocks, layer)[index];
+            char[] section = get(blocks, layer);
+            if (section == null) {
+                blocks.reset(layer);
+                section = blocks.empty.get(blocks, layer, false);
+            }
+            return section[index];
         }
 
         public final void set(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index, char value) {

@@ -96,6 +96,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.annotation.PatternList;
 import com.sk89q.worldedit.internal.annotation.ClipboardMask;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -108,7 +109,6 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.block.BlockID;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -632,10 +632,13 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.layer")
     public void surfaceLayer(InjectedValueAccess context,
                              @Arg(desc = "Expression")
-                                 Expression radius, List<BlockState> blockLayers)
+                                 Expression radius,
+                             @Arg(desc = "List of comma-separated patterns")
+                             @PatternList()
+                                 List<Pattern> patternLayers)
         throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        set(context, new LayerBrush(blockLayers.toArray(new BlockState[0]))).setSize(radius);
+        set(context, new LayerBrush(patternLayers.toArray(new Pattern[0]))).setSize(radius);
     }
 
     @Command(
@@ -683,7 +686,9 @@ public class BrushCommands {
                                     @Arg(desc = "double", def = "1")
                                         double points,
                                     @Arg(desc = "double", def = "1")
-                                        double distance, List<String> commandStr)
+                                        double distance,
+                                    @Arg(desc = "List of comma-separated commands")
+                                        List<String> commandStr)
         throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         set(context,

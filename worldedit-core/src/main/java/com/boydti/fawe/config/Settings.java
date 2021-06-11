@@ -20,7 +20,7 @@ public class Settings extends Config {
     @Final // Indicates that this value isn't configurable
     public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues";
     @Final
-    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit/wiki";
+    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki";
     @Final
     public String DATE; // These values are set from FAWE before loading
     @Final
@@ -192,6 +192,12 @@ public class Settings extends Config {
                 " - Slightly worse compression since dispatch order is different",
         })
         public boolean COMBINE_STAGES = true;
+        @Comment({
+            "Do not wait for a chunk's history to save before sending it",
+            " - Undo/redo commands will wait until the history has been written to disk before executing",
+            " - Requires combine-stages = true"
+        })
+        public boolean SEND_BEFORE_HISTORY = true;
         @Comment({
                 "Higher compression reduces the size of history at the expense of CPU",
                 "0 = Uncompressed byte array (fastest)",
@@ -381,12 +387,6 @@ public class Settings extends Config {
             "This will increase time taken slightly."
         })
         public boolean ALLOW_TICK_EXISTING = true;
-        @Comment({
-            "[SAFE] Do not wait for a chunk's history to save before sending it",
-            " - Undo/redo commands will wait until the history has been written to disk before executing",
-            " - Requires combine_stages = true"
-        })
-        public boolean SEND_BEFORE_HISTORY = false;
 
         @Comment({
                 "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",

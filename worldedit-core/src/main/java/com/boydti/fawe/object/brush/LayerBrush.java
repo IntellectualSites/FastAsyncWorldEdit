@@ -25,8 +25,8 @@ public class LayerBrush implements Brush {
     private final BlockState[] layers;
     private RecursiveVisitor visitor;
 
-    public LayerBrush(BlockState[] layers) {
-        this.layers = layers;
+    public LayerBrush(Pattern[] layers) {
+        this.layers = Arrays.stream(layers).map(p -> p.applyBlock(BlockVector3.ZERO).toBlockState()).toArray(BlockState[]::new);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class LayerBrush implements Brush {
         BlockVectorSet visited = visitor.getVisited();
         visitor = new RecursiveVisitor(new LayerBrushMask(editSession, visitor, layers, adjacent), pos -> {
             int depth = visitor.getDepth();
-            BlockState currentPattern = layers[depth];
+            Pattern currentPattern = layers[depth];
             return currentPattern.apply(editSession, pos, pos);
         }, layers.length - 1);
         for (BlockVector3 pos : visited) {
@@ -50,4 +50,5 @@ public class LayerBrush implements Brush {
         Operations.completeBlindly(visitor);
         visitor = null;
     }
+
 }

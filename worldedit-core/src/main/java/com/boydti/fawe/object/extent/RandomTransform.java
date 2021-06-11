@@ -48,10 +48,8 @@ public class RandomTransform extends SelectTransform {
             collection = RandomCollection.of(weights, random);
             extents = new LinkedHashSet<>(weights.keySet());
         }
-        for (AbstractDelegateExtent current : extents) {
-            if (current instanceof ResettableExtent) {
-                ((ResettableExtent) current).setExtent(extent);
-            }
+        for (ResettableExtent current : extents) {
+                current.setExtent(extent);
         }
         return this;
     }

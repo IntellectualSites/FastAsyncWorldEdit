@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.sk89q.worldedit.WorldEdit;
+
 /**
  * A collection of capabilities that a {@link Platform} may support.
  */
@@ -31,11 +33,12 @@ public enum Capability {
     GAME_HOOKS {
         @Override
         void initialize(PlatformManager platformManager, Platform platform) {
-            platform.registerGameHooks();
+            platform.setGameHooksEnabled(true);
         }
 
         @Override
-        void unload(PlatformManager platformManager, Platform platform) {
+        void uninitialize(PlatformManager platformManager, Platform platform) {
+            platform.setGameHooksEnabled(false);
         }
     },
 
@@ -54,7 +57,7 @@ public enum Capability {
         }
 
         @Override
-        void unload(PlatformManager platformManager, Platform platform) {
+        void uninitialize(PlatformManager platformManager, Platform platform) {
             platformManager.getPlatformCommandManager().removeCommands();
         }
     },
@@ -76,7 +79,7 @@ public enum Capability {
     WORLD_EDITING {
         /*
         @Override
-        void initialize(PlatformManager platformManager, Platform platform) {
+        void ready(PlatformManager platformManager, Platform platform) {
             BlockRegistry blockRegistry = platform.getRegistries().getBlockRegistry();
             for (BlockType type : BlockType.REGISTRY) {
                 for (BlockState state : type.getAllStates()) {
@@ -86,18 +89,35 @@ public enum Capability {
         }
 
         @Override
-        void unload(PlatformManager platformManager, Platform platform) {
+        void unready(PlatformManager platformManager, Platform platform) {
             BlockStateIdAccess.clear();
         }
         */
     };
 
+    /**
+     * Initialize platform-wide state.
+     */
     void initialize(PlatformManager platformManager, Platform platform) {
 
     }
 
-    void unload(PlatformManager platformManager, Platform platform) {
+    /**
+     * Un-initialize platform-wide state.
+     */
+    void uninitialize(PlatformManager platformManager, Platform platform) {
+    }
 
+    /**
+     * Initialize per-level state.
+     */
+    void ready(PlatformManager platformManager, Platform platform) {
+    }
+
+    /**
+     * Un-initialize per-level state.
+     */
+    void unready(PlatformManager platformManager, Platform platform) {
     }
 
 }
