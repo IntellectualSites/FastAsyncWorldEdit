@@ -38,6 +38,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.regen.Regen_v1_17_R1;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.extent.Extent;
@@ -106,7 +107,7 @@ public final class FAWE_Spigot_v1_17_R1 extends CachedBukkitAdapter implements I
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private final Spigot_v1_17_R1 parent;
+    private final BukkitImplAdapter<NBTBase> parent; // TODO
     private char[] ibdToStateOrdinal;
     private int[] ordinalToIbdID;
 
@@ -115,12 +116,12 @@ public final class FAWE_Spigot_v1_17_R1 extends CachedBukkitAdapter implements I
     // ------------------------------------------------------------------------
 
     public FAWE_Spigot_v1_17_R1() throws NoSuchFieldException, NoSuchMethodException {
-        this.parent = new Spigot_v1_17_R1();
+        this.parent = null;
     }
 
     @Override
     public BukkitImplAdapter<NBTBase> getParent() {
-        return parent;
+        return null; // parent;
     }
 
     private synchronized boolean init() {
@@ -436,9 +437,7 @@ public final class FAWE_Spigot_v1_17_R1 extends CachedBukkitAdapter implements I
 
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
-        // return new Regen_v1_17(bukkitWorld, region, target, options).regenerate();
-        // TODO
-        return false;
+        return new Regen_v1_17_R1(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override

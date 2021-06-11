@@ -70,7 +70,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     public final WorldEditPlugin plugin;
     private final CommandRegistration dynamicCommands;
     private final Lifecycled<Watchdog> watchdog;
-    private final RelighterFactory relighterFactory;
+    private RelighterFactory relighterFactory;
     private boolean hookingEvents;
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
@@ -80,16 +80,6 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         this.watchdog = plugin.getLifecycledBukkitImplAdapter()
                 .filter(BukkitImplAdapter::supportsWatchdog)
                 .map(BukkitWatchdog::new);
-        RelighterFactory tempFactory;
-        try {
-            Class.forName("com.tuinity.tuinity.config.TuinityConfig");
-            tempFactory = new TuinityRelighterFactory_1_16_5();
-            LOGGER.info("Using Tuinity internals for relighting");
-        } catch (ClassNotFoundException e) {
-            tempFactory = new NMSRelighterFactory();
-            LOGGER.info("Using FAWE for relighting");
-        }
-        this.relighterFactory = tempFactory;
     }
 
     CommandRegistration getDynamicCommands() {
@@ -262,6 +252,10 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public @NotNull RelighterFactory getRelighterFactory() {
+        if (this.relighterFactory == null) {
+            this.relighterFactory = this.plugin.getBukkitImplAdapter().geRelighterFactory();
+            LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");
+        }
         return this.relighterFactory;
     }
 

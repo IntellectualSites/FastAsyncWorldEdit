@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit.adapter;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.beta.IChunkGet;
+import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
 import com.sk89q.jnbt.CompoundTag;
@@ -270,5 +271,9 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     default int getInternalBiomeId(BiomeType biome) {
         return Biome.BADLANDS.ordinal();
+    }
+
+    default RelighterFactory geRelighterFactory() {
+        throw new UnsupportedOperationException();
     }
 }

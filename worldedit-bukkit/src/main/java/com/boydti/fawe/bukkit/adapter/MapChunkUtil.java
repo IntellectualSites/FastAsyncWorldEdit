@@ -18,7 +18,7 @@ public abstract class MapChunkUtil<T> {
     protected Field fieldBlockEntities;
     protected Field fieldFull;
 
-    public abstract T createPacket();
+    protected abstract T createPacket();
 
     public T create(BukkitImplAdapter adapter, ChunkPacket packet) {
         try {

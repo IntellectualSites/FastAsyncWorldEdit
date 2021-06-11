@@ -40,11 +40,6 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     BukkitImplAdapter<T> getParent();
 
     @Override
-    default int getDataVersion() {
-        return getParent().getDataVersion();
-    }
-
-    @Override
     @Nullable
     default DataFixer getDataFixer() {
         return getParent().getDataFixer();
