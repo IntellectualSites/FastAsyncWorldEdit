@@ -12,6 +12,10 @@ repositories {
         name = "IntellectualSites"
         url = uri("https://mvn.intellectualsites.com/content/groups/public/")
     }
+    maven {
+        name = "IntellectualSites-Snapshots"
+        url = uri("https://mvn.intellectualsites.com/content/groups/snapshots/")
+    }
 }
 
 applyPlatformAndCoreConfiguration()
@@ -51,7 +55,9 @@ dependencies {
     implementation("com.github.luben:zstd-jni:1.5.0-2")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
-    api("com.plotsquared:PlotSquared-Core:5.13.11") { isTransitive = false }
+    api("com.plotsquared:PlotSquared-Core:6.0.0-SNAPSHOT") { isTransitive = false }
+    compileOnlyApi("net.kyori:adventure-api:4.8.0")
+    compileOnlyApi("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     compileOnly("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
     compileOnly("org.lz4:lz4-java:1.7.1")

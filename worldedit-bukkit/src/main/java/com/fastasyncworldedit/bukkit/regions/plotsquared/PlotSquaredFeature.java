@@ -14,9 +14,8 @@ import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.flag.implementations.DoneFlag;
 import com.plotsquared.core.plot.flag.implementations.NoWorldeditFlag;
-import com.plotsquared.core.util.RegionManager;
-import com.plotsquared.core.util.SchematicHandler;
 import com.plotsquared.core.util.WEManager;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -39,15 +38,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
         LOGGER.debug("Optimizing PlotSquared");
-        if (com.fastasyncworldedit.core.configuration.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_HOOK) {
+        if (Settings.FAWE_Components.FAWE_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
-            try {
-                setupBlockQueue();
-                setupSchematicHandler();
-                setupRegionManager();
-            } catch (Throwable ignored) {
-                LOGGER.debug("Please update PlotSquared: https://www.spigotmc.org/resources/77506/");
-            }
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
                 new FaweTrim();
             }
@@ -71,38 +63,20 @@ public class PlotSquaredFeature extends FaweMaskManager {
         return UUIDHandler.getName(uuid);
     }
 
-    private void setupBlockQueue() throws RuntimeException {
-        // If it's going to fail, throw an error now rather than later
-        //QueueProvider provider = QueueProvider.of(FaweLocalBlockQueue.class, null);
-        //GlobalBlockQueue.IMP.setProvider(provider);
-        //HybridPlotManager.REGENERATIVE_CLEAR = false;
-        //log.debug(" - QueueProvider: " + FaweLocalBlockQueue.class);
-        //log.debug(" - HybridPlotManager.REGENERATIVE_CLEAR: " + HybridPlotManager.REGENERATIVE_CLEAR);
-    }
-
-    private void setupRegionManager() throws RuntimeException {
-        RegionManager.manager = new FaweRegionManager(RegionManager.manager);
-        LOGGER.debug(" - RegionManager: " + RegionManager.manager);
-    }
-
-    private void setupSchematicHandler() throws RuntimeException {
-        SchematicHandler.manager = new FaweSchematicHandler();
-        LOGGER.debug(" - SchematicHandler: " + SchematicHandler.manager);
-    }
-
     public boolean isAllowed(Player player, Plot plot, MaskType type) {
         if (plot == null) {
             return false;
         }
         UUID uid = player.getUniqueId();
-        return !plot.getFlag(NoWorldeditFlag.class) && (plot.isOwner(uid) || type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot
-            .getTrusted().contains(DBFunc.EVERYONE) || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) && player
-            .hasPermission("fawe.plotsquared.member")) || player.hasPermission("fawe.plotsquared.admin"));
+        return !plot.getFlag(NoWorldeditFlag.class) && (plot.isOwner(uid) || type == MaskType.MEMBER && (
+            plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)
+                || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) && player
+                .hasPermission("fawe.plotsquared.member")) || player.hasPermission("fawe.plotsquared.admin"));
     }
 
     @Override
     public FaweMask getMask(Player player, MaskType type) {
-        final PlotPlayer pp = PlotPlayer.wrap(player.getUniqueId());
+        final PlotPlayer<org.bukkit.entity.Player> pp = PlotPlayer.from(BukkitAdapter.adapt(player));
         if (pp == null) {
             return null;
         }
@@ -115,7 +89,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
             regions = WEManager.getMask(pp);
             if (regions.size() == 1) {
                 CuboidRegion region = regions.iterator().next();
-                if (region.getMinimumPoint().getX() == Integer.MIN_VALUE && region.getMaximumPoint().getX() == Integer.MAX_VALUE) {
+                if (region.getMinimumPoint().getX() == Integer.MIN_VALUE
+                    && region.getMaximumPoint().getX() == Integer.MAX_VALUE) {
                     regions.clear();
                 }
             }
@@ -159,7 +134,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
     @Override
     public RegionFilter getFilter(String world) {
-        PlotArea area = PlotSquared.get().getPlotArea(world, null);
+        PlotArea area = PlotSquared.get().getPlotAreaManager().getPlotArea(world, null);
         if (area != null) {
             return new PlotRegionFilter(area);
         }

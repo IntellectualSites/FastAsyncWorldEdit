@@ -25,6 +25,7 @@ import com.fastasyncworldedit.core.util.ThirdPartyManager;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.image.ImageViewer;
+import com.plotsquared.core.PlotSquared;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -281,12 +282,13 @@ public class FaweBukkit implements IFawe, Listener {
             return;
         }
         if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
-            WEManager.IMP.managers
-                .add(new com.fastasyncworldedit.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
+            WEManager.IMP.managers.add(new com.fastasyncworldedit.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
+            LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
+        } else if (PlotSquared.get().getVersion().version[0] == 6){
+            WEManager.IMP.managers.add(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
+            LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
         } else {
-            WEManager.IMP.managers
-                .add(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
+            LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");
         }
-        LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
     }
 }

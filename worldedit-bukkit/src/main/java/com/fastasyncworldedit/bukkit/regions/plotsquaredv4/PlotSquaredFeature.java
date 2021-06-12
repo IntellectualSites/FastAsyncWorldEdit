@@ -40,7 +40,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
         LOGGER.debug("Optimizing PlotSquared");
-        if (com.fastasyncworldedit.core.configuration.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_HOOK) {
+        if (com.fastasyncworldedit.core.configuration.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_v4_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
             try {
                 setupBlockQueue();
