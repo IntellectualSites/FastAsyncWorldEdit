@@ -51,8 +51,7 @@ fun Project.applyCommonConfiguration() {
 
     plugins.withId("java") {
         the<JavaPluginExtension>().toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
-            vendor.set(JvmVendorSpec.ADOPTOPENJDK)
+            languageVersion.set(JavaLanguageVersion.of(16))
         }
     }
 

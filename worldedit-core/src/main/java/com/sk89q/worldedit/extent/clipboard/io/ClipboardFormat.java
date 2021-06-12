@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.io.PGZIPOutputStream;
-import com.boydti.fawe.util.MainUtil;
+import com.fastasyncworldedit.core.object.RunnableVal;
+import com.fastasyncworldedit.core.object.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.object.io.PGZIPOutputStream;
+import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;

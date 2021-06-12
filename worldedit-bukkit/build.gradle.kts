@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+project.description = "Bukkit"
+
 applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
@@ -92,7 +94,7 @@ dependencies {
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    testImplementation("org.mockito:mockito-core:3.11.0")
+    testImplementation("org.mockito:mockito-core:3.11.1")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
@@ -142,7 +144,7 @@ tasks.named<ShadowJar>("shadowJar") {
     from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
         exclude("META-INF/")
     })
-    archiveFileName.set("FastAsyncWorldEdit-Bukkit-${project.version}.jar")
+    archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
     dependencies {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")

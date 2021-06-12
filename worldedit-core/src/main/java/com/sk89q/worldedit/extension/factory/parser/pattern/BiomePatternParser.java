@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.pattern.BiomeApplyingPattern;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.pattern.BiomeApplyingPattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;

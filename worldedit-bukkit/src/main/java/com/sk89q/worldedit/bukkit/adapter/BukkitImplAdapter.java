@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.bukkit.adapter;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
-import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
-import com.boydti.fawe.bukkit.FaweBukkit;
-import com.boydti.fawe.bukkit.NMSRelighterFactory;
+import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;

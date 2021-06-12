@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.math;
 
-import com.boydti.fawe.util.MathMan;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.google.common.collect.ComparisonChain;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
@@ -648,6 +648,30 @@ public abstract class Vector3 {
 
         Vector3 other = (Vector3) obj;
         return other.getX() == this.getX() && other.getY() == this.getY() && other.getZ() == this.getZ();
+    }
+
+    /**
+     * Tests if vectors are equal, accounting for floating point errors
+     *
+     * @param other Another Vector3
+     * @return if the vectors are effectively equal
+     */
+    public boolean equalsFuzzy(Vector3 other) {
+        if (this.equals(other)) {
+            return true;
+        }
+
+        // Minecraft deals in whole blocks, thus any difference smaller than this is unnecessary
+        if (Math.abs(getX() - other.getX()) > 0.000001d) {
+            return false;
+        }
+        if (Math.abs(getY() - other.getY()) > 0.000001d) {
+            return false;
+        }
+        if (Math.abs(getZ() - other.getZ()) > 0.000001d) {
+            return false;
+        }
+        return true;
     }
 
     @Override

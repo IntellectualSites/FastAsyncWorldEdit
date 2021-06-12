@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+project.description = "CLI"
+
 applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
@@ -25,7 +27,7 @@ tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include { true }
     }
-    archiveFileName.set("FastAsyncWorldEdit-CLI-${project.version}.jar")
+    archiveFileName.set("${rootProject.name}-${project.description}-${project.version}.${archiveExtension.getOrElse("jar")}")
     minimize {
         exclude(dependency("org.apache.logging.log4j:log4j-core"))
     }

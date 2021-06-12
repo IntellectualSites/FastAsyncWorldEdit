@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.boydti.fawe.object.mask.ZAxisMask;
+import com.fastasyncworldedit.core.object.mask.ZAxisMask;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.ParserContext;

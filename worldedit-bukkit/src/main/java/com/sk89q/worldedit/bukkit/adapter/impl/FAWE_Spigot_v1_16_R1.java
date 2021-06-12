@@ -19,15 +19,15 @@
 
 package com.sk89q.worldedit.bukkit.adapter.impl;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
-import com.boydti.fawe.bukkit.adapter.mc1_16_1.BlockMaterial_1_16_1;
-import com.boydti.fawe.bukkit.adapter.mc1_16_1.BukkitAdapter_1_16_1;
-import com.boydti.fawe.bukkit.adapter.mc1_16_1.BukkitGetBlocks_1_16_1;
-import com.boydti.fawe.bukkit.adapter.mc1_16_1.FAWEWorldNativeAccess_1_16_R1;
-import com.boydti.fawe.bukkit.adapter.mc1_16_1.MapChunkUtil_1_16_1;
-import com.boydti.fawe.bukkit.adapter.mc1_16_1.nbt.LazyCompoundTag_1_16_1;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.BlockMaterial_1_16_1;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.BukkitAdapter_1_16_1;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.BukkitGetBlocks_1_16_1;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.FAWEWorldNativeAccess_1_16_R1;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.MapChunkUtil_1_16_1;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.nbt.LazyCompoundTag_1_16_1;
 import com.google.common.base.Preconditions;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.StringTag;
@@ -36,9 +36,9 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.CachedBukkitAdapter;
-import com.sk89q.worldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.regen.Regen_v1_16_R1;
+import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
+import com.fastasyncworldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
+import com.fastasyncworldedit.bukkit.adapter.impl.regen.Regen_v1_16_R1;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.LazyBaseEntity;
 import com.sk89q.worldedit.extent.Extent;

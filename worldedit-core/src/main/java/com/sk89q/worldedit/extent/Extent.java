@@ -19,17 +19,17 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.beta.implementation.filter.block.ExtentFilterBlock;
-import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.changeset.AbstractChangeSet;
-import com.boydti.fawe.object.clipboard.WorldCopyClipboard;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.extent.NullExtent;
-import com.boydti.fawe.util.ExtentTraverser;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.beta.IBatchProcessor;
+import com.fastasyncworldedit.core.beta.implementation.filter.block.ExtentFilterBlock;
+import com.fastasyncworldedit.core.beta.implementation.processors.ProcessorScope;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.object.clipboard.WorldCopyClipboard;
+import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.object.extent.NullExtent;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
