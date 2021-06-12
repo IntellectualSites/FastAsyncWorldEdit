@@ -1,24 +1,76 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.regen;
+package com.fastasyncworldedit.bukkit.adapter.impl.regen;
 
 import com.fastasyncworldedit.Fawe;
 import com.fastasyncworldedit.beta.IChunkCache;
 import com.fastasyncworldedit.beta.IChunkGet;
-import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.BukkitGetBlocks_1_16_1;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_5.BukkitGetBlocks_1_16_5;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
-import com.sk89q.worldedit.bukkit.adapter.Regenerator;
+import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
+import net.minecraft.server.v1_16_R3.Area;
+import net.minecraft.server.v1_16_R3.AreaContextTransformed;
+import net.minecraft.server.v1_16_R3.AreaFactory;
+import net.minecraft.server.v1_16_R3.AreaTransformer8;
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.BiomeRegistry;
+import net.minecraft.server.v1_16_R3.Chunk;
+import net.minecraft.server.v1_16_R3.ChunkConverter;
+import net.minecraft.server.v1_16_R3.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R3.ChunkGenerator;
+import net.minecraft.server.v1_16_R3.ChunkGeneratorAbstract;
+import net.minecraft.server.v1_16_R3.ChunkProviderFlat;
+import net.minecraft.server.v1_16_R3.ChunkProviderServer;
+import net.minecraft.server.v1_16_R3.ChunkStatus;
+import net.minecraft.server.v1_16_R3.Convertable;
+import net.minecraft.server.v1_16_R3.DefinedStructureManager;
+import net.minecraft.server.v1_16_R3.DynamicOpsNBT;
+import net.minecraft.server.v1_16_R3.GenLayer;
+import net.minecraft.server.v1_16_R3.GenLayers;
+import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
+import net.minecraft.server.v1_16_R3.GeneratorSettings;
+import net.minecraft.server.v1_16_R3.GeneratorSettingsFlat;
+import net.minecraft.server.v1_16_R3.IChunkAccess;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.IRegistryCustom;
+import net.minecraft.server.v1_16_R3.LightEngineThreaded;
+import net.minecraft.server.v1_16_R3.LinearCongruentialGenerator;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.MinecraftServer;
+import net.minecraft.server.v1_16_R3.NBTBase;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NoiseGeneratorPerlin;
+import net.minecraft.server.v1_16_R3.ProtoChunk;
+import net.minecraft.server.v1_16_R3.RegistryGeneration;
+import net.minecraft.server.v1_16_R3.RegistryMaterials;
+import net.minecraft.server.v1_16_R3.RegistryReadOps;
+import net.minecraft.server.v1_16_R3.ResourceKey;
+import net.minecraft.server.v1_16_R3.World;
+import net.minecraft.server.v1_16_R3.WorldChunkManager;
+import net.minecraft.server.v1_16_R3.WorldChunkManagerOverworld;
+import net.minecraft.server.v1_16_R3.WorldDataServer;
+import net.minecraft.server.v1_16_R3.WorldDimension;
+import net.minecraft.server.v1_16_R3.WorldLoadListener;
+import net.minecraft.server.v1_16_R3.WorldServer;
+import net.minecraft.server.v1_16_R3.WorldSettings;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
+import org.bukkit.generator.BlockPopulator;
+
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,60 +82,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
-import net.minecraft.server.v1_16_R1.Area;
-import net.minecraft.server.v1_16_R1.AreaContextTransformed;
-import net.minecraft.server.v1_16_R1.AreaFactory;
-import net.minecraft.server.v1_16_R1.AreaTransformer8;
-import net.minecraft.server.v1_16_R1.BiomeBase;
-import net.minecraft.server.v1_16_R1.Biomes;
-import net.minecraft.server.v1_16_R1.Chunk;
-import net.minecraft.server.v1_16_R1.ChunkConverter;
-import net.minecraft.server.v1_16_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_16_R1.ChunkGenerator;
-import net.minecraft.server.v1_16_R1.ChunkGeneratorAbstract;
-import net.minecraft.server.v1_16_R1.ChunkProviderFlat;
-import net.minecraft.server.v1_16_R1.ChunkProviderServer;
-import net.minecraft.server.v1_16_R1.ChunkStatus;
-import net.minecraft.server.v1_16_R1.Convertable;
-import net.minecraft.server.v1_16_R1.DefinedStructureManager;
-import net.minecraft.server.v1_16_R1.DynamicOpsNBT;
-import net.minecraft.server.v1_16_R1.GenLayer;
-import net.minecraft.server.v1_16_R1.GenLayers;
-import net.minecraft.server.v1_16_R1.GeneratorSettingBase;
-import net.minecraft.server.v1_16_R1.GeneratorSettings;
-import net.minecraft.server.v1_16_R1.GeneratorSettingsFlat;
-import net.minecraft.server.v1_16_R1.IChunkAccess;
-import net.minecraft.server.v1_16_R1.IRegistry;
-import net.minecraft.server.v1_16_R1.LightEngineThreaded;
-import net.minecraft.server.v1_16_R1.LinearCongruentialGenerator;
-import net.minecraft.server.v1_16_R1.MinecraftKey;
-import net.minecraft.server.v1_16_R1.MinecraftServer;
-import net.minecraft.server.v1_16_R1.NBTBase;
-import net.minecraft.server.v1_16_R1.NBTTagCompound;
-import net.minecraft.server.v1_16_R1.NoiseGeneratorPerlin;
-import net.minecraft.server.v1_16_R1.ProtoChunk;
-import net.minecraft.server.v1_16_R1.ResourceKey;
-import net.minecraft.server.v1_16_R1.World;
-import net.minecraft.server.v1_16_R1.WorldChunkManager;
-import net.minecraft.server.v1_16_R1.WorldChunkManagerOverworld;
-import net.minecraft.server.v1_16_R1.WorldDataServer;
-import net.minecraft.server.v1_16_R1.WorldDimension;
-import net.minecraft.server.v1_16_R1.WorldLoadListener;
-import net.minecraft.server.v1_16_R1.WorldServer;
-import net.minecraft.server.v1_16_R1.WorldSettings;
-import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_16_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R1.generator.CustomChunkGenerator;
-import org.bukkit.generator.BlockPopulator;
+import java.util.stream.Collectors;
 
-public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk, Regen_v1_16_R1.ChunkStatusWrap> {
+public class Regen_v1_16_R3 extends Regenerator<IChunkAccess, ProtoChunk, Chunk, Regen_v1_16_R3.ChunkStatusWrap> {
 
     private static final Field serverWorldsField;
     private static final Field worldPaperConfigField;
     private static final Field flatBedrockField;
-    private static final Field generatorSettingBaseField;
+    private static final Field generatorSettingBaseSupplierField;
     private static final Field generatorSettingFlatField;
     private static final Field delegateField;
     private static final Field chunkProviderField;
@@ -124,8 +130,8 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             worldPaperConfigField = tmpPaperConfigField;
             flatBedrockField = tmpFlatBedrockField;
 
-            generatorSettingBaseField = ChunkGeneratorAbstract.class.getDeclaredField("h");
-            generatorSettingBaseField.setAccessible(true);
+            generatorSettingBaseSupplierField = ChunkGeneratorAbstract.class.getDeclaredField("h");
+            generatorSettingBaseSupplierField.setAccessible(true);
 
             generatorSettingFlatField = ChunkProviderFlat.class.getDeclaredField("e");
             generatorSettingFlatField.setAccessible(true);
@@ -154,7 +160,7 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
     private boolean generateFlatBedrock = false;
 
-    public Regen_v1_16_R1(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
+    public Regen_v1_16_R3(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
         super(originalBukkitWorld, region, target, options);
     }
 
@@ -193,17 +199,18 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
         MinecraftServer server = originalNMSWorld.getServer().getServer();
         WorldDataServer levelProperties = (WorldDataServer) server.getSaveData();
-        GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(DynamicOpsNBT.a, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(this.recursivelySetSeed(new Dynamic<>(DynamicOpsNBT.a, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
+        RegistryReadOps<NBTBase> nbtRegOps = RegistryReadOps.a(DynamicOpsNBT.a, server.dataPackResources.h(), IRegistryCustom.b());
+        GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(this.recursivelySetSeed(new Dynamic<>(nbtRegOps, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
         WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
         WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
 
         //init world
-        freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getTypeKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.e().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
+        freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.d().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
             @Override
             public void doTick(BooleanSupplier booleansupplier) { //no ticking
             }
 
-            private final BiomeBase singleBiome = options.hasBiomeType() ? IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId())) : null;
+            private final BiomeBase singleBiome = options.hasBiomeType() ? RegistryGeneration.WORLDGEN_BIOME.get(MinecraftKey.a(options.getBiomeType().getId())) : null;
 
             @Override
             public BiomeBase a(int i, int j, int k) {
@@ -217,7 +224,7 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         removeWorldFromWorldsMap();
         newWorldData.checkName(originalNMSWorld.worldDataServer.getName()); //rename to original world name
 
-        freshChunkProvider = new ChunkProviderServer(freshNMSWorld, session, server.getDataFixer(), server.getDefinedStructureManager(), server.executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, server.isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> server.D().getWorldPersistentData()) {
+        freshChunkProvider = new ChunkProviderServer(freshNMSWorld, session, server.getDataFixer(), server.getDefinedStructureManager(), server.executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, server.isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> server.E().getWorldPersistentData()) {
             // redirect to our protoChunks list
             @Override
             public IChunkAccess getChunkAt(int x, int z, ChunkStatus chunkstatus, boolean flag) {
@@ -231,12 +238,12 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             GeneratorSettingsFlat generatorSettingFlat = (GeneratorSettingsFlat) generatorSettingFlatField.get(originalChunkProvider.getChunkGenerator());
             generator = new ChunkProviderFlat(generatorSettingFlat);
         } else if (originalChunkProvider.getChunkGenerator() instanceof ChunkGeneratorAbstract) {
-            GeneratorSettingBase generatorSettingBase = (GeneratorSettingBase) generatorSettingBaseField.get(originalChunkProvider.getChunkGenerator());
+            Supplier<GeneratorSettingBase> generatorSettingBaseSupplier = (Supplier<GeneratorSettingBase>) generatorSettingBaseSupplierField.get(originalChunkProvider.getChunkGenerator());
             WorldChunkManager chunkManager = originalChunkProvider.getChunkGenerator().getWorldChunkManager();
             if (chunkManager instanceof WorldChunkManagerOverworld) {
                 chunkManager = fastOverWorldChunkManager(chunkManager);
             }
-            generator = new ChunkGeneratorAbstract(chunkManager, seed, generatorSettingBase);
+            generator = new ChunkGeneratorAbstract(chunkManager, seed, generatorSettingBaseSupplier);
         } else if (originalChunkProvider.getChunkGenerator() instanceof CustomChunkGenerator) {
             ChunkGenerator delegate = (ChunkGenerator) delegateField.get(originalChunkProvider.getChunkGenerator());
             generator = delegate;
@@ -278,7 +285,9 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
         //remove world from server
         try {
-            removeWorldFromWorldsMap();
+            Fawe.get().getQueueHandler().sync(() -> {
+                removeWorldFromWorldsMap();
+            });
         } catch (Exception e) {
         }
 
@@ -294,6 +303,12 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         return new ProtoChunk(new ChunkCoordIntPair(x, z), ChunkConverter.a) {
             public boolean generateFlatBedrock() {
                 return generateFlatBedrock;
+            }
+
+            // no one will ever see the entities!
+            @Override
+            public List<NBTTagCompound> y() {
+                return Collections.emptyList();
             }
         };
     }
@@ -320,7 +335,7 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
     @Override
     protected IChunkCache<IChunkGet> initSourceQueueCache() {
-        return (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_1(freshNMSWorld, chunkX, chunkZ) {
+        return (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_5(freshNMSWorld, chunkX, chunkZ) {
             @Override
             public Chunk ensureLoaded(World nmsWorld, int x, int z) {
                 return getChunkAt(x, z);
@@ -391,6 +406,7 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
                 return ((Dynamic) pair.getSecond()).getValue() instanceof NBTTagCompound ? pair.mapSecond((v) -> {
                     return this.recursivelySetSeed((Dynamic) v, seed, seen);
                 }) : pair;
+
             }
         });
     }
@@ -400,8 +416,8 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         legacyBiomeInitLayerField.setAccessible(true);
         Field largeBiomesField = WorldChunkManagerOverworld.class.getDeclaredField("j");
         largeBiomesField.setAccessible(true);
-        Field genLayerField = WorldChunkManagerOverworld.class.getDeclaredField("f");
-        genLayerField.setAccessible(true);
+        Field biomeRegistryField = WorldChunkManagerOverworld.class.getDeclaredField("k");
+        biomeRegistryField.setAccessible(true);
         Field areaLazyField = GenLayer.class.getDeclaredField("b");
         areaLazyField.setAccessible(true);
         Method initAreaFactoryMethod = GenLayers.class.getDeclaredMethod("a", boolean.class, int.class, int.class, LongFunction.class);
@@ -409,28 +425,36 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
         //init new WorldChunkManagerOverworld
         boolean legacyBiomeInitLayer = legacyBiomeInitLayerField.getBoolean(chunkManager);
-        boolean largeBiomes = largeBiomesField.getBoolean(chunkManager);
-
-        AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, legacyBiomeInitLayer, largeBiomes ? 6 : 4, 4, (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
+        boolean largebiomes = largeBiomesField.getBoolean(chunkManager);
+        IRegistry<BiomeBase> biomeRegistrynms = (IRegistry<BiomeBase>) biomeRegistryField.get(chunkManager);
+        IRegistry<BiomeBase> biomeRegistry;
         if (options.hasBiomeType()) {
-            BiomeBase biome = IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
-            chunkManager = new SingleBiomeWorldChunkManagerOverworld(biome);
+            BiomeBase biome = RegistryGeneration.WORLDGEN_BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
+            biomeRegistry = new RegistryMaterials<>(ResourceKey.a(new MinecraftKey("fawe_biomes")), Lifecycle.experimental());
+            ((RegistryMaterials) biomeRegistry).a(0, RegistryGeneration.WORLDGEN_BIOME.c(biome).get(), biome, Lifecycle.experimental());
         } else {
-            chunkManager = new WorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largeBiomes);
-            //replace genLayer
-            genLayerField.set(chunkManager, new FastGenLayer(factory));
+            biomeRegistry = biomeRegistrynms;
         }
+        chunkManager = new FastWorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largebiomes, biomeRegistry);
+
+        //replace genLayer
+        AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, legacyBiomeInitLayer, largebiomes ? 6 : 4, 4, (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
+        ((FastWorldChunkManagerOverworld) chunkManager).genLayer = new FastGenLayer(factory);
 
         return chunkManager;
     }
 
-    private static class SingleBiomeWorldChunkManagerOverworld extends WorldChunkManager {
+    private static class FastWorldChunkManagerOverworld extends WorldChunkManager {
 
-        private final BiomeBase biome;
+        private GenLayer genLayer;
+        private final IRegistry<BiomeBase> k;
+        private final boolean isSingleRegistry;
 
-        public SingleBiomeWorldChunkManagerOverworld(BiomeBase biome) {
-            super(Arrays.asList(biome));
-            this.biome = biome;
+        public FastWorldChunkManagerOverworld(long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, IRegistry<BiomeBase> biomeRegistry) {
+            super(biomeRegistry.g().collect(Collectors.toList()));
+            this.k = biomeRegistry;
+            this.isSingleRegistry = biomeRegistry.d().size() == 1;
+            this.genLayer = GenLayers.a(seed, legacyBiomeInitLayer, largeBiomes ? 6 : 4, 4);
         }
 
         @Override
@@ -440,9 +464,13 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
         @Override
         public BiomeBase getBiome(int i, int i1, int i2) {
-            return biome;
+            if (this.isSingleRegistry) {
+                return this.k.fromId(0);
+            }
+            return this.genLayer.a(this.k, i, i2);
         }
     }
+
 
     private static class FastWorldGenContextArea implements AreaContextTransformed<FastAreaLazy> {
 
@@ -508,10 +536,13 @@ public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         }
 
         @Override
-        public BiomeBase a(int x, int z) {
-            BiomeBase biome = IRegistry.BIOME.fromId(this.areaLazy.a(x, z));
+        public BiomeBase a(IRegistry<BiomeBase> registry, int x, int z) {
+            ResourceKey<BiomeBase> key = BiomeRegistry.a(this.areaLazy.a(x, z));
+            if (key == null)
+                return registry.a(BiomeRegistry.a(0));
+            BiomeBase biome = registry.a(key);
             if (biome == null)
-                return Biomes.b;
+                return registry.a(BiomeRegistry.a(0));
             return biome;
         }
     }

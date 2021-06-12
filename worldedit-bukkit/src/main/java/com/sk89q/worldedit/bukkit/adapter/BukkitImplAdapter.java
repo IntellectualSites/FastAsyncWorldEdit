@@ -23,6 +23,7 @@ import com.fastasyncworldedit.Fawe;
 import com.fastasyncworldedit.beta.IChunkGet;
 import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;

@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter;
+package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.CompoundTag;
@@ -7,6 +7,7 @@ import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;

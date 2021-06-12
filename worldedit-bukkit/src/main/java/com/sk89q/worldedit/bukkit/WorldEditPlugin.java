@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;

@@ -1,5 +1,6 @@
-package com.sk89q.worldedit.bukkit.adapter;
+package com.fastasyncworldedit.bukkit.adapter;
 
+import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;

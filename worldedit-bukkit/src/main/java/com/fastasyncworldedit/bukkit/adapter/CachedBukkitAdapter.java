@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter;
+package com.fastasyncworldedit.bukkit.adapter;
 
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;

@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+project.description = "Bukkit"
+
 applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
@@ -138,7 +140,7 @@ tasks.named<ShadowJar>("shadowJar") {
     from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
         exclude("META-INF/")
     })
-    archiveFileName.set("FastAsyncWorldEdit-Bukkit-${project.version}.jar")
+    archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
     dependencies {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")

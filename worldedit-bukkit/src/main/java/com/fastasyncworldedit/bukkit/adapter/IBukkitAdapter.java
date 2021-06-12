@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter;
+package com.fastasyncworldedit.bukkit.adapter;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

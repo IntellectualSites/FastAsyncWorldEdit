@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter;
+package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.beta.IChunkCache;
 import com.fastasyncworldedit.beta.IChunkGet;

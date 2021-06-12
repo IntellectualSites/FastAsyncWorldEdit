@@ -1,84 +1,90 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.regen;
+package com.fastasyncworldedit.bukkit.adapter.impl.regen;
 
 import com.fastasyncworldedit.Fawe;
 import com.fastasyncworldedit.beta.IChunkCache;
 import com.fastasyncworldedit.beta.IChunkGet;
-import com.fastasyncworldedit.bukkit.adapter.mc1_15_2.BukkitGetBlocks_1_15_2;
-import com.google.common.collect.ImmutableSet;
+import com.fastasyncworldedit.bukkit.adapter.mc1_16_1.BukkitGetBlocks_1_16_1;
+import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
-import com.sk89q.worldedit.bukkit.adapter.Regenerator;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.Dynamic;
+import com.mojang.serialization.Lifecycle;
+import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
 import java.util.function.LongFunction;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
-import net.minecraft.server.v1_15_R1.Area;
-import net.minecraft.server.v1_15_R1.AreaContextTransformed;
-import net.minecraft.server.v1_15_R1.AreaFactory;
-import net.minecraft.server.v1_15_R1.AreaTransformer8;
-import net.minecraft.server.v1_15_R1.BiomeBase;
-import net.minecraft.server.v1_15_R1.BiomeLayoutOverworldConfiguration;
-import net.minecraft.server.v1_15_R1.Biomes;
-import net.minecraft.server.v1_15_R1.Chunk;
-import net.minecraft.server.v1_15_R1.ChunkConverter;
-import net.minecraft.server.v1_15_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_15_R1.ChunkGenerator;
-import net.minecraft.server.v1_15_R1.ChunkProviderFlat;
-import net.minecraft.server.v1_15_R1.ChunkProviderGenerate;
-import net.minecraft.server.v1_15_R1.ChunkProviderHell;
-import net.minecraft.server.v1_15_R1.ChunkProviderServer;
-import net.minecraft.server.v1_15_R1.ChunkProviderTheEnd;
-import net.minecraft.server.v1_15_R1.ChunkStatus;
-import net.minecraft.server.v1_15_R1.DefinedStructureManager;
-import net.minecraft.server.v1_15_R1.GenLayer;
-import net.minecraft.server.v1_15_R1.GenLayers;
-import net.minecraft.server.v1_15_R1.GeneratorSettingsEnd;
-import net.minecraft.server.v1_15_R1.GeneratorSettingsFlat;
-import net.minecraft.server.v1_15_R1.GeneratorSettingsNether;
-import net.minecraft.server.v1_15_R1.GeneratorSettingsOverworld;
-import net.minecraft.server.v1_15_R1.IChunkAccess;
-import net.minecraft.server.v1_15_R1.IRegistry;
-import net.minecraft.server.v1_15_R1.LightEngineThreaded;
-import net.minecraft.server.v1_15_R1.LinearCongruentialGenerator;
-import net.minecraft.server.v1_15_R1.MinecraftKey;
-import net.minecraft.server.v1_15_R1.MinecraftServer;
-import net.minecraft.server.v1_15_R1.NBTTagCompound;
-import net.minecraft.server.v1_15_R1.NoiseGeneratorPerlin;
-import net.minecraft.server.v1_15_R1.ProtoChunk;
-import net.minecraft.server.v1_15_R1.World;
-import net.minecraft.server.v1_15_R1.WorldChunkManager;
-import net.minecraft.server.v1_15_R1.WorldChunkManagerOverworld;
-import net.minecraft.server.v1_15_R1.WorldData;
-import net.minecraft.server.v1_15_R1.WorldLoadListener;
-import net.minecraft.server.v1_15_R1.WorldNBTStorage;
-import net.minecraft.server.v1_15_R1.WorldServer;
-import net.minecraft.server.v1_15_R1.WorldType;
+import net.minecraft.server.v1_16_R1.Area;
+import net.minecraft.server.v1_16_R1.AreaContextTransformed;
+import net.minecraft.server.v1_16_R1.AreaFactory;
+import net.minecraft.server.v1_16_R1.AreaTransformer8;
+import net.minecraft.server.v1_16_R1.BiomeBase;
+import net.minecraft.server.v1_16_R1.Biomes;
+import net.minecraft.server.v1_16_R1.Chunk;
+import net.minecraft.server.v1_16_R1.ChunkConverter;
+import net.minecraft.server.v1_16_R1.ChunkCoordIntPair;
+import net.minecraft.server.v1_16_R1.ChunkGenerator;
+import net.minecraft.server.v1_16_R1.ChunkGeneratorAbstract;
+import net.minecraft.server.v1_16_R1.ChunkProviderFlat;
+import net.minecraft.server.v1_16_R1.ChunkProviderServer;
+import net.minecraft.server.v1_16_R1.ChunkStatus;
+import net.minecraft.server.v1_16_R1.Convertable;
+import net.minecraft.server.v1_16_R1.DefinedStructureManager;
+import net.minecraft.server.v1_16_R1.DynamicOpsNBT;
+import net.minecraft.server.v1_16_R1.GenLayer;
+import net.minecraft.server.v1_16_R1.GenLayers;
+import net.minecraft.server.v1_16_R1.GeneratorSettingBase;
+import net.minecraft.server.v1_16_R1.GeneratorSettings;
+import net.minecraft.server.v1_16_R1.GeneratorSettingsFlat;
+import net.minecraft.server.v1_16_R1.IChunkAccess;
+import net.minecraft.server.v1_16_R1.IRegistry;
+import net.minecraft.server.v1_16_R1.LightEngineThreaded;
+import net.minecraft.server.v1_16_R1.LinearCongruentialGenerator;
+import net.minecraft.server.v1_16_R1.MinecraftKey;
+import net.minecraft.server.v1_16_R1.MinecraftServer;
+import net.minecraft.server.v1_16_R1.NBTBase;
+import net.minecraft.server.v1_16_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R1.NoiseGeneratorPerlin;
+import net.minecraft.server.v1_16_R1.ProtoChunk;
+import net.minecraft.server.v1_16_R1.ResourceKey;
+import net.minecraft.server.v1_16_R1.World;
+import net.minecraft.server.v1_16_R1.WorldChunkManager;
+import net.minecraft.server.v1_16_R1.WorldChunkManagerOverworld;
+import net.minecraft.server.v1_16_R1.WorldDataServer;
+import net.minecraft.server.v1_16_R1.WorldDimension;
+import net.minecraft.server.v1_16_R1.WorldLoadListener;
+import net.minecraft.server.v1_16_R1.WorldServer;
+import net.minecraft.server.v1_16_R1.WorldSettings;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_15_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_15_R1.generator.CustomChunkGenerator;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_16_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R1.generator.CustomChunkGenerator;
 import org.bukkit.generator.BlockPopulator;
 
-public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk, Regen_v1_15_R2.ChunkStatusWrap> {
+public class Regen_v1_16_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk, Regen_v1_16_R1.ChunkStatusWrap> {
 
     private static final Field serverWorldsField;
     private static final Field worldPaperConfigField;
     private static final Field flatBedrockField;
+    private static final Field generatorSettingBaseField;
+    private static final Field generatorSettingFlatField;
     private static final Field delegateField;
     private static final Field chunkProviderField;
 
@@ -118,10 +124,16 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             worldPaperConfigField = tmpPaperConfigField;
             flatBedrockField = tmpFlatBedrockField;
 
+            generatorSettingBaseField = ChunkGeneratorAbstract.class.getDeclaredField("h");
+            generatorSettingBaseField.setAccessible(true);
+
+            generatorSettingFlatField = ChunkProviderFlat.class.getDeclaredField("e");
+            generatorSettingFlatField.setAccessible(true);
+
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
             delegateField.setAccessible(true);
 
-            chunkProviderField = World.class.getDeclaredField("chunkProvider");
+            chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
             chunkProviderField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -133,6 +145,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
     private ChunkProviderServer originalChunkProvider;
     private WorldServer freshNMSWorld;
     private ChunkProviderServer freshChunkProvider;
+    private Convertable.ConversionSession session;
     private DefinedStructureManager structureManager;
     private LightEngineThreaded lightEngine;
     private ChunkGenerator generator;
@@ -141,7 +154,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
     private boolean generateFlatBedrock = false;
 
-    public Regen_v1_15_R2(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
+    public Regen_v1_16_R1(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
         super(originalBukkitWorld, region, target, options);
     }
 
@@ -173,14 +186,19 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         //prepare for world init (see upstream implementation for reference)
         org.bukkit.World.Environment env = originalBukkitWorld.getEnvironment();
         org.bukkit.generator.ChunkGenerator gen = originalBukkitWorld.getGenerator();
+        Convertable convertable = Convertable.a(tempDir);
+        ResourceKey<WorldDimension> worldDimKey = getWorldDimKey(env);
+        session = convertable.c("worldeditregentempworld", worldDimKey);
+        WorldDataServer originalWorldData = originalNMSWorld.worldDataServer;
 
         MinecraftServer server = originalNMSWorld.getServer().getServer();
-        WorldData newWorldData = new WorldData(originalNMSWorld.worldData.a((NBTTagCompound) null), server.dataConverterManager, CraftMagicNumbers.INSTANCE.getDataVersion(), (NBTTagCompound) null);
-        newWorldData.setName("worldeditregentempworld");
-        WorldNBTStorage saveHandler = new WorldNBTStorage(new File(tempDir.toUri()), originalNMSWorld.getDataManager().getDirectory().getName(), server, server.dataConverterManager);
+        WorldDataServer levelProperties = (WorldDataServer) server.getSaveData();
+        GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(DynamicOpsNBT.a, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(this.recursivelySetSeed(new Dynamic<>(DynamicOpsNBT.a, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
+        WorldSettings newWorldSettings = new WorldSettings("worldeditregentempworld", originalWorldData.b.getGameType(), originalWorldData.b.hardcore, originalWorldData.b.getDifficulty(), originalWorldData.b.e(), originalWorldData.b.getGameRules(), originalWorldData.b.g());
+        WorldDataServer newWorldData = new WorldDataServer(newWorldSettings, newOpts, Lifecycle.stable());
 
         //init world
-        freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, saveHandler, newWorldData, originalNMSWorld.worldProvider.getDimensionManager(), originalNMSWorld.getMethodProfiler(), new RegenNoOpWorldLoadListener(), env, gen) {
+        freshNMSWorld = Fawe.get().getQueueHandler().sync((Supplier<WorldServer>) () -> new WorldServer(server, server.executorService, session, newWorldData, originalNMSWorld.getDimensionKey(), originalNMSWorld.getTypeKey(), originalNMSWorld.getDimensionManager(), new RegenNoOpWorldLoadListener(), ((WorldDimension) newOpts.e().a(worldDimKey)).c(), originalNMSWorld.isDebugWorld(), seed, ImmutableList.of(), false, env, gen) {
             @Override
             public void doTick(BooleanSupplier booleansupplier) { //no ticking
             }
@@ -188,7 +206,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             private final BiomeBase singleBiome = options.hasBiomeType() ? IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId())) : null;
 
             @Override
-            public BiomeBase a(int i, int k, int j) {
+            public BiomeBase a(int i, int j, int k) {
                 if (options.hasBiomeType()) {
                     return singleBiome;
                 }
@@ -197,16 +215,9 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         }).get();
         freshNMSWorld.savingDisabled = true;
         removeWorldFromWorldsMap();
-        newWorldData.checkName(originalNMSWorld.getWorldData().getName()); //rename to original world name
-        
-        try { //flat bedrock (paper only)
-            Object paperconf = worldPaperConfigField.get(freshNMSWorld);
-            flatBedrockField.setBoolean(paperconf, generateFlatBedrock);
-        } catch (Exception e) {
-        }
+        newWorldData.checkName(originalNMSWorld.worldDataServer.getName()); //rename to original world name
 
-        DefinedStructureManager tmpStructureManager = saveHandler.f();
-        freshChunkProvider = new ChunkProviderServer(freshNMSWorld, saveHandler.getDirectory(), server.aC(), tmpStructureManager, server.executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, new RegenNoOpWorldLoadListener(), () -> freshNMSWorld.getWorldPersistentData()) {
+        freshChunkProvider = new ChunkProviderServer(freshNMSWorld, session, server.getDataFixer(), server.getDefinedStructureManager(), server.executorService, originalChunkProvider.chunkGenerator, freshNMSWorld.spigotConfig.viewDistance, server.isSyncChunkWrites(), new RegenNoOpWorldLoadListener(), () -> server.D().getWorldPersistentData()) {
             // redirect to our protoChunks list
             @Override
             public IChunkAccess getChunkAt(int x, int z, ChunkStatus chunkstatus, boolean flag) {
@@ -217,21 +228,15 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
         //generator
         if (originalChunkProvider.getChunkGenerator() instanceof ChunkProviderFlat) {
-            GeneratorSettingsFlat generatorSettingFlat = (GeneratorSettingsFlat) originalChunkProvider.getChunkGenerator().getSettings();
-            generator = new ChunkProviderFlat(freshNMSWorld, originalChunkProvider.getChunkGenerator().getWorldChunkManager(), generatorSettingFlat);
-        } else if (originalChunkProvider.getChunkGenerator() instanceof ChunkProviderGenerate) { //overworld
-            GeneratorSettingsOverworld settings = (GeneratorSettingsOverworld) originalChunkProvider.getChunkGenerator().getSettings();
+            GeneratorSettingsFlat generatorSettingFlat = (GeneratorSettingsFlat) generatorSettingFlatField.get(originalChunkProvider.getChunkGenerator());
+            generator = new ChunkProviderFlat(generatorSettingFlat);
+        } else if (originalChunkProvider.getChunkGenerator() instanceof ChunkGeneratorAbstract) {
+            GeneratorSettingBase generatorSettingBase = (GeneratorSettingBase) generatorSettingBaseField.get(originalChunkProvider.getChunkGenerator());
             WorldChunkManager chunkManager = originalChunkProvider.getChunkGenerator().getWorldChunkManager();
-            if (chunkManager instanceof WorldChunkManagerOverworld) { //should always be true
+            if (chunkManager instanceof WorldChunkManagerOverworld) {
                 chunkManager = fastOverWorldChunkManager(chunkManager);
             }
-            generator = new ChunkProviderGenerate(freshNMSWorld, chunkManager, settings);
-        } else if (originalChunkProvider.getChunkGenerator() instanceof ChunkProviderHell) { //nether
-            GeneratorSettingsNether settings = (GeneratorSettingsNether) originalChunkProvider.getChunkGenerator().getSettings();
-            generator = new ChunkProviderHell(freshNMSWorld, originalChunkProvider.getChunkGenerator().getWorldChunkManager(), settings);
-        } else if (originalChunkProvider.getChunkGenerator() instanceof ChunkProviderTheEnd) { //end
-            GeneratorSettingsEnd settings = (GeneratorSettingsEnd) originalChunkProvider.getChunkGenerator().getSettings();
-            generator = new ChunkProviderTheEnd(freshNMSWorld, originalChunkProvider.getChunkGenerator().getWorldChunkManager(), settings);
+            generator = new ChunkGeneratorAbstract(chunkManager, seed, generatorSettingBase);
         } else if (originalChunkProvider.getChunkGenerator() instanceof CustomChunkGenerator) {
             ChunkGenerator delegate = (ChunkGenerator) delegateField.get(originalChunkProvider.getChunkGenerator());
             generator = delegate;
@@ -241,12 +246,12 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         }
         if (originalNMSWorld.generator != null) {
             // wrap custom world generator
-            generator = new CustomChunkGenerator(freshNMSWorld, originalNMSWorld.generator);
+            generator = new CustomChunkGenerator(freshNMSWorld, generator, originalNMSWorld.generator);
             generateConcurrent = originalNMSWorld.generator.isParallelCapable();
         }
 
         //lets start then
-        structureManager = tmpStructureManager;
+        structureManager = server.getDefinedStructureManager();
         lightEngine = freshChunkProvider.getLightEngine();
 
         return true;
@@ -254,6 +259,11 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
     @Override
     protected void cleanup() {
+        try {
+            session.close();
+        } catch (Exception e) {
+        }
+
         //shutdown chunk provider
         try {
             Fawe.get().getQueueHandler().sync(() -> {
@@ -310,7 +320,7 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
 
     @Override
     protected IChunkCache<IChunkGet> initSourceQueueCache() {
-        return (chunkX, chunkZ) -> new BukkitGetBlocks_1_15_2(freshNMSWorld, chunkX, chunkZ) {
+        return (chunkX, chunkZ) -> new BukkitGetBlocks_1_16_1(freshNMSWorld, chunkX, chunkZ) {
             @Override
             public Chunk ensureLoaded(World nmsWorld, int x, int z) {
                 return getChunkAt(x, z);
@@ -359,24 +369,55 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         });
     }
     
+    private ResourceKey<WorldDimension> getWorldDimKey(org.bukkit.World.Environment env) {
+        switch (env) {
+            case NETHER:
+                return WorldDimension.THE_NETHER;
+            case THE_END:
+                return WorldDimension.THE_END;
+            case NORMAL:
+            default:
+                return WorldDimension.OVERWORLD;
+        }
+    }
+
+    private Dynamic<NBTBase> recursivelySetSeed(Dynamic<NBTBase> dynamic, long seed, Set<Dynamic<NBTBase>> seen) {
+        return !seen.add(dynamic) ? dynamic : dynamic.updateMapValues((pair) -> {
+            if (((Dynamic) pair.getFirst()).asString("").equals("seed")) {
+                return pair.mapSecond((v) -> {
+                    return v.createLong(seed);
+                });
+            } else {
+                return ((Dynamic) pair.getSecond()).getValue() instanceof NBTTagCompound ? pair.mapSecond((v) -> {
+                    return this.recursivelySetSeed((Dynamic) v, seed, seen);
+                }) : pair;
+            }
+        });
+    }
+
     private WorldChunkManager fastOverWorldChunkManager(WorldChunkManager chunkManager) throws Exception {
-        Field genLayerField = WorldChunkManagerOverworld.class.getDeclaredField("d");
+        Field legacyBiomeInitLayerField = WorldChunkManagerOverworld.class.getDeclaredField("i");
+        legacyBiomeInitLayerField.setAccessible(true);
+        Field largeBiomesField = WorldChunkManagerOverworld.class.getDeclaredField("j");
+        largeBiomesField.setAccessible(true);
+        Field genLayerField = WorldChunkManagerOverworld.class.getDeclaredField("f");
         genLayerField.setAccessible(true);
         Field areaLazyField = GenLayer.class.getDeclaredField("b");
         areaLazyField.setAccessible(true);
-        Method initAreaFactoryMethod = GenLayers.class.getDeclaredMethod("a", WorldType.class, GeneratorSettingsOverworld.class, LongFunction.class);
+        Method initAreaFactoryMethod = GenLayers.class.getDeclaredMethod("a", boolean.class, int.class, int.class, LongFunction.class);
         initAreaFactoryMethod.setAccessible(true);
 
         //init new WorldChunkManagerOverworld
-        BiomeLayoutOverworldConfiguration biomeconfig = new BiomeLayoutOverworldConfiguration(freshNMSWorld.getWorldData())
-                .a((GeneratorSettingsOverworld) originalChunkProvider.getChunkGenerator().getSettings());
-        AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, biomeconfig.b(), biomeconfig.c(), (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
+        boolean legacyBiomeInitLayer = legacyBiomeInitLayerField.getBoolean(chunkManager);
+        boolean largeBiomes = largeBiomesField.getBoolean(chunkManager);
+
+        AreaFactory<FastAreaLazy> factory = (AreaFactory<FastAreaLazy>) initAreaFactoryMethod.invoke(null, legacyBiomeInitLayer, largeBiomes ? 6 : 4, 4, (LongFunction) (l -> new FastWorldGenContextArea(seed, l)));
         if (options.hasBiomeType()) {
             BiomeBase biome = IRegistry.BIOME.get(MinecraftKey.a(options.getBiomeType().getId()));
             chunkManager = new SingleBiomeWorldChunkManagerOverworld(biome);
         } else {
-            chunkManager = new WorldChunkManagerOverworld(biomeconfig);
-            //replace genlayer
+            chunkManager = new WorldChunkManagerOverworld(seed, legacyBiomeInitLayer, largeBiomes);
+            //replace genLayer
             genLayerField.set(chunkManager, new FastGenLayer(factory));
         }
 
@@ -388,8 +429,13 @@ public class Regen_v1_15_R2 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         private final BiomeBase biome;
 
         public SingleBiomeWorldChunkManagerOverworld(BiomeBase biome) {
-            super(ImmutableSet.of(biome));
+            super(Arrays.asList(biome));
             this.biome = biome;
+        }
+
+        @Override
+        protected Codec<? extends WorldChunkManager> a() {
+            return WorldChunkManagerOverworld.e;
         }
 
         @Override

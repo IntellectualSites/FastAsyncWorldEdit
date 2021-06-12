@@ -1,8 +1,10 @@
-package com.sk89q.worldedit.bukkit;
+package com.fastasyncworldedit.bukkit;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
 
