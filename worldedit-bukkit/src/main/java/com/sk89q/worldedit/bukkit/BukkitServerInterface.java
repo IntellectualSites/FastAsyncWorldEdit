@@ -20,8 +20,6 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
-import com.boydti.fawe.bukkit.NMSRelighterFactory;
-import com.boydti.fawe.bukkit.adapter.mc1_16_5.TuinityRelighterFactory_1_16_5;
 import com.google.common.collect.Sets;
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;
@@ -38,7 +36,6 @@ import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.SideEffect;
-import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.registry.Registries;
@@ -253,7 +250,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     @Override
     public @NotNull RelighterFactory getRelighterFactory() {
         if (this.relighterFactory == null) {
-            this.relighterFactory = this.plugin.getBukkitImplAdapter().geRelighterFactory();
+            this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
             LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");
         }
         return this.relighterFactory;

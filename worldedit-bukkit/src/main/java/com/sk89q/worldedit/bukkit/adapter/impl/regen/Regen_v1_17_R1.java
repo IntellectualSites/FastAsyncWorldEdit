@@ -203,7 +203,7 @@ public class Regen_v1_17_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
         session = convertable.c("worldeditregentempworld", worldDimKey);
         WorldDataServer originalWorldData = originalNMSWorld.E;
 
-        MinecraftServer server = originalNMSWorld.getServer().getServer();
+        MinecraftServer server = originalNMSWorld.getCraftServer().getServer();
         WorldDataServer levelProperties = (WorldDataServer) server.getSaveData();
         RegistryReadOps<NBTBase> nbtRegOps = RegistryReadOps.a(DynamicOpsNBT.a, server.aC.i(), IRegistryCustom.a());
         GeneratorSettings newOpts = GeneratorSettings.a.encodeStart(nbtRegOps, levelProperties.getGeneratorSettings()).flatMap(tag -> GeneratorSettings.a.parse(this.recursivelySetSeed(new Dynamic<>(nbtRegOps, tag), seed, new HashSet<>()))).result().orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));

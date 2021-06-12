@@ -184,7 +184,7 @@ public class FAWEWorldNativeAccess_1_17_R1 implements WorldNativeAccess<Chunk, I
             CraftWorld craftWorld = world.getWorld();
             if (craftWorld != null) {
                 BlockPhysicsEvent event = new BlockPhysicsEvent(craftWorld.getBlockAt(pos.getX(), pos.getY(), pos.getZ()), CraftBlockData.fromData(newState));
-                world.getServer().getPluginManager().callEvent(event);
+                world.getCraftServer().getPluginManager().callEvent(event);
                 if (event.isCancelled()) {
                     return;
                 }

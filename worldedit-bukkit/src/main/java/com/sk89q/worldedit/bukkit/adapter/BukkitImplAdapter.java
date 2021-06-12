@@ -273,7 +273,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         return Biome.BADLANDS.ordinal();
     }
 
-    default RelighterFactory geRelighterFactory() {
+    default RelighterFactory getRelighterFactory() {
         throw new UnsupportedOperationException();
     }
 }
