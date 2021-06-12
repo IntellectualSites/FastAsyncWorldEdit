@@ -27,6 +27,7 @@ import com.fastasyncworldedit.core.object.FaweOutputStream;
 import com.fastasyncworldedit.core.object.clipboard.LinearClipboard;
 import com.fastasyncworldedit.core.object.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.object.io.FastByteArraysInputStream;
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
