@@ -41,7 +41,7 @@ public class BlockMaterial_1_17 implements BlockMaterial {
         this.isTranslucent = !(boolean)ReflectionUtil.getField(BlockBase.Info.class, blockInfo, "n");
         opacity = defaultState.b(BlockAccessAir.a, BlockPosition.b);
         TileEntity tileEntity = !(block instanceof ITileEntity) ? null : ((ITileEntity)block).createTile(BlockPosition.b ,defaultState);
-        tile = new LazyCompoundTag_1_17(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
+        tile = tileEntity == null ? null : new LazyCompoundTag_1_17(Suppliers.memoize(() -> tileEntity.save(new NBTTagCompound())));
     }
 
     public Block getBlock() {
