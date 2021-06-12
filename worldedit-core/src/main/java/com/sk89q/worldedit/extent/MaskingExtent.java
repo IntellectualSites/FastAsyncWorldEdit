@@ -19,16 +19,16 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
-import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
-import com.boydti.fawe.beta.implementation.processors.ProcessorScope;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.beta.IBatchProcessor;
+import com.fastasyncworldedit.core.beta.IChunk;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.IChunkSet;
+import com.fastasyncworldedit.core.beta.implementation.filter.block.CharFilterBlock;
+import com.fastasyncworldedit.core.beta.implementation.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.beta.implementation.processors.ProcessorScope;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;

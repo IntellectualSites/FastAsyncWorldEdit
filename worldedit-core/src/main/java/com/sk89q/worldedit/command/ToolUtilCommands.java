@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.BrushSettings;
-import com.boydti.fawe.object.brush.TargetMode;
-import com.boydti.fawe.object.brush.scroll.Scroll;
-import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.brush.BrushSettings;
+import com.fastasyncworldedit.core.object.brush.TargetMode;
+import com.fastasyncworldedit.core.object.brush.scroll.Scroll;
+import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -46,7 +46,6 @@ import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
-import org.jetbrains.annotations.Range;
 
 import java.util.List;
 import java.util.Locale;

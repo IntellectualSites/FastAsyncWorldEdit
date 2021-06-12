@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.entity;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
-import com.boydti.fawe.regions.FaweMaskManager;
-import com.boydti.fawe.util.MainUtil;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;

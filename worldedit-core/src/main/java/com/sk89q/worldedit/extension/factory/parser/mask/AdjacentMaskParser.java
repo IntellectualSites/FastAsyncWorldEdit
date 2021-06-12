@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.boydti.fawe.object.mask.AdjacentAnyMask;
-import com.boydti.fawe.object.mask.AdjacentMask;
+import com.fastasyncworldedit.core.object.mask.AdjacentAnyMask;
+import com.fastasyncworldedit.core.object.mask.AdjacentMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
