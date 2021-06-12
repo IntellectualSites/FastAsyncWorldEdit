@@ -2,7 +2,7 @@ package com.boydti.fawe.bukkit.adapter.mc1_17;
 
 import com.boydti.fawe.Fawe;
 import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.bukkit.adapter.DelegateLock;
+import com.boydti.fawe.bukkit.adapter.DelegateSemaphore;
 import com.boydti.fawe.bukkit.adapter.NMSAdapter;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.BitArrayUnstretched;
@@ -46,7 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -77,24 +77,24 @@ public final class BukkitAdapter_1_17 extends NMSAdapter {
     static {
         try {
             // TODO
-            fieldSize = DataPaletteBlock.class.getDeclaredField("i");
+            fieldSize = DataPaletteBlock.class.getDeclaredField("l");
             fieldSize.setAccessible(true);
-            fieldBits = DataPaletteBlock.class.getDeclaredField("a");
+            fieldBits = DataPaletteBlock.class.getDeclaredField("c");
             fieldBits.setAccessible(true);
-            fieldPalette = DataPaletteBlock.class.getDeclaredField("h");
+            fieldPalette = DataPaletteBlock.class.getDeclaredField("k");
             fieldPalette.setAccessible(true);
 
             fieldBitsPerEntry = DataBits.class.getDeclaredField("c");
             fieldBitsPerEntry.setAccessible(true);
 
-            fieldFluidCount = ChunkSection.class.getDeclaredField("e");
+            fieldFluidCount = ChunkSection.class.getDeclaredField("h");
             fieldFluidCount.setAccessible(true);
-            fieldTickingBlockCount = ChunkSection.class.getDeclaredField("f");
+            fieldTickingBlockCount = ChunkSection.class.getDeclaredField("g");
             fieldTickingBlockCount.setAccessible(true);
-            fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("g");
+            fieldNonEmptyBlockCount = ChunkSection.class.getDeclaredField("f");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldBiomeArray = BiomeStorage.class.getDeclaredField("h");
+            fieldBiomeArray = BiomeStorage.class.getDeclaredField("f");
             fieldBiomeArray.setAccessible(true);
 
             Method declaredGetVisibleChunk = PlayerChunkMap.class.getDeclaredMethod("getVisibleChunk", long.class);
@@ -102,7 +102,7 @@ public final class BukkitAdapter_1_17 extends NMSAdapter {
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
 
             Unsafe unsafe = UnsafeUtility.getUNSAFE();
-            fieldLock = DataPaletteBlock.class.getDeclaredField("j");
+            fieldLock = DataPaletteBlock.class.getDeclaredField("m");
             fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
 
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(ChunkSection[].class);
@@ -127,17 +127,17 @@ public final class BukkitAdapter_1_17 extends NMSAdapter {
         return false;
     }
 
-    protected static DelegateLock applyLock(ChunkSection section) {
+    protected static DelegateSemaphore applyLock(ChunkSection section) {
         //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which acquires the lock in NMS?
         try {
             synchronized (section) {
                 Unsafe unsafe = UnsafeUtility.getUNSAFE();
                 DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                ReentrantLock currentLock = (ReentrantLock) unsafe.getObject(blocks, fieldLockOffset);
-                if (currentLock instanceof DelegateLock) {
-                    return (DelegateLock) currentLock;
+                Semaphore currentLock = (Semaphore) unsafe.getObject(blocks, fieldLockOffset);
+                if (currentLock instanceof DelegateSemaphore) {
+                    return (DelegateSemaphore) currentLock;
                 }
-                DelegateLock newLock = new DelegateLock(currentLock);
+                DelegateSemaphore newLock = new DelegateSemaphore(1, currentLock);
                 unsafe.putObject(blocks, fieldLockOffset, newLock);
                 return newLock;
             }

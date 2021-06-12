@@ -24,6 +24,7 @@ import com.boydti.fawe.beta.IChunkGet;
 import com.boydti.fawe.beta.implementation.lighting.RelighterFactory;
 import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
 import com.boydti.fawe.bukkit.FaweBukkit;
+import com.boydti.fawe.bukkit.NMSRelighterFactory;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -274,6 +275,6 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     }
 
     default RelighterFactory getRelighterFactory() {
-        throw new UnsupportedOperationException();
+        return new NMSRelighterFactory(); // TODO implement in adapters instead
     }
 }

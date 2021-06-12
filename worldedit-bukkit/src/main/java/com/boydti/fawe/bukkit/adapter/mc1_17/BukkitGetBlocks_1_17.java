@@ -8,7 +8,7 @@ import com.boydti.fawe.beta.implementation.blocks.CharGetBlocks;
 import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
 import com.boydti.fawe.beta.implementation.queue.QueueHandler;
 import com.boydti.fawe.bukkit.adapter.BukkitGetBlocks;
-import com.boydti.fawe.bukkit.adapter.DelegateLock;
+import com.boydti.fawe.bukkit.adapter.DelegateSemaphore;
 import com.boydti.fawe.bukkit.adapter.mc1_17.nbt.LazyCompoundTag_1_17;
 import com.boydti.fawe.config.Settings;
 import com.boydti.fawe.object.collection.AdaptedMap;
@@ -28,7 +28,6 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
 import net.minecraft.core.SectionPosition;
@@ -452,14 +451,14 @@ public class BukkitGetBlocks_1_17 extends CharGetBlocks implements BukkitGetBloc
                             }
                         }
                     }
-                    com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitAdapter_1_16_5.fieldTickingBlockCount.set(existingSection, (short) 0);
+                    BukkitAdapter_1_17.fieldTickingBlockCount.set(existingSection, (short) 0);
 
                     //ensure that the server doesn't try to tick the chunksection while we're editing it.
-                    DelegateLock lock = BukkitAdapter_1_17.applyLock(existingSection);
+                    DelegateSemaphore lock = BukkitAdapter_1_17.applyLock(existingSection);
 
                     synchronized (this) {
                         synchronized (lock) {
-                            lock.untilFree();
+                            // lock.acquire();
                             if (this.getChunk() != nmsChunk) {
                                 this.nmsChunk = nmsChunk;
                                 this.sections = null;
@@ -469,8 +468,8 @@ public class BukkitGetBlocks_1_17 extends CharGetBlocks implements BukkitGetBloc
                                 this.reset();
                             } else if (!Arrays.equals(update(layer, new char[4096], true), loadPrivately(layer))) {
                                 this.reset(layer);
-                            } else if (lock.isModified()) {
-                                this.reset(layer);
+                            /*} else if (lock.isModified()) {
+                                this.reset(layer);*/
                             }
                             newSection = BukkitAdapter_1_17
                                 .newChunkSection(layer, this::loadPrivately, setArr, fastmode);
@@ -714,19 +713,18 @@ public class BukkitGetBlocks_1_17 extends CharGetBlocks implements BukkitGetBloc
             data = new char[4096];
             Arrays.fill(data, (char) 1);
         }
-        DelegateLock lock = BukkitAdapter_1_17.applyLock(section);
+        DelegateSemaphore lock = BukkitAdapter_1_17.applyLock(section);
         synchronized (lock) {
-            lock.untilFree();
-            lock.setModified(false);
             // Efficiently convert ChunkSection to raw data
             try {
+                lock.acquire();
                 FAWE_Spigot_v1_17_R1 adapter = ((FAWE_Spigot_v1_17_R1) WorldEditPlugin.getInstance().getBukkitImplAdapter());
 
                 final DataPaletteBlock<IBlockData> blocks = section.getBlocks();
-                final DataBits bits = (DataBits) com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitAdapter_1_16_5.fieldBits.get(blocks);
-                final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitAdapter_1_16_5.fieldPalette.get(blocks);
+                final DataBits bits = (DataBits) BukkitAdapter_1_17.fieldBits.get(blocks);
+                final DataPalette<IBlockData> palette = (DataPalette<IBlockData>) BukkitAdapter_1_17.fieldPalette.get(blocks);
 
-                final int bitsPerEntry = (int) com.boydti.fawe.bukkit.adapter.mc1_16_5.BukkitAdapter_1_16_5.fieldBitsPerEntry.get(bits);
+                final int bitsPerEntry = (int) BukkitAdapter_1_17.fieldBitsPerEntry.get(bits);
                 final long[] blockStates = bits.a();
 
                 new BitArrayUnstretched(bitsPerEntry, 4096, blockStates).toRaw(data);
@@ -801,9 +799,11 @@ public class BukkitGetBlocks_1_17 extends CharGetBlocks implements BukkitGetBloc
                     }
                 }
                 return data;
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException | InterruptedException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
+            } finally {
+                lock.release();
             }
         }
     }

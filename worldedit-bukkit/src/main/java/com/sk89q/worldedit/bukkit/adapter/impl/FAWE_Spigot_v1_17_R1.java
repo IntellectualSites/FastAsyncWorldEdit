@@ -116,12 +116,12 @@ public final class FAWE_Spigot_v1_17_R1 extends CachedBukkitAdapter implements I
     // ------------------------------------------------------------------------
 
     public FAWE_Spigot_v1_17_R1() throws NoSuchFieldException, NoSuchMethodException {
-        this.parent = null;
+        this.parent = new Spigot_v1_17_R1();
     }
 
     @Override
     public BukkitImplAdapter<NBTBase> getParent() {
-        return null; // parent;
+        return parent;
     }
 
     private synchronized boolean init() {
