@@ -820,17 +820,12 @@ public class BukkitGetBlocks_1_16_5 extends CharGetBlocks implements BukkitGetBl
     }
 
     public ChunkSection[] getSections(boolean force) {
-        if (force && forceLoadSections) {
-            ChunkSection[] sections = getChunk().getSections();
-            ChunkSection[] copy = new ChunkSection[sections.length];
-            System.arraycopy(sections, 0, copy, 0, sections.length);
-            return copy;
-        }
+        force &= forceLoadSections;
         ChunkSection[] tmp = sections;
-        if (tmp == null) {
+        if (tmp == null || force) {
             synchronized (this) {
                 tmp = sections;
-                if (tmp == null) {
+                if (tmp == null || force) {
                     ChunkSection[] chunkSections = getChunk().getSections();
                     tmp = new ChunkSection[chunkSections.length];
                     System.arraycopy(chunkSections, 0, tmp, 0, chunkSections.length);
