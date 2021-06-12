@@ -131,7 +131,7 @@ public class Regen_v1_17_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             worldPaperConfigField = tmpPaperConfigField;
             flatBedrockField = tmpFlatBedrockField;
 
-            generatorSettingBaseSupplierField = ChunkGeneratorAbstract.class.getDeclaredField("h");
+            generatorSettingBaseSupplierField = ChunkGeneratorAbstract.class.getDeclaredField("g");
             generatorSettingBaseSupplierField.setAccessible(true);
 
             generatorSettingFlatField = ChunkProviderFlat.class.getDeclaredField("e");
@@ -140,7 +140,7 @@ public class Regen_v1_17_R1 extends Regenerator<IChunkAccess, ProtoChunk, Chunk,
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
             delegateField.setAccessible(true);
 
-            chunkProviderField = WorldServer.class.getDeclaredField("chunkProvider");
+            chunkProviderField = WorldServer.class.getDeclaredField("C");
             chunkProviderField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
