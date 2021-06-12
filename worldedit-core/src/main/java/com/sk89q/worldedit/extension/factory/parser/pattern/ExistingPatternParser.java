@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
-import com.fastasyncworldedit.object.pattern.ExistingPattern;
+import com.fastasyncworldedit.core.object.pattern.ExistingPattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;

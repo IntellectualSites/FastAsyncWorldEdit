@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.function.generator;
 
-import com.fastasyncworldedit.util.MathMan;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;

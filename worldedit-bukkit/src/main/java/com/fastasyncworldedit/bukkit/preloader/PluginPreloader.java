@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.preloader;
 
-import com.fastasyncworldedit.Fawe;
+import com.fastasyncworldedit.core.Fawe;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.regions.Region;

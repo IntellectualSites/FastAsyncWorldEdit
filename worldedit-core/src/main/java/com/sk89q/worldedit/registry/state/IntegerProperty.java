@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.registry.state;
 
-import com.fastasyncworldedit.util.StringMan;
+import com.fastasyncworldedit.core.util.StringMan;
 
 import java.util.Collections;
 import java.util.List;

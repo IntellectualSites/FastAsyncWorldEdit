@@ -1,11 +1,11 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.database.DBHandler;
-import com.fastasyncworldedit.database.RollbackDatabase;
-import com.fastasyncworldedit.regions.FaweMaskManager;
-import com.fastasyncworldedit.util.TextureUtil;
-import com.fastasyncworldedit.util.image.ImageUtil;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.database.DBHandler;
+import com.fastasyncworldedit.core.database.RollbackDatabase;
+import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.util.TextureUtil;
+import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;

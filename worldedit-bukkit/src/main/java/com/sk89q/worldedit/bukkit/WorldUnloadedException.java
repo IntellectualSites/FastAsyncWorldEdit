@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.WorldEditException;
 
 /**

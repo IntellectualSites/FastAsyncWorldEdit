@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;

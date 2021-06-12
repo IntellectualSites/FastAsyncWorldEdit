@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions;
 
-import com.fastasyncworldedit.regions.FaweMask;
+import com.fastasyncworldedit.core.regions.FaweMask;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.PlayerCache;

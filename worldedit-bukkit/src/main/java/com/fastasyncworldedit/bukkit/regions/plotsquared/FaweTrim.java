@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.plotsquared.core.command.CommandCategory;
 import com.plotsquared.core.command.CommandDeclaration;
 import com.plotsquared.core.command.RequiredType;

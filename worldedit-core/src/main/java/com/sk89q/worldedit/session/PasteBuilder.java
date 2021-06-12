@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.session;
 
-import com.fastasyncworldedit.util.MaskTraverser;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;

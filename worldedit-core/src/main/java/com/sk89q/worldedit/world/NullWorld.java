@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
-import com.fastasyncworldedit.beta.IChunkGet;
-import com.fastasyncworldedit.beta.implementation.blocks.NullChunkGet;
-import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.implementation.blocks.NullChunkGet;
+import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;

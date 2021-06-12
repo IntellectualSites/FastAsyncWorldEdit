@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.bukkit.adapter.mc1_16_2;
 
 
-import com.fastasyncworldedit.FaweCache;
-import com.fastasyncworldedit.beta.IBlocks;
-import com.fastasyncworldedit.beta.IChunkGet;
-import com.fastasyncworldedit.beta.IChunkSet;
-import com.fastasyncworldedit.beta.implementation.lighting.HeightMapType;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.beta.IBlocks;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.IChunkSet;
+import com.fastasyncworldedit.core.beta.implementation.lighting.HeightMapType;
 import com.fastasyncworldedit.bukkit.adapter.mc1_16_2.nbt.LazyCompoundTag_1_16_2;
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;

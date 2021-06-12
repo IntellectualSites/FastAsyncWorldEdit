@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.fastasyncworldedit.beta.ITileInput;
-import com.fastasyncworldedit.command.SuggestInputParseException;
-import com.fastasyncworldedit.object.string.MutableCharSequence;
-import com.fastasyncworldedit.util.StringMan;
+import com.fastasyncworldedit.core.beta.ITileInput;
+import com.fastasyncworldedit.core.command.SuggestInputParseException;
+import com.fastasyncworldedit.core.object.string.MutableCharSequence;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;

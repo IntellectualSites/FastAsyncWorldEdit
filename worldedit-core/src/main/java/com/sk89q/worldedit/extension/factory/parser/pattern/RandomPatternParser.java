@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;

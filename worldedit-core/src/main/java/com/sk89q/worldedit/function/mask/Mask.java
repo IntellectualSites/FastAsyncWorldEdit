@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.fastasyncworldedit.beta.Filter;
-import com.fastasyncworldedit.beta.implementation.filter.MaskFilter;
-import com.fastasyncworldedit.beta.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.beta.implementation.filter.MaskFilter;
+import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.jetbrains.annotations.Nullable;
 

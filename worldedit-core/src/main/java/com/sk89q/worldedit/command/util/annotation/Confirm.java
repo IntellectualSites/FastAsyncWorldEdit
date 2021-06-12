@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.command.util.annotation;
 
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.util.task.InterruptableCondition;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.util.task.InterruptableCondition;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.argument.Arguments;

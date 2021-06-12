@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.fastasyncworldedit.object.mask.WallMask;
+import com.fastasyncworldedit.core.object.mask.WallMask;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;

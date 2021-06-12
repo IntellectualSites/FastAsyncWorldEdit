@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import co.aikar.timings.Timings;
-import com.fastasyncworldedit.beta.implementation.queue.QueueHandler;
+import com.fastasyncworldedit.core.beta.implementation.queue.QueueHandler;
 import com.fastasyncworldedit.bukkit.listener.ChunkListener;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;

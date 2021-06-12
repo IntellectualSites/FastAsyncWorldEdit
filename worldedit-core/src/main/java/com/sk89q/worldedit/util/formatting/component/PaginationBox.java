@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.util.formatting.component;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;

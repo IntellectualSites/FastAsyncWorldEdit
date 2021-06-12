@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.internal.command.exception;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.DisallowedItemException;
 import com.sk89q.worldedit.EmptyClipboardException;

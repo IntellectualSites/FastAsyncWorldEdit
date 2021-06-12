@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.object.mask.AngleMask;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.mask.AngleMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;

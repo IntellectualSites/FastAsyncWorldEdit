@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions;
 
-import com.fastasyncworldedit.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import org.bukkit.permissions.Permissible;
 
 public abstract class BukkitMaskManager extends FaweMaskManager {

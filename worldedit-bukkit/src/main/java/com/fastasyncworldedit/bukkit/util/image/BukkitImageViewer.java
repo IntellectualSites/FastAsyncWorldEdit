@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.bukkit.util.image;
 
-import com.fastasyncworldedit.util.image.Drawable;
-import com.fastasyncworldedit.util.image.ImageUtil;
-import com.fastasyncworldedit.util.image.ImageViewer;
+import com.fastasyncworldedit.core.util.image.Drawable;
+import com.fastasyncworldedit.core.util.image.ImageUtil;
+import com.fastasyncworldedit.core.util.image.ImageViewer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

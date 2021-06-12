@@ -19,8 +19,8 @@
 
 package com.sk89q.jnbt;
 
-import com.fastasyncworldedit.jnbt.streamer.StreamDelegate;
-import com.fastasyncworldedit.jnbt.streamer.ValueReader;
+import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
+import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
 
 import java.io.Closeable;
 import java.io.DataInputStream;

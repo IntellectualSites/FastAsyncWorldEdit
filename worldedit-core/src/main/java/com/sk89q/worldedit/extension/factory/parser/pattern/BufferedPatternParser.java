@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.object.pattern.BufferedPattern;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.pattern.BufferedPattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;

@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.util;
 
-import com.fastasyncworldedit.util.ReflectionUtils;
+import com.fastasyncworldedit.core.util.ReflectionUtils;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;

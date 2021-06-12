@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.fastasyncworldedit.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.bukkit.adapter.mc1_16_5.TuinityRelighterFactory_1_16_5;
 import com.google.common.collect.Sets;

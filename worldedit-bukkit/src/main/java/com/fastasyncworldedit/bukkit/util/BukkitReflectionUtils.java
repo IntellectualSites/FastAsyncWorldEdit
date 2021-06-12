@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.util;
 
-import com.fastasyncworldedit.util.ReflectionUtils;
+import com.fastasyncworldedit.core.util.ReflectionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 

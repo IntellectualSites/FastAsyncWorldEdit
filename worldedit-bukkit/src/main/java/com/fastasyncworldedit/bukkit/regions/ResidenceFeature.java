@@ -4,7 +4,7 @@ import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
-import com.fastasyncworldedit.regions.FaweMask;
+import com.fastasyncworldedit.core.regions.FaweMask;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.CuboidRegion;

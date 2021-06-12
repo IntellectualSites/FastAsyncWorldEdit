@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.FaweAPI;
-import com.fastasyncworldedit.FaweCache;
-import com.fastasyncworldedit.beta.IQueueChunk;
-import com.fastasyncworldedit.beta.IQueueExtent;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.FaweAPI;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.beta.IQueueChunk;
+import com.fastasyncworldedit.core.beta.IQueueExtent;
 import com.plotsquared.core.queue.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.function.pattern.Pattern;

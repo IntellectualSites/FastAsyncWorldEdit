@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.bukkit.adapter;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.beta.IChunkGet;
-import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.jnbt.CompoundTag;

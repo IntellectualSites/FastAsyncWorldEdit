@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;

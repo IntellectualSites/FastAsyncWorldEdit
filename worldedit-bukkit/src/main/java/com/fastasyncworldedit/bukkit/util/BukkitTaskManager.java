@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.util;
 
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.util.TaskManager;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;

@@ -20,13 +20,13 @@
 package com.sk89q.worldedit.regions;
 
 
-import com.fastasyncworldedit.beta.Filter;
-import com.fastasyncworldedit.beta.IChunk;
-import com.fastasyncworldedit.beta.IChunkGet;
-import com.fastasyncworldedit.beta.IChunkSet;
-import com.fastasyncworldedit.beta.implementation.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.util.MathMan;
+import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.beta.IChunk;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.IChunkSet;
+import com.fastasyncworldedit.core.beta.implementation.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;

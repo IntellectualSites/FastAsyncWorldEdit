@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.command;
 
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.configuration.Settings;
-import com.fastasyncworldedit.object.clipboard.MultiClipboardHolder;
-import com.fastasyncworldedit.object.clipboard.URIClipboardHolder;
-import com.fastasyncworldedit.object.schematic.MinecraftStructure;
-import com.fastasyncworldedit.util.MainUtil;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.clipboard.MultiClipboardHolder;
+import com.fastasyncworldedit.core.object.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.object.schematic.MinecraftStructure;
+import com.fastasyncworldedit.core.util.MainUtil;
 import com.google.common.base.Function;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -91,7 +91,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
-import static com.fastasyncworldedit.util.ReflectionUtils.as;
+import static com.fastasyncworldedit.core.util.ReflectionUtils.as;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 

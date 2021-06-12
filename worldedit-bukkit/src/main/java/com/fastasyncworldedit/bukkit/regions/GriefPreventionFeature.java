@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.bukkit.filter.GriefPreventionFilter;
-import com.fastasyncworldedit.regions.FaweMask;
-import com.fastasyncworldedit.regions.general.RegionFilter;
+import com.fastasyncworldedit.core.regions.FaweMask;
+import com.fastasyncworldedit.core.regions.general.RegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;

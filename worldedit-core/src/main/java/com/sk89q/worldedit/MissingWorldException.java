@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 
 /**
  * Raised when a world is missing but is required.

@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
-import com.fastasyncworldedit.util.EditSessionBuilder;
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.util.EditSessionBuilder;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.github.intellectualsites.plotsquared.commands.Command;
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
 import com.github.intellectualsites.plotsquared.plot.commands.CommandCategory;

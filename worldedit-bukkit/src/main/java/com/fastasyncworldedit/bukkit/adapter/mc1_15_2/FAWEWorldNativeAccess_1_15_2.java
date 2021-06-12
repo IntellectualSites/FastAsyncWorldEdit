@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.bukkit.adapter.mc1_15_2;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.object.IntPair;
-import com.fastasyncworldedit.object.RunnableVal;
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.object.IntPair;
+import com.fastasyncworldedit.core.object.RunnableVal;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;

@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
-import com.fastasyncworldedit.FaweAPI;
-import com.fastasyncworldedit.object.RelightMode;
-import com.fastasyncworldedit.util.EditSessionBuilder;
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.FaweAPI;
+import com.fastasyncworldedit.core.object.RelightMode;
+import com.fastasyncworldedit.core.util.EditSessionBuilder;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.plotsquared.core.configuration.Settings;
 import com.plotsquared.core.generator.HybridPlotManager;
 import com.plotsquared.core.generator.HybridPlotWorld;
@@ -61,7 +61,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean setCuboids(final PlotArea area, final Set<CuboidRegion> regions, final Pattern blocks, final int minY, final int maxY) {
-        if (!com.fastasyncworldedit.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.CUBOIDS) {
+        if (!com.fastasyncworldedit.core.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.CUBOIDS) {
             return parent.setCuboids(area, regions, blocks, minY, maxY);
         }
         TaskManager.IMP.async(() -> {
@@ -77,7 +77,7 @@ public class FaweRegionManager extends RegionManager {
                     session.flushQueue();
                     for (CuboidRegion region : regions) {
                         FaweAPI.fixLighting(world, region, null,
-                            RelightMode.valueOf(com.fastasyncworldedit.configuration.Settings.IMP.LIGHTING.MODE));
+                            RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE));
                     }
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
@@ -89,7 +89,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean notifyClear(PlotManager manager) {
-        if (!com.fastasyncworldedit.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
+        if (!com.fastasyncworldedit.core.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
             return false;
         }
         final HybridPlotWorld hpw = ((HybridPlotManager) manager).getHybridPlotWorld();
@@ -98,7 +98,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean handleClear(final Plot plot, final Runnable whenDone, final PlotManager manager) {
-        if (!com.fastasyncworldedit.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
+        if (!com.fastasyncworldedit.core.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.CLEAR || !(manager instanceof HybridPlotManager)) {
             return false;
         }
         TaskManager.IMP.async(() -> {
@@ -157,7 +157,7 @@ public class FaweRegionManager extends RegionManager {
                 // Be verbose in editsession flushing
                 editSession.flushQueue();
                 FaweAPI.fixLighting(world, new CuboidRegion(plot.getBottomAbs().getBlockVector3(), plot.getTopAbs().getBlockVector3()), null,
-                    RelightMode.valueOf(com.fastasyncworldedit.configuration.Settings.IMP.LIGHTING.MODE));
+                    RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE));
                 TaskManager.IMP.task(whenDone);
             }
         });
@@ -166,7 +166,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public void swap(final Location pos1, final Location pos2, final Location pos3, final Location pos4, final Runnable whenDone) {
-        if (!com.fastasyncworldedit.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
+        if (!com.fastasyncworldedit.core.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
             parent.swap(pos1, pos2, pos3, pos4, whenDone);
         }
         TaskManager.IMP.async(() -> {
@@ -190,9 +190,9 @@ public class FaweRegionManager extends RegionManager {
                     e.printStackTrace();
                 }
                 FaweAPI.fixLighting(pos1World, new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3()), null,
-                    RelightMode.valueOf(com.fastasyncworldedit.configuration.Settings.IMP.LIGHTING.MODE));
+                    RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE));
                 FaweAPI.fixLighting(pos1World, new CuboidRegion(pos3.getBlockVector3(), pos4.getBlockVector3()), null,
-                    RelightMode.valueOf(com.fastasyncworldedit.configuration.Settings.IMP.LIGHTING.MODE));
+                    RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE));
                 TaskManager.IMP.task(whenDone);
             }
         });
@@ -200,7 +200,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public void setBiome(CuboidRegion region, int extendBiome, BiomeType biome, String world, Runnable whenDone) {
-        if (!com.fastasyncworldedit.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.SET_BIOME) {
+        if (!com.fastasyncworldedit.core.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.SET_BIOME) {
             parent.setBiome(region, extendBiome, biome, world, whenDone);
         }
         region.expand(BlockVector3.at(extendBiome, 0, extendBiome));
@@ -223,7 +223,7 @@ public class FaweRegionManager extends RegionManager {
 
     @Override
     public boolean copyRegion(final Location pos1, final Location pos2, final Location pos3, final Runnable whenDone) {
-        if (!com.fastasyncworldedit.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
+        if (!com.fastasyncworldedit.core.configuration.Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
             return parent.copyRegion(pos1, pos2, pos3, whenDone);
         }
         TaskManager.IMP.async(() -> {
@@ -239,7 +239,7 @@ public class FaweRegionManager extends RegionManager {
                     to.flushQueue();
                     FaweAPI.fixLighting(pos1World,
                         new CuboidRegion(pos3.getBlockVector3(), pos3.getBlockVector3().add(pos2.getBlockVector3().subtract(pos1.getBlockVector3()))),
-                        null, RelightMode.valueOf(com.fastasyncworldedit.configuration.Settings.IMP.LIGHTING.MODE));
+                        null, RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE));
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }

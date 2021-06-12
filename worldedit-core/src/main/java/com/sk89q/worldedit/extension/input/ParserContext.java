@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extension.input;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.platform.Actor;

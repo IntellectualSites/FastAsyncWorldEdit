@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.util;
 
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.function.EntityFunction;
 

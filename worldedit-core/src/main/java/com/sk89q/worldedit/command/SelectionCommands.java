@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.command;
 
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.object.clipboard.URIClipboardHolder;
-import com.fastasyncworldedit.object.mask.IdMask;
-import com.fastasyncworldedit.object.regions.selector.FuzzyRegionSelector;
-import com.fastasyncworldedit.object.regions.selector.PolyhedralRegionSelector;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.object.mask.IdMask;
+import com.fastasyncworldedit.core.object.regions.selector.FuzzyRegionSelector;
+import com.fastasyncworldedit.core.object.regions.selector.PolyhedralRegionSelector;
 import com.google.common.base.Strings;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;

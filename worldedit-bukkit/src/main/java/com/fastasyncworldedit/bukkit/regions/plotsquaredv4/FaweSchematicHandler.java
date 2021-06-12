@@ -1,12 +1,12 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
-import com.fastasyncworldedit.FaweAPI;
-import com.fastasyncworldedit.FaweCache;
-import com.fastasyncworldedit.object.clipboard.ReadOnlyClipboard;
-import com.fastasyncworldedit.object.io.PGZIPOutputStream;
-import com.fastasyncworldedit.util.EditSessionBuilder;
-import com.fastasyncworldedit.util.IOUtil;
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.FaweAPI;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.object.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.core.object.io.PGZIPOutputStream;
+import com.fastasyncworldedit.core.util.EditSessionBuilder;
+import com.fastasyncworldedit.core.util.IOUtil;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.RunnableVal;

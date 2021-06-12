@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extent.inventory;
 
-import com.fastasyncworldedit.FaweCache;
+import com.fastasyncworldedit.core.FaweCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;

@@ -1,12 +1,12 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.fastasyncworldedit.beta.IQueueChunk;
-import com.fastasyncworldedit.beta.IQueueExtent;
-import com.fastasyncworldedit.beta.implementation.lighting.NMSRelighter;
-import com.fastasyncworldedit.beta.implementation.lighting.Relighter;
-import com.fastasyncworldedit.beta.implementation.lighting.RelighterFactory;
-import com.fastasyncworldedit.configuration.Settings;
-import com.fastasyncworldedit.object.RelightMode;
+import com.fastasyncworldedit.core.beta.IQueueChunk;
+import com.fastasyncworldedit.core.beta.IQueueExtent;
+import com.fastasyncworldedit.core.beta.implementation.lighting.NMSRelighter;
+import com.fastasyncworldedit.core.beta.implementation.lighting.Relighter;
+import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.RelightMode;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 

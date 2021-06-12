@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
-import com.fastasyncworldedit.beta.IChunkCache;
-import com.fastasyncworldedit.beta.IChunkGet;
-import com.fastasyncworldedit.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.beta.IChunkCache;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;

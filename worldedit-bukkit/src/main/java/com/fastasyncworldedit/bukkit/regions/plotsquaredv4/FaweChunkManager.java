@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
-import com.fastasyncworldedit.configuration.Settings;
-import com.fastasyncworldedit.util.EditSessionBuilder;
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.util.EditSessionBuilder;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.util.ChunkManager;

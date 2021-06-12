@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.bukkit.listener;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.configuration.Settings;
-import com.fastasyncworldedit.util.TaskManager;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.util.TaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

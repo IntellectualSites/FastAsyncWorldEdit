@@ -21,7 +21,7 @@ package com.sk89q.util.yaml;
 
 import com.sk89q.util.StringUtil;
 import org.yaml.snakeyaml.DumperOptions;
-import com.fastasyncworldedit.configuration.Yaml;
+import com.fastasyncworldedit.core.configuration.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.reader.UnicodeReader;

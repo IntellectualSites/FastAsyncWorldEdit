@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.bukkit.listener;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.configuration.Settings;
-import com.fastasyncworldedit.util.FaweTimer;
-import com.fastasyncworldedit.util.MathMan;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.util.FaweTimer;
+import com.fastasyncworldedit.core.util.MathMan;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

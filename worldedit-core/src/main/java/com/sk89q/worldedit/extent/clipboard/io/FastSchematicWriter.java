@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.jnbt.streamer.IntValueReader;
-import com.fastasyncworldedit.object.FaweOutputStream;
-import com.fastasyncworldedit.util.IOUtil;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
+import com.fastasyncworldedit.core.object.FaweOutputStream;
+import com.fastasyncworldedit.core.util.IOUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntArrayTag;
 import com.sk89q.jnbt.ListTag;

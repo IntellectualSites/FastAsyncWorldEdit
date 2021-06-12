@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.bukkit.adapter.impl.regen;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.beta.IChunkCache;
-import com.fastasyncworldedit.beta.IChunkGet;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.beta.IChunkCache;
+import com.fastasyncworldedit.core.beta.IChunkGet;
 import com.fastasyncworldedit.bukkit.adapter.mc1_15_2.BukkitGetBlocks_1_15_2;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Either;

@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
-import com.fastasyncworldedit.FaweAPI;
-import com.fastasyncworldedit.object.RegionWrapper;
-import com.fastasyncworldedit.regions.FaweMask;
-import com.fastasyncworldedit.regions.FaweMaskManager;
-import com.fastasyncworldedit.regions.general.RegionFilter;
+import com.fastasyncworldedit.core.FaweAPI;
+import com.fastasyncworldedit.core.object.RegionWrapper;
+import com.fastasyncworldedit.core.regions.FaweMask;
+import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.regions.general.RegionFilter;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
 import com.github.intellectualsites.plotsquared.plot.config.Settings;
@@ -40,7 +40,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     public PlotSquaredFeature() {
         super("PlotSquared");
         LOGGER.debug("Optimizing PlotSquared");
-        if (com.fastasyncworldedit.configuration.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_HOOK) {
+        if (com.fastasyncworldedit.core.configuration.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
             try {
                 setupBlockQueue();

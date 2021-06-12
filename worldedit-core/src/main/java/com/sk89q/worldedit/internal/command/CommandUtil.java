@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.internal.command;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.extension.platform.Actor;

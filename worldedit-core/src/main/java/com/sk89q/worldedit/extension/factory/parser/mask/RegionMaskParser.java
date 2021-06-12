@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
-import com.fastasyncworldedit.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;

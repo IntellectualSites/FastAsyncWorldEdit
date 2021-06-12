@@ -19,15 +19,15 @@
 
 package com.sk89q.worldedit.command;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.object.extent.ResettableExtent;
-import com.fastasyncworldedit.util.CachedTextureUtil;
-import com.fastasyncworldedit.util.CleanTextureUtil;
-import com.fastasyncworldedit.util.MathMan;
-import com.fastasyncworldedit.util.RandomTextureUtil;
-import com.fastasyncworldedit.util.StringMan;
-import com.fastasyncworldedit.util.TextureUtil;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.util.CachedTextureUtil;
+import com.fastasyncworldedit.core.util.CleanTextureUtil;
+import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.RandomTextureUtil;
+import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.util.TextureUtil;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;

@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.fastasyncworldedit.Fawe;
-import com.fastasyncworldedit.configuration.Settings;
-import com.fastasyncworldedit.object.FaweLimit;
-import com.fastasyncworldedit.util.task.InterruptableCondition;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.util.task.InterruptableCondition;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.MapMetadatable;
 import com.sk89q.worldedit.entity.Player;

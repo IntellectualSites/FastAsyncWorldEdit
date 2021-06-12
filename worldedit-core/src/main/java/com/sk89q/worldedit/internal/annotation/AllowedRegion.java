@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.internal.annotation;
 
-import com.fastasyncworldedit.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import org.enginehub.piston.inject.InjectAnnotation;
 
 import java.lang.annotation.ElementType;

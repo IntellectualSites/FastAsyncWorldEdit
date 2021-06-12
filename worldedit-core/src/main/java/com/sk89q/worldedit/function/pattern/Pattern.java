@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.fastasyncworldedit.beta.Filter;
-import com.fastasyncworldedit.beta.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;

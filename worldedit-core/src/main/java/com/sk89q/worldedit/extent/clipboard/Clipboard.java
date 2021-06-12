@@ -19,14 +19,14 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import com.fastasyncworldedit.beta.Filter;
-import com.fastasyncworldedit.configuration.Settings;
-import com.fastasyncworldedit.object.clipboard.CPUOptimizedClipboard;
-import com.fastasyncworldedit.object.clipboard.DiskOptimizedClipboard;
-import com.fastasyncworldedit.object.clipboard.MemoryOptimizedClipboard;
-import com.fastasyncworldedit.object.clipboard.ReadOnlyClipboard;
-import com.fastasyncworldedit.util.EditSessionBuilder;
-import com.fastasyncworldedit.util.MaskTraverser;
+import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.clipboard.CPUOptimizedClipboard;
+import com.fastasyncworldedit.core.object.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.core.object.clipboard.MemoryOptimizedClipboard;
+import com.fastasyncworldedit.core.object.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.core.util.EditSessionBuilder;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Entity;

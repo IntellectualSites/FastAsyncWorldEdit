@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.object.exception.FaweException;
-import com.fastasyncworldedit.object.task.AsyncNotifyQueue;
-import com.fastasyncworldedit.regions.FaweMaskManager;
-import com.fastasyncworldedit.util.TaskManager;
-import com.fastasyncworldedit.util.WEManager;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.object.task.AsyncNotifyQueue;
+import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.WEManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;

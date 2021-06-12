@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.fastasyncworldedit.configuration.Caption;
-import com.fastasyncworldedit.object.exception.FaweException;
-import com.fastasyncworldedit.object.pattern.PatternTraverser;
-import com.fastasyncworldedit.wrappers.LocationMaskedPlayerWrapper;
-import com.fastasyncworldedit.wrappers.WorldWrapper;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.object.pattern.PatternTraverser;
+import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
+import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
