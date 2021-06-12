@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.command.SuggestInputParseException;
-import com.boydti.fawe.object.string.JoinedCharSequence;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.core.command.SuggestInputParseException;
+import com.fastasyncworldedit.core.object.string.JoinedCharSequence;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 

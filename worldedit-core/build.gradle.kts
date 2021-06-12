@@ -5,6 +5,8 @@ plugins {
     antlr
 }
 
+project.description = "Core"
+
 repositories {
     maven {
         name = "IntellectualSites"

@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.ITileInput;
+import com.fastasyncworldedit.core.beta.ITileInput;
 
 public enum CompoundInput {
     NULL,

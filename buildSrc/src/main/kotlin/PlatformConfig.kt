@@ -77,7 +77,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     tasks.register<Jar>("javadocJar") {
         dependsOn("javadoc")
-        archiveClassifier.set("javadoc")
+        archiveClassifier.set(null as String?)
+        archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-javadoc.${archiveExtension.getOrElse("jar")}")
         from(tasks.getByName<Javadoc>("javadoc").destinationDir)
     }
 
@@ -93,7 +94,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
     if (name == "worldedit-core" || name == "worldedit-bukkit") {
         tasks.register<Jar>("sourcesJar") {
             dependsOn("classes")
-            archiveClassifier.set("sources")
+            archiveClassifier.set(null as String?)
+            archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-sources.${archiveExtension.getOrElse("jar")}")
             from(sourceSets["main"].allSource)
         }
 

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.argument;
 
-import com.boydti.fawe.object.brush.scroll.Scroll;
+import com.fastasyncworldedit.core.object.brush.scroll.Scroll;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.command.util.HookMode;

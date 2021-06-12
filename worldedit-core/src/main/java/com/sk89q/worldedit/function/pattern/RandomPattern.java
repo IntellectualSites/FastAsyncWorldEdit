@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.boydti.fawe.object.collection.RandomCollection;
-import com.boydti.fawe.object.random.SimpleRandom;
-import com.boydti.fawe.object.random.TrueRandom;
+import com.fastasyncworldedit.core.object.collection.RandomCollection;
+import com.fastasyncworldedit.core.object.random.SimpleRandom;
+import com.fastasyncworldedit.core.object.random.TrueRandom;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;

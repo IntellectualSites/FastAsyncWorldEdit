@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.iterator.FlatRegion3DIterator;

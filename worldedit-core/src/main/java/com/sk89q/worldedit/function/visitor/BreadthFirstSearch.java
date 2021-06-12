@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.collection.BlockVectorSet;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.collection.BlockVectorSet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.WorldEditException;

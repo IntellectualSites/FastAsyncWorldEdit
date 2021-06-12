@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.util;
 
-import com.boydti.fawe.util.MathMan;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.Registry;
