@@ -238,7 +238,8 @@ public class BukkitGetBlocks_1_17 extends CharGetBlocks implements BukkitGetBloc
             }
             skyLight[layer] = nibbleArray;
         }
-        return skyLight[layer].a(x, y, z);
+        long l = BlockPosition.a(x, y, z);
+        return skyLight[layer].a(SectionPosition.b(BlockPosition.a(l)), SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)));
     }
 
     @Override
@@ -257,7 +258,8 @@ public class BukkitGetBlocks_1_17 extends CharGetBlocks implements BukkitGetBloc
             }
             blockLight[layer] = nibbleArray;
         }
-        return blockLight[layer].a(x, y, z);
+        long l = BlockPosition.a(x, y, z);
+        return blockLight[layer].a(SectionPosition.b(BlockPosition.a(l)), SectionPosition.b(BlockPosition.b(l)), SectionPosition.b(BlockPosition.c(l)));
     }
 
     @Override
