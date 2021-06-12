@@ -818,10 +818,14 @@ public class BukkitGetBlocks_1_17 extends CharGetBlocks implements BukkitGetBloc
 
     public ChunkSection[] getSections(boolean force) {
         if (force && forceLoadSections) {
-            ChunkSection[] sections = getChunk().getSections();
-            ChunkSection[] copy = new ChunkSection[sections.length];
-            System.arraycopy(sections, 0, copy, 0, sections.length);
-            return copy;
+            synchronized (this) {
+                ChunkSection[] chunkSections = getChunk().getSections();
+                int startY = -chunkSections[0].getYPosition();
+                int length = chunkSections.length - startY;
+                ChunkSection[] tmp = new ChunkSection[length];
+                System.arraycopy(chunkSections, startY, tmp, 0, length);
+                return sections = tmp;
+            }
         }
         ChunkSection[] tmp = sections;
         if (tmp == null) {
@@ -829,9 +833,11 @@ public class BukkitGetBlocks_1_17 extends CharGetBlocks implements BukkitGetBloc
                 tmp = sections;
                 if (tmp == null) {
                     ChunkSection[] chunkSections = getChunk().getSections();
-                    tmp = new ChunkSection[chunkSections.length];
-                    System.arraycopy(chunkSections, 0, tmp, 0, chunkSections.length);
-                    sections = tmp;
+                    int startY = -chunkSections[0].getYPosition();
+                    int length = chunkSections.length - startY;
+                    tmp = new ChunkSection[length];
+                    System.arraycopy(chunkSections, startY, tmp, 0, length);
+                    return sections = tmp;
                 }
             }
         }
