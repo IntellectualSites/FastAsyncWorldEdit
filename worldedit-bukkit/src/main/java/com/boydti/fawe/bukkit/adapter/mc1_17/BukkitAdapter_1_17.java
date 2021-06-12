@@ -299,7 +299,7 @@ public final class BukkitAdapter_1_17 extends NMSAdapter {
     }
 
     private static ChunkSection newChunkSection(int layer) {
-        return new ChunkSection(layer << 4);
+        return new ChunkSection(layer);
     }
 
     public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final ChunkSection section) throws IllegalAccessException {
