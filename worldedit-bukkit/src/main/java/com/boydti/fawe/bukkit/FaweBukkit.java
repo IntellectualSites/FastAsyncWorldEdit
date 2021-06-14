@@ -12,6 +12,7 @@ import com.boydti.fawe.bukkit.listener.BrushListener;
 import com.boydti.fawe.bukkit.listener.ChunkListener9;
 import com.boydti.fawe.bukkit.listener.RenderListener;
 import com.boydti.fawe.bukkit.regions.GriefPreventionFeature;
+import com.boydti.fawe.bukkit.regions.GriefDefenderFeature;
 import com.boydti.fawe.bukkit.regions.ResidenceFeature;
 import com.boydti.fawe.bukkit.regions.TownyFeature;
 import com.boydti.fawe.bukkit.regions.Worldguard;
@@ -214,6 +215,15 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
                 LOGGER.debug("Attempting to use plugin 'GriefPrevention'");
+            } catch (Throwable ignored) {
+            }
+        }
+        final Plugin griefdefenderPlugin =
+                Bukkit.getServer().getPluginManager().getPlugin("GriefDefender");
+        if (griefdefenderPlugin != null && griefdefenderPlugin.isEnabled()) {
+            try {
+                managers.add(new GriefDefenderFeature(griefdefenderPlugin));
+                LOGGER.debug("Attempting to use plugin 'GriefDefender'");
             } catch (Throwable ignored) {
             }
         }

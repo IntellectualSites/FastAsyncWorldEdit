@@ -107,6 +107,8 @@ dependencies {
     implementation("org.bstats:bstats-base:2.2.1")
     compileOnlyApi("org.inventivetalent:mapmanager:1.7.10-SNAPSHOT") { isTransitive = false }
     implementation("com.github.TechFortress:GriefPrevention:16.17.1") { isTransitive = false }
+    implementation("com.github.bloodmc:GriefDefenderApi:920a610") { isTransitive = false }
+    implementation("com.flowpowered:flow-math:1.0.3") { isTransitive = false }
     implementation("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     implementation("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
