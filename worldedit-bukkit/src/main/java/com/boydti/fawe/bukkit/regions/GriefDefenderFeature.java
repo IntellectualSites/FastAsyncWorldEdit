@@ -28,7 +28,7 @@ public class GriefDefenderFeature extends BukkitMaskManager implements Listener 
     }
 
     public boolean isAllowed(Player player, Claim claim, MaskType type) {
-        return GriefDefender.getCore().isEnabled(player.getWorld().getUID()) && !claim.isWilderness() && (claim.getOwnerName().equalsIgnoreCase(player.getName()) || claim.getOwnerName().equals(player.getUniqueId()) ||
+        return GriefDefender.getCore().isEnabled(player.getWorld().getUID()) && !claim.isWilderness() && (claim.getOwnerName().equalsIgnoreCase(player.getName()) || claim.getOwnerUniqueId().equals(player.getUniqueId()) ||
                 type == MaskType.MEMBER && claim.getUserTrusts(TrustTypes.BUILDER).contains(player.getUniqueId()));
     }
 
@@ -41,8 +41,8 @@ public class GriefDefenderFeature extends BukkitMaskManager implements Listener 
         if (!claim.isWilderness()) {
             if (isAllowed(player, claim, type)) {
                 claim.getGreaterBoundaryCorner().getX();
-                final BlockVector3 pos1 = BlockVector3.at(claim.getLesserBoundaryCorner().getX(), 0, claim.getLesserBoundaryCorner().getZ());
-                final BlockVector3 pos2 = BlockVector3.at(claim.getGreaterBoundaryCorner().getX(), 256, claim.getGreaterBoundaryCorner().getZ());
+                final BlockVector3 pos1 = BlockVector3.at(claim.getLesserBoundaryCorner().getX(), claim.getLesserBoundaryCorner().getY(), claim.getLesserBoundaryCorner().getZ());
+                final BlockVector3 pos2 = BlockVector3.at(claim.getGreaterBoundaryCorner().getX(), claim.getGreaterBoundaryCorner().getY(), claim.getGreaterBoundaryCorner().getZ());
                 return new FaweMask(new CuboidRegion(pos1, pos2)) {
 
                     @Override
