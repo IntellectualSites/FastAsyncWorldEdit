@@ -24,7 +24,7 @@ public class GriefDefenderFeature extends BukkitMaskManager implements Listener 
 
     public GriefDefenderFeature(final Plugin GriefDefenderPlugin) {
         super(GriefDefenderPlugin.getName());
-        LOGGER.debug("Plugin 'GriefDefender' found. Using it now.");
+        LOGGER.info("Plugin 'GriefDefender' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, Claim claim, MaskType type) {
