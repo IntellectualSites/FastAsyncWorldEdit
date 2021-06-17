@@ -59,10 +59,6 @@ configurations.all {
     }
 }
 
-the<JavaPluginExtension>().toolchain {
-    languageVersion.set(JavaLanguageVersion.of(16))
-}
-
 dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7") { isTransitive = false }
     api(project(":worldedit-core"))
