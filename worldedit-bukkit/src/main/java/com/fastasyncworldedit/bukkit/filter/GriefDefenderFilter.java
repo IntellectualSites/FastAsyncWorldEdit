@@ -1,7 +1,7 @@
-package com.boydti.fawe.bukkit.filter;
+package com.fastasyncworldedit.bukkit.filter;
 
-import com.boydti.fawe.regions.general.CuboidRegionFilter;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.core.regions.general.CuboidRegionFilter;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.griefdefender.api.claim.Claim;
 import com.griefdefender.api.GriefDefender;

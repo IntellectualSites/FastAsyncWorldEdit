@@ -12,6 +12,7 @@ import com.fastasyncworldedit.bukkit.listener.BrushListener;
 import com.fastasyncworldedit.bukkit.listener.ChunkListener9;
 import com.fastasyncworldedit.bukkit.listener.RenderListener;
 import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
+import com.fastasyncworldedit.bukkit.regions.GriefDefenderFeature;
 import com.fastasyncworldedit.bukkit.regions.ResidenceFeature;
 import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.Worldguard;
