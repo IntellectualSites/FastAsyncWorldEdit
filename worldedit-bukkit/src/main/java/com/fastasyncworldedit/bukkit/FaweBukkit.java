@@ -12,6 +12,7 @@ import com.fastasyncworldedit.bukkit.listener.BrushListener;
 import com.fastasyncworldedit.bukkit.listener.ChunkListener9;
 import com.fastasyncworldedit.bukkit.listener.RenderListener;
 import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
+import com.fastasyncworldedit.bukkit.regions.GriefDefenderFeature;
 import com.fastasyncworldedit.bukkit.regions.ResidenceFeature;
 import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.Worldguard;
@@ -214,7 +215,16 @@ public class FaweBukkit implements IFawe, Listener {
         if (griefpreventionPlugin != null && griefpreventionPlugin.isEnabled()) {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
-                LOGGER.debug("Attempting to use plugin 'GriefPrevention'");
+                LOGGER.info("Attempting to use plugin 'GriefPrevention'");
+            } catch (Throwable ignored) {
+            }
+        }
+        final Plugin griefdefenderPlugin =
+                Bukkit.getServer().getPluginManager().getPlugin("GriefDefender");
+        if (griefdefenderPlugin != null && griefdefenderPlugin.isEnabled()) {
+            try {
+                managers.add(new GriefDefenderFeature(griefdefenderPlugin));
+                LOGGER.info("Attempting to use plugin 'GriefDefender'");
             } catch (Throwable ignored) {
             }
         }
