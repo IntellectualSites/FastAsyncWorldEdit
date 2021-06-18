@@ -224,239 +224,119 @@ public class LimitExtent extends AbstractDelegateExtent {
     public void addCaves(Region region) throws WorldEditException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            super.addCaves(region);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-        }
+        super.addCaves(region);
     }
 
     @Override
     public void generate(Region region, GenBase gen) throws WorldEditException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            super.generate(region, gen);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-        }
+        super.generate(region, gen);
     }
 
     @Override
     public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            super.addSchems(region, mask, clipboards, rarity, rotate);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-        }
+        super.addSchems(region, mask, clipboards, rarity, rotate);
     }
 
     @Override
     public void spawnResource(Region region, Resource gen, int rarity, int frequency) throws WorldEditException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            super.spawnResource(region, gen, rarity, frequency);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-        }
+        super.spawnResource(region, gen, rarity, frequency);
     }
 
     @Override
     public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            super.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-        }
+        super.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
     }
 
     @Override
     public void addOres(Region region, Mask mask) throws WorldEditException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            super.addOres(region, mask);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-        }
+        super.addOres(region, mask);
     }
 
     @Override
     public List<Countable<BlockType>> getBlockDistribution(Region region) {
         limit.THROW_MAX_CHECKS(region.getVolume());
-        try {
-            return super.getBlockDistribution(region);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return Collections.emptyList();
-        }
+        return super.getBlockDistribution(region);
     }
 
     @Override
     public List<Countable<BlockState>> getBlockDistributionWithData(Region region) {
         limit.THROW_MAX_CHECKS(region.getVolume());
-        try {
-            return super.getBlockDistributionWithData(region);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return Collections.emptyList();
-        }
+        return super.getBlockDistributionWithData(region);
     }
 
     @Override
     public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
         limit.THROW_MAX_CHECKS(region.getVolume());
-        try {
-            return super.countBlocks(region, searchBlocks);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.countBlocks(region, searchBlocks);
     }
 
     @Override
     public int countBlocks(Region region, Mask searchMask) {
         limit.THROW_MAX_CHECKS(region.getVolume());
-        try {
-            return super.countBlocks(region, searchMask);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.countBlocks(region, searchMask);
     }
 
     @Override
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            return super.setBlocks(region, block);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.setBlocks(region, block);
     }
 
     @Override
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            return super.setBlocks(region, pattern);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.setBlocks(region, pattern);
     }
 
     @Override
     public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            return super.replaceBlocks(region, filter, replacement);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.replaceBlocks(region, filter, replacement);
     }
 
     @Override
     public int replaceBlocks(Region region, Set<BaseBlock> filter, Pattern pattern) throws MaxChangedBlocksException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            return super.replaceBlocks(region, filter, pattern);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.replaceBlocks(region, filter, pattern);
     }
 
     @Override
     public int replaceBlocks(Region region, Mask mask, Pattern pattern) throws MaxChangedBlocksException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            return super.replaceBlocks(region, mask, pattern);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.replaceBlocks(region, mask, pattern);
     }
 
     @Override
     public int center(Region region, Pattern pattern) throws MaxChangedBlocksException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            return super.center(region, pattern);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.center(region, pattern);
     }
 
     @Override
     public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
         limit.THROW_MAX_CHANGES(vset.size());
-        try {
-            return super.setBlocks(vset, pattern);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return 0;
-        }
+        return super.setBlocks(vset, pattern);
     }
 
     @Override
     public <T extends Filter> T apply(Region region, T filter, boolean full) {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
-        try {
-            return super.apply(region, filter, full);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return filter;
-        }
+        return super.apply(region, filter, full);
     }
 
     @Override
@@ -476,22 +356,22 @@ public class LimitExtent extends AbstractDelegateExtent {
             ExtentFilterBlock block = new ExtentFilterBlock(this);
             for (BlockVector3 pos : positions) {
                 limit.THROW_MAX_CHECKS();
-                filter.applyBlock(block.init(pos));
+                try {
+                    filter.applyBlock(block.init(pos));
+                } catch (FaweException e) {
+                    if (!limit.MAX_FAILS()) {
+                        throw e;
+                    }
+                }
             }
             return filter;
         }
         limit.THROW_MAX_CHECKS(size);
         limit.THROW_MAX_CHANGES(size);
-        try {
-            return super.apply(positions, filter);
-        } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
-                throw e;
-            }
-            return filter;
-        }
+        return super.apply(positions, filter);
     }
 
+    @Override
     public BlockState getBlock(BlockVector3 position) {
         limit.THROW_MAX_CHECKS();
         try {
@@ -573,8 +453,8 @@ public class LimitExtent extends AbstractDelegateExtent {
     @Deprecated
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
-        if (block.hasNbtData()) {
-            limit.MAX_BLOCKSTATES();
+        if (block.getNbtData() != null || block.getBlockType().getMaterial().isTile()) {
+            limit.THROW_MAX_BLOCKSTATES();
         }
         try {
             return super.setBlock(position, block);
@@ -589,8 +469,8 @@ public class LimitExtent extends AbstractDelegateExtent {
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
         limit.THROW_MAX_CHANGES();
-        if (block.hasNbtData()) {
-            limit.MAX_BLOCKSTATES();
+        if (block.getNbtData() != null || block.getBlockType().getMaterial().isTile()) {
+            limit.THROW_MAX_BLOCKSTATES();
         }
         try {
             return super.setBlock(x, y, z, block);
