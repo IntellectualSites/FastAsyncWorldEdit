@@ -401,6 +401,10 @@ public class BlockTransformExtent extends ResettableExtent {
                 long[] directions = getDirections(property);
                 if (directions != null) {
                     int oldIndex = property.getIndex(newMaskedId);
+                    if (oldIndex >= directions.length) {
+                        LOGGER.warn(String.format("Index outside direction array length found for block:{%s} propery:{%s}", state.getBlockType().getId(), property.getName()));
+                        continue;
+                    }
                     Integer newIndex = getNewStateIndex(transform, directions, oldIndex);
                     if (newIndex != null) {
                         newMaskedId = property.modifyIndex(newMaskedId, newIndex);

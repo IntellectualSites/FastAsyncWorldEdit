@@ -88,15 +88,15 @@ dependencies {
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    testImplementation("org.mockito:mockito-core:3.11.0")
+    testImplementation("org.mockito:mockito-core:3.11.1")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    compileOnly("net.kyori:adventure-api:4.8.0")
-    testImplementation("net.kyori:adventure-api:4.8.0")
+    compileOnly("net.kyori:adventure-api:4.8.1")
+    testImplementation("net.kyori:adventure-api:4.8.1")
     testImplementation("org.checkerframework:checker-qual:3.14.0")
     testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
@@ -107,6 +107,11 @@ dependencies {
     implementation("org.bstats:bstats-base:2.2.1")
     compileOnlyApi("org.inventivetalent:mapmanager:1.7.10-SNAPSHOT") { isTransitive = false }
     implementation("com.github.TechFortress:GriefPrevention:16.17.1") { isTransitive = false }
+    implementation("com.github.bloodmc:GriefDefenderApi:920a610") { isTransitive = false }
+    implementation("com.flowpowered:flow-math:1.0.3") {
+        because("This dependency is needed by GriefDefender but not exposed transitively.")
+        isTransitive = false
+    }
     implementation("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     implementation("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
