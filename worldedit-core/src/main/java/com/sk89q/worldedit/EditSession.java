@@ -584,9 +584,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         ExtentTraverser<SurvivalModeExtent> survivalExtent = new ExtentTraverser<>(getExtent()).find(SurvivalModeExtent.class);
         if (survivalExtent != null) {
             return survivalExtent.get();
-        } else {
-            SurvivalModeExtent survival = new SurvivalModeExtent(bypassAll, getWorld());
-            bypassAll = survival;
+        } else { // Kind of a bad way of doing it, but equally I (dords) hate the way upstream does it by just adding ALL possible extents to an edit and only "enabling" when required
+            SurvivalModeExtent survival = new SurvivalModeExtent(getExtent(), getWorld());
+            setExtent(survival);
             return survival;
         }
     }
