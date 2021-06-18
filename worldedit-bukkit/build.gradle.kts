@@ -164,19 +164,19 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
-        relocate("org.incendo.serverlib", "com.boydti.fawe.serverlib") {
+        relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
             include(dependency("org.incendo.serverlib:ServerLib:2.2.0"))
         }
-        relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
+        relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
         }
-        relocate("com.github.luben", "com.boydti.fawe.zstd") {
+        relocate("com.github.luben", "com.fastasyncworldedit.core.zstd") {
             include(dependency("com.github.luben:zstd-jni:1.5.0-2"))
         }
-        relocate("net.jpountz", "com.boydti.fawe.jpountz") {
+        relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz") {
             include(dependency("net.jpountz:lz4-java-stream:1.0.0"))
         }
-        relocate("org.lz4", "com.boydti.fawe.lz4") {
+        relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
             include(dependency("org.lz4:lz4-java:1.7.1"))
         }
     }
