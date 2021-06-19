@@ -8,6 +8,7 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report for FastAsyncWorldEdit! Fill out the following form to your best ability to help us fix the problem.
         Only use this if you're absolutely sure that you found a bug and can reproduce it. For anything else, use: [our Discord server](https://discord.gg/intellectualsites) or [the wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki).
+        Do NOT use the public issue tracker to report security vulnerabilities! They are disclosed using [this](https://forms.gle/btgdRn9yhGtzEiGW8) form!
 
   - type: dropdown
     attributes:
@@ -30,6 +31,7 @@ body:
       options:
         - '1.16.5'
         - '1.15.2'
+        - '1.17.1'
     validations:
       required: true
 
@@ -91,7 +93,7 @@ body:
       options:
         - label: I have included a Fawe debugpaste.
           required: true
-        - label: I am using the newest build from https://ci.athion.net/job/FastAsyncWorldEdit-1.16/ and the issue still persists.
+        - label: I am using the newest build from https://ci.athion.net/job/FastAsyncWorldEdit-1.17/ and the issue still persists.
           required: true
 
   - type: textarea

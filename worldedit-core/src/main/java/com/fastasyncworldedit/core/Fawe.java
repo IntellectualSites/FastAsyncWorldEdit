@@ -233,7 +233,7 @@ public class Fawe {
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
             Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toString();
-            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.16/" + version.build;
+            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit-1.17/" + version.build;
             Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignored) {
         }
