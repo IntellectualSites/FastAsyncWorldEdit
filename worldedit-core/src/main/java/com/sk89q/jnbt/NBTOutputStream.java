@@ -43,7 +43,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * found at <a href="https://minecraft.gamepedia.com/NBT_format">
  * https://minecraft.gamepedia.com/NBT_format</a>.
  * </p>
+ *
+ * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
+@Deprecated
 public final class NBTOutputStream extends OutputStream implements Closeable, DataOutput {
 
     /**
@@ -82,6 +85,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
         return os;
     }
 
+    //TODO writeNamedTag was changed in upstream so the code below this comment may not work anymore.
     /**
      * Writes a tag.
      *

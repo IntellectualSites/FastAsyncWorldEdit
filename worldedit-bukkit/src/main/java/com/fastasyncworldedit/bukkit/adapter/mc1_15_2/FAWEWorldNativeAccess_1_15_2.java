@@ -4,13 +4,14 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.object.IntPair;
 import com.fastasyncworldedit.core.object.RunnableVal;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import net.minecraft.server.v1_15_R1.Block;
 import net.minecraft.server.v1_15_R1.BlockPosition;
 import net.minecraft.server.v1_15_R1.Chunk;
@@ -119,14 +120,14 @@ public class FAWEWorldNativeAccess_1_15_2 implements WorldNativeAccess<Chunk, IB
     }
 
     @Override
-    public boolean updateTileEntity(BlockPosition position, CompoundTag tag) {
+    public boolean updateTileEntity(BlockPosition position, CompoundBinaryTag tag) {
         // We will assume that the tile entity was created for us,
         // though we do not do this on the other versions
         TileEntity tileEntity = getWorld().getTileEntity(position);
         if (tileEntity == null) {
             return false;
         }
-        NBTBase nativeTag = adapter.fromNative(tag);
+        NBTBase nativeTag = adapter.fromNative(AdventureNBTConverter.fromAdventure(tag));
         tileEntity.load((NBTTagCompound) nativeTag);
         return true;
     }

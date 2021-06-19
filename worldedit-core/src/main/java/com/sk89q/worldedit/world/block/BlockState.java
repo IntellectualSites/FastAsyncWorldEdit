@@ -40,6 +40,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.jetbrains.annotations.NotNull;
 
@@ -360,7 +362,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     @Override
-    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+    public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
         if (compoundTag == null) {
             return toBaseBlock();
         }

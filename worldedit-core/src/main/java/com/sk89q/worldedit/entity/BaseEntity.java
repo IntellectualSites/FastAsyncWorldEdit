@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.entity;
 
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
@@ -45,8 +45,22 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BaseEntity implements NbtValued {
 
-    private EntityType type;
-    private CompoundTag nbtData;
+    private final EntityType type;
+    @Nullable
+    private LazyReference<CompoundBinaryTag> nbtData;
+
+    /**
+     * Create a new base entity.
+     *
+     * @param type the entity type
+     * @param nbtData NBT data
+     * @deprecated Use {@link BaseEntity#BaseEntity(EntityType, LazyReference)}
+     */
+    @Deprecated
+    public BaseEntity(EntityType type, CompoundTag nbtData) {
+        this(type);
+        setNbtData(nbtData);
+    }
 
     /**
      * Create a new base entity.
@@ -54,13 +68,9 @@ public class BaseEntity implements NbtValued {
      * @param type the entity type
      * @param nbtData NBT data
      */
-    public BaseEntity(EntityType type, CompoundTag nbtData) {
+    public BaseEntity(EntityType type, LazyReference<CompoundBinaryTag> nbtData) {
         this(type);
-        setNbtData(nbtData);
-    }
-
-    public BaseEntity(CompoundTag tag) {
-        this(EntityTypes.parse(tag.getString("Id")), tag);
+        setNbtReference(nbtData);
     }
 
     /**
@@ -80,26 +90,17 @@ public class BaseEntity implements NbtValued {
     public BaseEntity(BaseEntity other) {
         checkNotNull(other);
         this.type = other.getType();
-        setNbtData(other.getNbtData());
-    }
-
-    public Location getLocation(Extent extent) {
-        return nbtData.getEntityLocation(extent);
-    }
-
-    @Override
-    public boolean hasNbtData() {
-        return true;
+        setNbtReference(other.getNbtReference());
     }
 
     @Nullable
     @Override
-    public CompoundTag getNbtData() {
+    public LazyReference<CompoundBinaryTag> getNbtReference() {
         return nbtData;
     }
 
     @Override
-    public void setNbtData(@Nullable CompoundTag nbtData) {
+    public void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
         this.nbtData = nbtData;
     }
 
@@ -111,5 +112,12 @@ public class BaseEntity implements NbtValued {
     public EntityType getType() {
         return this.type;
     }
+
+    // FAWE start
+    public BaseEntity(CompoundTag tag) {
+        this(EntityTypes.parse(tag.getString("Id")), tag);
+    }
+
+    // FAWE end
 
 }

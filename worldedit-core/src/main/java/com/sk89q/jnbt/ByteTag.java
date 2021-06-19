@@ -19,14 +19,17 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
+import com.sk89q.worldedit.util.nbt.ByteBinaryTag;
 
 /**
  * The {@code TAG_Byte} tag.
+ *
+ * @deprecated Use {@link ByteBinaryTag}.
  */
-public final class ByteTag extends NumberTag {
+@Deprecated
+public final class ByteTag extends Tag {
 
-    private final byte value;
+    private final ByteBinaryTag innerTag;
 
     /**
      * Creates the tag with an empty name.
@@ -35,17 +38,22 @@ public final class ByteTag extends NumberTag {
      */
     public ByteTag(byte value) {
         super();
-        this.value = value;
+        this.innerTag = ByteBinaryTag.of(value);
+    }
+
+    public ByteTag(ByteBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
     }
 
     @Override
     public Byte getValue() {
-        return value;
+        return innerTag.value();
     }
 
     @Override
-    public String toString() {
-        return "TAG_Byte(" + value + ")";
+    public ByteBinaryTag asBinaryTag() {
+        return innerTag;
     }
 
     // FAWE Start

@@ -22,6 +22,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -79,7 +80,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
-    default void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
+    default void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData) {
         getParent().sendFakeNBT(player, pos, nbtData);
     }
 

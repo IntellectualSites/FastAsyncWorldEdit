@@ -165,7 +165,7 @@ public class BukkitWorld extends AbstractWorld {
         return list;
     }
 
-    //createEntity was moved to IChunkExtent to prevent issues with Async Entitiy Add.
+    //createEntity was moved to IChunkExtent to prevent issues with Async Entity Add.
 
     /**
      * Get the world handle.
@@ -274,6 +274,7 @@ public class BukkitWorld extends AbstractWorld {
         if (!getBlock(pt).getBlockType().getMaterial().hasContainer()) {
             return false;
         }
+
         Block block = getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ());
         BlockState state = PaperLib.getBlockState(block, false).getState();
         if (!(state instanceof InventoryHolder)) {
@@ -496,9 +497,9 @@ public class BukkitWorld extends AbstractWorld {
             try {
                 return worldNativeAccess.setBlock(position, block, sideEffects);
             } catch (Exception e) {
-                if (block instanceof BaseBlock && ((BaseBlock) block).getNbtData() != null) {
+                if (block instanceof BaseBlock && ((BaseBlock) block).getNbt() != null) {
                     LOGGER.warn("Tried to set a corrupt tile entity at " + position.toString()
-                        + ": " + ((BaseBlock) block).getNbtData(), e);
+                        + ": " + ((BaseBlock) block).getNbt(), e);
                 } else {
                     LOGGER.warn("Failed to set block via adapter, falling back to generic", e);
                 }

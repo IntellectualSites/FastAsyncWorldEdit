@@ -13,6 +13,7 @@ fun Project.applyCommonConfiguration() {
 
     repositories {
         mavenLocal()
+        mavenCentral()
         maven {
             name = "IntellectualSites"
             url = uri("https://mvn.intellectualsites.com/content/groups/public/")

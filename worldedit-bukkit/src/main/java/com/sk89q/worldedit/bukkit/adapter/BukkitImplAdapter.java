@@ -40,6 +40,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -164,7 +165,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param pos The position
      * @param nbtData The NBT Data
      */
-    void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData);
+    void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData);
 
     /**
      * Make the client think it has operator status.
