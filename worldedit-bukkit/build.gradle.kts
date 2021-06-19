@@ -100,7 +100,7 @@ dependencies {
     testImplementation("org.checkerframework:checker-qual:3.14.0")
     testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
-    api("org.lz4:lz4-java:1.7.1")
+    api("org.lz4:lz4-java:1.8.0")
     api("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
