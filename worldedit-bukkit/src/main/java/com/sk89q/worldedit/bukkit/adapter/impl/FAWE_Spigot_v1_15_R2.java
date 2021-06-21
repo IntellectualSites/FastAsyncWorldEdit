@@ -424,7 +424,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
 
     @Override
     public Tag toNative(NBTBase foreign) {
-        return parent.toNative(foreign);
+        return (Tag) parent.toNative(foreign);
     }
 
     @Override
@@ -432,7 +432,7 @@ public final class FAWE_Spigot_v1_15_R2 extends CachedBukkitAdapter implements I
         if (foreign instanceof LazyCompoundTag_1_15_2) {
             return ((LazyCompoundTag_1_15_2) foreign).get();
         }
-        return parent.fromNative(foreign);
+        return (NBTBase) parent.fromNative(foreign);
     }
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {

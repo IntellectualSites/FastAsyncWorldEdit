@@ -32,8 +32,6 @@ import com.sk89q.worldedit.bukkit.adapter.AdapterLoadException;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_15_R2;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R1;
-import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R2;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_16_R3;
 import com.sk89q.worldedit.bukkit.adapter.impl.FAWE_Spigot_v1_17_R1;
 import com.sk89q.worldedit.event.platform.CommandEvent;
@@ -302,8 +300,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
         try {
             adapterLoader.addClass(FAWE_Spigot_v1_15_R2.class);
-            adapterLoader.addClass(FAWE_Spigot_v1_16_R1.class);
-            adapterLoader.addClass(FAWE_Spigot_v1_16_R2.class);
             adapterLoader.addClass(FAWE_Spigot_v1_16_R3.class);
             adapterLoader.addClass(FAWE_Spigot_v1_17_R1.class);
         } catch (Throwable throwable) {
