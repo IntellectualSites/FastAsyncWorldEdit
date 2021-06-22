@@ -76,10 +76,6 @@ public class BukkitImplLoader {
         }
     }
 
-    public void addClass(Class<?> cls) {
-        adapterCandidates.add(0, cls.getName());
-    }
-
     /**
      * Search the given JAR for candidate implementations.
      *
