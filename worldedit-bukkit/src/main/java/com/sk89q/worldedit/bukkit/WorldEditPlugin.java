@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.core.Fawe;
 import com.google.common.base.Joiner;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
@@ -31,9 +31,6 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.adapter.AdapterLoadException;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplLoader;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.FAWE_Spigot_v1_15_R2;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.FAWE_Spigot_v1_16_R3;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.FAWE_Spigot_v1_17_R1;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
@@ -298,14 +295,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
 
         // Attempt to load a Bukkit adapter
         BukkitImplLoader adapterLoader = new BukkitImplLoader();
-        try {
-            adapterLoader.addClass(FAWE_Spigot_v1_15_R2.class);
-            adapterLoader.addClass(FAWE_Spigot_v1_16_R3.class);
-            adapterLoader.addClass(FAWE_Spigot_v1_17_R1.class);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
-
         try {
             adapterLoader.addFromPath(getClass().getClassLoader());
         } catch (IOException e) {
