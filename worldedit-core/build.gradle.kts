@@ -58,7 +58,7 @@ dependencies {
     compileOnlyApi("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     compileOnly("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
-    compileOnly("org.lz4:lz4-java:1.7.1")
+    compileOnly("org.lz4:lz4-java:1.8.0")
 }
 
 tasks.named<Test>("test") {

@@ -470,7 +470,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
-                if (!actor.hasPermission("worldedit.anyblock")) {
+                if (!actor.hasPermission("worldedit.anyblock.nbt")) {
                     throw new DisallowedUsageException(Caption.of("fawe.error.nbt.forbidden"));
                 }
             }
