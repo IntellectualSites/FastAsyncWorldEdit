@@ -6,6 +6,7 @@ import com.boydti.fawe.object.collection.FastBitSet;
 import com.boydti.fawe.object.string.MutableCharSequence;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
@@ -101,7 +102,7 @@ public class BlockMaskBuilder {
         return result;
     }
 
-    public BlockMaskBuilder addRegex(String input) throws InputParseException {
+    public BlockMaskBuilder addRegex(String input, final ParserContext context) throws InputParseException {
         if (input.charAt(input.length() - 1) == ']') {
             int propStart = StringMan.findMatchingBracket(input, input.length() - 1);
             if (propStart == -1) {
@@ -115,7 +116,7 @@ public class BlockMaskBuilder {
             BlockType type = null;
             List<BlockType> blockTypeList = null;
             if (StringMan.isAlphanumericUnd(charSequence)) {
-                type = BlockTypes.parse(charSequence.toString());
+                type = BlockTypes.parse(charSequence.toString(), context);
                 add(type);
             } else {
                 String regex = charSequence.toString();
@@ -236,7 +237,7 @@ public class BlockMaskBuilder {
             }
         } else {
             if (StringMan.isAlphanumericUnd(input)) {
-                add(BlockTypes.parse(input));
+                add(BlockTypes.parse(input, context));
             } else {
                 for (BlockType myType : BlockTypesCache.values) {
                     if (myType.getId().matches(input)) {

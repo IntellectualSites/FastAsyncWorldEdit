@@ -52,6 +52,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nullable;
 
 public final class LegacyMapper {
@@ -64,10 +65,10 @@ public final class LegacyMapper {
     private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
     private final int[] blockArr = new int[4096];
     private final BiMap<Integer, ItemType> itemMap = HashBiMap.create();
-    private Map<String, String> blockEntries = new HashMap<>();
-    private final Map<String, BlockState> stringToBlockMap = new HashMap<>();
+    private ConcurrentHashMap<String, String> blockEntries = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, BlockState> stringToBlockMap = new ConcurrentHashMap<>();
     private final Multimap<BlockState, String> blockToStringMap = HashMultimap.create();
-    private final Map<String, ItemType> stringToItemMap = new HashMap<>();
+    private final ConcurrentHashMap<String, ItemType> stringToItemMap = new ConcurrentHashMap<>();
     private final Multimap<ItemType, String> itemToStringMap = HashMultimap.create();
 
     /**
@@ -102,6 +103,7 @@ public final class LegacyMapper {
         DataFixer fixer = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataFixer();
         ParserContext parserContext = new ParserContext();
         parserContext.setPreferringWildcard(false);
+        parserContext.setLegacyMapper(this);
         parserContext.setRestricted(false);
         parserContext.setTryLegacy(false); // This is legacy. Don't match itself.
 

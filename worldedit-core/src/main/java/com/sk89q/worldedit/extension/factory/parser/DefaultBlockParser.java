@@ -262,18 +262,19 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         // Legacy matcher
         if (context.isTryingLegacy()) {
             try {
+                final LegacyMapper legacyMapper = context.getLegacyMapper();
                 String[] split = blockAndExtraData[0].split(":", 2);
                 if (split.length == 0) {
                     throw new InputParseException(Caption.of("worldedit.error.parser.invalid-colon"));
                 } else if (split.length == 1) {
-                    state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]));
+                    state = legacyMapper.getBlockFromLegacy(Integer.parseInt(split[0]));
                 } else if (MathMan.isInteger(split[0])) {
                     int id = Integer.parseInt(split[0]);
                     int data = Integer.parseInt(split[1]);
                     if (data < 0 || data >= 16) {
                         throw new InputParseException(Caption.of("fawe.error.parser.invalid-data", TextComponent.of(data)));
                     }
-                    state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
+                    state = legacyMapper.getBlockFromLegacy(id, data);
                 } else {
                     BlockType type = BlockTypes.get(split[0].toLowerCase(Locale.ROOT));
                     if (type != null) {
@@ -281,7 +282,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         if (data < 0 || data >= 16) {
                             throw new InputParseException(Caption.of("fawe.error.parser.invalid-data", TextComponent.of(data)));
                         }
-                        state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, data);
+                        state = legacyMapper.getBlockFromLegacy(type.getLegacyCombinedId() >> 4, data);
                     }
                 }
             } catch (NumberFormatException ignored) {
@@ -357,7 +358,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 state = item.getType().getBlockType().getDefaultState();
                 nbt = item.getNbtData();
             } else {
-                BlockType type = BlockTypes.parse(typeString.toLowerCase(Locale.ROOT));
+                BlockType type = BlockTypes.parse(typeString.toLowerCase(Locale.ROOT), context);
 
                 if (type != null) {
                     state = type.getDefaultState();
@@ -465,7 +466,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     private <T extends BlockStateHolder> T validate(ParserContext context, T holder) {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
-            if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
+            if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder, context)) {
                 throw new DisallowedUsageException(Caption.of("fawe.error.block.not.allowed", TextComponent.of(String.valueOf(holder))));
             }
             CompoundTag nbt = holder.getNbtData();

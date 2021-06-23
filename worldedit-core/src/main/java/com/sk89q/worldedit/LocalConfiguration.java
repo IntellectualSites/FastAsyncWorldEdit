@@ -21,6 +21,7 @@ package com.sk89q.worldedit;
 
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
@@ -173,7 +174,7 @@ public abstract class LocalConfiguration {
      */
     public abstract void load();
 
-    public boolean checkDisallowedBlocks(BlockStateHolder holder) {
+    public boolean checkDisallowedBlocks(BlockStateHolder holder, final ParserContext context) {
         if (disallowedBlocks.isEmpty()) {
             return false;
         }
@@ -181,7 +182,7 @@ public abstract class LocalConfiguration {
             BlockMaskBuilder builder = new BlockMaskBuilder();
             for (String blockRegex : disallowedBlocks) {
                 try {
-                    builder.addRegex(blockRegex);
+                    builder.addRegex(blockRegex, context);
                 } catch (InputParseException e) {
                     e.printStackTrace();
                 }

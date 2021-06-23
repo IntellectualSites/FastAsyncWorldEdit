@@ -25,6 +25,7 @@ import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.enginehub.piston.inject.InjectedValueAccess;
 
 import javax.annotation.Nullable;
@@ -49,6 +50,7 @@ public class ParserContext {
     private boolean tryLegacy = true;
     private boolean preferringWildcard;
     private InjectedValueAccess injected;
+    private LegacyMapper legacyMapper;
 
     /**
      * Create a new instance.
@@ -62,6 +64,7 @@ public class ParserContext {
      * @param other the other instance
      */
     public ParserContext(ParserContext other) {
+        setLegacyMapper(other.legacyMapper);
         setExtent(other.getExtent());
         setSession(other.getSession());
         setWorld(other.getWorld());
@@ -90,6 +93,10 @@ public class ParserContext {
         this.extent = extent;
     }
 
+    public void setLegacyMapper(@Nullable LegacyMapper legacyMapper) {
+        this.legacyMapper = legacyMapper;
+    }
+
     /**
      * Get the {@link LocalSession}.
      *
@@ -98,6 +105,10 @@ public class ParserContext {
     @Nullable
     public LocalSession getSession() {
         return session;
+    }
+
+    public LegacyMapper getLegacyMapper() {
+        return legacyMapper;
     }
 
     /**

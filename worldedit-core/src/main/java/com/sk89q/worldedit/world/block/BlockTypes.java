@@ -23,11 +23,13 @@ import com.boydti.fawe.command.SuggestInputParseException;
 import com.boydti.fawe.object.string.JoinedCharSequence;
 import com.boydti.fawe.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.lang.reflect.Field;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -833,7 +835,7 @@ public final class BlockTypes {
      -----------------------------------------------------
      */
 
-    public static BlockType parse(final String type) throws InputParseException {
+    public static BlockType parse(final String type, final ParserContext parserContext) throws InputParseException {
         final String inputLower = type.toLowerCase(Locale.ROOT);
         String input = inputLower;
 
@@ -846,7 +848,7 @@ public final class BlockTypes {
         }
 
         try {
-            BlockStateHolder<BlockState> block = LegacyMapper.getInstance().getBlockFromLegacy(input);
+            BlockStateHolder<BlockState> block = parserContext.getLegacyMapper().getBlockFromLegacy(input);
             if (block != null) {
                 return block.getBlockType();
             }
