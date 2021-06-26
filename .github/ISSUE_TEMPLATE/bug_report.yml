@@ -28,6 +28,7 @@ body:
       description: Which server version version you using? If your server version is not listed, it is not supported. Update to a supported version first.
       multiple: false
       options:
+        - '1.17.+'
         - '1.16.5'
         - '1.15.2'
     validations:
@@ -91,7 +92,7 @@ body:
       options:
         - label: I have included a Fawe debugpaste.
           required: true
-        - label: I am using the newest build from https://ci.athion.net/job/FastAsyncWorldEdit-1.16/ and the issue still persists.
+        - label: I am using the newest build from https://ci.athion.net/job/FastAsyncWorldEdit-1.16/ or an experimental build and the issue still persists.
           required: true
 
   - type: textarea
