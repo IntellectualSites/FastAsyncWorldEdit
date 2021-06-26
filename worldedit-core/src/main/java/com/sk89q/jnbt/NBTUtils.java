@@ -20,6 +20,7 @@
 package com.sk89q.jnbt;
 
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
 import java.util.Map;
@@ -87,6 +88,9 @@ public final class NBTUtils {
      * @throws IllegalArgumentException if the tag class is invalid.
      */
     public static int getTypeCode(Class<? extends Tag> clazz) {
+        if (LazyCompoundTag.class.isAssignableFrom(clazz)) {
+            return BinaryTagTypes.COMPOUND.id();
+        }
         return AdventureNBTConverter.getAdventureType(clazz).id();
     }
 

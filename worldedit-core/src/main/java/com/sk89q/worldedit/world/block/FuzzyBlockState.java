@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
 
@@ -121,6 +122,12 @@ public class FuzzyBlockState extends BlockState {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Deprecated
+    @Override
+    public CompoundTag getNbtData() {
+        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
     }
 
     /**

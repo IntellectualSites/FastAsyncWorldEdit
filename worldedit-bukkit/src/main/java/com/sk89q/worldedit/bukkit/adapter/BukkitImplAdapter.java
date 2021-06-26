@@ -21,12 +21,12 @@ package com.sk89q.worldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.beta.IChunkGet;
 import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
-import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -40,6 +40,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.RegenOptions;
@@ -236,11 +237,21 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         return null;
     }
 
+    @Deprecated
     default Tag toNative(T foreign) {
+        return FaweCache.IMP.asTag(toNativeBinary(foreign));
+    }
+
+    default BinaryTag toNativeBinary(T foreign) {
         return null;
     }
 
+    @Deprecated
     default T fromNative(Tag foreign) {
+        return fromNativeBinary(foreign.asBinaryTag());
+    }
+
+    default T fromNativeBinary(BinaryTag foreign) {
         return null;
     }
 

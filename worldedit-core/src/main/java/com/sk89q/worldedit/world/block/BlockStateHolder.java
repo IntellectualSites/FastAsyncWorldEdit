@@ -36,7 +36,6 @@ import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEntityBlock, Pattern {
 
@@ -188,51 +187,6 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     }
 
     void applyTileEntity(OutputExtent output, int x, int y, int z);
-
-    /**
-     * Return the name of the title entity ID.
-     *
-     * @return tile entity ID, non-null string
-     */
-    default String getNbtId() {
-        return "";
-    }
-
-    /**
-     * Returns whether the block contains NBT data. {@link #getNbtData()}
-     * must not return null if this method returns true.
-     *
-     * @return true if there is NBT data
-     */
-    default boolean hasNbtData() {
-        return false;
-    }
-
-    /**
-     * Get the object's NBT data (tile entity data). The returned tag, if
-     * modified in any way, should be sent to {@link #setNbtData(CompoundTag)}
-     * so that the instance knows of the changes. Making changes without
-     * calling {@link #setNbtData(CompoundTag)} could have unintended
-     * consequences.
-     *
-     * <p>{@link #hasNbtData()} must return true if and only if method does
-     * not return null.</p>
-     *
-     * @return compound tag, or null
-     */
-    @Nullable
-    default CompoundTag getNbtData() {
-        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
-    }
-
-    /**
-     * Set the object's NBT data (tile entity data).
-     *
-     * @param nbtData NBT data, or null if no data
-     */
-    default void setNbtData(@Nullable CompoundTag nbtData) {
-        throw new UnsupportedOperationException("State is immutable");
-    }
 
     default BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         throw new UnsupportedOperationException("State is immutable");

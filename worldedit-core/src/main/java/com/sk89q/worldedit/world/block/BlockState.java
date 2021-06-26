@@ -361,6 +361,12 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         return getState(getBlockType().getProperty(key));
     }
 
+    @Deprecated
+    @Override
+    public CompoundTag getNbtData() {
+        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
+    }
+
     @Override
     public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
         if (compoundTag == null) {
