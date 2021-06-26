@@ -117,7 +117,7 @@ dependencies {
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.6.0") { isTransitive = false }
-    implementation("org.incendo.serverlib:ServerLib:2.2.0")
+    implementation("org.incendo.serverlib:ServerLib:2.2.1")
 }
 
 tasks.named<Copy>("processResources") {
