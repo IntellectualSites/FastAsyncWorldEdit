@@ -27,6 +27,7 @@ import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory
 import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -239,7 +240,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     @Deprecated
     default Tag toNative(T foreign) {
-        return FaweCache.IMP.asTag(toNativeBinary(foreign));
+        return AdventureNBTConverter.fromAdventure(toNativeBinary(foreign));
     }
 
     default BinaryTag toNativeBinary(T foreign) {

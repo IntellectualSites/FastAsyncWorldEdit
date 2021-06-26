@@ -96,6 +96,9 @@ public class AdventureNBTConverter {
     }
 
     public static Tag fromAdventure(BinaryTag other) {
+        if (other == null) {
+            return null;
+        }
         Function<BinaryTag, Tag> conversion = CONVERSION.get(other.type());
         if (conversion == null) {
             throw new IllegalArgumentException("Can't convert other of type " + other.getClass().getCanonicalName());
