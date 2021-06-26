@@ -30,7 +30,7 @@ import java.util.Map;
  * @deprecated Use {@link CompoundBinaryTag}.
  */
 @Deprecated
-public class LazyCompoundTag extends CompoundTag {
+public abstract class LazyCompoundTag extends CompoundTag {
 
     public LazyCompoundTag(Map<String, Tag> value) {
         super(value);
@@ -39,5 +39,8 @@ public class LazyCompoundTag extends CompoundTag {
     public LazyCompoundTag(CompoundBinaryTag adventureTag) {
         super(adventureTag);
     }
+
+    @Override
+    public abstract CompoundBinaryTag asBinaryTag();
 
 }
