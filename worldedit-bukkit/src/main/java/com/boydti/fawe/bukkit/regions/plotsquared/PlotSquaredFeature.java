@@ -5,6 +5,7 @@ import com.boydti.fawe.regions.FaweMask;
 import com.boydti.fawe.regions.FaweMaskManager;
 import com.boydti.fawe.regions.general.RegionFilter;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
+import com.plotsquared.bukkit.util.BukkitUtil;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.command.MainCommand;
 import com.plotsquared.core.configuration.Settings;
@@ -24,6 +25,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 
 import java.util.List;
 import java.util.Locale;
@@ -76,7 +78,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
     @Override
     public FaweMask getMask(Player player, MaskType type) {
-        final PlotPlayer<org.bukkit.entity.Player> pp = PlotPlayer.from(BukkitAdapter.adapt(player));
+        final PlotPlayer<?> pp = BukkitUtil.adapt(Bukkit.getPlayer(player.getUniqueId()));
         if (pp == null) {
             return null;
         }

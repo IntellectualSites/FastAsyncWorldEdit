@@ -102,6 +102,7 @@ dependencies {
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     api("org.lz4:lz4-java:1.8.0")
     api("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
+    api("com.plotsquared:PlotSquared-Bukkit:6.0.0-SNAPSHOT") { isTransitive = false }
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
