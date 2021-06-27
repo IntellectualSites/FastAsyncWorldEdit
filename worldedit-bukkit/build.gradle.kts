@@ -89,7 +89,7 @@ dependencies {
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    testImplementation("org.mockito:mockito-core:3.11.1")
+    testImplementation("org.mockito:mockito-core:3.11.2")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
@@ -118,7 +118,7 @@ dependencies {
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.6.0") { isTransitive = false }
-    implementation("org.incendo.serverlib:ServerLib:2.2.0")
+    implementation("org.incendo.serverlib:ServerLib:2.2.1")
 }
 
 tasks.named<Copy>("processResources") {
@@ -165,7 +165,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            include(dependency("org.incendo.serverlib:ServerLib:2.2.0"))
+            include(dependency("org.incendo.serverlib:ServerLib:2.2.1"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
