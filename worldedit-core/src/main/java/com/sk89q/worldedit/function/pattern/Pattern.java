@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.beta.Filter;
 import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -41,7 +42,13 @@ public interface Pattern extends Filter {
      * @deprecated use {@link Pattern#applyBlock(BlockVector3)}
      */
     @Deprecated
-    BaseBlock apply(BlockVector3 position);
+    @NonAbstractForCompatibility(
+        delegateName = "applyBlock",
+        delegateParams = { BlockVector3.class }
+    )
+    default BaseBlock apply(BlockVector3 position) {
+        return applyBlock(position);
+    }
 
     default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return set.setFullBlock(extent, applyBlock(get));
@@ -62,11 +69,5 @@ public interface Pattern extends Filter {
      * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
      *          for details
      */
-    @NonAbstractForCompatibility(
-            delegateName = "apply",
-            delegateParams = { BlockVector3.class }
-    )
-    default BaseBlock applyBlock(BlockVector3 position) {
-        return apply(position);
-    }
+    BaseBlock applyBlock(BlockVector3 position);
 }
