@@ -21,7 +21,7 @@ public class AverageColorPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock block = getExtent().getFullBlock(position);
         TextureUtil util = holder.getTextureUtil();
         int currentColor = util.getColor(block.getBlockType());

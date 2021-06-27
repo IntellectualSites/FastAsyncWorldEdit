@@ -19,14 +19,14 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 pos) {
+    public BaseBlock applyBlock(BlockVector3 pos) {
         if (origin == null) {
             origin = pos;
         }
         mutable.mutX(pos.getX() - origin.getX());
         mutable.mutY(pos.getY() - origin.getY());
         mutable.mutZ(pos.getZ() - origin.getZ());
-        return pattern.apply(mutable);
+        return pattern.applyBlock(mutable);
     }
 
     @Override

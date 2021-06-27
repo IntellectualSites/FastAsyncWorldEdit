@@ -29,8 +29,8 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
-        return pattern.apply(travel(position));
+    public BaseBlock applyBlock(BlockVector3 position) {
+        return pattern.applyBlock(travel(position));
     }
 
     private BlockVector3 travel(BlockVector3 pos) {
@@ -57,7 +57,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
 
     private boolean allowed(BlockVector3 bv) {
         MutableBlockVector3 v = new MutableBlockVector3(bv);
-        BaseBlock block = pattern.apply(bv);
+        BaseBlock block = pattern.applyBlock(bv);
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return false;
         }
@@ -101,7 +101,7 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     }
 
     private boolean canPassthrough(BlockVector3 v) {
-        BaseBlock block = pattern.apply(v);
+        BaseBlock block = pattern.applyBlock(v);
         return !block.getBlockType().getMaterial().isMovementBlocker();
     }
 }

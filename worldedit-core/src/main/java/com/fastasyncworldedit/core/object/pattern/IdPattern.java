@@ -17,9 +17,9 @@ public class IdPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock oldBlock = getExtent().getFullBlock(position);
-        BaseBlock newBlock = pattern.apply(position);
+        BaseBlock newBlock = pattern.applyBlock(position);
         return newBlock.withPropertyId(oldBlock.getInternalPropertiesId()).toBaseBlock();
     }
 }

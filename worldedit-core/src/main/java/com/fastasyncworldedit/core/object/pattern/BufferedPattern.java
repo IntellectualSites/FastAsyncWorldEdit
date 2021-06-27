@@ -33,8 +33,8 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
-        return pattern.apply(position);
+    public BaseBlock applyBlock(BlockVector3 position) {
+        return pattern.applyBlock(position);
     }
 
     @Override

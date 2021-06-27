@@ -21,11 +21,11 @@ public class MaskedPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         if (mask.test(position)) {
-            return primary.apply(position);
+            return primary.applyBlock(position);
         }
-        return secondary.apply(position);
+        return secondary.applyBlock(position);
     }
 
     @Override

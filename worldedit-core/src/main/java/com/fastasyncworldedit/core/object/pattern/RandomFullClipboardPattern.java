@@ -57,7 +57,7 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         throw new IllegalStateException("Incorrect use. This pattern can only be applied to an extent!");
     }
 }

@@ -43,7 +43,7 @@ public class ExpressionPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 vector) {
+    public BaseBlock applyBlock(BlockVector3 vector) {
         try {
             if (expression.getEnvironment() instanceof WorldEditExpressionEnvironment) {
                 ((WorldEditExpressionEnvironment) expression.getEnvironment()).setCurrentBlock(vector.toVector3());

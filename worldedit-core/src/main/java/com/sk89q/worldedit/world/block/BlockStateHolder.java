@@ -182,7 +182,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     }
 
     @Override
-    default BaseBlock apply(BlockVector3 position) {
+    default BaseBlock applyBlock(BlockVector3 position) {
         return toBaseBlock();
     }
 

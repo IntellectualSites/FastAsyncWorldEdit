@@ -48,7 +48,7 @@ public class AngleColorPattern extends DataAnglePattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock block = extent.getFullBlock(position);
         int slope = getSlope(block, position, extent);
         if (slope == -1) {

@@ -11,7 +11,7 @@ public class ExistingPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         return getExtent().getFullBlock(position);
     }
 

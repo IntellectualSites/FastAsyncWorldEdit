@@ -19,10 +19,10 @@ public class NoZPattern extends AbstractPattern {
     private transient MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
-    public BaseBlock apply(BlockVector3 pos) {
+    public BaseBlock applyBlock(BlockVector3 pos) {
         mutable.mutX(pos.getX());
         mutable.mutY(pos.getY());
-        return pattern.apply(mutable);
+        return pattern.applyBlock(mutable);
     }
 
     @Override

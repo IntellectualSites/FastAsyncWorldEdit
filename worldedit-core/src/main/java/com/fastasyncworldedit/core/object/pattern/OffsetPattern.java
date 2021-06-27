@@ -24,11 +24,11 @@ public class OffsetPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         mutable.mutX(position.getX() + dx);
         mutable.mutY(position.getY() + dy);
         mutable.mutZ(position.getZ() + dz);
-        return pattern.apply(mutable);
+        return pattern.applyBlock(mutable);
     }
 
     @Override

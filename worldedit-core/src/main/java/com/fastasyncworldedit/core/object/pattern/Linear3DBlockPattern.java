@@ -22,13 +22,13 @@ public class Linear3DBlockPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         int index = (position.getBlockX() / this.xScale
                 + position.getBlockY() / this.yScale + position.getBlockZ() / this.zScale) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }
-        return patternsArray[index].apply(position);
+        return patternsArray[index].applyBlock(position);
     }
 
     @Override

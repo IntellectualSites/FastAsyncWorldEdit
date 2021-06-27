@@ -19,16 +19,16 @@ public class DataPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock oldBlock = getExtent().getFullBlock(position);
-        BaseBlock newBlock = pattern.apply(position);
+        BaseBlock newBlock = pattern.applyBlock(position);
         return oldBlock.toBlockState().withProperties(newBlock.toBlockState()).toBaseBlock(newBlock.getNbtData());
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BaseBlock oldBlock = get.getFullBlock(extent);
-        BaseBlock newBlock = pattern.apply(get);
+        BaseBlock newBlock = pattern.applyBlock(get);
 
         BlockState oldState = oldBlock.toBlockState();
         BlockState newState = oldState.withProperties(newBlock.toBlockState());

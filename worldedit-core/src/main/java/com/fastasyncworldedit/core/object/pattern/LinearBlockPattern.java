@@ -17,11 +17,11 @@ public class LinearBlockPattern extends AbstractPattern implements ResettablePat
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         if (index == patternsArray.length) {
             index = 0;
         }
-        return patternsArray[index++].apply(position);
+        return patternsArray[index++].applyBlock(position);
     }
 
     @Override

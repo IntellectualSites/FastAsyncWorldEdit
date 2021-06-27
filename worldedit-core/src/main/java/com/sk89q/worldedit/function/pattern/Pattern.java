@@ -23,7 +23,6 @@ import com.fastasyncworldedit.core.beta.Filter;
 import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -45,7 +44,7 @@ public interface Pattern extends Filter {
     BaseBlock apply(BlockVector3 position);
 
     default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return set.setFullBlock(extent, apply(get));
+        return set.setFullBlock(extent, applyBlock(get));
     }
 
     @Override

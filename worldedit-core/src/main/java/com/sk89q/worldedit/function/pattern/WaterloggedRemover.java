@@ -66,7 +66,7 @@ public class WaterloggedRemover extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock block = getExtent().getFullBlock(position);
         BlockState newState = remap[block.getOrdinal()];
         if (newState != null) {

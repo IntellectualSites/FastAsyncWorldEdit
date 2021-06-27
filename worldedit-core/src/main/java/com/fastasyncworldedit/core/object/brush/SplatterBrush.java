@@ -27,7 +27,7 @@ public class SplatterBrush extends ScatterBrush {
     public void apply(final EditSession editSession, final LocalBlockVectorSet placed, final BlockVector3 position, Pattern p, double size) throws MaxChangedBlocksException {
         final Pattern finalPattern;
         if (solid) {
-            finalPattern = p.apply(position);
+            finalPattern = p.applyBlock(position);
         } else {
             finalPattern = p;
         }

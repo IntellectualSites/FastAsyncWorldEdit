@@ -160,7 +160,7 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
 
 
     @Override
-    public BaseBlock apply(BlockVector3 pos) {
+    public BaseBlock applyBlock(BlockVector3 pos) {
         BaseBlock block = buffer.get(pos);
         if (block != null) {
             return block;

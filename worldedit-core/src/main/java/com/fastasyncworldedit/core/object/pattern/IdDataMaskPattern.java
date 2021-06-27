@@ -16,9 +16,9 @@ public class IdDataMaskPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock oldBlock = getExtent().getFullBlock(position);
-        BaseBlock newBlock = pattern.apply(position);
+        BaseBlock newBlock = pattern.applyBlock(position);
         int oldData = oldBlock.getInternalPropertiesId();
         int newData = newBlock.getInternalPropertiesId() + oldData - (oldData & bitMask);
         return newBlock.withPropertyId(newData).toBaseBlock();

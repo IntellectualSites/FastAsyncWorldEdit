@@ -15,7 +15,7 @@ public class BiomeApplyingPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         getExtent().setBiome(position, this.biomeType);
         // don't change the block, everything should remain the same
         return getExtent().getFullBlock(position);

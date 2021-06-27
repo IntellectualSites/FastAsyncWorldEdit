@@ -94,8 +94,8 @@ public class RandomPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
-        return collection.next(position.getBlockX(), position.getBlockY(), position.getBlockZ()).apply(position);
+    public BaseBlock applyBlock(BlockVector3 position) {
+        return collection.next(position.getBlockX(), position.getBlockY(), position.getBlockZ()).applyBlock(position);
     }
 
     @Override

@@ -39,7 +39,7 @@ public class DataAnglePattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BlockState block = extent.getBlock(position);
         int slope = getSlope(block, position, extent);
         if (slope == -1) {
