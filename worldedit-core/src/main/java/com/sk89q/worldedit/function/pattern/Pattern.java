@@ -68,8 +68,6 @@ public interface Pattern extends Filter {
             delegateParams = { BlockVector3.class }
     )
     default BaseBlock applyBlock(BlockVector3 position) {
-        DeprecationUtil.checkDelegatingOverride(getClass());
-
         return apply(position);
     }
 }
