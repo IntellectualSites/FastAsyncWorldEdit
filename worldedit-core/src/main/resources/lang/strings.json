@@ -133,6 +133,7 @@
     "fawe.error.too-simple": "Complexity must be in the range 0-100",
     "fawe.error.input-parser-exception": "Invalid empty string instead of boolean.",
     "fawe.error.invalid-boolean": "Invalid boolean {0}",
+    "fawe.error.schematic.not.found": "Schematic {0} not found.",
 
     "fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {2}",
