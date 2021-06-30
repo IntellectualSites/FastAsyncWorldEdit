@@ -19,6 +19,7 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.jnbt.fawe.NumberTag;
 import com.sk89q.worldedit.util.nbt.FloatBinaryTag;
 
 /**
@@ -27,7 +28,7 @@ import com.sk89q.worldedit.util.nbt.FloatBinaryTag;
  * @deprecated Use {@link FloatBinaryTag}.
  */
 @Deprecated
-public final class FloatTag extends Tag {
+public final class FloatTag extends NumberTag {
 
     private final FloatBinaryTag innerTag;
 
