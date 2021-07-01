@@ -38,6 +38,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
             val disabledLint = listOf(
                 "processing", "path", "fallthrough", "serial"
             )
+            options.release.set(11)
             //options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
             options.isDeprecation = false
             options.encoding = "UTF-8"
