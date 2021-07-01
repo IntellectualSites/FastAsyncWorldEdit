@@ -19,14 +19,13 @@
 
 package com.sk89q.worldedit.bukkit.adapter;
 
+import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.beta.IChunkGet;
 import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
-import com.fastasyncworldedit.bukkit.FaweBukkit;
-import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -249,6 +248,9 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     @Deprecated
     default T fromNative(Tag foreign) {
+        if (foreign == null) {
+            return null;
+        }
         return fromNativeBinary(foreign.asBinaryTag());
     }
 
