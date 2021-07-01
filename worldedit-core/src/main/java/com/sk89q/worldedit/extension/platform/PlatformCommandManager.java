@@ -330,9 +330,13 @@ public final class PlatformCommandManager {
         globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), Optional::of);
     }
 
-    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-                                      CommandRegistration<CI> registration, CI instance) {
-        registerSubCommands(name, aliases, desc, registration, instance, m -> {});
+    /**
+     * Internal use only.
+     */
+    public <CI> void registerSubCommands(String name, List<String> aliases, String desc,
+                                         CommandRegistration<CI> registration, CI instance) {
+        registerSubCommands(name, aliases, desc, registration, instance, m -> {
+        });
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
