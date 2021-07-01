@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.util;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;

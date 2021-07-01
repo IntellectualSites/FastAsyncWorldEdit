@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -102,7 +102,7 @@ public class FloodFillTool implements BlockTool {
         visited.add(pos);
 
         if (editSession.getBlock(pos).getBlockType() == initialType) {
-            editSession.setBlock(pos, pattern.apply(pos));
+            editSession.setBlock(pos, pattern.applyBlock(pos));
         } else {
             return;
         }

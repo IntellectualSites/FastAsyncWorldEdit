@@ -19,29 +19,24 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.beta.implementation.IChunkExtent;
-import com.boydti.fawe.beta.implementation.processors.NullProcessor;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.BrushSettings;
-import com.boydti.fawe.object.brush.MovableTool;
-import com.boydti.fawe.object.brush.ResettableTool;
-import com.boydti.fawe.object.brush.TargetMode;
-import com.boydti.fawe.object.brush.scroll.Scroll;
-import com.boydti.fawe.object.brush.scroll.ScrollTool;
-import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.object.mask.MaskedTargetBlock;
-import com.boydti.fawe.object.pattern.PatternTraverser;
-import com.boydti.fawe.util.BrushCache;
-import com.boydti.fawe.util.EditSessionBuilder;
-import com.boydti.fawe.util.ExtentTraverser;
-import com.boydti.fawe.util.MaskTraverser;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.brush.BrushSettings;
+import com.fastasyncworldedit.core.object.brush.MovableTool;
+import com.fastasyncworldedit.core.object.brush.ResettableTool;
+import com.fastasyncworldedit.core.object.brush.TargetMode;
+import com.fastasyncworldedit.core.object.brush.scroll.Scroll;
+import com.fastasyncworldedit.core.object.brush.scroll.ScrollTool;
+import com.fastasyncworldedit.core.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.object.mask.MaskedTargetBlock;
+import com.fastasyncworldedit.core.object.pattern.PatternTraverser;
+import com.fastasyncworldedit.core.util.BrushCache;
+import com.fastasyncworldedit.core.util.MaskTraverser;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
@@ -57,15 +52,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;

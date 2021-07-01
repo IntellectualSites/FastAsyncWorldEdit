@@ -1,6 +1,6 @@
 package com.sk89q.util;
 
-import com.boydti.fawe.bukkit.util.MinecraftVersion;
+import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

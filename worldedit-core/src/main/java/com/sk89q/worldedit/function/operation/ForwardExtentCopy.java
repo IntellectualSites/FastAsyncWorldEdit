@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.extent.BlockTranslateExtent;
-import com.boydti.fawe.object.extent.PositionTransformExtent;
-import com.boydti.fawe.object.function.block.BiomeCopy;
-import com.boydti.fawe.object.function.block.CombinedBlockCopy;
-import com.boydti.fawe.object.function.block.SimpleBlockCopy;
-import com.boydti.fawe.util.MaskTraverser;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.extent.BlockTranslateExtent;
+import com.fastasyncworldedit.core.object.extent.PositionTransformExtent;
+import com.fastasyncworldedit.core.object.function.block.BiomeCopy;
+import com.fastasyncworldedit.core.object.function.block.CombinedBlockCopy;
+import com.fastasyncworldedit.core.object.function.block.SimpleBlockCopy;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;

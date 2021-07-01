@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
@@ -42,10 +42,16 @@ public interface Pattern extends Filter {
      * @deprecated use {@link Pattern#applyBlock(BlockVector3)}
      */
     @Deprecated
-    BaseBlock apply(BlockVector3 position);
+    @NonAbstractForCompatibility(
+        delegateName = "applyBlock",
+        delegateParams = { BlockVector3.class }
+    )
+    default BaseBlock apply(BlockVector3 position) {
+        return applyBlock(position);
+    }
 
     default boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        return set.setFullBlock(extent, apply(get));
+        return set.setFullBlock(extent, applyBlock(get));
     }
 
     @Override
@@ -63,13 +69,5 @@ public interface Pattern extends Filter {
      * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
      *          for details
      */
-    @NonAbstractForCompatibility(
-            delegateName = "apply",
-            delegateParams = { BlockVector3.class }
-    )
-    default BaseBlock applyBlock(BlockVector3 position) {
-        DeprecationUtil.checkDelegatingOverride(getClass());
-
-        return apply(position);
-    }
+    BaseBlock applyBlock(BlockVector3 position);
 }

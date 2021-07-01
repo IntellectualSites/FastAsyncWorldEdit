@@ -93,6 +93,7 @@ public class TreeGenerator {
         },
         SWAMP("Swamp tree", "swamp", "swamptree"),
         ACACIA("Acacia tree", "acacia"),
+        AZALEA("Azalea tree", "azalea"),
         DARK_OAK("Dark oak tree", "darkoak"),
         PINE("Pine tree", "pine") {
             @Override

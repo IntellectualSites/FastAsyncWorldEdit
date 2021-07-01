@@ -86,7 +86,7 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         int x = Math.floorMod(position.getBlockX() + offset.getBlockX(), size.getBlockX()) + origin.getBlockX();
         int y = Math.floorMod(position.getBlockY() + offset.getBlockY(), size.getBlockY()) + origin.getBlockY();
         int z = Math.floorMod(position.getBlockZ() + offset.getBlockZ(), size.getBlockZ()) + origin.getBlockZ();

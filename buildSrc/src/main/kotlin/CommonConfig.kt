@@ -13,6 +13,7 @@ fun Project.applyCommonConfiguration() {
 
     repositories {
         mavenLocal()
+        mavenCentral()
         maven {
             name = "IntellectualSites"
             url = uri("https://mvn.intellectualsites.com/content/groups/public/")
@@ -51,8 +52,7 @@ fun Project.applyCommonConfiguration() {
 
     plugins.withId("java") {
         the<JavaPluginExtension>().toolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
-            vendor.set(JvmVendorSpec.ADOPTOPENJDK)
+            languageVersion.set(JavaLanguageVersion.of(16))
         }
     }
 

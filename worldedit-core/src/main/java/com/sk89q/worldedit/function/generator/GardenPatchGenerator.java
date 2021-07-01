@@ -118,7 +118,7 @@ public class GardenPatchGenerator implements RegionFunction {
                     setBlockIfAir(editSession, pos.add(1, h, -1), log);
                     affected++;
                 }
-                setBlockIfAir(editSession, p = pos.add(0, 0, -1), plant.apply(p));
+                setBlockIfAir(editSession, p = pos.add(0, 0, -1), plant.applyBlock(p));
                 affected++;
                 break;
 
@@ -130,7 +130,7 @@ public class GardenPatchGenerator implements RegionFunction {
                     setBlockIfAir(editSession, pos.add(1, h, 0), log);
                     affected++;
                 }
-                setBlockIfAir(editSession, p = pos.add(1, 0, 1), plant.apply(p));
+                setBlockIfAir(editSession, p = pos.add(1, 0, 1), plant.applyBlock(p));
                 affected++;
                 break;
 
@@ -142,7 +142,7 @@ public class GardenPatchGenerator implements RegionFunction {
                     setBlockIfAir(editSession, pos.add(-1, h, 0), log);
                     affected++;
                 }
-                setBlockIfAir(editSession, p = pos.add(-1, 0, 1), plant.apply(p));
+                setBlockIfAir(editSession, p = pos.add(-1, 0, 1), plant.applyBlock(p));
                 affected++;
                 break;
 
@@ -154,7 +154,7 @@ public class GardenPatchGenerator implements RegionFunction {
                     setBlockIfAir(editSession, pos.add(-1, h, -1), log);
                     affected++;
                 }
-                setBlockIfAir(editSession, p = pos.add(-1, 0, -1), plant.apply(p));
+                setBlockIfAir(editSession, p = pos.add(-1, 0, -1), plant.applyBlock(p));
                 affected++;
                 break;
         }

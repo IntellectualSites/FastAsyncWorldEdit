@@ -19,10 +19,15 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.worldedit.util.nbt.BinaryTagLike;
+
 /**
  * Represents a NBT tag.
+ *
+ * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
-public abstract class Tag {
+@Deprecated
+public abstract class Tag implements BinaryTagLike {
 
     /**
      * Gets the value of this tag.
@@ -30,6 +35,11 @@ public abstract class Tag {
      * @return the value
      */
     public abstract Object getValue();
+
+    @Override
+    public String toString() {
+        return asBinaryTag().toString();
+    }
 
     // FAWE Start
     public Object toRaw() {

@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.ITileInput;
-import com.boydti.fawe.command.SuggestInputParseException;
-import com.boydti.fawe.object.string.MutableCharSequence;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.core.beta.ITileInput;
+import com.fastasyncworldedit.core.command.SuggestInputParseException;
+import com.fastasyncworldedit.core.object.string.MutableCharSequence;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -40,6 +40,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import org.jetbrains.annotations.NotNull;
 
@@ -242,7 +244,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         return this.toBaseBlock();
     }
 
@@ -359,8 +361,14 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         return getState(getBlockType().getProperty(key));
     }
 
+    @Deprecated
     @Override
-    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+    public CompoundTag getNbtData() {
+        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
+    }
+
+    @Override
+    public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
         if (compoundTag == null) {
             return toBaseBlock();
         }

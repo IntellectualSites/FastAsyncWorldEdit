@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.FaweAPI;
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.RelightMode;
+import com.fastasyncworldedit.core.FaweAPI;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.object.RelightMode;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;

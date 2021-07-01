@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.collection.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.object.collection.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
