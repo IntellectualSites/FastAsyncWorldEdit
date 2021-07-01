@@ -39,7 +39,7 @@ dependencies {
         because("Mojang provides Log4J 2.8.1")
     }
     implementation("it.unimi.dsi:fastutil")
-    compileOnly("net.kyori:adventure-nbt:4.7.0")
+    compileOnly("net.kyori:adventure-nbt:4.8.1")
     testImplementation("net.kyori:adventure-nbt:4.7.0")
 
     val antlrVersion = "4.9.1"
