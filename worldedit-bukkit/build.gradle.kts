@@ -17,11 +17,11 @@ repositories {
     maven {
         name = "PaperMC"
         url = uri("https://papermc.io/repo/repository/maven-public/")
-            }
+    }
     maven {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
-            }
+    }
     maven {
         name = "Athion"
         url = uri("https://ci.athion.net/plugin/repository/tools/")
@@ -29,23 +29,27 @@ repositories {
     maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
-            }
+    }
     maven {
         name = "ProtocolLib"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
-            }
+    }
     maven {
         name = "Inventivetalent"
         url = uri("https://repo.inventivetalent.org/content/groups/public/")
-            }
+    }
+    maven {
+        name = "IntellectualSites Releases"
+        url = uri("https://mvn.intellectualsites.com/content/repositories/releases")
+    }
     maven {
         name = "IntellectualSites 3rd Party"
         url = uri("https://mvn.intellectualsites.com/content/repositories/thirdparty")
-            }
+    }
     maven {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-            }
+    }
     maven {
         name = "OSS Sonatype Releases"
         url = uri("https://oss.sonatype.org/content/repositories/releases/")
@@ -119,6 +123,7 @@ dependencies {
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.6.0") { isTransitive = false }
     implementation("org.incendo.serverlib:ServerLib:2.2.1")
+    api("com.plotsquared:PlotSquared-Bukkit:6.0.6-SNAPSHOT")
 }
 
 tasks.named<Copy>("processResources") {
