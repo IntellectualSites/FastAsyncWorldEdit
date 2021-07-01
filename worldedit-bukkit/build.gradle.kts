@@ -39,10 +39,6 @@ repositories {
         url = uri("https://repo.inventivetalent.org/content/groups/public/")
     }
     maven {
-        name = "IntellectualSites Releases"
-        url = uri("https://mvn.intellectualsites.com/content/repositories/releases")
-    }
-    maven {
         name = "IntellectualSites 3rd Party"
         url = uri("https://mvn.intellectualsites.com/content/repositories/thirdparty")
     }
