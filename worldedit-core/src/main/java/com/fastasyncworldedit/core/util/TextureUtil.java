@@ -355,8 +355,8 @@ public class TextureUtil implements TextureHolder {
             try {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
                 new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
-                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
+                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/1cf89c77ed5e72401b869f66410934804f3d6f52/client.jar").openStream());
+                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.17.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -633,8 +633,8 @@ public class TextureUtil implements TextureHolder {
             }
             if (files.length == 0) {
                 new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
-                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/37fd3c903861eeff3bc24b71eed48f828b5269c8/client.jar").openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.16.5.jar")) {
+                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/1cf89c77ed5e72401b869f66410934804f3d6f52/client.jar").openStream());
+                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.17.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
