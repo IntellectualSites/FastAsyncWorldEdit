@@ -18,6 +18,7 @@ import com.plotsquared.core.util.task.RunnableVal3;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -27,14 +28,16 @@ import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import org.bukkit.Bukkit;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @CommandDeclaration(command = "generatebiome",
     permission = "plots.generatebiome",
     category = CommandCategory.APPEARANCE,
-    requiredType = RequiredType.NONE,
+    requiredType = RequiredType.PLAYER,
     description = "Generate a biome in your plot",
     aliases = {"bg", "gb"},
     usage = "/plots generatebiome <biome>")
@@ -92,5 +95,14 @@ public class PlotSetBiome extends Command {
         }, null);
 
         return CompletableFuture.completedFuture(true);
+    }
+
+    @Override
+    public Collection<Command> tab(final PlotPlayer<?> player, final String[] args, final boolean space) {
+        return SuggestionHelper.getNamespacedRegistrySuggestions(BiomeType.REGISTRY, args[0])
+                .map(value -> value.toLowerCase(Locale.ENGLISH).replace("minecraft:", ""))
+                .filter(value -> value.startsWith(args[0].toLowerCase(Locale.ENGLISH)))
+                .map(value -> new Command(null, false, value, "", RequiredType.PLAYER, null) {
+                }).collect(Collectors.toList());
     }
 }
