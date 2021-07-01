@@ -181,7 +181,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.lz4:lz4-java:1.8.0"))
         }
         relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
-            include(dependency("net.kyori:adventure-nbt:4.7.0"))
+            include(dependency("net.kyori:adventure-nbt:4.8.1"))
         }
     }
 }
