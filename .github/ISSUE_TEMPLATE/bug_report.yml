@@ -32,7 +32,6 @@ body:
         - '1.17.+'
         - '1.16.5'
         - '1.15.2'
-        - '1.17.1'
     validations:
       required: true
 
