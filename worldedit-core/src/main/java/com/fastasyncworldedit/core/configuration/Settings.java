@@ -79,6 +79,9 @@ public class Settings extends Config {
             "Only disables/enables the hook with v4. For v6, see PlotSquared settings.yml"
         })
         public boolean PLOTSQUARED_v4_HOOK = true;
+        @Comment({"Show additional information in console. It helps us at IntellectualSites to find out more about an issue.",
+                "Leave it off if you don't need it, it can spam your console."})
+        public boolean DEBUG = false;
     }
 
     @Comment("Paths for various directories")

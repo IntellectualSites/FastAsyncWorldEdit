@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent.transform;
 
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.extent.ResettableExtent;
 import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.ByteTag;
@@ -402,7 +403,9 @@ public class BlockTransformExtent extends ResettableExtent {
                 if (directions != null) {
                     int oldIndex = property.getIndex(newMaskedId);
                     if (oldIndex >= directions.length) {
-                        LOGGER.warn(String.format("Index outside direction array length found for block:{%s} property:{%s}", state.getBlockType().getId(), property.getName()));
+                        if (Settings.IMP.ENABLED_COMPONENTS.DEBUG) {
+                            LOGGER.warn(String.format("Index outside direction array length found for block:{%s} property:{%s}", state.getBlockType().getId(), property.getName()));
+                        }
                         continue;
                     }
                     Integer newIndex = getNewStateIndex(transform, directions, oldIndex);
