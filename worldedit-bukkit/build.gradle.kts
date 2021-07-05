@@ -39,10 +39,6 @@ repositories {
         url = uri("https://repo.inventivetalent.org/content/groups/public/")
     }
     maven {
-        name = "IntellectualSites 3rd Party"
-        url = uri("https://mvn.intellectualsites.com/content/repositories/thirdparty")
-    }
-    maven {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
     }

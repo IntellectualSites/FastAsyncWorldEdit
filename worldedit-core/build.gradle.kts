@@ -7,17 +7,6 @@ plugins {
 
 project.description = "Core"
 
-repositories {
-    maven {
-        name = "IntellectualSites"
-        url = uri("https://mvn.intellectualsites.com/content/groups/public/")
-    }
-    maven {
-        name = "IntellectualSites-Snapshots"
-        url = uri("https://mvn.intellectualsites.com/content/groups/snapshots/")
-    }
-}
-
 applyPlatformAndCoreConfiguration()
 
 dependencies {
