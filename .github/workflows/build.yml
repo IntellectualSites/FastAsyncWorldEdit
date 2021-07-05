@@ -46,7 +46,7 @@ jobs:
     - name: "Run BuildTools"
       run: "java -jar BuildTools.jar --rev 1.16.5"
     - name: "Clean Build"
-      run: "./gradlew clean build sourcesJar javadocJar -x test"
+      run: "./gradlew clean build sourcesJar javadocJar"
     - name: Cleanup Gradle Cache
       # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
       # Restoring these files from a GitHub Actions cache might cause problems for future builds.
