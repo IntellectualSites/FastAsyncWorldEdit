@@ -136,7 +136,7 @@
     "fawe.error.schematic.not.found": "Schematic {0} not found.",
 
     "fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
-	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {2}",
+	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {0}",
 	"fawe.cancel.worldedit.cancel.reason.confirm.region": "Your selection is large ({0} -> {1}, containing {3} blocks). Use //confirm to execute {2}",
 	"fawe.cancel.worldedit.cancel.reason.confirm.radius": "Your radius is large ({0} > {1}). Use //confirm to execute {2}",
 	"fawe.cancel.worldedit.cancel.reason.confirm.limit": "You're exceeding your limit for this action ({0} > {1}). Use //confirm to execute {2}",

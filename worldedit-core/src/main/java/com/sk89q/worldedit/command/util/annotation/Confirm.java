@@ -101,7 +101,7 @@ public @interface Confirm {
                 if (checkExisting(context)) {
                     return true;
                 }
-                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm"));
+                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm", Processor.getArgs(context)));
                 return confirm(actor, context);
             }
         };
