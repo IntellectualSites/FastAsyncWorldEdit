@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extension.platform.binding;
 
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.Component;

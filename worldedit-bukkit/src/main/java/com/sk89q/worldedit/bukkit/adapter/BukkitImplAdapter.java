@@ -19,11 +19,14 @@
 
 package com.sk89q.worldedit.bukkit.adapter;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
-import com.boydti.fawe.bukkit.FaweBukkit;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
+import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -37,6 +40,8 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -54,22 +59,15 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
+import javax.annotation.Nullable;
 
 /**
  * An interface for adapters of various Bukkit implementations.
  */
 public interface BukkitImplAdapter<T> extends IBukkitAdapter {
-
-    /**
-     * Get the Minecraft data version for the current world data.
-     *
-     * @return the data version
-     */
-    int getDataVersion();
 
     /**
      * Get a data fixer, or null if not supported.
@@ -168,7 +166,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param pos The position
      * @param nbtData The NBT Data
      */
-    void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData);
+    void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData);
 
     /**
      * Make the client think it has operator status.
@@ -239,11 +237,24 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         return null;
     }
 
+    @Deprecated
     default Tag toNative(T foreign) {
+        return AdventureNBTConverter.fromAdventure(toNativeBinary(foreign));
+    }
+
+    default BinaryTag toNativeBinary(T foreign) {
         return null;
     }
 
+    @Deprecated
     default T fromNative(Tag foreign) {
+        if (foreign == null) {
+            return null;
+        }
+        return fromNativeBinary(foreign.asBinaryTag());
+    }
+
+    default T fromNativeBinary(BinaryTag foreign) {
         return null;
     }
 
@@ -277,5 +288,9 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     default int getInternalBiomeId(BiomeType biome) {
         return Biome.BADLANDS.ordinal();
+    }
+
+    default RelighterFactory getRelighterFactory() {
+        return new NMSRelighterFactory(); // TODO implement in adapters instead
     }
 }

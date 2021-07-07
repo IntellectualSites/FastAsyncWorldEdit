@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.core.beta.IChunk;
+import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.beta.IChunkSet;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.math.BlockVector2;

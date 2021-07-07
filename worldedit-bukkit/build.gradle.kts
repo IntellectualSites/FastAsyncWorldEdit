@@ -4,6 +4,8 @@ plugins {
     `java-library`
 }
 
+project.description = "Bukkit"
+
 applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
@@ -15,11 +17,11 @@ repositories {
     maven {
         name = "PaperMC"
         url = uri("https://papermc.io/repo/repository/maven-public/")
-            }
+    }
     maven {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
-            }
+    }
     maven {
         name = "Athion"
         url = uri("https://ci.athion.net/plugin/repository/tools/")
@@ -27,23 +29,19 @@ repositories {
     maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
-            }
+    }
     maven {
         name = "ProtocolLib"
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
-            }
+    }
     maven {
         name = "Inventivetalent"
         url = uri("https://repo.inventivetalent.org/content/groups/public/")
-            }
-    maven {
-        name = "IntellectualSites 3rd Party"
-        url = uri("https://mvn.intellectualsites.com/content/repositories/thirdparty")
-            }
+    }
     maven {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-            }
+    }
     maven {
         name = "OSS Sonatype Releases"
         url = uri("https://oss.sonatype.org/content/repositories/releases/")
@@ -77,42 +75,47 @@ dependencies {
         isTransitive = false
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    implementation(enforcedPlatform("org.apache.logging.log4j:log4j-bom:2.8.1") {
-        // Note: Paper will bump to 2.11.2, but we should only depend on 2.8 APIs for compatibility.
+    implementation(platform("org.apache.logging.log4j:log4j-bom:2.14.1") {
         because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
     })
     implementation("org.apache.logging.log4j:log4j-api")
-    compileOnly("org.spigotmc:spigot:1.16.5-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot:1.17-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:21.0.0")
     implementation("io.papermc:paperlib:1.0.6")
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
-    testImplementation("org.mockito:mockito-core:3.11.0")
+    testImplementation("org.mockito:mockito-core:3.11.2")
     compileOnly("com.sk89q.worldguard:worldguard-bukkit:7.0.5") {
         exclude("com.sk89q.worldedit", "worldedit-bukkit")
         exclude("com.sk89q.worldedit", "worldedit-core")
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    compileOnly("net.kyori:adventure-api:4.8.0")
-    testImplementation("net.kyori:adventure-api:4.8.0")
-    testImplementation("org.checkerframework:checker-qual:3.14.0")
-    testImplementation("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT") { isTransitive = true }
+    compileOnly("net.kyori:adventure-api:4.8.1")
+    testImplementation("net.kyori:adventure-api:4.8.1")
+    testImplementation("org.checkerframework:checker-qual:3.15.0")
+    testImplementation("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
-    api("org.lz4:lz4-java:1.7.1")
+    api("org.lz4:lz4-java:1.8.0")
     api("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
     compileOnlyApi("org.inventivetalent:mapmanager:1.7.10-SNAPSHOT") { isTransitive = false }
     implementation("com.github.TechFortress:GriefPrevention:16.17.1") { isTransitive = false }
+    implementation("com.github.bloodmc:GriefDefenderApi:920a610") { isTransitive = false }
+    implementation("com.flowpowered:flow-math:1.0.3") {
+        because("This dependency is needed by GriefDefender but not exposed transitively.")
+        isTransitive = false
+    }
     implementation("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     implementation("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.6.0") { isTransitive = false }
-    implementation("org.incendo.serverlib:ServerLib:2.2.0")
+    implementation("org.incendo.serverlib:ServerLib:2.2.1")
+    api("com.plotsquared:PlotSquared-Bukkit:6.0.6-SNAPSHOT")
 }
 
 tasks.named<Copy>("processResources") {
@@ -138,7 +141,7 @@ tasks.named<ShadowJar>("shadowJar") {
     from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
         exclude("META-INF/")
     })
-    archiveFileName.set("FastAsyncWorldEdit-Bukkit-${project.version}.jar")
+    archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
     dependencies {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
@@ -158,20 +161,23 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
-        relocate("org.incendo.serverlib", "com.boydti.fawe.serverlib") {
-            include(dependency("org.incendo.serverlib:ServerLib:2.2.0"))
+        relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
+            include(dependency("org.incendo.serverlib:ServerLib:2.2.1"))
         }
-        relocate("com.intellectualsites.paster", "com.boydti.fawe.paster") {
+        relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
         }
-        relocate("com.github.luben", "com.boydti.fawe.zstd") {
+        relocate("com.github.luben", "com.fastasyncworldedit.core.zstd") {
             include(dependency("com.github.luben:zstd-jni:1.5.0-2"))
         }
-        relocate("net.jpountz", "com.boydti.fawe.jpountz") {
+        relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz") {
             include(dependency("net.jpountz:lz4-java-stream:1.0.0"))
         }
-        relocate("org.lz4", "com.boydti.fawe.lz4") {
-            include(dependency("org.lz4:lz4-java:1.7.1"))
+        relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
+            include(dependency("org.lz4:lz4-java:1.8.0"))
+        }
+        relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
+            include(dependency("net.kyori:adventure-nbt:4.8.1"))
         }
     }
 }

@@ -133,6 +133,7 @@
     "fawe.error.too-simple": "Complexity must be in the range 0-100",
     "fawe.error.input-parser-exception": "Invalid empty string instead of boolean.",
     "fawe.error.invalid-boolean": "Invalid boolean {0}",
+    "fawe.error.schematic.not.found": "Schematic {0} not found.",
 
     "fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {2}",
@@ -372,6 +373,7 @@
     "worldedit.schematic.directory-does-not-exist": "Directory '{0}' does not exist!",
     "worldedit.schematic.file-perm-fail": "Creation of '{0}' failed! Check file permission.",
     "worldedit.schematic.sorting-old-new": "Cannot sort by oldest and newest.",
+    "worldedit.schematic.unsupported-minecraft-version": "This version of WorldEdit does not support your Minecraft version. Schematics will not work until this is resolved.",
 
     "worldedit.pos.already-set": "Position already set.",
     "worldedit.pos.console-require-coords": "You must provide coordinates as console.",
@@ -583,6 +585,8 @@
     "worldedit.operation.affected.column": "{0} columns affected",
     "worldedit.operation.affected.entity": "{0} entities affected",
     "worldedit.operation.deform.expression": "deformed using {0}",
+
+    "worldedit.error.parser.invalid-nbt": "Invalid NBT Data in input: '{0}'. Error: {1}",
 
     "worldedit.selection.convex.info.vertices": "Vertices: {0}",
     "worldedit.selection.convex.info.triangles": "Triangles: {0}",

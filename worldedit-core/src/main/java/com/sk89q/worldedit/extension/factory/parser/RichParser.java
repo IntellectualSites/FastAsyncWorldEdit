@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;

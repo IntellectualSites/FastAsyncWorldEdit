@@ -41,7 +41,7 @@ public class BukkitImplLoader {
     private final List<String> adapterCandidates = new ArrayList<>();
     private String customCandidate;
 
-    private static final String SEARCH_PACKAGE = "com.sk89q.worldedit.bukkit.adapter.impl";
+    private static final String SEARCH_PACKAGE = "com.sk89q.worldedit.bukkit.adapter.impl.fawe";
     private static final String SEARCH_PACKAGE_DOT = SEARCH_PACKAGE + ".";
     private static final String SEARCH_PATH = SEARCH_PACKAGE.replace(".", "/");
     private static final String CLASS_SUFFIX = ".class";
@@ -74,10 +74,6 @@ public class BukkitImplLoader {
             adapterCandidates.add(className);
             LOGGER.info("-Dworldedit.bukkit.adapter used to add " + className + " to the list of available Bukkit adapters");
         }
-    }
-
-    public void addClass(Class<?> cls) {
-        adapterCandidates.add(0, cls.getName());
     }
 
     /**

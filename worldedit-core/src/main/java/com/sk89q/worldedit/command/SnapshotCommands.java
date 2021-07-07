@@ -21,7 +21,7 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.config.Caption;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;

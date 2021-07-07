@@ -19,20 +19,23 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.ITileInput;
+import com.fastasyncworldedit.core.beta.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.util.DeprecationUtil;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEntityBlock, Pattern {
 
@@ -143,60 +146,47 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      *
      * @param compoundTag The NBT Data to apply
      * @return The BaseBlock
+     * @deprecated Use {@link BlockStateHolder#toBaseBlock(LazyReference)}.
      */
-    BaseBlock toBaseBlock(CompoundTag compoundTag);
+    @Deprecated
+    default BaseBlock toBaseBlock(CompoundTag compoundTag) {
+        return toBaseBlock(compoundTag == null ? null : LazyReference.from(compoundTag::asBinaryTag));
+    }
+
+    /**
+     * Gets a {@link BaseBlock} from this BlockStateHolder.
+     *
+     * @param compoundTag The NBT Data to apply
+     * @return The BaseBlock
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
+     */
+    @NonAbstractForCompatibility(
+        delegateName = "toBaseBlock",
+        delegateParams = { CompoundTag.class }
+    )
+    default BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
+        DeprecationUtil.checkDelegatingOverride(getClass());
+
+        return toBaseBlock(compoundTag == null ? null : new CompoundTag(compoundTag.getValue()));
+    }
+
+    /**
+     * Gets a {@link BaseBlock} from this BlockStateHolder.
+     *
+     * @param compoundTag The NBT Data to apply
+     * @return The BaseBlock
+     */
+    default BaseBlock toBaseBlock(CompoundBinaryTag compoundTag) {
+        return toBaseBlock(compoundTag == null ? null : LazyReference.computed(compoundTag));
+    }
 
     @Override
-    default BaseBlock apply(BlockVector3 position) {
+    default BaseBlock applyBlock(BlockVector3 position) {
         return toBaseBlock();
     }
 
     void applyTileEntity(OutputExtent output, int x, int y, int z);
-
-    /**
-     * Return the name of the title entity ID.
-     *
-     * @return tile entity ID, non-null string
-     */
-    default String getNbtId() {
-        return "";
-    }
-
-    /**
-     * Returns whether the block contains NBT data. {@link #getNbtData()}
-     * must not return null if this method returns true.
-     *
-     * @return true if there is NBT data
-     */
-    default boolean hasNbtData() {
-        return false;
-    }
-
-    /**
-     * Get the object's NBT data (tile entity data). The returned tag, if
-     * modified in any way, should be sent to {@link #setNbtData(CompoundTag)}
-     * so that the instance knows of the changes. Making changes without
-     * calling {@link #setNbtData(CompoundTag)} could have unintended
-     * consequences.
-     *
-     * <p>{@link #hasNbtData()} must return true if and only if method does
-     * not return null.</p>
-     *
-     * @return compound tag, or null
-     */
-    @Nullable
-    default CompoundTag getNbtData() {
-        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
-    }
-
-    /**
-     * Set the object's NBT data (tile entity data).
-     *
-     * @param nbtData NBT data, or null if no data
-     */
-    default void setNbtData(@Nullable CompoundTag nbtData) {
-        throw new UnsupportedOperationException("State is immutable");
-    }
 
     default BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         throw new UnsupportedOperationException("State is immutable");

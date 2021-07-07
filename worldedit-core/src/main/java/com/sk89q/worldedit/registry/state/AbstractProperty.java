@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.registry.state;
 
-import com.boydti.fawe.util.MathMan;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.jetbrains.annotations.Nullable;
 

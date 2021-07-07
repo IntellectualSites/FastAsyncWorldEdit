@@ -1,6 +1,6 @@
 package com.sk89q.worldedit.math;
 
-import com.boydti.fawe.FaweCache;
+import com.fastasyncworldedit.core.FaweCache;
 
 public class MutableVector3 extends Vector3 {
 

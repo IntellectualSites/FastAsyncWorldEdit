@@ -19,8 +19,8 @@
 
 package com.sk89q.jnbt;
 
-import com.boydti.fawe.jnbt.streamer.StreamDelegate;
-import com.boydti.fawe.jnbt.streamer.ValueReader;
+import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
+import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -32,8 +32,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// THIS CLASS HAS BEEN HEAVILY MODIFIED BY FAWE
-
 /**
  * This class reads <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
  * streams, and produces an object graph of subclasses of the {@code Tag}
@@ -44,7 +42,10 @@ import java.util.Map;
  * found at <a href="https://minecraft.gamepedia.com/NBT_format">
  * https://minecraft.gamepedia.com/NBT_format</a>.
  * </p>
+ *
+ * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
+@Deprecated
 public final class NBTInputStream implements Closeable {
 
     private final DataInputStream is;

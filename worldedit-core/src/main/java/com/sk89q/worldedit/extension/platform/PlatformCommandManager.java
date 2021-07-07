@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.task.ThrowableSupplier;
-import com.boydti.fawe.util.StringMan;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.object.task.ThrowableSupplier;
+import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -330,9 +330,13 @@ public final class PlatformCommandManager {
         globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), Optional::of);
     }
 
-    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-                                      CommandRegistration<CI> registration, CI instance) {
-        registerSubCommands(name, aliases, desc, registration, instance, m -> {});
+    /**
+     * Internal use only.
+     */
+    public <CI> void registerSubCommands(String name, List<String> aliases, String desc,
+                                         CommandRegistration<CI> registration, CI instance) {
+        registerSubCommands(name, aliases, desc, registration, instance, m -> {
+        });
     }
 
     private <CI> void registerSubCommands(String name, List<String> aliases, String desc,

@@ -9,4 +9,4 @@ jobs:
       - name: "Checkout Repository"
         uses: "actions/checkout@v2.3.4"
       - name: "Validate Gradle Wrapper"
-        uses: "gradle/wrapper-validation-action@v1.0.3" 
+        uses: "gradle/wrapper-validation-action@v1.0.4" 

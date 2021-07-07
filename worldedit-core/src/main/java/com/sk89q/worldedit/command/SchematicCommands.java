@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.clipboard.MultiClipboardHolder;
-import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.schematic.MinecraftStructure;
-import com.boydti.fawe.util.MainUtil;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.clipboard.MultiClipboardHolder;
+import com.fastasyncworldedit.core.object.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.object.schematic.MinecraftStructure;
+import com.fastasyncworldedit.core.util.MainUtil;
 import com.google.common.base.Function;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -38,6 +38,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.extent.ActorSaveClipboardEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -91,7 +92,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
 
-import static com.boydti.fawe.util.ReflectionUtils.as;
+import static com.fastasyncworldedit.core.util.ReflectionUtils.as;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -328,6 +329,11 @@ public class SchematicCommands {
                          boolean allowOverwrite,
                      @Switch(name = 'g', desc = "Bypasses per-player-schematic folders")
                          boolean global) throws WorldEditException {
+        if (worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion() == -1) {
+            actor.printError(TranslatableComponent.of("worldedit.schematic.unsupported-minecraft-version"));
+            return;
+        }
+
         LocalConfiguration config = worldEdit.getConfiguration();
 
         File dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();

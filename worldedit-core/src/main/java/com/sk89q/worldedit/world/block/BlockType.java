@@ -353,7 +353,7 @@ public class BlockType implements Keyed, Pattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         return this.getDefaultState().toBaseBlock();
     }
 

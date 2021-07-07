@@ -1,7 +1,7 @@
 package com.sk89q.worldedit.entity;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.entity.EntityType;
 
@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 public class LazyBaseEntity extends BaseEntity {
     private Supplier<CompoundTag> saveTag;
     public LazyBaseEntity(EntityType type, Supplier<CompoundTag> saveTag) {
-        super(type, null);
+        super(type);
         this.saveTag = saveTag;
     }
 

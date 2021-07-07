@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.DelegateConsumer;
-import com.boydti.fawe.object.function.QuadFunction;
-import com.boydti.fawe.util.MainUtil;
-import com.boydti.fawe.util.image.ImageUtil;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.DelegateConsumer;
+import com.fastasyncworldedit.core.object.function.QuadFunction;
+import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.google.common.base.Function;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;

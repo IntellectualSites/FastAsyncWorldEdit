@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.beta.implementation.lighting.HeightMapType;
+import com.fastasyncworldedit.core.beta.implementation.lighting.HeightMapType;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;

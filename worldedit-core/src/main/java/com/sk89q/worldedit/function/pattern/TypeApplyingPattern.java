@@ -39,7 +39,7 @@ public class TypeApplyingPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BlockState oldBlock = getExtent().getBlock(position);
         BlockState newBlock = blockState.withProperties(oldBlock);
         return newBlock.toBaseBlock();

@@ -38,6 +38,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
             val disabledLint = listOf(
                 "processing", "path", "fallthrough", "serial"
             )
+            options.release.set(11)
             //options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
             options.isDeprecation = false
             options.encoding = "UTF-8"
@@ -77,7 +78,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     tasks.register<Jar>("javadocJar") {
         dependsOn("javadoc")
-        archiveClassifier.set("javadoc")
+        archiveClassifier.set(null as String?)
+        archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-javadoc.${archiveExtension.getOrElse("jar")}")
         from(tasks.getByName<Javadoc>("javadoc").destinationDir)
     }
 
@@ -93,7 +95,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
     if (name == "worldedit-core" || name == "worldedit-bukkit") {
         tasks.register<Jar>("sourcesJar") {
             dependsOn("classes")
-            archiveClassifier.set("sources")
+            archiveClassifier.set(null as String?)
+            archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-sources.${archiveExtension.getOrElse("jar")}")
             from(sourceSets["main"].allSource)
         }
 
@@ -133,8 +136,8 @@ val CLASSPATH = listOf("truezip", "truevfs", "js")
     .joinToString(separator = " ")
 
 sealed class WorldEditKind(
-        val name: String,
-        val mainClass: String = "com.sk89q.worldedit.internal.util.InfoEntryPoint"
+    val name: String,
+    val mainClass: String = "com.sk89q.worldedit.internal.util.InfoEntryPoint"
 ) {
     class Standalone(mainClass: String) : WorldEditKind("STANDALONE", mainClass)
     object Mod : WorldEditKind("MOD")
@@ -146,10 +149,10 @@ fun Project.addJarManifest(kind: WorldEditKind, includeClasspath: Boolean = fals
         val version = project(":worldedit-core").version
         inputs.property("version", version)
         val attributes = mutableMapOf(
-                "Implementation-Version" to version,
-                "WorldEdit-Version" to version,
-                "WorldEdit-Kind" to kind.name,
-                "Main-Class" to kind.mainClass
+            "Implementation-Version" to version,
+            "WorldEdit-Version" to version,
+            "WorldEdit-Kind" to kind.name,
+            "Main-Class" to kind.mainClass
         )
         if (includeClasspath) {
             attributes["Class-Path"] = CLASSPATH

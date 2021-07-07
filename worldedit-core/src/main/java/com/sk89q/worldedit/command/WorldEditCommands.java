@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.command;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.FaweVersion;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.FaweVersion;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.intellectualsites.paster.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;

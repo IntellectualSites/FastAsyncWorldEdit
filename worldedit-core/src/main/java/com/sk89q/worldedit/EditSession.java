@@ -19,29 +19,29 @@
 
 package com.sk89q.worldedit;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.implementation.lighting.NullRelighter;
-import com.boydti.fawe.beta.implementation.lighting.Relighter;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.FaweLimit;
-import com.boydti.fawe.object.RegionWrapper;
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.changeset.AbstractChangeSet;
-import com.boydti.fawe.object.changeset.BlockBagChangeSet;
-import com.boydti.fawe.object.collection.LocalBlockVectorSet;
-import com.boydti.fawe.object.extent.FaweRegionExtent;
-import com.boydti.fawe.object.extent.ProcessedWEExtent;
-import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.object.extent.SourceMaskExtent;
-import com.boydti.fawe.object.function.SurfaceRegionFunction;
-import com.boydti.fawe.object.mask.ResettableMask;
-import com.boydti.fawe.object.pattern.ExistingPattern;
-import com.boydti.fawe.util.EditSessionBuilder;
-import com.boydti.fawe.util.ExtentTraverser;
-import com.boydti.fawe.util.MaskTraverser;
-import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.beta.implementation.lighting.NullRelighter;
+import com.fastasyncworldedit.core.beta.implementation.lighting.Relighter;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.object.RegionWrapper;
+import com.fastasyncworldedit.core.object.RunnableVal;
+import com.fastasyncworldedit.core.object.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.object.changeset.BlockBagChangeSet;
+import com.fastasyncworldedit.core.object.collection.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.object.extent.FaweRegionExtent;
+import com.fastasyncworldedit.core.object.extent.ProcessedWEExtent;
+import com.fastasyncworldedit.core.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.object.extent.SourceMaskExtent;
+import com.fastasyncworldedit.core.object.function.SurfaceRegionFunction;
+import com.fastasyncworldedit.core.object.mask.ResettableMask;
+import com.fastasyncworldedit.core.object.pattern.ExistingPattern;
+import com.fastasyncworldedit.core.util.EditSessionBuilder;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
+import com.fastasyncworldedit.core.util.MaskTraverser;
+import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
@@ -633,9 +633,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         ExtentTraverser<SurvivalModeExtent> survivalExtent = new ExtentTraverser<>(getExtent()).find(SurvivalModeExtent.class);
         if (survivalExtent != null) {
             return survivalExtent.get();
-        } else {
-            SurvivalModeExtent survival = new SurvivalModeExtent(bypassAll, getWorld());
-            bypassAll = survival;
+        } else { // Kind of a bad way of doing it, but equally I (dords) hate the way upstream does it by just adding ALL possible extents to an edit and only "enabling" when required
+            SurvivalModeExtent survival = new SurvivalModeExtent(getExtent(), getWorld());
+            setExtent(survival);
             return survival;
         }
     }

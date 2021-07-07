@@ -5,12 +5,7 @@ plugins {
     antlr
 }
 
-repositories {
-    maven {
-        name = "IntellectualSites"
-        url = uri("https://mvn.intellectualsites.com/content/groups/public/")
-    }
-}
+project.description = "Core"
 
 applyPlatformAndCoreConfiguration()
 
@@ -33,11 +28,12 @@ dependencies {
         because("Mojang provides Log4J 2.8.1")
     }
     implementation("it.unimi.dsi:fastutil")
+    compileOnly("net.kyori:adventure-nbt:4.8.1")
+    testImplementation("net.kyori:adventure-nbt:4.7.0")
 
     val antlrVersion = "4.9.1"
     antlr("org.antlr:antlr4:$antlrVersion")
     implementation("org.antlr:antlr4-runtime:$antlrVersion")
-
     implementation("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
     compileOnly(project(":worldedit-libs:core:ap"))
     annotationProcessor(project(":worldedit-libs:core:ap"))
@@ -49,10 +45,12 @@ dependencies {
     implementation("com.github.luben:zstd-jni:1.5.0-2")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
-    api("com.plotsquared:PlotSquared-Core:5.13.11") { isTransitive = false }
+    api("com.plotsquared:PlotSquared-Core:6.0.6-SNAPSHOT")
+    compileOnlyApi("net.kyori:adventure-api:4.8.0")
+    compileOnlyApi("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     compileOnly("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
-    compileOnly("org.lz4:lz4-java:1.7.1")
+    compileOnly("org.lz4:lz4-java:1.8.0")
 }
 
 tasks.named<Test>("test") {
