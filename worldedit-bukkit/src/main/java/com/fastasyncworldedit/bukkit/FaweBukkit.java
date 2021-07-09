@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.IFawe;
@@ -126,7 +127,7 @@ public class FaweBukkit implements IFawe, Listener {
                     fos.write(jarData);
                 }
             }
-         //   return new BukkitImageViewer(BukkitAdapter.adapt(player));
+            return new BukkitImageViewer(BukkitAdapter.adapt(player));
         } catch (Throwable ignored) {
         }
         return null;

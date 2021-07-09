@@ -1,4 +1,3 @@
-/*
 package com.fastasyncworldedit.bukkit.util.image;
 
 import com.fastasyncworldedit.core.util.image.Drawable;
@@ -201,5 +200,3 @@ public class BukkitImageViewer implements ImageViewer {
         last = null;
     }
 }
-
- */
