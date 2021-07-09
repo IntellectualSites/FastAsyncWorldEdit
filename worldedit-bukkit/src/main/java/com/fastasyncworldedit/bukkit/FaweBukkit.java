@@ -19,7 +19,7 @@ import com.fastasyncworldedit.bukkit.regions.Worldguard;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
-import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
+//import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.ThirdPartyManager;
@@ -126,7 +126,7 @@ public class FaweBukkit implements IFawe, Listener {
                     fos.write(jarData);
                 }
             }
-            return new BukkitImageViewer(BukkitAdapter.adapt(player));
+         //   return new BukkitImageViewer(BukkitAdapter.adapt(player));
         } catch (Throwable ignored) {
         }
         return null;

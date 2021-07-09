@@ -102,7 +102,7 @@ dependencies {
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
-    compileOnlyApi("org.inventivetalent:mapmanager:1.7.10-SNAPSHOT") { isTransitive = false }
+  //  compileOnlyApi("org.inventivetalent:mapmanager:1.7.10-SNAPSHOT") { isTransitive = false }
     implementation("com.github.TechFortress:GriefPrevention:16.17.1") { isTransitive = false }
     implementation("com.github.bloodmc:GriefDefenderApi:920a610") { isTransitive = false }
     implementation("com.flowpowered:flow-math:1.0.3") {
