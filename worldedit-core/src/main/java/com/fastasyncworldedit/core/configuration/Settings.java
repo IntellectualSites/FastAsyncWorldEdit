@@ -168,6 +168,11 @@ public class Settings extends Config {
         })
         public boolean CONFIRM_LARGE = true;
         @Comment({
+            "If undo and redo commands should be restricted to allowed regions",
+            " - Prevents scenarios where players can delete/reset a region, and then continue to undo/redo on it"
+        })
+        public boolean RESTRICT_HISTORY_TO_REGIONS = true;
+        @Comment({
                 "List of blocks to strip nbt from",
         })
         public List<String> STRIP_NBT = new ArrayList<>();
@@ -523,6 +528,7 @@ public class Settings extends Config {
                 limit.SPEED_REDUCTION = Math.min(limit.SPEED_REDUCTION, newLimit.SPEED_REDUCTION);
                 limit.FAST_PLACEMENT |= newLimit.FAST_PLACEMENT;
                 limit.CONFIRM_LARGE &= newLimit.CONFIRM_LARGE;
+                limit.RESTRICT_HISTORY_TO_REGIONS &= newLimit.RESTRICT_HISTORY_TO_REGIONS;
                 if (limit.STRIP_NBT == null) {
                     limit.STRIP_NBT = newLimit.STRIP_NBT.isEmpty() ? Collections.emptySet() : new HashSet<>(newLimit.STRIP_NBT);
                 } else if (limit.STRIP_NBT.isEmpty() || newLimit.STRIP_NBT.isEmpty()) {

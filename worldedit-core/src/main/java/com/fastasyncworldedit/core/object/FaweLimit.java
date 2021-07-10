@@ -18,6 +18,7 @@ public class FaweLimit {
     public int SPEED_REDUCTION = Integer.MAX_VALUE;
     public boolean FAST_PLACEMENT = false;
     public boolean CONFIRM_LARGE = true;
+    public boolean RESTRICT_HISTORY_TO_REGIONS = true;
     public Set<String> STRIP_NBT = null;
 
     public static FaweLimit MAX;
@@ -108,6 +109,7 @@ public class FaweLimit {
         MAX.MAX_EXPRESSION_MS = 50;
         MAX.FAST_PLACEMENT = true;
         MAX.CONFIRM_LARGE = true;
+        MAX.RESTRICT_HISTORY_TO_REGIONS = false;
         MAX.STRIP_NBT = null;
     }
 
@@ -229,6 +231,7 @@ public class FaweLimit {
             && INVENTORY_MODE == 0
             && SPEED_REDUCTION == 0
             && FAST_PLACEMENT
+            && !RESTRICT_HISTORY_TO_REGIONS
             && (STRIP_NBT == null || STRIP_NBT.isEmpty());
     }
 
@@ -245,6 +248,7 @@ public class FaweLimit {
         SPEED_REDUCTION = limit.SPEED_REDUCTION;
         FAST_PLACEMENT = limit.FAST_PLACEMENT;
         CONFIRM_LARGE = limit.CONFIRM_LARGE;
+        RESTRICT_HISTORY_TO_REGIONS = limit.RESTRICT_HISTORY_TO_REGIONS;
         STRIP_NBT = limit.STRIP_NBT;
     }
 
@@ -262,6 +266,7 @@ public class FaweLimit {
         limit.MAX_HISTORY = MAX_HISTORY;
         limit.FAST_PLACEMENT = FAST_PLACEMENT;
         limit.CONFIRM_LARGE = CONFIRM_LARGE;
+        limit.RESTRICT_HISTORY_TO_REGIONS = RESTRICT_HISTORY_TO_REGIONS;
         limit.STRIP_NBT = STRIP_NBT;
         return limit;
     }
