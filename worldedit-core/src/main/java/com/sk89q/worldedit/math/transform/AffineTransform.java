@@ -306,13 +306,13 @@ public class AffineTransform implements Transform, Serializable {
             return true;
         }
         // Check for flip-and-rotate
-        if (vector.getX() != 0 && vector.getY() != 0 &&  m01 != 0 && m10 != 0) {
+        if (vector.getX() != 0 && vector.getY() != 0 && ((m01 < 0 && m10 < 0) || (m01 > 0 && m10 > 0))) {
             flip = true;
         }
-        if (vector.getX() != 0 && vector.getZ() != 0 &&  m02 != 0 && m20 != 0) {
+        if (vector.getX() != 0 && vector.getZ() != 0 && ((m02 < 0 && m20 < 0) || (m02 > 0 && m20 > 0))) {
             flip = !flip;
         }
-        if (vector.getY() != 0 && vector.getZ() != 0 && m12 != 0 && m21 != 0) {
+        if (vector.getY() != 0 && vector.getZ() != 0 && ((m12 < 0 && m21 < 0) || (m12 > 0 && m21 > 0))) {
             flip = !flip;
         }
         return flip;

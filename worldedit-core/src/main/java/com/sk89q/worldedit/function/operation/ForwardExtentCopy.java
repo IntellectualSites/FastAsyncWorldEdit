@@ -279,6 +279,8 @@ public class ForwardExtentCopy implements Operation {
     public Operation resume(RunContext run) throws WorldEditException {
         if (currentTransform == null) {
             currentTransform = transform;
+        } else if (!currentTransform.equals(transform)) {
+            currentTransform = currentTransform.combine(transform);
         }
         if (lastBiomeVisitor != null) {
             affectedBiomeCols += lastBiomeVisitor.getAffected();
@@ -406,7 +408,6 @@ public class ForwardExtentCopy implements Operation {
             }
 
             if (transExt != null) {
-                currentTransform = currentTransform.combine(transform);
                 transExt.setTransform(currentTransform);
             }
 
