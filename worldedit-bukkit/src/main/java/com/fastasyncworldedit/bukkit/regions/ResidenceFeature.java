@@ -25,7 +25,7 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
         super(residencePlugin.getName());
         this.residence = residencePlugin;
         this.plugin = p3;
-        LOGGER.debug("Plugin 'Residence' found. Using it now.");
+        LOGGER.info("Plugin 'Residence' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, ClaimedResidence residence, MaskType type) {

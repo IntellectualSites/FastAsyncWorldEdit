@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit;
+package com.fastasyncworldedit.bukkit.util;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.WorldEditException;
@@ -25,12 +25,12 @@ import com.sk89q.worldedit.WorldEditException;
 /**
  * Thrown if the world has been unloaded.
  */
-class WorldUnloadedException extends WorldEditException {
+public class WorldUnloadedException extends WorldEditException {
 
     /**
      * Create a new instance.
      */
-    WorldUnloadedException() {
+    public WorldUnloadedException() {
         super(Caption.of("worldedit.error.world-unloaded"));
     }
 }

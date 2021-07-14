@@ -25,6 +25,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.SessionIdleEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.block.Block;
@@ -107,13 +108,14 @@ public class WorldEditListener implements Listener {
         final Player player = plugin.wrapPlayer(event.getPlayer());
         final World world = player.getWorld();
         final WorldEdit we = plugin.getWorldEdit();
+        final Direction direction = BukkitAdapter.adapt(event.getBlockFace());
 
         Action action = event.getAction();
         if (action == Action.LEFT_CLICK_BLOCK) {
             final Block clickedBlock = event.getClickedBlock();
             final Location pos = new Location(world, clickedBlock.getX(), clickedBlock.getY(), clickedBlock.getZ());
 
-            if (we.handleBlockLeftClick(player, pos)) {
+            if (we.handleBlockLeftClick(player, pos, direction)) {
                 event.setCancelled(true);
             }
 
@@ -131,7 +133,7 @@ public class WorldEditListener implements Listener {
             final Block clickedBlock = event.getClickedBlock();
             final Location pos = new Location(world, clickedBlock.getX(), clickedBlock.getY(), clickedBlock.getZ());
 
-            if (we.handleBlockRightClick(player, pos)) {
+            if (we.handleBlockRightClick(player, pos, direction)) {
                 event.setCancelled(true);
             }
 

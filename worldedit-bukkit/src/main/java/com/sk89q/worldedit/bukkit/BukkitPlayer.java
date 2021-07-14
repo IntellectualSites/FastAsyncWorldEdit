@@ -76,7 +76,9 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     private final Player player;
     private final WorldEditPlugin plugin;
+    //FAWE start
     private final PermissionAttachment permAttachment;
+
     /**
      * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
      *
@@ -88,6 +90,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         this.player = player;
         this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
     }
+    //FAWE end
 
     /**
      * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
@@ -98,12 +101,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public BukkitPlayer(@Nonnull WorldEditPlugin plugin, @Nullable Player player) {
         this.plugin = plugin;
         this.player = player;
+        //FAWE start
         this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
         if (player != null && Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
+        //FAWE end
     }
 
+    //FAWE start
     private static Map<String, Object> getExistingMap(WorldEditPlugin plugin, Player player) {
         BukkitPlayer cached = plugin.getCachedPlayer(player);
         if (cached != null) {
@@ -111,6 +117,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         return new ConcurrentHashMap<>();
     }
+    //FAWE end
 
     @Override
     public UUID getUniqueId() {
@@ -143,6 +150,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         return player.getDisplayName();
     }
 
+    //FAWE start
     @Override
     public void giveItem(BaseItemStack itemStack) {
         final PlayerInventory inv = player.getInventory();
@@ -154,14 +162,13 @@ public class BukkitPlayer extends AbstractPlayerActor {
         player.getInventory().setItemInMainHand(newItem);
         HashMap<Integer, ItemStack> overflow = inv.addItem(item);
         if (!overflow.isEmpty()) {
-            TaskManager.IMP.sync(new RunnableVal<Object>() {
+            TaskManager.IMP.sync(new RunnableVal<>() {
                 @Override
                 public void run(Object value) {
                     for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
                         ItemStack stack = entry.getValue();
                         if (stack.getType() != Material.AIR && stack.getAmount() > 0) {
-                            Item
-                                dropped = player.getWorld().dropItem(player.getLocation(), stack);
+                            Item dropped = player.getWorld().dropItem(player.getLocation(), stack);
                             PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
                             Bukkit.getPluginManager().callEvent(event);
                             if (event.isCancelled()) {
@@ -174,7 +181,9 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         player.updateInventory();
     }
+    //FAWE end
 
+    @Deprecated
     @Override
     public void printRaw(String msg) {
         for (String part : msg.split("\n")) {
@@ -182,6 +191,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    @Deprecated
     @Override
     public void print(String msg) {
         for (String part : msg.split("\n")) {
@@ -189,6 +199,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    @Deprecated
     @Override
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
@@ -196,6 +207,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    @Deprecated
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
@@ -205,12 +217,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void print(Component component) {
+        //FAWE start - Add FAWE prefix to all messages
         component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
+        //FAWE end
         TextAdapter.sendMessage(player, WorldEditText.format(component, getLocale()));
     }
 
     @Override
     public boolean trySetPosition(Vector3 pos, float pitch, float yaw) {
+        //FAWE start
         org.bukkit.World world = player.getWorld();
         if (pos instanceof com.sk89q.worldedit.util.Location) {
             com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
@@ -220,6 +235,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
             }
         }
         org.bukkit.World finalWorld = world;
+        //FAWE end
         return TaskManager.IMP.sync(() -> player.teleport(new Location(finalWorld, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch)));
     }
 
@@ -250,6 +266,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
                     player.getWorld().getName(), player, perm);
     }
 
+    //FAWE start
     @Override
     public void setPermission(String permission, boolean value) {
         /*
@@ -272,6 +289,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
             permAttachment.setPermission(permission, value);
         }
     }
+    //FAWE end
 
     @Override
     public World getWorld() {
@@ -331,9 +349,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
     @Override
     public void sendAnnouncements() {
         if (WorldEditPlugin.getInstance().getLifecycledBukkitImplAdapter() == null) {
+            //FAWE start - swap out EH download url with ours
             print(Caption.of("worldedit.version.bukkit.unsupported-adapter",
                     TextComponent.of("https://intellectualsites.github.io/download/fawe.html", TextColor.AQUA)
                         .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
+            //FAWE end
         }
     }
 
@@ -406,6 +426,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    //FAWE start
     @Override
     public void sendTitle(Component title, Component sub) {
         String titleStr = WorldEditText.reduceToText(title, getLocale());
@@ -419,4 +440,5 @@ public class BukkitPlayer extends AbstractPlayerActor {
         plugin.getPermissionAttachmentManager().removeAttachment(player);
         super.unregister();
     }
+    //FAWE end
 }

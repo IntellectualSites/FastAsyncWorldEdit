@@ -31,7 +31,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+//FAWE start - implements SlottableBlockBag
 public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag {
+//FAWE end
 
     private Player player;
     private ItemStack[] items;
@@ -182,6 +184,7 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
     public void addSingleSourcePosition(Location pos) {
     }
 
+    //FAWE start
     @Override
     public BaseItem getItem(int slot) {
         loadInventory();
@@ -194,5 +197,6 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
         BaseItemStack stack = block instanceof BaseItemStack ? (BaseItemStack) block : new BaseItemStack(block.getType(), block.getNbtData(), 1);
         items[slot] = BukkitAdapter.adapt(stack);
     }
+    //FAWE end
 
 }

@@ -214,6 +214,17 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     void simulateBlockMine(BlockVector3 position);
 
     /**
+     * Gets whether the given {@link BlockState} can be placed here.
+     *
+     * @param position The position
+     * @param blockState The blockstate
+     * @return If it can be placed
+     */
+    default boolean canPlaceAt(BlockVector3 position, BlockState blockState) {
+        return true;
+    }
+
+    /**
      * Regenerate an area.
      *
      * @param region the region

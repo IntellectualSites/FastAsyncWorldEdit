@@ -23,6 +23,8 @@ import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.core.Fawe;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.sk89q.bukkit.util.ClassSourceValidator;
 import com.sk89q.util.yaml.YAMLProcessor;
 import com.sk89q.wepif.PermissionsResolverManager;
 import com.sk89q.worldedit.EditSession;
@@ -45,6 +47,7 @@ import com.sk89q.worldedit.internal.command.CommandUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
@@ -70,6 +73,7 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.enginehub.piston.CommandManager;
 import org.incendo.serverlib.ServerLib;
 
 import java.io.File;
@@ -90,7 +94,9 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
 /**
  * Plugin for Bukkit.
  */
-public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
+//FAWE start - Don't implement TabCompleter, we use Paper's AsyncTabCompleteListener
+public class WorldEditPlugin extends JavaPlugin {
+//FAWE end
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final String CUI_PLUGIN_CHANNEL = "worldedit:cui";
@@ -129,17 +135,24 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         platform = new BukkitServerInterface(this, getServer());
         worldEdit.getPlatformManager().register(platform);
 
-        createDefaultConfiguration("config-legacy.yml"); // Create the default configuration file for WorldEdit, for it's config-legacy.yml
+        //FAWE start - Rename config to config-legacy.yml TODO: Chose a better name in the future
+        createDefaultConfiguration("config-legacy.yml"); // Create the default configuration file for WorldEdit, for us it's 'config-legacy.yml'
+        //FAWE end
 
+        //FAWE start - Modify WorldEdit config name
         config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "config-legacy.yml"), true), this);
+        //FAWE end
         
+        //FAWE start - Setup permission attachments
         permissionAttachmentManager = new BukkitPermissionAttachmentManager(this);
+        //FAWE end
 
         Path delChunks = Paths.get(getDataFolder().getPath(), DELCHUNKS_FILE_NAME);
         if (Files.exists(delChunks)) {
             ChunkDeleter.runFromFile(delChunks, true);
         }
 
+        //FAWE start - Delete obsolete DummyFawe from pre 1.14 days
         if (this.getDataFolder().getParentFile().listFiles(file -> {
             if (file.getName().equals("DummyFawe.jar")) {
                 file.delete();
@@ -149,6 +162,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         }).length > 0) {
             LOGGER.warn("DummyFawe detected and automatically deleted! This file is no longer necessary.");
         }
+        //FAWE end
     }
 
     /**
@@ -157,17 +171,22 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
     @Override
     public void onEnable() {
 
+        // Catch bad things being done by naughty plugins that include
+        // WorldEdit's classes
+        ClassSourceValidator verifier = new ClassSourceValidator(this);
+        verifier.reportMismatches(ImmutableList.of(World.class, CommandManager.class, EditSession.class, Actor.class));
+
+        //FAWE start
         new FaweBukkit(this);
+        //FAWE end
 
         WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
 
         PermissionsResolverManager.initialize(this); // Setup permission resolver
 
         // Register CUI
-        fail(() -> {
-            getServer().getMessenger().registerIncomingPluginChannel(this, CUI_PLUGIN_CHANNEL, new CUIChannelListener(this));
-            getServer().getMessenger().registerOutgoingPluginChannel(this, CUI_PLUGIN_CHANNEL);
-        }, "Failed to register CUI");
+        getServer().getMessenger().registerIncomingPluginChannel(this, CUI_PLUGIN_CHANNEL, new CUIChannelListener(this));
+        getServer().getMessenger().registerOutgoingPluginChannel(this, CUI_PLUGIN_CHANNEL);
 
         // Now we can register events
         getServer().getPluginManager().registerEvents(new WorldEditListener(this), this);
@@ -182,8 +201,10 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             // register this so we can load world-dependent data right as the first world is loading
             getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
         } else {
+            //FAWE start
             LOGGER.warn("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins. Reloading the server is not advised.");
             LOGGER.warn("For more information why reloading is bad, see https://madelinemiller.dev/blog/problem-with-reload/");
+            //FAWE end
             try {
                 setupPreWorldData();
                 // since worlds are loaded already, we can do this now
@@ -192,7 +213,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             }
         }
 
-        // Setup metrics
+        // Enable metrics
         new Metrics(this, BSTATS_ID);
 
         // Check whether the server runs on 11 or greater
@@ -281,15 +302,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         }
     }
 
-    private void fail(Runnable run, String message) {
-        try {
-            run.run();
-        } catch (Throwable e) {
-            getLogger().severe(message);
-            e.printStackTrace();
-        }
-    }
-
     private void loadAdapter() {
         WorldEdit worldEdit = WorldEdit.getInstance();
 
@@ -315,9 +327,11 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             if (platform instanceof BukkitServerInterface) {
                 LOGGER.warn(e.getMessage());
             } else {
+                //FAWE start - Identify as FAWE
                 LOGGER.info("FastAsyncWorldEdit could not find a Bukkit adapter for this MC version, "
                              + "but it seems that you have another implementation of FastAsyncWorldEdit installed (" + platform.getPlatformName() + ") "
                              + "that handles the world editing.");
+                //FAWE end
             }
             this.adapter.invalidate();
         }
@@ -398,25 +412,6 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         return true;
     }
 
-    /*
-    @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd, String commandLabel, String[] args) {
-        int plSep = commandLabel.indexOf(":");
-        if (plSep >= 0 && plSep < commandLabel.length() + 1) {
-            commandLabel = commandLabel.substring(plSep + 1);
-        }
-
-        StringBuilder sb = new StringBuilder("/").append(commandLabel);
-        if (args.length > 0) {
-            sb.append(" ");
-        }
-        String arguments = Joiner.on(" ").appendTo(sb, args).toString();
-        CommandSuggestionEvent event = new CommandSuggestionEvent(wrapCommandSender(sender), arguments);
-        getWorldEdit().getEventBus().post(event);
-        return CommandUtil.fixSuggestions(arguments, event.getSuggestions());
-    }
-    */
-
     /**
      * Gets the session for the player.
      *
@@ -456,7 +451,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(wePlayer);
 
         session.remember(editSession);
-        editSession.flushSession();
+        editSession.close();
 
         WorldEdit.getInstance().flushBlockBag(wePlayer, editSession);
     }
@@ -479,14 +474,16 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         return PermissionsResolverManager.getInstance();
     }
     
+    //FAWE start
     /**
-     * Get the permissions resolver in use.
+     * Get the permissions attachment manager in use
      *
-     * @return the permissions resolver
+     * @return the permissions attachment manager
      */
     public BukkitPermissionAttachmentManager getPermissionAttachmentManager() {
         return permissionAttachmentManager;
     }
+    //FAWE end
 
     /**
      * Used to wrap a Bukkit Player as a WorldEdit Player.
@@ -495,6 +492,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
      * @return a wrapped player
      */
     public BukkitPlayer wrapPlayer(Player player) {
+        //FAWE start - Use cache over returning a direct BukkitPlayer
         BukkitPlayer wePlayer = getCachedPlayer(player);
         if (wePlayer == null) {
             synchronized (player) {
@@ -507,8 +505,10 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
             }
         }
         return wePlayer;
+        //FAWE end
     }
 
+    //FAWE start
     public BukkitPlayer getCachedPlayer(Player player) {
         List<MetadataValue> meta = player.getMetadata("WE");
         if (meta.isEmpty()) {
@@ -516,6 +516,7 @@ public class WorldEditPlugin extends JavaPlugin { //implements TabCompleter
         }
         return (BukkitPlayer) meta.get(0).value();
     }
+    //FAWE end
 
     public Actor wrapCommandSender(CommandSender sender) {
         if (sender instanceof Player) {
