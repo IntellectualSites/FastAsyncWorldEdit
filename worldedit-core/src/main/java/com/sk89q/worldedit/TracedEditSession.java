@@ -34,7 +34,7 @@ class TracedEditSession extends EditSession {
     TracedEditSession(EventBus eventBus, @Nullable World world, int maxBlocks, @Nullable BlockBag blockBag,
                       @Nullable Actor actor,
                       boolean tracing) {
-        super(eventBus, world, maxBlocks, blockBag, actor, tracing);
+        super(new EditSessionBuilder(eventBus).world(world).maxBlocks(maxBlocks).blockBag(blockBag).actor(actor).tracing(tracing));
     }
 
     private final Throwable stacktrace = new Throwable("Creation trace.");

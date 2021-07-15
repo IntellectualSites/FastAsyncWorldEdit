@@ -29,6 +29,7 @@ import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -70,7 +71,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         checkNotNull(region);
         checkNotNull(region.getWorld(),
             "World cannot be null (use the other constructor for the region)");
-        EditSession session = new EditSessionBuilder(region.getWorld()).allowedRegionsEverywhere()
+        EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(region.getWorld()).allowedRegionsEverywhere()
             .autoQueue(false).build();
         return ReadOnlyClipboard.of(session, region);
     }
@@ -229,7 +230,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         if (world instanceof EditSession) {
             editSession = (EditSession) world;
         } else {
-            EditSessionBuilder builder = new EditSessionBuilder(world).autoQueue(true)
+            EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world).autoQueue(true)
                 .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
             if (allowUndo) {
                 editSession = builder.build();
@@ -272,7 +273,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir,
         @Nullable Transform transform) {
         if (extent instanceof World) {
-            EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
+            EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world((World) extent).autoQueue(true)
                 .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
             extent = builder.build();
         }
@@ -308,7 +309,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
         if (extent instanceof World) {
-            EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
+            EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world((World) extent).autoQueue(true)
                 .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
             extent = builder.build();
         }

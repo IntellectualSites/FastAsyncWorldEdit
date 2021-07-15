@@ -255,8 +255,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param world the world
      * @param maxBlocks the maximum number of blocks that can be changed, or -1 to use no limit
      * @param blockBag an optional {@link BlockBag} to use, otherwise null
-     * @param actor the actor that owns the session
-     * @param tracing if tracing is enabled. An actor is required if this is {@code true}
      */
     public EditSession(EventBus eventBus, World world, int maxBlocks, @Nullable BlockBag blockBag, EditSessionEvent event) {
         this(eventBus, world, null, null, null, null, true, null, null, null, blockBag, event);
@@ -913,7 +911,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return whether the block changed
      * @throws WorldEditException thrown on a set error
      */
-    @Deprecated
+    @Deprecated //TODO Explain Deprecation
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, Stage stage) throws WorldEditException {
         if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
@@ -939,7 +937,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param block the block
      * @return whether the block changed
      */
-    @Deprecated
+    @Deprecated //TODO Explain Deprecation
     public <B extends BlockStateHolder<B>> boolean rawSetBlock(BlockVector3 position, B block) {
         if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
@@ -974,7 +972,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
-    @Deprecated
+    @Deprecated //TODO Explain Deprecation
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
         if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
@@ -1048,16 +1046,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        return this.changes = super.setBlocks(region, block);
-    }
-
-    @Override
-    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        return this.changes = super.setBlocks(region, pattern);
     }
 
     /**
@@ -1433,6 +1421,32 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
+     * Sets all the blocks inside a region to a given block type.
+     *
+     * @param region the region
+     * @param block the block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    @Override
+    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
+        return this.changes = super.setBlocks(region, block);
+    }
+
+    /**
+     * Sets all the blocks inside a region to a given pattern.
+     *
+     * @param region the region
+     * @param pattern the pattern that provides the replacement block
+     * @return number of blocks affected
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    @Override
+    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        return this.changes = super.setBlocks(region, pattern);
+    }
+
+    /**
      * Sets the blocks at the center of the given region to the given pattern.
      * If the center sits between two blocks on a certain axis, then two blocks
      * will be placed to mark the center.
@@ -1642,7 +1656,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Stack a cuboid region.
      *
      * @param region the region to stack
-     * @param dir the direction to stack
+     * @param offset how far to move the contents each stack
      * @param count the number of times to stack
      * @param copyEntities true to copy entities
      * @param copyBiomes true to copy biomes
@@ -1650,17 +1664,17 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int stackCuboidRegion(Region region, BlockVector3 dir, int count,
+    public int stackCuboidRegion(Region region, BlockVector3 offset, int count,
                                  boolean copyEntities, boolean copyBiomes, Mask mask) throws MaxChangedBlocksException {
         checkNotNull(region);
-        checkNotNull(dir);
+        checkNotNull(offset);
         checkArgument(count >= 1, "count >= 1 required");
 
         BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
         BlockVector3 to = region.getMinimumPoint();
         ForwardExtentCopy copy = new ForwardExtentCopy(this, region, this, to);
         copy.setRepetitions(count);
-        copy.setTransform(new AffineTransform().translate(dir.multiply(size)));
+        copy.setTransform(new AffineTransform().translate(offset.multiply(size)));
         copy.setCopyingEntities(copyEntities);
         copy.setCopyingBiomes(copyBiomes);
         final Region allowedRegion;
@@ -1682,8 +1696,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Move the blocks in a region a certain direction.
      *
      * @param region the region to move
-     * @param dir the direction
-     * @param distance the distance to move
+     * @param offset the offset
+     * @param multiplier the number to multiply the offset by
      * @param copyAir true to copy air blocks
      * @param moveEntities true to move entities
      * @param copyBiomes true to copy biomes
@@ -1691,20 +1705,20 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return number of blocks moved
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    public int moveRegion(Region region, BlockVector3 dir, int distance, boolean copyAir, boolean moveEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
+    public int moveRegion(Region region, BlockVector3 offset, int multiplier, boolean copyAir, boolean moveEntities, boolean copyBiomes, Pattern replacement) throws MaxChangedBlocksException {
         Mask mask = null;
         if (!copyAir) {
             mask = new ExistingBlockMask(this);
         }
-        return moveRegion(region, dir, distance, moveEntities, copyBiomes, mask, replacement);
+        return moveRegion(region, offset, multiplier, moveEntities, copyBiomes, mask, replacement);
     }
 
     /**
      * Move the blocks in a region a certain direction.
      *
      * @param region the region to move
-     * @param dir the direction
-     * @param distance the distance to move
+     * @param offset the offset
+     * @param multiplier the number to multiply the offset by
      * @param moveEntities true to move entities
      * @param copyBiomes true to copy biomes (source biome is unchanged)
      * @param mask source mask for the operation (only matching blocks are moved)
@@ -1713,16 +1727,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      * @throws IllegalArgumentException thrown if the region is not a flat region, but copyBiomes is true
      */
-    public int moveRegion(Region region, BlockVector3 dir, int distance,
+    public int moveRegion(Region region, BlockVector3 offset, int multiplier,
                           boolean moveEntities, boolean copyBiomes, Mask mask, Pattern replacement) throws MaxChangedBlocksException {
         checkNotNull(region);
-        checkNotNull(dir);
-        checkArgument(distance >= 1, "distance >= 1 required");
+        checkNotNull(offset);
+        checkArgument(multiplier >= 1, "distance >= 1 required");
         checkArgument(!copyBiomes || region instanceof FlatRegion, "can't copy biomes from non-flat region");
 
-        BlockVector3 to = region.getMinimumPoint().add(dir.multiply(distance));
+        BlockVector3 to = region.getMinimumPoint().add(offset.multiply(multiplier));
 
-        final BlockVector3 displace = dir.multiply(distance);
+        final BlockVector3 displace = offset.multiply(multiplier);
         final BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
 
         BlockVector3 disAbs = displace.abs();
@@ -1873,7 +1887,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         // There are boundaries that the routine needs to stay in
         Mask mask = new MaskIntersection(
-                new BoundedHeightMask(0, Math.min(origin.getBlockY(), getWorld().getMaxY())),
+                new BoundedHeightMask(0, Math.min(origin.getBlockY(), getWorld().getMaxY())), //TODO Support for new world heights.
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 blockMask
         );
@@ -2708,7 +2722,18 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                             final int timeout) throws ExpressionException, MaxChangedBlocksException {
         final Expression expression = Expression.compile(expressionString, "x", "y", "z");
         expression.optimize();
+        return deformRegion(region, zero, unit, expression, timeout);
+    }
 
+    /**
+     * Internal version of {@link EditSession#deformRegion(Region, Vector3, Vector3, String, int)}.
+     *
+     * <p>
+     * The Expression class is subject to change. Expressions should be provided via the string overload.
+     * </p>
+     */
+    public int deformRegion(final Region region, final Vector3 zero, final Vector3 unit, final Expression expression,
+                            final int timeout) throws ExpressionException, MaxChangedBlocksException {
         final Variable x = expression.getSlots().getVariable("x")
             .orElseThrow(IllegalStateException::new);
         final Variable y = expression.getSlots().getVariable("y")

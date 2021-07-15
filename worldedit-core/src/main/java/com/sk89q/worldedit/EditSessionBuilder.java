@@ -3,18 +3,18 @@
  * Copyright (C) sk89q <http://www.sk89q.com>
  * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.sk89q.worldedit;
@@ -33,7 +33,7 @@ import java.util.Objects;
 /**
  * A builder-style factory for {@link EditSession EditSessions}.
  */
-public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBuilder {
+public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.EditSessionBuilder {
 
     private final EventBus eventBus;
     private @Nullable World world;
@@ -43,11 +43,12 @@ public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBu
     private boolean tracing;
 
     EditSessionBuilder(EventBus eventBus) {
-        super(null); //TODO
+        super(null); //TODO?
         this.eventBus = eventBus;
     }
 
-    @Nullable public World getWorld() {
+    @Nullable
+    public World getWorld() {
         return world;
     }
 
@@ -146,7 +147,7 @@ public final class EditSessionBuilder extends com.boydti.fawe.util.EditSessionBu
         if (WorldEdit.getInstance().getConfiguration().traceUnflushedSessions) {
             return new TracedEditSession(eventBus, world, maxBlocks, blockBag, actor, tracing);
         }
-        com.boydti.fawe.util.EditSessionBuilder editSessionBuilder = new com.boydti.fawe.util.EditSessionBuilder(Objects.requireNonNull(world));
+        com.fastasyncworldedit.core.util.EditSessionBuilder editSessionBuilder = WorldEdit.getInstance().newEditSessionBuilder().world(Objects.requireNonNull(world));
         editSessionBuilder.eventBus(eventBus)
                           .blockBag(blockBag)
                           .actor(actor)

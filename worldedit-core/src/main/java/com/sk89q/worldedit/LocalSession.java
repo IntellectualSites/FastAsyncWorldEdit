@@ -567,7 +567,7 @@ public class LocalSession implements TextureHolder {
         loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() < history.size()) {
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(world)
+            try (EditSession newEditSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                     .allowedRegionsEverywhere()
                     .checkMemory(false)
                     .changeSetNull()
@@ -606,7 +606,7 @@ public class LocalSession implements TextureHolder {
             setDirty();
             historyNegativeIndex--;
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(world)
+            try (EditSession newEditSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                     .allowedRegionsEverywhere()
                     .checkMemory(false)
                     .changeSetNull()
@@ -1526,7 +1526,7 @@ public class LocalSession implements TextureHolder {
 
         // Create an edit session
         EditSession editSession;
-        EditSessionBuilder builder = new EditSessionBuilder(world);
+        EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world);
         if (actor.isPlayer() && actor instanceof Player) {
             BlockBag blockBag = getBlockBag((Player) actor);
             builder.actor((Player) actor);

@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.github.intellectualsites.plotsquared.commands.Command;
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
@@ -24,11 +23,12 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+import org.bukkit.Bukkit;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import org.bukkit.Bukkit;
 
 @CommandDeclaration(
         command = "generatebiome",
@@ -72,7 +72,7 @@ public class PlotSetBiome extends Command {
             }
             plot.addRunning();
             TaskManager.IMP.async(() -> {
-                EditSession session = new EditSessionBuilder(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().worldname)))
+                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().worldname)))
                         .autoQueue(false)
                         .checkMemory(false)
                         .allowedRegionsEverywhere()

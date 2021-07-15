@@ -14,6 +14,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -244,8 +245,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public EditSession toEditSession(Player player, Region[] regions) {
         EditSessionBuilder builder =
-            new EditSessionBuilder(getWorld()).actor(player).autoQueue(false).fastmode(false)
-                                              .checkMemory(false).changeSet(this).limitUnlimited();
+            WorldEdit.getInstance().newEditSessionBuilder().world(getWorld()).actor(player).autoQueue(false).fastmode(false)
+                     .checkMemory(false).changeSet(this).limitUnlimited();
         if (regions != null) {
             builder.allowedRegions(regions);
         } else {

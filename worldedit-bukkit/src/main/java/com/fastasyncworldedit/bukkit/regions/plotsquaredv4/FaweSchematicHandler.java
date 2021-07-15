@@ -4,7 +4,6 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.object.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.object.io.PGZIPOutputStream;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
@@ -15,10 +14,11 @@ import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompressedCompoundTag;
-import com.sk89q.jnbt.fawe.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.jnbt.fawe.CompressedSchematicTag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -60,7 +60,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             Location pos2 = corners[1];
             World adaptedWorld = BukkitAdapter.adapt(getWorld(world));
             final CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
-            final EditSession editSession = new EditSessionBuilder(adaptedWorld).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+            final EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(adaptedWorld).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
 
             ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region, false, true);
 

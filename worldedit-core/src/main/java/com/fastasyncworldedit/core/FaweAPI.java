@@ -37,7 +37,6 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -48,6 +47,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * The FaweAPI class offers a few useful functions.<br>
@@ -66,9 +66,9 @@ public class FaweAPI {
      * @return A new EditSessionBuilder
      * @see EditSessionBuilder
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static EditSessionBuilder getEditSessionBuilder(World world) {
-        return new EditSessionBuilder(world);
+        return WorldEdit.getInstance().newEditSessionBuilder().world(world);
     }
 
     /**

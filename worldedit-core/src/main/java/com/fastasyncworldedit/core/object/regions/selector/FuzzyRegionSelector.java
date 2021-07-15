@@ -2,12 +2,12 @@ package com.fastasyncworldedit.core.object.regions.selector;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.object.regions.FuzzyRegion;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.PassthroughExtent;
@@ -31,12 +31,12 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
     private ArrayList<BlockVector3> positions;
 
     public FuzzyRegionSelector(Player player, @Nullable World world, Mask mask) {
-        super(new EditSessionBuilder(world)
-                .actor(player)
-                .changeSetNull()
-                .checkMemory(false)
-                .autoQueue(false)
-                .build());
+        super(WorldEdit.getInstance().newEditSessionBuilder().world(world)
+                       .actor(player)
+                       .changeSetNull()
+                       .checkMemory(false)
+                       .autoQueue(false)
+                       .build());
         this.player = player;
         this.region = new FuzzyRegion(world, getExtent(), mask);
         this.positions = new ArrayList<>();
@@ -51,7 +51,7 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
 
     @Override
     public void setWorld(@Nullable World world) {
-        EditSession extent = new EditSessionBuilder(world)
+        EditSession extent = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                 .actor(player)
                 .changeSetNull()
                 .checkMemory(false)
