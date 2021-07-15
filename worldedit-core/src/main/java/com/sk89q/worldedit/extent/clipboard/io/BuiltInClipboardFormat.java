@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
+import com.fastasyncworldedit.core.object.extent.clipboard.io.FastSchematicReader;
+import com.fastasyncworldedit.core.object.extent.clipboard.io.FastSchematicWriter;
 import com.fastasyncworldedit.core.object.io.PGZIPOutputStream;
 import com.fastasyncworldedit.core.object.io.ResettableFileInputStream;
 import com.fastasyncworldedit.core.object.schematic.MinecraftStructure;
@@ -48,6 +50,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public enum BuiltInClipboardFormat implements ClipboardFormat {
 
+    //FAWE start - register fast clipboard io
     FAST("fast", "fawe") {
 
         @Override
@@ -85,6 +88,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         }
 
     },
+    //FAWE end
 
     /**
      * The Schematic format used by MCEdit.
@@ -104,7 +108,10 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            throw new IOException("The formats `.schematic`, `.mcedit` and `.mce` are discontinued on versions newer than 1.12 and superseded by the sponge schematic implementation known for `.schem` files.");
+            //FAWE start - be a more helpful exception
+            throw new IOException("The formats `.schematic`, `.mcedit` and `.mce` are discontinued on versions newer than" +
+                    "1.12 and superseded by the sponge schematic implementation known for `.schem` files.");
+            //FAWE end
         }
 
         @Override
@@ -154,6 +161,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         }
     },
 
+    //FAWE start - recover schematics with bad entity data & register other clipboard formats
     BROKENENTITY("brokenentity", "legacyentity", "le", "be", "brokenentities", "legacyentities") {
 
         @Override
@@ -252,6 +260,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return "png";
         }
     };
+    //FAWE end
 
     private final ImmutableSet<String> aliases;
 

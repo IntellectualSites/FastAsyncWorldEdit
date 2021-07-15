@@ -96,7 +96,9 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
         } else {
             // Can't be an inlined check due to inconsistent generic return type
             if (stripNbt) {
+                //FAWE start - Use CompoundBinaryTag
                 return super.setBlock(location, block.toBaseBlock((CompoundBinaryTag) null));
+                //FAWE end
             } else {
                 return super.setBlock(location, block);
             }

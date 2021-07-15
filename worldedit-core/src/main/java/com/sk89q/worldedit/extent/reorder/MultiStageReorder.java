@@ -132,15 +132,19 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
         BlockCategories.DOORS.getAll().forEach(type -> priorityMap.put(type, PlacementPriority.FINAL));
         BlockCategories.BANNERS.getAll().forEach(type -> priorityMap.put(type, PlacementPriority.FINAL));
         BlockCategories.SIGNS.getAll().forEach(type -> priorityMap.put(type, PlacementPriority.FINAL));
-        priorityMap.put(BlockTypes.SIGN, PlacementPriority.FINAL);
-        priorityMap.put(BlockTypes.WALL_SIGN, PlacementPriority.FINAL);
+        @SuppressWarnings("deprecation")
+        BlockType sign = BlockTypes.SIGN;
+        priorityMap.put(sign, PlacementPriority.FINAL);
+        @SuppressWarnings("deprecation")
+        BlockType wallSign = BlockTypes.WALL_SIGN;
+        priorityMap.put(wallSign, PlacementPriority.FINAL);
         priorityMap.put(BlockTypes.CACTUS, PlacementPriority.FINAL);
         priorityMap.put(BlockTypes.SUGAR_CANE, PlacementPriority.FINAL);
         priorityMap.put(BlockTypes.PISTON_HEAD, PlacementPriority.FINAL);
         priorityMap.put(BlockTypes.MOVING_PISTON, PlacementPriority.FINAL);
     }
 
-    private Map<PlacementPriority, BlockMap<BaseBlock>> stages = new HashMap<>();
+    private final Map<PlacementPriority, BlockMap<BaseBlock>> stages = new HashMap<>();
 
     private boolean enabled;
 
@@ -232,6 +236,8 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
                     break;
                 case LAST:
                     stages.get(PlacementPriority.CLEAR_LAST).put(location, replacement);
+                    break;
+                default:
                     break;
             }
 

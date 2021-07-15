@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.extent.clipboard.io;
+package com.fastasyncworldedit.core.object.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
@@ -40,6 +40,7 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.NBTSchematicReader;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -75,7 +76,7 @@ public class FastSchematicReader extends NBTSchematicReader {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final NBTInputStream inputStream;
-    private DataFixer fixer;
+    private final DataFixer fixer;
     private int dataVersion = -1;
     private int version = -1;
     private int faweWritten = -1;

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.extent.clipboard.io;
+package com.fastasyncworldedit.core.object.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
@@ -36,6 +36,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;

@@ -99,6 +99,7 @@ public interface ClipboardFormat {
      */
     Set<String> getFileExtensions();
 
+    //FAWE start
     /**
      * Sets the actor's clipboard.
      * @param actor the actor
@@ -131,7 +132,6 @@ public interface ClipboardFormat {
         return getReader(stream).read();
     }
 
-
     default URL upload(final Clipboard clipboard) {
         return MainUtil.upload(null, null, getPrimaryFileExtension(), new RunnableVal<OutputStream>() {
             @Override
@@ -152,4 +152,5 @@ public interface ClipboardFormat {
             throw new RuntimeException(e);
         }
     }
+    //FAWE end
 }

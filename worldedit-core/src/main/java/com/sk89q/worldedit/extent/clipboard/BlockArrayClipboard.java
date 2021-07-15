@@ -53,6 +53,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BlockArrayClipboard implements Clipboard {
 
+    //FAWE start
     private final Region region;
     private final BlockVector3 origin;
     private final Clipboard parent;
@@ -87,6 +88,7 @@ public class BlockArrayClipboard implements Clipboard {
         this.region = region.clone();
         this.origin = region.getMinimumPoint();
     }
+    //FAWE end
 
     @Override
     public Region getRegion() {
@@ -139,14 +141,17 @@ public class BlockArrayClipboard implements Clipboard {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
         if (region.contains(position)) {
+            //FAWE - get points
             final int x = position.getBlockX();
             final int y = position.getBlockY();
             final int z = position.getBlockZ();
             return setBlock(x, y, z, block);
+            //FAWE end
         }
         return false;
     }
 
+    //FAWE start
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
         x -= origin.getX();
@@ -154,6 +159,7 @@ public class BlockArrayClipboard implements Clipboard {
         z -= origin.getZ();
         return getParent().setTile(x, y, z, tag);
     }
+
 
     public boolean setTile(BlockVector3 position, CompoundTag tag) {
         return setTile(position.getX(), position.getY(), position.getZ(), tag);
@@ -293,6 +299,7 @@ public class BlockArrayClipboard implements Clipboard {
         OffsetBlockVector3 mutable = new OffsetBlockVector3(origin);
         return Iterators.transform(getParent().iterator(order), mutable::init);
     }
+    //FAWE end
 
     @Override
     public BlockVector3 getDimensions() {
@@ -313,6 +320,7 @@ public class BlockArrayClipboard implements Clipboard {
         this.parent.close();
     }
 
+    //FAWE start
     /**
      * Stores entity data.
      */
@@ -384,4 +392,5 @@ public class BlockArrayClipboard implements Clipboard {
             return result != null;
         }
     }
+    //FAWE end
 }

@@ -147,6 +147,7 @@ public interface Extent extends InputExtent, OutputExtent {
         return null;
     }
 
+    //FAWE start
     /**
      * Create an entity at the given location.
      *
@@ -741,4 +742,5 @@ public interface Extent extends InputExtent, OutputExtent {
         }
         return filter;
     }
+    //FAWE end
 }

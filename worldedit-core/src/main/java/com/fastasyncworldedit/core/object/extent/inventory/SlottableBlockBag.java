@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.extent.inventory;
+package com.fastasyncworldedit.core.object.extent.inventory;
 
 import com.sk89q.worldedit.blocks.BaseItem;
 
