@@ -36,7 +36,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
  */
 public class AreaPickaxe implements BlockTool {
 
-    private int range;
+    private final int range;
 
     public AreaPickaxe(int range) {
         this.range = range;

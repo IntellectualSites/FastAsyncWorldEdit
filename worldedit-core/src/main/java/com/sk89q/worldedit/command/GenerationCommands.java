@@ -31,7 +31,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
-import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.fastasyncworldedit.core.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.generator.CavesGen;
@@ -85,111 +85,6 @@ public class GenerationCommands {
     public GenerationCommands(WorldEdit worldEdit) {
         checkNotNull(worldEdit);
         this.worldEdit = worldEdit;
-    }
-
-    @Command(
-            name = "/caves",
-            desc = "Generates a cave network"
-    )
-    @CommandPermissions("worldedit.generation.caves")
-    @Logging(PLACEMENT)
-    @Confirm(Confirm.Processor.REGION)
-    public void caves(Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
-                      @Arg(name = "size", desc = "TODO", def = "8") int sizeOpt,
-                      @Arg(name = "frequency", desc = "TODO", def = "40") int frequencyOpt,
-                      @Arg(name = "rarity", desc = "TODO", def = "7") int rarityOpt,
-                      @Arg(name = "minY", desc = "TODO", def = "8") int minYOpt,
-                      @Arg(name = "maxY", desc = "TODO", def = "127") int maxYOpt,
-                      @Arg(name = "systemFrequency", desc = "TODO", def = "1") int systemFrequencyOpt,
-                      @Arg(name = "individualRarity", desc = "TODO", def = "25") int individualRarityOpt,
-                      @Arg(name = "pocketChance", desc = "TODO", def = "0") int pocketChanceOpt,
-                      @Arg(name = "pocketMin", desc = "TODO", def = "0") int pocketMinOpt,
-                      @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt) throws WorldEditException {
-        CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
-        editSession.generate(region, gen);
-        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
-    }
-
-
-    @Command(
-        name = "/ores",
-        desc = "Generates ores"
-    )
-    @CommandPermissions("worldedit.generation.ore")
-    @Logging(PLACEMENT)
-    @Confirm(Confirm.Processor.REGION)
-    public void ores(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask) throws WorldEditException {
-        editSession.addOres(region, mask);
-        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
-    }
-
-    @Command(
-        name = "/img",
-        aliases = { "/image", "image" },
-        desc = "Generate an image"
-    )
-    @CommandPermissions("worldedit.generation.image")
-    @Logging(PLACEMENT)
-    public void image(Actor actor,
-                      LocalSession session,
-                      EditSession editSession,
-                      @Arg(desc = "Image URL (imgur only)") String imageURL,
-                      @Arg(desc = "boolean", def = "true") boolean randomize,
-                      @Arg(desc = "TODO", def = "100") int threshold,
-                      @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
-        TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
-        URL url = new URL(imageURL);
-        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
-            throw new IOException("Only i.imgur.com links are allowed!");
-        }
-        BufferedImage image = MainUtil.readImage(url);
-        if (dimensions != null) {
-            image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
-        }
-
-        BlockVector3 pos1 = session.getPlacementPosition(actor);
-        BlockVector3 pos2 = pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1);
-        CuboidRegion region = new CuboidRegion(pos1, pos2);
-        int[] count = new int[1];
-        final BufferedImage finalImage = image;
-        RegionVisitor visitor = new RegionVisitor(region, pos -> {
-            try {
-                int x = pos.getBlockX() - pos1.getBlockX();
-                int z = pos.getBlockZ() - pos1.getBlockZ();
-                int color = finalImage.getRGB(x, z);
-                BlockType block = tu.getNearestBlock(color);
-                count[0]++;
-                if (block != null) {
-                    return editSession.setBlock(pos, block.getDefaultState());
-                }
-                return false;
-            } catch (Throwable e) {
-                e.printStackTrace();
-            }
-            return false;
-        });
-        Operations.completeBlindly(visitor);
-        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
-    }
-
-    @Command(name = "/ore", desc = "Generates ores")
-    @CommandPermissions("worldedit.generation.ore")
-    @Logging(PLACEMENT)
-    @Confirm(Confirm.Processor.REGION)
-    public void ore(Actor actor,
-                    LocalSession session,
-                    EditSession editSession,
-                    @Selection Region region,
-                    @Arg(desc = "Mask") Mask mask,
-                    @Arg(desc = "Pattern") Pattern material,
-                    @Arg(desc = "Ore vein size") @Range(from = 0, to = Integer.MAX_VALUE) int size,
-                    @Arg(desc = "Ore vein frequency (number of times to attempt to place ore)", def = "10") @Range(from = 0, to = Integer.MAX_VALUE) int freq,
-                    @Arg(desc = "Ore vein rarity (% chance each attempt is placed)", def = "100") @Range(from = 0, to = 100) int rarity,
-                    @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
-                    @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY) throws WorldEditException {
-        editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
-        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
 
     @Command(
@@ -538,5 +433,112 @@ public class GenerationCommands {
             return 0;
         }
     }
+
+    //FAWE start
+    @Command(
+            name = "/caves",
+            desc = "Generates a cave network"
+    )
+    @CommandPermissions("worldedit.generation.caves")
+    @Logging(PLACEMENT)
+    @Confirm(Confirm.Processor.REGION)
+    public void caves(Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
+                      @Arg(name = "size", desc = "TODO", def = "8") int sizeOpt,
+                      @Arg(name = "frequency", desc = "TODO", def = "40") int frequencyOpt,
+                      @Arg(name = "rarity", desc = "TODO", def = "7") int rarityOpt,
+                      @Arg(name = "minY", desc = "TODO", def = "8") int minYOpt,
+                      @Arg(name = "maxY", desc = "TODO", def = "127") int maxYOpt,
+                      @Arg(name = "systemFrequency", desc = "TODO", def = "1") int systemFrequencyOpt,
+                      @Arg(name = "individualRarity", desc = "TODO", def = "25") int individualRarityOpt,
+                      @Arg(name = "pocketChance", desc = "TODO", def = "0") int pocketChanceOpt,
+                      @Arg(name = "pocketMin", desc = "TODO", def = "0") int pocketMinOpt,
+                      @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt) throws WorldEditException {
+        CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
+        editSession.generate(region, gen);
+        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
+    }
+
+
+    @Command(
+            name = "/ores",
+            desc = "Generates ores"
+    )
+    @CommandPermissions("worldedit.generation.ore")
+    @Logging(PLACEMENT)
+    @Confirm(Confirm.Processor.REGION)
+    public void ores(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask) throws WorldEditException {
+        editSession.addOres(region, mask);
+        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
+    }
+
+    @Command(
+            name = "/img",
+            aliases = { "/image", "image" },
+            desc = "Generate an image"
+    )
+    @CommandPermissions("worldedit.generation.image")
+    @Logging(PLACEMENT)
+    public void image(Actor actor,
+                      LocalSession session,
+                      EditSession editSession,
+                      @Arg(desc = "Image URL (imgur only)") String imageURL,
+                      @Arg(desc = "boolean", def = "true") boolean randomize,
+                      @Arg(desc = "TODO", def = "100") int threshold,
+                      @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
+        TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
+        URL url = new URL(imageURL);
+        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
+            throw new IOException("Only i.imgur.com links are allowed!");
+        }
+        BufferedImage image = MainUtil.readImage(url);
+        if (dimensions != null) {
+            image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
+        }
+
+        BlockVector3 pos1 = session.getPlacementPosition(actor);
+        BlockVector3 pos2 = pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1);
+        CuboidRegion region = new CuboidRegion(pos1, pos2);
+        int[] count = new int[1];
+        final BufferedImage finalImage = image;
+        RegionVisitor visitor = new RegionVisitor(region, pos -> {
+            try {
+                int x = pos.getBlockX() - pos1.getBlockX();
+                int z = pos.getBlockZ() - pos1.getBlockZ();
+                int color = finalImage.getRGB(x, z);
+                BlockType block = tu.getNearestBlock(color);
+                count[0]++;
+                if (block != null) {
+                    return editSession.setBlock(pos, block.getDefaultState());
+                }
+                return false;
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+            return false;
+        });
+        Operations.completeBlindly(visitor);
+        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
+    }
+
+    @Command(name = "/ore", desc = "Generates ores")
+    @CommandPermissions("worldedit.generation.ore")
+    @Logging(PLACEMENT)
+    @Confirm(Confirm.Processor.REGION)
+    public void ore(Actor actor,
+                    LocalSession session,
+                    EditSession editSession,
+                    @Selection Region region,
+                    @Arg(desc = "Mask") Mask mask,
+                    @Arg(desc = "Pattern") Pattern material,
+                    @Arg(desc = "Ore vein size") @Range(from = 0, to = Integer.MAX_VALUE) int size,
+                    @Arg(desc = "Ore vein frequency (number of times to attempt to place ore)", def = "10") @Range(from = 0, to = Integer.MAX_VALUE) int freq,
+                    @Arg(desc = "Ore vein rarity (% chance each attempt is placed)", def = "100") @Range(from = 0, to = 100) int rarity,
+                    @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
+                    @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY) throws WorldEditException {
+        editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
+        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
+    }
+    //FAWE end
 
 }

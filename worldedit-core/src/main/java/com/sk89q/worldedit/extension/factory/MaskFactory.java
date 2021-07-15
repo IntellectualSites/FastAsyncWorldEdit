@@ -21,33 +21,33 @@ package com.sk89q.worldedit.extension.factory;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.parser.mask.AdjacentMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.AdjacentMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.AirMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.AngleMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.AngleMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BiomeMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockCategoryMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockStateMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlocksMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ExistingMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ExtremaMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.FalseMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.ExtremaMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.FalseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.LazyRegionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.LiquidMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.LiquidMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.NegateMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.OffsetMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ROCAngleMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.ROCAngleMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.RegionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.RichOffsetMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.SimplexMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.RichOffsetMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.SimplexMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.SolidMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.SurfaceMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.TrueMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.WallMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.XAxisMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.YAxisMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ZAxisMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.SurfaceMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.TrueMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.WallMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.XAxisMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.YAxisMaskParser;
+import com.fastasyncworldedit.core.object.mask.parser.ZAxisMaskParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -91,6 +91,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
 
         register(new BlockCategoryMaskParser(worldEdit));
         register(new BiomeMaskParser(worldEdit));
+        //FAWE start
         // Mask Parsers from FAWE
         register(new AdjacentMaskParser(worldEdit));
         register(new AngleMaskParser(worldEdit));
@@ -107,6 +108,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new XAxisMaskParser(worldEdit));
         register(new YAxisMaskParser(worldEdit));
         register(new ZAxisMaskParser(worldEdit));
+        //FAWE end
 
     }
 

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.FaweInputStream;
 import com.fastasyncworldedit.core.object.FaweLimit;
@@ -1114,7 +1115,7 @@ public class LocalSession implements TextureHolder {
 
     public BrushTool getBrushTool(BaseItem item, Player player, boolean create) throws InvalidToolBindException {
         if (item.getType().hasBlockType()) {
-            throw new InvalidToolBindException(item.getType(), "Blocks can't be used");
+            throw new InvalidToolBindException(item.getType(), Caption.of("worldedit.error.blocks-cant-be-used"));
         }
         Tool tool = getTool(item, player);
         if (!(tool instanceof BrushTool)) {
@@ -1138,7 +1139,7 @@ public class LocalSession implements TextureHolder {
      */
     public void setTool(ItemType item, @Nullable Tool tool) throws InvalidToolBindException {
         if (item.hasBlockType()) {
-            throw new InvalidToolBindException(item, "Blocks can't be used");
+            throw new InvalidToolBindException(item, Caption.of("worldedit.error.blocks-cant-be-used"));
         }
         if (tool instanceof SelectionWand) {
             changeTool(this.wandItem, this.wandItem = item, tool);
@@ -1175,7 +1176,7 @@ public class LocalSession implements TextureHolder {
     public void setTool(BaseItem item, @Nullable Tool tool, Player player) throws InvalidToolBindException {
         ItemType type = item.getType();
         if (type.hasBlockType() && type.getBlockType().getMaterial().isAir()) {
-            throw new InvalidToolBindException(type, "Blocks can't be used");
+            throw new InvalidToolBindException(type, Caption.of("worldedit.error.blocks-cant-be-used"));
         } else if (tool instanceof SelectionWand) {
             changeTool(this.wandItem, this.wandItem = item.getType(), tool);
             setDirty();

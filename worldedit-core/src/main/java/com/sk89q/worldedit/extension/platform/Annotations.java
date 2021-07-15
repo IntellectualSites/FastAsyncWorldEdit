@@ -33,10 +33,12 @@ class Annotations {
         return new AutoAnnotation_Annotations_radii(value);
     }
 
+    //FAWE start
     @AutoAnnotation
     static PatternList patternList() {
         return new AutoAnnotation_Annotations_patternList();
     }
+    //FAWE end
 
     private Annotations() {
     }

@@ -102,7 +102,7 @@ public class GeneralCommands {
         Set<org.enginehub.piston.Command> commands = collect.getAllCommands()
             .collect(Collectors.toSet());
         for (org.enginehub.piston.Command command : commands) {
-            /*if in FAWE, //fast will remain for now
+            /*FAWE start - if in FAWE, //fast will remain for now
              (command.getName().equals("/fast")) {
 
                 // deprecate to `//perf`
@@ -209,30 +209,6 @@ public class GeneralCommands {
             component.append(Caption.of("worldedit.timeout.return-to-default"));
         }
         actor.print(component);
-    }
-
-    @Command(
-        name = "/fast",
-        desc = "Toggle fast mode"
-    )
-    @CommandPermissions("worldedit.fast")
-    @Deprecated
-    void fast(Actor actor, LocalSession session,
-              @Arg(desc = "The new fast mode state", def = "")
-                  Boolean fastMode) {
-        boolean hasFastMode = session.hasFastMode();
-        if (fastMode != null && fastMode == hasFastMode) {
-            actor.print(Caption.of(fastMode ? "worldedit.fast.enabled.already" : "worldedit.fast.disabled.already"));
-            return;
-        }
-
-        if (hasFastMode) {
-            session.setFastMode(false);
-            actor.print(Caption.of("worldedit.fast.disabled"));
-        } else {
-            session.setFastMode(true);
-            actor.print(Caption.of("worldedit.fast.enabled"));
-        }
     }
 
     @Command(
@@ -487,6 +463,7 @@ public class GeneralCommands {
         }
     }
 
+    //FAWE start
     @Command(
             name = "/gtexture",
             aliases = {"gtexture"},
@@ -601,4 +578,29 @@ public class GeneralCommands {
             player.print(Caption.of("fawe.info.worldedit.toggle.tips.off"));
         }
     }
+
+    @Command(
+            name = "/fast",
+            desc = "Toggle fast mode"
+    )
+    @CommandPermissions("worldedit.fast")
+    @Deprecated
+    void fast(Actor actor, LocalSession session,
+              @Arg(desc = "The new fast mode state", def = "")
+                      Boolean fastMode) {
+        boolean hasFastMode = session.hasFastMode();
+        if (fastMode != null && fastMode == hasFastMode) {
+            actor.print(Caption.of(fastMode ? "worldedit.fast.enabled.already" : "worldedit.fast.disabled.already"));
+            return;
+        }
+
+        if (hasFastMode) {
+            session.setFastMode(false);
+            actor.print(Caption.of("worldedit.fast.disabled"));
+        } else {
+            session.setFastMode(true);
+            actor.print(Caption.of("worldedit.fast.enabled"));
+        }
+    }
+    //FAWE end
 }

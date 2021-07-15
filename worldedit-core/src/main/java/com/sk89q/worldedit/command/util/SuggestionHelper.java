@@ -179,6 +179,7 @@ public final class SuggestionHelper {
         return registry.keySet().stream().filter(search);
     }
 
+    //FAWE start
     /**
      * Returns a stream of suggestions for positive doubles.
      *
@@ -231,4 +232,5 @@ public final class SuggestionHelper {
         }
         return true;
     }
+    //FAWE end
 }

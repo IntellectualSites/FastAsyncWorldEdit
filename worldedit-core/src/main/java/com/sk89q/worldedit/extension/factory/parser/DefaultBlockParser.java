@@ -118,7 +118,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
     }
 
-    private static String[] EMPTY_STRING_ARRAY = {};
+    private static final String[] EMPTY_STRING_ARRAY = {};
 
     /**
      * Backwards compatibility for wool colours in block syntax.
@@ -253,9 +253,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     }
 
     private BaseBlock parseLogic(String input, ParserContext context) throws InputParseException {
+        //FAWE start
         String[] blockAndExtraData = input.trim().split("\\|", 2);
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
         Map<Property<?>, Object> blockStates = new HashMap<>();
+        //FAWE end
 
         BlockState state = null;
 
@@ -270,6 +272,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 } else if (MathMan.isInteger(split[0])) {
                     int id = Integer.parseInt(split[0]);
                     int data = Integer.parseInt(split[1]);
+                    //FAWE start
                     if (data < 0 || data >= 16) {
                         throw new InputParseException(Caption.of("fawe.error.parser.invalid-data", TextComponent.of(data)));
                     }
@@ -289,6 +292,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
 
         CompoundTag nbt = null;
+        //FAWE end
         if (state == null) {
             String typeString;
             String stateString = null;
@@ -319,13 +323,17 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             if ("hand".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's hand.
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
+                //FAWE start
                 state = blockInHand.toBlockState();
                 nbt = blockInHand.getNbtData();
+                //FAWE end
             } else if ("offhand".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's off hand.
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
+                //FAWE start
                 state = blockInHand.toBlockState();
                 nbt = blockInHand.getNbtData();
+                //FAWE end
             } else if (typeString.matches("pos[0-9]+")) {
                 int index = Integer.parseInt(typeString.replaceAll("[a-z]+", ""));
                 // Get the block type from the "primary position"
@@ -337,6 +345,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new InputParseException(Caption.of("worldedit.error.incomplete-region"));
                 }
                 state = world.getBlock(primaryPosition);
+                //FAWE start
             } else if (typeString.matches("slot[0-9]+")) {
                 int slot = Integer.parseInt(typeString.substring(4)) - 1;
                 Actor actor = context.requireActor();
@@ -369,6 +378,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             if (nbt == null) {
                 nbt = state.getNbtData();
             }
+            //FAWE end
 
             blockStates.putAll(parseProperties(state.getBlockType(), stateProperties, context));
             if (context.isPreferringWildcard()) {
@@ -394,7 +404,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
         // this should be impossible but IntelliJ isn't that smart
         if (state == null) {
-            throw new NoMatchException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)));
+            throw new NoMatchException(Caption.of("worldedit.error.unknown-block", TextComponent.of(input)));
         }
 
         if (blockAndExtraData.length > 1 && blockAndExtraData[1].startsWith("{")) {
@@ -413,7 +423,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             Actor actor = context.requireActor();
             if (actor != null && !actor.hasPermission("worldedit.anyblock")
                     && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
-                throw new DisallowedUsageException(Caption.of("fawe.error.block.not.allowed", TextComponent.of(input)));
+                throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(input)));
             }
         }
 
@@ -462,11 +472,12 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
     }
 
+    //FAWE Start
     private <T extends BlockStateHolder> T validate(ParserContext context, T holder) {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
-                throw new DisallowedUsageException(Caption.of("fawe.error.block.not.allowed", TextComponent.of(String.valueOf(holder))));
+                throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(String.valueOf(holder))));
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
@@ -477,4 +488,5 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
         return holder;
     }
+    //FAWE end
 }

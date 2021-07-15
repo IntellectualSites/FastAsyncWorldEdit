@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.internal.command;
 
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.fastasyncworldedit.core.util.annotation.Confirm;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.CommandParameters;

@@ -26,7 +26,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.fastasyncworldedit.core.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -68,10 +68,12 @@ public class HistoryCommands {
                          String playerName) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession undoSession = session;
+        //FAWE start - Add fastmode check
         if (session.hasFastMode()) {
             actor.print(Caption.of("fawe.worldedit.history.command.undo.disabled"));
             return;
         }
+        //FAWE end
         if (playerName != null) {
             actor.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);

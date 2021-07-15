@@ -348,6 +348,7 @@ public interface Player extends Entity, Actor {
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
 
+    //FAWE start
     public Region[] getCurrentRegions();
 
     Region[] getCurrentRegions(FaweMaskManager.MaskType type);
@@ -429,4 +430,5 @@ public interface Player extends Entity, Actor {
             print(Caption.of("fawe.error.stacktrace"));
         }
     }
+    //FAWE end
 }
