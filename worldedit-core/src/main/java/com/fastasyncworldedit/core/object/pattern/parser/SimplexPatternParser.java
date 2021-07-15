@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.object.pattern.parser;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.math.noise.SimplexNoiseGenerator;
+import com.fastasyncworldedit.core.object.random.SimplexNoiseGenerator;
 
 public class SimplexPatternParser extends NoisePatternParser {
     private static final String SIMPLEX_NAME = "simplex";

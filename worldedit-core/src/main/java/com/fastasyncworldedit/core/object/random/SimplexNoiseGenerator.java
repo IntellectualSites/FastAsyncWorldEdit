@@ -1,8 +1,8 @@
-package com.sk89q.worldedit.math.noise;
+package com.fastasyncworldedit.core.object.random;
 
-import com.fastasyncworldedit.core.object.random.SimplexNoise;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.math.noise.NoiseGenerator;
 
 public class SimplexNoiseGenerator implements NoiseGenerator {
 

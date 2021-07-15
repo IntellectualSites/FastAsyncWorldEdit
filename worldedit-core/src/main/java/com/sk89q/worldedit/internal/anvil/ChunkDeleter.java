@@ -52,7 +52,7 @@ import java.util.stream.Stream;
 public final class ChunkDeleter {
 
     public static final String DELCHUNKS_FILE_NAME = "delete_chunks.json";
-    private static final Logger LOGGER = LogManagerCompat.getLogger();;
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Comparator<BlockVector2> chunkSorter = Comparator.comparing(
         pos -> (pos.getBlockX() & 31) + (pos.getBlockZ() & 31) * 32
@@ -64,7 +64,7 @@ public final class ChunkDeleter {
             .create();
 
     public static ChunkDeletionInfo readInfo(Path chunkFile) throws IOException, JsonSyntaxException {
-        String json = new String(Files.readAllBytes(chunkFile), StandardCharsets.UTF_8);
+        String json = Files.readString(chunkFile);
         return chunkDeleterGson.fromJson(json, ChunkDeletionInfo.class);
     }
 

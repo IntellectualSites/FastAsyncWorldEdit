@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.sk89q.worldedit.command.argument.HeightConverter;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.FaweLimit;
@@ -97,9 +96,8 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.internal.annotation.PatternList;
+import com.fastasyncworldedit.core.util.annotation.PatternList;
 import com.sk89q.worldedit.internal.annotation.ClipboardMask;
-import com.sk89q.worldedit.internal.annotation.VertHeight;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;

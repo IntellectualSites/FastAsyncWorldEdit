@@ -14,7 +14,7 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.object.extent.NullExtent;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.extent.PassthroughExtent;
+import com.fastasyncworldedit.core.object.extent.PassthroughExtent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockMaskBuilder;

@@ -112,6 +112,7 @@ public interface OutputExtent {
         return setBiome(MutableBlockVector3.get(x, y, z), biome);
     }
 
+    //FAWE start
     /**
      * Set the biome.
      *
@@ -159,6 +160,7 @@ public interface OutputExtent {
     default void setSkyLight(BlockVector3 position, int value) {
         setSkyLight(position.getX(), position.getY(), position.getZ(), value);
     }
+    //FAWE end
 
     default void setSkyLight(int x, int y, int z, int value) {
     }

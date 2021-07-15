@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.internal.annotation;
+package com.fastasyncworldedit.core.util.annotation;
 
 import org.enginehub.piston.inject.InjectAnnotation;
 

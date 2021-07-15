@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.google.auto.value.AutoAnnotation;
-import com.sk89q.worldedit.internal.annotation.PatternList;
+import com.fastasyncworldedit.core.util.annotation.PatternList;
 import com.sk89q.worldedit.internal.annotation.Radii;
 
 /**

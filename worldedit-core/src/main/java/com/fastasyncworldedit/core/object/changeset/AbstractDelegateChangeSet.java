@@ -8,7 +8,7 @@ import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
-import com.sk89q.worldedit.history.changeset.ChangeSetSummary;
+import com.fastasyncworldedit.core.history.changeset.ChangeSetSummary;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;

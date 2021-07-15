@@ -1,6 +1,7 @@
-package com.sk89q.worldedit.math.transform;
+package com.fastasyncworldedit.core.math.transform;
 
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.math.transform.Transform;
 
 public class RoundedTransform implements Transform {
     private final Transform transform;

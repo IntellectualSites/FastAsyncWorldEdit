@@ -85,6 +85,7 @@ public class Expression implements Cloneable {
 
         for (String variableName : variableNames) {
             slots.initVariable(variableName)
+                    //FAWE start
                 .orElseThrow(() -> new ExpressionException(-1,
                     "Tried to overwrite identifier '" + variableName + "'"));
         }
@@ -120,6 +121,7 @@ public class Expression implements Cloneable {
             slots.initVariable(variableName)
                 .orElseThrow(() -> new ExpressionException(-1,
                     "Tried to overwrite identifier '" + variableName + "'"));
+            //FAWE end
         }
         this.providedSlots = ImmutableList.copyOf(variableNames);
 

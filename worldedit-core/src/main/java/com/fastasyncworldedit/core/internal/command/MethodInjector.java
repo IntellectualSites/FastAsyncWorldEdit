@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.internal.command;
+package com.fastasyncworldedit.core.internal.command;
 
 import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.gen.CommandCallListener;
