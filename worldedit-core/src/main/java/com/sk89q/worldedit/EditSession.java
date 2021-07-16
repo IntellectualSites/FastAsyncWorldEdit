@@ -29,6 +29,7 @@ import com.fastasyncworldedit.core.object.RegionWrapper;
 import com.fastasyncworldedit.core.object.RunnableVal;
 import com.fastasyncworldedit.core.object.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.object.changeset.BlockBagChangeSet;
+import com.fastasyncworldedit.core.object.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.object.collection.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.object.extent.FaweRegionExtent;
 import com.fastasyncworldedit.core.object.extent.ProcessedWEExtent;
@@ -51,6 +52,7 @@ import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.MaskingExtent;
 import com.sk89q.worldedit.extent.PassthroughExtent;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
@@ -62,6 +64,9 @@ import com.sk89q.worldedit.function.block.Naturalizer;
 import com.sk89q.worldedit.function.block.SnowSimulator;
 import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.function.generator.GardenPatchGenerator;
+import com.sk89q.worldedit.function.generator.GenBase;
+import com.sk89q.worldedit.function.generator.OreGen;
+import com.sk89q.worldedit.function.generator.SchemGen;
 import com.sk89q.worldedit.function.mask.BlockStateMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.BoundedHeightMask;
@@ -120,6 +125,7 @@ import com.sk89q.worldedit.regions.shape.ArbitraryBiomeShape;
 import com.sk89q.worldedit.regions.shape.ArbitraryShape;
 import com.sk89q.worldedit.regions.shape.RegionShape;
 import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
+import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
@@ -3266,5 +3272,29 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } catch (WorldEditException e) {
             throw new RuntimeException("Unexpected exception", e);
         }
+    }
+
+    @Override
+    public void generate(Region region, GenBase gen) throws WorldEditException {
+        for (BlockVector2 chunkPos : region.getChunks()) {
+            gen.generate(chunkPos, this);
+        }
+    }
+
+    @Override
+    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+        spawnResource(region, new SchemGen(mask, this, clipboards, rotate), rarity, 1);
+    }
+
+    @Override
+    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+        spawnResource(region, new OreGen(this, mask, material, size, minY, maxY), rarity, frequency);
+    }
+
+    @Override
+    public Clipboard lazyCopy(Region region) {
+        WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> this, region);
+        faweClipboard.setOrigin(region.getMinimumPoint());
+        return faweClipboard;
     }
 }
