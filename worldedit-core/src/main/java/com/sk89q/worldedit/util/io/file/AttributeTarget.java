@@ -19,22 +19,6 @@
 
 package com.sk89q.worldedit.util.io.file;
 
-import java.io.IOException;
-import java.nio.file.FileSystem;
-import java.nio.file.Path;
-import java.util.Optional;
-
-/**
- * Something that can provide access to an archive file as a file system.
- */
-public interface ArchiveNioSupport {
-
-    /**
-     * Try to open the given archive as a file system.
-     *
-     * @param archive the archive to open
-     * @return the path for the root of the archive, if available
-     */
-    Optional<Path> tryOpenAsDir(Path archive) throws IOException;
-
+public enum AttributeTarget {
+    FILE, DIRECTORY
 }
