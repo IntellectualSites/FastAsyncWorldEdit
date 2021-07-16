@@ -34,6 +34,7 @@ import com.fastasyncworldedit.core.object.collection.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.object.extent.FaweRegionExtent;
 import com.fastasyncworldedit.core.object.extent.ProcessedWEExtent;
 import com.fastasyncworldedit.core.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.object.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.object.extent.SourceMaskExtent;
 import com.fastasyncworldedit.core.object.function.SurfaceRegionFunction;
 import com.fastasyncworldedit.core.object.mask.ResettableMask;
@@ -3277,7 +3278,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Override
     public void generate(Region region, GenBase gen) throws WorldEditException {
         for (BlockVector2 chunkPos : region.getChunks()) {
-            gen.generate(chunkPos, this);
+            gen.generate(chunkPos, new SingleRegionExtent(this, getLimit(), region));
         }
     }
 
