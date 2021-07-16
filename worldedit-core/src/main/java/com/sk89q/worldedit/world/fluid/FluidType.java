@@ -21,7 +21,7 @@ package com.sk89q.worldedit.world.fluid;
 
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.sk89q.worldedit.registry.RegistryItem;
+import com.fastasyncworldedit.core.registry.RegistryItem;
 
 /**
  * Minecraft now has a 'fluid' system. This is a

@@ -21,7 +21,7 @@ package com.sk89q.worldedit.util;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.math.Vector3Impl;
+import com.fastasyncworldedit.core.math.Vector3Impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;

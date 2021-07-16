@@ -23,7 +23,7 @@ import com.sk89q.worldedit.function.pattern.BiomePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.sk89q.worldedit.registry.RegistryItem;
+import com.fastasyncworldedit.core.registry.RegistryItem;
 
 /**
  * All the types of biomes in the game.

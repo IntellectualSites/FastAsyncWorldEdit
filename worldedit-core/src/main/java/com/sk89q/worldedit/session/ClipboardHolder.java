@@ -63,6 +63,7 @@ public class ClipboardHolder {
         return clipboard;
     }
 
+    //FAWE start
     /**
      * Gets all currently held clipboards.
      * @return all clipboards being held.
@@ -84,6 +85,7 @@ public class ClipboardHolder {
     public List<ClipboardHolder> getHolders() {
         return Collections.singletonList(this);
     }
+    //FAWE end
 
     /**
      * Set the transform.

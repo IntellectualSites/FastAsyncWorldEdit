@@ -1,5 +1,4 @@
-
-package com.sk89q.worldedit.registry;
+package com.fastasyncworldedit.core.registry;
 
 public interface RegistryItem {
     void setInternalId(int internalId);

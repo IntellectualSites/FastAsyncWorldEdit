@@ -1,4 +1,6 @@
-package com.sk89q.worldedit.math;
+package com.fastasyncworldedit.core.math;
+
+import com.sk89q.worldedit.math.BlockVector3;
 
 public class OffsetBlockVector3 extends DelegateBlockVector3 {
     private final BlockVector3 offset;

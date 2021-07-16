@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.registry.state;
 
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -44,10 +46,6 @@ public interface Property<T> {
      */
     List<T> getValues();
 
-    default int getIndex(T value) {
-        return getValues().indexOf(value);
-    }
-
     /**
      * Gets the value for the given string, or null.
      *
@@ -58,6 +56,11 @@ public interface Property<T> {
     @Nullable
     T getValueFor(String string) throws IllegalArgumentException;
 
+    //FAWE start
+    default int getIndex(T value) {
+        return getValues().indexOf(value);
+    }
+
     default int getIndexFor(CharSequence string) throws IllegalArgumentException {
         return getIndex(getValueFor(string.toString()));
     }
@@ -65,4 +68,5 @@ public interface Property<T> {
     default PropertyKey getKey() {
         return PropertyKey.getOrCreate(getName());
     }
+    //FAWE end
 }

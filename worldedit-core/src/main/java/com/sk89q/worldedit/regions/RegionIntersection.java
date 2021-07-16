@@ -146,6 +146,7 @@ public class RegionIntersection extends AbstractRegion {
 
     }
 
+    //FAWE start
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         for (Region region : regions) {
@@ -237,4 +238,5 @@ public class RegionIntersection extends AbstractRegion {
         }
         return false;
     }
+    //FAWE end
 }

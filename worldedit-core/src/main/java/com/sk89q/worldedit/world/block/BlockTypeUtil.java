@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.sk89q.worldedit.registry.state.PropertyGroup;
-import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.registry.state.PropertyGroup;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

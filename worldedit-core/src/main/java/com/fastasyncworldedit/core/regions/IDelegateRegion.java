@@ -1,8 +1,10 @@
-package com.sk89q.worldedit.regions;
+package com.fastasyncworldedit.core.regions;
 
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 

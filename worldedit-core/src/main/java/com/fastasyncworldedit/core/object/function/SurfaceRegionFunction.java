@@ -5,7 +5,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 public class SurfaceRegionFunction implements FlatRegionFunction {
     private final Extent extent;

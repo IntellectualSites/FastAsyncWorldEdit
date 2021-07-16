@@ -316,8 +316,10 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         return "cuboid";
     }
 
+    //FAWE start
     @Override
     public List<BlockVector3> getVertices() {
         return Arrays.asList(position1, position2);
     }
+    //FAWE end
 }

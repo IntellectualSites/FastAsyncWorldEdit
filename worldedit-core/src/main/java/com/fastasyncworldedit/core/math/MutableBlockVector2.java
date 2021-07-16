@@ -1,4 +1,6 @@
-package com.sk89q.worldedit.math;
+package com.fastasyncworldedit.core.math;
+
+import com.sk89q.worldedit.math.BlockVector2;
 
 public class MutableBlockVector2 extends BlockVector2 {
 

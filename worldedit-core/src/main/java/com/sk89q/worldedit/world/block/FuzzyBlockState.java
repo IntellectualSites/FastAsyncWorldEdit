@@ -21,7 +21,7 @@ package com.sk89q.worldedit.world.block;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 
 import java.util.Collections;
 import java.util.HashMap;

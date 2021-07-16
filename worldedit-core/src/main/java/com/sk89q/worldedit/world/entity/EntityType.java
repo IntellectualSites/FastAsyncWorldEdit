@@ -21,7 +21,7 @@ package com.sk89q.worldedit.world.entity;
 
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.sk89q.worldedit.registry.RegistryItem;
+import com.fastasyncworldedit.core.registry.RegistryItem;
 
 public class EntityType implements RegistryItem, Keyed {
 

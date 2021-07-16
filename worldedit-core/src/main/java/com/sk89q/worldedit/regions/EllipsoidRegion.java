@@ -53,10 +53,12 @@ public class EllipsoidRegion extends AbstractRegion {
      */
     private Vector3 radius;
 
+    //FAWE start
     private Vector3 radiusSqr;
     private Vector3 inverseRadius;
     private int radiusLengthSqr;
     private boolean sphere;
+    //FAWE end
 
     /**
      * Construct a new instance of this ellipsoid region.
@@ -194,10 +196,12 @@ public class EllipsoidRegion extends AbstractRegion {
      */
     public void setRadius(Vector3 radius) {
         this.radius = radius.add(0.5, 0.5, 0.5);
+        //FAWE start
         radiusSqr = radius.multiply(radius);
         radiusLengthSqr = (int) radiusSqr.getX();
         this.sphere = radius.getY() == radius.getX() && radius.getX() == radius.getZ();
         inverseRadius = Vector3.ONE.divide(radius);
+        //FAWE end
     }
 
     @Override
@@ -224,6 +228,7 @@ public class EllipsoidRegion extends AbstractRegion {
         return chunks;
     }
 
+    //FAWE start
     @Override
     public boolean contains(int x, int y, int z) {
         int cx = x - center.getBlockX();
@@ -238,7 +243,7 @@ public class EllipsoidRegion extends AbstractRegion {
         }
         int cy = y - center.getBlockY();
         int cy2 = cy * cy;
-        if (radiusSqr.getBlockY() < 255 && cy2 > radiusSqr.getBlockY()) {
+        if (radiusSqr.getBlockY() < world.getMaxY() && cy2 > radiusSqr.getBlockY()) {
             return false;
         }
         if (sphere) {
@@ -250,13 +255,13 @@ public class EllipsoidRegion extends AbstractRegion {
         return cxd + cyd + czd <= 1;
     }
 
-    /*
+    /* FAWE start
     /* Slow and unnecessary
     @Override
     public boolean contains(BlockVector3 position) {
         return position.subtract(center).toVector3().divide(radius).lengthSq() <= 1;
     }
-    */
+     */
 
     @Override
     public boolean contains(BlockVector3 position) {
@@ -279,6 +284,7 @@ public class EllipsoidRegion extends AbstractRegion {
         double czd = cz2 * inverseRadius.getZ();
         return cxd + czd <= 1;
     }
+    //FAWE end
 
     /**
      * Returns string representation in the format
@@ -300,6 +306,7 @@ public class EllipsoidRegion extends AbstractRegion {
         return (EllipsoidRegion) super.clone();
     }
 
+    //FAWE start
     private void filterSpherePartial(int y1, int y2, int bx, int bz, Filter filter,
         ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
         int minSection = y1 >> 4;
@@ -311,7 +318,7 @@ public class EllipsoidRegion extends AbstractRegion {
             filterSpherePartial(minSection, 0, 15, bx, bz, filter, block, get, set);
         }
 
-        if (yStart != 0) {
+        if (yStart != world.getMinY()) {
             filterSpherePartial(minSection, yStart, 15, bx, bz, filter, block, get, set);
             minSection++;
         }
@@ -405,28 +412,28 @@ public class EllipsoidRegion extends AbstractRegion {
             int cy = center.getBlockY();
             int diffYFull = MathMan.usqrt(diffY2);
 
-            int yBotFull = Math.max(0, cy - diffYFull);
-            int yTopFull = Math.min(255, cy + diffYFull);
+            int yBotFull = Math.max(world.getMinY(), cy - diffYFull);
+            int yTopFull = Math.min(world.getMaxY(), cy + diffYFull);
 
             if (yBotFull == yTopFull || yBotFull > yTopFull) {
             }
             // Set those layers
             filter(chunk, filter, block, get, set, yBotFull, yTopFull, full);
 
-            if (yBotFull == 0 && yTopFull == 255) {
+            if (yBotFull == world.getMinY() && yTopFull == world.getMaxY()) {
                 return;
             }
 
             int diffYPartial = MathMan.usqrt(radiusLengthSqr - cxMin * cxMin - czMin * czMin);
 
             //Fill the remaining layers
-            if (yBotFull != 0) {
-                int yBotPartial = Math.max(0, cy - diffYPartial);
+            if (yBotFull != world.getMinY()) {
+                int yBotPartial = Math.max(world.getMinY(), cy - diffYPartial);
                 filterSpherePartial(yBotPartial, yBotFull - 1, bx, bz, filter, block, get, set);
             }
 
-            if (yTopFull != 255) {
-                int yTopPartial = Math.min(255, cy + diffYPartial);
+            if (yTopFull != world.getMaxY()) {
+                int yTopPartial = Math.min(world.getMaxY(), cy + diffYPartial);
                 filterSpherePartial(yTopFull + 1, yTopPartial, bx, bz, filter, block, get, set);
             }
 
@@ -434,4 +441,5 @@ public class EllipsoidRegion extends AbstractRegion {
             super.filter(chunk, filter, block, get, set, full);
         }
     }
+    //FAWE end
 }

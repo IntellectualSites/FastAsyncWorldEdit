@@ -1,4 +1,6 @@
-package com.sk89q.worldedit.math;
+package com.fastasyncworldedit.core.math;
+
+import com.sk89q.worldedit.math.Vector3;
 
 public class Vector3Impl extends Vector3 {
     private final double x;

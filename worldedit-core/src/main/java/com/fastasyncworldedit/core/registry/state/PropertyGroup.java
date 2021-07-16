@@ -1,5 +1,6 @@
-package com.sk89q.worldedit.registry.state;
+package com.fastasyncworldedit.core.registry.state;
 
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;

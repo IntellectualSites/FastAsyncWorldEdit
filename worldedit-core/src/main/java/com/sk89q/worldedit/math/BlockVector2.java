@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.math;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 import java.util.Comparator;

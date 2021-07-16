@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.fastasyncworldedit.core.math.MutableBlockVector2;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

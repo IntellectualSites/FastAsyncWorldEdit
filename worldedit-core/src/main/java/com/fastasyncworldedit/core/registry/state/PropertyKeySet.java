@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.registry.state;
+package com.fastasyncworldedit.core.registry.state;
 
 import org.jetbrains.annotations.NotNull;
 

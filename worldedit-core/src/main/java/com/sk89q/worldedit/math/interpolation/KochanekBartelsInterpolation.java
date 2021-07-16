@@ -21,7 +21,7 @@
 
 package com.sk89q.worldedit.math.interpolation;
 
-import com.sk89q.worldedit.math.MutableVector3;
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 import java.util.Collections;
