@@ -568,14 +568,14 @@ public class LocalSession implements TextureHolder {
         if (getHistoryNegativeIndex() < history.size()) {
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
             try (EditSession newEditSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
-                    .allowedRegionsEverywhere()
-                    .checkMemory(false)
-                    .changeSetNull()
-                    .fastmode(false)
-                    .limitUnprocessed((Player)actor)
-                    .actor((Player)actor)
-                    .blockBag(getBlockBag((Player)actor))
-                    .build()) {
+                .allowedRegionsEverywhere()
+                .checkMemory(false)
+                .changeSetNull()
+                .fastmode(false)
+                .limitUnprocessed((Player)actor)
+                .actor((Player)actor)
+                .blockBag(getBlockBag((Player)actor))
+                .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.UNDO);
                 setDirty();
                 historyNegativeIndex++;

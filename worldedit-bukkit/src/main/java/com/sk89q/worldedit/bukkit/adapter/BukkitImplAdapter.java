@@ -67,7 +67,9 @@ import javax.annotation.Nullable;
 /**
  * An interface for adapters of various Bukkit implementations.
  */
+// FAWE start - Generic & extends IBukkitAdapter
 public interface BukkitImplAdapter<T> extends IBukkitAdapter {
+// FAWE end
 
     /**
      * Get a data fixer, or null if not supported.
@@ -190,6 +192,16 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     }
 
     /**
+     * Gets whether the given {@link BlockState} can be placed here.
+     *
+     * @param world The world
+     * @param position The position
+     * @param blockState The blockstate
+     * @return If it can be placed
+     */
+    boolean canPlaceAt(World world, BlockVector3 position, BlockState blockState);
+
+    /**
      * Create a Bukkit ItemStack with NBT, if available.
      *
      * @param item the WorldEdit BaseItemStack to adapt
@@ -213,8 +225,10 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     Set<SideEffect> getSupportedSideEffects();
 
     default OptionalInt getInternalBlockStateId(BlockData data) {
+        // FAWE start
         // return OptionalInt.empty();
         return getInternalBlockStateId(BukkitAdapter.adapt(data));
+        // FAWE end
     }
 
     /**
@@ -227,8 +241,19 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         return OptionalInt.empty();
     }
 
+    /**
+     * Regenerate a region in the given world, so it appears "as new".
+     * @param world the world to regen in
+     * @param region the region to regen
+     * @param extent the extent to use for setting blocks
+     * @param options the regeneration options
+     * @return true on success, false on failure
+     */
+    default boolean regenerate(World world, Region region, Extent extent, RegenOptions options) throws Exception {
+        throw new UnsupportedOperationException("This adapter does not support regeneration.");
+    }
 
-    // FAWE ADDITIONS
+    // FAWE start
     default BlockMaterial getMaterial(BlockType blockType) {
         return getMaterial(blockType.getDefaultState());
     }
@@ -270,18 +295,6 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         throw new UnsupportedOperationException("Cannot send fake chunks");
     }
 
-    /**
-     * Regenerate a region in the given world, so it appears "as new".
-     * @param world the world to regen in
-     * @param region the region to regen
-     * @param extent the extent to use for setting blocks
-     * @param options the regeneration options
-     * @return true on success, false on failure
-     */
-    default boolean regenerate(World world, Region region, Extent extent, RegenOptions options) throws Exception{
-        throw new UnsupportedOperationException("This adapter does not support regeneration.");
-    }
-
     default IChunkGet get(World world, int chunkX, int chunkZ) {
         throw new UnsupportedOperationException();
     }
@@ -293,4 +306,5 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default RelighterFactory getRelighterFactory() {
         return new NMSRelighterFactory(); // TODO implement in adapters instead
     }
+    // FAWE end
 }

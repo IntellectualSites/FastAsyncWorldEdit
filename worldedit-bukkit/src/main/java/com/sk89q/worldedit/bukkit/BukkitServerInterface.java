@@ -67,7 +67,9 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     public final WorldEditPlugin plugin;
     private final CommandRegistration dynamicCommands;
     private final Lifecycled<Watchdog> watchdog;
+    //FAWE start
     private RelighterFactory relighterFactory;
+    //FAWE end
     private boolean hookingEvents;
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
@@ -247,15 +249,6 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         return SUPPORTED_SIDE_EFFECTS;
     }
 
-    @Override
-    public @NotNull RelighterFactory getRelighterFactory() {
-        if (this.relighterFactory == null) {
-            this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
-            LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");
-        }
-        return this.relighterFactory;
-    }
-
     public void unregisterCommands() {
         dynamicCommands.unregisterCommands();
     }
@@ -268,4 +261,15 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         }
         return users;
     }
+
+    //FAWE start
+    @Override
+    public @NotNull RelighterFactory getRelighterFactory() {
+        if (this.relighterFactory == null) {
+            this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
+            LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");
+        }
+        return this.relighterFactory;
+    }
+    //FAWE end
 }

@@ -39,10 +39,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * An adapter to adapt a Bukkit entity into a WorldEdit one.
  */
+//FAWE start - made class public
 public class BukkitEntity implements Entity {
+//FAWE end
 
     private final WeakReference<org.bukkit.entity.Entity> entityRef;
+    //FAWE start
     private final EntityType type;
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -51,7 +55,9 @@ public class BukkitEntity implements Entity {
      */
     public BukkitEntity(org.bukkit.entity.Entity entity) {
         checkNotNull(entity);
+        //FAWE start
         this.type = entity.getType();
+        //FAWE end
         this.entityRef = new WeakReference<>(entity);
     }
 
@@ -83,11 +89,6 @@ public class BukkitEntity implements Entity {
         } else {
             return false;
         }
-    }
-
-    @Override
-    public com.sk89q.worldedit.world.entity.EntityType getType() {
-        return EntityTypes.get(type.getName().toLowerCase(Locale.ROOT));
     }
 
     @Override

@@ -103,8 +103,7 @@ public class InspectBrush extends BrushTool {
                     BlockState blockTo = BlockState.getFromOrdinal(to);
                     TranslatableComponent msg = Caption.of("fawe.worldedit.tool.tool.inspect.info", name, blockFrom, blockTo, ageFormatted);
 
-                    String cmd = edit.getCommand();
-                    TextComponent hover = TextComponent.of(cmd, TextColor.GOLD);
+                    TextComponent hover = TextComponent.of("/tool inspect", TextColor.GOLD);
                     String infoCmd = "//history summary " + uuid + " " + index;
                     msg = msg.hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, hover));
                     msg = msg.clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, infoCmd));
@@ -114,8 +113,6 @@ public class InspectBrush extends BrushTool {
             player.print(Caption.of("fawe.worldedit.tool.tool.inspect.info.footer", count));
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (Throwable e) {
-            LOGGER.error("E throw", e);
         }
         return true;
     }

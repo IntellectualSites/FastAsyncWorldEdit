@@ -30,7 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import java.util.Locale;
 
-public class Worldguard extends BukkitMaskManager implements Listener {
+public class WorldGuardFeature extends BukkitMaskManager implements Listener {
     private final WorldGuardPlugin worldguard;
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -45,10 +45,10 @@ public class Worldguard extends BukkitMaskManager implements Listener {
         return (WorldGuardPlugin) plugin;
     }
 
-    public Worldguard(Plugin p2) {
+    public WorldGuardFeature(Plugin p2) {
         super(p2.getName());
         this.worldguard = this.getWorldGuard();
-        LOGGER.debug("Plugin 'WorldGuard' found. Using it now.");
+        LOGGER.info("Plugin 'WorldGuard' found. Using it now.");
 
     }
 

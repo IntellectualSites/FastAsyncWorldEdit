@@ -351,14 +351,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         new ExtentTraverser(this).setNext(extent);
     }
 
+    //FAWE Start
     /**
-     * Get the Player or null.
+     * Get the Actor or null.
      *
      * @return the player
      */
     public Actor getActor() {
         return actor;
     }
+    //FAWE End
 
     private Extent traceIfNeeded(Extent input) {
         Extent output = input;

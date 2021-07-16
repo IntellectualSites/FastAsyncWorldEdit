@@ -44,8 +44,8 @@ public class StencilBrush extends HeightBrush {
         final SolidBlockMask solid = new SolidBlockMask(editSession);
 
         Actor actor = editSession.getActor();
-        if (!(actor instanceof Player)) {
-            return; //todo throw error
+        if (actor != null && !(actor instanceof Player)) {
+            throw new RuntimeException(); //TODO add message here.
         }
         Player player = (Player) actor;
         Location loc = player.getLocation();

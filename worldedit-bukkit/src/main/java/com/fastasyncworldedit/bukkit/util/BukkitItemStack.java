@@ -1,10 +1,11 @@
-package com.sk89q.worldedit.bukkit;
+package com.fastasyncworldedit.bukkit.util;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.world.item.ItemType;
 import org.bukkit.inventory.ItemStack;
 
