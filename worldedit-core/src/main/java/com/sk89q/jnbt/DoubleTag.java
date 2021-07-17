@@ -57,11 +57,11 @@ public final class DoubleTag extends NumberTag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_DOUBLE;
     }
-    // FAWE End
+    //FAWE end
 
 }

@@ -109,7 +109,7 @@ public class BaseEntity implements NbtValued {
         return this.type;
     }
 
-    // FAWE start
+    //FAWE start
     public BaseEntity(CompoundTag tag) {
         this(EntityTypes.parse(tag.getString("Id")), tag);
     }
@@ -119,6 +119,6 @@ public class BaseEntity implements NbtValued {
     public LazyReference<CompoundBinaryTag> getNbtReference() {
         return nbtData;
     }
-    // FAWE end
+    //FAWE end
 
 }

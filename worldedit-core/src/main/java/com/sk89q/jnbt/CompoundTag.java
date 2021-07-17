@@ -338,7 +338,7 @@ public class CompoundTag extends Tag {
     }
 
 
-    // FAWE Start
+    //FAWE start
     public UUID getUUID() {
         long most = getLong("UUIDMost");
         long least = getLong("UUIDLeast");
@@ -376,6 +376,6 @@ public class CompoundTag extends Tag {
         }
         return raw;
     }
-    // FAWE End
+    //FAWE end
 
 }

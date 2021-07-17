@@ -64,7 +64,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new RandomStatePatternParser(worldEdit));
         register(new BlockCategoryPatternParser(worldEdit));
 
-        // FAWE start
+        //FAWE start
         register(new SimplexPatternParser(worldEdit));
         register(new VoronoiPatternParser(worldEdit));
         register(new PerlinPatternParser(worldEdit));

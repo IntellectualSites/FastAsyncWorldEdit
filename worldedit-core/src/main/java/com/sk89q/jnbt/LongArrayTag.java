@@ -59,11 +59,11 @@ public class LongArrayTag extends Tag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_LONG_ARRAY;
     }
-    // FAWE End
+    //FAWE end
 
 }

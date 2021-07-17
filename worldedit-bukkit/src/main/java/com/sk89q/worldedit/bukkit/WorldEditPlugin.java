@@ -112,7 +112,7 @@ public class WorldEditPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
 
-        // FAWE start
+        //FAWE start
         // This is already covered by Spigot, however, a more pesky warning with a proper explanation over "Ambiguous plugin name..." can't hurt.
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         for (Plugin p : plugins) {
@@ -122,7 +122,7 @@ public class WorldEditPlugin extends JavaPlugin {
                         "Stop your server and delete the 'worldedit-bukkit' jar from your plugins folder.");
             }
         }
-        // FAWE end
+        //FAWE end
 
         INSTANCE = this;
 

@@ -39,11 +39,11 @@ public final class EndTag extends Tag {
         return EndBinaryTag.get();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_END;
     }
-    // FAWE End
+    //FAWE end
 
 }

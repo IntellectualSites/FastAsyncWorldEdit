@@ -57,11 +57,11 @@ public final class FloatTag extends NumberTag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_FLOAT;
     }
-    // FAWE End
+    //FAWE end
 
 }
