@@ -123,6 +123,7 @@ public class LocalSession implements TextureHolder {
     // Session related
     private transient RegionSelector selector = new CuboidRegionSelector();
     private transient boolean placeAtPos1 = false;
+    //FAWE start
     private final transient List<Object> history = Collections.synchronizedList(new LinkedList<>() {
         @Override
         public Object get(int index) {
@@ -140,12 +141,17 @@ public class LocalSession implements TextureHolder {
         }
     });
     private transient volatile Integer historyNegativeIndex;
+    private transient final Lock historyWriteLock = new ReentrantLock(true);
+    private final transient Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
+    private transient Mask sourceMask;
+    private transient TextureUtil texture;
+    private transient ResettableExtent transform = null;
+    private transient World currentWorld;
+    //FAWE end
     private transient ClipboardHolder clipboard;
     private transient final Object clipboardLock = new Object();
-    private transient final Lock historyWriteLock = new ReentrantLock(true);
     private transient boolean superPickaxe = false;
     private transient BlockTool pickaxeMode = new SinglePickaxe();
-    private final transient Int2ObjectOpenHashMap<Tool> tools = new Int2ObjectOpenHashMap<>(0);
     private transient int maxBlocksChanged = -1;
     private transient int maxTimeoutTime;
     private transient boolean useInventory;
@@ -153,11 +159,7 @@ public class LocalSession implements TextureHolder {
     private transient Snapshot snapshotExperimental;
     private transient SideEffectSet sideEffectSet = SideEffectSet.defaults();
     private transient Mask mask;
-    private transient Mask sourceMask;
-    private transient TextureUtil texture;
-    private transient ResettableExtent transform = null;
     private transient ZoneId timezone = ZoneId.systemDefault();
-    private transient World currentWorld;
     private transient UUID uuid;
     private transient volatile long historySize = 0;
 
@@ -175,7 +177,6 @@ public class LocalSession implements TextureHolder {
     private boolean useServerCUI = false; // Save this to not annoy players.
     private ItemType wandItem;
     private ItemType navWandItem;
-    private Map<String, String> macros = new HashMap<>();
 
     /**
      * Construct the object.
@@ -214,6 +215,7 @@ public class LocalSession implements TextureHolder {
         }
     }
 
+    //FAWE start
     public boolean loadSessionHistoryFromDisk(UUID uuid, World world) {
         if (world == null || uuid == null) {
             return false;
@@ -308,19 +310,7 @@ public class LocalSession implements TextureHolder {
             file.delete();
         }
     }
-
-    public Map<String, String> getMacros() {
-        return Collections.unmodifiableMap(this.macros);
-    }
-
-    public void setMacro(String key, String value) {
-        this.macros.put(key, value);
-        setDirty();
-    }
-
-    public String getMacro(String key) {
-        return this.macros.get(key);
-    }
+    //FAWE end
 
     /**
      * Get whether this session is "dirty" and has changes that needs to
@@ -339,6 +329,7 @@ public class LocalSession implements TextureHolder {
         dirty.set(true);
     }
 
+    //FAWE start
     public int getHistoryIndex() {
         return history.size() - 1 - (historyNegativeIndex == null ? 0 : historyNegativeIndex);
     }
@@ -361,6 +352,7 @@ public class LocalSession implements TextureHolder {
         }
         return false;
     }
+    //FAWE end
 
     /**
      * Get whether this session is "dirty" and has changes that needs to
@@ -396,9 +388,11 @@ public class LocalSession implements TextureHolder {
      */
     public void clearHistory() {
         history.clear();
+        //FAWE start
         historyNegativeIndex = 0;
         historySize = 0;
         currentWorld = null;
+        //FAWE end
     }
 
     /**
@@ -415,6 +409,7 @@ public class LocalSession implements TextureHolder {
             return;
         }
 
+        //FAWE start
         Player player = editSession.getPlayer();
         int limit = player == null ? Integer.MAX_VALUE : player.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
@@ -553,6 +548,7 @@ public class LocalSession implements TextureHolder {
             historyWriteLock.unlock();
         }
     }
+    //FAWE end
 
     /**
      * Performs an undo.
@@ -563,6 +559,7 @@ public class LocalSession implements TextureHolder {
      */
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
+        //FAWE start - use our logic
         World world = ((Player) actor).getWorldForEditing();
         loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() < history.size()) {
@@ -591,6 +588,7 @@ public class LocalSession implements TextureHolder {
             }
             return null;
         }
+        //FAWE end
     }
 
     /**
@@ -600,6 +598,7 @@ public class LocalSession implements TextureHolder {
      * @param actor the actor
      * @return whether anything was redone
      */
+    //FAWE start - use our logic
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
         World world = ((Player) actor).getWorldForEditing();
@@ -621,6 +620,7 @@ public class LocalSession implements TextureHolder {
                 return newEditSession;
             }
         }
+        //FAWE end
 
         return null;
     }
@@ -776,14 +776,17 @@ public class LocalSession implements TextureHolder {
      * @throws EmptyClipboardException thrown if no clipboard is set
      */
     public ClipboardHolder getClipboard() throws EmptyClipboardException {
+        //FAWE start
         synchronized (clipboardLock) {
             if (clipboard == null) {
                 throw new EmptyClipboardException();
             }
+        //FAWE end
             return clipboard;
         }
     }
 
+    //FAWE start
     @Nullable
     public ClipboardHolder getExistingClipboard() {
         synchronized (clipboardLock) {
@@ -811,6 +814,7 @@ public class LocalSession implements TextureHolder {
         }
         setClipboard(multi);
     }
+    //FAWE end
 
     /**
      * Sets the clipboard.
@@ -820,6 +824,7 @@ public class LocalSession implements TextureHolder {
      * @param clipboard the clipboard, or null if the clipboard is to be cleared
      */
     public void setClipboard(@Nullable ClipboardHolder clipboard) {
+        //FAWE start
         synchronized (clipboardLock) {
             if (this.clipboard == clipboard) {
                 return;
@@ -830,6 +835,7 @@ public class LocalSession implements TextureHolder {
                     this.clipboard.close();
                 }
             }
+            //FAWE end
             this.clipboard = clipboard;
         }
     }
@@ -968,7 +974,9 @@ public class LocalSession implements TextureHolder {
     @Nullable
     public BlockBag getBlockBag(Player player) {
         checkNotNull(player);
+        //FAWE start - inventory mode
         if (!useInventory && player.getLimit().INVENTORY_MODE == 0) {
+        //FAWE end
             return null;
         }
         return player.getInventoryBlockBag();
@@ -1045,6 +1053,7 @@ public class LocalSession implements TextureHolder {
         }
     }
 
+    //FAWE start
     @Nullable
     public Tool getTool(Player player) {
         loadDefaults(player, false);
@@ -1088,7 +1097,9 @@ public class LocalSession implements TextureHolder {
             }
         }
     }
+    //FAWE end
 
+    //FAWE start - see deprecation note
     /**
      * Get the brush tool assigned to the item. If there is no tool assigned
      * or the tool is not assigned, the slot will be replaced with the
@@ -1129,7 +1140,9 @@ public class LocalSession implements TextureHolder {
 
         return (BrushTool) tool;
     }
+    //FAWE end
 
+    //FAWE start - see note of getBrushTool
     /**
      * Set the tool.
      *
@@ -1209,6 +1222,7 @@ public class LocalSession implements TextureHolder {
             }
         }
     }
+    //FAWE end
 
     /**
      * Returns whether inventory usage is enabled for this session.
@@ -1381,7 +1395,9 @@ public class LocalSession implements TextureHolder {
     public void describeCUI(Actor actor) {
         checkNotNull(actor);
 
+        //FAWE start
         // TODO preload
+        //FAWE end
 
         if (!hasCUISupport) {
             return;
@@ -1519,6 +1535,7 @@ public class LocalSession implements TextureHolder {
         }
 
         // Create an edit session
+        //FAWE start - we don't use the edit session builder yet
         EditSession editSession;
         EditSessionBuilder builder = new EditSessionBuilder(world);
         if (actor.isPlayer() && actor instanceof Player) {
@@ -1544,6 +1561,7 @@ public class LocalSession implements TextureHolder {
 
         return editSession;
     }
+    //FAWE end
 
     private void prepareEditingExtents(EditSession editSession, Actor actor) {
         editSession.setSideEffectApplier(sideEffectSet);
@@ -1618,6 +1636,7 @@ public class LocalSession implements TextureHolder {
         return mask;
     }
 
+    //FAWE start
     /**
      * Get the mask.
      *
@@ -1626,6 +1645,7 @@ public class LocalSession implements TextureHolder {
     public Mask getSourceMask() {
         return sourceMask;
     }
+    //FAWE end
 
     /**
      * Set a mask.
@@ -1636,6 +1656,7 @@ public class LocalSession implements TextureHolder {
         this.mask = mask;
     }
 
+    //FAWE start
     /**
      * Set a mask.
      *
@@ -1663,6 +1684,7 @@ public class LocalSession implements TextureHolder {
         }
         return tmp;
     }
+    //FAWE end
 
     /**
      * Get the preferred wand item for this user, or {@code null} to use the default

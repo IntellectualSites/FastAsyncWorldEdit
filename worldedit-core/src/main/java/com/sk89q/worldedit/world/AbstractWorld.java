@@ -76,7 +76,9 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public Mask createLiquidMask() {
+        //FAWE start - use BlockMaskBuilder
         return new BlockMaskBuilder().addTypes(BlockTypes.LAVA, BlockTypes.WATER).build(this);
+        //FAWE end
     }
 
     @Override

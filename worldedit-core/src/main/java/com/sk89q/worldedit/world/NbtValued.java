@@ -43,9 +43,12 @@ public interface NbtValued {
      */
     @Deprecated
     default boolean hasNbtData() {
+        //FAWE start - return & deprecation
         return getNbt() != null;
+        //FAWE end
     }
 
+    //FAWE start
     /**
      * Get the object's NBT data (tile entity data). The returned tag, if
      * modified in any way, should be sent to {@link #setNbtData(CompoundTag)}
@@ -139,5 +142,6 @@ public interface NbtValued {
     default void setNbt(@Nullable CompoundBinaryTag nbtData) {
         setNbtReference(nbtData == null ? null : LazyReference.computed(nbtData));
     }
+    //FAWE end
 
 }

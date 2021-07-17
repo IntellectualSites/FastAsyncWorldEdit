@@ -101,7 +101,7 @@ public abstract class LocalConfiguration {
 
     protected String[] getDefaultDisallowedBlocks() {
         List<BlockType> blockTypes = Lists.newArrayList(
-                /*
+                /* FAWE start
                 BlockTypes.OAK_SAPLING,
                 BlockTypes.JUNGLE_SAPLING,
                 BlockTypes.DARK_OAK_SAPLING,
@@ -163,7 +163,7 @@ public abstract class LocalConfiguration {
                 BlockTypes.SUGAR_CANE,
                 // ores and stuff
                 BlockTypes.BEDROCK
-                */
+                FAWE end*/
         );
         return blockTypes.stream().filter(Objects::nonNull).map(BlockType::getId).toArray(String[]::new);
     }
