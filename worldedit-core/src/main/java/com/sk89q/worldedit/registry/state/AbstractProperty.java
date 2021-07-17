@@ -21,7 +21,7 @@ package com.sk89q.worldedit.registry.state;
 
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.fastasyncworldedit.core.util.MathMan;
-import com.sk89q.worldedit.world.block.BlockTypesCache;;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

@@ -42,7 +42,7 @@ class SimpleBlockMaterial implements BlockMaterial {
     private boolean replacedDuringPlacement;
     private boolean isTranslucent;
     private boolean hasContainer;
-    //FAWE Starstart
+    //FAWE start
     private int lightOpacity;
     private int mapColor;
     private boolean isTile;

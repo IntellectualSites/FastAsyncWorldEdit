@@ -96,9 +96,11 @@ public class NoiseFilter extends AbstractMask {
         return new NoiseFilter2D(getNoiseGenerator(), getDensity());
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new NoiseFilter(noiseGenerator, density);
     }
+    //FAWE end
 
 }

@@ -37,7 +37,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-//FAWE start - TileEntityBlock, Pattern
+//FAWE start - TileEntityBlock
 public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEntityBlock, Pattern {
 //FAWE end
 

@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.fastasyncworldedit.core.function.mask.ABlockMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -45,8 +48,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>This mask checks for both an exact block type and state value match,
  * respecting fuzzy status of the BlockState.</p>
  */
+//FAWE start - ABlockMask > AbstractExtentMask
 public class BlockMask extends ABlockMask {
+//FAWE end
 
+    //FAWE start
     private final boolean[] ordinals;
 
     public BlockMask() {
@@ -61,6 +67,7 @@ public class BlockMask extends ABlockMask {
         super(extent == null ? new NullExtent() : extent);
         this.ordinals = ordinals;
     }
+    //FAWE end
 
     /**
      * Create a new block mask.
@@ -86,6 +93,7 @@ public class BlockMask extends ABlockMask {
         this(extent, Arrays.asList(checkNotNull(block)));
     }
 
+    //FAWE start
     public BlockMask add(Predicate<BlockState> predicate) {
         for (int i = 0; i < ordinals.length; i++) {
             if (!ordinals[i]) {
@@ -144,6 +152,7 @@ public class BlockMask extends ABlockMask {
         }
         return this;
     }
+    //FAWE end
 
     /**
      * Add the given blocks to the list of criteria.
@@ -154,6 +163,7 @@ public class BlockMask extends ABlockMask {
     @Deprecated
     public void add(Collection<BaseBlock> blocks) {
         checkNotNull(blocks);
+        //FAWE start - get ordinals
         for (BaseBlock block : blocks) {
             if (block instanceof BlanketBaseBlock) {
                 for (BlockState state : block.getBlockType().getAllStates()) {
@@ -163,6 +173,7 @@ public class BlockMask extends ABlockMask {
                 add(block.toBlockState());
             }
         }
+        //FAWE end
     }
 
     /**
@@ -180,9 +191,12 @@ public class BlockMask extends ABlockMask {
      * @return a list of blocks
      */
     public Collection<BaseBlock> getBlocks() {
+        //FAWE start
         return Collections.emptyList(); //TODO Not supported in FAWE yet
+        //FAWE end
     }
 
+    //FAWE start
     @Override
     public boolean test(BlockState state) {
         return ordinals[state.getOrdinal()] || replacesAir() && state.getOrdinal() == 0;
@@ -332,4 +346,5 @@ public class BlockMask extends ABlockMask {
     public Mask copy() {
         return new BlockMask(getExtent(), ordinals.clone());
     }
+    //FAWE end
 }

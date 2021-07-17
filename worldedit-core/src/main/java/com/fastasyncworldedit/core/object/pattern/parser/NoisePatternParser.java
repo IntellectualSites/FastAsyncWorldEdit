@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.object.pattern.parser;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.random.NoiseRandom;
+import com.fastasyncworldedit.core.math.random.NoiseRandom;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.fastasyncworldedit.core.object.parser.RichParser;

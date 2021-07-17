@@ -43,19 +43,17 @@ public final class Request {
 
     @Nullable
     private World world;
-    //FAWE start
-    @Nullable
-    private Actor actor;
-    //FAWE end
     @Nullable
     private LocalSession session;
     @Nullable
     private EditSession editSession;
+    private boolean valid;
     //FAWE start
+    @Nullable
+    private Actor actor;
     @Nullable
     private Extent extent;
     //FAWE end
-    private boolean valid;
 
     //FAWE start
     private Request() {

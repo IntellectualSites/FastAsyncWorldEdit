@@ -120,7 +120,7 @@ public class SelectionCommands {
                      @Arg(desc = "Coordinates to set position 1 to", def = "")
                          BlockVector3 coordinates) throws WorldEditException {
         Location pos;
-        //FAWE start - camp
+        //FAWE start - clamp
         if (coordinates != null) {
             pos = new Location(world, coordinates.toVector3().clampY(0, world.getMaxY()));
         } else if (actor instanceof Locatable) {

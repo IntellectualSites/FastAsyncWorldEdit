@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.function.pattern;
 
 import com.fastasyncworldedit.core.object.collection.RandomCollection;
-import com.fastasyncworldedit.core.object.random.SimpleRandom;
-import com.fastasyncworldedit.core.object.random.TrueRandom;
+import com.fastasyncworldedit.core.math.random.SimpleRandom;
+import com.fastasyncworldedit.core.math.random.TrueRandom;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;

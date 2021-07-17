@@ -41,8 +41,8 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
     //FAWE start
     private final boolean mine;
-    //FAWE end
     private int[] missingBlocks = new int[BlockTypes.size()];
+    //FAWE end
     private BlockBag blockBag;
 
     /**
@@ -89,7 +89,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
      * @return a map of missing blocks
      */
     public Map<BlockType, Integer> popMissing() {
-        //FAWE start - Use a HashMap
+        //FAWE start - Use an Array
         HashMap<BlockType, Integer> map = new HashMap<>();
         for (int i = 0; i < missingBlocks.length; i++) {
             int count = missingBlocks[i];

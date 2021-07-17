@@ -34,7 +34,7 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.fastasyncworldedit.core.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.function.generator.CavesGen;
+import com.fastasyncworldedit.core.function.generator.CavesGen;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;

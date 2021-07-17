@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.object.mask;
 
 import com.fastasyncworldedit.core.object.collection.LocalBlockVectorSet;
-import com.fastasyncworldedit.core.object.function.mask.AbstractDelegateMask;
+import com.fastasyncworldedit.core.function.mask.AbstractDelegateMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;

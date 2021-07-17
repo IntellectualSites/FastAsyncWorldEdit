@@ -577,5 +577,5 @@ public class BlockTransformExtent extends ResettableExtent {
     private BlockState transformInverse(BlockState block) {
         return transform(block, BLOCK_TRANSFORM_INVERSE, transformInverse);
     }
-    //FAWE ned
+    //FAWE end
 }

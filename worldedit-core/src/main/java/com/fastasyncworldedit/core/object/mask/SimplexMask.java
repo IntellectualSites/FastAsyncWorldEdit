@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.object.mask;
 
-import com.fastasyncworldedit.core.object.random.SimplexNoise;
+import com.fastasyncworldedit.core.math.random.SimplexNoise;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;

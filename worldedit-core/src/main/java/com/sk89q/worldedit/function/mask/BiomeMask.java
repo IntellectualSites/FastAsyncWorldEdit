@@ -34,7 +34,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Tests true if the biome at applied points is the same as the one given.
  */
+//FAWE start - AbstractExtentMask
 public class BiomeMask extends AbstractExtentMask {
+//FAWE end
 
     private final Set<BiomeType> biomes = new HashSet<>();
 
@@ -45,7 +47,9 @@ public class BiomeMask extends AbstractExtentMask {
      * @param biomes a list of biomes to match
      */
     public BiomeMask(Extent extent, Collection<BiomeType> biomes) {
+        //FAWE start
         super(extent);
+        //FAWE end
         checkNotNull(biomes);
         this.biomes.addAll(biomes);
     }
@@ -100,10 +104,12 @@ public class BiomeMask extends AbstractExtentMask {
         return null;
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new BiomeMask(getExtent(), new HashSet<>(biomes));
     }
+    //FAWE end
 
     @Override
     public boolean test(Extent extent, BlockVector3 position) {
