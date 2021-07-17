@@ -65,10 +65,12 @@ public interface BlockRegistry {
     @Nullable
     BlockMaterial getMaterial(BlockType blockType);
 
+    //FAWE start
     @Nullable
     default BlockMaterial getMaterial(BlockState state) {
         return getMaterial(state.getBlockType());
     }
+    //FAWE end
 
     /**
      * Get an unmodifiable map of states for this block.
@@ -86,10 +88,12 @@ public interface BlockRegistry {
      */
     OptionalInt getInternalBlockStateId(BlockState state);
 
+    //FAWE start
     /**
      * Register all blocks.
      */
     default Collection<String> values() {
         return Collections.emptyList();
     }
+    //FAWE end
 }

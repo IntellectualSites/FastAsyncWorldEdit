@@ -44,14 +44,17 @@ import javax.annotation.Nullable;
  */
 public class AnvilChunk13 implements Chunk {
 
+    //FAWE start - CBT > CT
     private final CompoundBinaryTag rootTag;
-    private BlockState[][] blocks;
-    private int rootX;
-    private int rootZ;
+    //FAWE end
+    private final BlockState[][] blocks;
+    private final int rootX;
+    private final int rootZ;
 
     private Map<BlockVector3, CompoundBinaryTag> tileEntities;
 
 
+    //FAWE start
     /**
      * Construct the chunk with a compound tag.
      *
@@ -63,6 +66,7 @@ public class AnvilChunk13 implements Chunk {
     public AnvilChunk13(CompoundTag tag) throws DataException {
         this(tag.asBinaryTag());
     }
+    //FAWE end
 
     /**
      * Construct the chunk with a compound tag.
@@ -78,6 +82,7 @@ public class AnvilChunk13 implements Chunk {
 
         blocks = new BlockState[16][];
 
+        //FAWE start - use *BinaryTag > *Tag
         ListBinaryTag sections = NbtUtils.getChildTag(rootTag, "Sections", BinaryTagTypes.LIST);
 
         for (BinaryTag rawSectionTag : sections) {
@@ -124,6 +129,7 @@ public class AnvilChunk13 implements Chunk {
                 }
                 palette[paletteEntryId] = blockState;
             }
+            //FAWE end
 
             // parse block states
             long[] blockStatesSerialized = NbtUtils.getChildTag(sectionTag, "BlockStates", BinaryTagTypes.LONG_ARRAY).value();
@@ -181,6 +187,7 @@ public class AnvilChunk13 implements Chunk {
         if (rootTag.get("TileEntities") == null) {
             return;
         }
+        //FAWE start - use *BinaryTag > *Tag
         ListBinaryTag tags = NbtUtils.getChildTag(rootTag, "TileEntities", BinaryTagTypes.LIST);
 
         for (BinaryTag tag : tags) {
@@ -197,6 +204,7 @@ public class AnvilChunk13 implements Chunk {
             BlockVector3 vec = BlockVector3.at(x, y, z);
             tileEntities.put(vec, t);
         }
+        //FAWE end
     }
 
     /**
@@ -209,6 +217,7 @@ public class AnvilChunk13 implements Chunk {
      * @throws DataException thrown if there is a data error
      */
     @Nullable
+    //FAWE start - use *BinaryTag > *Tag
     private CompoundBinaryTag getBlockTileEntity(BlockVector3 position) throws DataException {
         if (tileEntities == null) {
             populateTileEntities();
@@ -246,5 +255,6 @@ public class AnvilChunk13 implements Chunk {
 
         return state.toBaseBlock();
     }
+    //FAWE end
 
 }

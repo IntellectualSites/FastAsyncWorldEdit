@@ -27,7 +27,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import com.sk89q.worldedit.world.block.BlanketBaseBlock;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;

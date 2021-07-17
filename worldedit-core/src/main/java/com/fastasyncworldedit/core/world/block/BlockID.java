@@ -1,7 +1,12 @@
-package com.sk89q.worldedit.world.block;
+package com.fastasyncworldedit.core.world.block;
 
+/**
+ * An internal FAWE class used for switch statements on blocks.
+ * Using IDs to register items is pre 1.13 days. This class is
+ * deprecated for removal with replacement of namespaced IDs.
+ */
+@Deprecated(forRemoval = true)
 public class BlockID {
-    // Used for switch statements on blocks
     public static final int __RESERVED__ = 0;
     public static final int AIR = 1;
     public static final int CAVE_AIR = 2;

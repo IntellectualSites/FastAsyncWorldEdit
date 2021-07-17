@@ -35,7 +35,9 @@ import com.sk89q.worldedit.world.registry.ItemMaterial;
 
 import javax.annotation.Nullable;
 
+//FAWE start - implements RegistryItem
 public class ItemType implements RegistryItem, Keyed {
+//FAWE end
 
     public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type");
 
@@ -57,9 +59,11 @@ public class ItemType implements RegistryItem, Keyed {
         WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
             .getRegistries().getItemRegistry().getMaterial(this)
     );
+    //FAWE start
     private BlockType blockType;
     private boolean initBlockType;
     private BaseItem defaultState;
+    //FAWE end
 
     public ItemType(String id) {
         // If it has no namespace, assume minecraft.
@@ -74,6 +78,7 @@ public class ItemType implements RegistryItem, Keyed {
         return this.id;
     }
 
+    //FAWE start
     private int internalId;
 
     @Override
@@ -89,6 +94,7 @@ public class ItemType implements RegistryItem, Keyed {
     public Component getRichName() {
         return richName.getValue();
     }
+    //FAWE end
 
     /**
      * Gets the name of this item, or the ID if the name cannot be found.
@@ -125,12 +131,14 @@ public class ItemType implements RegistryItem, Keyed {
         return this.blockType;
     }
 
+    //FAWE start
     public BaseItem getDefaultState() {
         if (defaultState == null) {
             this.defaultState = new BaseItemStack(this);
         }
         return this.defaultState;
     }
+    //FAWE end
 
     /**
      * Get the material for this ItemType.

@@ -5,7 +5,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
+import com.sk89q.worldedit.world.block.BlockTypesCache;;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -48,6 +48,8 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
      *
      * @param zipFile the ZIP file
      * @param folder the folder
+     * @throws IOException if there is an error opening the zip
+     * @throws ZipException if there is an error opening the zip
      */
     public ZippedMcRegionChunkStore(File zipFile, String folder) throws IOException, ZipException {
         this.zipFile = zipFile;
@@ -61,6 +63,8 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
      * be detected.
      *
      * @param zipFile the ZIP file
+     * @throws IOException if there is an error opening the zip
+     * @throws ZipException if there is an error opening the zip
      */
     public ZippedMcRegionChunkStore(File zipFile) throws IOException, ZipException {
         this.zipFile = zipFile;
@@ -77,12 +81,18 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
             }
         } else {
             Pattern pattern = Pattern.compile(".*\\.mc[ra]$");
+            Pattern worldPattern = Pattern.compile(worldName + "[\\\\/].*");
             for (Enumeration<? extends ZipEntry> e = zip.entries(); e.hasMoreElements(); ) {
                 ZipEntry testEntry = e.nextElement();
                 // Check for world
-                if (testEntry.getName().startsWith(worldName + "/")) {
-                    if (pattern.matcher(testEntry.getName()).matches()) { // does entry end in .mca
-                        folder = testEntry.getName().substring(0, testEntry.getName().lastIndexOf('/'));
+                String entryName = testEntry.getName();
+                if (worldPattern.matcher(entryName).matches()) {
+                    if (pattern.matcher(entryName).matches()) { // does entry end in .mca
+                        int endIndex = entryName.lastIndexOf('/');
+                        if (endIndex < 0) {
+                            endIndex = entryName.lastIndexOf('\\');
+                        }
+                        folder = entryName.substring(0, endIndex);
                         if (folder.endsWith("poi")) {
                             continue;
                         }

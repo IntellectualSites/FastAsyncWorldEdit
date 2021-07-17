@@ -50,7 +50,9 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+//FAWE start - Pattern
 public class BlockType implements Keyed, Pattern {
+//FAWE end
 
     public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
 
@@ -59,6 +61,7 @@ public class BlockType implements Keyed, Pattern {
     private final LazyReference<FuzzyBlockState> emptyFuzzy
         = LazyReference.from(() -> new FuzzyBlockState(this));
 
+    //FAWE start
     private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
     private final LazyReference<Integer> legacyData = LazyReference.from(() -> computeLegacy(1));
 
@@ -86,6 +89,7 @@ public class BlockType implements Keyed, Pattern {
     public int getMaxStateId() {
         return settings.permutations;
     }
+    //FAWE end
 
     /**
      * Gets the ID of this block.
@@ -102,6 +106,7 @@ public class BlockType implements Keyed, Pattern {
             .getRegistries().getBlockRegistry().getRichName(this);
     }
 
+    //FAWE start
     public String getNamespace() {
         String id = getId();
         int i = id.indexOf(':');
@@ -134,6 +139,7 @@ public class BlockType implements Keyed, Pattern {
         return defaultState;
     }
     */
+
     @Deprecated
     public BlockState withPropertyId(int propertyId) {
         if (settings.stateOrdinals == null) {
@@ -146,6 +152,7 @@ public class BlockType implements Keyed, Pattern {
     public BlockState withStateId(int internalStateId) { //
         return this.withPropertyId(internalStateId >> BlockTypesCache.BIT_OFFSET);
     }
+    //FAWE end
 
     /**
      * Gets the properties of this BlockType in a {@code key->property} mapping.
@@ -162,13 +169,17 @@ public class BlockType implements Keyed, Pattern {
      * @return the properties
      */
     public List<? extends Property<?>> getProperties() {
-        return this.settings.propertiesList; // stop changing this
+        //FAWE start - Don't use an ImmutableList here
+        return this.settings.propertiesList;
+        //FAWE end
     }
 
+    //FAWE start
     @Deprecated
     public Set<? extends Property<?>> getPropertiesSet() {
         return this.settings.propertiesSet;
     }
+    //FAWE end
 
     /**
      * Gets a property by name.
@@ -177,9 +188,12 @@ public class BlockType implements Keyed, Pattern {
      * @return The property
      */
     public <V> Property<V> getProperty(String name) {
-        return (Property<V>) this.settings.propertiesMap.get(name);  // stop changing this (performance)
+        //FAWE start - use properties map
+        return (Property<V>) this.settings.propertiesMap.get(name);
+        //FAWE end
     }
 
+    //FAWE start
     public boolean hasProperty(PropertyKey key) {
         int ordinal = key.getId();
         return this.settings.propertiesMapArr.length > ordinal && this.settings.propertiesMapArr[ordinal] != null;
@@ -192,6 +206,7 @@ public class BlockType implements Keyed, Pattern {
             return null;
         }
     }
+    //FAWE end
 
     /**
      * Gets the default state of this block type.
@@ -199,7 +214,9 @@ public class BlockType implements Keyed, Pattern {
      * @return The default state
      */
     public BlockState getDefaultState() {
+        //FAWE start - use settings
         return this.settings.defaultState;
+        //FAWE end
     }
 
     public FuzzyBlockState getFuzzyMatcher() {
@@ -212,10 +229,12 @@ public class BlockType implements Keyed, Pattern {
      * @return All possible states
      */
     public List<BlockState> getAllStates() {
+        //FAWE start - use ordinals
         if (settings.stateOrdinals == null) {
             return Collections.singletonList(getDefaultState());
         }
         return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
+        //FAWE end
     }
 
     /**
@@ -223,7 +242,8 @@ public class BlockType implements Keyed, Pattern {
      *
      * @return The state, if it exists
      */
-    public BlockState getState(Map<Property<?>, Object> key) { //
+    public BlockState getState(Map<Property<?>, Object> key) {
+        //FAWE start - use ids & btp (block type property)
         int id = getInternalId();
         for (Map.Entry<Property<?>, Object> iter : key.entrySet()) {
             Property<?> prop = iter.getKey();
@@ -239,6 +259,7 @@ public class BlockType implements Keyed, Pattern {
             id = btp.modify(id, btp.getValueFor((String) value));
         }
         return withStateId(id);
+        //FAWE end
     }
 
     /**
@@ -257,11 +278,13 @@ public class BlockType implements Keyed, Pattern {
      */
     @Nullable
     public ItemType getItemType() {
+        //FAWE start - init this
         if (!initItemType) {
             initItemType = true;
             itemType = ItemTypes.get(this.id);
         }
         return itemType;
+        //FAWE end
     }
 
     /**
@@ -270,7 +293,9 @@ public class BlockType implements Keyed, Pattern {
      * @return The material
      */
     public BlockMaterial getMaterial() {
+        //FAWE start - use settings
         return this.settings.blockMaterial;
+        //FAWE end
     }
 
     /**
@@ -282,8 +307,10 @@ public class BlockType implements Keyed, Pattern {
      */
     @Deprecated
     public int getLegacyCombinedId() {
+        //FAWE start - use LegacyMapper
         Integer combinedId = LegacyMapper.getInstance().getLegacyCombined(this);
         return combinedId == null ? 0 : combinedId;
+        //FAWE end
     }
 
     /**
@@ -295,7 +322,9 @@ public class BlockType implements Keyed, Pattern {
      */
     @Deprecated
     public int getLegacyId() {
+        //FAWE start
         return computeLegacy(0);
+        //FAWE end
     }
 
     /**
@@ -309,16 +338,21 @@ public class BlockType implements Keyed, Pattern {
      */
     @Deprecated
     public int getLegacyData() {
+        //FAWE start
         return computeLegacy(1);
+        //FAWE end
     }
 
     private int computeLegacy(int index) {
+        //FAWE start
         if (this.legacyCombinedId == null) {
             this.legacyCombinedId = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
         }
         return index == 0 ? legacyCombinedId >> 4 : legacyCombinedId & 15;
+        //FAWE end
     }
 
+    //FAWE start
     /**
      * The internal index of this type.
      *
@@ -364,4 +398,5 @@ public class BlockType implements Keyed, Pattern {
     public SingleBlockTypeMask toMask(Extent extent) {
         return new SingleBlockTypeMask(extent, this);
     }
+    //FAWE end
 }

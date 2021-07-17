@@ -43,7 +43,9 @@ import java.util.Set;
  */
 public class SnapshotRestore {
 
+    //FAWE start - Set instead of ArrayList
     private final Map<BlockVector2, Set<BlockVector3>> neededChunks = new LinkedHashMap<>();
+    //FAWE end
     private final ChunkStore chunkStore;
     private final EditSession editSession;
     private ArrayList<BlockVector2> missingChunks;
@@ -129,7 +131,7 @@ public class SnapshotRestore {
     /**
      * Restores to world.
      *
-     * @throws MaxChangedBlocksException
+     * @throws MaxChangedBlocksException if the max block change limit is exceeded
      */
     public void restore() throws MaxChangedBlocksException {
 

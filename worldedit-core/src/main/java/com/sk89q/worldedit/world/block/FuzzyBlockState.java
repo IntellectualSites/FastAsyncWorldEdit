@@ -33,10 +33,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A Fuzzy BlockState. Used for partial matching.
  *
+ * <p>
  * Immutable, construct with {@link FuzzyBlockState.Builder}.
+ * </p>
  */
 public class FuzzyBlockState extends BlockState {
 
+    //FAWE start
     private final Map<PropertyKey, Object> props;
     private final Map<Property<?>, Object> values;
 
@@ -47,7 +50,9 @@ public class FuzzyBlockState extends BlockState {
     public FuzzyBlockState(BlockState state) {
         this(state, null);
     }
+    //FAWE end
 
+    //FAWE start - use internal ids
     private FuzzyBlockState(BlockState state, Map<Property<?>, Object> values) {
         super(state.getBlockType(), state.getInternalId(), state.getOrdinal());
         if (values == null || values.isEmpty()) {
@@ -62,6 +67,7 @@ public class FuzzyBlockState extends BlockState {
         }
 
     }
+    //FAWE end
 
     /**
      * Gets a full BlockState from this fuzzy one, filling in
@@ -79,6 +85,7 @@ public class FuzzyBlockState extends BlockState {
         return state;
     }
 
+    //FAWE start
     @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
         if (!getBlockType().equals(o.getBlockType())) {
@@ -114,6 +121,7 @@ public class FuzzyBlockState extends BlockState {
     public Map<Property<?>, Object> getStates() {
         return values;
     }
+    //FAWE end
 
     /**
      * Gets an instance of a builder.
@@ -124,18 +132,20 @@ public class FuzzyBlockState extends BlockState {
         return new Builder();
     }
 
+    //FAWE start
     @Deprecated
     @Override
     public CompoundTag getNbtData() {
         return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
     }
+    //FAWE end
 
     /**
      * Builder for FuzzyBlockState
      */
     public static class Builder {
         private BlockType type;
-        private Map<Property<?>, Object> values = new HashMap<>();
+        private final Map<Property<?>, Object> values = new HashMap<>();
 
         /**
          * The type of the Fuzzy BlockState

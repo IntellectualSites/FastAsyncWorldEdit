@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 public class FileMcRegionChunkStore extends McRegionChunkStore {
 
-    private File path;
+    private final File path;
 
     /**
      * Create an instance. The passed path is the folder to read the

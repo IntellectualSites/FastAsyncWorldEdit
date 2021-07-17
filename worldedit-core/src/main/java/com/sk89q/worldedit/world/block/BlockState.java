@@ -23,6 +23,8 @@ import com.fastasyncworldedit.core.beta.ITileInput;
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.object.string.MutableCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
+import com.fastasyncworldedit.core.world.block.CompoundInput;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -56,16 +58,22 @@ import javax.annotation.Nullable;
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
+//FAWE start - Pattern
 public class BlockState implements BlockStateHolder<BlockState>, Pattern {
+//FAWE end
+
+    //FAWE start
     private final int internalId;
     private final int ordinal;
     private final char ordinalChar;
-    private final BlockType blockType;
     private BlockMaterial material;
     private final BaseBlock emptyBaseBlock;
     private CompoundInput compoundInput = CompoundInput.NULL;
+    //FAWE end
+    private final BlockType blockType;
 
-    protected BlockState(BlockType blockType, int internalId, int ordinal) {
+    //FAWE start
+    public BlockState(BlockType blockType, int internalId, int ordinal) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
@@ -73,7 +81,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.emptyBaseBlock = new BlanketBaseBlock(this);
     }
 
-    protected BlockState(BlockType blockType, int internalId, int ordinal, @NotNull CompoundTag tile) {
+    public BlockState(BlockType blockType, int internalId, int ordinal, @NotNull CompoundTag tile) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
@@ -329,6 +337,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
         return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
     }
+    //FAWE end
 
     @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
@@ -361,11 +370,13 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         return getState(getBlockType().getProperty(key));
     }
 
+    //FAWE start
     @Deprecated
     @Override
     public CompoundTag getNbtData() {
         return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
     }
+    //FAWE end
 
     @Override
     public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
@@ -375,6 +386,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         return new BaseBlock(this, compoundTag);
     }
 
+    //FAWE start
     @Override
     public int getInternalId() {
         return internalId;
@@ -431,4 +443,5 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         return compoundInput.get(this, input, x, y, z);
     }
+    //FAWE end
 }

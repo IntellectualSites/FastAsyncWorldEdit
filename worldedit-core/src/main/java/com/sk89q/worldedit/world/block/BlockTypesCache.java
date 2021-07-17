@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.world.block.BlockID;
 import com.google.common.primitives.Booleans;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;

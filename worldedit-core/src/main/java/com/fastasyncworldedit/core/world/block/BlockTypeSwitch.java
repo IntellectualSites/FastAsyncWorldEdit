@@ -1,4 +1,6 @@
-package com.sk89q.worldedit.world.block;
+package com.fastasyncworldedit.core.world.block;
+
+import com.sk89q.worldedit.world.block.BlockType;
 
 import java.util.function.Function;
 

@@ -43,7 +43,9 @@ import java.util.Map;
  */
 public class OldChunk implements Chunk {
 
+    //FAWE start
     private final CompoundBinaryTag rootTag;
+    //FAWE end
     private final byte[] blocks;
     private final byte[] data;
     private final int rootX;
@@ -51,7 +53,7 @@ public class OldChunk implements Chunk {
 
     private Map<BlockVector3, CompoundBinaryTag> tileEntities;
 
-
+    //FAWE start
     /**
      * Construct the chunk with a compound tag.
      *
@@ -63,6 +65,7 @@ public class OldChunk implements Chunk {
     public OldChunk(CompoundTag tag) throws DataException {
         this(tag.asBinaryTag());
     }
+    //FAWE end
 
     /**
      * Construct the chunk with a compound tag.
@@ -70,6 +73,7 @@ public class OldChunk implements Chunk {
      * @param tag the tag
      * @throws DataException if there is an error getting the chunk data
      */
+    //FAWE start - use *BinaryTag > *Tag
     public OldChunk(CompoundBinaryTag tag) throws DataException {
         rootTag = tag;
 
@@ -209,5 +213,6 @@ public class OldChunk implements Chunk {
 
         return state.toBaseBlock();
     }
+    //FAWE end
 
 }

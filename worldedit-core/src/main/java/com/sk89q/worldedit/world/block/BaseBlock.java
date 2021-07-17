@@ -54,8 +54,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     private final BlockState blockState;
     @Nullable
+    //FAWE start - LR<CBT> instead of CompoundTat
     private final LazyReference<CompoundBinaryTag> nbtData;
+    //FAWE end
 
+    //FAWE start
     /**
      * Construct a block with the given type and default data.
      * @deprecated Just use the BlockType.getDefaultState()
@@ -65,7 +68,9 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public BaseBlock(BlockType blockType) {
         this(blockType.getDefaultState());
     }
+    //FAWE end
 
+    //FAWE start - made public from protected
     /**
      * Construct a block with a state.
      *
@@ -75,7 +80,9 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         this.blockState = blockState;
         this.nbtData = null;
     }
+    //FAWE end
 
+    //FAWE start - deprecated upstream method and replaced CompoundTag with LR
     /**
      * Construct a block with the given ID, data value and NBT data structure.
      *
@@ -86,6 +93,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public BaseBlock(BlockState state, CompoundTag nbtData) {
         this(state, LazyReference.from(checkNotNull(nbtData)::asBinaryTag));
     }
+    //FAWE end
 
 
     /**
@@ -100,6 +108,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         this.nbtData = nbtData;
     }
 
+    //FAWE start
     /**
      * Construct a block with the given ID and data value.
      *
@@ -118,6 +127,8 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         }
         return blockState;
     }
+    //FAWE end
+
     /**
      * Gets a map of state to state values.
      *
@@ -151,13 +162,16 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public String getNbtId() {
+        //FAWE start - LR<CBT> > CompoundTag
         LazyReference<CompoundBinaryTag> nbtData = this.nbtData;
         if (nbtData == null) {
             return "";
         }
         return nbtData.getValue().getString("id");
+        //FAWE end
     }
 
+    //FAWE start
     @Nullable
     @Override
     public LazyReference<CompoundBinaryTag> getNbtReference() {
@@ -168,6 +182,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
         throw new UnsupportedOperationException("This class is immutable.");
     }
+    //FAWE end
 
     /**
      * Checks whether the type ID and data value are equal.
@@ -186,6 +201,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         return this.blockState.equalsFuzzy(otherBlock.blockState) && Objects.equals(getNbt(), otherBlock.getNbt());
     }
 
+    //FAWE start
     @Override
     public int getInternalId() {
         return blockState.getInternalId();
@@ -200,6 +216,12 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public int getOrdinal() {
         return blockState.getOrdinal();
     }
+
+    @Override
+    public final char getOrdinalChar() {
+        return blockState.getOrdinalChar();
+    }
+    //FAWE end
 
     /**
      * Checks if the type is the same, and if the matched states are the same.
@@ -218,15 +240,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Override
-    public final char getOrdinalChar() {
-        return blockState.getOrdinalChar();
-    }
-
-    @Override
     public BaseBlock toBaseBlock() {
         return this;
     }
 
+    //FAWE start
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         set.setFullBlock(extent, this);
@@ -277,16 +295,16 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         return toImmutableState().getState(property);
     }
 
-    // Fawe start
     @Override
     public int hashCode() {
         return getOrdinal();
     }
-    // Fawe end
+    //FAWE end
 
     @Override
     public String toString() {
         String nbtString = "";
+        //FAWE start - use CBT
         CompoundBinaryTag nbtData = getNbt();
         if (nbtData != null) {
             try {
@@ -302,4 +320,5 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public BlockState toBlockState() {
         return blockState;
     }
+    //FAWE end
 }

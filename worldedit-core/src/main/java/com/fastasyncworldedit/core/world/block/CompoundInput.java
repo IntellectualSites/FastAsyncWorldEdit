@@ -1,6 +1,8 @@
-package com.sk89q.worldedit.world.block;
+package com.fastasyncworldedit.core.world.block;
 
 import com.fastasyncworldedit.core.beta.ITileInput;
+import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockState;
 
 public enum CompoundInput {
     NULL,
