@@ -224,7 +224,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     default boolean isGlobal() {
         BlockVector3 pos1 = getMinimumPoint();
         BlockVector3 pos2 = getMaximumPoint();
-        return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2.getBlockZ() == Integer.MAX_VALUE && pos1.getBlockY() <= getWorld().getMinY() && pos2.getBlockY() >= getWorld().getMaxY();
+        return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2.getBlockZ() == Integer.MAX_VALUE && pos1.getBlockY() <= 0 && pos2.getBlockY() >= 255;
     }
 
     default int getMinimumY() {
