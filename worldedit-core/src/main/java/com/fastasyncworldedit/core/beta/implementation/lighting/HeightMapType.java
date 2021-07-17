@@ -39,6 +39,10 @@ public enum HeightMapType {
         }
     };
 
+    static {
+        BlockCategories.LEAVES.getAll(); // make sure this category is initialized, otherwise isLeaf might fail
+    }
+
     private static boolean isLeaf(BlockState state) {
         return BlockCategories.LEAVES.contains(state);
     }

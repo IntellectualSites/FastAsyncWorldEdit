@@ -94,7 +94,7 @@ dependencies {
     }
     compileOnly("net.kyori:adventure-api:4.8.1")
     testImplementation("net.kyori:adventure-api:4.8.1")
-    testImplementation("org.checkerframework:checker-qual:3.15.0")
+    testImplementation("org.checkerframework:checker-qual:3.16.0")
     testImplementation("org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT") { isTransitive = true }
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     api("org.lz4:lz4-java:1.8.0")
@@ -113,7 +113,7 @@ dependencies {
     implementation("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
     implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
-    implementation("com.comphenix.protocol:ProtocolLib:4.6.0") { isTransitive = false }
+    implementation("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
     implementation("org.incendo.serverlib:ServerLib:2.2.1")
     api("com.plotsquared:PlotSquared-Bukkit:6.0.6-SNAPSHOT")
 }

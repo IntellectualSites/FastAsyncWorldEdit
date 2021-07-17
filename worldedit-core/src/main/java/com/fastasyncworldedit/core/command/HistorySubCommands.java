@@ -399,7 +399,7 @@ public class HistorySubCommands {
         PaginationBox pages = cached == null ? null : cached.get();
         if (page == null || pages == null) {
             RollbackOptimizedHistory edit = database.getEdit(other, index).get();
-            SimpleChangeSetSummary summary = edit.summarize(null, false);
+            SimpleChangeSetSummary summary = edit.summarize(RegionWrapper.GLOBAL(), false);
             if (summary != null) {
                 List<Countable<BlockState>> distr = summary.getBlockDistributionWithData();
                 SelectionCommands.BlockDistributionResult distrPages = new SelectionCommands.BlockDistributionResult((List) distr, true, pageCommand);
@@ -408,7 +408,11 @@ public class HistorySubCommands {
             }
             page = 1;
         }
-        player.print(pages.create(page));
+        if (pages == null) {
+            player.print(Caption.of("fawe.worldedit.history.distr.summary_null"));
+        } else {
+            player.print(pages.create(page));
+        }
     }
 
     @Command(
