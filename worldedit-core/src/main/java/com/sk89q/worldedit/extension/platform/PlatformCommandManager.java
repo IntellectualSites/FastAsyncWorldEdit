@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.command.HistorySubCommandsRegistration;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.exception.FaweException;
@@ -53,6 +52,7 @@ import com.sk89q.worldedit.command.GenerationCommandsRegistration;
 import com.sk89q.worldedit.command.HistoryCommands;
 import com.sk89q.worldedit.command.HistoryCommandsRegistration;
 import com.sk89q.worldedit.command.HistorySubCommands;
+import com.sk89q.worldedit.command.HistorySubCommandsRegistration;
 import com.sk89q.worldedit.command.NavigationCommands;
 import com.sk89q.worldedit.command.NavigationCommandsRegistration;
 import com.sk89q.worldedit.command.PaintBrushCommands;
