@@ -35,6 +35,7 @@ import java.lang.ref.SoftReference;
  */
 public class WaterloggedRemover extends AbstractExtentPattern {
 
+    //FAWE start
     private static SoftReference<BlockState[]> cache = new SoftReference<>(null);
 
     private synchronized BlockState[] getRemap() {
@@ -59,6 +60,7 @@ public class WaterloggedRemover extends AbstractExtentPattern {
     }
 
     private final BlockState[] remap;
+    //FAWE end
 
     public WaterloggedRemover(Extent extent) {
         super(extent);
@@ -68,10 +70,12 @@ public class WaterloggedRemover extends AbstractExtentPattern {
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock block = getExtent().getFullBlock(position);
+        //FAWE start - remap
         BlockState newState = remap[block.getOrdinal()];
         if (newState != null) {
             return newState.toBaseBlock(block.getNbtData());
         }
+        //FAWE end
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
 }

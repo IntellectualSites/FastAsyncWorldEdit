@@ -87,9 +87,11 @@ public class RepeatingExtentPattern extends AbstractExtentPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
+        //FAWE start - calculate offset
         int x = Math.floorMod(position.getBlockX() + offset.getBlockX(), size.getBlockX()) + origin.getBlockX();
         int y = Math.floorMod(position.getBlockY() + offset.getBlockY(), size.getBlockY()) + origin.getBlockY();
         int z = Math.floorMod(position.getBlockZ() + offset.getBlockZ(), size.getBlockZ()) + origin.getBlockZ();
+        //FAWE end
         return getExtent().getFullBlock(x, y, z);
     }
 

@@ -31,7 +31,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 /**
  * Returns a {@link BaseBlock} for a given position.
  */
-//FAWE start
+//FAWE start - extends Filter
 public interface Pattern extends Filter {
 
     /**

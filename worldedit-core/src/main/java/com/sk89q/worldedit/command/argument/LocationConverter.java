@@ -1,7 +1,5 @@
-package com.fastasyncworldedit.core.command.argument;
+package com.sk89q.worldedit.command.argument;
 
-import com.sk89q.worldedit.command.argument.VectorConverter;
-import com.sk89q.worldedit.command.argument.WorldConverter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;

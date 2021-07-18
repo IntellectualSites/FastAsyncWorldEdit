@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.function.visitor;
+package com.fastasyncworldedit.core.function.visitor;
 
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;

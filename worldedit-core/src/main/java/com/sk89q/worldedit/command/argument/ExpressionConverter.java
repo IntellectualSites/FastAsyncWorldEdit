@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.command.argument;
+package com.sk89q.worldedit.command.argument;
 
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.util.formatting.text.Component;

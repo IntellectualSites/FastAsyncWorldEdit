@@ -17,9 +17,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.function;
+package com.fastasyncworldedit.core.function;
 
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -34,7 +35,7 @@ public class RegionMaskTestFunction implements RegionFunction {
 
     private final RegionFunction pass;
     private final RegionFunction fail;
-    private Mask mask;
+    private final Mask mask;
 
     /**
      * Create a new masking filter.

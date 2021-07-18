@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.command;
+package com.sk89q.worldedit.command.util.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

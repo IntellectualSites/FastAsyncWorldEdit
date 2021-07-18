@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.command;
+package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweAPI;
@@ -15,18 +15,15 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.command.HistoryCommands;
-import com.sk89q.worldedit.command.InsufficientArgumentsException;
-import com.sk89q.worldedit.command.SelectionCommands;
 import com.sk89q.worldedit.command.argument.Arguments;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
-import com.fastasyncworldedit.core.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
-import com.fastasyncworldedit.core.util.annotation.AllowedRegion;
-import com.fastasyncworldedit.core.util.annotation.Time;
+import com.sk89q.worldedit.command.util.annotation.AllowedRegion;
+import com.sk89q.worldedit.command.util.annotation.Time;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;

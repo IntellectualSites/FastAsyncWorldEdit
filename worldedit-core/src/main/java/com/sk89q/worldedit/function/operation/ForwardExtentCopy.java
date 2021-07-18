@@ -34,13 +34,13 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.function.RegionMaskTestFunction;
+import com.fastasyncworldedit.core.function.RegionMaskTestFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
-import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
+import com.fastasyncworldedit.core.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -79,10 +79,12 @@ public class ForwardExtentCopy implements Operation {
     private RegionFunction sourceFunction = null;
     private Transform transform = new Identity();
     private Transform currentTransform = null;
-    private int affectedBlocks;
+
     private RegionFunction filterFunction;
     private RegionVisitor lastBiomeVisitor;
     private EntityVisitor lastEntityVisitor;
+
+    private int affectedBlocks;
     private int affectedBiomeCols;
     private int affectedEntities;
 
@@ -166,9 +168,11 @@ public class ForwardExtentCopy implements Operation {
         this.sourceMask = sourceMask;
     }
 
+    //FAWE start
     public void setFilterFunction(RegionFunction filterFunction) {
         this.filterFunction = filterFunction;
     }
+    //FAWE end
 
     /**
      * Get the function that gets applied to all source blocks <em>after</em>
@@ -260,9 +264,11 @@ public class ForwardExtentCopy implements Operation {
      * @param copyingBiomes true if copying
      */
     public void setCopyingBiomes(boolean copyingBiomes) {
+        //FAWE start - FlatRegion
         if (copyingBiomes && !(region instanceof FlatRegion)) {
             throw new UnsupportedOperationException("Can't copy biomes from region that doesn't implement FlatRegion");
         }
+        //FAWE end
         this.copyingBiomes = copyingBiomes;
     }
 
@@ -277,9 +283,11 @@ public class ForwardExtentCopy implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
+        //FAWE start
         if (currentTransform == null) {
             currentTransform = transform;
         }
+        //FAWE end
         if (lastBiomeVisitor != null) {
             affectedBiomeCols += lastBiomeVisitor.getAffected();
             lastBiomeVisitor = null;
@@ -289,13 +297,16 @@ public class ForwardExtentCopy implements Operation {
             lastEntityVisitor = null;
         }
 
+        //FAWE start
         Extent finalDest = destination;
         BlockVector3 translation = to.subtract(from);
 
         if (!translation.equals(BlockVector3.ZERO)) {
             finalDest = new BlockTranslateExtent(finalDest, translation.getBlockX(), translation.getBlockY(), translation.getBlockZ());
         }
+        //FAWE end
 
+       //FAWE start - RegionVisitor > ExtentBlockCopy
         RegionFunction copy;
         RegionVisitor blockCopy = null;
         PositionTransformExtent transExt = null;
@@ -388,7 +399,6 @@ public class ForwardExtentCopy implements Operation {
             entities = Collections.emptyList();
         }
 
-
         for (int i = 0; i < repetitions; i++) {
             Operations.completeBlindly(blockCopy);
 
@@ -412,6 +422,7 @@ public class ForwardExtentCopy implements Operation {
 
         }
         affectedBlocks += blockCopy.getAffected();
+        //FAWE end
         return null;
     }
 

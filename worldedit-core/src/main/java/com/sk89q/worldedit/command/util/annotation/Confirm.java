@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.util.annotation;
+package com.sk89q.worldedit.command.util.annotation;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.util.task.InterruptableCondition;

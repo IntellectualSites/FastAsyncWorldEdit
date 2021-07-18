@@ -39,11 +39,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RandomPattern extends AbstractPattern {
 
+    //FAWE start - SimpleRandom > Random, LHS<P> > List
     private final SimpleRandom random;
     private Map<Pattern, Double> weights = new HashMap<>();
     private RandomCollection<Pattern> collection;
     private LinkedHashSet<Pattern> patterns = new LinkedHashSet<>();
+    //FAWE end
 
+    //FAWE start
     public RandomPattern() {
         this(new TrueRandom());
     }
@@ -64,6 +67,7 @@ public class RandomPattern extends AbstractPattern {
         this.collection = RandomCollection.of(weights, random);
         this.patterns = parent.patterns;
     }
+    //FAWE end
 
     /**
      * Add a pattern to the weight list of patterns.
@@ -76,6 +80,7 @@ public class RandomPattern extends AbstractPattern {
      */
     public void add(Pattern pattern, double chance) {
         checkNotNull(pattern);
+        //FAWE start - Double, weights, patterns and collection
         Double existingWeight = weights.get(pattern);
         if (existingWeight != null) {
             chance += existingWeight;
@@ -102,7 +107,6 @@ public class RandomPattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, get, set);
     }
-
-
+    //FAWE end
 
 }

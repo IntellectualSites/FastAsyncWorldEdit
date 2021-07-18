@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.function.visitor;
+package com.fastasyncworldedit.core.function.visitor;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -10,7 +10,6 @@ public class IntersectRegionFunction implements RegionFunction {
     public IntersectRegionFunction(RegionFunction... functions) {
         this.functions = functions;
     }
-
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
