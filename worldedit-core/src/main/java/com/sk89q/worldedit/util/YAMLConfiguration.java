@@ -29,6 +29,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Locale;
 
 /**
  * A less simple implementation of {@link LocalConfiguration}
@@ -54,7 +55,7 @@ public class YAMLConfiguration extends LocalConfiguration {
 
         profile = config.getBoolean("debug", profile);
         traceUnflushedSessions = config.getBoolean("debugging.trace-unflushed-sessions", traceUnflushedSessions);
-        wandItem = convertLegacyItem(config.getString("wand-item", wandItem));
+        wandItem = convertLegacyItem(config.getString("wand-item", wandItem)).toLowerCase(Locale.ROOT);
 
         defaultChangeLimit = Math.max(-1, config.getInt(
                 "limits.max-blocks-changed.default", defaultChangeLimit));
@@ -81,7 +82,6 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
         disallowedBlocks = new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks())));
-        disallowedBlocksMask = null;
         allowedDataCycleBlocks = new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
 
         registerHelp = config.getBoolean("register-help", true);
@@ -100,7 +100,7 @@ public class YAMLConfiguration extends LocalConfiguration {
         useInventoryCreativeOverride = config.getBoolean("use-inventory.creative-mode-overrides",
                 useInventoryCreativeOverride);
 
-        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand));
+        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand)).toLowerCase(Locale.ROOT);
         navigationWandMaxDistance = config.getInt("navigation-wand.max-distance", navigationWandMaxDistance);
         navigationUseGlass = config.getBoolean("navigation.use-glass", navigationUseGlass);
 

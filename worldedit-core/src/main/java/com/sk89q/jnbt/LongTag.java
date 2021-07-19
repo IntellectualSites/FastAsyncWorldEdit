@@ -56,11 +56,11 @@ public final class LongTag extends Tag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_LONG;
     }
-    // FAWE End
+    //FAWE end
 
 }

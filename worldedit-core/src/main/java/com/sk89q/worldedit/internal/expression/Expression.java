@@ -62,21 +62,27 @@ import java.util.Set;
  * pass values for all slots specified while compiling.
  * To query slots after evaluation, you can use the {@linkplain #getSlots() slot table}.
  */
+//FAWE start - implements Cloneable
 public class Expression implements Cloneable {
+//FAWE end
 
     private final SlotTable slots = new SlotTable();
     private final List<String> providedSlots;
     private final ExpressionParser.AllStatementsContext root;
     private final Functions functions = Functions.create();
     private final CompiledExpression compiledExpression;
+    //FAWE start
     private final String initialExpression;
+    //FAWE end
 
     public static Expression compile(String expression, String... variableNames) throws ExpressionException {
         return new Expression(expression, variableNames);
     }
 
     private Expression(String expression, String... variableNames) throws ExpressionException {
+        //FAWE start
         this.initialExpression = expression;
+        //FAWE end
 
         slots.putSlot("e", new LocalSlot.Constant(Math.E));
         slots.putSlot("pi", new LocalSlot.Constant(Math.PI));
@@ -185,8 +191,10 @@ public class Expression implements Cloneable {
         functions.setEnvironment(environment);
     }
 
+    //FAWE start
     public Expression clone() {
         return new Expression(initialExpression, new HashSet<>(providedSlots));
     }
+    //FAWE end
 
 }

@@ -329,8 +329,10 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
         return new ConvexPolyhedralRegion(this);
     }
 
+    //FAWE start
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         return false;
     }
+    //FAWE end
 }

@@ -120,8 +120,10 @@ public class FloatingTreeRemover implements BlockTool {
      * @return a set containing all blocks in the tree/shroom or null if this is not a floating tree/shroom.
      */
     private Set<BlockVector3> bfs(World world, BlockVector3 origin) {
+        //FAWE start - Use a LBVS over a HashMap & LinkedList
         final LocalBlockVectorSet visited = new LocalBlockVectorSet();
         final LocalBlockVectorSet queue = new LocalBlockVectorSet();
+        //FAWE end
 
         queue.add(origin);
         visited.add(origin);

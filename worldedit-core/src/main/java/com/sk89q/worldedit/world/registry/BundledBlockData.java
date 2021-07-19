@@ -82,6 +82,7 @@ public final class BundledBlockData {
     private void loadFromResource() throws IOException {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
+        //FAWE start
         gsonBuilder.registerTypeAdapter(int.class, (JsonDeserializer<Integer>) (json, typeOfT, context) -> {
             JsonPrimitive primitive = (JsonPrimitive) json;
             if (primitive.isString()) {
@@ -93,6 +94,7 @@ public final class BundledBlockData {
             }
             return primitive.getAsInt();
         });
+        //FAWE end
         Gson gson = gsonBuilder.create();
         URL url = null;
         final int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
@@ -162,9 +164,11 @@ public final class BundledBlockData {
     }
 
     public static class BlockEntry {
+        //FAWE start - made public
         public String id;
         public String localizedName;
         public SimpleBlockMaterial material = new SimpleBlockMaterial();
+        //FAWE end
     }
 
 }

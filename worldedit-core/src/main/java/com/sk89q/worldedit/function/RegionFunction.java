@@ -27,7 +27,9 @@ import com.sk89q.worldedit.math.BlockVector3;
 /**
  * Performs a function on points in a region.
  */
+//FAWE start - extends Filter
 public interface RegionFunction extends Filter {
+//FAWE end
 
     /**
      * Apply the function to the given position.
@@ -39,8 +41,10 @@ public interface RegionFunction extends Filter {
     boolean apply(BlockVector3 position) throws WorldEditException;
 
 
+    //FAWE start
     @Override
     default void applyBlock(FilterBlock block) {
         apply(block);
     }
+    //FAWE end
 }

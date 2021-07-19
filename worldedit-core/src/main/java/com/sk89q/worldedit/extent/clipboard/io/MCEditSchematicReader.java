@@ -222,7 +222,9 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             }
 
             if (fixer != null && t != null) {
+                //FAWE start
                 t = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, t.asBinaryTag(), -1));
+                //FAWE end
             }
 
             BlockVector3 vec = BlockVector3.at(x, y, z);

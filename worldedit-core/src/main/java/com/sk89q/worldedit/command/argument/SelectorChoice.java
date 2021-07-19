@@ -30,7 +30,9 @@ public enum SelectorChoice {
     HULL,
     POLYHEDRON,
     LIST,
+    //FAWE start
     FUZZY,
     MAGIC,
     POLYHEDRAL
+    //FAWE end
 }

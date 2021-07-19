@@ -34,8 +34,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class DownwardVisitor extends RecursiveVisitor {
 
-    private int baseY;
+    private final int baseY;
 
+    //FAWE start
     /**
      * Create a new visitor.
      *
@@ -46,6 +47,7 @@ public class DownwardVisitor extends RecursiveVisitor {
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
         this(mask, function, baseY, Integer.MAX_VALUE);
     }
+    //FAWE end
 
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth) {
         super(mask, function, depth);

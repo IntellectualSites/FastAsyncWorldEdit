@@ -23,12 +23,14 @@ import com.sk89q.worldedit.function.pattern.BiomePattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.sk89q.worldedit.registry.RegistryItem;
+import com.fastasyncworldedit.core.registry.RegistryItem;
 
 /**
  * All the types of biomes in the game.
  */
+//FAWE start - RegistryItem
 public class BiomeType implements RegistryItem, Keyed, BiomePattern {
+//FAWE end
 
     public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type");
 
@@ -36,6 +38,7 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
     private int legacyId = -1;
     private int internalId;
 
+    //FAWE start
     public BiomeType(String id) {
         this.id = id;
     }
@@ -57,6 +60,7 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
     public int getInternalId() {
         return internalId;
     }
+    //FAWE end
 
     /**
      * Gets the ID of this biome.
@@ -75,7 +79,9 @@ public class BiomeType implements RegistryItem, Keyed, BiomePattern {
 
     @Override
     public int hashCode() {
+        //FAWE start - internalId > hashCode
         return this.internalId; // stop changing this
+        //FAWE end
     }
 
     @Override

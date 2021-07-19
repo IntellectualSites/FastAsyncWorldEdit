@@ -5,7 +5,7 @@ import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import java.awt.image.BufferedImage;

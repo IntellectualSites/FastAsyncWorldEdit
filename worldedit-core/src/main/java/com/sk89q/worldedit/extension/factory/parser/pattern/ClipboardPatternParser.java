@@ -99,10 +99,10 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
                 Clipboard clipboard = holder.getClipboard();
                 return new ClipboardPattern(clipboard, offset);
             } catch (EmptyClipboardException e) {
-                throw new InputParseException(Caption.of("fawe.error.empty-clipboard", TextComponent.of("#clipboard")));
+                throw new InputParseException(Caption.of("worldedit.error.empty-clipboard"));
             }
         } else {
-            throw new InputParseException(Caption.of("fawe.error.no-session"));
+            throw new InputParseException(Caption.of("worldedit.error.missing-session"));
         }
     }
 

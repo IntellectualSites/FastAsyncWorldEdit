@@ -45,7 +45,9 @@ public class Deform implements Contextual<Operation> {
 
     private Extent destination;
     private Region region;
+    //FAWE Start - String
     private String expression;
+    //FAWE end
     private Mode mode;
     private Vector3 offset = Vector3.ZERO;
 
@@ -119,7 +121,9 @@ public class Deform implements Contextual<Operation> {
 
     @Override
     public String toString() {
+        //FAWE start - We string-ify elsewhere
         return "deformation of " + expression;
+        //FAWE end
     }
 
     @Override

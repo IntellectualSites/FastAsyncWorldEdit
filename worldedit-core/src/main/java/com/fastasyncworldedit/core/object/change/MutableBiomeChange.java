@@ -3,7 +3,7 @@ package com.fastasyncworldedit.core.object.change;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 
 public class MutableBiomeChange implements Change {

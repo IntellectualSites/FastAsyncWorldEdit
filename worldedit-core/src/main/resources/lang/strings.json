@@ -252,6 +252,7 @@
     "worldedit.tool.error.cannot-bind": "Can't bind tool to {0}: {1}",
     "worldedit.error.file-aborted": "File selection aborted.",
     "worldedit.error.world-unloaded": "The world was unloaded already.",
+    "worldedit.error.blocks-cant-be-used": "Blocks can't be used",
 
     "worldedit.brush.radius-too-large": "Maximum allowed brush radius: {0}",
     "worldedit.brush.apply.description": "Apply brush, apply a function to every block",
@@ -278,7 +279,7 @@
     "worldedit.setbiome.changed": "Biomes were changed in {0} columns. You may have to rejoin your game (or close and reopen your world) to see a change.",
 
     "worldedit.drawsel.disabled": "Server CUI disabled.",
-    "worldedit.drawsel.enabled": "Server CUI enabled. This only supports cuboid regions, with a maximum size of 32x32x32 on versions lower than 1.16, otherwise 48x48x48.",
+    "worldedit.drawsel.enabled": "Server CUI enabled. This only supports cuboid regions, with a maximum size of {0}x{1}x{2}.",
     "worldedit.drawsel.disabled.already": "Server CUI already disabled.",
     "worldedit.drawsel.enabled.already": "Server CUI already enabled.",
     "worldedit.limit.too-high": "Your maximum allowable limit is {0}.",
@@ -380,8 +381,8 @@
     "worldedit.pos.console-require-coords": "You must provide coordinates as console.",
     "worldedit.hpos.no-block": "No block in sight!",
     "worldedit.hpos.already-set": "Position already set.",
-    "worldedit.chunk.selected-multiple": "Chunks selected: ({0}, {1}) - ({2}, {3})",
-    "worldedit.chunk.selected": "Chunk selected: {0}, {1}",
+    "worldedit.chunk.selected-multiple": "Chunks selected: ({0}, {1}, {2}) - ({3}, {4}, {5})",
+    "worldedit.chunk.selected": "Chunk selected: {0}, {1}, {2}",
     "worldedit.wand.invalid": "Wand item is mis-configured or disabled.",
     "worldedit.wand.selwand.info": "Left click: select pos #1; Right click: select pos #2",
     "worldedit.wand.selwand.now.tool": "The selection wand is now a normal tool. You can disable it with {0} and rebind it to any item with {1} or get a new wand with {2}.",

@@ -21,13 +21,15 @@ package com.sk89q.worldedit.world.entity;
 
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.sk89q.worldedit.registry.RegistryItem;
+import com.fastasyncworldedit.core.registry.RegistryItem;
 
+//FAWE start - implements RegistryItem
 public class EntityType implements RegistryItem, Keyed {
+//FAWE end
 
     public static final NamespacedRegistry<EntityType> REGISTRY = new NamespacedRegistry<>("entity type");
 
-    private String id;
+    private final String id;
 
     public EntityType(String id) {
         // If it has no namespace, assume minecraft.
@@ -42,6 +44,7 @@ public class EntityType implements RegistryItem, Keyed {
         return this.id;
     }
 
+    //FAWE start
     private int internalId;
 
     @Override
@@ -53,6 +56,7 @@ public class EntityType implements RegistryItem, Keyed {
     public int getInternalId() {
         return internalId;
     }
+    //FAWE end
 
     /**
      * Gets the name of this item, or the ID if the name cannot be found.

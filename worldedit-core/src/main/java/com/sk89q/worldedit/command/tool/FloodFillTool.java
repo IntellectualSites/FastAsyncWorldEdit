@@ -77,11 +77,13 @@ public class FloodFillTool implements BlockTool {
 
         try (EditSession editSession = session.createEditSession(player, "FloodFillTool")) {
             try {
+                //FAWE start - Respect masks
                 Mask mask = initialType.toMask(editSession);
                 BlockReplace function = new BlockReplace(editSession, pattern);
                 RecursiveVisitor visitor = new RecursiveVisitor(mask, function, range);
                 visitor.visit(origin);
                 Operations.completeLegacy(visitor);
+                //FAWE end
             } catch (MaxChangedBlocksException e) {
                 player.print(Caption.of("worldedit.tool.max-block-changes"));
             } finally {

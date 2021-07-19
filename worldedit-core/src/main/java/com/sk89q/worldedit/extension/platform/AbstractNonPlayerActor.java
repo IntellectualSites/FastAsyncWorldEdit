@@ -57,6 +57,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
     public void dispatchCUIEvent(CUIEvent event) {
     }
 
+    //FAWE start
     private final ConcurrentHashMap<String, Object> meta = new ConcurrentHashMap<>();
 
     @Override
@@ -112,4 +113,5 @@ public abstract class AbstractNonPlayerActor implements Actor {
         }
         return true;
     }
+    //FAWE end
 }

@@ -23,7 +23,6 @@ import com.google.common.collect.Maps;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -36,7 +35,7 @@ import static com.sk89q.worldedit.blocks.Blocks.resolveProperties;
 public class StateApplyingPattern extends AbstractExtentPattern {
 
     private final Map<String, String> states;
-    private Map<BlockType, Map<Property<Object>, Object>> cache = Maps.newHashMap();
+    private final Map<BlockType, Map<Property<Object>, Object>> cache = Maps.newHashMap();
 
     public StateApplyingPattern(Extent extent, Map<String, String> statesToSet) {
         super(extent);
@@ -48,9 +47,11 @@ public class StateApplyingPattern extends AbstractExtentPattern {
         BlockState block = getExtent().getBlock(position);
         for (Entry<Property<Object>, Object> entry : cache
                 .computeIfAbsent(block.getBlockType(), (b -> resolveProperties(states, b))).entrySet()) {
+            //FAWE start
             if (block.getBlockType().hasProperty(entry.getKey().getKey())) {
                 block = block.with(entry.getKey(), entry.getValue());
             }
+            //FAWE end
         }
         return block.toBaseBlock();
     }

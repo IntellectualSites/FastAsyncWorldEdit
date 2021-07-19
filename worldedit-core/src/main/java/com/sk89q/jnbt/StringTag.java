@@ -59,11 +59,11 @@ public final class StringTag extends Tag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_STRING;
     }
-    // FAWE End
+    //FAWE end
 
 }

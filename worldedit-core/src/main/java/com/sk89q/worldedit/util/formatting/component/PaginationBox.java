@@ -78,11 +78,13 @@ public abstract class PaginationBox extends MessageBox {
         super(title, new TextComponentProducer());
 
         if (pageCommand != null && !pageCommand.contains("%page%")) {
+            //FAWE start
             if (pageCommand.contains("-p ")) {
                 pageCommand = pageCommand.replaceAll("-p [0-9]+", "-p %page%");
             } else {
                 pageCommand = pageCommand + " -p %page%";
             }
+            //FAWE end
         }
         this.pageCommand = pageCommand;
     }
@@ -171,6 +173,7 @@ public abstract class PaginationBox extends MessageBox {
         }
     }
 
+    //FAWE start
     public static class MergedPaginationBox extends PaginationBox {
         private final PaginationBox[] values;
 
@@ -182,9 +185,11 @@ public abstract class PaginationBox extends MessageBox {
         @Override
         public Component getComponent(int number) {
             for (PaginationBox box : values) {
+                //FAWE start
                 if (box == null) {
                     continue;
                 }
+                //FAWE end
                 int size = box.getComponentsSize();
                 if (size > number) {
                     return box.getComponent(number);
@@ -198,12 +203,15 @@ public abstract class PaginationBox extends MessageBox {
         public int getComponentsSize() {
             int size = 0;
             for (PaginationBox box : values) {
+                //FAWE start
                 if (box == null) {
                     continue;
                 }
+                //FAWE end
                 size += box.getComponentsSize();
             }
             return size;
         }
     }
+    //FAWE end
 }

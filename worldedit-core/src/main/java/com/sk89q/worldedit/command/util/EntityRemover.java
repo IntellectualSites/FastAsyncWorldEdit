@@ -146,7 +146,9 @@ public class EntityRemover {
             EntityProperties registryType = entity.getFacet(EntityProperties.class);
             if (registryType != null) {
                 if (type.matches(registryType)) {
+                    //FAWE start - Calling this async violates thread safety
                     TaskManager.IMP.sync(entity::remove);
+                    //FAWE end
                     return true;
                 }
             }

@@ -49,7 +49,9 @@ public class PlayerProxy extends AbstractPlayerActor {
     private final Actor permActor;
     private final Actor cuiActor;
     private final World world;
+    //FAWE start
     private Vector3 offset = Vector3.ZERO;
+    //FAWE end
 
     public PlayerProxy(Player player) {
         this(player, player, player, player.getWorld());
@@ -65,27 +67,6 @@ public class PlayerProxy extends AbstractPlayerActor {
         this.permActor = permActor;
         this.cuiActor = cuiActor;
         this.world = world;
-    }
-
-    public static Player unwrap(Player player) {
-        if (player instanceof PlayerProxy) {
-            return unwrap(((PlayerProxy) player).getBasePlayer());
-        }
-        return player;
-    }
-
-    public void setOffset(Vector3 position) {
-        this.offset = position;
-    }
-
-    @Override
-    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
-        return basePlayer.getBlockInHand(handSide);
-    }
-
-    @Override
-    public boolean runAction(Runnable ifFree, boolean checkFree, boolean async) {
-        return basePlayer.runAction(ifFree, checkFree, async);
     }
 
     @Override
@@ -226,15 +207,6 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
-    public void sendTitle(Component title, Component sub) {
-        basePlayer.sendTitle(title, sub);
-    }
-
-    public Player getBasePlayer() {
-        return basePlayer;
-    }
-
-    @Override
     public void floatAt(int x, int y, int z, boolean alwaysGlass) {
         basePlayer.floatAt(x, y, z, alwaysGlass);
     }
@@ -243,4 +215,36 @@ public class PlayerProxy extends AbstractPlayerActor {
     public Locale getLocale() {
         return basePlayer.getLocale();
     }
+
+    //FAWE start
+    public static Player unwrap(Player player) {
+        if (player instanceof PlayerProxy) {
+            return unwrap(((PlayerProxy) player).getBasePlayer());
+        }
+        return player;
+    }
+
+    public void setOffset(Vector3 position) {
+        this.offset = position;
+    }
+
+    @Override
+    public BaseBlock getBlockInHand(HandSide handSide) throws WorldEditException {
+        return basePlayer.getBlockInHand(handSide);
+    }
+
+    @Override
+    public boolean runAction(Runnable ifFree, boolean checkFree, boolean async) {
+        return basePlayer.runAction(ifFree, checkFree, async);
+    }
+
+    @Override
+    public void sendTitle(Component title, Component sub) {
+        basePlayer.sendTitle(title, sub);
+    }
+
+    public Player getBasePlayer() {
+        return basePlayer;
+    }
+    //FAWE end
 }

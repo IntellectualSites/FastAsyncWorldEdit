@@ -195,12 +195,12 @@ class ForgePlatform extends AbstractPlatform implements MultiUserPlatform {
         return mod.getInternalVersion();
     }
 
-    // FAWE start
+    //FAWE start
     @Override
     public String getId() {
         return "intellectualsites:forge";
     }
-    // FAWE end
+    //FAWE end
 
     @Override
     public Map<Capability, Preference> getCapabilities() {

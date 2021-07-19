@@ -32,7 +32,9 @@ import java.util.Set;
  * blocks such as wool into separate ids.
  */
 public class BlockCategory extends Category<BlockType> implements Keyed {
-    private boolean[] flat_map;
+    //FAWE start
+    private boolean[] flatMap;
+    //FAWE end
     public static final NamespacedRegistry<BlockCategory> REGISTRY = new NamespacedRegistry<>("block tag");
 
     public BlockCategory(final String id) {
@@ -45,15 +47,17 @@ public class BlockCategory extends Category<BlockType> implements Keyed {
                 .queryCapability(Capability.GAME_HOOKS).getRegistries()
                 .getBlockCategoryRegistry().getAll(this);
 
+        //FAWE start
         int max = -1;
         for (BlockType type : result) {
             max = Math.max(max, type.getInternalId());
         }
-        this.flat_map = new boolean[max + 1];
+        this.flatMap = new boolean[max + 1];
         for (BlockType type : result) {
-            this.flat_map[type.getInternalId()] = true;
+            this.flatMap[type.getInternalId()] = true;
         }
         return result;
+        //FAWE end
     }
 
     /**
@@ -64,7 +68,9 @@ public class BlockCategory extends Category<BlockType> implements Keyed {
      * @return If it's a part of this category
      */
     public <B extends BlockStateHolder<B>> boolean contains(B blockStateHolder) {
+        //FAWE start - use internal id
         int typeId = blockStateHolder.getBlockType().getInternalId();
-        return flat_map.length > typeId && flat_map[typeId];
+        return flatMap.length > typeId && flatMap[typeId];
+        //FAWE end
     }
 }

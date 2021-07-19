@@ -97,7 +97,9 @@ public class ChunkStoreHelper {
         if (tag.getValue().containsKey("Sections") && dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
             final DataFixer dataFixer = platform.getDataFixer();
             if (dataFixer != null) {
+                //FAWE start - use Adventure
                 tag = (CompoundTag) ((CompoundTag) AdventureNBTConverter.fromAdventure(dataFixer.fixUp(DataFixer.FixTypes.CHUNK, rootTag.asBinaryTag(), dataVersion))).getValue().get("Level");
+                //FAWE end
                 dataVersion = currentDataVersion;
             }
         }

@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.object.extent;
 
 import com.fastasyncworldedit.core.object.collection.RandomCollection;
-import com.fastasyncworldedit.core.object.random.SimpleRandom;
-import com.fastasyncworldedit.core.object.random.TrueRandom;
+import com.fastasyncworldedit.core.math.random.SimpleRandom;
+import com.fastasyncworldedit.core.math.random.TrueRandom;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 

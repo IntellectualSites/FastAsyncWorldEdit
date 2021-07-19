@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.history.changeset;
 
+import com.fastasyncworldedit.core.history.changeset.ChangeSetSummary;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.regions.Region;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,9 @@ import java.util.Iterator;
  * Tracks a set of undoable operations and allows their undo and redo. The
  * entirety of a change set should be undone and redone at once.
  */
+//FAWE start - extends Closable
 public interface ChangeSet extends Closeable {
+//FAWE end
 
     /**
      * Add the given change to the history.
@@ -81,6 +84,7 @@ public interface ChangeSet extends Closeable {
      */
     int size();
 
+    //FAWE start
     /**
      * Close the changeset.
      */
@@ -109,4 +113,5 @@ public interface ChangeSet extends Closeable {
     default boolean isEmpty() {
         return size() == 0;
     }
+    //FAWE end
 }

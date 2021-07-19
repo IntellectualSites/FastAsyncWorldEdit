@@ -28,7 +28,9 @@ import java.util.Locale;
 /**
  * Parent for all WorldEdit exceptions.
  */
+//FAWE start - RuntimeException > Exception
 public abstract class WorldEditException extends RuntimeException {
+//FAWE end
 
     private final Component message;
 

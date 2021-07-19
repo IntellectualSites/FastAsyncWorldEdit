@@ -58,7 +58,7 @@ public class BlockStateMaskParser extends InputParser<Mask> {
                     Splitter.on(',').omitEmptyStrings().trimResults().withKeyValueSeparator('=').split(states),
                     strict);
         } catch (Exception e) {
-            throw new InputParseException(Caption.of("fawe.error.invalid-states", TextComponent.of(String.valueOf(e))));
+            throw new InputParseException(Caption.of("worldedit.error.parser.bad-state-format", TextComponent.of(String.valueOf(e))));
         }
     }
 }

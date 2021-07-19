@@ -71,7 +71,6 @@ public class SessionManager {
     private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
             EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5, "WorldEdit Session Saver - %s"));
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static boolean warnedInvalidTool;
 
     private final Timer timer = new Timer("WorldEdit Session Manager");
     private final WorldEdit worldEdit;
@@ -169,6 +168,7 @@ public class SessionManager {
             session.setConfiguration(config);
             session.setBlockChangeLimit(config.defaultChangeLimit);
             session.setTimeout(config.calculationTimeout);
+            //FAWE start
             /*
             try {
                 if (owner.hasPermission("worldedit.selection.pos")) {
@@ -184,6 +184,7 @@ public class SessionManager {
                 }
             }
             */
+            //FAWE end
 
             // Remember the session regardless of if it's currently active or not.
             // And have the SessionTracker FLUSH inactive sessions.
@@ -328,8 +329,10 @@ public class SessionManager {
                 stored.lastActive = now;
 
                 if (stored.session.compareAndResetDirty()) {
+                    //FAWE start
                     // Don't save unless player disconnects
                     // saveQueue.put(stored.key, stored.session);
+                    //FAWE end
                 }
             } else {
                 if (now - stored.lastActive > EXPIRATION_GRACE) {
@@ -350,7 +353,7 @@ public class SessionManager {
     @Subscribe
     public void onConfigurationLoad(ConfigurationLoadEvent event) {
         LocalConfiguration config = event.getConfiguration();
-        File dir = new File(config.getWorkingDirectory(), "sessions");
+        File dir = new File(config.getWorkingDirectoryPath().toFile(), "sessions");
         store = new JsonFileSessionStore(dir);
     }
 

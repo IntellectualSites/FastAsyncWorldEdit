@@ -83,7 +83,7 @@ public class PasteBuilder {
      * This provides a more flexible alternative to {@link #ignoreAirBlocks(boolean)}, for example
      * one might want to ignore structure void if copying a Minecraft Structure, etc.
      *
-     * @param sourceMask
+     * @param sourceMask the mask for the source
      * @return this builder instance
      */
     public PasteBuilder maskSource(Mask sourceMask) {
@@ -109,7 +109,7 @@ public class PasteBuilder {
      * Set whether the copy should include source entities.
      * Note that this is true by default for legacy reasons.
      *
-     * @param copyEntities
+     * @param copyEntities if entities should be copied
      * @return this builder instance
      */
     public PasteBuilder copyEntities(boolean copyEntities) {
@@ -120,17 +120,20 @@ public class PasteBuilder {
     /**
      * Set whether the copy should include source biomes (if available).
      *
-     * @param copyBiomes
+     * @param copyBiomes if biomes should be copied
      * @return this builder instance
      */
     public PasteBuilder copyBiomes(boolean copyBiomes) {
         this.copyBiomes = copyBiomes;
         return this;
     }
+
+    //FAWE start
     public PasteBuilder filter(RegionFunction function) {
         this.canApply = function;
         return this;
     }
+    //FAWE end
 
     /**
      * Build the operation.
@@ -138,19 +141,24 @@ public class PasteBuilder {
      * @return the operation
      */
     public Operation build() {
+        //FAWE start
         Extent extent = clipboard;
         if (!transform.isIdentity()) {
             extent = new BlockTransformExtent(extent, transform);
         }
+        //FAWE end
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), targetExtent, to);
         copy.setTransform(transform);
 
+        //FAWE start
         copy.setCopyingEntities(copyEntities);
         copy.setCopyingBiomes(copyBiomes && clipboard.hasBiomes());
         if (this.canApply != null) {
             copy.setFilterFunction(this.canApply);
         }
+        //FAWE end
         if (ignoreAirBlocks) {
+            //FAWE start - respect clipboard
             sourceMask = MaskIntersection.of(sourceMask, new ExistingBlockMask(clipboard));
         }
         if (targetExtent instanceof EditSession) {
@@ -164,6 +172,7 @@ public class PasteBuilder {
                 sourceMask = MaskIntersection.of(sourceMask, esSourceMask);
             }
         }
+        //FAWE end
         if (sourceMask != null && sourceMask != Masks.alwaysTrue()) {
             copy.setSourceMask(sourceMask);
         }

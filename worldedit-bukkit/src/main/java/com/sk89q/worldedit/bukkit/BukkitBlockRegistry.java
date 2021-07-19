@@ -146,7 +146,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         }
     }
 
-    // FAWE start
+    //FAWE start
     @Override
     public Collection<String> values() {
         ArrayList<String> blocks = new ArrayList<>();

@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.object.brush.heightmap;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableVector3;
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 public class RotatableHeightMap extends AbstractDelegateHeightMap {

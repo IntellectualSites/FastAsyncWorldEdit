@@ -70,10 +70,12 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         this((World) null);
     }
 
+    //FAWE start
     public CylinderRegionSelector(CylinderRegion region) {
         checkNotNull(region);
         this.region = region;
     }
+    //FAWE end
 
     /**
      * Create a new region selector.

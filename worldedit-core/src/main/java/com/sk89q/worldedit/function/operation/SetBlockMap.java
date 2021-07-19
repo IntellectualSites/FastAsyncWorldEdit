@@ -52,8 +52,10 @@ public class SetBlockMap implements Operation {
     public void cancel() {
     }
 
+    //FAWE start
     @Override
     public void addStatusMessages(List<String> messages) {
     }
+    //FAWE end
 
 }

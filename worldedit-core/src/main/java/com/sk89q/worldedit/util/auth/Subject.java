@@ -48,6 +48,7 @@ public interface Subject {
      */
     boolean hasPermission(String permission);
 
+    //FAWE start
     /**
      * Add and remove permissions from a subject to show and hide certain messages.
      *
@@ -65,4 +66,5 @@ public interface Subject {
     }
 
     void setPermission(String permission, boolean value);
+    //FAWE end
 }

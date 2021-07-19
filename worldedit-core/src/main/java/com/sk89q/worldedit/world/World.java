@@ -56,7 +56,9 @@ import javax.annotation.Nullable;
 /**
  * Represents a world (dimension).
  */
+//FAWE start - IChunkCache<IChunkGet>
 public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
+//FAWE end
 
     /**
      * Get the name of the world.
@@ -371,6 +373,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     @Override
     int hashCode();
 
+    //FAWE start
     @Override
     default boolean isWorld() {
         return true;
@@ -414,4 +417,5 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     }
 
     void flush();
+    //FAWE end
 }

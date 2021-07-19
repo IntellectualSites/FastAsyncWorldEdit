@@ -33,7 +33,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CombinedRegionFunction implements RegionFunction {
 
+    //FAWE start - don't use a List<RF> here
     private RegionFunction[] functions;
+    //FAWE end
 
     /**
      * Create a combined region function.
@@ -60,6 +62,7 @@ public class CombinedRegionFunction implements RegionFunction {
         this.functions = function;
     }
 
+    //FAWE start
     public static CombinedRegionFunction combine(RegionFunction function, RegionFunction add) {
         CombinedRegionFunction combined;
         if (function instanceof CombinedRegionFunction) {
@@ -73,6 +76,7 @@ public class CombinedRegionFunction implements RegionFunction {
         }
         return combined;
     }
+    //FAWE end
 
     /**
      * Add the given functions to the list of functions to call.
@@ -81,9 +85,11 @@ public class CombinedRegionFunction implements RegionFunction {
      */
     public void add(Collection<RegionFunction> functions) {
         checkNotNull(functions);
+        //FAWE start - use our logic
         ArrayList<RegionFunction> functionsList = new ArrayList<>(Arrays.asList(this.functions));
         functionsList.addAll(functions);
         this.functions = functionsList.toArray(new RegionFunction[0]);
+        //FAWE end
     }
 
     /**

@@ -291,6 +291,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         recalculate();
     }
 
+    //FAWE start
     @Override
     public boolean contains(int targetX, int targetZ) {
         boolean inside = false;
@@ -344,6 +345,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
 
         return inside;
     }
+    //FAWE end
 
     @Override
     public boolean contains(BlockVector3 position) {
@@ -501,6 +503,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         return points;
     }
 
+    //FAWE start
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         for (int x = bx; x <= tx; x++) {
@@ -525,4 +528,5 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         }
         return true;
     }
+    //FAWE end
 }

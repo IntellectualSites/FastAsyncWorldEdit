@@ -48,7 +48,9 @@ public class ParserContext {
     private boolean restricted = true;
     private boolean tryLegacy = true;
     private boolean preferringWildcard;
+    //Fawe start
     private InjectedValueAccess injected;
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -260,6 +262,7 @@ public class ParserContext {
         return tryLegacy;
     }
 
+    //FAWE start
     public void setInjected(InjectedValueAccess injected) {
         this.injected = injected;
     }
@@ -267,4 +270,5 @@ public class ParserContext {
     public InjectedValueAccess getInjected() {
         return injected;
     }
+    //FAWE end
 }

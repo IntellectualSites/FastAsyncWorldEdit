@@ -72,6 +72,7 @@ public class RegionMask extends AbstractMask {
         return null;
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new RegionMask(region.clone());
@@ -84,5 +85,6 @@ public class RegionMask extends AbstractMask {
         }
         return this;
     }
+    //FAWE end
 
 }

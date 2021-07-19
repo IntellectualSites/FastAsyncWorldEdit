@@ -25,6 +25,7 @@ import com.sk89q.worldedit.WorldEdit;
  * An abstract base class for all WorldEdit events.
  */
 public abstract class Event {
+    //FAWE start
 
     /**
      * Returns true if this event was called and not cancelled.
@@ -37,4 +38,5 @@ public abstract class Event {
         }
         return true;
     }
+    //FAWE end
 }

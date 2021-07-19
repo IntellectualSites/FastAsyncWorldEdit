@@ -53,6 +53,7 @@ public class BlockStateMask extends AbstractExtentMask {
         this.strict = strict;
     }
 
+    //FAWE start
     @Override
     public boolean test(BlockVector3 vector) {
         return test(getExtent().getBlock(vector));
@@ -90,4 +91,5 @@ public class BlockStateMask extends AbstractExtentMask {
         states.forEach(statesClone::put);
         return new BlockStateMask(getExtent(), statesClone, strict);
     }
+    //FAWE end
 }

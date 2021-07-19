@@ -105,17 +105,17 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
-import com.sk89q.worldedit.extension.platform.binding.Bindings;
-import com.sk89q.worldedit.extension.platform.binding.ConsumeBindings;
-import com.sk89q.worldedit.extension.platform.binding.PrimitiveBindings;
-import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
+import com.fastasyncworldedit.core.extension.platform.binding.Bindings;
+import com.fastasyncworldedit.core.extension.platform.binding.ConsumeBindings;
+import com.fastasyncworldedit.core.extension.platform.binding.PrimitiveBindings;
+import com.fastasyncworldedit.core.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
-import com.sk89q.worldedit.internal.command.ConfirmHandler;
-import com.sk89q.worldedit.internal.command.MethodInjector;
+import com.sk89q.worldedit.command.util.annotation.ConfirmHandler;
+import com.fastasyncworldedit.core.internal.command.MethodInjector;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -193,7 +193,9 @@ public final class PlatformCommandManager {
     private final WorldEditExceptionConverter exceptionConverter;
     public final CommandRegistrationHandler registration;
 
+    //FAWE start
     private static PlatformCommandManager INSTANCE;
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -203,7 +205,9 @@ public final class PlatformCommandManager {
     public PlatformCommandManager(final WorldEdit worldEdit, PlatformManager platformManager) {
         checkNotNull(worldEdit);
         checkNotNull(platformManager);
+        //FAWE start
         INSTANCE = this;
+        //FAWE end
 
         this.worldEdit = worldEdit;
         this.platformManager = platformManager;
@@ -261,6 +265,7 @@ public final class PlatformCommandManager {
         SideEffectConverter.register(commandManager);
         HeightConverter.register(commandManager);
         OffsetConverter.register(worldEdit, commandManager);
+        //FAWE start
         commandManager.registerConverter(Key.of(com.sk89q.worldedit.function.pattern.Pattern.class, Annotations.patternList()),
             CommaSeparatedValuesConverter.wrap(commandManager.getConverter(Key.of(
                 com.sk89q.worldedit.function.pattern.Pattern.class)).get()));
@@ -268,11 +273,14 @@ public final class PlatformCommandManager {
         registerBindings(new ConsumeBindings(worldEdit, this));
         registerBindings(new PrimitiveBindings(worldEdit));
         registerBindings(new ProvideBindings(worldEdit));
+        //FAWE end
     }
 
+    //FAWE start
     private void registerBindings(Bindings bindings) {
         bindings.register(globalInjectedValues, commandManager);
     }
+    //FAWE end
 
     private void registerAlwaysInjectedValues() {
         globalInjectedValues.injectValue(Key.of(Region.class, Selection.class),
@@ -289,6 +297,7 @@ public final class PlatformCommandManager {
                                 }
                             });
                 });
+        //FAWE start
         /*
         globalInjectedValues.injectValue(Key.of(EditSession.class),
                 context -> {
@@ -307,6 +316,7 @@ public final class PlatformCommandManager {
 //        globalInjectedValues.injectValue(Key.of(CFICommands.CFISettings.class),
 //                context -> context.injectedValue(Key.of(Actor.class))
 //                        .orElseThrow(() -> new IllegalStateException("No CFI Settings")).getMeta("CFISettings"));
+        //FAWE end
         globalInjectedValues.injectValue(Key.of(World.class),
                 context -> {
                     LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
@@ -327,7 +337,9 @@ public final class PlatformCommandManager {
                                 }
                             });
                 });
+        //FAWE start
         globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), Optional::of);
+        //FAWE end
     }
 
     /**
@@ -376,13 +388,14 @@ public final class PlatformCommandManager {
 
             CommandManager manager = commandManagerService.newCommandManager();
 
-            handlerInstance.accept((handler, instance) -> {
-                this.registration.register(
-                        manager,
-                        handler,
-                        instance
-                );
-            });
+            //FAWE start
+            handlerInstance.accept((handler, instance) ->
+                    this.registration.register(
+                    manager,
+                    handler,
+                    instance
+            ));
+            //FAWE end
             additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
@@ -397,6 +410,7 @@ public final class PlatformCommandManager {
     }
 
     public void registerAllCommands() {
+        //FAWE start
         if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
             // TODO: Ping @MattBDev to reimplement (or remove) 2020-02-04
 //            registerSubCommands(
@@ -420,6 +434,7 @@ public final class PlatformCommandManager {
 //                TransformCommandsRegistration.builder(),
 //                new TransformCommands()
 //            );
+        //FAWE end
             registerSubCommands(
                 "schematic",
                 ImmutableList.of("schem", "/schematic", "/schem"),
@@ -443,6 +458,7 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                     "brush",
+                    //FAWE start - register tools as brushes (?)
                     Lists.newArrayList("br", "/brush", "/br", "/tool", "tool"),
                     "Brushing commands",
                     c -> {
@@ -450,6 +466,7 @@ public final class PlatformCommandManager {
                         c.accept(ToolCommandsRegistration.builder(), new ToolCommands(worldEdit));
                         c.accept(ToolUtilCommandsRegistration.builder(), new ToolUtilCommands(worldEdit));
                     },
+                    //FAWE end
                     manager -> {
                         PaintBrushCommands.register(commandManagerService, manager, registration);
                         ApplyBrushCommands.register(commandManagerService, manager, registration);
@@ -457,28 +474,13 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                 "worldedit",
+                //FAWE start - register fawe
                 ImmutableList.of("we", "fawe", "fastasyncworldedit"),
+                //FAWE end
                 "WorldEdit commands",
                 WorldEditCommandsRegistration.builder(),
                 new WorldEditCommands(worldEdit)
             );
-            /*
-            TODO: Ping @MattBDev to reimplement 2020-02-04
-            registerSubCommands(
-                "cfi",
-                ImmutableList.of("/cfi"),
-                "CFI commands",
-                CFICommandsRegistration.builder(),
-                new CFICommands(worldEdit)
-            );
-            registerSubCommands(
-                "/anvil",
-                ImmutableList.of(),
-                "Manipulate billions of blocks",
-                AnvilCommandsRegistration.builder(),
-                new AnvilCommands(worldEdit)
-            );
-             */
             this.registration.register(
                 commandManager,
                 BiomeCommandsRegistration.builder(),
@@ -505,6 +507,7 @@ public final class PlatformCommandManager {
                     GenerationCommandsRegistration.builder(),
                     new GenerationCommands(worldEdit)
             );
+            //FAWE start
             HistoryCommands history = new HistoryCommands(worldEdit);
             this.registration.register(
                     commandManager,
@@ -518,6 +521,7 @@ public final class PlatformCommandManager {
                 HistorySubCommandsRegistration.builder(),
                 new HistorySubCommands(history)
             );
+            //FAWE end
             this.registration.register(
                 commandManager,
                 NavigationCommandsRegistration.builder(),
@@ -583,7 +587,7 @@ public final class PlatformCommandManager {
             dynamicHandler.setHandler(null);
             COMMAND_LOG.setLevel(Level.OFF);
         } else {
-            File file = new File(config.getWorkingDirectory(), path);
+            File file = new File(config.getWorkingDirectoryPath().toFile(), path);
             COMMAND_LOG.setLevel(Level.ALL);
 
             LOGGER.info("Logging WorldEdit commands to " + file.getAbsolutePath());
@@ -608,6 +612,7 @@ public final class PlatformCommandManager {
         return CommandArgParser.forArgString(input).parseArgs();
     }
 
+    //FAWE start
     public int parseCommand(String args, Actor actor) {
         InjectedValueAccess context;
         if (actor == null) {
@@ -643,6 +648,7 @@ public final class PlatformCommandManager {
     @Subscribe
     public void handleCommand(CommandEvent event) {
         Request.reset();
+
         Actor actor = event.getActor();
         String args = event.getArguments();
         TaskManager.IMP.taskNow(() -> {
@@ -802,8 +808,11 @@ public final class PlatformCommandManager {
         PrintCommandHelp.help(arguments, 0, false,
                 getCommandManager(), actor, "//help");
     }
+    //FAWE end
 
+    //FAWE start - Event & suggestions
     private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event, boolean isSuggestions) {
+        //FAWE end
         InjectedValueStore store = MapBackedValueStore.create();
         store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
         if (actor instanceof Player) {
@@ -838,14 +847,18 @@ public final class PlatformCommandManager {
     public void handleCommandSuggestion(CommandSuggestionEvent event) {
         try {
             String rawArgs = event.getArguments();
+            //FAWE start
             // Increase the resulting positions by 1 if we remove a leading `/`
             final int posOffset = rawArgs.startsWith("/") ? 1 : 0;
             String arguments = rawArgs.startsWith("/") ? rawArgs.substring(1) : rawArgs;
+            //FAWE end
             List<Substring> split = parseArgs(arguments).collect(Collectors.toList());
             List<String> argStrings = split.stream()
                 .map(Substring::getSubstring)
                 .collect(Collectors.toList());
+            //FAWE start - event & suggestion
             MemoizingValueAccess access = initializeInjectedValues(() -> arguments, event.getActor(), event, true);
+            //FAWE end
             ImmutableSet<Suggestion> suggestions;
             try {
                 suggestions = commandManager.getSuggestions(access, argStrings);

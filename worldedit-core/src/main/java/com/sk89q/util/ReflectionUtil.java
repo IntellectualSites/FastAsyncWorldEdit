@@ -26,6 +26,7 @@ public final class ReflectionUtil {
     private ReflectionUtil() {
     }
 
+    //FAWE start
     @SuppressWarnings("unchecked")
     public static <T> T getField(Object from, String name) {
         if (from instanceof Class) {
@@ -34,6 +35,7 @@ public final class ReflectionUtil {
             return getField(from.getClass(), from, name);
         }
     }
+    //FAWE end
 
     @SuppressWarnings("unchecked")
     public static <T> T getField(Class checkClass, Object from, String name) {

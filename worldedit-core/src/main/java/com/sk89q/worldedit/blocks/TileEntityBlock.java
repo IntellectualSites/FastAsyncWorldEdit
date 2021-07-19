@@ -37,6 +37,7 @@ public interface TileEntityBlock extends NbtValued {
      *
      * @return tile entity ID, non-null string
      */
+    //FAWE start - Handle method here
     default String getNbtId() {
         CompoundTag nbtData = getNbtData();
         if (nbtData == null) {
@@ -48,6 +49,7 @@ public interface TileEntityBlock extends NbtValued {
         } else {
             return "";
         }
+        //FAWE end
     }
 
 }

@@ -218,12 +218,12 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         return plugin.getDescription().getVersion();
     }
 
-    // FAWE start
+    //FAWE start
     @Override
     public String getId() {
         return "intellectualsites:bukkit";
     }
-    // FAWE end
+    //FAWE end
 
     @Override
     public Map<Capability, Preference> getCapabilities() {

@@ -28,15 +28,18 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TreeGenerator;
+
+import javax.annotation.Nullable;
 
 /**
  * Plants a tree.
  */
 public class TreePlanter implements BlockTool {
 
-    private TreeGenerator.TreeType treeType;
+    private final TreeGenerator.TreeType treeType;
 
     public TreePlanter(TreeGenerator.TreeType treeType) {
         this.treeType = treeType;
@@ -48,7 +51,7 @@ public class TreePlanter implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
+    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
 
         try (EditSession editSession = session.createEditSession(player)) {
             try {

@@ -71,10 +71,12 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         region = new ConvexPolyhedralRegion(world);
     }
 
+    //FAWE start
     public ConvexPolyhedralRegionSelector(ConvexPolyhedralRegion region) {
         checkNotNull(region);
         this.region = region;
     }
+    //FAWE end
 
     /**
      * Create a new selector.
@@ -277,8 +279,10 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         }
     }
 
+    //FAWE start
     @Override
     public List<BlockVector3> getVertices() {
         return new ArrayList<>(region.getVertices());
     }
+    //FAWE end
 }

@@ -127,7 +127,7 @@ public class SnapshotRestore {
     /**
      * Restores to world.
      *
-     * @throws MaxChangedBlocksException
+     * @throws MaxChangedBlocksException if the max block change limit is exceeded
      */
     public void restore() throws MaxChangedBlocksException {
 

@@ -4,7 +4,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 import java.util.Arrays;
 

@@ -98,10 +98,12 @@ public class MaskIntersection2D implements Mask2D {
         return true;
     }
 
+    //FAWE start
     @Override
     public Mask2D copy2D() {
         Set<Mask2D> masksCopy = this.masks.stream().map(Mask2D::copy2D).collect(Collectors.toSet());
         return new MaskIntersection2D(masksCopy);
     }
+    //FAWE end
 
 }

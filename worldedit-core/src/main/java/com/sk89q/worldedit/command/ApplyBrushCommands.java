@@ -35,6 +35,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.factory.Apply;
+import com.sk89q.worldedit.function.factory.ApplyRegion;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
@@ -97,7 +98,7 @@ public class ApplyBrushCommands {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));
         RegionFactory regionFactory = REGION_FACTORY.value(parameters).asSingle(RegionFactory.class);
         BrushCommands.setOperationBasedBrush(player, localSession, Expression.compile(Double.toString(radius)),
-            new Apply(generatorFactory), regionFactory, "worldedit.brush.apply");
+            new ApplyRegion(generatorFactory), regionFactory, "worldedit.brush.apply");
     }
 
     @Command(

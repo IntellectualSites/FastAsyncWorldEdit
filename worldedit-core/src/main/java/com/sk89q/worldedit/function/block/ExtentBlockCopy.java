@@ -88,6 +88,7 @@ public class ExtentBlockCopy implements RegionFunction {
      * @return a new state or the existing one
      */
     private BaseBlock transformNbtData(BaseBlock state) {
+        //FAWE start - Replace CompoundTag with CompoundBinaryTag
         CompoundBinaryTag tag = state.getNbt();
 
         if (tag != null) {
@@ -105,6 +106,7 @@ public class ExtentBlockCopy implements RegionFunction {
                     if (newDirection != null) {
                         return state.toBaseBlock(
                             tag.putByte("Rot", (byte) MCDirections.toRotation(newDirection))
+                        //FAWE end
                         );
                     }
                 }

@@ -32,6 +32,7 @@ public class LazyReference<T> {
         return new LazyReference<>(valueComputation);
     }
 
+    //FAWE start
     /**
      * Pre-computed reference, for setting a lazy reference field with a known value.
      *
@@ -42,6 +43,7 @@ public class LazyReference<T> {
     public static <T> LazyReference<T> computed(T value) {
         return new LazyReference<>(value);
     }
+    //FAWE end
 
     // Memory saving technique: hold the computation info in the same reference field that we'll
     // put the value into, so the memory possibly retained by those parts is GC'able as soon as
@@ -62,9 +64,11 @@ public class LazyReference<T> {
         this.value = new RefInfo<>(valueComputation);
     }
 
+    //FAWE start
     private LazyReference(T value) {
         this.value = value;
     }
+    //FAWE end
 
     // casts are safe, value is either RefInfo or T
     @SuppressWarnings("unchecked")

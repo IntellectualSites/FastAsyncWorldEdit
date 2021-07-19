@@ -105,9 +105,11 @@ public class OffsetMask extends AbstractMask {
         }
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new OffsetMask(mask.copy(), offset.toImmutable());
     }
+    //FAWE end
 
 }

@@ -23,7 +23,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.DelegateConsumer;
-import com.fastasyncworldedit.core.object.function.QuadFunction;
+import com.fastasyncworldedit.core.function.QuadFunction;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
@@ -204,13 +204,17 @@ public class UtilityCommands {
     public int fill(Actor actor, LocalSession session, EditSession editSession,
                     @Arg(desc = "The blocks to fill with")
                         Pattern pattern,
+                    //FAWE start - we take an expression over a double
                     @Arg(desc = "The radius to fill in")
                         Expression radiusExp,
+                    //FAWE end
                     @Arg(desc = "The depth to fill", def = "1")
                         int depth,
                     @Arg(desc = "The direction to move", def = "down")
                         @Direction BlockVector3 direction) throws WorldEditException, EvaluationException {
+        //FAWE start
         double radius = radiusExp.evaluate();
+        //FAWE end
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
         depth = Math.max(1, depth);
@@ -222,22 +226,6 @@ public class UtilityCommands {
     }
 
 /*
-    @Command(
-        name = "/fillr",
-        desc = "Fill a hole recursively"
-        name = "patterns",
-        desc = "View help about patterns",
-        descFooter = "Patterns determine what blocks are placed\n" +
-            " - Use [brackets] for arguments\n" +
-            " - Use , to OR multiple\n" +
-            "e.g., #surfacespread[10][#existing],andesite\n" +
-            "More Info: https://git.io/vSPmA"
-    )
-    @CommandQueued(false)
-    @CommandPermissions("worldedit.patterns")
-    public void patterns(Player player, LocalSession session, InjectedValueAccess args) throws WorldEditException {
-        displayModifierHelp(player, DefaultPatternParser.class, args);
-    }
 
     @Command(
         name = "masks",
@@ -303,11 +291,15 @@ public class UtilityCommands {
     public int fillr(Actor actor, LocalSession session, EditSession editSession,
                      @Arg(desc = "The blocks to fill with")
                          Pattern pattern,
+                     //FAWE start - we take an expression over a double
                      @Arg(desc = "The radius to fill in")
                          Expression radiusExp,
+                     //FAWE end
                      @Arg(desc = "The depth to fill", def = "")
                          Integer depth) throws WorldEditException {
+        //FAWE start
         double radius = radiusExp.evaluate();
+        //FAWE end
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
         depth = depth == null ? Integer.MAX_VALUE : Math.max(1, depth);
@@ -326,12 +318,16 @@ public class UtilityCommands {
     @CommandPermissions("worldedit.drain")
     @Logging(PLACEMENT)
     public int drain(Actor actor, LocalSession session, EditSession editSession,
+                     //FAWE start - we take an expression over a double
                      @Arg(desc = "The radius to drain")
                          Expression radiusExp,
+                     //FAWE end
                      @Switch(name = 'w', desc = "Also un-waterlog blocks")
                          boolean waterlogged,
+                     //FAWE start
                      @Switch(name = 'p', desc = "Also remove water plants")
                          boolean plants) throws WorldEditException {
+                     //FAWE end
         double radius = radiusExp.evaluate();
         radius = Math.max(0, radius);
         we.checkMaxRadius(radius);
@@ -637,8 +633,10 @@ public class UtilityCommands {
         flags.or(CreatureButcher.Flags.ARMOR_STAND, killArmorStands, "worldedit.butcher.armorstands");
         flags.or(CreatureButcher.Flags.WATER, killWater, "worldedit.butcher.water");
 
+        //FAWE start - run this sync
         int finalRadius = radius;
         int killed = TaskManager.IMP.sync(() -> killMatchingEntities(finalRadius, actor, flags::createFunction));
+        //FAWE end
 
         actor.print(Caption.of(
                 "worldedit.butcher.killed",
@@ -666,7 +664,9 @@ public class UtilityCommands {
             return 0;
         }
 
+        //FAWE start - run this sync
         int removed =  TaskManager.IMP.sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
+        //FAWE end
         actor.print(Caption.of("worldedit.remove.removed", TextComponent.of(removed)));
         return removed;
     }
@@ -694,7 +694,7 @@ public class UtilityCommands {
         }
 
         session.remember(editSession);
-        editSession.flushSession();
+        editSession.close();
         return killed;
     }
 
@@ -749,6 +749,7 @@ public class UtilityCommands {
     }
 
 
+    //FAWE start
     @Command(
         name = "/confirm",
         desc = "Confirm a command"
@@ -1064,5 +1065,6 @@ public class UtilityCommands {
         name.append(relative.getPath());
         return name.toString();
     }
+    //FAWE end
 
 }

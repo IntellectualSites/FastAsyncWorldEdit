@@ -25,6 +25,7 @@ import javax.annotation.Nullable;
 
 public final class BlockStateIdAccess {
 
+    //FAWE start - Register via ordinal ID
     private static final int INVALID_ID = -1;
 
     /**
@@ -50,5 +51,6 @@ public final class BlockStateIdAccess {
 
     private BlockStateIdAccess() {
     }
+    //FAWE end
 
 }

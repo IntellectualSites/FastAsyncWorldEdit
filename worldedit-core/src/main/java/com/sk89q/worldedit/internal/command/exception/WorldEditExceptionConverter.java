@@ -97,6 +97,7 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
         throw newCommandException(Caption.of("worldedit.error.unknown-block", TextComponent.of(e.getID())), e);
     }
 
+    @Deprecated
     @ExceptionMatch
     public void convert(InvalidItemException e) throws CommandException {
         throw newCommandException(e.getMessage(), e);

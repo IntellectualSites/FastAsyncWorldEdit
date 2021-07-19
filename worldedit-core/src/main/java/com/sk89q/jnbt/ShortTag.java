@@ -56,11 +56,11 @@ public final class ShortTag extends Tag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_SHORT;
     }
-    // FAWE End
+    //FAWE end
 
 }

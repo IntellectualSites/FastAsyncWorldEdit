@@ -92,12 +92,6 @@ public class NullExtent implements Extent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
-        return false;
-    }
-
-    @Override
     public boolean fullySupports3DBiomes() {
         return false;
     }
@@ -112,10 +106,18 @@ public class NullExtent implements Extent {
         return false;
     }
 
+    //FAWE start
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return false;
     }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+            throws WorldEditException {
+        return false;
+    }
+    //FAWE end
 
     @Nullable
     @Override

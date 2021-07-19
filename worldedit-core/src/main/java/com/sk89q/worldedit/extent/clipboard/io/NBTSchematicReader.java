@@ -26,7 +26,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 /**
- * Base class for NBT schematic readers
+ * Base class for NBT schematic readers.
  */
 public abstract class NBTSchematicReader implements ClipboardReader {
 

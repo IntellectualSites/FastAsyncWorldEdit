@@ -3,7 +3,7 @@ package com.fastasyncworldedit.core.object.mask;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 public class WallMask extends AbstractMask {
     private final int min;

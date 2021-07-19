@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.object;
 
-import com.sk89q.worldedit.entity.MapMetadatable;
+import com.fastasyncworldedit.core.entity.MapMetadatable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -50,6 +50,7 @@ public class PassthroughBlockMaterial implements BlockMaterial {
         return blockMaterial.isAir();
     }
 
+    //FAWE start
     @Override
     public int getMapColor() {
         if (blockMaterial == null) {
@@ -58,6 +59,7 @@ public class PassthroughBlockMaterial implements BlockMaterial {
             return blockMaterial.getMapColor();
         }
     }
+    //FAWE end
 
     @Override
     public boolean isFullCube() {
@@ -104,10 +106,12 @@ public class PassthroughBlockMaterial implements BlockMaterial {
         return blockMaterial.getLightValue();
     }
 
+    //FAWE start
     @Override
     public int getLightOpacity() {
         return blockMaterial.getLightOpacity();
     }
+    //FAWE end
 
     @Override
     public boolean isFragileWhenPushed() {
@@ -154,6 +158,7 @@ public class PassthroughBlockMaterial implements BlockMaterial {
         return blockMaterial.hasContainer();
     }
 
+    //FAWE start
     @Override
     public boolean isTile() {
         return blockMaterial.isTile();
@@ -163,4 +168,5 @@ public class PassthroughBlockMaterial implements BlockMaterial {
     public CompoundTag getDefaultTile() {
         return blockMaterial.getDefaultTile();
     }
+    //FAWE end
 }

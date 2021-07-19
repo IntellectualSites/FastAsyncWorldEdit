@@ -28,11 +28,8 @@ import javax.annotation.Nullable;
 
 public class DirectionalProperty extends AbstractProperty<Direction> {
 
+    //FAWE start
     private final int[] map;
-
-    public DirectionalProperty(final String name, final List<Direction> values) {
-        this(name, values, 0);
-    }
 
     private DirectionalProperty(final String name, final List<Direction> values, int bitOffset) {
         super(name, values, bitOffset);
@@ -60,6 +57,11 @@ public class DirectionalProperty extends AbstractProperty<Direction> {
             return -1;
         }
         return getIndex(dir);
+    }
+    //FAWE end
+
+    public DirectionalProperty(final String name, final List<Direction> values) {
+        this(name, values, 0);
     }
 
     @Nullable

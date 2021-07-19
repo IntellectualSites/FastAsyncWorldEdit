@@ -34,7 +34,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
@@ -56,13 +56,11 @@ import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypeUtil;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import java.io.File;
 import java.util.Map;
@@ -76,6 +74,7 @@ import javax.annotation.Nullable;
  * players that make use of WorldEdit.
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
+    //FAWE start
     private final Map<String, Object> meta;
 
     // Queue for async tasks
@@ -104,6 +103,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public AbstractPlayerActor() {
         this(new ConcurrentHashMap<>());
     }
+    //FAWE end
 
     @Override
     public final Extent getExtent() {
@@ -254,57 +254,21 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public boolean ascendLevel() {
+        final World world = getWorld();
         final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY());
+        int y = Math.max(world.getMinY(), pos.getBlockY() + 1);
         final int z = pos.getBlockZ();
-        final Extent world = pos.getExtent();
+        int yPlusSearchHeight = y + WorldEdit.getInstance().getConfiguration().defaultVerticalHeight;
+        int maxY = Math.min(world.getMaxY(), yPlusSearchHeight) + 2;
 
-        int maxY = world.getMaxY();
-        if (y >= maxY) {
-            return false;
-        }
-
-        BlockMaterial initialMaterial = world.getBlock(BlockVector3.at(x, y, z)).getMaterial();
-
-        boolean lastState = initialMaterial.isMovementBlocker() && initialMaterial.isFullCube();
-
-        double height = 1.85;
-        double freeStart = -1;
-
-        for (int level = y + 1; level <= maxY + 2; level++) {
-            BlockState state;
-            if (level >= maxY) {
-                state = BlockTypes.VOID_AIR.getDefaultState();
-            } else {
-                state = world.getBlock(BlockVector3.at(x, level, z));
+        while (y <= maxY) {
+            if (isLocationGoodForStanding(BlockVector3.at(x, y, z))
+                    && trySetPosition(Vector3.at(x + 0.5, y, z + 0.5))) {
+                return true;
             }
-            BlockType type = state.getBlockType();
-            BlockMaterial material = type.getMaterial();
 
-            if (!material.isFullCube() || !material.isMovementBlocker()) {
-                if (!lastState) {
-                    lastState = BlockTypeUtil.centralBottomLimit(state) != 1;
-                    continue;
-                }
-                if (freeStart == -1) {
-                    freeStart = level + BlockTypeUtil.centralTopLimit(state);
-                } else {
-                    double bottomLimit = BlockTypeUtil.centralBottomLimit(state);
-                    double space = level + bottomLimit - freeStart;
-                    if (space >= height) {
-                        trySetPosition(Vector3.at(x + 0.5, freeStart, z + 0.5));
-                        return true;
-                    }
-                    // Not enough room, reset the free position
-                    if (bottomLimit != 1) {
-                        freeStart = -1;
-                    }
-                }
-            } else {
-                freeStart = -1;
-                lastState = true;
-            }
+            ++y;
         }
 
         return false;
@@ -312,57 +276,21 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public boolean descendLevel() {
+        final World world = getWorld();
         final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
-        int y = Math.max(0, pos.getBlockY() - 1);
+        int y = Math.max(world.getMinY(), pos.getBlockY() - 1);
         final int z = pos.getBlockZ();
-        final Extent world = pos.getExtent();
+        int yLessSearchHeight = y - WorldEdit.getInstance().getConfiguration().defaultVerticalHeight;
+        int minY = Math.min(world.getMinY() + 1, yLessSearchHeight);
 
-        BlockMaterial initialMaterial = world.getBlock(BlockVector3.at(x, y, z)).getMaterial();
-
-        boolean lastState = initialMaterial.isMovementBlocker() && initialMaterial.isFullCube();
-
-        int maxY = world.getMaxY();
-        if (y <= 2) {
-            return false;
-        }
-
-        double freeEnd = -1;
-        double height = 1.85;
-        for (int level = y + 1; level > 0; level--) {
-            BlockState state;
-            if (level >= maxY) {
-                state = BlockTypes.VOID_AIR.getDefaultState();
-            } else {
-                state = world.getBlock(BlockVector3.at(x, level, z));
+        while (y >= minY) {
+            if (isLocationGoodForStanding(BlockVector3.at(x, y, z))
+                    && trySetPosition(Vector3.at(x + 0.5, y, z + 0.5))) {
+                return true;
             }
-            BlockType type = state.getBlockType();
-            BlockMaterial material = type.getMaterial();
 
-            if (!material.isFullCube() || !material.isMovementBlocker()) {
-                if (!lastState) {
-                    lastState = BlockTypeUtil.centralTopLimit(state) != 0;
-                    continue;
-                }
-                if (freeEnd == -1) {
-                    freeEnd = level + BlockTypeUtil.centralBottomLimit(state);
-                } else {
-                    double topLimit = BlockTypeUtil.centralTopLimit(state);
-                    double freeStart = level + topLimit;
-                    double space = freeEnd - freeStart;
-                    if (space >= height) {
-                        trySetPosition(Vector3.at(x + 0.5, freeStart, z + 0.5));
-                        return true;
-                    }
-                    // Not enough room, reset the free position
-                    if (topLimit != 0) {
-                        freeEnd = -1;
-                    }
-                }
-            } else {
-                lastState = true;
-                freeEnd = -1;
-            }
+            --y;
         }
 
         return false;
@@ -375,19 +303,22 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
+        World world = getWorld();
         Location pos = getBlockLocation();
         int x = pos.getBlockX();
-        int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 2);
+        int initialY = Math.max(world.getMinY(), pos.getBlockY());
+        int y = Math.max(world.getMinY(), pos.getBlockY() + 2);
         int z = pos.getBlockZ();
-        Extent world = getLocation().getExtent();
 
         // No free space above
         if (!world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isAir()) {
             return false;
         }
 
-        while (y <= world.getMaximumPoint().getY()) {
+        int yPlusSearchHeight = y + WorldEdit.getInstance().getConfiguration().defaultVerticalHeight;
+        int maxY = Math.min(world.getMaxY(), yPlusSearchHeight);
+
+        while (y <= maxY) {
             // Found a ceiling!
             if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
@@ -416,8 +347,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         final World world = getWorld();
         final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
-        final int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 1);
+        final int initialY = Math.max(world.getMinY(), pos.getBlockY());
+        int y = Math.max(world.getMinY(), pos.getBlockY() + 1);
         final int z = pos.getBlockZ();
         final int maxY = Math.min(world.getMaxY() + 1, initialY + distance);
 
@@ -521,6 +452,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return getCardinalDirection(0);
     }
 
+    //FAWE start
     /**
      * Get the player's current allowed WorldEdit regions.
      *
@@ -566,6 +498,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         getSession().setRegionSelector(getWorld(), selector);
     }
+    //FAWE end
 
     @Override
     public Direction getCardinalDirection(int yawOffset) {
@@ -591,7 +524,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         if (typeId.hasBlockType()) {
             return typeId.getBlockType().getDefaultState().toBaseBlock();
         } else {
+            //FAWE start
             return BlockTypes.AIR.getDefaultState().toBaseBlock(); // FAWE returns air here
+            //FAWE end
         }
     }
 
@@ -676,6 +611,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return null;
     }
 
+    //FAWE start
     /**
      * Run a task either async, or on the current thread.
      *
@@ -706,6 +642,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         }
         return true;
     }
+    //FAWE end
 
     @Override
     public boolean canDestroyBedrock() {

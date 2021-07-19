@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.object.collection;
 
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

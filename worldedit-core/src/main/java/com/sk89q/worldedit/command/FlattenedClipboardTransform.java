@@ -83,7 +83,8 @@ public class FlattenedClipboardTransform {
                 minimum.withZ(maximum.getZ()),
                 maximum.withX(minimum.getX()),
                 maximum.withY(minimum.getY()),
-                maximum.withZ(minimum.getZ()) };
+                maximum.withZ(minimum.getZ())
+        };
 
         for (int i = 0; i < corners.length; i++) {
             corners[i] = transformAround.apply(corners[i]);
@@ -112,10 +113,12 @@ public class FlattenedClipboardTransform {
      * @return the operation
      */
     public Operation copyTo(Extent target) {
+        //FAWE start
         Extent extent = original;
         if (transform != null && !transform.isIdentity()) {
             extent = new BlockTransformExtent(original, transform);
         }
+        //FAWE end
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, original.getRegion(), original.getOrigin(), target, original.getOrigin());
         copy.setTransform(transform);
         if (original.hasBiomes()) {

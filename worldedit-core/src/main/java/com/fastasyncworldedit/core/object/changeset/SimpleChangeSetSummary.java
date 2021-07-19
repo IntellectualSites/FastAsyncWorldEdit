@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.object.changeset;
 
-import com.sk89q.worldedit.history.changeset.ChangeSetSummary;
+import com.fastasyncworldedit.core.history.changeset.ChangeSetSummary;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 

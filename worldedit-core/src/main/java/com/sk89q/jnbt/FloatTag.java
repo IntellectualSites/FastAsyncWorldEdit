@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
+import com.fastasyncworldedit.core.jnbt.NumberTag;
 import com.sk89q.worldedit.util.nbt.FloatBinaryTag;
 
 /**
@@ -57,11 +57,11 @@ public final class FloatTag extends NumberTag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_FLOAT;
     }
-    // FAWE End
+    //FAWE end
 
 }

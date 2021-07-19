@@ -39,9 +39,11 @@ public class SideEffectSet {
     private final Set<SideEffect> appliedSideEffects;
     private final boolean appliesAny;
 
+    //FAWE start
     private SideEffectSet() {
         this(ImmutableMap.of());
     }
+    //FAWE end
 
     public SideEffectSet(Map<SideEffect, SideEffect.State> sideEffects) {
         this.sideEffects = Maps.immutableEnumMap(sideEffects);

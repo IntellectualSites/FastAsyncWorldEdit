@@ -68,10 +68,12 @@ public class HistoryCommands {
                          String playerName) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession undoSession = session;
+        //FAWE start - Add fastmode check
         if (session.hasFastMode()) {
             actor.print(Caption.of("fawe.worldedit.history.command.undo.disabled"));
             return;
         }
+        //FAWE end
         if (playerName != null) {
             actor.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);

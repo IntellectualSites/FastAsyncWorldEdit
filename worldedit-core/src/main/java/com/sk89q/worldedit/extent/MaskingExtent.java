@@ -47,7 +47,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MaskingExtent extends AbstractDelegateExtent implements IBatchProcessor, Filter {
 
     private Mask mask;
+    //FAWE start
     private final LoadingCache<Long, ChunkFilterBlock> threadIdToFilter;
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -59,15 +61,19 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
         super(extent);
         checkNotNull(mask);
         this.mask = mask;
+        //FAWE start
         this.threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
+        //FAWE end
     }
 
+    //FAWE start
     private MaskingExtent(Extent extent, Mask mask, LoadingCache<Long, ChunkFilterBlock> threadIdToFilter) {
         super(extent);
         checkNotNull(mask);
         this.mask = mask;
         this.threadIdToFilter = threadIdToFilter;
     }
+    //FAWE end
 
     /**
      * Get the mask.
@@ -88,6 +94,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
         this.mask = mask;
     }
 
+    //FAWE start
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return this.mask.test(location) && super.setBlock(location, block);
@@ -134,4 +141,5 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     public ProcessorScope getScope() {
         return ProcessorScope.REMOVING_BLOCKS;
     }
+    //FAWE end
 }

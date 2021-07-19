@@ -27,6 +27,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
@@ -38,6 +39,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
@@ -100,6 +102,12 @@ public class ChunkCommands {
                             @ArgFlag(name = 'p', desc = "Page number.", def = "1") int page) throws WorldEditException {
         final Region region = session.getSelection(world);
 
+        WorldEditAsyncCommandBuilder.createAndSendMessage(actor,
+                () -> new ChunkListPaginationBox(region).create(page),
+                TranslatableComponent.of(
+                        "worldedit.listchunks.listfor",
+                        TextComponent.of(actor.getName())
+                ));
         actor.print(new ChunkListPaginationBox(region).create(page));
         actor.print(Caption.of("worldedit.listchunks.listfor", TextComponent.of(actor.getName())));
     }
@@ -178,6 +186,10 @@ public class ChunkCommands {
 
         ChunkListPaginationBox(Region region) {
             super("Selected Chunks", "/listchunks -p %page%");
+            // TODO make efficient/streamable/calculable implementations of this
+            // for most region types, so we can just store the region and random-access get one page of chunks
+            // (this is non-trivial for some types of selections...)
+            //this.region = region.clone();
             this.chunks = new ArrayList<>(region.getChunks());
         }
 

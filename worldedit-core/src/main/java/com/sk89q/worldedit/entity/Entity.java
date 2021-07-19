@@ -48,10 +48,12 @@ public interface Entity extends Faceted, Locatable {
     @Nullable
     BaseEntity getState();
 
+    //FAWE start
     default EntityType getType() {
         BaseEntity state = getState();
         return state != null ? state.getType() : null;
     }
+    //FAWE end
 
     /**
      * Remove this entity from it container.

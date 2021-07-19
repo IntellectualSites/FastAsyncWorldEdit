@@ -21,7 +21,7 @@ package com.sk89q.worldedit.util;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.math.Vector3Impl;
+import com.fastasyncworldedit.core.math.Vector3Impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,7 +36,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link #equals(Object)} are subject to minor differences caused by
  * floating point errors.</p>
  */
+//FAWE start - extends Vector3Impl
 public class Location extends Vector3Impl {
+//FAWE end
 
     private final Extent extent;
     private final float pitch;
@@ -127,7 +129,9 @@ public class Location extends Vector3Impl {
      * @param pitch the pitch, in degrees
      */
     public Location(Extent extent, Vector3 position, float yaw, float pitch) {
+        //FAWE start
         super(position);
+        //FAWE end
         checkNotNull(extent);
         checkNotNull(position);
         this.extent = extent;
@@ -293,6 +297,7 @@ public class Location extends Vector3Impl {
         return new Location(extent, position, yaw, pitch);
     }
 
+    //FAWE start
     @Override public Location clampY(int min, int max) {
         checkArgument(min <= max, "minimum cannot be greater than maximum");
         if (getY() < min) {
@@ -304,6 +309,7 @@ public class Location extends Vector3Impl {
         return this;
 
     }
+    //FAWE end
 
     @Override
     public boolean equals(Object o) {
@@ -322,6 +328,7 @@ public class Location extends Vector3Impl {
         if (Double.doubleToLongBits(yaw) != Double.doubleToLongBits(location.yaw)) {
             return false;
         }
+        //FAWE start
         if (this.getX() != location.getX()) {
             return false;
         }
@@ -334,6 +341,7 @@ public class Location extends Vector3Impl {
         if (!extent.equals(location.extent)) {
             return false;
         }
+        //FAWE end
 
         return true;
     }

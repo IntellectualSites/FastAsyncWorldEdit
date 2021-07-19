@@ -26,7 +26,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
-import com.sk89q.worldedit.registry.state.PropertyGroup;
+import com.fastasyncworldedit.core.registry.state.PropertyGroup;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -43,9 +43,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class HeightMap {
 
+    //FAWE start
     private final boolean layers;
-    private int[] data;
     private boolean[] invalid;
+    //FAWE end
+    private final int[] data;
     private final int width;
     private final int height;
 
@@ -58,6 +60,7 @@ public class HeightMap {
      * @param session an edit session
      * @param region the region
      */
+    //FAWE start
     public HeightMap(EditSession session, Region region) {
         this(session, region, (Mask) null, false);
     }
@@ -65,6 +68,7 @@ public class HeightMap {
     public HeightMap(EditSession session, Region region, @Nullable Mask mask) {
         this(session, region, mask, false);
     }
+    //FAWE end
 
     public HeightMap(EditSession session, Region region, @Nullable Mask mask, boolean layers) {
         checkNotNull(session);
@@ -87,6 +91,7 @@ public class HeightMap {
         data = new int[width * height];
         invalid = new boolean[data.length];
 
+        //FAWE start
         if (layers) {
             BlockVector3 min = region.getMinimumPoint();
             int bx = min.getBlockX();
@@ -141,6 +146,7 @@ public class HeightMap {
 
         this.layers = layers;
     }
+    //FAWE end
 
     /**
      * Apply the filter 'iterations' amount times.
@@ -160,6 +166,7 @@ public class HeightMap {
             newData = filter.filter(newData, width, height);
         }
 
+        //FAWE start - check layers
         return layers ? applyLayers(newData) : apply(newData);
     }
 
@@ -249,6 +256,7 @@ public class HeightMap {
         }
         return blocksChanged;
     }
+    //FAWE end
 
     /**
      * Apply a raw heightmap to the region.
@@ -273,6 +281,7 @@ public class HeightMap {
         BlockState tmpBlock = BlockTypes.AIR.getDefaultState();
         // Apply heightmap
         int index = 0;
+        //FAWE start
         for (int z = 0; z < height; ++z) {
             int zr = z + originZ;
             for (int x = 0; x < width; ++x, index++) {
@@ -326,6 +335,7 @@ public class HeightMap {
                 }
             }
         }
+        //FAWE end
 
         // Drop trees to the floor -- TODO
 

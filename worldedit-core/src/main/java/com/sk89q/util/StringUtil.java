@@ -333,6 +333,7 @@ public final class StringUtil {
         return parsableBlocks;
     }
 
+   //FAWE start
     /**
      * Splits a string respecting enclosing quotes.
      *
@@ -365,4 +366,5 @@ public final class StringUtil {
         }
         return split;
     }
+    //FAWE end
 }

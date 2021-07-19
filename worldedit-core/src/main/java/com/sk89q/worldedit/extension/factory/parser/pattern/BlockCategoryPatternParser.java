@@ -60,13 +60,13 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> {
 
         BlockCategory category = BlockCategory.REGISTRY.get(tag);
         if (category == null) {
-            throw new InputParseException(Caption.of("fawe.error.unknown-block-tag", TextComponent.of(tag)));
+            throw new InputParseException(Caption.of("worldedit.error.unknown-tag", TextComponent.of(tag)));
         }
         RandomPattern randomPattern = new RandomPattern();
 
         Set<BlockType> blocks = category.getAll();
         if (blocks.isEmpty()) {
-            throw new InputParseException(Caption.of("fawe.error.block-tag-no-blocks", TextComponent.of(category.getId())));
+            throw new InputParseException(Caption.of("worldedit.error.empty-tag", TextComponent.of(category.getId())));
         }
 
         if (anyState) {

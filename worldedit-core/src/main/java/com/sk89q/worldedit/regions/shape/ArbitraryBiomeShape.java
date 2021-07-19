@@ -42,12 +42,14 @@ public abstract class ArbitraryBiomeShape {
     private final int cacheSizeY;
     private final int cacheSizeZ;
 
+    //FAWE start
     /**
      * Cache entries.
      * null = unknown
      * OUTSIDE = outside
      * else = inside
      */
+    //FAWE end
     private final BiomeType[] cache;
     private final BitSet isCached;
 
@@ -96,6 +98,7 @@ public abstract class ArbitraryBiomeShape {
         return cache[index];
     }
 
+    //FAWE start
     private boolean isInsideCached(int x, int y, int z, BiomeType baseBiome) {
         final int index = (y - cacheOffsetY) + (z - cacheOffsetZ) * cacheSizeY + (x - cacheOffsetX) * cacheSizeY * cacheSizeZ;
 
@@ -107,6 +110,7 @@ public abstract class ArbitraryBiomeShape {
 
         return cacheEntry != BiomeTypes.THE_VOID;
     }
+    //FAWE end
 
     private boolean isOutside(int x, int y, int z, BiomeType baseBiome) {
         return getBiomeCached(x, y, z, baseBiome) == null;

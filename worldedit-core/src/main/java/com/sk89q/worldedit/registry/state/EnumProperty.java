@@ -26,12 +26,15 @@ import javax.annotation.Nullable;
 
 public class EnumProperty extends AbstractProperty<String> {
 
-    private Map<CharSequence, Integer> offsets = new HashMap<>();
+    //FAWE start
+    private final Map<CharSequence, Integer> offsets = new HashMap<>();
+    //FAWE end
 
     public EnumProperty(final String name, final List<String> values) {
         this(name, values, 0);
     }
 
+    //FAWE start
     private EnumProperty(final String name, final List<String> values, int bitOffset) {
         super(name, values, bitOffset);
         for (int i = 0; i < values.size(); i++) {
@@ -51,6 +54,7 @@ public class EnumProperty extends AbstractProperty<String> {
         Integer value = offsets.get(string);
         return value == null ? -1 : value;
     }
+    //FAWE end
 
     @Nullable
     @Override

@@ -7,7 +7,6 @@ import com.fastasyncworldedit.core.util.Permission;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.PassthroughExtent;
 
 public class MemoryCheckingExtent extends PassthroughExtent {
 

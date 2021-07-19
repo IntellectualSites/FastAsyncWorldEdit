@@ -65,9 +65,11 @@ public class CommandEvent extends AbstractCancellable {
         return arguments;
     }
 
+    //FAWE start
     @Override
     public boolean call() {
         PlatformCommandManager.getInstance().handleCommandOnCurrentThread(this);
         return true;
     }
+    //FAWE end
 }
