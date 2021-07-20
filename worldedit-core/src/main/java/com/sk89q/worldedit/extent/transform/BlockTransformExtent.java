@@ -170,7 +170,12 @@ public class BlockTransformExtent extends ResettableExtent {
                 return adapt(UP, DOWN);
             }
             if (values.contains("left")) {
-                return adapt(0L, combine(EAST, WEST), combine(NORTH, SOUTH));
+                if (key == PropertyKey.SHAPE) {
+                    return adapt(combine(EAST, WEST), combine(NORTH, SOUTH));
+                } else if (key == PropertyKey.HINGE) {
+                    //TODO: hinges are slightly funky still
+                    return adapt(combine(NORTH, EAST), combine(SOUTH, WEST));
+                }
             }
             if (key == PropertyKey.ROTATION) {
                 List<Direction> directions = new ArrayList<>();
