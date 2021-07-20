@@ -6,7 +6,7 @@ import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
-import com.sk89q.worldedit.function.visitor.Order;
+import com.fastasyncworldedit.core.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;

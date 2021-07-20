@@ -389,7 +389,7 @@ public final class ListTag extends Tag {
         );
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_LIST;

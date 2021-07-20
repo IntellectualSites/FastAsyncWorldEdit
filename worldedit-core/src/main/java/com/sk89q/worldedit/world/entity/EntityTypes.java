@@ -155,6 +155,7 @@ public final class EntityTypes {
         return EntityType.REGISTRY.get(id);
     }
 
+    //FAWE Start
     private static String convertEntityId(String id) {
         if (id.startsWith("minecraft:")) {
             id = id.substring(10);
@@ -265,5 +266,6 @@ public final class EntityTypes {
     public static EntityType parse(String id) {
         return get(convertEntityId(id));
     }
+    //FAWE end
 
 }

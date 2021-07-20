@@ -156,7 +156,9 @@ public final class BlockCategories {
         BlockCategory entry = BlockCategory.REGISTRY.get(id);
         if (entry == null) {
             BlockCategory blockCategory = new BlockCategory(id);
+            //FAWE start
             blockCategory.load();
+            //FAWE end
             return blockCategory;
         }
         return entry;

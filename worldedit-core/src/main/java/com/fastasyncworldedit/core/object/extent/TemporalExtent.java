@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.object.extent;
 
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.extent.PassthroughExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;

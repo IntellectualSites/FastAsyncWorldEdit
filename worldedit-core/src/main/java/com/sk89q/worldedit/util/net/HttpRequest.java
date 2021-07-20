@@ -217,13 +217,6 @@ public class HttpRequest implements Closeable {
         return conn.getResponseCode();
     }
 
-    public String getSingleHeaderValue(String header) {
-        checkState(conn != null, "No connection has been made");
-
-        // maybe we should check for multi-header?
-        return conn.getHeaderField(header);
-    }
-
     /**
      * Get the input stream.
      *

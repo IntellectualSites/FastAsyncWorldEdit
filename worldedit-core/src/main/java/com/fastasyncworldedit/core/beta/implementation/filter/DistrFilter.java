@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.beta.implementation.filter;
 
 import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.function.mask.ABlockMask;
+import com.fastasyncworldedit.core.function.mask.ABlockMask;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockState;

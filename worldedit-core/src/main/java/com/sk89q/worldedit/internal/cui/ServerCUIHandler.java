@@ -40,7 +40,16 @@ import javax.annotation.Nullable;
  */
 public class ServerCUIHandler {
 
+    private static final int MAX_DISTANCE = 32;
+
     private ServerCUIHandler() {
+    }
+
+    public static int getMaxServerCuiSize() {
+        int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion();
+
+        // 1.16 increased maxSize to 48.
+        return dataVersion >= 2566 ? 48 : 32;
     }
 
     /**
@@ -109,16 +118,11 @@ public class ServerCUIHandler {
             return null;
         }
 
-        if (dataVersion >= 2526) {
-            if (width > 48 || length > 48 || height > 48) {
-                // 20w16a+ allows structure blocks up to 48 per axis
-                return null;
-            } else {
-                if (width > 32 || length > 32 || height > 32) {
-                    // Structure blocks on versions <= 20w16a have a limit of 32x32x32
-                    return null;
-                }
-            }
+        int maxSize = getMaxServerCuiSize();
+
+        if (width > maxSize || length > maxSize || height > maxSize) {
+            // Structure blocks have a limit of maxSize^3
+            return null;
         }
 
         // Borrowed this math from FAWE
@@ -128,7 +132,10 @@ public class ServerCUIHandler {
         double xz = Math.cos(Math.toRadians(rotY));
         int x = (int) (location.getX() - (-xz * Math.sin(Math.toRadians(rotX))) * 12);
         int z = (int) (location.getZ() - (xz * Math.cos(Math.toRadians(rotX))) * 12);
-        int y = Math.max(0, Math.min(Math.min(255, posY + 32), posY + 3));
+        int y = Math.max(
+                player.getWorld().getMinY(),
+                Math.min(Math.min(player.getWorld().getMaxY(), posY + MAX_DISTANCE), posY + 3)
+        );
 
         CompoundBinaryTag.Builder structureTag = CompoundBinaryTag.builder();
 
@@ -136,16 +143,8 @@ public class ServerCUIHandler {
         posY -= y;
         posZ -= z;
 
-        if (dataVersion >= 2526) {
-            if (Math.abs(posX) > 48 || Math.abs(posY) > 48 || Math.abs(posZ) > 48) {
-                // 20w16a+ allows structure blocks up to 48 per axis
-                return null;
-            } else {
-                if (Math.abs(posX) > 32 || Math.abs(posY) > 32 || Math.abs(posZ) > 32) {
-                    // Structure blocks on versions <= 20w16a have a limit of 32x32x32
-                    return null;
-                }
-            }
+        if (Math.abs(posX) > MAX_DISTANCE || Math.abs(posY) > MAX_DISTANCE || Math.abs(posZ) > MAX_DISTANCE) {
+            return null;
         }
 
         structureTag.putString("name", "worldedit:" + player.getName());

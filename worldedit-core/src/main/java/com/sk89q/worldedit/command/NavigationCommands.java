@@ -156,15 +156,8 @@ public class NavigationCommands {
         desc = "Teleport to a location"
     )
     @CommandPermissions("worldedit.navigation.jumpto.command")
-    public void jumpTo(Player player,
-        @Arg(desc = "Location to jump to", def = "")
-            Location pos,
-        @Switch(name = 'f', desc = "force teleport")
-            boolean force) throws WorldEditException {
-
-        if (pos == null) {
-            pos = player.getSolidBlockTrace(300);
-        }
+    public void jumpTo(Player player) throws WorldEditException {
+        Location pos = player.getSolidBlockTrace(300);
         if (pos != null) {
             player.findFreePosition(pos);
             player.print(Caption.of("worldedit.jumpto.moved"));

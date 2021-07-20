@@ -115,6 +115,15 @@ public final class BiomeTypes {
     private BiomeTypes() {
     }
 
+    /**
+     * Gets the {@link BiomeType} associated with the given id.
+     */
+    @Nullable
+    public static BiomeType get(String id) {
+        return BiomeType.REGISTRY.get(id);
+    }
+
+    //FAWE start
     private static BiomeType register(final String id) {
         return register(new BiomeType(id));
     }
@@ -136,14 +145,6 @@ public final class BiomeTypes {
         return BiomeType.REGISTRY.getByInternalId(internalId);
     }
 
-    /**
-     * Gets the {@link BiomeType} associated with the given id.
-     */
-    @Nullable
-    public static BiomeType get(String id) {
-        return BiomeType.REGISTRY.get(id);
-    }
-
     public static Collection<BiomeType> values() {
         return BiomeType.REGISTRY.values();
     }
@@ -157,4 +158,5 @@ public final class BiomeTypes {
         }
         return maxBiomeId;
     }
+    //FAWE end
 }

@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
+import com.fastasyncworldedit.core.jnbt.NumberTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
@@ -338,7 +338,7 @@ public class CompoundTag extends Tag {
     }
 
 
-    // FAWE Start
+    //FAWE start
     public UUID getUUID() {
         long most = getLong("UUIDMost");
         long least = getLong("UUIDLeast");
@@ -376,6 +376,6 @@ public class CompoundTag extends Tag {
         }
         return raw;
     }
-    // FAWE End
+    //FAWE end
 
 }

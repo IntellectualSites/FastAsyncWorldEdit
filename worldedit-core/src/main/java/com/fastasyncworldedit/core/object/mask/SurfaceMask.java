@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.object.mask;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
-import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
+import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypes;

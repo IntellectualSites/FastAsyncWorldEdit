@@ -41,12 +41,12 @@ public abstract class Tag implements BinaryTagLike {
         return asBinaryTag().toString();
     }
 
-    // FAWE Start
+    //FAWE start
     public Object toRaw() {
         return getValue();
     }
 
     public abstract int getTypeCode();
-    // FAWE End
+    //FAWE end
 
 }

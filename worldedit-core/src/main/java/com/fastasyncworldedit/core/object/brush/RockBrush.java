@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.object.brush;
 
-import com.fastasyncworldedit.core.object.random.SimplexNoise;
+import com.fastasyncworldedit.core.math.random.SimplexNoise;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;

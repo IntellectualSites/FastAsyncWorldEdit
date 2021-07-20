@@ -2,8 +2,8 @@ package com.fastasyncworldedit.core.object.brush;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.object.clipboard.ResizableClipboardBuilder;
-import com.fastasyncworldedit.core.object.function.NullRegionFunction;
-import com.fastasyncworldedit.core.object.function.mask.AbstractDelegateMask;
+import com.fastasyncworldedit.core.function.NullRegionFunction;
+import com.fastasyncworldedit.core.function.mask.AbstractDelegateMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;

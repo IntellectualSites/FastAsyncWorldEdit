@@ -42,7 +42,9 @@ public class BaseItem implements NbtValued {
 
     private ItemType itemType;
     @Nullable
+    //FAWE start - Use LR & CBT over CompoundTag
     private LazyReference<CompoundBinaryTag> nbtData;
+    //FAWE end
 
     /**
      * Construct the object.
@@ -54,6 +56,25 @@ public class BaseItem implements NbtValued {
         this.itemType = itemType;
     }
 
+    /**
+     * Get the type of item.
+     *
+     * @return the type
+     */
+    public ItemType getType() {
+        return this.itemType;
+    }
+
+    /**
+     * Set the type of the item.
+     *
+     * @param itemType The type to set
+     */
+    public void setType(ItemType itemType) {
+        this.itemType = itemType;
+    }
+
+    //FAWE start
     /**
      * Construct the object.
      *
@@ -83,24 +104,6 @@ public class BaseItem implements NbtValued {
         return null;
     }
 
-    /**
-     * Get the type of item.
-     *
-     * @return the type
-     */
-    public ItemType getType() {
-        return this.itemType;
-    }
-
-    /**
-     * Set the type of the item.
-     *
-     * @param itemType The type to set
-     */
-    public void setType(ItemType itemType) {
-        this.itemType = itemType;
-    }
-
     @Nullable
     @Override
     public LazyReference<CompoundBinaryTag> getNbtReference() {
@@ -126,4 +129,5 @@ public class BaseItem implements NbtValued {
 
         return getType().getId() + nbtString;
     }
+    //FAWE end
 }

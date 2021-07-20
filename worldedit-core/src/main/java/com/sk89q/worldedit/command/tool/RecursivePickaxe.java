@@ -75,6 +75,7 @@ public class RecursivePickaxe implements BlockTool {
         try (EditSession editSession = session.createEditSession(player, "RecursivePickaxe")) {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
 
+            //FAWE start
             final int radius = (int) range;
             final BlockReplace replace = new BlockReplace(editSession, (BlockTypes.AIR.getDefaultState()));
             editSession.setMask(null);
@@ -83,6 +84,7 @@ public class RecursivePickaxe implements BlockTool {
             //visitor.visit(pos);
             //Operations.completeBlindly(visitor);
             recurse(server, editSession, world, pos, origin, radius, initialType, visitor.getVisited());
+            //FAWE end
             editSession.flushQueue();
             session.remember(editSession);
         }

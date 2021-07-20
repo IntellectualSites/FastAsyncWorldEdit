@@ -45,7 +45,9 @@ import javax.annotation.Nullable;
 /**
  * Represents a physical shape.
  */
+//FAWE start - IBatchProcessor
 public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcessor {
+//FAWE end
 
     /**
      * Get the lower point of a region.
@@ -61,9 +63,11 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      */
     BlockVector3 getMaximumPoint();
 
+    //FAWE start
     default BlockVector3 getDimensions() {
         return getMaximumPoint().subtract(getMinimumPoint()).add(1, 1, 1);
     }
+    //FAWE end
 
     /**
      * Get the center point of a region.
@@ -157,20 +161,6 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      */
     void shift(BlockVector3 change) throws RegionOperationException;
 
-    default boolean contains(int x, int y, int z) {
-        return contains(BlockVector3.at(x, y, z));
-    }
-
-    default boolean contains(int x, int z) {
-        return contains(BlockVector3.at(x, 0, z));
-    }
-
-    default boolean isGlobal() {
-        BlockVector3 pos1 = getMinimumPoint();
-        BlockVector3 pos2 = getMaximumPoint();
-        return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2.getBlockZ() == Integer.MAX_VALUE && pos1.getBlockY() <= 0 && pos2.getBlockY() >= 255;
-    }
-
     /**
      * Returns true based on whether the region contains the point.
      *
@@ -222,6 +212,21 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      */
     List<BlockVector2> polygonize(int maxPoints);
 
+    //FAWE start
+    default boolean contains(int x, int y, int z) {
+        return contains(BlockVector3.at(x, y, z));
+    }
+
+    default boolean contains(int x, int z) {
+        return contains(BlockVector3.at(x, 0, z));
+    }
+
+    default boolean isGlobal() {
+        BlockVector3 pos1 = getMinimumPoint();
+        BlockVector3 pos2 = getMaximumPoint();
+        return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2.getBlockZ() == Integer.MAX_VALUE && pos1.getBlockY() <= 0 && pos2.getBlockY() >= 255;
+    }
+
     default int getMinimumY() {
         return getMinimumPoint().getY();
     }
@@ -265,7 +270,6 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         for (int layer = minSection; layer <= maxSection; layer++) {
             filter(chunk, filter, block, get, set, layer, full);
         }
-        return;
     }
 
     default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, boolean full) {

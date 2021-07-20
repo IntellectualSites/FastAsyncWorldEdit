@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.math;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 import java.util.Comparator;
@@ -26,7 +27,9 @@ import java.util.Comparator;
 /**
  * An immutable 2-dimensional vector.
  */
+//FAWE start - un-finalize
 public class BlockVector2 {
+//FAWE end
 
     public static final BlockVector2 ZERO = new BlockVector2(0, 0);
     public static final BlockVector2 UNIT_X = new BlockVector2(1, 0);
@@ -57,6 +60,7 @@ public class BlockVector2 {
     }
 
     public static BlockVector2 at(int x, int z) {
+        //FAWE start
         /* unnecessary
         switch (x) {
             case 0:
@@ -112,6 +116,7 @@ public class BlockVector2 {
     public MutableBlockVector2 mutZ(int z) {
         return new MutableBlockVector2(x, z);
     }
+    //FAWE end
 
     /**
      * Get the X coordinate.
@@ -169,6 +174,7 @@ public class BlockVector2 {
         return BlockVector2.at(x, z);
     }
 
+    //FAWE start
     public MutableBlockVector2 nextPosition() {
         int absX = Math.abs(x);
         int absY = Math.abs(z);
@@ -197,6 +203,7 @@ public class BlockVector2 {
             return setComponents(x + 1, z);
         }
     }
+    //FAWE end
 
     /**
      * Add another vector to this vector and return the result as a new vector.

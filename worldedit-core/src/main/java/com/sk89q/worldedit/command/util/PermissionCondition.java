@@ -31,7 +31,9 @@ public class PermissionCondition implements Command.Condition {
     private static final Key<Actor> ACTOR_KEY = Key.of(Actor.class);
 
     private final Set<String> permissions;
+    //FAWE start
     private final boolean queued;
+    //FAWE end
 
     public PermissionCondition(Set<String> permissions) {
         this(permissions, true);
@@ -54,7 +56,9 @@ public class PermissionCondition implements Command.Condition {
             .orElse(false);
     }
 
+    //FAWE start
     public boolean isQueued() {
         return queued;
     }
+    //FAWE end
 }

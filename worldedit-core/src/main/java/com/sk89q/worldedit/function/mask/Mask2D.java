@@ -34,6 +34,8 @@ public interface Mask2D {
      */
     boolean test(BlockVector2 vector);
 
+    //FAWE start
     Mask2D copy2D();
+    //FAWE end
 
 }

@@ -24,11 +24,15 @@ import com.sk89q.worldedit.event.Cancellable;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.TracingExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.EditSession.Stage;
@@ -67,7 +71,11 @@ public class EditSessionEvent extends Event implements Cancellable {
     private final int maxBlocks;
     private final Stage stage;
     private Extent extent;
+    private final List<TracingExtent> tracingExtents = new ArrayList<>();
+    private boolean tracing;
+    //FAWE start
     private boolean cancelled;
+    //FAWE end
 
     /**
      * Create a new event.
@@ -139,17 +147,31 @@ public class EditSessionEvent extends Event implements Cancellable {
      */
     public void setExtent(Extent extent) {
         checkNotNull(extent);
+        if (tracing && extent != this.extent) {
+            TracingExtent tracingExtent = new TracingExtent(extent);
+            extent = tracingExtent;
+            tracingExtents.add(tracingExtent);
+        }
         this.extent = extent;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
+    /**
+     * Set tracing enabled, with the current extent as the "base".
+     *
+     * <em>Internal use only.</em>
+     * @param tracing if tracing is enabled
+     */
+    public void setTracing(boolean tracing) {
+        this.tracing = tracing;
     }
 
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    /**
+     * Get the current list of tracing extents.
+     *
+     * <em>Internal use only.</em>
+     */
+    public List<TracingExtent> getTracingExtents() {
+        return tracingExtents;
     }
 
     /**
@@ -161,5 +183,17 @@ public class EditSessionEvent extends Event implements Cancellable {
     public EditSessionEvent clone(Stage stage) {
         return new EditSessionEvent(world, actor, maxBlocks, stage);
     }
+
+    //FAWE start
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+    //FAWE end
 
 }

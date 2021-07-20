@@ -41,12 +41,14 @@ public class SideEffectBox extends PaginationBox {
     private SideEffectSet sideEffectSet;
 
     private static List<SideEffect> getSideEffects() {
+        //FAWE start
         if (sideEffects == null) {
             sideEffects = WorldEdit.getInstance().getPlatformManager().getSupportedSideEffects()
                     .stream()
                     .sorted(Comparator.comparing(Enum::name))
                     .collect(Collectors.toList());
         }
+        //FAWE end
 
         return sideEffects;
     }

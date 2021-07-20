@@ -33,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class FlatRegionMaskingFilter implements FlatRegionFunction {
 
     private final FlatRegionFunction function;
-    private Mask2D mask;
+    private final Mask2D mask;
 
     /**
      * Create a new masking filter.

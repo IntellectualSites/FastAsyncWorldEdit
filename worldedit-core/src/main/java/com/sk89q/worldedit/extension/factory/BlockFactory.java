@@ -58,8 +58,10 @@ public class BlockFactory extends AbstractFactory<BaseBlock> {
      */
     public Set<BaseBlock> parseFromListInput(String input, ParserContext context) throws InputParseException {
         Set<BaseBlock> blocks = new HashSet<>();
+        //FAWE start
         // String[] splits = input.split(",");
         for (String token : StringUtil.split(input, ',', '[', ']')) {
+        //FAWE end
             blocks.add(parseFromInput(token, context));
         }
         return blocks;

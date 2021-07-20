@@ -69,6 +69,7 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         if (successful || old == newState) {
             if (block instanceof BaseBlock) {
                 BaseBlock baseBlock = (BaseBlock) block;
+                //FAWE start - use CompoundBinaryTag over CompoundTag
                 CompoundBinaryTag tag = baseBlock.getNbt();
                 if (tag != null) {
                     tag = tag.put(ImmutableMap.of(
@@ -81,6 +82,7 @@ public interface WorldNativeAccess<NC, NBS, NP> {
                     // update if TE changed as well
                     successful = updateTileEntity(pos, tag);
                 }
+                //FAWE end
             }
         }
 
@@ -190,6 +192,8 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         onBlockStateChange(pos, oldState, newState);
     }
 
+    //FAWE start
     void flush();
+    //FAWE end
 
 }

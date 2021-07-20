@@ -19,10 +19,15 @@
 
 package com.sk89q.worldedit.registry;
 
+import com.fastasyncworldedit.core.registry.RegistryItem;
+
 import java.util.HashSet;
 import java.util.Set;
 
+//FAWE start - implements RegistryItem
 public abstract class Category<T extends Keyed> implements RegistryItem {
+//FAWE end
+
     private final Set<T> set = new HashSet<>();
     protected final String id;
     private boolean empty = true;
@@ -43,6 +48,7 @@ public abstract class Category<T extends Keyed> implements RegistryItem {
         return this.set;
     }
 
+    //FAWE start
     private int internalId;
 
     @Override
@@ -56,6 +62,7 @@ public abstract class Category<T extends Keyed> implements RegistryItem {
     }
 
     protected abstract Set<T> load();
+    //FAWE end
 
     /**
      * Checks if this category contains {@code object}.

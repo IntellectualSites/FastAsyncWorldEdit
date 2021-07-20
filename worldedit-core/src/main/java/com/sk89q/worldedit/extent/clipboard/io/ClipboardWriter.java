@@ -47,6 +47,7 @@ public interface ClipboardWriter extends Closeable {
      */
     void write(Clipboard clipboard) throws IOException;
 
+    //FAWE start
     default Tag writeVector(Vector3 vector) {
         List<DoubleTag> list = new ArrayList<>();
         list.add(new DoubleTag(vector.getX()));
@@ -61,4 +62,5 @@ public interface ClipboardWriter extends Closeable {
         list.add(new FloatTag(location.getPitch()));
         return new ListTag(FloatTag.class, list);
     }
+    //FAWE end
 }

@@ -89,9 +89,11 @@ public class ExpressionMask extends AbstractMask {
         return new ExpressionMask2D(expression, timeout);
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new ExpressionMask(expression.clone(), timeout);
     }
+    //FAWE end
 
 }

@@ -33,9 +33,11 @@ public class RecursiveVisitor extends BreadthFirstSearch {
 
     private final Mask mask;
 
+    //FAWE start
     public RecursiveVisitor(Mask mask, RegionFunction function) {
         this(mask, function, Integer.MAX_VALUE);
     }
+    //FAWE end
 
     /**
      * Create a new recursive visitor.

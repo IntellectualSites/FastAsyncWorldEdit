@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.object.collection;
 
-import com.fastasyncworldedit.core.object.random.SimpleRandom;
+import com.fastasyncworldedit.core.math.random.SimpleRandom;
 
 import java.util.Map;
 

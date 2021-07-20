@@ -42,7 +42,9 @@ public class WorldConverter implements ArgumentConverter<World> {
         commandManager.registerConverter(Key.of(World.class), WORLD_CONVERTER);
     }
     
+    //FAWE start - Accessed by LocationConverter
     public static final WorldConverter WORLD_CONVERTER = new WorldConverter();
+    //FAWE end
 
     private final TextComponent choices;
 
