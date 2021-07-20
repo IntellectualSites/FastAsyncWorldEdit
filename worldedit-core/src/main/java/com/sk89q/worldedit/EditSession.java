@@ -172,7 +172,7 @@ import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
  * using the {@link ChangeSetExtent}.</p>
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-//FAWE start - PassthroughExtent > Extent
+//FAWE start - extends PassthroughExtent > implements Extent
 public class EditSession extends PassthroughExtent implements AutoCloseable {
 //FAWE end
 
