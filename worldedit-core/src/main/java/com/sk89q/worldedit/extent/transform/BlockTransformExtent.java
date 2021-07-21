@@ -168,8 +168,7 @@ public class BlockTransformExtent extends ResettableExtent {
                 if (key == PropertyKey.SHAPE) {
                     return adapt(combine(EAST, WEST), combine(NORTH, SOUTH));
                 } else if (key == PropertyKey.HINGE) {
-                    //TODO: hinges are slightly funky still
-                    return adapt(combine(NORTH, EAST), combine(SOUTH, WEST));
+                    return adapt(combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST), combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST));
                 }
             }
             if (key == PropertyKey.ROTATION) {
