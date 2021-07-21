@@ -2,8 +2,8 @@ package com.fastasyncworldedit.core.function.mask;
 
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.collection.FastBitSet;
-import com.fastasyncworldedit.core.object.string.MutableCharSequence;
+import com.fastasyncworldedit.core.math.FastBitSet;
+import com.fastasyncworldedit.core.function.string.MutableCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;

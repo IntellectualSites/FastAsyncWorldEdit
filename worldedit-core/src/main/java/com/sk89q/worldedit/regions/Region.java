@@ -27,7 +27,7 @@ import com.fastasyncworldedit.core.beta.IChunkSet;
 import com.fastasyncworldedit.core.beta.implementation.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.beta.implementation.processors.ProcessorScope;
 import com.fastasyncworldedit.core.object.FaweLimit;
-import com.fastasyncworldedit.core.object.extent.SingleRegionExtent;
+import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;

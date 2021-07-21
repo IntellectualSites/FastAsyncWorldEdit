@@ -20,9 +20,8 @@
 package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
-import com.fastasyncworldedit.core.object.string.JoinedCharSequence;
+import com.fastasyncworldedit.core.function.string.JoinedCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 

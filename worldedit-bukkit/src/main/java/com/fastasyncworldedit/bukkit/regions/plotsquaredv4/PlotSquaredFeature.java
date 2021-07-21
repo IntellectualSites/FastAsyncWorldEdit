@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
 import com.fastasyncworldedit.core.FaweAPI;
-import com.fastasyncworldedit.core.object.RegionWrapper;
+import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
-import com.fastasyncworldedit.core.regions.general.RegionFilter;
+import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
 import com.github.intellectualsites.plotsquared.plot.config.Settings;

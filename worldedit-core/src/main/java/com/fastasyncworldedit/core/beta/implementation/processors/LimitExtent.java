@@ -4,7 +4,7 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.beta.Filter;
 import com.fastasyncworldedit.core.beta.implementation.filter.block.ExtentFilterBlock;
 import com.fastasyncworldedit.core.object.FaweLimit;
-import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;

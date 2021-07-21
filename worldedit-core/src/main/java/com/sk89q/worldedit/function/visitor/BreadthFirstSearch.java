@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.collection.BlockVectorSet;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.WorldEditException;

@@ -35,7 +35,7 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     int getSkyLight(int x, int y, int z);
 
     @Override
-    int getEmmittedLight(int x, int y, int z);
+    int getEmittedLight(int x, int y, int z);
 
     @Override
     int[] getHeightMap(HeightMapType type);

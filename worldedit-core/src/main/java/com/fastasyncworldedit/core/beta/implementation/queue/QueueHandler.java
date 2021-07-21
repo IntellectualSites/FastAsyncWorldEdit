@@ -39,9 +39,9 @@ import java.util.function.Supplier;
 @SuppressWarnings("UnstableApiUsage")
 public abstract class QueueHandler implements Trimable, Runnable {
 
-    private ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
-    private ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
-    private ThreadPoolExecutor blockingExecutor = FaweCache.IMP.newBlockingExecutor();
+    private final ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
+    private final ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
+    private final ThreadPoolExecutor blockingExecutor = FaweCache.IMP.newBlockingExecutor();
     private final ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
 

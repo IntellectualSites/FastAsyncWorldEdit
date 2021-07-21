@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.bukkit.filter;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.regions.general.CuboidRegionFilter;
+import com.fastasyncworldedit.core.regions.filter.CuboidRegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;

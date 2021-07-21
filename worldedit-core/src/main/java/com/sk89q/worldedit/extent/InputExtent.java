@@ -123,11 +123,11 @@ public interface InputExtent {
      * @param position location
      * @return the light level at the location
      */
-    default int getEmmittedLight(BlockVector3 position) {
-        return getEmmittedLight(position.getX(), position.getY(), position.getZ());
+    default int getEmittedLight(BlockVector3 position) {
+        return getEmittedLight(position.getX(), position.getY(), position.getZ());
     }
 
-    default int getEmmittedLight(int x, int y, int z) {
+    default int getEmittedLight(int x, int y, int z) {
         return 0;
     }
 

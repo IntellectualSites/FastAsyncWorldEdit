@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.extension.factory.parser.mask;
 
-import com.fastasyncworldedit.core.object.mask.YAxisMask;
+import com.fastasyncworldedit.core.function.mask.YAxisMask;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.ParserContext;

@@ -19,7 +19,7 @@
 
 package com.sk89q.jnbt;
 
-import com.fastasyncworldedit.core.object.io.LittleEndianOutputStream;
+import com.fastasyncworldedit.core.internal.io.LittleEndianOutputStream;
 
 import java.io.Closeable;
 import java.io.DataOutput;

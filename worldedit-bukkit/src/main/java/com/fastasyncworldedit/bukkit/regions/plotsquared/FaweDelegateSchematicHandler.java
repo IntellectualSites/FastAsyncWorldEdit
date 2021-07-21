@@ -3,7 +3,6 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.object.io.PGZIPOutputStream;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.plotsquared.core.PlotSquared;
@@ -24,14 +23,15 @@ import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.fastasyncworldedit.core.object.extent.clipboard.io.FastSchematicReader;
-import com.fastasyncworldedit.core.object.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
 import com.sk89q.worldedit.extent.clipboard.io.MCEditSchematicReader;
 import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicReader;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import net.jpountz.lz4.LZ4BlockInputStream;
+import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
@@ -136,19 +136,19 @@ public class FaweDelegateSchematicHandler {
                     Clipboard clipboard = (Clipboard) cTag.getSource();
                     try (OutputStream stream = new FileOutputStream(tmp);
                         NBTOutputStream output = new NBTOutputStream(
-                            new BufferedOutputStream(new PGZIPOutputStream(stream)))) {
+                            new BufferedOutputStream(new ParallelGZIPOutputStream(stream)))) {
                         new FastSchematicWriter(output).write(clipboard);
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp);
-                        BufferedOutputStream output = new BufferedOutputStream(new PGZIPOutputStream(stream))) {
+                        BufferedOutputStream output = new BufferedOutputStream(new ParallelGZIPOutputStream(stream))) {
                         LZ4BlockInputStream is = cTag.adapt(cTag.getSource());
                         IOUtil.copy(is, output);
                     }
                 }
             } else {
                 try (OutputStream stream = new FileOutputStream(tmp);
-                    NBTOutputStream output = new NBTOutputStream(new PGZIPOutputStream(stream))) {
+                    NBTOutputStream output = new NBTOutputStream(new ParallelGZIPOutputStream(stream))) {
                     Map<String, Tag> map = tag.getValue();
                     output.writeNamedTag("Schematic", map.getOrDefault("Schematic", tag));
                 }
@@ -177,7 +177,7 @@ public class FaweDelegateSchematicHandler {
                     BuiltInClipboardFormat.SPONGE_SCHEMATIC.write(output, clipboard);
                 }
                 try {
-                    try (PGZIPOutputStream gzip = new PGZIPOutputStream(output)) {
+                    try (ParallelGZIPOutputStream gzip = new ParallelGZIPOutputStream(output)) {
                         try (NBTOutputStream nos = new NBTOutputStream(gzip)) {
                             Map<String, Tag> map = weTag.getValue();
                             nos.writeNamedTag("Schematic", map.getOrDefault("Schematic", weTag));

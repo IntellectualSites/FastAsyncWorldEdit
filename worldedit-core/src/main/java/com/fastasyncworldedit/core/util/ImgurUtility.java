@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.util;
 
-import com.fastasyncworldedit.core.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 

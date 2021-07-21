@@ -21,9 +21,9 @@ package com.sk89q.worldedit.extent;
 
 import com.fastasyncworldedit.core.beta.IBatchProcessor;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.HistoryExtent;
-import com.fastasyncworldedit.core.object.changeset.AbstractChangeSet;
-import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.extent.HistoryExtent;
+import com.fastasyncworldedit.core.function.operation.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -282,8 +282,8 @@ public class AbstractDelegateExtent implements Extent {
      */
 
     @Override
-    public int getEmmittedLight(int x, int y, int z) {
-        return extent.getEmmittedLight(x, y, z);
+    public int getEmittedLight(int x, int y, int z) {
+        return extent.getEmittedLight(x, y, z);
     }
 
     @Override

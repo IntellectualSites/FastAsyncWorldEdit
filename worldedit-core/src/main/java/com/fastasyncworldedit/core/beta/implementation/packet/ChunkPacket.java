@@ -3,8 +3,8 @@ package com.fastasyncworldedit.core.beta.implementation.packet;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.beta.IBlocks;
-import com.fastasyncworldedit.core.object.FaweOutputStream;
-import com.fastasyncworldedit.core.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.sk89q.jnbt.CompoundTag;
 
 import java.util.HashMap;
@@ -91,9 +91,8 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
     public CompoundTag getHeightMap() {
         HashMap<String, Object> map = new HashMap<>();
         map.put("MOTION_BLOCKING", new long[36]);
-        CompoundTag tag = FaweCache.IMP.asTag(map);
         // TODO
-        return tag;
+        return FaweCache.IMP.asTag(map);
     }
 
     @Override

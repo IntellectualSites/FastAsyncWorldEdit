@@ -21,10 +21,10 @@ package com.sk89q.worldedit.extent.clipboard;
 
 import com.fastasyncworldedit.core.beta.Filter;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.clipboard.CPUOptimizedClipboard;
-import com.fastasyncworldedit.core.object.clipboard.DiskOptimizedClipboard;
-import com.fastasyncworldedit.core.object.clipboard.MemoryOptimizedClipboard;
-import com.fastasyncworldedit.core.object.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;

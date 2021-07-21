@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.filter;
 
-import com.fastasyncworldedit.core.regions.general.CuboidRegionFilter;
+import com.fastasyncworldedit.core.regions.filter.CuboidRegionFilter;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.griefdefender.api.claim.Claim;

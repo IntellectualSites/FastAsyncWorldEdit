@@ -5,7 +5,7 @@ import com.fastasyncworldedit.core.beta.IChunkSet;
 import com.fastasyncworldedit.core.beta.implementation.lighting.HeightMapType;
 import com.fastasyncworldedit.core.beta.implementation.queue.Pool;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.collection.BlockVector3ChunkMap;
+import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;

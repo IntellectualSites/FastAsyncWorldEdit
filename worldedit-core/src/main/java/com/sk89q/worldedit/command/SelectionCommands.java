@@ -20,10 +20,10 @@
 package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.clipboard.URIClipboardHolder;
-import com.fastasyncworldedit.core.object.mask.IdMask;
-import com.fastasyncworldedit.core.object.regions.selector.FuzzyRegionSelector;
-import com.fastasyncworldedit.core.object.regions.selector.PolyhedralRegionSelector;
+import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.function.mask.IdMask;
+import com.fastasyncworldedit.core.regions.selector.FuzzyRegionSelector;
+import com.fastasyncworldedit.core.regions.selector.PolyhedralRegionSelector;
 import com.google.common.base.Strings;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -47,7 +47,6 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.MultiDirection;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;

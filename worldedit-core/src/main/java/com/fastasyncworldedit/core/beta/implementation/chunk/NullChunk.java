@@ -86,7 +86,7 @@ public final class NullChunk implements IQueueChunk {
         return new int[256];
     }
 
-    public int getEmmittedLight(int x, int y, int z) {
+    public int getEmittedLight(int x, int y, int z) {
         return 15;
     }
 

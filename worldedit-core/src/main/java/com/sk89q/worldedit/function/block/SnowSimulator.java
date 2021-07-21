@@ -115,7 +115,7 @@ public class SnowSimulator implements LayerFunction {
         if (!above.getBlockType().getMaterial().isAir() && (!stack || above.getBlockType() != BlockTypes.SNOW)) {
             return false;
             //FAWE start
-        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmmittedLight(abovePosition) > 10) {
+        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmittedLight(abovePosition) > 10) {
             return false;
         } else if (!block.getBlockType().getMaterial().isFullCube()) {
             Map<Property<?>, Object> states = block.getStates();

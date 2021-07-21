@@ -262,7 +262,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public int getEmmittedLight(ChunkHolder chunk, int x, int y, int z) {
+        public int getEmittedLight(ChunkHolder chunk, int x, int y, int z) {
             if (chunk.chunkSet.getLight() != null) {
                 int layer = y >> 4;
                 if (chunk.chunkSet.getLight()[layer] != null) {
@@ -272,7 +272,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
                     }
                 }
             }
-            return chunk.chunkExisting.getEmmittedLight(x, y, z);
+            return chunk.chunkExisting.getEmittedLight(x, y, z);
         }
 
         @Override
@@ -410,8 +410,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public int getEmmittedLight(ChunkHolder chunk, int x, int y, int z) {
-            return chunk.chunkExisting.getEmmittedLight(x, y, z);
+        public int getEmittedLight(ChunkHolder chunk, int x, int y, int z) {
+            return chunk.chunkExisting.getEmittedLight(x, y, z);
         }
 
         @Override
@@ -553,7 +553,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public int getEmmittedLight(ChunkHolder chunk, int x, int y, int z) {
+        public int getEmittedLight(ChunkHolder chunk, int x, int y, int z) {
             if (chunk.chunkSet.getLight() != null) {
                 int layer = y >> 4;
                 if (chunk.chunkSet.getLight()[layer] != null) {
@@ -566,7 +566,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
             chunk.chunkExisting.trim(false);
-            return chunk.getEmmittedLight(x, y, z);
+            return chunk.getEmittedLight(x, y, z);
         }
 
         @Override
@@ -739,11 +739,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public int getEmmittedLight(ChunkHolder chunk, int x, int y, int z) {
+        public int getEmittedLight(ChunkHolder chunk, int x, int y, int z) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
             chunk.chunkExisting.trim(false);
-            return chunk.getEmmittedLight(x, y, z);
+            return chunk.getEmittedLight(x, y, z);
         }
 
         @Override
@@ -1024,8 +1024,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public int getEmmittedLight(int x, int y, int z) {
-        return delegate.getEmmittedLight(this, x, y, z);
+    public int getEmittedLight(int x, int y, int z) {
+        return delegate.getEmittedLight(this, x, y, z);
     }
 
     @Override
@@ -1073,7 +1073,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
         int getSkyLight(ChunkHolder chunk, int x, int y, int z);
 
-        int getEmmittedLight(ChunkHolder chunk, int x, int y, int z);
+        int getEmittedLight(ChunkHolder chunk, int x, int y, int z);
 
         int getBrightness(ChunkHolder chunk, int x, int y, int z);
 

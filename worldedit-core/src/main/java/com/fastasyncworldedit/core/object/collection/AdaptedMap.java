@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.object.collection;
 
+import com.fastasyncworldedit.core.math.IAdaptedMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -71,7 +72,7 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
             return Collections.emptySet();
         }
         return new AdaptedSetCollection<>(getParent().entrySet(), new com.google.common.base.Function<Entry<K2, V2>, Entry<K, V>>() {
-            private AdaptedPair entry = new AdaptedPair();
+            private final AdaptedPair entry = new AdaptedPair();
             @Override
             public Entry<K, V> apply(@javax.annotation.Nullable Entry<K2, V2> input) {
                 entry.input = input;

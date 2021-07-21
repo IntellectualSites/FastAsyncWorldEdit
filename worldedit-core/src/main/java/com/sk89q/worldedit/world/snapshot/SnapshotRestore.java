@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.world.snapshot;
 
-import com.fastasyncworldedit.core.object.collection.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.math.BlockVector2;

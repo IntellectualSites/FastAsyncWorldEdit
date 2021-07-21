@@ -2,8 +2,8 @@ package com.fastasyncworldedit.core.logging;
 
 import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
-import com.fastasyncworldedit.core.object.changeset.DiskStorageHistory;
-import com.fastasyncworldedit.core.object.changeset.SimpleChangeSetSummary;
+import com.fastasyncworldedit.core.function.operation.changeset.DiskStorageHistory;
+import com.fastasyncworldedit.core.function.operation.changeset.SimpleChangeSetSummary;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;

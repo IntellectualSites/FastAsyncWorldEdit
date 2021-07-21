@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.beta.implementation.processors;
 
 import com.fastasyncworldedit.core.beta.IBatchProcessor;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.function.operation.changeset.AbstractChangeSet;
 import com.sk89q.worldedit.extent.Extent;
 
 public abstract class ExtentBatchProcessorHolder extends BatchProcessorHolder implements Extent {

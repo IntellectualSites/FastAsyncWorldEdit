@@ -2,7 +2,6 @@ package com.fastasyncworldedit.core.beta.implementation.lighting;
 
 import com.fastasyncworldedit.core.beta.IQueueChunk;
 import com.fastasyncworldedit.core.beta.IQueueExtent;
-import com.fastasyncworldedit.core.object.RelightMode;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 

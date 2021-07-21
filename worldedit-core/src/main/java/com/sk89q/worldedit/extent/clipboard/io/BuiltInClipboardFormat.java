@@ -19,18 +19,18 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.fastasyncworldedit.core.object.extent.clipboard.io.FastSchematicReader;
-import com.fastasyncworldedit.core.object.extent.clipboard.io.FastSchematicWriter;
-import com.fastasyncworldedit.core.object.io.PGZIPOutputStream;
-import com.fastasyncworldedit.core.object.io.ResettableFileInputStream;
-import com.fastasyncworldedit.core.object.schematic.MinecraftStructure;
-import com.fastasyncworldedit.core.object.schematic.PNGWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
+import com.fastasyncworldedit.core.function.schematic.MinecraftStructure;
+import com.fastasyncworldedit.core.function.schematic.PNGWriter;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.Tag;
+import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -71,11 +71,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             OutputStream gzip;
-            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+            if (outputStream instanceof ParallelGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
                 gzip = outputStream;
             } else {
                 outputStream = new BufferedOutputStream(outputStream);
-                gzip = new PGZIPOutputStream(outputStream);
+                gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new FastSchematicWriter(nbtStream);
@@ -184,11 +184,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             OutputStream gzip;
-            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+            if (outputStream instanceof ParallelGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
                 gzip = outputStream;
             } else {
                 outputStream = new BufferedOutputStream(outputStream);
-                gzip = new PGZIPOutputStream(outputStream);
+                gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             FastSchematicWriter writer = new FastSchematicWriter(nbtStream);
@@ -223,7 +223,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             outputStream = new BufferedOutputStream(outputStream);
-            OutputStream gzip = new PGZIPOutputStream(outputStream);
+            OutputStream gzip = new ParallelGZIPOutputStream(outputStream);
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new MinecraftStructure(nbtStream);
         }

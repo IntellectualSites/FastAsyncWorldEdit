@@ -136,7 +136,6 @@ public class ImageUtil {
                 default:
                     alpha = MathMan.clamp((int) (alpha * alphaScale), 0, 255);
                     raw[i] = (color & 0x00FFFFFF) + (alpha << 24);
-                    continue;
             }
         }
     }

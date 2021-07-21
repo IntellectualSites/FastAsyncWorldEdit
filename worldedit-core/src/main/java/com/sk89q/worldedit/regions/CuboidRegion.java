@@ -26,7 +26,7 @@ import com.fastasyncworldedit.core.beta.IChunkGet;
 import com.fastasyncworldedit.core.beta.IChunkSet;
 import com.fastasyncworldedit.core.beta.implementation.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.collection.BlockVectorSet;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.fastasyncworldedit.core.math.MutableBlockVector2;

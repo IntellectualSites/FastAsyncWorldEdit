@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.beta;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.object.FaweOutputStream;
-import com.fastasyncworldedit.core.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;

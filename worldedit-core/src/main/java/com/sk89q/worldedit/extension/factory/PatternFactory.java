@@ -20,21 +20,21 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.fastasyncworldedit.core.object.pattern.parser.BiomePatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.BiomePatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.BlockCategoryPatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.BufferedPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.BufferedPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.ExistingPatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.Linear2DPatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.Linear3DPatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.PerlinPatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.RandomPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.ExistingPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.Linear2DPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.Linear3DPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.PerlinPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.RandomPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.RandomStatePatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.RidgedMultiFractalPatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.SimplexPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.RidgedMultiFractalPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.SimplexPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.SingleBlockPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.TypeOrStateApplyingPatternParser;
-import com.fastasyncworldedit.core.object.pattern.parser.VoronoiPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.VoronoiPatternParser;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 

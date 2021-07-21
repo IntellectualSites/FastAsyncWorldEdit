@@ -13,7 +13,7 @@ public class DBHandler {
 
     public static final DBHandler IMP = new DBHandler();
 
-    private Map<World, RollbackDatabase> databases = new ConcurrentHashMap<>(8, 0.9f, 1);
+    private final Map<World, RollbackDatabase> databases = new ConcurrentHashMap<>(8, 0.9f, 1);
 
     public RollbackDatabase getDatabase(World world) {
         RollbackDatabase database = databases.get(world);

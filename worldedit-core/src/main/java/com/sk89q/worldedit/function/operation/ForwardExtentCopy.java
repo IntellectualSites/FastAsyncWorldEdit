@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.function.operation;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.extent.BlockTranslateExtent;
-import com.fastasyncworldedit.core.object.extent.PositionTransformExtent;
+import com.fastasyncworldedit.core.extent.BlockTranslateExtent;
+import com.fastasyncworldedit.core.extent.PositionTransformExtent;
 import com.fastasyncworldedit.core.function.block.BiomeCopy;
 import com.fastasyncworldedit.core.function.block.CombinedBlockCopy;
 import com.fastasyncworldedit.core.function.block.SimpleBlockCopy;

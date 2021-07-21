@@ -5,12 +5,10 @@ import com.fastasyncworldedit.core.beta.IQueueChunk;
 import com.fastasyncworldedit.core.beta.IQueueExtent;
 import com.fastasyncworldedit.core.beta.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.RelightMode;
 import com.fastasyncworldedit.core.object.RunnableVal;
-import com.fastasyncworldedit.core.object.collection.BlockVectorSet;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.EnumProperty;
@@ -20,7 +18,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -39,7 +36,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class NMSRelighter implements Relighter {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final int DISPATCH_SIZE = 64;
     private static final DirectionalProperty stairDirection;
     private static final EnumProperty stairHalf;
@@ -58,7 +54,7 @@ public class NMSRelighter implements Relighter {
     private final Map<Long, RelightSkyEntry> skyToRelight;
     private final Object present = new Object();
     private final Map<Long, Integer> chunksToSend;
-    private final ConcurrentLinkedQueue<RelightSkyEntry> extentdSkyToRelight = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<RelightSkyEntry> extendSkyToRelight = new ConcurrentLinkedQueue<>();
     private final Map<Long, long[][][] /* z y x */> lightQueue;
     private final AtomicBoolean lightLock = new AtomicBoolean(false);
     private final ConcurrentHashMap<Long, long[][][]> concurrentLightQueue;
@@ -84,7 +80,7 @@ public class NMSRelighter implements Relighter {
     }
 
     @Override public boolean isEmpty() {
-        return skyToRelight.isEmpty() && lightQueue.isEmpty() && extentdSkyToRelight.isEmpty() && concurrentLightQueue.isEmpty();
+        return skyToRelight.isEmpty() && lightQueue.isEmpty() && extendSkyToRelight.isEmpty() && concurrentLightQueue.isEmpty();
     }
 
     @Override
@@ -149,7 +145,7 @@ public class NMSRelighter implements Relighter {
     }
 
     public synchronized void clear() {
-        extentdSkyToRelight.clear();
+        extendSkyToRelight.clear();
         skyToRelight.clear();
         chunksToSend.clear();
         lightQueue.clear();
@@ -157,13 +153,13 @@ public class NMSRelighter implements Relighter {
 
     public boolean addChunk(int cx, int cz, byte[] fix, int bitmask) {
         RelightSkyEntry toPut = new RelightSkyEntry(cx, cz, fix, bitmask);
-        extentdSkyToRelight.add(toPut);
+        extendSkyToRelight.add(toPut);
         return true;
     }
 
     private synchronized Map<Long, RelightSkyEntry> getSkyMap() {
         RelightSkyEntry entry;
-        while ((entry = extentdSkyToRelight.poll()) != null) {
+        while ((entry = extendSkyToRelight.poll()) != null) {
             long pair = MathMan.pairInt(entry.x, entry.z);
             RelightSkyEntry existing = skyToRelight.put(pair, entry);
             if (existing != null) {
@@ -242,7 +238,7 @@ public class NMSRelighter implements Relighter {
                                     int x = lx + bx;
                                     int y = yStart + j;
                                     int z = lz + bz;
-                                    int oldLevel = iChunk.getEmmittedLight(lx, y, lz);
+                                    int oldLevel = iChunk.getEmittedLight(lx, y, lz);
                                     int newLevel = iChunk.getBrightness(lx, y, lz);
                                     if (oldLevel != newLevel) {
                                         iChunk.setBlockLight(lx, y, lz, newLevel);
@@ -293,7 +289,7 @@ public class NMSRelighter implements Relighter {
             if (!iChunk.isInit()) {
                 iChunk.init(queue, node.getX() >> 4, node.getZ() >> 4);
             }
-            int lightLevel = iChunk.getEmmittedLight(node.getX() & 15, node.getY(), node.getZ() & 15);
+            int lightLevel = iChunk.getEmittedLight(node.getX() & 15, node.getY(), node.getZ() & 15);
             BlockState state = this.queue.getBlock(node.getX(), node.getY(), node.getZ());
             String id = state.getBlockType().getId().toLowerCase(Locale.ROOT);
             if (lightLevel <= 1) {
@@ -724,7 +720,7 @@ public class NMSRelighter implements Relighter {
         if (!iChunk.isInit()) {
             iChunk.init(this.queue, x >> 4, z >> 4);
         }
-        int current = iChunk.getEmmittedLight(x & 15, y, z & 15);
+        int current = iChunk.getEmittedLight(x & 15, y, z & 15);
         if (current != 0 && current < currentLight) {
             iChunk.setBlockLight(x, y, z, 0);
             if (current > 1) {
@@ -758,7 +754,7 @@ public class NMSRelighter implements Relighter {
             if (!iChunk.isInit()) {
                 iChunk.init(this.queue, x >> 4, z >> 4);
             }
-            int current = iChunk.getEmmittedLight(x & 15, y, z & 15);
+            int current = iChunk.getEmittedLight(x & 15, y, z & 15);
             if (currentLight > current) {
                 iChunk.setBlockLight(x & 15, y, z & 15, currentLight);
                 mutableBlockPos.setComponents(x, y, z);
@@ -831,8 +827,9 @@ public class NMSRelighter implements Relighter {
             queue.flush();
             finished.set(true);
         } else {
-            TaskManager.IMP.sync(new RunnableVal<Object>() {
-                @Override public void run(Object value) {
+            TaskManager.IMP.sync(new RunnableVal<>() {
+                @Override
+                public void run(Object value) {
                     queue.flush();
                     finished.set(true);
                 }
@@ -849,7 +846,7 @@ public class NMSRelighter implements Relighter {
     }
 
     public synchronized void sendChunks() {
-        RunnableVal<Object> runnable = new RunnableVal<Object>() {
+        RunnableVal<Object> runnable = new RunnableVal<>() {
             @Override
             public void run(Object value) {
                 Iterator<Map.Entry<Long, Integer>> iter = chunksToSend.entrySet().iterator();
@@ -973,7 +970,7 @@ public class NMSRelighter implements Relighter {
                     BlockMaterial material = state.getMaterial();
                     int opacity = material.getLightOpacity();
                     int brightness = material.getLightValue();
-                    if (brightness > 0 && brightness != iChunk.getEmmittedLight(x, y, z)) {
+                    if (brightness > 0 && brightness != iChunk.getEmittedLight(x, y, z)) {
                         addLightUpdate(bx + x, y, bz + z);
                     }
 

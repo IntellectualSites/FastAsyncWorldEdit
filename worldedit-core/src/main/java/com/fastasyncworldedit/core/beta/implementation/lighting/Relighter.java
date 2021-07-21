@@ -10,7 +10,7 @@ public interface Relighter extends AutoCloseable {
      * @param cx chunk x
      * @param cz chunk z
      * @param skipReason byte array of {@link SkipReason} for each chunksection in the chunk. Use case? No idea.
-     * @param bitmask Initial bitmask of the chunk (if being editited beforehand)
+     * @param bitmask Initial bitmask of the chunk (if being edited beforehand)
      * @return Was the chunk added
      */
     boolean addChunk(int cx, int cz, byte[] skipReason, int bitmask);

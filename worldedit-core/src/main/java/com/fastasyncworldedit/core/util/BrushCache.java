@@ -75,7 +75,7 @@ public final class BrushCache {
         return null;
     }
 
-    public static final BrushTool setTool(BaseItem item, BrushTool tool) {
+    public static BrushTool setTool(BaseItem item, BrushTool tool) {
         if (item.getNativeItem() == null) {
             return null;
         }

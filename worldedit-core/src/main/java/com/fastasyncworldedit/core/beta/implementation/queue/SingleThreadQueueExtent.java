@@ -16,7 +16,7 @@ import com.fastasyncworldedit.core.beta.implementation.processors.EmptyBatchProc
 import com.fastasyncworldedit.core.beta.implementation.processors.ExtentBatchProcessorHolder;
 import com.fastasyncworldedit.core.beta.implementation.processors.ProcessorScope;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
@@ -50,7 +50,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private boolean initialized;
 
     private Thread currentThread;
-    private ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
     // Last access pointers
     private IQueueChunk lastChunk;
     private long lastPair = Long.MAX_VALUE;

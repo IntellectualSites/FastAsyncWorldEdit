@@ -20,15 +20,15 @@
 package com.sk89q.worldedit.command.tool;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.brush.BrushSettings;
-import com.fastasyncworldedit.core.object.brush.MovableTool;
-import com.fastasyncworldedit.core.object.brush.ResettableTool;
-import com.fastasyncworldedit.core.object.brush.TargetMode;
-import com.fastasyncworldedit.core.object.brush.scroll.Scroll;
-import com.fastasyncworldedit.core.object.brush.scroll.ScrollTool;
-import com.fastasyncworldedit.core.object.extent.ResettableExtent;
-import com.fastasyncworldedit.core.object.mask.MaskedTargetBlock;
-import com.fastasyncworldedit.core.object.pattern.PatternTraverser;
+import com.fastasyncworldedit.core.command.brush.BrushSettings;
+import com.fastasyncworldedit.core.command.brush.MovableTool;
+import com.fastasyncworldedit.core.command.brush.ResettableTool;
+import com.fastasyncworldedit.core.command.brush.TargetMode;
+import com.fastasyncworldedit.core.command.brush.scroll.Scroll;
+import com.fastasyncworldedit.core.command.brush.scroll.ScrollTool;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.function.mask.MaskedTargetBlock;
+import com.fastasyncworldedit.core.function.pattern.PatternTraverser;
 import com.fastasyncworldedit.core.util.BrushCache;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.StringMan;
