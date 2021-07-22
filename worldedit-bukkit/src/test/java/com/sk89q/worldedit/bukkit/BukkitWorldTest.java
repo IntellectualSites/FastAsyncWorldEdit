@@ -19,7 +19,9 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.sk89q.util.StubServer;
 import com.sk89q.worldedit.util.TreeGenerator;
+import org.bukkit.Bukkit;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,6 +30,7 @@ public class BukkitWorldTest {
 
     @Test
     public void testTreeTypeMapping() {
+        Bukkit.setServer(new StubServer());
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             assertNotNull(BukkitWorld.toBukkitTreeType(type), "No mapping for: " + type);
         }
