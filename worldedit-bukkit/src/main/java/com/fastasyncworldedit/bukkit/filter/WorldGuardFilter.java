@@ -37,7 +37,7 @@ public class WorldGuardFilter extends CuboidRegionFilter {
                 BlockVector3 min = region.getMinimumPoint();
                 BlockVector3 max = region.getMaximumPoint();
                 if (max.getBlockX() - min.getBlockX() > 1024 || max.getBlockZ() - min.getBlockZ() > 1024) {
-                    LOGGER.debug("Large or complex region shapes cannot be optimized. Filtering will be slower");
+                    LOGGER.info("Large or complex region shapes cannot be optimized. Filtering will be slower");
                     large = true;
                     break;
                 }

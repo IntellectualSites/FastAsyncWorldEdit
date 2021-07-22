@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.IFawe;
@@ -15,11 +16,11 @@ import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
 import com.fastasyncworldedit.bukkit.regions.GriefDefenderFeature;
 import com.fastasyncworldedit.bukkit.regions.ResidenceFeature;
 import com.fastasyncworldedit.bukkit.regions.TownyFeature;
-import com.fastasyncworldedit.bukkit.regions.Worldguard;
+import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
-import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
+//import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.ThirdPartyManager;
@@ -189,7 +190,7 @@ public class FaweBukkit implements IFawe, Listener {
         final ArrayList<FaweMaskManager> managers = new ArrayList<>();
         if (worldguardPlugin != null && worldguardPlugin.isEnabled()) {
             try {
-                managers.add(new Worldguard(worldguardPlugin));
+                managers.add(new WorldGuardFeature(worldguardPlugin));
                 LOGGER.info("Attempting to use plugin 'WorldGuard'");
             } catch (Throwable ignored) {
             }

@@ -165,7 +165,11 @@ public class BlockTransformExtent extends ResettableExtent {
                 return adapt(UP, DOWN);
             }
             if (values.contains("left")) {
-                return adapt(0L, combine(EAST, WEST), combine(NORTH, SOUTH));
+                if (key == PropertyKey.SHAPE) {
+                    return adapt(combine(EAST, WEST), combine(NORTH, SOUTH));
+                } else if (key == PropertyKey.HINGE) {
+                    return adapt(combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST), combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST));
+                }
             }
             if (key == PropertyKey.ROTATION) {
                 List<Direction> directions = new ArrayList<>();
@@ -401,7 +405,7 @@ public class BlockTransformExtent extends ResettableExtent {
             if (isDirectional(property)) {
                 long[] directions = getDirections(property);
                 if (directions != null) {
-                    int oldIndex = property.getIndex(newMaskedId);
+                    int oldIndex = property.getIndex(state.getInternalId());
                     if (oldIndex >= directions.length) {
                         if (Settings.IMP.ENABLED_COMPONENTS.DEBUG) {
                             LOGGER.warn(String.format("Index outside direction array length found for block:{%s} property:{%s}", state.getBlockType().getId(), property.getName()));

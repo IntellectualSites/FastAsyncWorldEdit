@@ -108,6 +108,16 @@ fun Project.applyPlatformAndCoreConfiguration() {
         }
     }
 
+    if (name != "worldedit-fabric") {
+        configurations["compileClasspath"].apply {
+            resolutionStrategy.componentSelection {
+                withModule("org.slf4j:slf4j-api") {
+                    reject("No SLF4J allowed on compile classpath")
+                }
+            }
+        }
+    }
+
 //    tasks.named("check").configure {
 //        dependsOn("checkstyleMain", "checkstyleTest")
 //    }

@@ -1,7 +1,5 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.destroystokyo.paper.util.ReentrantLockWithGetOwner;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;

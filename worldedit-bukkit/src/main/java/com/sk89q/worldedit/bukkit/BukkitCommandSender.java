@@ -113,8 +113,10 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
         return true;
     }
 
+    //FAWE start
     @Override public void setPermission(String permission, boolean value) {
     }
+    //FAWE end
 
     @Override
     public void checkPermission(String permission) throws AuthorizationException {
@@ -140,10 +142,12 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
 
             @Override
             public boolean isActive() {
+                //FAWE start - check if sender instanceof Entity, before returning true
                 if (sender instanceof Entity) {
                     Entity entity = (Entity) sender;
                     return entity.isValid() && !entity.isDead();
                 }
+                //FAWE end
                 return true;
             }
 

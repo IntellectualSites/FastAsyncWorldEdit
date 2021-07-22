@@ -5,6 +5,7 @@ import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.core.regions.FaweMask;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -25,11 +26,14 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
         super(residencePlugin.getName());
         this.residence = residencePlugin;
         this.plugin = p3;
-        LOGGER.debug("Plugin 'Residence' found. Using it now.");
+        LOGGER.info("Plugin 'Residence' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, ClaimedResidence residence, MaskType type) {
-        return residence != null && (residence.getOwner().equals(player.getName()) || residence.getOwner().equals(player.getUniqueId().toString()) || type == MaskType.MEMBER && residence.getPermissions().playerHas(player, "build", false));
+        return residence != null &&
+            (residence.getOwner().equals(player.getName()) ||
+                residence.getOwner().equals(player.getUniqueId().toString()) ||
+                type == MaskType.MEMBER && TaskManager.IMP.sync(() -> residence.getPermissions().playerHas(player, "build", false)));
     }
 
     @Override

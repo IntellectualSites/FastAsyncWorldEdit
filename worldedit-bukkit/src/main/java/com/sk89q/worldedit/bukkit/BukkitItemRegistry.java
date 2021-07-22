@@ -45,6 +45,7 @@ class BukkitItemRegistry extends BundledItemRegistry {
         return super.getRichName(itemStack);
     }
 
+    //FAWE start
     @Override
     public Collection<String> values() {
         ArrayList<String> values = new ArrayList<>();
@@ -56,4 +57,5 @@ class BukkitItemRegistry extends BundledItemRegistry {
         }
         return values;
     }
+    //FAWE end
 }

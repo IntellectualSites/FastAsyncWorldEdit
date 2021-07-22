@@ -51,6 +51,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
     @Nullable
     @Override
     public BlockMaterial getMaterial(BlockType blockType) {
+        //FAWE start - delegate to our internal values
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             BlockMaterial result = adapter.getMaterial(blockType);
@@ -71,8 +72,10 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
             materialMap[mat.ordinal()] = result;
         }
         return result;
+        //FAWE end
     }
 
+    //FAWE start
     @Nullable
     @Override
     public BlockMaterial getMaterial(BlockState state) {
@@ -85,14 +88,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         }
         return super.getMaterial(state);
     }
-
-    @Override
-    public OptionalInt getInternalBlockStateId(BlockState state) {
-        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
-            return WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBlockStateId(state);
-        }
-        return OptionalInt.empty();
-    }
+    //FAWE end
 
     @Nullable
     @Override
@@ -104,6 +100,14 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         return super.getProperties(blockType);
     }
 
+    @Override
+    public OptionalInt getInternalBlockStateId(BlockState state) {
+        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {
+            return WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBlockStateId(state);
+        }
+        return OptionalInt.empty();
+    }
+
     public static class BukkitBlockMaterial extends PassthroughBlockMaterial {
 
         private final Material material;
@@ -111,10 +115,6 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         public BukkitBlockMaterial(@Nullable BlockMaterial material, Material bukkitMaterial) {
             super(material);
             this.material = bukkitMaterial;
-        }
-
-        public int getId() {
-            return material.getId();
         }
 
         @Override
@@ -139,12 +139,14 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
             return material.isBurnable();
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public boolean isTranslucent() {
             return material.isTransparent();
         }
     }
 
+    // FAWE start
     @Override
     public Collection<String> values() {
         ArrayList<String> blocks = new ArrayList<>();
@@ -156,4 +158,5 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         }
         return blocks;
     }
+    //FAWE end
 }

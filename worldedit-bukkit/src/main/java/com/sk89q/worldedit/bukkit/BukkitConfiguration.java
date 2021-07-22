@@ -20,11 +20,9 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.util.yaml.YAMLProcessor;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.YAMLConfiguration;
 import com.sk89q.worldedit.util.report.Unreported;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -33,8 +31,6 @@ import java.nio.file.Path;
  * YAMLConfiguration but with setting for no op permissions and plugin root data folder.
  */
 public class BukkitConfiguration extends YAMLConfiguration {
-
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public boolean noOpPermissions = false;
     public boolean commandBlockSupport = false;
@@ -61,13 +57,13 @@ public class BukkitConfiguration extends YAMLConfiguration {
 
     private void migrate(String file, String name) {
         File fromDir = new File(".", file);
-        File toDir = new File(getWorkingDirectory(), file);
+        File toDir = new File(getWorkingDirectoryPath().toFile(), file);
         if (fromDir.exists() & !toDir.exists()) {
             if (fromDir.renameTo(toDir)) {
-                LOGGER.info("Migrated " + name + " folder '" + file
+                plugin.getLogger().info("Migrated " + name + " folder '" + file
                         + "' from server root to plugin data folder.");
             } else {
-                LOGGER.warn("Error while migrating " + name + " folder!");
+                plugin.getLogger().warning("Error while migrating " + name + " folder!");
             }
         }
     }

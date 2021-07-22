@@ -47,6 +47,7 @@ public class BukkitImplLoader {
     private static final String CLASS_SUFFIX = ".class";
 
     private static final String LOAD_ERROR_MESSAGE =
+    //FAWE start - exchange WorldEdit to FAWE & suggest to update Fawe & the server software
         "\n**********************************************\n"
             + "** This FastAsyncWorldEdit version does not fully support your version of Bukkit.\n"
             + "** You can fix this by:\n"
@@ -55,6 +56,7 @@ public class BukkitImplLoader {
             + "** will be blank, and so on. There will be no support for entity\n"
             + "** and block property-related functions.\n"
             + "**********************************************\n";
+    //FAWE end
 
     /**
      * Create a new instance.

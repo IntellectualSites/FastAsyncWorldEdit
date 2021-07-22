@@ -29,7 +29,7 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
     public TownyFeature(Plugin townyPlugin) {
         super(townyPlugin.getName());
         this.towny = townyPlugin;
-        LOGGER.debug("Plugin 'Towny' found. Using it now.");
+        LOGGER.info("Plugin 'Towny' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, TownBlock block) {

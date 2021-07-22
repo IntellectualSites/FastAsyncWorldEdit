@@ -26,6 +26,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
@@ -38,6 +39,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,6 +55,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class BlockType implements Keyed, Pattern {
 
     public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final String id;
     private final BlockTypesCache.Settings settings;
@@ -138,8 +141,16 @@ public class BlockType implements Keyed, Pattern {
     public BlockState withPropertyId(int propertyId) {
         if (settings.stateOrdinals == null) {
             return settings.defaultState;
+        } else if (propertyId >= settings.stateOrdinals.length || propertyId < 0) {
+            LOGGER.error("Attempted to load blockstate with id {} of type {} outside of state ordinals length. Using default state.", propertyId, getId());
+            return settings.defaultState;
         }
-        return BlockTypesCache.states[settings.stateOrdinals[propertyId]];
+        int ordinal = settings.stateOrdinals[propertyId];
+        if (ordinal >= BlockTypesCache.states.length || ordinal < 0) {
+            LOGGER.error("Attempted to load blockstate with ordinal {} of type {} outside of states length. Using default state. Using default state.", ordinal, getId());
+            return settings.defaultState;
+        }
+        return BlockTypesCache.states[ordinal];
     }
 
     @Deprecated
