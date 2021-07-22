@@ -8,7 +8,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.math.BitArray;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
-import com.fastasyncworldedit.core.object.collection.CleanableThreadLocal;
+import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.internal.exception.FaweBlockBagException;
 import com.fastasyncworldedit.core.internal.exception.FaweChunkLoadException;
 import com.fastasyncworldedit.core.internal.exception.FaweException;

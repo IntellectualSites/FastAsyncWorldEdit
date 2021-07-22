@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.extent;
 
-import com.fastasyncworldedit.core.function.operation.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.change.AbstractChangeSet;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;

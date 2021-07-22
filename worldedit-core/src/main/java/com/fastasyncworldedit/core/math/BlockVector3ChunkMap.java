@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.math;
 
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.collection.IAdaptedMap;
 import com.sk89q.worldedit.math.BlockVector3;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectArrayMap;
 

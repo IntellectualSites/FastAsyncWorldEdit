@@ -8,7 +8,7 @@ import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.object.RunnableVal;
 import com.fastasyncworldedit.core.object.RunnableVal2;
-import com.fastasyncworldedit.core.function.operation.changeset.FaweStreamChangeSet;
+import com.fastasyncworldedit.core.history.changeset.change.FaweStreamChangeSet;
 import com.fastasyncworldedit.core.internal.io.AbstractDelegateOutputStream;
 import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;

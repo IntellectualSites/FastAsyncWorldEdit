@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import com.fastasyncworldedit.core.function.operation.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.change.AbstractChangeSet;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.UndoContext;

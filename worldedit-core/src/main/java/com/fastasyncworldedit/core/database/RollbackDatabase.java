@@ -3,7 +3,7 @@ package com.fastasyncworldedit.core.database;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.logging.RollbackOptimizedHistory;
-import com.fastasyncworldedit.core.object.collection.YieldIterable;
+import com.fastasyncworldedit.core.util.collection.YieldIterable;
 import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;

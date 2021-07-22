@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.beta.implementation.preloader;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.object.collection.MutablePair;
+import com.fastasyncworldedit.core.util.collection.MutablePair;
 import com.fastasyncworldedit.core.util.FaweTimer;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;

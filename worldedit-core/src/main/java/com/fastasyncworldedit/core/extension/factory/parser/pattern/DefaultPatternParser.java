@@ -1,6 +1,6 @@
 // TODO: Ping @MattBDev to reimplement (or remove because this class is stupid) 2020-02-04
 ///*
-//package com.sk89q.worldedit.extension.factory.parser.pattern;
+//package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 //
 //import com.boydti.fawe.command.FaweParser;
 //import com.boydti.fawe.command.SuggestInputParseException;

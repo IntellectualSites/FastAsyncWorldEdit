@@ -34,7 +34,6 @@ import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.function.factory.Apply;
 import com.sk89q.worldedit.function.factory.ApplyRegion;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.annotation.Direction;

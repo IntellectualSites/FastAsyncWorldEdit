@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.function.pattern;
 
-import com.fastasyncworldedit.core.function.string.MutableCharSequence;
+import com.fastasyncworldedit.core.util.MutableCharSequence;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.jnbt.CompoundTag;

@@ -25,7 +25,7 @@ import com.fastasyncworldedit.core.beta.IBatchProcessor;
 import com.fastasyncworldedit.core.beta.implementation.filter.block.ExtentFilterBlock;
 import com.fastasyncworldedit.core.beta.implementation.processors.ProcessorScope;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.function.operation.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.change.AbstractChangeSet;
 import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.extent.NullExtent;

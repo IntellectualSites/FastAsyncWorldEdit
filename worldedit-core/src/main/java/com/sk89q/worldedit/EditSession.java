@@ -27,8 +27,8 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.object.RunnableVal;
-import com.fastasyncworldedit.core.function.operation.changeset.AbstractChangeSet;
-import com.fastasyncworldedit.core.function.operation.changeset.BlockBagChangeSet;
+import com.fastasyncworldedit.core.history.changeset.change.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.change.BlockBagChangeSet;
 import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.extent.FaweRegionExtent;
@@ -172,7 +172,10 @@ import static com.sk89q.worldedit.regions.Regions.minimumBlockY;
  * using the {@link ChangeSetExtent}.</p>
  */
 @SuppressWarnings({"FieldCanBeLocal"})
-//FAWE start - extends PassthroughExtent > implements Extent
+/* FAWE start - extends PassthroughExtent > implements Extent
+Make sure, that all edits go thru it, else history etc. can have issues.
+PassthroughExtent has some for loops that then delegate to methods editsession overrides.
+ */
 public class EditSession extends PassthroughExtent implements AutoCloseable {
 //FAWE end
 
@@ -786,7 +789,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param batchingChunks {@code true} to enable, {@code false} to disable
      */
     public void setBatchingChunks(boolean batchingChunks) {
-        //FAWE start - altered by out lifecycle
+        //FAWE start - altered by our lifecycle
         if (batchingChunks) {
             enableQueue();
         } else {
@@ -1937,9 +1940,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
     //FAWE end
 
-    //FAWE start - made private
-    private int makeCylinder(BlockVector3 pos, Pattern block, double radiusX, double radiusZ, int height, double thickness, boolean filled) throws MaxChangedBlocksException {
-    //FAWE end
+    public int makeCylinder(BlockVector3 pos, Pattern block, double radiusX, double radiusZ, int height, double thickness, boolean filled) throws MaxChangedBlocksException {
         radiusX += 0.5;
         radiusZ += 0.5;
 

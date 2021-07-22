@@ -11,7 +11,7 @@ import com.fastasyncworldedit.core.beta.IQueueExtent;
 import com.fastasyncworldedit.core.beta.Trimable;
 import com.fastasyncworldedit.core.beta.implementation.chunk.ChunkCache;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.collection.CleanableThreadLocal;
+import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;

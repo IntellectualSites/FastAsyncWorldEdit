@@ -3,7 +3,7 @@ package com.fastasyncworldedit.core.beta.implementation.blocks;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.beta.IChunkSet;
 import com.fastasyncworldedit.core.beta.implementation.lighting.HeightMapType;
-import com.fastasyncworldedit.core.object.collection.MemBlockSet;
+import com.fastasyncworldedit.core.util.collection.MemBlockSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;

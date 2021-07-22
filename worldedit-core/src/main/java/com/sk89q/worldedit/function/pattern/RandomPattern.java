@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.fastasyncworldedit.core.object.collection.RandomCollection;
+import com.fastasyncworldedit.core.util.collection.RandomCollection;
 import com.fastasyncworldedit.core.math.random.SimpleRandom;
 import com.fastasyncworldedit.core.math.random.TrueRandom;
 import com.sk89q.worldedit.WorldEditException;

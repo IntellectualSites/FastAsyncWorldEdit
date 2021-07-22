@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.regions.filter;
 
-import com.fastasyncworldedit.core.object.collection.LongHashSet;
+import com.fastasyncworldedit.core.util.collection.LongHashSet;
 import com.sk89q.worldedit.math.BlockVector2;
 
 public abstract class CuboidRegionFilter implements RegionFilter {

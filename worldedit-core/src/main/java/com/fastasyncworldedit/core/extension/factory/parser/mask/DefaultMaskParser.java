@@ -1,6 +1,6 @@
 // TODO: Ping @MattBDev to reimplement 2020-02-04
 //*
-//package com.sk89q.worldedit.extension.factory.parser.mask;
+//package com.fastasyncworldedit.core.extension.factory.parser.mask;
 //
 //import com.boydti.fawe.command.FaweParser;
 //import com.boydti.fawe.command.SuggestInputParseException;

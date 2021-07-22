@@ -23,7 +23,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
-import com.fastasyncworldedit.core.function.schematic.MinecraftStructure;
+import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.google.common.base.Function;
 import com.google.common.collect.Multimap;

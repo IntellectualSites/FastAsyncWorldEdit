@@ -7,8 +7,8 @@ import com.fastasyncworldedit.core.beta.implementation.queue.ParallelQueueExtent
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.beta.implementation.lighting.RelightMode;
-import com.fastasyncworldedit.core.function.operation.changeset.DiskStorageHistory;
-import com.fastasyncworldedit.core.function.operation.changeset.SimpleChangeSetSummary;
+import com.fastasyncworldedit.core.history.changeset.change.DiskStorageHistory;
+import com.fastasyncworldedit.core.history.changeset.change.SimpleChangeSetSummary;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
