@@ -69,6 +69,7 @@ import com.fastasyncworldedit.core.function.generator.GenBase;
 import com.fastasyncworldedit.core.function.generator.OreGen;
 import com.fastasyncworldedit.core.function.generator.SchemGen;
 import com.sk89q.worldedit.function.mask.BlockStateMask;
+import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -1819,8 +1820,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         //FAWE start - liquidmask
         Mask liquidMask;
         if (plants) {
-            liquidMask = new BlockMaskBuilder().addTypes(BlockTypes.LAVA, BlockTypes.WATER,
-                    BlockTypes.KELP_PLANT, BlockTypes.KELP, BlockTypes.SEAGRASS, BlockTypes.TALL_SEAGRASS).build(extent);
+            liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER,
+                    BlockTypes.KELP_PLANT, BlockTypes.KELP, BlockTypes.SEAGRASS, BlockTypes.TALL_SEAGRASS);
         } else {
             liquidMask = new BlockMaskBuilder()
                     .addTypes(BlockTypes.WATER, BlockTypes.LAVA)

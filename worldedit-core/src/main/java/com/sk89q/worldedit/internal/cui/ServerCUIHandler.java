@@ -67,8 +67,6 @@ public class ServerCUIHandler {
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
         RegionSelector regionSelector = session.getRegionSelector(player.getWorld());
 
-        int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
-
         int posX;
         int posY;
         int posZ;
@@ -137,6 +135,7 @@ public class ServerCUIHandler {
                 Math.min(Math.min(player.getWorld().getMaxY(), posY + MAX_DISTANCE), posY + 3)
         );
 
+        //FAWE start - CBT > Map<String, Tag>
         CompoundBinaryTag.Builder structureTag = CompoundBinaryTag.builder();
 
         posX -= x;
@@ -144,9 +143,11 @@ public class ServerCUIHandler {
         posZ -= z;
 
         if (Math.abs(posX) > MAX_DISTANCE || Math.abs(posY) > MAX_DISTANCE || Math.abs(posZ) > MAX_DISTANCE) {
+            // Structure blocks have a limit
             return null;
         }
 
+        //FAWE start - see comment of CBT
         structureTag.putString("name", "worldedit:" + player.getName());
         structureTag.putString("author", player.getName());
         structureTag.putString("metadata", "");
@@ -167,5 +168,6 @@ public class ServerCUIHandler {
         structureTag.putString("id", BlockTypes.STRUCTURE_BLOCK.getId());
 
         return BlockTypes.STRUCTURE_BLOCK.getDefaultState().toBaseBlock(structureTag.build());
+        //FAWE end
     }
 }

@@ -38,9 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * <p>This mask checks for ONLY the block type. If state should also be checked,
  * use {@link BlockMask}.</p>
- * @deprecated use BlockMaskBuilder - FAWE deprecation
  */
-@Deprecated
 public class BlockTypeMask extends AbstractExtentMask {
 
     private final boolean[] types;
