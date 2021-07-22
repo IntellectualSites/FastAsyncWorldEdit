@@ -45,7 +45,7 @@ public final class BlockStateIdAccess {
 
     @Nullable
     public static BlockState getBlockStateById(int id) {
-        return BlockState.getFromOrdinal(id);
+        return BlockState.getFromInternalId(id);
     }
 
     private BlockStateIdAccess() {
