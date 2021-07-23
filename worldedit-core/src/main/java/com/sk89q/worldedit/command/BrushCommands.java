@@ -1096,7 +1096,7 @@ public class BrushCommands {
         name = "clipboard",
         desc = "@Deprecated use instead: `/br copypaste`)",
         descFooter = "Choose the clipboard brush.\n"
-             + "Without the -p flag, the paste will appear centered at the target location. "
+             + "Without the -o flag, the paste will appear centered at the target location. "
              + "With the flag, then the paste will appear relative to where you had "
              + "stood relative to the copied area when you copied it."
     )
