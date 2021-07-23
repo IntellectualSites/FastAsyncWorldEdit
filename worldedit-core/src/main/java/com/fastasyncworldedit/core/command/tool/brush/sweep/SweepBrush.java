@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.command.tool.brush.sweep;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.command.tool.brush.ResettableTool;
+import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;

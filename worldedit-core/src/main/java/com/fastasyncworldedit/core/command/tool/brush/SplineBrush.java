@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.function.mask.IdMask;
 import com.fastasyncworldedit.core.function.visitor.DFSRecursiveVisitor;

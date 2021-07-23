@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.fastasyncworldedit.core.beta.ITileInput;
+import com.fastasyncworldedit.core.queue.ITileInput;
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.util.MutableCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;

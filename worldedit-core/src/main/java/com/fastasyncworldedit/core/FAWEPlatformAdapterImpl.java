@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core;
 
-import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkGet;
 
 public interface FAWEPlatformAdapterImpl {
 

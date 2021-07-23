@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush.scroll;
 
-import com.fastasyncworldedit.core.command.tool.brush.TargetMode;
+import com.fastasyncworldedit.core.command.tool.TargetMode;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;

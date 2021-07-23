@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.fastasyncworldedit.core.beta.IBatchProcessor;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
-import com.fastasyncworldedit.core.history.changeset.change.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
