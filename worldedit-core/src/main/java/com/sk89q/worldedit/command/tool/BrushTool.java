@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.command.tool;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.command.tool.BrushSettings;
+import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
 import com.fastasyncworldedit.core.command.tool.MovableTool;
 import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.command.tool.TargetMode;

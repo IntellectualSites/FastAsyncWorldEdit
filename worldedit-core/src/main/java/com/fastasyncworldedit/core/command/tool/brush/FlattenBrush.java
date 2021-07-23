@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.command.tool;
+package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.extension.processor.heightmap.HeightMap;
 import com.fastasyncworldedit.core.extension.processor.heightmap.ScalableHeightMap;

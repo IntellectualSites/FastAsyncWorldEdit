@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.command.tool;
+package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.function.mask.ImageBrushMask;
 import com.fastasyncworldedit.core.util.collection.SummedColorTable;

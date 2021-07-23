@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.command.tool;
+package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.wrappers.AsyncPlayer;

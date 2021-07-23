@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.command.tool;
+package com.fastasyncworldedit.core.command.tool.brush;
 
 public class RaiseBrush extends ErodeBrush {
     public RaiseBrush() {

@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.command.tool;
+package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.command.tool.scroll.Scroll;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.fastasyncworldedit.core.command.tool.BrushSettings.SettingType.BRUSH;
+import static com.fastasyncworldedit.core.command.tool.brush.BrushSettings.SettingType.BRUSH;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BrushSettings {
