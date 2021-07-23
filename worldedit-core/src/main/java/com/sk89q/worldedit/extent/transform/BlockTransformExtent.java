@@ -91,6 +91,7 @@ public class BlockTransformExtent extends ResettableExtent {
             PropertyKey.ROTATION,
             PropertyKey.AXIS,
             PropertyKey.FACING,
+            PropertyKey.FACE,
             PropertyKey.SHAPE,
             PropertyKey.NORTH,
             PropertyKey.EAST,
@@ -166,108 +167,118 @@ public class BlockTransformExtent extends ResettableExtent {
         } else {
             List values = property.getValues();
             PropertyKey key = property.getKey();
-            if (key == PropertyKey.HALF || values.contains("top")) {
-                return adapt(UP, DOWN);
-            }
-            if (values.contains("left")) {
-                if (key == PropertyKey.SHAPE) {
-                    return adapt(combine(EAST, WEST), combine(NORTH, SOUTH));
-                } else if (key == PropertyKey.HINGE) {
+            switch (key.getName().toLowerCase()) {
+                case "half": {
+                    return adapt(UP, DOWN);
+                }
+                case "type": {
+                    return adapt(combine(UP), combine(DOWN), 0L);
+                }
+                case "rotation": {
+                    List<Direction> directions = new ArrayList<>();
+                    for (Object value : values) {
+                        directions.add(Direction.fromRotationIndex((Integer) value).get());
+                    }
+                    return adapt(directions.toArray(new Direction[0]));
+                }
+                case "axis": {
+                    switch (property.getValues().size()) {
+                        case 3:
+                            return adapt(combine(EAST, WEST), combine(UP, DOWN), combine(SOUTH, NORTH));
+                        case 2:
+                            return adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
+                        default:
+                            LOGGER.error("Invalid {} {}", property.getName(), property.getValues());
+                            return null;
+                    }
+                }
+                case "facing": {
+                    List<Direction> directions = new ArrayList<>();
+                    for (Object value : values) {
+                        directions.add(Direction.valueOf(value.toString().toUpperCase(Locale.ROOT)));
+                    }
+                    return adapt(directions.toArray(new Direction[0]));
+                }
+                case "face": {
+                    if (values.size() == 3) {
+                        return adapt(combine(UP), combine(NORTH, EAST, SOUTH, WEST), combine(DOWN));
+                    }
+                    return null;
+                }
+                case "hinge": {
                     return adapt(combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST), combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST));
                 }
-            }
-            if (key == PropertyKey.ROTATION) {
-                List<Direction> directions = new ArrayList<>();
-                for (Object value : values) {
-                    directions.add(Direction.fromRotationIndex((Integer) value).get());
-                }
-                return adapt(directions.toArray(new Direction[0]));
-            }
-            if (key == PropertyKey.AXIS) {
-                switch (property.getValues().size()) {
-                    case 3:
-                        return adapt(combine(EAST, WEST), combine(UP, DOWN), combine(SOUTH, NORTH));
-                    case 2:
-                        return adapt(combine(EAST, WEST), combine(SOUTH, NORTH));
-                    default:
-                        LOGGER.error("Invalid {} {}", property.getName(), property.getValues());
-                        return null;
-                }
-            }
-            if (key == PropertyKey.FACING) {
-                List<Direction> directions = new ArrayList<>();
-                for (Object value : values) {
-                    directions.add(Direction.valueOf(value.toString().toUpperCase(Locale.ROOT)));
-                }
-                return adapt(directions.toArray(new Direction[0]));
-            }
-            if (key == PropertyKey.SHAPE) {
-                if (values.contains("straight")) {
-                    ArrayList<Long> result = new ArrayList<>();
-                    for (Object value : values) {
-                        // [straight, inner_left, inner_right, outer_left, outer_right]
-                        switch (value.toString()) {
-                            case "straight":
-                                result.add(combine(NORTH, EAST, SOUTH, WEST));
-                                continue;
-                            case "inner_left":
-                                result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
-                                continue;
-                            case "inner_right":
-                                result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
-                                continue;
-                            case "outer_left":
-                                result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
-                                continue;
-                            case "outer_right":
-                                result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
-                                continue;
-                            default:
-                                LOGGER.warn("Unknown direction {}", value);
-                                result.add(0L);
-                        }
+                case "shape": {
+                    if (values.contains("left")) {
+                        return adapt(combine(EAST, WEST), combine(NORTH, SOUTH));
                     }
-                    return adapt(result.toArray(new Long[0]));
-                } else {
-                    List<Long> directions = new ArrayList<>();
-                    for (Object value : values) {
-                        switch (value.toString()) {
-                            case "north_south":
-                                directions.add(combine(NORTH, SOUTH));
-                                break;
-                            case "east_west":
-                                directions.add(combine(EAST, WEST));
-                                break;
-                            case "ascending_east":
-                                directions.add(combine(ASCENDING_EAST));
-                                break;
-                            case "ascending_west":
-                                directions.add(combine(ASCENDING_WEST));
-                                break;
-                            case "ascending_north":
-                                directions.add(combine(ASCENDING_NORTH));
-                                break;
-                            case "ascending_south":
-                                directions.add(combine(ASCENDING_SOUTH));
-                                break;
-                            case "south_east":
-                                directions.add(combine(SOUTHEAST));
-                                break;
-                            case "south_west":
-                                directions.add(combine(SOUTHWEST));
-                                break;
-                            case "north_west":
-                                directions.add(combine(NORTHWEST));
-                                break;
-                            case "north_east":
-                                directions.add(combine(NORTHEAST));
-                                break;
-                            default:
-                                LOGGER.warn("Unknown direction {}", value);
-                                directions.add(0L);
+                    if (values.contains("straight")) {
+                        ArrayList<Long> result = new ArrayList<>();
+                        for (Object value : values) {
+                            // [straight, inner_left, inner_right, outer_left, outer_right]
+                            switch (value.toString()) {
+                                case "straight":
+                                    result.add(combine(NORTH, EAST, SOUTH, WEST));
+                                    continue;
+                                case "inner_left":
+                                    result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
+                                    continue;
+                                case "inner_right":
+                                    result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
+                                    continue;
+                                case "outer_left":
+                                    result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
+                                    continue;
+                                case "outer_right":
+                                    result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
+                                    continue;
+                                default:
+                                    LOGGER.warn("Unknown direction {}", value);
+                                    result.add(0L);
+                            }
                         }
+                        return adapt(result.toArray(new Long[0]));
+                    } else {
+                        List<Long> directions = new ArrayList<>();
+                        for (Object value : values) {
+                            switch (value.toString()) {
+                                case "north_south":
+                                    directions.add(combine(NORTH, SOUTH));
+                                    break;
+                                case "east_west":
+                                    directions.add(combine(EAST, WEST));
+                                    break;
+                                case "ascending_east":
+                                    directions.add(combine(ASCENDING_EAST));
+                                    break;
+                                case "ascending_west":
+                                    directions.add(combine(ASCENDING_WEST));
+                                    break;
+                                case "ascending_north":
+                                    directions.add(combine(ASCENDING_NORTH));
+                                    break;
+                                case "ascending_south":
+                                    directions.add(combine(ASCENDING_SOUTH));
+                                    break;
+                                case "south_east":
+                                    directions.add(combine(SOUTHEAST));
+                                    break;
+                                case "south_west":
+                                    directions.add(combine(SOUTHWEST));
+                                    break;
+                                case "north_west":
+                                    directions.add(combine(NORTHWEST));
+                                    break;
+                                case "north_east":
+                                    directions.add(combine(NORTHEAST));
+                                    break;
+                                default:
+                                    LOGGER.warn("Unknown direction {}", value);
+                                    directions.add(0L);
+                            }
+                        }
+                        return adapt(directions.toArray(new Long[0]));
                     }
-                    return adapt(directions.toArray(new Long[0]));
                 }
             }
         }
