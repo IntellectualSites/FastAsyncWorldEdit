@@ -32,7 +32,9 @@ import java.io.Serializable;
  * <a href="http://geom-java.sourceforge.net/index.html">JavaGeom project</a>,
  * which is licensed under LGPL v2.1.</p>
  */
+//FAWE start - made Serializable
 public class AffineTransform implements Transform, Serializable {
+//FAWE end
 
     /**
      * coefficients for x coordinate.
@@ -139,6 +141,7 @@ public class AffineTransform implements Transform, Serializable {
         return new double[]{m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23};
     }
 
+    //FAWE start
     public boolean isOffAxis() {
         double[] c = coefficients();
         for (int i = 0; i < c.length; i++) {
@@ -150,6 +153,7 @@ public class AffineTransform implements Transform, Serializable {
         }
         return false;
     }
+    //FAWE end
 
     /**
      * Computes the determinant of this transform. Can be zero.
@@ -294,6 +298,7 @@ public class AffineTransform implements Transform, Serializable {
         return scale(vec.getX(), vec.getY(), vec.getZ());
     }
 
+    //FAWE start
     public boolean isScaled(Vector3 vector) {
         boolean flip = vector.getX() != 0 && m00 < 0;
         if (vector.getY() != 0 && m11 < 0) {
@@ -317,6 +322,7 @@ public class AffineTransform implements Transform, Serializable {
         }
         return flip;
     }
+    //FAWE end
 
     @Override
     public Vector3 apply(Vector3 vector) {
@@ -335,9 +341,11 @@ public class AffineTransform implements Transform, Serializable {
 
     @Override
     public Transform combine(Transform other) {
+        //FAWE start - check other identity
         if (other instanceof Identity || other.isIdentity()) {
             return this;
         } else if (other instanceof AffineTransform) {
+            //FAWE end
             return concatenate((AffineTransform) other);
         } else {
             return new CombinedTransform(this, other);

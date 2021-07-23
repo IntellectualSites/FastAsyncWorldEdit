@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.fastasyncworldedit.core.beta.Filter;
-import com.fastasyncworldedit.core.beta.IChunk;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.IChunkSet;
-import com.fastasyncworldedit.core.beta.implementation.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -185,18 +185,11 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public int getMaximumY() {
-        int worldMax = world != null ? world.getMaxY() - 1 : 255;
-        if (maxY > worldMax) {
-            return maxY = worldMax;
-        }
         return maxY;
     }
 
     @Override
     public int getMinimumY() {
-        if (minY < 0) {
-            return minY = 0;
-        }
         return minY;
     }
 
@@ -304,7 +297,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     /**
      * Checks to see if a point is inside this region.
      */
-    /* Slow and unnecessary
+    /* FAWE start - Slow and unnecessary
     @Override
     public boolean contains(BlockVector3 position) {
         final int blockY = position.getBlockY();
@@ -339,6 +332,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     public boolean contains(BlockVector3 position) {
         return contains(position.getX(), position.getY(), position.getZ());
     }
+    //FAWE end
 
     /**
      * Sets the height of the cylinder to fit the specified Y.
@@ -413,6 +407,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         return new CylinderRegion(center, radiusVec, minY, maxY);
     }
 
+    //FAWE start
     @Override
     public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
         final IChunkGet get, final IChunkSet set, boolean full) {
@@ -426,4 +421,5 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         }
         super.filter(chunk, filter, block, get, set, full);
     }
+    //FAWE end
 }

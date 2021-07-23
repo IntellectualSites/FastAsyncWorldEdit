@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.regions;
 
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.regions.general.RegionFilter;
+import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.sk89q.worldedit.entity.Player;
 
 import java.util.Locale;

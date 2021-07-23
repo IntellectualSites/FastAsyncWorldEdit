@@ -99,6 +99,8 @@ dependencies {
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     api("org.lz4:lz4-java:1.8.0")
     api("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
+    api("com.zaxxer:SparseBitSet:1.2") { isTransitive = false }
+    api("org.anarres:parallelgzip:1.0.5") { isTransitive = false }
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
@@ -179,7 +181,14 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
             include(dependency("net.kyori:adventure-nbt:4.8.1"))
         }
+        relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
+            include(dependency("com.zaxxer:SparseBitSet:1.2"))
+        }
+        relocate("org.anarres", "com.fastasyncworldedit.core.internal.io") {
+            include(dependency("org.anarres:parallelgzip:1.0.5"))
+        }
     }
+    minimize()
 }
 
 tasks.named("assemble").configure {

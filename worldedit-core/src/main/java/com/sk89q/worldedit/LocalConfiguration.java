@@ -23,7 +23,7 @@ import com.google.common.collect.Lists;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
+import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.io.file.ArchiveNioSupports;
@@ -101,7 +101,7 @@ public abstract class LocalConfiguration {
 
     protected String[] getDefaultDisallowedBlocks() {
         List<BlockType> blockTypes = Lists.newArrayList(
-                /*
+                /* FAWE start
                 BlockTypes.OAK_SAPLING,
                 BlockTypes.JUNGLE_SAPLING,
                 BlockTypes.DARK_OAK_SAPLING,
@@ -163,7 +163,7 @@ public abstract class LocalConfiguration {
                 BlockTypes.SUGAR_CANE,
                 // ores and stuff
                 BlockTypes.BEDROCK
-                */
+                FAWE end*/
         );
         return blockTypes.stream().filter(Objects::nonNull).map(BlockType::getId).toArray(String[]::new);
     }

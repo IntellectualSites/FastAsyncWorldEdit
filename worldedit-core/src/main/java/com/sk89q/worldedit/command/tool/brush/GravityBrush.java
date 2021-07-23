@@ -36,6 +36,7 @@ public class GravityBrush implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+        //FAWE start - Ours operates differently to upstream, but does the same
         double endY = position.getY() + size;
         double startPerformY = Math.max(0, position.getY() - size);
         double startCheckY = fullHeight ? 0 : startPerformY;
@@ -54,5 +55,6 @@ public class GravityBrush implements Brush {
                 }
             }
         }
+        //FAWE end
     }
 }

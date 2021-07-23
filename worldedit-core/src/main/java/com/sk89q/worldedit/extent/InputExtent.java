@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.fastasyncworldedit.core.beta.implementation.lighting.HeightMapType;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -53,6 +53,7 @@ public interface InputExtent {
         return getBlock(position.getX(), position.getY(), position.getZ());
     }
 
+    //FAWE start
     default BlockState getBlock(int x, int y, int z) {
         return getBlock(MutableBlockVector3.get(x, y, z));
     }
@@ -70,6 +71,7 @@ public interface InputExtent {
     default BaseBlock getFullBlock(int x, int y, int z) {
         return getFullBlock(MutableBlockVector3.get(x, y, z));
     }
+    //FAWE end
 
     /**
      * Get the biome at the given location.
@@ -114,17 +116,18 @@ public interface InputExtent {
         return getBiome(position.toBlockVector2());
     }
 
+    //FAWE start
     /**
      * Get the light level at the given location.
      *
      * @param position location
      * @return the light level at the location
      */
-    default int getEmmittedLight(BlockVector3 position) {
-        return getEmmittedLight(position.getX(), position.getY(), position.getZ());
+    default int getEmittedLight(BlockVector3 position) {
+        return getEmittedLight(position.getX(), position.getY(), position.getZ());
     }
 
-    default int getEmmittedLight(int x, int y, int z) {
+    default int getEmittedLight(int x, int y, int z) {
         return 0;
     }
 
@@ -161,4 +164,5 @@ public interface InputExtent {
     default int[] getHeightMap(HeightMapType type) {
         return new int[256];
     }
+    //FAWE end
 }

@@ -20,9 +20,9 @@
 package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.brush.BrushSettings;
-import com.fastasyncworldedit.core.object.brush.TargetMode;
-import com.fastasyncworldedit.core.object.brush.scroll.Scroll;
+import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
+import com.fastasyncworldedit.core.command.tool.TargetMode;
+import com.fastasyncworldedit.core.command.tool.scroll.Scroll;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.collect.Iterables;
@@ -61,6 +61,7 @@ public class ToolUtilCommands {
         this.we = we;
     }
 
+    //FAWE start - destination mask > mask
     @Command(
         name = "mask",
         aliases = "/mask",
@@ -90,6 +91,7 @@ public class ToolUtilCommands {
             player.print(Caption.of("worldedit.tool.mask.set"));
         }
     }
+    //FAWE end
 
     @Command(
         name = "material",
@@ -100,6 +102,7 @@ public class ToolUtilCommands {
     public void material(Player player, LocalSession session,
                          @Arg(desc = "The pattern of blocks to use")
                              Pattern pattern,
+                         //FAWE start - add offhand
                          @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
                              boolean offHand, Arguments arguments) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
@@ -116,6 +119,7 @@ public class ToolUtilCommands {
             settings.addSetting(BrushSettings.SettingType.FILL, lastArg);
             tool.update();
         }
+        //FAWE end
         player.print(Caption.of("worldedit.tool.material.set"));
     }
 
@@ -128,7 +132,7 @@ public class ToolUtilCommands {
     public void range(Player player, LocalSession session,
                       @Arg(desc = "The range of the brush")
                           int range) throws WorldEditException {
-        session.getBrushTool(player, false).setRange(range);
+        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setRange(range);
         player.print(Caption.of("worldedit.tool.range.set"));
     }
 
@@ -186,6 +190,7 @@ public class ToolUtilCommands {
         }
     }
 
+    //FAWE start
     @Command(
         name = "primary",
         aliases = { "/primary" },
@@ -358,4 +363,5 @@ public class ToolUtilCommands {
 //        tool.update();
 //        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform"));
 //    }
+    //FAWE end
 }

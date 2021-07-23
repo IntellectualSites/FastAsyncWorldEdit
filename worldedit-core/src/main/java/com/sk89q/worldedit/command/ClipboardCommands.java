@@ -24,13 +24,13 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.FaweLimit;
-import com.fastasyncworldedit.core.object.RunnableVal;
-import com.fastasyncworldedit.core.object.clipboard.DiskOptimizedClipboard;
-import com.fastasyncworldedit.core.object.clipboard.MultiClipboardHolder;
-import com.fastasyncworldedit.core.object.clipboard.ReadOnlyClipboard;
-import com.fastasyncworldedit.core.object.clipboard.URIClipboardHolder;
-import com.fastasyncworldedit.core.object.exception.FaweException;
-import com.fastasyncworldedit.core.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
+import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
+import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.util.ImgurUtility;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -45,7 +45,7 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.event.extent.PasteEvent;
+import com.fastasyncworldedit.core.event.extent.PasteEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -119,6 +119,7 @@ public class ClipboardCommands {
                          boolean copyEntities,
                      @Switch(name = 'b', desc = "Also copy biomes")
                          boolean copyBiomes,
+                     //FAWE start
                      @Switch(name = 'c', desc = "Set the origin of the clipboard to the center of the copied region")
                         boolean centerClipboard,
                      @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
@@ -165,8 +166,10 @@ public class ClipboardCommands {
         session.setClipboard(new ClipboardHolder(clipboard));
 
         copy.getStatusMessages().forEach(actor::print);
+        //FAWE end
     }
 
+    //FAWE start
     @Command(
         name = "/lazycopy",
         desc = "Lazily copy the selection to the clipboard"
@@ -223,6 +226,7 @@ public class ClipboardCommands {
         session.setClipboard(new ClipboardHolder(lazyClipboard));
         actor.print(Caption.of("fawe.worldedit.cut.command.cut.lazy", region.getArea()));
     }*/
+    //FAWE end
 
     @Command(
         name = "/cut",
@@ -243,6 +247,7 @@ public class ClipboardCommands {
                         boolean copyBiomes,
                     @ArgFlag(name = 'm', desc = "Set the exclude mask, non-matching blocks become air")
                         Mask mask) throws WorldEditException {
+        //FAWE start - Inject limits & respect source mask
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
 
@@ -289,8 +294,10 @@ public class ClipboardCommands {
             actor.print(Caption.of("fawe.tips.tip.lazycut"));
         }
         copy.getStatusMessages().forEach(actor::print);
+        //FAWE end
     }
 
+    //FAWE start
     @Command(
         name = "download",
         aliases = { "/download" },
@@ -329,7 +336,7 @@ public class ClipboardCommands {
             final LocalConfiguration config = WorldEdit.getInstance().getConfiguration();
             final File working = WorldEdit.getInstance().getWorkingDirectoryFile(config.saveDir).getAbsoluteFile();
 
-            url = MainUtil.upload(null, null, "zip", new RunnableVal<OutputStream>() {
+            url = MainUtil.upload(null, null, "zip", new RunnableVal<>() {
                 @Override
                 public void run(OutputStream out) {
                     try (ZipOutputStream zos = new ZipOutputStream(out)) {
@@ -389,6 +396,61 @@ public class ClipboardCommands {
     }
 
     @Command(
+            name = "/place",
+            desc = "Place the clipboard's contents without applying transformations (e.g. rotate)"
+    )
+    @CommandPermissions("worldedit.clipboard.place")
+    @Logging(PLACEMENT)
+    public void place(Actor actor, World world, LocalSession session, final EditSession editSession,
+                      @Switch(name = 'a', desc = "Skip air blocks")
+                              boolean ignoreAirBlocks,
+                      @Switch(name = 'o', desc = "Paste at the original position")
+                              boolean atOrigin,
+                      @Switch(name = 's', desc = "Select the region after pasting")
+                              boolean selectPasted,
+                      @Switch(name = 'e', desc = "Paste entities if available")
+                              boolean pasteEntities,
+                      @Switch(name = 'b', desc = "Paste biomes if available")
+                              boolean pasteBiomes) throws WorldEditException {
+        ClipboardHolder holder = session.getClipboard();
+        final Clipboard clipboard = holder.getClipboard();
+        final BlockVector3 origin = clipboard.getOrigin();
+        final BlockVector3 to = atOrigin ? origin : session.getPlacementPosition(actor);
+        checkPaste(actor, editSession, to, holder, clipboard);
+
+        clipboard.paste(editSession, to, !ignoreAirBlocks, pasteEntities, pasteBiomes);
+
+        Region region = clipboard.getRegion().clone();
+        if (selectPasted) {
+            BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
+            BlockVector3 realTo = to.add(holder.getTransform().apply(clipboardOffset.toVector3()).toBlockPoint());
+            BlockVector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()).toBlockPoint());
+            RegionSelector selector = new CuboidRegionSelector(world, realTo, max);
+            session.setRegionSelector(world, selector);
+            selector.learnChanges();
+            selector.explainRegionAdjust(actor, session);
+        }
+        actor.print(Caption.of("fawe.worldedit.paste.command.paste", to));
+
+        if (!actor.hasPermission("fawe.tips")) {
+            actor.print(Caption.of("fawe.tips.tip.copypaste"));
+        }
+    }
+
+    private void saveDiskClipboard(Clipboard clipboard) {
+        DiskOptimizedClipboard c;
+        if (clipboard instanceof DiskOptimizedClipboard)
+            c = (DiskOptimizedClipboard) clipboard;
+        else if (clipboard instanceof BlockArrayClipboard
+                && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard)
+            c = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+        else
+            return;
+        c.flush();
+    }
+    //FAWE end
+
+    @Command(
         name = "/paste",
         aliases = {"/p", "/pa"},
         desc = "Paste the clipboard's contents"
@@ -414,8 +476,10 @@ public class ClipboardCommands {
 
         ClipboardHolder holder = session.getClipboard();
         if (holder.getTransform().isIdentity() && editSession.getSourceMask() == null) {
+            //FAWE start - use place
             place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted,
                 pasteEntities, pasteBiomes);
+            //FAWE end
             return;
         }
         Clipboard clipboard = holder.getClipboard();
@@ -423,7 +487,9 @@ public class ClipboardCommands {
         List<Component> messages = Lists.newArrayList();
 
         BlockVector3 to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(actor);
+        //FAWE start
         checkPaste(actor, editSession, to, holder, clipboard);
+        //FAWE end
 
         if (!onlySelect) {
             Operation operation = holder
@@ -456,6 +522,7 @@ public class ClipboardCommands {
         messages.forEach(actor::print);
     }
 
+    //FAWE start
     private void checkPaste(Actor player, EditSession editSession, BlockVector3 to, ClipboardHolder holder, Clipboard clipboard) {
         URI uri = null;
         if (holder instanceof URIClipboardHolder) {
@@ -467,48 +534,7 @@ public class ClipboardCommands {
             throw new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.manual"));
         }
     }
-
-    @Command(
-        name = "/place",
-        desc = "Place the clipboard's contents without applying transformations (e.g. rotate)"
-    )
-    @CommandPermissions("worldedit.clipboard.place")
-    @Logging(PLACEMENT)
-    public void place(Actor actor, World world, LocalSession session, final EditSession editSession,
-                      @Switch(name = 'a', desc = "Skip air blocks")
-                          boolean ignoreAirBlocks,
-                      @Switch(name = 'o', desc = "Paste at the original position")
-                          boolean atOrigin,
-                      @Switch(name = 's', desc = "Select the region after pasting")
-                          boolean selectPasted,
-                      @Switch(name = 'e', desc = "Paste entities if available")
-                          boolean pasteEntities,
-                      @Switch(name = 'b', desc = "Paste biomes if available")
-                          boolean pasteBiomes) throws WorldEditException {
-        ClipboardHolder holder = session.getClipboard();
-        final Clipboard clipboard = holder.getClipboard();
-        final BlockVector3 origin = clipboard.getOrigin();
-        final BlockVector3 to = atOrigin ? origin : session.getPlacementPosition(actor);
-        checkPaste(actor, editSession, to, holder, clipboard);
-
-        clipboard.paste(editSession, to, !ignoreAirBlocks, pasteEntities, pasteBiomes);
-
-        Region region = clipboard.getRegion().clone();
-        if (selectPasted) {
-            BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
-            BlockVector3 realTo = to.add(holder.getTransform().apply(clipboardOffset.toVector3()).toBlockPoint());
-            BlockVector3 max = realTo.add(holder.getTransform().apply(region.getMaximumPoint().subtract(region.getMinimumPoint()).toVector3()).toBlockPoint());
-            RegionSelector selector = new CuboidRegionSelector(world, realTo, max);
-            session.setRegionSelector(world, selector);
-            selector.learnChanges();
-            selector.explainRegionAdjust(actor, session);
-        }
-        actor.print(Caption.of("fawe.worldedit.paste.command.paste", to));
-
-        if (!actor.hasPermission("fawe.tips")) {
-            actor.print(Caption.of("fawe.tips.tip.copypaste"));
-        }
-    }
+    //FAWE end
 
     @Command(
         name = "/rotate",
@@ -558,17 +584,5 @@ public class ClipboardCommands {
     public void clearClipboard(Actor actor, LocalSession session) throws WorldEditException {
         session.setClipboard(null);
         actor.print(Caption.of("worldedit.clearclipboard.cleared"));
-    }
-    
-    private void saveDiskClipboard(Clipboard clipboard) {
-        DiskOptimizedClipboard c;
-        if (clipboard instanceof DiskOptimizedClipboard)
-            c = (DiskOptimizedClipboard) clipboard;
-        else if (clipboard instanceof BlockArrayClipboard
-                 && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard)
-            c = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
-        else
-            return;
-        c.flush();
     }
 }

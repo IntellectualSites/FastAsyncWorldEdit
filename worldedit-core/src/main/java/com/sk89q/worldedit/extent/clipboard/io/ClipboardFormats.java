@@ -21,10 +21,10 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.clipboard.LazyClipboardHolder;
-import com.fastasyncworldedit.core.object.clipboard.MultiClipboardHolder;
-import com.fastasyncworldedit.core.object.clipboard.URIClipboardHolder;
-import com.fastasyncworldedit.core.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.core.extent.clipboard.LazyClipboardHolder;
+import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
+import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -127,26 +127,6 @@ public class ClipboardFormats {
     }
 
     /**
-     * Detect the format using the given extension.
-     *
-     * @param extension the extension
-     * @return the format, otherwise null if one cannot be detected
-     */
-    @Nullable
-    public static ClipboardFormat findByExtension(String extension) {
-        checkNotNull(extension);
-
-        Collection<Entry<String, ClipboardFormat>> entries = getFileExtensionMap().entries();
-        for (Map.Entry<String, ClipboardFormat> entry : entries) {
-            if (entry.getKey().equalsIgnoreCase(extension)) {
-                return entry.getValue();
-            }
-        }
-        return null;
-
-    }
-
-    /**
      * A mapping from extensions to formats.
      *
      * @return a multimap from a file extension to the potential matching formats.
@@ -168,6 +148,27 @@ public class ClipboardFormats {
     }
 
     private ClipboardFormats() {
+    }
+
+    //FAWE start
+    /**
+     * Detect the format using the given extension.
+     *
+     * @param extension the extension
+     * @return the format, otherwise null if one cannot be detected
+     */
+    @Nullable
+    public static ClipboardFormat findByExtension(String extension) {
+        checkNotNull(extension);
+
+        Collection<Entry<String, ClipboardFormat>> entries = getFileExtensionMap().entries();
+        for (Map.Entry<String, ClipboardFormat> entry : entries) {
+            if (entry.getKey().equalsIgnoreCase(extension)) {
+                return entry.getValue();
+            }
+        }
+        return null;
+
     }
 
     public static MultiClipboardHolder loadAllFromInput(Actor player, String input, ClipboardFormat format, boolean message) throws IOException {
@@ -325,4 +326,5 @@ public class ClipboardFormats {
             throw new RuntimeException(e);
         }
     }
+    //FAWE end
 }

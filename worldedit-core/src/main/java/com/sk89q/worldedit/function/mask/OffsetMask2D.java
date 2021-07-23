@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.math.BlockVector2;
-import com.sk89q.worldedit.math.MutableBlockVector2;
+import com.fastasyncworldedit.core.math.MutableBlockVector2;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,7 +32,7 @@ public class OffsetMask2D extends AbstractMask2D {
 
     private Mask2D mask;
     private BlockVector2 offset;
-    private MutableBlockVector2 mutable;
+    private final MutableBlockVector2 mutableBlockVector2;
 
     /**
      * Create a new instance.
@@ -45,7 +45,7 @@ public class OffsetMask2D extends AbstractMask2D {
         checkNotNull(offset);
         this.mask = mask;
         this.offset = offset;
-        this.mutable = new MutableBlockVector2();
+        this.mutableBlockVector2 = new MutableBlockVector2();
     }
 
     /**
@@ -86,15 +86,17 @@ public class OffsetMask2D extends AbstractMask2D {
         this.offset = offset;
     }
 
+    //FAWE start
     @Override
     public boolean test(BlockVector2 vector) {
-        mutable.setComponents(vector.getX() + offset.getX(), vector.getZ() + offset.getZ());
-        return getMask().test(mutable);
+        mutableBlockVector2.setComponents(vector.getX() + offset.getX(), vector.getZ() + offset.getZ());
+        return getMask().test(mutableBlockVector2);
     }
 
     @Override
     public Mask2D copy2D() {
         return new OffsetMask2D(mask.copy2D(), BlockVector2.at(offset.getX(), offset.getZ()));
     }
+    //FAWE end
 
 }

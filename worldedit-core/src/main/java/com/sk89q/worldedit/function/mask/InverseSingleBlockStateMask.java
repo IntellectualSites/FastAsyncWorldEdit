@@ -1,5 +1,7 @@
 package com.sk89q.worldedit.function.mask;
 
+import com.fastasyncworldedit.core.function.mask.ABlockMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;

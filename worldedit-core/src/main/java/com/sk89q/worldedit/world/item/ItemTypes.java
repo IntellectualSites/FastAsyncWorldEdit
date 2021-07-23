@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.world.item;
 
-import com.fastasyncworldedit.core.object.string.JoinedCharSequence;
-import com.sk89q.worldedit.world.block.ItemTypesCache;
+import com.fastasyncworldedit.core.util.JoinedCharSequence;
+import com.fastasyncworldedit.core.world.block.ItemTypesCache;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.lang.reflect.Field;
@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("unused")
 public final class ItemTypes {
+    //FAWE start - init
     @Nullable public static final ItemType ACACIA_BOAT = init();
     @Nullable public static final ItemType ACACIA_BUTTON = init();
     @Nullable public static final ItemType ACACIA_DOOR = init();
@@ -1187,6 +1188,7 @@ public final class ItemTypes {
         }
         return get(input);
     }
+    //FAWE end
 
     /**
      * Gets the {@link ItemType} associated with the given id.
@@ -1196,6 +1198,7 @@ public final class ItemTypes {
         return ItemType.REGISTRY.get(id);
     }
 
+    //FAWE start
     @Deprecated
     public static ItemType get(int ordinal) {
         return ItemType.REGISTRY.getByInternalId(ordinal);
@@ -1208,4 +1211,5 @@ public final class ItemTypes {
     public static Collection<ItemType> values() {
         return ItemType.REGISTRY.values();
     }
+    //FAWE end
 }

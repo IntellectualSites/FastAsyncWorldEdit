@@ -19,10 +19,12 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.fastasyncworldedit.core.beta.ITileInput;
+import com.fastasyncworldedit.core.queue.ITileInput;
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
-import com.fastasyncworldedit.core.object.string.MutableCharSequence;
+import com.fastasyncworldedit.core.util.MutableCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
+import com.fastasyncworldedit.core.world.block.CompoundInput;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -34,12 +36,12 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -57,15 +59,19 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("unchecked")
 public class BlockState implements BlockStateHolder<BlockState>, Pattern {
+
+    //FAWE start
     private final int internalId;
     private final int ordinal;
     private final char ordinalChar;
-    private final BlockType blockType;
     private BlockMaterial material;
     private final BaseBlock emptyBaseBlock;
     private CompoundInput compoundInput = CompoundInput.NULL;
+    //FAWE end
+    private final BlockType blockType;
 
-    protected BlockState(BlockType blockType, int internalId, int ordinal) {
+    //FAWE start
+    public BlockState(BlockType blockType, int internalId, int ordinal) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
@@ -73,7 +79,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.emptyBaseBlock = new BlanketBaseBlock(this);
     }
 
-    protected BlockState(BlockType blockType, int internalId, int ordinal, @NotNull CompoundTag tile) {
+    public BlockState(BlockType blockType, int internalId, int ordinal, @NotNull CompoundTag tile) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
@@ -329,6 +335,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
         return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
     }
+    //FAWE end
 
     @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
@@ -361,11 +368,13 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         return getState(getBlockType().getProperty(key));
     }
 
+    //FAWE start
     @Deprecated
     @Override
     public CompoundTag getNbtData() {
         return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
     }
+    //FAWE end
 
     @Override
     public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
@@ -375,6 +384,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         return new BaseBlock(this, compoundTag);
     }
 
+    //FAWE start
     @Override
     public int getInternalId() {
         return internalId;
@@ -431,4 +441,5 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         return compoundInput.get(this, input, x, y, z);
     }
+    //FAWE end
 }

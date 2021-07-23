@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
  */
 public enum Direction {
 
+    //FAWE start - left, right
     NORTH(Vector3.at(0, 0, -1), Flag.CARDINAL, 3, 1),
     EAST(Vector3.at(1, 0, 0), Flag.CARDINAL, 0, 2),
     SOUTH(Vector3.at(0, 0, 1), Flag.CARDINAL, 1, 3),
@@ -62,14 +63,18 @@ public enum Direction {
     ASCENDING_SOUTH(Vector3.at(0, 1, 1), Flag.ASCENDING_CARDINAL, 1 + 18, 3 + 18),
     ASCENDING_WEST(Vector3.at(-1, 1, 0), Flag.ASCENDING_CARDINAL, 2 + 18, 0 + 18),
     ;
+    //FAWE end
 
     private final Vector3 direction;
     private final int flags;
+    //FAWE start
     private final int left;
     private final int right;
+    //FAWE end
     private final BlockVector3 blockPoint;
 
-    private static HashMap<String, Direction> map = new HashMap<>();
+    //FAWE start
+    private static final HashMap<String, Direction> map = new HashMap<>();
 
     static {
         for (Direction dir : Direction.values()) {
@@ -121,6 +126,7 @@ public enum Direction {
     public int getBlockZ() {
         return blockPoint.getZ();
     }
+    //FAWE end
 
     /**
      * Return true if the direction is of a cardinal direction (north, west
@@ -326,9 +332,13 @@ public enum Direction {
         public static int ORDINAL = 0x2;
         public static int SECONDARY_ORDINAL = 0x4;
         public static int UPRIGHT = 0x8;
+        //FAWE start
         public static int ASCENDING_CARDINAL = 0xF;
+        //FAWE end
 
+        //FAWE start - ASCENDING_CARDINAL
         public static int ALL = CARDINAL | ORDINAL | SECONDARY_ORDINAL | UPRIGHT | ASCENDING_CARDINAL;
+        //FAWE end
 
         private Flag() {
         }

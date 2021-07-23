@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.fastasyncworldedit.core.beta.IChunk;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.IChunkSet;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
@@ -146,6 +146,7 @@ public class RegionIntersection extends AbstractRegion {
 
     }
 
+    //FAWE start
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         for (Region region : regions) {
@@ -237,4 +238,5 @@ public class RegionIntersection extends AbstractRegion {
         }
         return false;
     }
+    //FAWE end
 }

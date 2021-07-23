@@ -20,17 +20,17 @@
 package com.sk89q.worldedit.regions;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.beta.Filter;
-import com.fastasyncworldedit.core.beta.IChunk;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.IChunkSet;
-import com.fastasyncworldedit.core.beta.implementation.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.collection.BlockVectorSet;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector2;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector2;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 import org.jetbrains.annotations.NotNull;
@@ -48,13 +48,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
-
+    //FAWE start
     private int minX;
     private int minY;
     private int minZ;
     private int maxX;
     private int maxY;
     private int maxZ;
+    //FAWE end
     private BlockVector3 pos1;
     private BlockVector3 pos2;
 
@@ -100,7 +101,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
      */
     public void setPos1(BlockVector3 pos1) {
         this.pos1 = pos1;
+        //FAWE start
         recalculate();
+        //FAWE end
     }
 
     /**
@@ -119,7 +122,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
      */
     public void setPos2(BlockVector3 pos2) {
         this.pos2 = pos2;
+        //FAWE start
         recalculate();
+        //FAWE end
     }
 
     /**
@@ -129,8 +134,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         if (pos1 == null || pos2 == null) {
             return;
         }
-        pos1 = pos1.clampY(0, world == null ? 255 : world.getMaxY());
-        pos2 = pos2.clampY(0, world == null ? 255 : world.getMaxY());
+        pos1 = pos1.clampY(getWorldMinY(), getWorldMaxY());
+        pos2 = pos2.clampY(getWorldMinY(), getWorldMaxY());
         minX = Math.min(pos1.getX(), pos2.getX());
         minY = Math.min(pos1.getY(), pos2.getY());
         minZ = Math.min(pos1.getZ(), pos2.getZ());
@@ -322,6 +327,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         final int minZ = min.getBlockZ() >> ChunkStore.CHUNK_SHIFTS;
         final int size = (maxX - minX + 1) * (maxZ - minZ + 1);
 
+        //FAWE start
         return new AbstractSet<BlockVector2>() {
             @NotNull
             @Override
@@ -408,10 +414,13 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             }
         };
     }
+    //FAWE end
 
     @Override
     public Set<BlockVector3> getChunkCubes() {
+        //FAWE start - BlockVectorSet instead of HashMap
         Set<BlockVector3> chunks = new BlockVectorSet();
+        //FAWE end
 
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
@@ -430,9 +439,12 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public boolean contains(BlockVector3 position) {
+        //FAWE start
         return contains(position.getX(), position.getY(), position.getZ());
+        //FAWE end
     }
 
+    //FAWE start
     @Override
     public boolean contains(int x, int y, int z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ && y >= this.minY && y <= this.maxY;
@@ -442,13 +454,17 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     public boolean contains(int x, int z) {
         return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ;
     }
+    //FAWE end
 
     @Override
     public Iterator<BlockVector3> iterator() {
+        //FAWE start
         if (Settings.IMP.HISTORY.COMPRESSION_LEVEL >= 9) {
             return iterator_old();
         }
+        //FAWE end
         return new Iterator<BlockVector3>() {
+            //FAWE start
             final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
             private final BlockVector3 min = getMinimumPoint();
             private final BlockVector3 max = getMaximumPoint();
@@ -566,6 +582,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             }
         };
     }
+    //FAWE end
 
     @Override
     public Iterable<BlockVector2> asFlatRegion() {
@@ -621,11 +638,13 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return new CuboidRegion(region.getMinimumPoint(), region.getMaximumPoint());
     }
 
+    //FAWE start
     public static boolean contains(CuboidRegion region) {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         return region.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ()) && region.contains(max.getBlockX(), max.getBlockY(), max.getBlockZ());
     }
+    //FAWE end
 
     /**
      * Make a cuboid from the center.
@@ -641,6 +660,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         return new CuboidRegion(origin.subtract(size), origin.add(size));
     }
 
+    //FAWE start
     public int getMinimumX() {
         return minX;
     }
@@ -732,7 +752,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {
                         int indexY = 0;
-                        for (int y = 0; y < 16; y++, indexY += 256) {
+                        for (int y = world.getMinY(); y < 16; y++, indexY += world.getMaxY()) {
                             int index;
                             if (trimZ) {
                                 index = indexY;
@@ -773,5 +793,6 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         }
         return null;
     }
+    //FAWE end
 
 }

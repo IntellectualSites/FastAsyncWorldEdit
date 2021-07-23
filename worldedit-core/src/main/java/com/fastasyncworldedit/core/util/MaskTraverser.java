@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.util;
 
-import com.fastasyncworldedit.core.object.mask.ResettableMask;
+import com.fastasyncworldedit.core.function.mask.ResettableMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;

@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.clipboard.CPUOptimizedClipboard;
-import com.fastasyncworldedit.core.object.clipboard.DiskOptimizedClipboard;
-import com.fastasyncworldedit.core.object.clipboard.MemoryOptimizedClipboard;
-import com.fastasyncworldedit.core.object.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
@@ -38,7 +38,7 @@ import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.visitor.Order;
+import com.fastasyncworldedit.core.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -66,6 +66,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
+    //FAWE start
     static Clipboard create(Region region) {
         checkNotNull(region);
         checkNotNull(region.getWorld(),
@@ -84,6 +85,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             return new MemoryOptimizedClipboard(region);
         }
     }
+    //FAWE end
 
     /**
      * Get the bounding region of this extent.
@@ -127,6 +129,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         return false;
     }
 
+    //FAWE start
     /**
      * Remove entity from clipboard.
      */
@@ -358,4 +361,5 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             }
         }
     }
+    //FAWE end
 }

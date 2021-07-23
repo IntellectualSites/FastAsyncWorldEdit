@@ -3,7 +3,7 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
-import com.fastasyncworldedit.core.regions.general.RegionFilter;
+import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.command.MainCommand;

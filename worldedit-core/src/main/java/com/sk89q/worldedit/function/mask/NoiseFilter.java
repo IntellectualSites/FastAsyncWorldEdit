@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableVector3;
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.noise.NoiseGenerator;
 
 import javax.annotation.Nullable;
@@ -96,9 +96,11 @@ public class NoiseFilter extends AbstractMask {
         return new NoiseFilter2D(getNoiseGenerator(), getDensity());
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new NoiseFilter(noiseGenerator, density);
     }
+    //FAWE end
 
 }

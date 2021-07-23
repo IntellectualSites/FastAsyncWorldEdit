@@ -151,20 +151,22 @@ public class NavigationCommands {
     }
 
     @Command(
-        name = "jumpto",
-        aliases = { "j", "/jumpto", "/j" },
-        desc = "Teleport to a location"
+            name = "jumpto",
+            aliases = { "j", "/jumpto", "/j" },
+            desc = "Teleport to a location"
     )
     @CommandPermissions("worldedit.navigation.jumpto.command")
     public void jumpTo(Player player,
-        @Arg(desc = "Location to jump to", def = "")
-            Location pos,
-        @Switch(name = 'f', desc = "force teleport")
-            boolean force) throws WorldEditException {
+                       @Arg(desc = "Location to jump to", def = "")
+                               Location pos,
+                       //FAWE start
+                       @Switch(name = 'f', desc = "force teleport")
+                               boolean force) throws WorldEditException {
 
         if (pos == null) {
             pos = player.getSolidBlockTrace(300);
         }
+        //FAWE end
         if (pos != null) {
             player.findFreePosition(pos);
             player.print(Caption.of("worldedit.jumpto.moved"));

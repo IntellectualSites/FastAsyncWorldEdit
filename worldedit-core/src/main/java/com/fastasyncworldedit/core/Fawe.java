@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core;
 
-import com.fastasyncworldedit.core.beta.implementation.queue.QueueHandler;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.CachedTextureUtil;
 import com.fastasyncworldedit.core.util.CleanTextureUtil;

@@ -71,18 +71,6 @@ public class BaseItemStack extends BaseItem {
     }
 
     /**
-     * Construct the object.
-     *
-     * @param id The item type
-     * @param tag Tag value
-     * @param amount amount in the stack
-     */
-    public BaseItemStack(ItemType id, LazyReference<CompoundBinaryTag> tag, int amount) {
-        super(id, tag);
-        this.amount = amount;
-    }
-
-    /**
      * Get the number of items in the stack.
      *
      * @return the amount
@@ -104,4 +92,18 @@ public class BaseItemStack extends BaseItem {
         return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
             .getRegistries().getItemRegistry().getRichName(this);
     }
+
+    //FAWE start
+    /**
+     * Construct the object.
+     *
+     * @param id The item type
+     * @param tag Tag value
+     * @param amount amount in the stack
+     */
+    public BaseItemStack(ItemType id, LazyReference<CompoundBinaryTag> tag, int amount) {
+        super(id, tag);
+        this.amount = amount;
+    }
+    //FAWE end
 }

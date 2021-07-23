@@ -20,7 +20,7 @@ public class CachedMathMan {
         }
     }
 
-    private static float[] ANGLES = new float[65536];
+    private static final float[] ANGLES = new float[65536];
 
     static {
         for (int i = 0; i < 65536; ++i) {
@@ -28,7 +28,7 @@ public class CachedMathMan {
         }
     }
 
-    private static char[] SQRT = new char[65536];
+    private static final char[] SQRT = new char[65536];
 
     static {
         for (int i = 0; i < SQRT.length; i++) {

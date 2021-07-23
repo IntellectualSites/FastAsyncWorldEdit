@@ -35,9 +35,11 @@ public class SolidBlockMask extends BlockMask {
         return null;
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new SolidBlockMask(getExtent());
     }
+    //FAWE end
 
 }

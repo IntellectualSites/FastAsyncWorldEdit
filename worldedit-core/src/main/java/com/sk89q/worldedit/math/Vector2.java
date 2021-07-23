@@ -470,7 +470,9 @@ public final class Vector2 {
 
     @Override
     public int hashCode() {
+        //FAWE start - XOR over x z calc
         return (int) x << 16 ^ (int) z;
+        //FAWE end
     }
 
     @Override

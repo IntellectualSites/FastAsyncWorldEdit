@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
-import com.fastasyncworldedit.core.beta.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.world.block.BlockID;
+import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 

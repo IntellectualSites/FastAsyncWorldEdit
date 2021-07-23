@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.brush.InspectBrush;
+import com.fastasyncworldedit.core.command.tool.brush.InspectBrush;
 import com.google.common.collect.Collections2;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -143,8 +143,10 @@ public class ToolCommands {
 
     static void setToolNone(Player player, LocalSession session, boolean isBrush)
         throws InvalidToolBindException {
+        //FAWE start
         isBrush = session.getTool(player) instanceof BrushTool;
         session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
+        //FAWE end
         player.print(Caption.of(isBrush ? "worldedit.brush.none.equip" : "worldedit.tool.none.equip"));
     }
 
@@ -183,7 +185,9 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.setwand")
     public void selwand(Player player, LocalSession session) throws WorldEditException {
+        //FAWE start - instance-inized
         setTool(player, session, SelectionWand.INSTANCE, "worldedit.tool.selwand.equip");
+        //FAWE end
     }
 
     @Command(
@@ -193,7 +197,9 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.setwand")
     public void navwand(Player player, LocalSession session) throws WorldEditException {
+        //FAWE start - instance-inized
         setTool(player, session, NavigationWand.INSTANCE, "worldedit.tool.navwand.equip");
+        //FAWE end
     }
 
     @Command(
@@ -206,6 +212,7 @@ public class ToolCommands {
         setTool(player, session, new QueryTool(), "worldedit.tool.info.equip");
     }
 
+    //FAWE start
     @Command(
             name = "inspect",
             aliases = { "/inspect" },
@@ -215,6 +222,7 @@ public class ToolCommands {
     public void inspectBrush(Player player, LocalSession session) throws WorldEditException {
         setTool(player, session, new InspectBrush(), "worldedit.tool.info.equip");
     }
+    //FAWE end
 
     @Command(
         name = "tree",

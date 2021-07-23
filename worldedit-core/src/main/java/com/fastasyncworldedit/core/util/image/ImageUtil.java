@@ -6,7 +6,7 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
+import com.fastasyncworldedit.core.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 import java.awt.Graphics2D;
@@ -136,7 +136,6 @@ public class ImageUtil {
                 default:
                     alpha = MathMan.clamp((int) (alpha * alphaScale), 0, 255);
                     raw[i] = (color & 0x00FFFFFF) + (alpha << 24);
-                    continue;
             }
         }
     }

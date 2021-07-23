@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.exception.FaweException;
-import com.fastasyncworldedit.core.object.task.AsyncNotifyQueue;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
@@ -57,6 +57,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
     public void dispatchCUIEvent(CUIEvent event) {
     }
 
+    //FAWE start
     private final ConcurrentHashMap<String, Object> meta = new ConcurrentHashMap<>();
 
     @Override
@@ -112,4 +113,5 @@ public abstract class AbstractNonPlayerActor implements Actor {
         }
         return true;
     }
+    //FAWE end
 }

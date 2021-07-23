@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
-import com.fastasyncworldedit.core.beta.IChunkCache;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.queue.IChunkCache;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -56,7 +56,9 @@ import javax.annotation.Nullable;
 /**
  * Represents a world (dimension).
  */
+//FAWE start - IChunkCache<IChunkGet>
 public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
+//FAWE end
 
     /**
      * Get the name of the world.
@@ -371,6 +373,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     @Override
     int hashCode();
 
+    //FAWE start
     @Override
     default boolean isWorld() {
         return true;
@@ -414,4 +417,5 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     }
 
     void flush();
+    //FAWE end
 }

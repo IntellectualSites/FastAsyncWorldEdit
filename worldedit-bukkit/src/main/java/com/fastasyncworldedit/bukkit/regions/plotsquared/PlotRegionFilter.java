@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
-import com.fastasyncworldedit.core.regions.general.CuboidRegionFilter;
+import com.fastasyncworldedit.core.regions.filter.CuboidRegionFilter;
 import com.plotsquared.core.location.Location;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.argument;
 
-import com.fastasyncworldedit.core.object.extent.SupplyingExtent;
+import com.fastasyncworldedit.core.extent.SupplyingExtent;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;

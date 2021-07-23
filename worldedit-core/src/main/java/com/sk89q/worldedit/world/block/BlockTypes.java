@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
-import com.fastasyncworldedit.core.object.string.JoinedCharSequence;
+import com.fastasyncworldedit.core.util.JoinedCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -39,6 +39,7 @@ import javax.annotation.Nullable;
  */
 @SuppressWarnings("unused")
 public final class BlockTypes {
+    //FAWE start - init
     // Doesn't really matter what the hardcoded values are, as FAWE will update it on load
     @Nullable public static final BlockType __RESERVED__ = init(); // Placeholder for null index (i.e. when block types are represented as primitives)
     @Nullable public static final BlockType ACACIA_BUTTON = init();
@@ -998,6 +999,7 @@ public final class BlockTypes {
     public static Set<String> getNameSpaces() {
         return BlockTypesCache.$NAMESPACES;
     }
+    //FAWE end
 
     /**
      * Gets the {@link BlockType} associated with the given id.
@@ -1007,6 +1009,7 @@ public final class BlockTypes {
         return BlockType.REGISTRY.get(id);
     }
 
+    //FAWE start
     @Nullable
     public static BlockType get(final CharSequence id) {
         return BlockType.REGISTRY.get(id.toString());
@@ -1030,5 +1033,6 @@ public final class BlockTypes {
     public static int size() {
         return BlockTypesCache.values.length;
     }
+    //FAWE end
 
 }

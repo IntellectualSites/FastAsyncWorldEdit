@@ -40,7 +40,7 @@ import javax.annotation.Nullable;
 /**
  * Tree generator.
  */
-public class TreeGenerator {
+public final class TreeGenerator {
 
     public enum TreeType {
         TREE("Oak tree", "oak", "tree", "regular"),
@@ -171,7 +171,7 @@ public class TreeGenerator {
          */
         @Nullable
         public static TreeType lookup(String name) {
-            return lookup.get(name.replace("_", "").toLowerCase(Locale.ROOT));
+            return lookup.get(name.toLowerCase(Locale.ROOT));
         }
     }
 

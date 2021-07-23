@@ -56,6 +56,7 @@ public class ExtentEntityCopy implements EntityFunction {
     private final Transform transform;
     private boolean removing;
 
+    //FAWE start
     /**
      * Create a new instance.
      *
@@ -63,6 +64,7 @@ public class ExtentEntityCopy implements EntityFunction {
      * @param destination the destination {@code Extent}
      * @param to the destination position
      * @param transform the transformation to apply to both position and orientation
+     * @deprecated FAWE Deprecation - Use method with Extent
      */
     @Deprecated
     public ExtentEntityCopy(Vector3 from, Extent destination, Vector3 to, Transform transform) {
@@ -76,6 +78,7 @@ public class ExtentEntityCopy implements EntityFunction {
         this.to = to;
         this.transform = transform;
     }
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -120,7 +123,9 @@ public class ExtentEntityCopy implements EntityFunction {
     @Override
     public boolean apply(Entity entity) throws WorldEditException {
         BaseEntity state = entity.getState();
+        //FAWE start - Don't copy players
         if (state != null && state.getType() != EntityTypes.PLAYER) {
+        //FAWE end
             Location newLocation;
             Location location = entity.getLocation();
             // If the entity has stored the location in the NBT data, we use that location
@@ -149,6 +154,7 @@ public class ExtentEntityCopy implements EntityFunction {
 
             // Remove
             if (isRemoving() && success) {
+                //FAWE start
                 UUID uuid = null;
                 if (tag.containsKey("UUID")) {
                     int[] arr = tag.getIntArray("UUID");
@@ -162,6 +168,7 @@ public class ExtentEntityCopy implements EntityFunction {
                     if (source != null) {
                         source.removeEntity(entity.getLocation().getBlockX(), entity.getLocation().getBlockY(), entity.getLocation().getBlockZ(), uuid);
                     } else {
+                //FAWE end
                         entity.remove();
                     }
                 }
@@ -204,7 +211,9 @@ public class ExtentEntityCopy implements EntityFunction {
             // Handle hanging entities (paintings, item frames, etc.)
             boolean hasTilePosition = tag.containsKey("TileX") && tag.containsKey("TileY") && tag.containsKey("TileZ");
             boolean hasFacing = tag.containsKey("Facing");
+            //FAWE Start
             boolean hasRotation = tag.containsKey("Rotation");
+            //FAWE end
 
             if (hasTilePosition) {
                 Vector3 tilePosition = Vector3.at(tag.asInt("TileX"), tag.asInt("TileY"), tag.asInt("TileZ"));
@@ -229,6 +238,7 @@ public class ExtentEntityCopy implements EntityFunction {
                     }
                 }
 
+                //FAWE start
                 if (hasRotation) {
                     ListTag orgrot = state.getNbtData().getListTag("Rotation");
                     Vector3 orgDirection = new Location(source, 0, 0, 0, orgrot.getFloat(0), orgrot.getFloat(1)).getDirection();
@@ -246,6 +256,7 @@ public class ExtentEntityCopy implements EntityFunction {
                 builder.put("Rotation", new ListTag(FloatTag.class, Arrays.asList(new FloatTag((float) newDirection.toYaw()), new FloatTag((float) newDirection.toPitch()))));
 
                 return new BaseEntity(state.getType(), builder.build());
+                //FAWE end
             }
         }
 

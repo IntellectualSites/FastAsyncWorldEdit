@@ -90,9 +90,6 @@ public class PropertiesConfiguration extends LocalConfiguration {
         profile = getBool("profile", profile);
         traceUnflushedSessions = getBool("trace-unflushed-sessions", traceUnflushedSessions);
         disallowedBlocks = getStringSet("disallowed-blocks", getDefaultDisallowedBlocks());
-        disallowedBlocksMask = null;
-        allowedDataCycleBlocks =
-                new HashSet<>(getStringSet("limits.allowed-data-cycle-blocks", null));
         defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
         maxChangeLimit = getInt("max-changed-blocks", maxChangeLimit);
         defaultVerticalHeight = getInt("default-vertical-height", defaultVerticalHeight);

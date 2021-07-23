@@ -35,7 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ChunkLoadingExtent extends AbstractDelegateExtent {
 
     private final World world;
-    private boolean enabled;
+    private final boolean enabled;
 
     /**
      * Create a new instance.

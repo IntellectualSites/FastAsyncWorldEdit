@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.fastasyncworldedit.core.beta.implementation.lighting.HeightMapType;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -27,7 +27,7 @@ import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -112,6 +112,7 @@ public interface OutputExtent {
         return setBiome(MutableBlockVector3.get(x, y, z), biome);
     }
 
+    //FAWE start
     /**
      * Set the biome.
      *
@@ -159,6 +160,7 @@ public interface OutputExtent {
     default void setSkyLight(BlockVector3 position, int value) {
         setSkyLight(position.getX(), position.getY(), position.getZ(), value);
     }
+    //FAWE end
 
     default void setSkyLight(int x, int y, int z, int value) {
     }

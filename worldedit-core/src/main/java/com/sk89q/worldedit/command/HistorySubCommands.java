@@ -6,9 +6,9 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
-import com.fastasyncworldedit.core.logging.RollbackOptimizedHistory;
-import com.fastasyncworldedit.core.object.RegionWrapper;
-import com.fastasyncworldedit.core.object.changeset.SimpleChangeSetSummary;
+import com.fastasyncworldedit.core.history.RollbackOptimizedHistory;
+import com.fastasyncworldedit.core.regions.RegionWrapper;
+import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.base.Function;
@@ -22,8 +22,8 @@ import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
-import com.sk89q.worldedit.internal.annotation.AllowedRegion;
-import com.sk89q.worldedit.internal.annotation.Time;
+import com.sk89q.worldedit.command.util.annotation.AllowedRegion;
+import com.sk89q.worldedit.command.util.annotation.Time;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -76,7 +76,7 @@ public class HistorySubCommands {
             + " - The time uses s, m, h, d, y.\n"
             + " - Import from disk: /history import"
     )
-    @CommandPermissions("worldedit.history.redo")
+    @CommandPermissions("worldedit.history.restore")
     @Confirm
     public synchronized void rerun(Player player, World world, RollbackDatabase database,
                                    @AllowedRegion Region[] allowedRegions,
@@ -96,7 +96,7 @@ public class HistorySubCommands {
         desc = "Undo a specific edit. "
             + " - The time uses s, m, h, d, y."
     )
-    @CommandPermissions("worldedit.history.undo")
+    @CommandPermissions("worldedit.history.rollback")
     @Confirm
     public synchronized void rollback(Player player, World world, RollbackDatabase database,
                                       @AllowedRegion Region[] allowedRegions,

@@ -77,6 +77,7 @@ public class WorldEditCommands {
     )
     @CommandPermissions(queued = false)
     public void version(Actor actor) {
+        //FAWE start - get own version format
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
         actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
@@ -95,6 +96,7 @@ public class WorldEditCommands {
         }
 
         actor.printInfo(TextComponent.of("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki"));
+        //FAWE end
 
         PlatformManager pm = we.getPlatformManager();
 
@@ -130,10 +132,13 @@ public class WorldEditCommands {
     public void reload(Actor actor) {
         we.getPlatformManager().queryCapability(Capability.CONFIGURATION).reload();
         we.getEventBus().post(new ConfigurationLoadEvent(we.getPlatformManager().queryCapability(Capability.CONFIGURATION).getConfiguration()));
+        //FAWE start
         Fawe.get().setupConfigs();
+        //FAWE end
         actor.print(Caption.of("worldedit.reload.config"));
     }
 
+    //FAWE start
     @Command(
         name = "debugpaste",
         desc = "Writes a report of latest.log, config.yml, config-legacy.yml, strings.json to https://athion.net/ISPaster/paste"
@@ -171,6 +176,7 @@ public class WorldEditCommands {
             }
         }
     }
+    //FAWE end
 
     @Command(
         name = "cui",

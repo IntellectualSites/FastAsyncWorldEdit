@@ -20,21 +20,21 @@
 package com.sk89q.worldedit.extension.factory;
 
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.parser.pattern.BiomePatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.BiomePatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.BlockCategoryPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.BufferedPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.BufferedPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.ClipboardPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.ExistingPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.Linear2DPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.Linear3DPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.PerlinPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.RandomPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.ExistingPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.Linear2DPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.Linear3DPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.PerlinPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.RandomPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.RandomStatePatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.RidgedMultiFractalPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.SimplexPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.RidgedMultiFractalPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.SimplexPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.SingleBlockPatternParser;
 import com.sk89q.worldedit.extension.factory.parser.pattern.TypeOrStateApplyingPatternParser;
-import com.sk89q.worldedit.extension.factory.parser.pattern.VoronoiPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.VoronoiPatternParser;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 
@@ -64,7 +64,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new RandomStatePatternParser(worldEdit));
         register(new BlockCategoryPatternParser(worldEdit));
 
-        // FAWE
+        //FAWE start
         register(new SimplexPatternParser(worldEdit));
         register(new VoronoiPatternParser(worldEdit));
         register(new PerlinPatternParser(worldEdit));
@@ -74,6 +74,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new Linear3DPatternParser(worldEdit));
         register(new BufferedPatternParser(worldEdit));
         register(new ExistingPatternParser(worldEdit));
+        //FAWE end
     }
 
 }

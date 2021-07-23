@@ -69,9 +69,11 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     }
 
 
+    //FAWE start
     public Polygonal2DRegionSelector(Polygonal2DRegion region) {
         this.region = region;
     }
+    //FAWE end
 
     /**
      * Create a new selector from another one.

@@ -38,9 +38,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  * <p>This mask checks for ONLY the block type. If state should also be checked,
  * use {@link BlockMask}.</p>
- * @deprecated use BlockMaskBuilder
  */
-@Deprecated
 public class BlockTypeMask extends AbstractExtentMask {
 
     private final boolean[] types;
@@ -70,11 +68,13 @@ public class BlockTypeMask extends AbstractExtentMask {
         }
     }
 
+    //FAWE start
     private BlockTypeMask(Extent extent, boolean[] types, boolean hasAir) {
         super(extent);
         this.types = types;
         this.hasAir = hasAir;
     }
+    //FAWE end
 
     /**
      * Add the given blocks to the list of criteria.
@@ -83,9 +83,11 @@ public class BlockTypeMask extends AbstractExtentMask {
      */
     public void add(@NotNull Collection<BlockType> blocks) {
         checkNotNull(blocks);
+        //FAWE start
         for (BlockType type : blocks) {
             add(type);
         }
+        //FAWE end
     }
 
     /**
@@ -94,12 +96,14 @@ public class BlockTypeMask extends AbstractExtentMask {
      * @param block an array of blocks
      */
     public void add(@NotNull BlockType... block) {
+        //FAWE start - get internal id
         for (BlockType type : block) {
             if (!hasAir && (type == BlockTypes.AIR || type == BlockTypes.CAVE_AIR || type == BlockTypes.VOID_AIR)) {
                 hasAir = true;
             }
             this.types[type.getInternalId()] = true;
         }
+        //FAWE end
     }
 
     /**
@@ -117,6 +121,7 @@ public class BlockTypeMask extends AbstractExtentMask {
         return blocks;
     }
 
+    //FAWE start
     @Override
     public boolean test(BlockVector3 vector) {
         return test(getExtent().getBlock(vector).getBlockType());
@@ -135,6 +140,7 @@ public class BlockTypeMask extends AbstractExtentMask {
     public boolean test(BlockType block) {
         return types[block.getInternalId()];
     }
+    //FAWE end
 
     @Nullable
     @Override

@@ -59,7 +59,6 @@ import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
 import com.sk89q.worldedit.util.io.file.FilenameException;
 import com.sk89q.worldedit.util.io.file.FilenameResolutionException;
@@ -123,10 +122,12 @@ public final class WorldEdit {
     private final SessionManager sessions = new SessionManager(this);
     private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
     private final Supervisor supervisor = new SimpleSupervisor();
+    //FAWE start
     private final LazyReference<TranslationManager> translationManager =
             LazyReference.from(() -> new TranslationManager(
                     WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader()
             ));
+    //FAWE end
 
     private final BlockFactory blockFactory = new BlockFactory(this);
     private final ItemFactory itemFactory = new ItemFactory(this);
@@ -423,6 +424,7 @@ public final class WorldEdit {
         }
     }
 
+    //FAWE start
     public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
         double val = radius.evaluate();
         checkArgument(val >= 0, "Radius must be a positive number.");
@@ -432,6 +434,7 @@ public final class WorldEdit {
             }
         }
     }
+    //FAWE end
 
     /**
      * Get a file relative to the defined working directory. If the specified
@@ -462,7 +465,7 @@ public final class WorldEdit {
         return getConfiguration().getWorkingDirectoryPath().resolve(path);
     }
 
-    //FAWE
+    //FAWE start
     /**
      * Gets the path to the folder in which schematics are saved by default
      *
@@ -471,6 +474,7 @@ public final class WorldEdit {
     public Path getSchematicsFolderPath() {
         return getWorkingDirectoryPath(getConfiguration().saveDir);
     }
+    //FAWE end
 
     /**
      * Get the direction vector for a player's direction.
@@ -782,7 +786,7 @@ public final class WorldEdit {
             logger.warn("Failed to execute script", e);
         } finally {
             for (EditSession editSession : scriptContext.getEditSessions()) {
-                editSession.flushSession();
+                editSession.close();
                 session.remember(editSession);
             }
         }

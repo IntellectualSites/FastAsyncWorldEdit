@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.beta.implementation.filter.block.SingleFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.SingleFilterBlock;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.google.gson.Gson;

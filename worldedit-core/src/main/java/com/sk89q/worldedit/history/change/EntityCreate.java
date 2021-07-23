@@ -33,7 +33,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class EntityCreate implements Change {
 
     private final Location location;
+    //FAWE start - made public
     public final BaseEntity state;
+    //FAWE end
     private Entity entity;
 
     /**
@@ -60,9 +62,11 @@ public class EntityCreate implements Change {
         }
     }
 
+    //FAWE start
     public Entity getEntity() {
         return entity;
     }
+    //FAWE end
 
     @Override
     public void redo(UndoContext context) throws WorldEditException {

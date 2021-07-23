@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.google.common.collect.Sets;
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;
@@ -218,12 +218,12 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         return plugin.getDescription().getVersion();
     }
 
-    // FAWE start
+    //FAWE start
     @Override
     public String getId() {
         return "intellectualsites:bukkit";
     }
-    // FAWE end
+    //FAWE end
 
     @Override
     public Map<Capability, Preference> getCapabilities() {

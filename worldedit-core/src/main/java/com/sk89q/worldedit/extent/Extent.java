@@ -20,15 +20,15 @@
 package com.sk89q.worldedit.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.beta.Filter;
-import com.fastasyncworldedit.core.beta.IBatchProcessor;
-import com.fastasyncworldedit.core.beta.implementation.filter.block.ExtentFilterBlock;
-import com.fastasyncworldedit.core.beta.implementation.processors.ProcessorScope;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
+import com.fastasyncworldedit.core.extent.filter.block.ExtentFilterBlock;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.changeset.AbstractChangeSet;
-import com.fastasyncworldedit.core.object.clipboard.WorldCopyClipboard;
-import com.fastasyncworldedit.core.object.exception.FaweException;
-import com.fastasyncworldedit.core.object.extent.NullExtent;
+import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.extent.NullExtent;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -37,11 +37,11 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
-import com.sk89q.worldedit.function.generator.CavesGen;
-import com.sk89q.worldedit.function.generator.GenBase;
-import com.sk89q.worldedit.function.generator.OreGen;
-import com.sk89q.worldedit.function.generator.Resource;
-import com.sk89q.worldedit.function.generator.SchemGen;
+import com.fastasyncworldedit.core.function.generator.CavesGen;
+import com.fastasyncworldedit.core.function.generator.GenBase;
+import com.fastasyncworldedit.core.function.generator.OreGen;
+import com.fastasyncworldedit.core.function.generator.Resource;
+import com.fastasyncworldedit.core.function.generator.SchemGen;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -53,11 +53,11 @@ import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
-import com.sk89q.worldedit.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.registry.state.PropertyGroup;
+import com.fastasyncworldedit.core.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
@@ -147,6 +147,7 @@ public interface Extent extends InputExtent, OutputExtent {
         return null;
     }
 
+    //FAWE start
     /**
      * Create an entity at the given location.
      *
@@ -741,4 +742,5 @@ public interface Extent extends InputExtent, OutputExtent {
         }
         return filter;
     }
+    //FAWE end
 }

@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.implementation.blocks.NullChunkGet;
-import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.NullChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -160,6 +160,7 @@ public class NullWorld extends AbstractWorld {
         return BlockVector3.ZERO;
     }
 
+    //FAWE start
     @Override
     public void refreshChunk(int chunkX, int chunkZ) {
 
@@ -169,6 +170,7 @@ public class NullWorld extends AbstractWorld {
     public IChunkGet get(int x, int z) {
         return NullChunkGet.getInstance();
     }
+    //FAWE end
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
@@ -190,10 +192,12 @@ public class NullWorld extends AbstractWorld {
         return false;
     }
 
+    //FAWE start
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return false;
     }
+    //FAWE end
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
@@ -225,6 +229,7 @@ public class NullWorld extends AbstractWorld {
         return INSTANCE;
     }
 
+    //FAWE start
     @Override
     public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
     }
@@ -236,4 +241,5 @@ public class NullWorld extends AbstractWorld {
 
     @Override
     public void flush() {}
+    //FAWE end
 }

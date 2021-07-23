@@ -62,7 +62,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Adapts between Bukkit and WorldEdit equivalent objects.
  */
-// FAWE start - enum-ized
+//FAWE start - enum-ized
 public enum BukkitAdapter {
     INSTANCE;
 
@@ -77,7 +77,7 @@ public enum BukkitAdapter {
         return INSTANCE.adapter;
     }
 
-    // FAWE end
+    //FAWE end
 
     private static final ParserContext TO_BLOCK_CONTEXT = new ParserContext();
 
@@ -93,9 +93,9 @@ public enum BukkitAdapter {
      * @return If they are equal
      */
     public static boolean equals(BlockType blockType, Material type) {
-        // FAWE start - swapped reference to getAdapter
+        //FAWE start - swapped reference to getAdapter
         return getAdapter().equals(blockType, type);
-        // FAWE end
+        //FAWE end
     }
 
     /**
@@ -108,9 +108,9 @@ public enum BukkitAdapter {
      * @return a wrapped Bukkit world
      */
     public static BukkitWorld asBukkitWorld(World world) {
-        // FAWE start - logic moved to IBukkitAdapter
+        //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().asBukkitWorld(world);
-        // FAWE end
+        //FAWE end
     }
 
     /**
@@ -120,9 +120,9 @@ public enum BukkitAdapter {
      * @return a WorldEdit world
      */
     public static World adapt(org.bukkit.World world) {
-        // FAWE start - logic moved to IBukkitAdapter
+        //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().adapt(world);
-        // FAWE end
+        //FAWE end
     }
 
     /**

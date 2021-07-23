@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.extent.transform;
 
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -36,8 +36,8 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
-import com.sk89q.worldedit.registry.state.PropertyKeySet;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.registry.state.PropertyKeySet;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -83,6 +83,7 @@ import static com.sk89q.worldedit.util.Direction.values;
  */
 public class BlockTransformExtent extends ResettableExtent {
 
+    //FAWE start
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Set<PropertyKey> directional = PropertyKeySet.of(
@@ -115,6 +116,7 @@ public class BlockTransformExtent extends ResettableExtent {
     public BlockTransformExtent(Extent parent) {
         this(parent, new AffineTransform());
     }
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -125,11 +127,14 @@ public class BlockTransformExtent extends ResettableExtent {
         super(extent);
         checkNotNull(transform);
         this.transform = transform;
+        //FAWE start - cache this
         this.transformInverse = this.transform.inverse();
         cache();
+        //FAWE end
     }
 
 
+    //FAWE start
     private static long combine(Direction... directions) {
         long mask = 0;
         for (Direction dir : directions) {
@@ -444,6 +449,7 @@ public class BlockTransformExtent extends ResettableExtent {
             }
         }
     }
+    //FAWE end
 
     /**
      * Get the transform.
@@ -497,8 +503,10 @@ public class BlockTransformExtent extends ResettableExtent {
 
     public void setTransform(Transform affine) {
         this.transform = affine;
+        //FAWE start - cache this
         this.transformInverse = this.transform.inverse();
         cache();
+        //FAWE end
     }
 
     /**
@@ -511,6 +519,7 @@ public class BlockTransformExtent extends ResettableExtent {
      * @return the same block
      */
     public static <B extends BlockStateHolder<B>> B transform(@NotNull B block, @NotNull Transform transform) {
+        //FAWE start - use own logic
         // performance critical
         BlockState state = block.toImmutableState();
 
@@ -520,8 +529,10 @@ public class BlockTransformExtent extends ResettableExtent {
             return (B) transformBaseBlockNBT(transformed, block.getNbtData(), transform);
         }
         return (B) (block instanceof BaseBlock ? transformed.toBaseBlock() : transformed);
+        //FAWE end
     }
 
+    //FAWE start - use own logic
     private BlockState transform(BlockState state, int[][] transformArray, Transform transform) {
         int typeId = state.getInternalBlockTypeId();
         int[] arr = transformArray[typeId];
@@ -570,4 +581,5 @@ public class BlockTransformExtent extends ResettableExtent {
     private BlockState transformInverse(BlockState block) {
         return transform(block, BLOCK_TRANSFORM_INVERSE, transformInverse);
     }
+    //FAWE end
 }

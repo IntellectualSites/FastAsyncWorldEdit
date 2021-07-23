@@ -101,16 +101,21 @@ public class DefaultItemParser extends InputParser<BaseItem> {
 
             if ("hand".equalsIgnoreCase(typeString)) {
                 BaseItemStack heldItem = getItemInHand(context.requireActor(), HandSide.MAIN_HAND);
+                //FAWE start
                 itemType = heldItem.getType();
                 itemNbtData = heldItem.getNbt();
+                //FAWE end
             } else if ("offhand".equalsIgnoreCase(typeString)) {
                 BaseItemStack heldItem = getItemInHand(context.requireActor(), HandSide.OFF_HAND);
+                //FAWE start
                 itemType = heldItem.getType();
                 itemNbtData = heldItem.getNbt();
+                //FAWE end
             } else {
                 itemType = ItemTypes.get(typeString.toLowerCase(Locale.ROOT));
             }
 
+            //FAWE start
             if (itemType == null) {
                 throw new NoMatchException(TranslatableComponent.of("worldedit.error.unknown-item", TextComponent.of(input)));
             }
@@ -139,6 +144,7 @@ public class DefaultItemParser extends InputParser<BaseItem> {
 
         return item;
     }
+    //FAWE end
 
     private BaseItemStack getItemInHand(Actor actor, HandSide handSide) throws InputParseException {
         if (actor instanceof Player) {

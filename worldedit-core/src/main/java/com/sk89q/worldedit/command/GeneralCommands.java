@@ -21,7 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.util.CachedTextureUtil;
 import com.fastasyncworldedit.core.util.CleanTextureUtil;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -48,6 +48,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.CommandUtil;
+import com.sk89q.worldedit.internal.cui.ServerCUIHandler;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
@@ -102,7 +103,7 @@ public class GeneralCommands {
         Set<org.enginehub.piston.Command> commands = collect.getAllCommands()
             .collect(Collectors.toSet());
         for (org.enginehub.piston.Command command : commands) {
-            /*if in FAWE, //fast will remain for now
+            /*FAWE start - if in FAWE, //fast will remain for now
              (command.getName().equals("/fast")) {
 
                 // deprecate to `//perf`
@@ -212,30 +213,6 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/fast",
-        desc = "Toggle fast mode"
-    )
-    @CommandPermissions("worldedit.fast")
-    @Deprecated
-    void fast(Actor actor, LocalSession session,
-              @Arg(desc = "The new fast mode state", def = "")
-                  Boolean fastMode) {
-        boolean hasFastMode = session.hasFastMode();
-        if (fastMode != null && fastMode == hasFastMode) {
-            actor.print(Caption.of(fastMode ? "worldedit.fast.enabled.already" : "worldedit.fast.disabled.already"));
-            return;
-        }
-
-        if (hasFastMode) {
-            session.setFastMode(false);
-            actor.print(Caption.of("worldedit.fast.disabled"));
-        } else {
-            session.setFastMode(true);
-            actor.print(Caption.of("worldedit.fast.enabled"));
-        }
-    }
-
-    @Command(
         name = "/perf",
         desc = "Toggle side effects for performance",
         descFooter = "Note that this command is GOING to change in the future." +
@@ -338,7 +315,8 @@ public class GeneralCommands {
         } else {
             session.setUseServerCUI(true);
             session.updateServerCUI(player);
-            player.print(Caption.of("worldedit.drawsel.enabled"));
+            int maxSize = ServerCUIHandler.getMaxServerCuiSize();
+            player.print(Caption.of("worldedit.drawsel.enabled", TextComponent.of(maxSize), TextComponent.of(maxSize), TextComponent.of(maxSize)));
         }
     }
 
@@ -487,6 +465,7 @@ public class GeneralCommands {
         }
     }
 
+    //FAWE start
     @Command(
             name = "/gtexture",
             aliases = {"gtexture"},
@@ -601,4 +580,29 @@ public class GeneralCommands {
             player.print(Caption.of("fawe.info.worldedit.toggle.tips.off"));
         }
     }
+
+    @Command(
+            name = "/fast",
+            desc = "Toggle fast mode"
+    )
+    @CommandPermissions("worldedit.fast")
+    @Deprecated
+    void fast(Actor actor, LocalSession session,
+              @Arg(desc = "The new fast mode state", def = "")
+                      Boolean fastMode) {
+        boolean hasFastMode = session.hasFastMode();
+        if (fastMode != null && fastMode == hasFastMode) {
+            actor.print(Caption.of(fastMode ? "worldedit.fast.enabled.already" : "worldedit.fast.disabled.already"));
+            return;
+        }
+
+        if (hasFastMode) {
+            session.setFastMode(false);
+            actor.print(Caption.of("worldedit.fast.disabled"));
+        } else {
+            session.setFastMode(true);
+            actor.print(Caption.of("worldedit.fast.enabled"));
+        }
+    }
+    //FAWE end
 }

@@ -1,8 +1,7 @@
 package com.fastasyncworldedit.core.regions;
 
-import com.fastasyncworldedit.core.beta.implementation.processors.ProcessorScope;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.regions.IDelegateRegion;
 import com.sk89q.worldedit.regions.Region;
 
 public class FaweMask implements IDelegateRegion {

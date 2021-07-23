@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.fastasyncworldedit.core.beta.ITileInput;
+import com.fastasyncworldedit.core.queue.ITileInput;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.OutputExtent;
@@ -28,7 +28,7 @@ import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
@@ -37,7 +37,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+//FAWE start - TileEntityBlock
 public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEntityBlock, Pattern {
+//FAWE end
 
     /**
      * Get the block type.
@@ -46,6 +48,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      */
     BlockType getBlockType();
 
+    //FAWE start
     /**
      * Magic number (legacy uses).
      */
@@ -77,6 +80,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      */
     @Deprecated
     int getInternalPropertiesId();
+    //FAWE end
 
     /**
      * Returns a BlockState with the given state and value applied.
@@ -141,6 +145,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      */
     BaseBlock toBaseBlock();
 
+    //FAWE start
     /**
      * Gets a {@link BaseBlock} from this BlockStateHolder.
      *
@@ -191,6 +196,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     default BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         throw new UnsupportedOperationException("State is immutable");
     }
+    //FAWE end
 
     default String getAsString() {
         if (getStates().isEmpty()) {

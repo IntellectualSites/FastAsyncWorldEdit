@@ -19,11 +19,10 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.fastasyncworldedit.core.beta.Filter;
-import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -31,7 +30,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 /**
  * Returns a {@link BaseBlock} for a given position.
  */
-// FAWE Start
+//FAWE start - extends Filter
 public interface Pattern extends Filter {
 
     /**
@@ -59,7 +58,7 @@ public interface Pattern extends Filter {
         apply(block, block, block);
     }
 
-    // FAWE End
+    //FAWE end
 
     /**
      * Return a {@link BaseBlock} for the given position.

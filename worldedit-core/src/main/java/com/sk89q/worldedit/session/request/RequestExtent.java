@@ -90,10 +90,12 @@ public class RequestExtent implements Extent {
         return getExtent().getBiome(position);
     }
 
+    //FAWE start
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         return getExtent().setBlock(position, block);
     }
+    //FAWE end
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
@@ -106,6 +108,7 @@ public class RequestExtent implements Extent {
         return getExtent().fullySupports3DBiomes();
     }
 
+    //FAWE start
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return getExtent().setTile(x, y, z, tile);
@@ -115,6 +118,7 @@ public class RequestExtent implements Extent {
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return getExtent().setBiome(position, biome);
     }
+    //FAWE end
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {

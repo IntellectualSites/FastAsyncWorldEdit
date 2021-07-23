@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.exception.FaweException;
-import com.fastasyncworldedit.core.object.pattern.PatternTraverser;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.function.pattern.PatternTraverser;
 import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -43,7 +43,6 @@ import com.sk89q.worldedit.event.platform.PlatformUnreadyEvent;
 import com.sk89q.worldedit.event.platform.PlatformsRegisteredEvent;
 import com.sk89q.worldedit.event.platform.PlayerInputEvent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
-import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
@@ -174,10 +173,12 @@ public class PlatformManager {
         } else {
             if (preferences.isEmpty()) {
                 // Not all platforms registered, this is being called too early!
+                //FAWE start - exchange WE -> FAWE
                 throw new NoCapablePlatformException(
                         "Not all platforms have been registered yet!"
                                 + " Please wait until FastAsyncWorldEdit is initialized."
                 );
+                //FAWE end
             }
             throw new NoCapablePlatformException("No platform was found supporting " + capability.name());
         }
@@ -288,9 +289,11 @@ public class PlatformManager {
         }
     }
 
+    //FAWE start
     private <T extends Player> T  proxyFawe(T player) {
         return (T) new LocationMaskedPlayerWrapper(player, player.getLocation(), true);
     }
+    //FAWE end
 
     /**
      * Get the command manager.
@@ -378,17 +381,17 @@ public class PlatformManager {
         Request.request().setWorld(player.getWorld());
 
         try {
-            Vector3 vector = location.toVector();
-
             if (event.getType() == Interaction.HIT) {
                 // superpickaxe is special because its primary interaction is a left click, not a right click
                 // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
                 if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
                     final BlockTool superPickaxe = session.getSuperPickaxe();
                     if (superPickaxe != null && superPickaxe.canUse(player)) {
+                        //FAWE start - run async
                         player.runAction(() -> reset(superPickaxe)
                             .actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                        getConfiguration(), player, session, location), false, true);
+                                        getConfiguration(), player, session, location, event.getFace()), false, true);
+                        //FAWE end
                         event.setCancelled(true);
                         return;
                     }
@@ -396,24 +399,29 @@ public class PlatformManager {
 
                 Tool tool = session.getTool(player);
                 if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
+                    //FAWE start - run async
                     player.runAction(() -> reset((DoubleActionBlockTool) tool)
                         .actSecondary(queryCapability(Capability.WORLD_EDITING),
-                                      getConfiguration(), player, session, location), false, true);
+                                      getConfiguration(), player, session, location, event.getFace()), false, true);
+                    //FAWE end
                     event.setCancelled(true);
                 }
 
             } else if (event.getType() == Interaction.OPEN) {
+                //FAWE start - get general tool over item in main hand & run async
                 Tool tool = session.getTool(player);
                 if (tool instanceof BlockTool && tool.canUse(player)) {
                     if (player.checkAction()) {
+                        // FAWE run async
                         player.runAction(() -> {
                             BlockTool blockTool = (BlockTool) tool;
                             if (!(tool instanceof BrushTool)) {
                                 blockTool = reset(blockTool);
                             }
                             blockTool.actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                                 getConfiguration(), player, session, location);
+                                                 getConfiguration(), player, session, location, event.getFace());
                         }, false, true);
+                        //FAWE end
                         event.setCancelled(true);
                     }
                 }
@@ -425,6 +433,7 @@ public class PlatformManager {
         }
     }
 
+    //FAWE start
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);
         if (faweException != null) {
@@ -435,6 +444,7 @@ public class PlatformManager {
             e.printStackTrace();
         }
     }
+    //FAWE end
 
     @Subscribe
     public void handlePlayerInput(PlayerInputEvent event) {
@@ -448,8 +458,10 @@ public class PlatformManager {
                 case PRIMARY: {
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
+                        //FAWE start - run async
                         player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),
                             getConfiguration(), player, session));
+                        //FAWE end
                         event.setCancelled(true);
                         return;
                     }
@@ -460,9 +472,11 @@ public class PlatformManager {
                 case SECONDARY: {
                     Tool tool = session.getTool(player);
                     if (tool instanceof TraceTool && tool.canUse(player)) {
+                        //FAWE start - run async
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true
                         player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),
                             getConfiguration(), player, session), false, true);
+                        //FAWE end
                         event.setCancelled(true);
                         return;
                     }
@@ -470,6 +484,7 @@ public class PlatformManager {
                     break;
                 }
             }
+            //FAWE start - add own message
         } catch (Throwable e) {
             FaweException faweException = FaweException.get(e);
             if (faweException != null) {
@@ -479,6 +494,7 @@ public class PlatformManager {
                 player.print(Caption.of(e.getClass().getName() + ": " + e.getMessage()));
                 e.printStackTrace();
             }
+            //FAWE end
         } finally {
             Request.reset();
         }

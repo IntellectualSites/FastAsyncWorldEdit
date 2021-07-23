@@ -59,11 +59,11 @@ public final class IntArrayTag extends Tag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_INT_ARRAY;
     }
-    // FAWE End
+    //FAWE end
 
 }

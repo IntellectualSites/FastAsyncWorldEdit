@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.fastasyncworldedit.core.object.collection.BlockVectorSet;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -35,7 +35,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+//FAWE start - extends AbstractSet<BlockVector3>
 public abstract class AbstractRegion extends AbstractSet<BlockVector3> implements Region {
+//FAWE end
 
     protected World world;
 
@@ -43,10 +45,12 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         this.world = world;
     }
 
+    //FAWE start
     @Override
     public int size() {
         return com.google.common.primitives.Ints.saturatedCast(getVolume());
     }
+    //FAWE end
 
     @Override
     public Vector3 getCenter() {
@@ -168,8 +172,10 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         final BlockVector3 minBlock = getMinimumPoint();
         final BlockVector3 maxBlock = getMaximumPoint();
 
+        //FAWE start
         final BlockVector2 min = BlockVector2.at(minBlock.getX() >> 4, minBlock.getZ() >> 4);
         final BlockVector2 max = BlockVector2.at(maxBlock.getX() >> 4, maxBlock.getZ() >> 4);
+        //FAWE end
 
         for (int X = min.getBlockX(); X <= max.getBlockX(); ++X) {
             for (int Z = min.getBlockZ(); Z <= max.getBlockZ(); ++Z) {
@@ -218,6 +224,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         return world == null ? Integer.MAX_VALUE : world.getMaxY();
     }
 
+    //FAWE start
     @Override
     public int hashCode() {
         int worldHash = this.world == null ? 7 : this.world.hashCode();
@@ -246,5 +253,6 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         }
         return false;
     }
+    //FAWE end
 
 }

@@ -2,7 +2,7 @@ package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.bukkit.filter.GriefDefenderFilter;
 import com.fastasyncworldedit.core.regions.FaweMask;
-import com.fastasyncworldedit.core.regions.general.RegionFilter;
+import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.flowpowered.math.vector.Vector3i;
 import com.griefdefender.api.GriefDefender;
 import com.griefdefender.api.claim.Claim;

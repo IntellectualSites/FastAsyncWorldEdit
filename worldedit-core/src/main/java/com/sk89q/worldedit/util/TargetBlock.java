@@ -38,7 +38,9 @@ import javax.annotation.Nullable;
  */
 public class TargetBlock {
 
+    //FAWE start - Extent > World
     private final Extent world;
+    //FAWE end
 
     private int maxDistance;
     private double checkDistance;
@@ -74,15 +76,19 @@ public class TargetBlock {
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
     public TargetBlock(Player player, int maxDistance, double checkDistance) {
+        //FAWE start
         this(player, player.getWorld(), maxDistance, checkDistance);
+        //FAWE end
     }
 
+    //FAWE start - Extend > World
     public TargetBlock(Player player, Extent extent, int maxDistance, double checkDistance) {
         this.world = player.getWorld();
         this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
         this.stopMask = new ExistingBlockMask(world);
         this.solidMask = new SolidBlockMask(world);
     }
+    //FAWE end
 
     /**
      * Set the mask used for determine where to stop traces.

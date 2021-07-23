@@ -19,15 +19,17 @@
 
 package com.sk89q.worldedit.function;
 
-import com.fastasyncworldedit.core.beta.Filter;
-import com.fastasyncworldedit.core.beta.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 
 /**
  * Performs a function on points in a region.
  */
+//FAWE start - extends Filter
 public interface RegionFunction extends Filter {
+//FAWE end
 
     /**
      * Apply the function to the given position.
@@ -39,8 +41,10 @@ public interface RegionFunction extends Filter {
     boolean apply(BlockVector3 position) throws WorldEditException;
 
 
+    //FAWE start
     @Override
     default void applyBlock(FilterBlock block) {
         apply(block);
     }
+    //FAWE end
 }

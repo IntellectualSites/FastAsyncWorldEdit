@@ -23,9 +23,9 @@ import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
-import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -67,9 +67,9 @@ import javax.annotation.Nullable;
 /**
  * An interface for adapters of various Bukkit implementations.
  */
-// FAWE start - Generic & extends IBukkitAdapter
+//FAWE start - Generic & extends IBukkitAdapter
 public interface BukkitImplAdapter<T> extends IBukkitAdapter {
-// FAWE end
+//FAWE end
 
     /**
      * Get a data fixer, or null if not supported.
@@ -225,10 +225,10 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     Set<SideEffect> getSupportedSideEffects();
 
     default OptionalInt getInternalBlockStateId(BlockData data) {
-        // FAWE start
+        //FAWE start
         // return OptionalInt.empty();
         return getInternalBlockStateId(BukkitAdapter.adapt(data));
-        // FAWE end
+        //FAWE end
     }
 
     /**
@@ -253,7 +253,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         throw new UnsupportedOperationException("This adapter does not support regeneration.");
     }
 
-    // FAWE start
+    //FAWE start
     default BlockMaterial getMaterial(BlockType blockType) {
         return getMaterial(blockType.getDefaultState());
     }
@@ -306,5 +306,5 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default RelighterFactory getRelighterFactory() {
         return new NMSRelighterFactory(); // TODO implement in adapters instead
     }
-    // FAWE end
+    //FAWE end
 }

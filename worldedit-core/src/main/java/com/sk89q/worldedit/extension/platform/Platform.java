@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.fastasyncworldedit.core.beta.implementation.lighting.Relighter;
-import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -197,18 +197,6 @@ public interface Platform extends Keyed {
     String getPlatformVersion();
 
     /**
-     * {@inheritDoc}
-     * @return an id
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
-     */
-    @NonAbstractForCompatibility(delegateName = "getPlatformName", delegateParams = {})
-    @Override
-    default String getId() {
-        return "legacy:" + getPlatformName().toLowerCase(Locale.ROOT).replaceAll("[^a-z_.-]", "_");
-    }
-
-    /**
      * Get a map of advertised capabilities of this platform, where each key
      * in the given map is a supported capability and the respective value
      * indicates the preference for this platform for that given capability.
@@ -224,6 +212,19 @@ public interface Platform extends Keyed {
      */
     Set<SideEffect> getSupportedSideEffects();
 
+    //FAWE start
+    /**
+     * {@inheritDoc}
+     * @return an id
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
+     */
+    @NonAbstractForCompatibility(delegateName = "getPlatformName", delegateParams = {})
+    @Override
+    default String getId() {
+        return "legacy:" + getPlatformName().toLowerCase(Locale.ROOT).replaceAll("[^a-z_.-]", "_");
+    }
+
     /**
      * Get the {@link RelighterFactory} that can be used to obtain
      * {@link Relighter}s.
@@ -232,4 +233,5 @@ public interface Platform extends Keyed {
      */
     @NotNull
     RelighterFactory getRelighterFactory();
+    //FAWE end
 }
