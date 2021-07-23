@@ -1,8 +1,7 @@
-package com.fastasyncworldedit.core.logging;
+package com.fastasyncworldedit.core.history;
 
 import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
-import com.fastasyncworldedit.core.history.changeset.DiskStorageHistory;
 import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;

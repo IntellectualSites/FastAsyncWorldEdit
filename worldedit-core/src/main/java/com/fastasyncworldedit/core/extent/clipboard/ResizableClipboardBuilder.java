@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.history.change.MutableBlockChange;
 import com.fastasyncworldedit.core.history.change.MutableTileChange;
-import com.fastasyncworldedit.core.history.changeset.MemoryOptimizedHistory;
+import com.fastasyncworldedit.core.history.MemoryOptimizedHistory;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;

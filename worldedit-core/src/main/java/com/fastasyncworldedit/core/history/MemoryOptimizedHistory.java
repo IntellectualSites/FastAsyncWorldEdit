@@ -1,6 +1,7 @@
-package com.fastasyncworldedit.core.history.changeset;
+package com.fastasyncworldedit.core.history;
 
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.history.changeset.FaweStreamChangeSet;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;

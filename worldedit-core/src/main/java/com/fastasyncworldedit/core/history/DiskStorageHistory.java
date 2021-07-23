@@ -1,9 +1,11 @@
-package com.fastasyncworldedit.core.history.changeset;
+package com.fastasyncworldedit.core.history;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
+import com.fastasyncworldedit.core.history.changeset.FaweStreamChangeSet;
+import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.math.IntPair;

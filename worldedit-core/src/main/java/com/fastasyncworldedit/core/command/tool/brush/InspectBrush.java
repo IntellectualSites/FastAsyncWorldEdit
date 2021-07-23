@@ -5,7 +5,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
-import com.fastasyncworldedit.core.logging.RollbackOptimizedHistory;
+import com.fastasyncworldedit.core.history.RollbackOptimizedHistory;
 import com.fastasyncworldedit.core.history.change.MutableFullBlockChange;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.worldedit.LocalConfiguration;
