@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.beta.implementation.queue.QueueHandler;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.RunnableVal;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;

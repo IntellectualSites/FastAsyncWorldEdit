@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.history.changeset;
 
 import com.fastasyncworldedit.core.history.changeset.ChangeSetSummary;
-import com.fastasyncworldedit.core.history.changeset.change.SimpleChangeSetSummary;
+import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;

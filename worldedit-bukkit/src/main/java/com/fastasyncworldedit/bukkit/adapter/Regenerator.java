@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.fastasyncworldedit.core.beta.IChunkCache;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.implementation.queue.SingleThreadQueueExtent;
+import com.fastasyncworldedit.core.queue.IChunkCache;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.extent.Extent;

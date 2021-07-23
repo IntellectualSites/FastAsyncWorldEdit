@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.world.block;
 
-import com.fastasyncworldedit.core.beta.ITileInput;
+import com.fastasyncworldedit.core.queue.ITileInput;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 

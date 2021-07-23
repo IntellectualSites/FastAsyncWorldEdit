@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import com.fastasyncworldedit.core.beta.Filter;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
