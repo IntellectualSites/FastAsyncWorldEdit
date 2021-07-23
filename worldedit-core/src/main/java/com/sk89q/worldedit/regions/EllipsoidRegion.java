@@ -24,7 +24,7 @@ import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.queue.implementation.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;

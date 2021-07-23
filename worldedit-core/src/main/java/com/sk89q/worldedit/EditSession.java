@@ -20,8 +20,8 @@
 package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.implementation.lighting.NullRelighter;
-import com.fastasyncworldedit.core.queue.implementation.lighting.Relighter;
+import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
+import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.FaweLimit;

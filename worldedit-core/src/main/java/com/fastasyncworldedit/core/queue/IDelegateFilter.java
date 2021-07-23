@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.queue;
 
-import com.fastasyncworldedit.core.queue.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.sk89q.worldedit.regions.Region;
 
 import javax.annotation.Nullable;

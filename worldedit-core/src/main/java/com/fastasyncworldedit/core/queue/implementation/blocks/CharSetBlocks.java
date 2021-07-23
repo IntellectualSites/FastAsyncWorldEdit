@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.queue.implementation.blocks;
 
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.queue.implementation.lighting.HeightMapType;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.queue.Pool;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;

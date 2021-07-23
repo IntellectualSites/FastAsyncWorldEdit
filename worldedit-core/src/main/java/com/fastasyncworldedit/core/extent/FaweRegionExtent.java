@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
-import com.fastasyncworldedit.core.queue.implementation.processors.ProcessorScope;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.WEManager;

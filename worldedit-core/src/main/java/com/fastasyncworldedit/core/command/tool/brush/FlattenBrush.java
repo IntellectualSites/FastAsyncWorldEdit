@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
-import com.fastasyncworldedit.core.extension.processor.heightmap.HeightMap;
-import com.fastasyncworldedit.core.extension.processor.heightmap.ScalableHeightMap;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMap;
+import com.fastasyncworldedit.core.extent.processor.heightmap.ScalableHeightMap;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;

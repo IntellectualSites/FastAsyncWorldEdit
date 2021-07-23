@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.function.mask;
 
 import com.fastasyncworldedit.core.queue.Filter;
-import com.fastasyncworldedit.core.queue.implementation.filter.MaskFilter;
-import com.fastasyncworldedit.core.queue.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.extent.filter.MaskFilter;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.InverseMask;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.jetbrains.annotations.Nullable;

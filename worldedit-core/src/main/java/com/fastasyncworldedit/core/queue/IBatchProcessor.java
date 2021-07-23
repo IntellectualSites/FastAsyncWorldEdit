@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.implementation.processors.EmptyBatchProcessor;
-import com.fastasyncworldedit.core.queue.implementation.processors.MultiBatchProcessor;
-import com.fastasyncworldedit.core.queue.implementation.processors.ProcessorScope;
+import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
+import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;

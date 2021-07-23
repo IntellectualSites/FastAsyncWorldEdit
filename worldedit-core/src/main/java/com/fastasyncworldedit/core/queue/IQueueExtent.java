@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.queue;
 
-import com.fastasyncworldedit.core.queue.implementation.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.queue.implementation.processors.IBatchProcessorHolder;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.processor.IBatchProcessorHolder;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;

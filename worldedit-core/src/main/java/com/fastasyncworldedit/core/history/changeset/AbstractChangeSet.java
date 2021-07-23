@@ -6,7 +6,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.queue.implementation.processors.ProcessorScope;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MainUtil;

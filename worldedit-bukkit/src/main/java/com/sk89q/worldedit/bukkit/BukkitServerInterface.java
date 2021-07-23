@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.fastasyncworldedit.core.queue.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.google.common.collect.Sets;
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;

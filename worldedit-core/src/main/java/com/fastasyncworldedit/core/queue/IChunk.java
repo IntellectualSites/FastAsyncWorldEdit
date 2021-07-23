@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.queue;
 
-import com.fastasyncworldedit.core.queue.implementation.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.sk89q.worldedit.regions.Region;
 import org.jetbrains.annotations.Range;
 
