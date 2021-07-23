@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core;
 
-import com.fastasyncworldedit.core.beta.IChunkSet;
-import com.fastasyncworldedit.core.beta.Trimable;
-import com.fastasyncworldedit.core.beta.implementation.queue.Pool;
-import com.fastasyncworldedit.core.beta.implementation.queue.QueuePool;
+import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.Trimable;
+import com.fastasyncworldedit.core.queue.Pool;
+import com.fastasyncworldedit.core.queue.implementation.QueuePool;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.math.BitArray;

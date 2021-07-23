@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.cli;
 
-import com.fastasyncworldedit.core.beta.implementation.lighting.NullRelighter;
-import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.queue.implementation.lighting.NullRelighter;
+import com.fastasyncworldedit.core.queue.implementation.lighting.RelighterFactory;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.fastasyncworldedit.core.object.RunnableVal;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.worldedit.LocalSession;

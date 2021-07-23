@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool;
 
+import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;

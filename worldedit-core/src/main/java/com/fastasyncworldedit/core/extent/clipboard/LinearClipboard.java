@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.extent.clipboard;
 
-import com.fastasyncworldedit.core.beta.implementation.filter.block.AbstractFilterBlock;
+import com.fastasyncworldedit.core.queue.implementation.filter.block.AbstractFilterBlock;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;

@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.fastasyncworldedit.core.beta.Filter;
-import com.fastasyncworldedit.core.beta.IBatchProcessor;
-import com.fastasyncworldedit.core.beta.IChunk;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.IChunkSet;
-import com.fastasyncworldedit.core.beta.implementation.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.beta.implementation.processors.ProcessorScope;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.queue.implementation.processors.ProcessorScope;
 import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.sk89q.worldedit.extent.Extent;

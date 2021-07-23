@@ -8,7 +8,7 @@ import com.fastasyncworldedit.core.database.DBHandler;
 import com.fastasyncworldedit.core.database.RollbackDatabase;
 import com.fastasyncworldedit.core.logging.RollbackOptimizedHistory;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
-import com.fastasyncworldedit.core.history.changeset.change.SimpleChangeSetSummary;
+import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.base.Function;

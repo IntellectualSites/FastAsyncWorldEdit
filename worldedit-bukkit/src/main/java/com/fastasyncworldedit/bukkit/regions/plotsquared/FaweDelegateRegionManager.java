@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
 import com.fastasyncworldedit.core.FaweAPI;
-import com.fastasyncworldedit.core.beta.implementation.lighting.RelightMode;
+import com.fastasyncworldedit.core.queue.implementation.lighting.RelightMode;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.plotsquared.core.configuration.Settings;

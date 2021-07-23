@@ -24,7 +24,7 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.FaweLimit;
-import com.fastasyncworldedit.core.object.RunnableVal;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;

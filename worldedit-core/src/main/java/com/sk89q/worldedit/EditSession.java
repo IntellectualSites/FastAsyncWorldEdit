@@ -20,15 +20,15 @@
 package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.beta.implementation.lighting.NullRelighter;
-import com.fastasyncworldedit.core.beta.implementation.lighting.Relighter;
+import com.fastasyncworldedit.core.queue.implementation.lighting.NullRelighter;
+import com.fastasyncworldedit.core.queue.implementation.lighting.Relighter;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
-import com.fastasyncworldedit.core.object.RunnableVal;
-import com.fastasyncworldedit.core.history.changeset.change.AbstractChangeSet;
-import com.fastasyncworldedit.core.history.changeset.change.BlockBagChangeSet;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
+import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
 import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.extent.FaweRegionExtent;

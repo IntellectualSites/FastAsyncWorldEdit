@@ -2,8 +2,8 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.beta.IQueueChunk;
-import com.fastasyncworldedit.core.beta.IQueueExtent;
+import com.fastasyncworldedit.core.queue.IQueueChunk;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.plotsquared.core.queue.LightingMode;
 import com.plotsquared.core.queue.QueueCoordinator;
 import com.plotsquared.core.queue.subscriber.ProgressSubscriber;
