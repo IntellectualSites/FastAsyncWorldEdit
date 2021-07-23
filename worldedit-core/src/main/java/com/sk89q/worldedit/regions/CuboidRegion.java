@@ -726,7 +726,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
         if (bx >= minX && tx <= maxX && bz >= minZ && tz <= maxZ) {
             // contains all X/Z
-            if (minY <= world.getMinY() && maxY >= world.getMaxY()) {
+            if (minY <= 0 && maxY >= 255) {
                 return set;
             }
             trimY(set, minY, maxY);

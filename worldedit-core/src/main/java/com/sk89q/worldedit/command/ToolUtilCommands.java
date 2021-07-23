@@ -20,9 +20,9 @@
 package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
-import com.fastasyncworldedit.core.command.tool.brush.TargetMode;
-import com.fastasyncworldedit.core.command.tool.brush.scroll.Scroll;
+import com.fastasyncworldedit.core.command.tool.BrushSettings;
+import com.fastasyncworldedit.core.command.tool.TargetMode;
+import com.fastasyncworldedit.core.command.tool.scroll.Scroll;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.collect.Iterables;

@@ -20,12 +20,12 @@
 package com.sk89q.worldedit.command.tool;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
-import com.fastasyncworldedit.core.command.tool.brush.MovableTool;
-import com.fastasyncworldedit.core.command.tool.brush.ResettableTool;
-import com.fastasyncworldedit.core.command.tool.brush.TargetMode;
-import com.fastasyncworldedit.core.command.tool.brush.scroll.Scroll;
-import com.fastasyncworldedit.core.command.tool.brush.scroll.ScrollTool;
+import com.fastasyncworldedit.core.command.tool.BrushSettings;
+import com.fastasyncworldedit.core.command.tool.MovableTool;
+import com.fastasyncworldedit.core.command.tool.ResettableTool;
+import com.fastasyncworldedit.core.command.tool.TargetMode;
+import com.fastasyncworldedit.core.command.tool.scroll.Scroll;
+import com.fastasyncworldedit.core.command.tool.scroll.ScrollTool;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.function.mask.MaskedTargetBlock;
 import com.fastasyncworldedit.core.function.pattern.PatternTraverser;

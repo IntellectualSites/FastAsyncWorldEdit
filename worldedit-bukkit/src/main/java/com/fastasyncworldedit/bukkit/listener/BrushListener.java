@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.bukkit.listener;
 
-import com.fastasyncworldedit.core.command.tool.brush.MovableTool;
-import com.fastasyncworldedit.core.command.tool.brush.ResettableTool;
-import com.fastasyncworldedit.core.command.tool.brush.scroll.ScrollTool;
+import com.fastasyncworldedit.core.command.tool.MovableTool;
+import com.fastasyncworldedit.core.command.tool.ResettableTool;
+import com.fastasyncworldedit.core.command.tool.scroll.ScrollTool;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;

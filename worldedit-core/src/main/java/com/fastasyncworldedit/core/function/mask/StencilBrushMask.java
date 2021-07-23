@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.function.mask;
 
-import com.fastasyncworldedit.core.command.tool.brush.heightmap.HeightMap;
+import com.fastasyncworldedit.core.extension.processor.heightmap.HeightMap;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;

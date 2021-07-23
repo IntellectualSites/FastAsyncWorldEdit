@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.function.mask;
 
-import com.fastasyncworldedit.core.command.tool.brush.ImageBrush;
+import com.fastasyncworldedit.core.command.tool.ImageBrush;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
