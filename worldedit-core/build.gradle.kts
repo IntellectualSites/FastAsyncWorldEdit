@@ -42,7 +42,7 @@ dependencies {
     compileOnly("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
     annotationProcessor("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.8.1")
-    implementation("com.github.luben:zstd-jni:1.5.0-2")
+    implementation("com.github.luben:zstd-jni:1.5.0-4")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
     api("com.plotsquared:PlotSquared-Core:6.0.6-SNAPSHOT")
