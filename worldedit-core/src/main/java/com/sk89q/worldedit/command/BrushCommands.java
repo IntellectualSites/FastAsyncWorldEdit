@@ -727,7 +727,7 @@ public class BrushCommands {
         name = "clipboard",
         desc = "@Deprecated use instead: `/br copypaste`)",
         descFooter = "Choose the clipboard brush.\n"
-             + "Without the -p flag, the paste will appear centered at the target location. "
+             + "Without the -o flag, the paste will appear centered at the target location. "
              + "With the flag, then the paste will appear relative to where you had "
              + "stood relative to the copied area when you copied it."
     )
@@ -736,7 +736,7 @@ public class BrushCommands {
     public void clipboardBrush(Player player, LocalSession session,
                                @Switch(name = 'a', desc = "Don't paste air from the clipboard")
                                    boolean ignoreAir,
-                               @Switch(name = 'p', desc = "Paste starting at the target location, instead of centering on it")
+                               @Switch(name = 'o', desc = "Paste starting at the target location, instead of centering on it")
                                    boolean usingOrigin,
                                @Switch(name = 'e', desc = "Paste entities if available")
                                    boolean pasteEntities,
