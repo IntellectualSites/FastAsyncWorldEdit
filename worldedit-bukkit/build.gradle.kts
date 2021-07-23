@@ -170,7 +170,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
         }
         relocate("com.github.luben", "com.fastasyncworldedit.core.zstd") {
-            include(dependency("com.github.luben:zstd-jni:1.5.0-2"))
+            include(dependency("com.github.luben:zstd-jni:1.5.0-4"))
         }
         relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz") {
             include(dependency("net.jpountz:lz4-java-stream:1.0.0"))
