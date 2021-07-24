@@ -1290,7 +1290,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
             }
             return true;
-        });
+        }, this);
         Operations.completeBlindly(visitor);
         return this.changes;
     }
@@ -2927,7 +2927,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             } catch (EvaluationException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }, this);
         Operations.completeBlindly(visitor);
         changes += visitor.getAffected();
         return changes;

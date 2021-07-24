@@ -35,6 +35,7 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -522,6 +523,9 @@ public class GenerationCommands {
             @Selection Region region,
             @Arg(desc = "Mask") Mask mask
     ) throws WorldEditException {
+        if (mask instanceof AbstractExtentMask) {
+            ((AbstractExtentMask) mask).setExtent(editSession);
+        }
         editSession.addOres(region, mask);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
@@ -574,7 +578,7 @@ public class GenerationCommands {
                 e.printStackTrace();
             }
             return false;
-        });
+        }, editSession);
         Operations.completeBlindly(visitor);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
@@ -596,6 +600,9 @@ public class GenerationCommands {
             @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
             @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY
     ) throws WorldEditException {
+        if (mask instanceof AbstractExtentMask) {
+            ((AbstractExtentMask) mask).setExtent(editSession);
+        }
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }

@@ -42,6 +42,7 @@ import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.block.BlockDistributionCounter;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
@@ -574,6 +575,11 @@ public class SelectionCommands {
             @Arg(desc = "The mask of blocks to match")
                     Mask mask
     ) throws WorldEditException {
+        //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
+        if (mask instanceof AbstractExtentMask) {
+            ((AbstractExtentMask) mask).setExtent(editSession);
+        }
+        //FAWE end
         int count = editSession.countBlocks(session.getSelection(world), mask);
         actor.print(Caption.of("worldedit.count.counted", TextComponent.of(count)));
         return count;
@@ -586,6 +592,9 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.analysis.distr")
     public void distr(
             Actor actor, World world, LocalSession session,
+            //FAWE start > add extent to RegionVisitor to allow chunk preloading
+            EditSession editSession,
+            //FAWE end
             @Switch(name = 'c', desc = "Get the distribution of the clipboard instead")
                     boolean clipboardDistr,
             @Switch(name = 'd', desc = "Separate blocks by state")
@@ -599,13 +608,13 @@ public class SelectionCommands {
             if (clipboardDistr) {
                 Clipboard clipboard = session.getClipboard().getClipboard(); // throws if missing
                 BlockDistributionCounter count = new BlockDistributionCounter(clipboard, separateStates);
-                RegionVisitor visitor = new RegionVisitor(clipboard.getRegion(), count);
+                //FAWE start > add extent to RegionVisitor to allow chunk preloading
+                RegionVisitor visitor = new RegionVisitor(clipboard.getRegion(), count, editSession);
+                //FAWE end
                 Operations.completeBlindly(visitor);
                 distribution = count.getDistribution();
             } else {
-                try (EditSession editSession = session.createEditSession(actor)) {
-                    distribution = editSession.getBlockDistribution(session.getSelection(world), separateStates);
-                }
+                distribution = editSession.getBlockDistribution(session.getSelection(world), separateStates);
             }
             session.setLastDistribution(distribution);
             page = 1;

@@ -184,7 +184,9 @@ public class BiomeCommands {
         if (mask != null) {
             replace = new RegionMaskingFilter(editSession, mask, replace);
         }
-        RegionVisitor visitor = new RegionVisitor(region, replace);
+        //FAWE start > add extent to RegionVisitor to allow chunk preloading
+        RegionVisitor visitor = new RegionVisitor(region, replace, editSession);
+        //FAWE end
         Operations.completeLegacy(visitor);
 
         player.print(Caption.of(

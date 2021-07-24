@@ -570,7 +570,9 @@ public interface Extent extends InputExtent, OutputExtent {
      * @return the number of blocks that matched the mask
      */
     default int countBlocks(Region region, Mask searchMask) {
-        RegionVisitor visitor = new RegionVisitor(region, searchMask::test);
+        //FAWE start > use slightly more performant RegionVisitor
+        RegionVisitor visitor = new RegionVisitor(region, searchMask::test, this);
+        //FAWE end
         Operations.completeBlindly(visitor);
         return visitor.getAffected();
     }
@@ -670,7 +672,9 @@ public interface Extent extends InputExtent, OutputExtent {
 
         BlockReplace replace = new BlockReplace(this, pattern);
         RegionMaskingFilter filter = new RegionMaskingFilter(this, mask, replace);
-        RegionVisitor visitor = new RegionVisitor(region, filter);
+        //FAWE start > add extent to RegionVisitor to allow chunk preloading
+        RegionVisitor visitor = new RegionVisitor(region, filter, this);
+        //FAWE end
         Operations.completeLegacy(visitor);
         return visitor.getAffected();
     }

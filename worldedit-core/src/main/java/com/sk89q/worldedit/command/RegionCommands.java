@@ -315,6 +315,10 @@ public class RegionCommands {
     ) throws WorldEditException {
         if (from == null) {
             from = new ExistingBlockMask(editSession);
+        //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow
+        } else if (from instanceof AbstractExtentMask) {
+            ((AbstractExtentMask) from).setExtent(editSession);
+        //FAWE end
         }
         if (from instanceof AbstractExtentMask) {
             ((AbstractExtentMask) from).setExtent(editSession);
@@ -453,6 +457,11 @@ public class RegionCommands {
             @Switch(name = 's', desc = "The flag makes it only consider snow")
                     boolean snow
     ) throws WorldEditException {
+        //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
+        if (mask instanceof AbstractExtentMask) {
+            ((AbstractExtentMask) mask).setExtent(editSession);
+        }
+        //FAWE end
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
         long volume = (((long) max.getX() - (long) min.getX() + 1) * ((long) max.getY() - (long) min.getY() + 1) * ((long) max.getZ() - (long) min
@@ -537,6 +546,11 @@ public class RegionCommands {
     ) throws WorldEditException {
         checkCommandArgument(count >= 1, "Count must be >= 1");
 
+        //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
+        if (mask instanceof AbstractExtentMask) {
+            ((AbstractExtentMask) mask).setExtent(editSession);
+        }
+        //FAWE end
         Mask combinedMask;
         if (ignoreAirBlocks) {
             if (mask == null) {
@@ -612,6 +626,11 @@ public class RegionCommands {
                     Mask mask
     ) throws WorldEditException {
 
+        //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
+        if (mask instanceof AbstractExtentMask) {
+            ((AbstractExtentMask) mask).setExtent(editSession);
+        }
+        //FAWE end
         Mask combinedMask;
         if (ignoreAirBlocks) {
             if (mask == null) {
@@ -781,7 +800,17 @@ public class RegionCommands {
                     Mask mask
     ) throws WorldEditException {
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
-        Mask finalMask = mask == null ? new SolidBlockMask(editSession) : mask;
+        //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
+        Mask finalMask;
+        if (mask != null) {
+            if (mask instanceof AbstractExtentMask) {
+                ((AbstractExtentMask) mask).setExtent(editSession);
+            }
+            finalMask = mask;
+        } else {
+            finalMask = new SolidBlockMask(editSession);
+        }
+        //FAWE end
 
         int affected = editSession.hollowOutRegion(region, thickness, pattern, finalMask);
         actor.print(Caption.of("worldedit.hollow.changed", TextComponent.of(affected)));
