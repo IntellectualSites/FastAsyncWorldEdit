@@ -23,10 +23,6 @@ repositories {
         url = uri("https://maven.enginehub.org/repo/")
     }
     maven {
-        name = "Athion"
-        url = uri("https://ci.athion.net/plugin/repository/tools/")
-    }
-    maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
     }
@@ -60,15 +56,6 @@ dependencies {
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:bukkit"))
     implementation(":worldedit-adapters:")
-    // Paper-patched NMS jars
-    compileOnly("com.destroystokyo.paperv1_15_r1:paperv1_15_r1:1_15_r1")
-    compileOnly("com.destroystokyo.paperv1_16_r1:paperv1_16_r1:1_16_r1")
-    compileOnly("com.destroystokyo.paperv1_16_r2:paperv1_16_r2:1_16_r2")
-    compileOnly("com.destroystokyo.paperv1_16_r3:paperv1_16_r3:1_16_r3")
-    compileOnly("org.spigotmcv1_15_r1:spigotmcv1_15_r1:1_15_r1")
-    compileOnly("org.spigotmcv1_16_r1:spigotmcv1_16_r1:1_16_r1")
-    compileOnly("org.spigotmcv1_16_r2:spigotmcv1_16_r2:1_16_r2")
-    compileOnly("org.spigotmcv1_16_r3:spigotmcv1_16_r3:1_16_r3")
     implementation("it.unimi.dsi:fastutil")
     api("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
@@ -187,7 +174,6 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.anarres:parallelgzip:1.0.5"))
         }
     }
-    minimize()
 }
 
 tasks.named("assemble").configure {
