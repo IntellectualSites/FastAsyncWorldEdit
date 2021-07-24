@@ -160,9 +160,9 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("io.papermc.lib", "com.sk89q.worldedit.bukkit.paperlib") {
             include(dependency("io.papermc:paperlib"))
         }
-        relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
-            include(dependency("it.unimi.dsi:fastutil"))
-        }
+//        relocate("it.unimi.dsi.fastutil", "com.sk89q.worldedit.bukkit.fastutil") {
+//            include(dependency("it.unimi.dsi:fastutil"))
+//        }
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
             include(dependency("org.incendo.serverlib:ServerLib:2.2.1"))
         }
