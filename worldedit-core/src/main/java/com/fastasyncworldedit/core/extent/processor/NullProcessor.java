@@ -6,8 +6,8 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.concurrent.Future;
 
@@ -19,17 +19,17 @@ public final class NullProcessor implements IBatchProcessor {
     }
 
     @Nullable
-    public IChunkSet processSet(@NotNull IChunk chunk, @NotNull IChunkGet get, @NotNull IChunkSet set) {
+    public IChunkSet processSet(@Nonnull IChunk chunk, @Nonnull IChunkGet get, @Nonnull IChunkSet set) {
         return null;
     }
 
     @Nullable
-    public Future<IChunkSet> postProcessSet(@NotNull IChunk chunk, @NotNull IChunkGet get, @NotNull IChunkSet set) {
+    public Future<IChunkSet> postProcessSet(@Nonnull IChunk chunk, @Nonnull IChunkGet get, @Nonnull IChunkSet set) {
         return null;
     }
 
-    @NotNull
-    public Extent construct(@NotNull Extent child) {
+    @Nonnull
+    public Extent construct(@Nonnull Extent child) {
         return new NullExtent();
     }
 

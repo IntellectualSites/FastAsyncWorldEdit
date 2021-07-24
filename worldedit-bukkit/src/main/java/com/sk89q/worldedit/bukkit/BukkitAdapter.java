@@ -49,8 +49,8 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -430,7 +430,7 @@ public enum BukkitAdapter {
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
      */
-    public static BlockState adapt(@NotNull BlockData blockData) {
+    public static BlockState adapt(@Nonnull BlockData blockData) {
         //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().adapt(blockData);
         //FAWE end
@@ -444,7 +444,7 @@ public enum BukkitAdapter {
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
      */
-    public static BlockData adapt(@NotNull BlockStateHolder block) {
+    public static BlockData adapt(@Nonnull BlockStateHolder block) {
         //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().adapt(block);
         //FAWE end

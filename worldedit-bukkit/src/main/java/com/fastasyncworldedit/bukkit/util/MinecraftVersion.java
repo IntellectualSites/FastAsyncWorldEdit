@@ -2,7 +2,7 @@ package com.fastasyncworldedit.bukkit.util;
 
 import com.google.common.collect.ComparisonChain;
 import org.bukkit.Bukkit;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * Utility class for retrieving and comparing minecraft server versions.
@@ -107,7 +107,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
     }
 
     @Override
-    public int compareTo(@NotNull MinecraftVersion other) {
+    public int compareTo(@Nonnull MinecraftVersion other) {
         if (other.equals(this)) {
             return 0;
         }

@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.util.collection;
 
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 import java.io.Closeable;
 import java.util.Iterator;

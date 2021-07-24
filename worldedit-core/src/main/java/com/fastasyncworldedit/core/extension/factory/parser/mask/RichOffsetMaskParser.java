@@ -10,7 +10,7 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.mask.OffsetMask;
 import com.sk89q.worldedit.math.BlockVector3;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.stream.Stream;
 
@@ -37,7 +37,7 @@ public class RichOffsetMaskParser extends RichParser<Mask> {
     }
 
     @Override
-    protected Mask parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
+    protected Mask parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 4) {
             return null;
         }

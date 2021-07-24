@@ -33,7 +33,6 @@ import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.jpountz.lz4.LZ4InputStream;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -389,11 +388,11 @@ public class MainUtil {
         return new FaweInputStream(new FastBufferedInputStream(is));
     }
 
-    public static URL upload(UUID uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
+    public static URL upload(UUID uuid, String file, String extension, @Nonnull final RunnableVal<OutputStream> writeTask) {
         return upload(Settings.IMP.WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
-    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
+    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, @Nonnull final RunnableVal<OutputStream> writeTask) {
         String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension : "");
         uuid = uuid == null ? UUID.randomUUID().toString() : uuid;
         final String website;
@@ -460,7 +459,7 @@ public class MainUtil {
      * @param z   New Z coordinate
      * @return New tag
      */
-    public static @NotNull CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
+    public static @Nonnull CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
         Map<String, Tag> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
@@ -475,7 +474,7 @@ public class MainUtil {
      * @param entity Entity
      * @return New tag
      */
-    public static @NotNull CompoundTag setEntityInfo(@NotNull CompoundTag tag, @NotNull Entity entity) {
+    public static @Nonnull CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
         Map<String, Tag> map = new HashMap<>(tag.getValue());
         map.put("Id", new StringTag(entity.getState().getType().getId()));
         ListTag pos = (ListTag) map.get("Pos");

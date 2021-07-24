@@ -33,8 +33,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -84,9 +84,9 @@ public class FaweDelegateRegionManager {
         return hpw.getType() != PlotAreaType.AUGMENTED || hpw.getTerrain() == PlotAreaTerrainType.NONE;
     }
 
-    public boolean handleClear(@NotNull Plot plot,
+    public boolean handleClear(@Nonnull Plot plot,
                                @Nullable Runnable whenDone,
-                               @NotNull PlotManager manager) {
+                               @Nonnull PlotManager manager) {
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 final HybridPlotWorld hybridPlotWorld = ((HybridPlotManager) manager).getHybridPlotWorld();

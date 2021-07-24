@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.util.collection;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.Collections;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
         return value2.apply(value);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Set<Entry<K, V>> entrySet() {
         if (isEmpty()) {

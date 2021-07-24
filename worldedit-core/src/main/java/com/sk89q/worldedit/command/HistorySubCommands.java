@@ -45,7 +45,7 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 import org.jetbrains.annotations.Range;
 
 import java.io.File;
@@ -276,7 +276,7 @@ public class HistorySubCommands {
 
     private PaginationBox list(RollbackDatabase database, String pageCommand, List<Supplier<? extends ChangeSet>> histories, BlockVector3 origin) {
         return PaginationBox.fromStrings("Edits:", pageCommand, histories, new Function<Supplier<? extends ChangeSet>, Component>() {
-            @NotNull
+            @Nonnull
             @Override
             public Component apply(@Nullable Supplier<? extends ChangeSet> input) {
                 ChangeSet edit = input.get();

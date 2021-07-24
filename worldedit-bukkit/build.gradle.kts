@@ -67,7 +67,6 @@ dependencies {
     })
     implementation("org.apache.logging.log4j:log4j-api")
     compileOnly("org.spigotmc:spigot:1.17-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains:annotations:21.0.0")
     implementation("io.papermc:paperlib:1.0.6")
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")

@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.registry.state;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -121,7 +121,7 @@ public class PropertyKey implements Comparable<PropertyKey> {
     }
 
     @Override
-    public int compareTo(@NotNull PropertyKey o) {
+    public int compareTo(@Nonnull PropertyKey o) {
         return Integer.compare(this.id, o.id);
     }
 }

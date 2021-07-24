@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.entity;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.Map;
 
@@ -48,9 +48,9 @@ public interface MapMetadatable extends Metadatable {
     /**
      * {@inheritDoc}
      */
-    @NotNull
+    @Nonnull
     @Override
-    default <V> V getMeta(String key, @NotNull V def) {
+    default <V> V getMeta(String key, @Nonnull V def) {
         V value = (V) getRawMeta().get(key);
         return value == null ? def : value;
     }

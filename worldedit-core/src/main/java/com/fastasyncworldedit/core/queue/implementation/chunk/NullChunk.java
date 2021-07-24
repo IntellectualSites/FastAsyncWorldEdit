@@ -13,8 +13,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.util.Collections;
 import java.util.Map;
@@ -45,21 +45,21 @@ public final class NullChunk implements IQueueChunk {
         return null;
     }
 
-    public void filterBlocks(@NotNull Filter filter, @NotNull ChunkFilterBlock block, @Nullable Region region, boolean full) {
+    public void filterBlocks(@Nonnull Filter filter, @Nonnull ChunkFilterBlock block, @Nullable Region region, boolean full) {
     }
 
-    public boolean setBiome(int x, int y, int z, @NotNull BiomeType biome) {
+    public boolean setBiome(int x, int y, int z, @Nonnull BiomeType biome) {
         return false;
     }
 
-    public boolean setTile(int x, int y, int z, @NotNull CompoundTag tag) {
+    public boolean setTile(int x, int y, int z, @Nonnull CompoundTag tag) {
         return false;
     }
 
-    public void setEntity(@NotNull CompoundTag tag) {
+    public void setEntity(@Nonnull CompoundTag tag) {
     }
 
-    public void removeEntity(@NotNull UUID uuid) {
+    public void removeEntity(@Nonnull UUID uuid) {
     }
 
     @Nullable
@@ -71,17 +71,17 @@ public final class NullChunk implements IQueueChunk {
         return 15;
     }
 
-    @NotNull
+    @Nonnull
     public char[][] getLight() {
         return new char[0][];
     }
 
-    @NotNull
+    @Nonnull
     public char[][] getSkyLight() {
         return new char[0][];
     }
 
-    @NotNull
+    @Nonnull
     public int[] getHeightMap(@Nullable HeightMapType type) {
         return new int[256];
     }
@@ -124,7 +124,7 @@ public final class NullChunk implements IQueueChunk {
         return false;
     }
 
-    public void setBlocks(int layer, @NotNull char[] data) {
+    public void setBlocks(int layer, @Nonnull char[] data) {
     }
 
     @Nullable
@@ -136,17 +136,17 @@ public final class NullChunk implements IQueueChunk {
         return false;
     }
 
-    @NotNull
+    @Nonnull
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypes.__RESERVED__.getDefaultState();
     }
 
-    @NotNull
+    @Nonnull
     public BaseBlock getFullBlock(int x, int y, int z) {
         return BlockTypes.__RESERVED__.getDefaultState().toBaseBlock();
     }
 
-    @NotNull
+    @Nonnull
     public Map<BlockVector3, CompoundTag> getTiles() {
         return Collections.emptyMap();
     }
@@ -156,7 +156,7 @@ public final class NullChunk implements IQueueChunk {
         return null;
     }
 
-    @NotNull
+    @Nonnull
     public Set<CompoundTag> getEntities() {
         return Collections.emptySet();
     }
@@ -167,7 +167,7 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Nullable
-    public CompoundTag getEntity(@NotNull UUID uuid) {
+    public CompoundTag getEntity(@Nonnull UUID uuid) {
         return null;
     }
 

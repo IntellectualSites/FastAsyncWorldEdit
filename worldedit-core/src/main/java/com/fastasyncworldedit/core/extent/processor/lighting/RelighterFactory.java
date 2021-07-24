@@ -3,7 +3,7 @@ package com.fastasyncworldedit.core.extent.processor.lighting;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.world.World;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * This abstracts the creation of {@link Relighter}s to allow more modular code.
@@ -23,6 +23,6 @@ public interface RelighterFactory {
      * @param queue the queue extent to work with.
      * @return a new Relighter instance with the specified settings.
      */
-    @NotNull
+    @Nonnull
     Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue);
 }

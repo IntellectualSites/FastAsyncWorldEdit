@@ -33,7 +33,7 @@ import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
@@ -329,7 +329,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
         //FAWE start
         return new AbstractSet<BlockVector2>() {
-            @NotNull
+            @Nonnull
             @Override
             public Iterator<BlockVector2> iterator() {
                 return new Iterator<BlockVector2>() {

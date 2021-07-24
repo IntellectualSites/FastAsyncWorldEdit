@@ -45,7 +45,7 @@ import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +79,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.emptyBaseBlock = new BlanketBaseBlock(this);
     }
 
-    public BlockState(BlockType blockType, int internalId, int ordinal, @NotNull CompoundTag tile) {
+    public BlockState(BlockType blockType, int internalId, int ordinal, @Nonnull CompoundTag tile) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;

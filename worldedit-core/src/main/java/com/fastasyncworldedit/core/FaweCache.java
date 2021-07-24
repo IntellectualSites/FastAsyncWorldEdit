@@ -35,7 +35,7 @@ import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,7 +118,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Supplier<V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(@NotNull T key) {
+            public V load(@Nonnull T key) {
                 return withInitial.get();
             }
         });
@@ -127,7 +127,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Function<T, V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(@NotNull T key) {
+            public V load(@Nonnull T key) {
                 return withInitial.apply(key);
             }
         });
