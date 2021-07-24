@@ -332,6 +332,8 @@ public class Config {
     /**
      * Get the field for a specific config node and instance.
      *
+     * @apiNote As expiry can have multiple blocks there will be multiple instances
+     *
      * @param split    the node (split by period)
      * @param instance the instance
      */

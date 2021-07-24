@@ -92,6 +92,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      * Create a new root IChunk object. Full chunks will be reused, so a more optimized chunk can be
      * returned in that case.
      *
+     * @see IQueueExtent#wrap(IChunk) Don't wrap the chunk, that should be done in
      * @param isFull true if a more optimized chunk should be returned
      * @return a more optimized chunk object
      */
@@ -115,6 +116,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 
     /**
      * Flush all changes to the world.
+     * @apiNote Best to call this async, so it doesn't hang the server.
      */
     @Override
     void flush();
