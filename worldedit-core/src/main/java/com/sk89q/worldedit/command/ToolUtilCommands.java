@@ -327,7 +327,6 @@ public class ToolUtilCommands {
         bt.update();
     }
 
-
     @Command(
             name = "smask",
             aliases = {"/smask", "/sourcemask", "sourcemask"},

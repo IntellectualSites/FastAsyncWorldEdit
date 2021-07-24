@@ -369,8 +369,9 @@ public class SchematicCommands {
                     }
                 }
                 if (file == null || !file.exists() || !MainUtil.isInSubDirectory(saveDir, file)) {
-                    actor.printError("Schematic " + filename + " does not exist! (" + (file != null && file.exists()) + "|" + file + "|" + (file != null && !MainUtil
-                            .isInSubDirectory(saveDir, file)) + ")");
+                    actor.printError(TextComponent.of("Schematic " + filename + " does not exist! (" + (file != null && file.exists()) +
+                            "|" + file + "|" + (file != null && !MainUtil
+                            .isInSubDirectory(saveDir, file)) + ")"));
                     return;
                 }
                 if (format == null) {

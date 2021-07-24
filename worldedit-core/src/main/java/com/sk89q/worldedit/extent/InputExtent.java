@@ -108,6 +108,7 @@ public interface InputExtent {
      *
      * @param position the (x, y, z) location to check the biome at
      * @return the biome at the location
+     * @see NonAbstractForCompatibility This must be overridden by new subclasses.
      */
     @NonAbstractForCompatibility(delegateName = "getBiome", delegateParams = {BlockVector2.class})
     default BiomeType getBiome(BlockVector3 position) {

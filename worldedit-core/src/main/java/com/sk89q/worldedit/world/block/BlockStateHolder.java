@@ -165,6 +165,8 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      *
      * @param compoundTag The NBT Data to apply
      * @return The BaseBlock
+     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
+     *          for details
      */
     @NonAbstractForCompatibility(
             delegateName = "toBaseBlock",

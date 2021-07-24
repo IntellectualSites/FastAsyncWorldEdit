@@ -38,6 +38,7 @@ public interface Pattern extends Filter {
      *
      * @param position the position
      * @return a block
+     * @see NonAbstractForCompatibility This must be overridden by new subclasses.
      * @deprecated use {@link Pattern#applyBlock(BlockVector3)}
      */
     @Deprecated
