@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class MultiClipboardHolder extends URIClipboardHolder {
+
     private final List<URIClipboardHolder> holders;
     private Clipboard[] cached;
 
@@ -150,8 +151,10 @@ public class MultiClipboardHolder extends URIClipboardHolder {
             cached = available = getClipboards().toArray(new Clipboard[0]);
         }
         switch (available.length) {
-            case 0: return EmptyClipboard.getInstance();
-            case 1: return available[0];
+            case 0:
+                return EmptyClipboard.getInstance();
+            case 1:
+                return available[0];
         }
 
         int index = ThreadLocalRandom.current().nextInt(available.length);
@@ -179,4 +182,5 @@ public class MultiClipboardHolder extends URIClipboardHolder {
             holder.close();
         }
     }
+
 }

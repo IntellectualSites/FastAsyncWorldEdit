@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -27,7 +28,6 @@ import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
@@ -51,7 +51,7 @@ public interface OutputExtent {
      * example, the approximate number of changes.</p>
      *
      * @param position position of the block
-     * @param block block to set
+     * @param block    block to set
      * @return true if the block was successfully set (return value may not be accurate)
      * @throws WorldEditException thrown on an error
      * @deprecated It is recommended that you use {@link #setBlock(int, int, int, BlockStateHolder)} in FAWE
@@ -88,22 +88,22 @@ public interface OutputExtent {
      * Set the biome.
      *
      * @param position the (x, z) location to set the biome at
-     * @param biome the biome to set to
+     * @param biome    the biome to set to
      * @return true if the biome was successfully set (return value may not be accurate)
      * @deprecated Biomes in Minecraft are 3D now, use {@link OutputExtent#setBiome(BlockVector3, BiomeType)}
      */
     @Deprecated
     default boolean setBiome(BlockVector2 position, BiomeType biome) {
         boolean result = false;
-        for (int y = 0; y < 256; y ++) {
+        for (int y = 0; y < 256; y++) {
             result |= setBiome(position.toBlockVector3().mutY(y), biome);
         }
         return result;
     }
 
     @NonAbstractForCompatibility(
-        delegateName = "setBiome",
-        delegateParams = { int.class, int.class, int.class, BiomeType.class }
+            delegateName = "setBiome",
+            delegateParams = {int.class, int.class, int.class, BiomeType.class}
     )
     // The defaults need to remain for compatibility (the actual implementation still needs to override one of these)
     default boolean setBiome(int x, int y, int z, BiomeType biome) {
@@ -113,24 +113,23 @@ public interface OutputExtent {
     }
 
     //FAWE start
+
     /**
      * Set the biome.
      *
      * <p>
-     *     As implementation varies per Minecraft version, this may set more than
-     *     this position's biome. On versions prior to 1.15, this will set the entire
-     *     column. On later versions it will set the 4x4x4 cube.
+     * As implementation varies per Minecraft version, this may set more than
+     * this position's biome. On versions prior to 1.15, this will set the entire
+     * column. On later versions it will set the 4x4x4 cube.
      * </p>
      *
      * @param position the (x, y, z) location to set the biome at
-     * @param biome the biome to set to
+     * @param biome    the biome to set to
      * @return true if the biome was successfully set (return value may not be accurate)
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "setBiome",
-        delegateParams = { BlockVector3.class, BiomeType.class }
+            delegateName = "setBiome",
+            delegateParams = {BlockVector3.class, BiomeType.class}
     )
     default boolean setBiome(BlockVector3 position, BiomeType biome) {
         DeprecationUtil.checkDelegatingOverride(getClass());
@@ -142,7 +141,7 @@ public interface OutputExtent {
      * Set the light value.
      *
      * @param position position of the block
-     * @param value light level to set
+     * @param value    light level to set
      */
     default void setBlockLight(BlockVector3 position, int value) {
         setBlockLight(position.getX(), position.getY(), position.getZ(), value);
@@ -155,7 +154,7 @@ public interface OutputExtent {
      * Set the sky light value.
      *
      * @param position position of the block
-     * @param value light level to set
+     * @param value    light level to set
      */
     default void setSkyLight(BlockVector3 position, int value) {
         setSkyLight(position.getX(), position.getY(), position.getZ(), value);
@@ -174,5 +173,7 @@ public interface OutputExtent {
      *
      * @return an operation or null if there is none to execute
      */
-    @Nullable Operation commit();
+    @Nullable
+    Operation commit();
+
 }

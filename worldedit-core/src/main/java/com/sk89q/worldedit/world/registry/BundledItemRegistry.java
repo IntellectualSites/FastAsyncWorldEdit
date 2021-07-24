@@ -48,7 +48,7 @@ public class BundledItemRegistry implements ItemRegistry {
             return TextComponent.of(itemEntry.localizedName);
         }
         return Caption.of(
-            TranslationManager.makeTranslationKey("item", itemType.getId())
+                TranslationManager.makeTranslationKey("item", itemType.getId())
         );
     }
 
@@ -76,4 +76,5 @@ public class BundledItemRegistry implements ItemRegistry {
     public ItemMaterial getMaterial(ItemType itemType) {
         return new PassthroughItemMaterial(BundledItemData.getInstance().getMaterialById(itemType.getId()));
     }
+
 }

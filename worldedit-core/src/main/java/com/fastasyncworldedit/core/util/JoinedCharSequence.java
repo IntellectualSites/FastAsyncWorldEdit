@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 public class JoinedCharSequence implements CharSequence {
+
     private char join;
     private int len2;
     private int len1;
@@ -17,6 +18,7 @@ public class JoinedCharSequence implements CharSequence {
         this.b = b;
         return this;
     }
+
     @Override
     public int length() {
         return length;
@@ -69,4 +71,5 @@ public class JoinedCharSequence implements CharSequence {
         }
         return false;
     }
+
 }

@@ -259,4 +259,5 @@ class SimpleBlockMaterial implements BlockMaterial {
     public void setHasContainer(boolean hasContainer) {
         this.hasContainer = hasContainer;
     }
+
 }

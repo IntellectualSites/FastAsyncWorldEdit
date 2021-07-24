@@ -73,7 +73,7 @@ public class ExtendingCuboidRegionSelector extends CuboidRegionSelector {
     /**
      * Create a new selector.
      *
-     * @param world the world
+     * @param world     the world
      * @param position1 the first position
      * @param position2 the second position
      */

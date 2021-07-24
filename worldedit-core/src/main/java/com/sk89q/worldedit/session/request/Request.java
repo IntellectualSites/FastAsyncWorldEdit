@@ -124,6 +124,7 @@ public final class Request {
     }
 
     //FAWE start
+
     /**
      * Get the request session.
      *
@@ -185,4 +186,5 @@ public final class Request {
     private void invalidate() {
         valid = false;
     }
+
 }

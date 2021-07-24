@@ -4,6 +4,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 
 public class ExtremaMask extends AngleMask {
+
     public ExtremaMask(Extent extent, double min, double max, boolean overlay, int distance) {
         super(extent, min, max, overlay, distance);
     }
@@ -83,4 +84,5 @@ public class ExtremaMask extends AngleMask {
     public Mask copy() {
         return new ExtremaMask(getExtent(), min, max, overlay, distance);
     }
+
 }

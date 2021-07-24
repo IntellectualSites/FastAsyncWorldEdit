@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -18,6 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RandomFullClipboardPattern extends AbstractPattern {
+
     private final Extent extent;
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private final List<ClipboardHolder> clipboards;
@@ -60,4 +61,5 @@ public class RandomFullClipboardPattern extends AbstractPattern {
     public BaseBlock applyBlock(BlockVector3 position) {
         throw new IllegalStateException("Incorrect use. This pattern can only be applied to an extent!");
     }
+
 }

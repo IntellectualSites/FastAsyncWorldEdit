@@ -2,8 +2,8 @@ package com.fastasyncworldedit.core.util.collection;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -17,6 +17,7 @@ import java.util.stream.Stream;
  * @apiNote It's assumed that the collection is set like, otherwise behavior will be weird
  */
 public class AdaptedSetCollection<T, V> implements Set<V> {
+
     private final Collection<V> adapted;
     private final Collection<T> original;
 
@@ -131,4 +132,5 @@ public class AdaptedSetCollection<T, V> implements Set<V> {
     public void forEach(Consumer<? super V> action) {
         adapted.forEach(action);
     }
+
 }

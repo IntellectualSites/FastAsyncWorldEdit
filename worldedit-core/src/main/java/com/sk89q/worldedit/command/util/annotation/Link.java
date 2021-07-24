@@ -7,5 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface Link {
 
     Class clazz() default Link.class;
+
     String value();
+
 }

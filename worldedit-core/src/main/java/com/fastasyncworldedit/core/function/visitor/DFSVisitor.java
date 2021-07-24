@@ -99,8 +99,9 @@ public abstract class DFSVisitor implements Operation {
 //                mutable2.mutY(from.getY() + direction.y);
 //                mutable2.mutZ(from.getZ() + direction.z);
                 BlockVector3 bv2 = BlockVector3
-                    .at(from.getX() + direction.getX(), from.getY() + direction.getY(),
-                        from.getZ() + direction.getZ());
+                        .at(from.getX() + direction.getX(), from.getY() + direction.getY(),
+                                from.getZ() + direction.getZ()
+                        );
                 if (isVisitable(bv, bv2)) {
                     Node adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
                     if (!adjacent.equals(current.from)) {
@@ -113,7 +114,7 @@ public abstract class DFSVisitor implements Operation {
                                     } else {
                                         hashQueue.add(adjacent);
                                         queue.addFirst(
-                                            new NodePair(from, adjacent, current.depth + 1));
+                                                new NodePair(from, adjacent, current.depth + 1));
                                     }
                                 } else {
                                     countAttempt++;
@@ -144,8 +145,8 @@ public abstract class DFSVisitor implements Operation {
 
     public Iterable<Component> getStatusMessages() {
         return Lists.newArrayList(Caption.of(
-            "fawe.worldedit.visitor.visitor.block",
-            TextComponent.of(getAffected())
+                "fawe.worldedit.visitor.visitor.block",
+                TextComponent.of(getAffected())
         ));
     }
 
@@ -208,6 +209,7 @@ public abstract class DFSVisitor implements Operation {
             Node other = (Node) obj;
             return other.x == x && other.z == z && other.y == y;
         }
+
     }
 
     public static class NodePair {
@@ -221,5 +223,7 @@ public abstract class DFSVisitor implements Operation {
             this.to = to;
             this.depth = depth;
         }
+
     }
+
 }

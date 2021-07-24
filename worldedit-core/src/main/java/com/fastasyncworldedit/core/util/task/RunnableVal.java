@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class RunnableVal<T> implements Runnable, Supplier<T>, Consumer<T> {
+
     public T value;
 
     public RunnableVal() {
@@ -34,4 +35,5 @@ public abstract class RunnableVal<T> implements Runnable, Supplier<T>, Consumer<
     public void accept(T t) {
         run(value);
     }
+
 }

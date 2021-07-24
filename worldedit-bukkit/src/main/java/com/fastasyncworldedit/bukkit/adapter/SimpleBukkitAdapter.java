@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -11,6 +10,7 @@ import org.bukkit.block.data.BlockData;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SimpleBukkitAdapter extends CachedBukkitAdapter {
+
     private BlockData[][] blockDataCache;
 
     private boolean init() {
@@ -18,7 +18,7 @@ public class SimpleBukkitAdapter extends CachedBukkitAdapter {
             return false;
         }
         this.blockDataCache = new BlockData[BlockTypes.size()][];
-        blockDataCache[0] = new BlockData[] {Material.AIR.createBlockData()};
+        blockDataCache[0] = new BlockData[]{Material.AIR.createBlockData()};
         return true;
     }
 
@@ -51,4 +51,5 @@ public class SimpleBukkitAdapter extends CachedBukkitAdapter {
             throw e;
         }
     }
+
 }

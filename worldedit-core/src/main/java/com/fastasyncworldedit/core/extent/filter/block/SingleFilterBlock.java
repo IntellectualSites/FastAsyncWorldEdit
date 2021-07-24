@@ -30,4 +30,5 @@ public class SingleFilterBlock extends AbstractSingleFilterBlock {
     public int getZ() {
         return z;
     }
+
 }

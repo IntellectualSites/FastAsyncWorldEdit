@@ -14,7 +14,7 @@ public class NullChangeSet extends AbstractChangeSet {
     public NullChangeSet(World world) {
         super(world);
     }
-    
+
     @Override
     public final void close() {
     }
@@ -75,4 +75,5 @@ public class NullChangeSet extends AbstractChangeSet {
         // TODO Auto-generated method stub
 
     }
+
 }

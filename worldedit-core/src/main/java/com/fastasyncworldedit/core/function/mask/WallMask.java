@@ -1,15 +1,16 @@
 package com.fastasyncworldedit.core.function.mask;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 public class WallMask extends AbstractMask {
+
     private final int min;
     private final int max;
     private final Mask mask;
-    private MutableBlockVector3 vector;
+    private final MutableBlockVector3 vector;
 
     public WallMask(Mask mask, int requiredMin, int requiredMax) {
         this.mask = mask;
@@ -54,4 +55,5 @@ public class WallMask extends AbstractMask {
     public Mask copy() {
         return new WallMask(mask.copy(), min, max);
     }
+
 }

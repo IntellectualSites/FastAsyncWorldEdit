@@ -80,7 +80,7 @@ public abstract class ChunkStore implements Closeable {
      * @param position the position of the chunk
      * @return tag
      * @throws DataException thrown on data error
-     * @throws IOException thrown on I/O error
+     * @throws IOException   thrown on I/O error
      */
     public abstract CompoundTag getChunkTag(BlockVector2 position, World world) throws DataException, IOException;
 
@@ -90,8 +90,8 @@ public abstract class ChunkStore implements Closeable {
      * @param position the position of the chunk
      * @return a chunk
      * @throws ChunkStoreException thrown if there is an error from the chunk store
-     * @throws DataException thrown on data error
-     * @throws IOException thrown on I/O error
+     * @throws DataException       thrown on data error
+     * @throws IOException         thrown on I/O error
      */
     public Chunk getChunk(BlockVector2 position, World world) throws DataException, IOException {
         CompoundTag rootTag = getChunkTag(position, world);

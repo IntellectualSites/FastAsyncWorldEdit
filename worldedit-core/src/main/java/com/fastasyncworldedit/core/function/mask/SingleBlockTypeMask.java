@@ -9,6 +9,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class SingleBlockTypeMask extends ABlockMask {
+
     private final int internalId;
     private final boolean isAir;
 
@@ -47,4 +48,5 @@ public class SingleBlockTypeMask extends ABlockMask {
     public Mask copy() {
         return new SingleBlockTypeMask(getExtent(), internalId, isAir);
     }
+
 }

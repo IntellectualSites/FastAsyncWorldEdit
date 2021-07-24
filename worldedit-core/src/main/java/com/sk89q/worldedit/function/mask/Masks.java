@@ -126,7 +126,8 @@ public final class Masks {
 
     //FAWE start - protected > private
     protected static class AlwaysTrue implements Mask, Mask2D {
-    //FAWE end
+
+        //FAWE end
         @Override
         public boolean test(BlockVector3 vector) {
             return true;
@@ -171,7 +172,8 @@ public final class Masks {
 
     //FAWE start - protected > private
     protected static class AlwaysFalse implements Mask, Mask2D {
-    //FAWE end
+
+        //FAWE end
         @Override
         public boolean test(BlockVector3 vector) {
             return false;

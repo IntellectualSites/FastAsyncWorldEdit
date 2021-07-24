@@ -23,6 +23,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +37,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -260,7 +260,7 @@ public class MaskIntersection extends AbstractMask {
     @Override
     public boolean test(BlockVector3 vector) {
         for (Mask mask : masksArray) {
-            if (!mask.test( vector)) {
+            if (!mask.test(vector)) {
                 return false;
             }
         }
@@ -286,7 +286,7 @@ public class MaskIntersection extends AbstractMask {
 
     //FAWE start
     @Override
-    public Mask copy(){
+    public Mask copy() {
         Set<Mask> masks = this.masks.stream().map(Mask::copy).collect(Collectors.toSet());
         return new MaskIntersection(masks);
     }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ChangeSetSummary {
+
     Map<BlockState, Integer> getBlocks();
 
     int getSize();
@@ -33,4 +34,5 @@ public interface ChangeSetSummary {
         }
         return newMap;
     }
+
 }

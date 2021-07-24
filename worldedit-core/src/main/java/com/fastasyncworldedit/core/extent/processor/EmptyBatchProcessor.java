@@ -8,11 +8,11 @@ import com.sk89q.worldedit.extent.Extent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public final class EmptyBatchProcessor implements IBatchProcessor {
+
     private static final EmptyBatchProcessor instance = new EmptyBatchProcessor();
 
     public static EmptyBatchProcessor getInstance() {

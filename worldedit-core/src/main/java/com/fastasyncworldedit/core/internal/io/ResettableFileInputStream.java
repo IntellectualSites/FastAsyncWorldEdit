@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 public class ResettableFileInputStream extends FilterInputStream {
+
     private final FileChannel myFileChannel;
     private long mark = 0;
 
@@ -36,4 +37,5 @@ public class ResettableFileInputStream extends FilterInputStream {
         }
         myFileChannel.position(mark);
     }
+
 }

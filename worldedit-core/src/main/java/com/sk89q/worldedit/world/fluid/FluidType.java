@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world.fluid;
 
+import com.fastasyncworldedit.core.registry.RegistryItem;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.fastasyncworldedit.core.registry.RegistryItem;
 
 /**
  * Minecraft now has a 'fluid' system. This is a
@@ -79,4 +79,5 @@ public class FluidType implements RegistryItem, Keyed {
     public boolean equals(Object obj) {
         return obj instanceof FluidType && this.id.equals(((FluidType) obj).id);
     }
+
 }

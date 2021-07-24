@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.FaweCache;
 import java.util.Set;
 
 public class FaweLimit {
+
     public int MAX_ACTIONS = 0;
     public int MAX_CHANGES = 0;
     public int MAX_FAILS = 0;
@@ -178,6 +179,7 @@ public class FaweLimit {
             throw FaweCache.MAX_CHANGES;
         }
     }
+
     public void THROW_MAX_CHANGES(long amt) {
         if ((MAX_CHANGES -= amt) <= 0) {
             throw FaweCache.MAX_CHANGES;
@@ -222,17 +224,17 @@ public class FaweLimit {
 
     public boolean isUnlimited() {
         return MAX_CHANGES == Integer.MAX_VALUE
-            && MAX_FAILS == Integer.MAX_VALUE
-            && MAX_CHECKS == Integer.MAX_VALUE
-            && MAX_ITERATIONS == Integer.MAX_VALUE
-            && MAX_BLOCKSTATES == Integer.MAX_VALUE
-            && MAX_ENTITIES == Integer.MAX_VALUE
-            && MAX_HISTORY == Integer.MAX_VALUE
-            && INVENTORY_MODE == 0
-            && SPEED_REDUCTION == 0
-            && FAST_PLACEMENT
-            && !RESTRICT_HISTORY_TO_REGIONS
-            && (STRIP_NBT == null || STRIP_NBT.isEmpty());
+                && MAX_FAILS == Integer.MAX_VALUE
+                && MAX_CHECKS == Integer.MAX_VALUE
+                && MAX_ITERATIONS == Integer.MAX_VALUE
+                && MAX_BLOCKSTATES == Integer.MAX_VALUE
+                && MAX_ENTITIES == Integer.MAX_VALUE
+                && MAX_HISTORY == Integer.MAX_VALUE
+                && INVENTORY_MODE == 0
+                && SPEED_REDUCTION == 0
+                && FAST_PLACEMENT
+                && !RESTRICT_HISTORY_TO_REGIONS
+                && (STRIP_NBT == null || STRIP_NBT.isEmpty());
     }
 
     public void set(FaweLimit limit) {
@@ -275,4 +277,5 @@ public class FaweLimit {
     public String toString() {
         return MAX_CHANGES + "";
     }
+
 }

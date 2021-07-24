@@ -10,11 +10,12 @@ import java.util.Map;
  * instance.
  */
 public final class TypeDescription {
+
     private final Class<? extends Object> type;
     private Tag tag;
-    private Map<String, Class<? extends Object>> listProperties;
-    private Map<String, Class<? extends Object>> keyProperties;
-    private Map<String, Class<? extends Object>> valueProperties;
+    private final Map<String, Class<? extends Object>> listProperties;
+    private final Map<String, Class<? extends Object>> keyProperties;
+    private final Map<String, Class<? extends Object>> valueProperties;
 
     public TypeDescription(Class<? extends Object> clazz, Tag tag) {
         this.type = clazz;
@@ -68,7 +69,7 @@ public final class TypeDescription {
      * Specify that the property is a type-safe {@code List}.
      *
      * @param property name of the JavaBean property
-     * @param type class of List values
+     * @param type     class of List values
      */
     public void putListPropertyType(String property, Class<? extends Object> type) {
         listProperties.put(property, type);
@@ -88,11 +89,13 @@ public final class TypeDescription {
      * Specify that the property is a type-safe {@code Map}.
      *
      * @param property property name of this JavaBean
-     * @param key class of keys in Map
-     * @param value class of values in Map
+     * @param key      class of keys in Map
+     * @param value    class of values in Map
      */
-    public void putMapPropertyType(String property, Class<? extends Object> key,
-                                   Class<? extends Object> value) {
+    public void putMapPropertyType(
+            String property, Class<? extends Object> key,
+            Class<? extends Object> value
+    ) {
         keyProperties.put(property, key);
         valueProperties.put(property, value);
     }
@@ -121,4 +124,5 @@ public final class TypeDescription {
     public String toString() {
         return "TypeDescription for " + getType() + " (tag='" + getTag() + "')";
     }
+
 }

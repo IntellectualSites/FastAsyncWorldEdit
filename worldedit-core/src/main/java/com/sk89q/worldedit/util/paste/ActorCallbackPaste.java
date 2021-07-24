@@ -40,9 +40,9 @@ public final class ActorCallbackPaste {
      * Submit data to a pastebin service and inform the sender of
      * success or failure.
      *
-     * @param supervisor The supervisor instance
-     * @param sender The sender
-     * @param content The content
+     * @param supervisor     The supervisor instance
+     * @param sender         The sender
+     * @param content        The content
      * @param successMessage The message, formatted with {@link String#format(String, Object...)} on success
      * @deprecated Use the Component-based version
      */
@@ -62,12 +62,17 @@ public final class ActorCallbackPaste {
      * Submit data to a pastebin service and inform the sender of
      * success or failure.
      *
-     * @param supervisor The supervisor instance
-     * @param sender The sender
-     * @param content The content
+     * @param supervisor     The supervisor instance
+     * @param sender         The sender
+     * @param content        The content
      * @param successMessage The message builder, given the URL as an arg
      */
-    public static void pastebin(Supervisor supervisor, final Actor sender, String content, final TranslatableComponent.Builder successMessage) {
+    public static void pastebin(
+            Supervisor supervisor,
+            final Actor sender,
+            String content,
+            final TranslatableComponent.Builder successMessage
+    ) {
         Callable<URL> task = paster.paste(content);
 
         AsyncCommandBuilder.wrap(task, sender)

@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.history.changeset;
 
-import com.fastasyncworldedit.core.history.changeset.ChangeSetSummary;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
@@ -8,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SimpleChangeSetSummary implements ChangeSetSummary {
+
     public int[] blocks;
 
     public int minX;
@@ -66,4 +66,5 @@ public class SimpleChangeSetSummary implements ChangeSetSummary {
         }
         return count;
     }
+
 }

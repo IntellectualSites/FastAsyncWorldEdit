@@ -29,10 +29,10 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Applies a {@link BlockBag} to operations.
@@ -41,14 +41,14 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
     //FAWE start
     private final boolean mine;
-    private int[] missingBlocks = new int[BlockTypes.size()];
+    private final int[] missingBlocks = new int[BlockTypes.size()];
     //FAWE end
     private BlockBag blockBag;
 
     /**
      * Create a new instance.
      *
-     * @param extent the extent
+     * @param extent   the extent
      * @param blockBag the block bag
      */
     //FAWE start
@@ -137,4 +137,5 @@ public class BlockBagExtent extends AbstractDelegateExtent {
 
         return super.setBlock(x, y, z, block);
     }
+
 }

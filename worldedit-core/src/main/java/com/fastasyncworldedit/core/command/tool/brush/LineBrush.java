@@ -22,7 +22,8 @@ public class LineBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         if (pos1 == null) {
             pos1 = position;
             editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.primary", position));
@@ -42,4 +43,5 @@ public class LineBrush implements Brush, ResettableTool {
         pos1 = null;
         return true;
     }
+
 }

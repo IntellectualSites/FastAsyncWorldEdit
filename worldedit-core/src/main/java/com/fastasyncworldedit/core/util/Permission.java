@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 import com.sk89q.worldedit.util.auth.Subject;
+
 import javax.annotation.Nonnull;
 
 public enum Permission {

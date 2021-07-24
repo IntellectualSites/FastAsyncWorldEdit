@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.queue.implementation.chunk;
 
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
-import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -13,9 +13,9 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 public final class NullChunk implements IQueueChunk {
+
     private static final NullChunk instance = new NullChunk();
 
     public static NullChunk getInstance() {
@@ -171,20 +172,26 @@ public final class NullChunk implements IQueueChunk {
         return null;
     }
 
-    @Override public void setCreateCopy(boolean createCopy) {}
+    @Override
+    public void setCreateCopy(boolean createCopy) {
+    }
 
-    @Override public boolean isCreateCopy() {
+    @Override
+    public boolean isCreateCopy() {
         return false;
     }
 
     @Override
-    public void setLightingToGet(char[][] lighting) {}
+    public void setLightingToGet(char[][] lighting) {
+    }
 
     @Override
-    public void setSkyLightingToGet(char[][] lighting) {}
+    public void setSkyLightingToGet(char[][] lighting) {
+    }
 
     @Override
-    public void setHeightmapToGet(HeightMapType type, int[] data) {}
+    public void setHeightmapToGet(HeightMapType type, int[] data) {
+    }
 
     @Nullable
     public <T extends Future<T>> T call(@Nullable IChunkSet set, @Nullable Runnable finalize) {
@@ -201,4 +208,5 @@ public final class NullChunk implements IQueueChunk {
 
     private NullChunk() {
     }
+
 }

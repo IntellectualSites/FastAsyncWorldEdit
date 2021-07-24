@@ -22,6 +22,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 public class MemoryOptimizedClipboard extends LinearClipboard {
 
@@ -51,7 +51,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     private boolean saveOrdinals = false;
 
-    private int compressionLevel;
+    private final int compressionLevel;
 
     public MemoryOptimizedClipboard(Region region) {
         this(region, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
@@ -95,7 +95,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
             return;
         }
         try {
-            for (int y = 0; y < getHeight(); y ++) {
+            for (int y = 0; y < getHeight(); y++) {
                 for (int z = 0; z < getLength(); z++) {
                     for (int x = 0; x < getWidth(); x++) {
                         task.applyInt(getIndex(x, y, z), biomes[getBiomeIndex(x, y, z)] & 0xFF);
@@ -285,7 +285,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             int y = index / getArea();
-            int newI = index- y * getArea();
+            int newI = index - y * getArea();
             int z = newI / getWidth();
             int x = newI - z * getWidth();
             setTile(x, y, z, block.getNbtData());
@@ -308,7 +308,10 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        return new ArrayList<>(entities.stream().filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList()));
+        return new ArrayList<>(entities
+                .stream()
+                .filter(e -> region.contains(e.getLocation().toBlockPoint()))
+                .collect(Collectors.toList()));
     }
 
     @Override
@@ -317,4 +320,5 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
             this.entities.remove(entity);
         }
     }
+
 }

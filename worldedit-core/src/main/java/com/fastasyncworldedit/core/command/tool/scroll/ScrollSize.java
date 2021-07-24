@@ -5,6 +5,7 @@ import com.sk89q.worldedit.command.tool.BrushTool;
 import com.sk89q.worldedit.entity.Player;
 
 public class ScrollSize extends Scroll {
+
     public ScrollSize(BrushTool tool) {
         super(tool);
     }
@@ -16,4 +17,5 @@ public class ScrollSize extends Scroll {
         getTool().setSize(newSize);
         return true;
     }
+
 }

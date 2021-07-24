@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.function.mask;
 
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
@@ -75,4 +75,5 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
     public Mask copy() {
         return new CachedMask(getMask().copy());
     }
+
 }

@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.extent.filter;
 
-import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.extent.filter.block.DelegateFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 
@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  * @param <T> Parent which extends Filter
  */
 public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
+
     private final Supplier<Mask> supplier;
     private final Mask mask;
     private final AtomicInteger changes;
@@ -69,4 +70,5 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
     public Filter fork() {
         return new MaskFilter<>(getParent().fork(), mask::copy, mask.copy(), changes);
     }
+
 }

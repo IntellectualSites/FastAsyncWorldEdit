@@ -16,7 +16,7 @@ public class StringMan {
 
     public static boolean containsAny(CharSequence sequence, String any) {
         return IntStream.range(0, sequence.length())
-            .anyMatch(i -> any.indexOf(sequence.charAt(i)) != -1);
+                .anyMatch(i -> any.indexOf(sequence.charAt(i)) != -1);
     }
 
     public static boolean containsIgnoreCase(String haystack, String needle) {
@@ -68,11 +68,11 @@ public class StringMan {
         long b = bytes == Long.MIN_VALUE ? Long.MAX_VALUE : Math.abs(bytes);
         return b < 1024L ? bytes + " B"
                 : b <= 0xfffccccccccccccL >> 40 ? String.format("%.1f KiB", bytes / 0x1p10)
-                : b <= 0xfffccccccccccccL >> 30 ? String.format("%.1f MiB", bytes / 0x1p20)
-                : b <= 0xfffccccccccccccL >> 20 ? String.format("%.1f GiB", bytes / 0x1p30)
-                : b <= 0xfffccccccccccccL >> 10 ? String.format("%.1f TiB", bytes / 0x1p40)
-                : b <= 0xfffccccccccccccL ? String.format("%.1f PiB", (bytes >> 10) / 0x1p40)
-                : String.format("%.1f EiB", (bytes >> 20) / 0x1p40);
+                        : b <= 0xfffccccccccccccL >> 30 ? String.format("%.1f MiB", bytes / 0x1p20)
+                                : b <= 0xfffccccccccccccL >> 20 ? String.format("%.1f GiB", bytes / 0x1p30)
+                                        : b <= 0xfffccccccccccccL >> 10 ? String.format("%.1f TiB", bytes / 0x1p40)
+                                                : b <= 0xfffccccccccccccL ? String.format("%.1f PiB", (bytes >> 10) / 0x1p40)
+                                                        : String.format("%.1f EiB", (bytes >> 20) / 0x1p40);
     }
 
     public static String prettyFormat(double d) {
@@ -96,21 +96,31 @@ public class StringMan {
             case '{':
             case '<':
                 return true;
-            default: return false;
+            default:
+                return false;
         }
     }
 
     public static char getMatchingBracket(char c) {
         switch (c) {
-            case '[': return ']';
-            case '(': return ')';
-            case '{': return '}';
-            case '<': return '>';
-            case ']': return '[';
-            case ')': return '(';
-            case '}': return '{';
-            case '>': return '<';
-            default: return c;
+            case '[':
+                return ']';
+            case '(':
+                return ')';
+            case '{':
+                return '}';
+            case '<':
+                return '>';
+            case ']':
+                return '[';
+            case ')':
+                return '(';
+            case '}':
+                return '{';
+            case '>':
+                return '<';
+            default:
+                return c;
         }
     }
 
@@ -174,7 +184,7 @@ public class StringMan {
             char currentChar = input.charAt(current);
             boolean atLastChar = current == input.length() - 1;
             if (!atLastChar && (bracket > 0 || currentChar == '{' && ++bracket > 0
-                || current == '}' && --bracket <= 0)) {
+                    || current == '}' && --bracket <= 0)) {
                 continue;
             }
             if (currentChar == '\"') {
@@ -287,7 +297,7 @@ public class StringMan {
         for (int i = 0; i < str.length(); i++) {
             final char c = str.charAt(i);
             if (c < 0x30 || c >= 0x3a && c <= 0x40 || c > 0x5a && c <= 0x60 ||
-                c > 0x7a) {
+                    c > 0x7a) {
                 return false;
             }
         }
@@ -519,16 +529,17 @@ public class StringMan {
 
     public static boolean isEqual(String a, String b) {
         return a == b || a != null && b != null && a.length() == b.length()
-            && a.hashCode() == b.hashCode()
-            && a.equals(b);
+                && a.hashCode() == b.hashCode()
+                && a.equals(b);
     }
 
     public static boolean isEqualIgnoreCase(String a, String b) {
         return a == b ||
-            a != null && b != null && a.length() == b.length() && a.equalsIgnoreCase(b);
+                a != null && b != null && a.length() == b.length() && a.equalsIgnoreCase(b);
     }
 
     public static String repeat(String s, int n) {
         return IntStream.range(0, n).mapToObj(i -> s).collect(Collectors.joining());
     }
+
 }

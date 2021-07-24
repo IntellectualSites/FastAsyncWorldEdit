@@ -8,6 +8,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class IdPattern extends AbstractExtentPattern {
+
     private final Pattern pattern;
 
     public IdPattern(Extent extent, Pattern parent) {
@@ -22,4 +23,5 @@ public class IdPattern extends AbstractExtentPattern {
         BaseBlock newBlock = pattern.applyBlock(position);
         return newBlock.withPropertyId(oldBlock.getInternalPropertiesId()).toBaseBlock();
     }
+
 }

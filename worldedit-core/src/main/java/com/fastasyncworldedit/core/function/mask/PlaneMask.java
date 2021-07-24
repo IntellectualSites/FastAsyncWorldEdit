@@ -45,10 +45,7 @@ public class PlaneMask extends AbstractMask implements ResettableMask {
                 if (originZ != vector.getBlockZ() && (mode & 4) == 0) {
                     return false;
                 }
-                if (originY != vector.getBlockY() && (mode & 2) == 0) {
-                    return false;
-                }
-                return true;
+                return originY == vector.getBlockY() || (mode & 2) != 0;
 
         }
     }

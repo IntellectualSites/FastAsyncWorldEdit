@@ -5,4 +5,5 @@ package com.sk89q.worldedit.cli;
  * annoying, if you try to use the CLI as plugin.
  */
 public class AccessPoint {
+
 }

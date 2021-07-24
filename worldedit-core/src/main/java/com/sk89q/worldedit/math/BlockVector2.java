@@ -53,7 +53,7 @@ public class BlockVector2 {
      * </pre>
      */
     public static final Comparator<BlockVector2> COMPARING_GRID_ARRANGEMENT =
-        Comparator.comparingInt(BlockVector2::getZ).thenComparingInt(BlockVector2::getX);
+            Comparator.comparingInt(BlockVector2::getZ).thenComparingInt(BlockVector2::getX);
 
     public static BlockVector2 at(double x, double z) {
         return at((int) Math.floor(x), (int) Math.floor(z));
@@ -508,9 +508,9 @@ public class BlockVector2 {
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle in degrees
-     * @param aboutX about which x coordinate to rotate
-     * @param aboutZ about which z coordinate to rotate
+     * @param angle      in degrees
+     * @param aboutX     about which x coordinate to rotate
+     * @param aboutZ     about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
@@ -526,7 +526,8 @@ public class BlockVector2 {
         double z2 = x * sin + z * cos;
         return BlockVector2.at(
                 x2 + aboutX + translateX,
-                z2 + aboutZ + translateZ);
+                z2 + aboutZ + translateZ
+        );
     }
 
     /**
@@ -537,8 +538,8 @@ public class BlockVector2 {
      */
     public BlockVector2 getMinimum(BlockVector2 v2) {
         return new BlockVector2(
-            Math.min(x, v2.x),
-            Math.min(z, v2.z)
+                Math.min(x, v2.x),
+                Math.min(z, v2.z)
         );
     }
 
@@ -550,8 +551,8 @@ public class BlockVector2 {
      */
     public BlockVector2 getMaximum(BlockVector2 v2) {
         return new BlockVector2(
-            Math.max(x, v2.x),
-            Math.max(z, v2.z)
+                Math.max(x, v2.x),
+                Math.max(z, v2.z)
         );
     }
 
@@ -620,9 +621,11 @@ public class BlockVector2 {
 
     /**
      * Returns a string representation that is supported by the parser.
+     *
      * @return string
      */
     public String toParserString() {
         return x + "," + z;
     }
+
 }

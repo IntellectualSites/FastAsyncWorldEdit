@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.JarURLConnection;
@@ -26,7 +27,6 @@ import java.net.URL;
 import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import javax.annotation.Nullable;
 
 /**
  * Represents WorldEdit info from the MANIFEST.MF file.
@@ -58,7 +58,7 @@ public class WorldEditManifest {
             kind = Kind.UNKNOWN;
         }
         return new WorldEditManifest(
-            readAttribute(attributes, WORLD_EDIT_VERSION, () -> "(unknown)"),
+                readAttribute(attributes, WORLD_EDIT_VERSION, () -> "(unknown)"),
                 kind
         );
     }
@@ -82,8 +82,10 @@ public class WorldEditManifest {
         }
     }
 
-    private static String readAttribute(@Nullable Attributes attributes, String name,
-                                        Supplier<String> defaultAction) {
+    private static String readAttribute(
+            @Nullable Attributes attributes, String name,
+            Supplier<String> defaultAction
+    ) {
         if (attributes == null) {
             return defaultAction.get();
         }
@@ -106,4 +108,5 @@ public class WorldEditManifest {
     public Kind getWorldEditKind() {
         return worldEditKind;
     }
+
 }

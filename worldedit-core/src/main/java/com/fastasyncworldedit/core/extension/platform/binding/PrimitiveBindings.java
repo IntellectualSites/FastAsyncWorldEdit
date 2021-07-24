@@ -12,10 +12,11 @@ import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
-import java.util.Locale;
 import javax.annotation.Nullable;
+import java.util.Locale;
 
 public class PrimitiveBindings extends Bindings {
+
     public PrimitiveBindings(WorldEdit worldEdit) {
         super(worldEdit);
     }
@@ -242,4 +243,5 @@ public class PrimitiveBindings extends Bindings {
             }
         }
     }
+
 }

@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.function.mask;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
@@ -7,7 +8,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 
 public class LayerBrushMask extends AbstractExtentMask {
@@ -39,12 +39,21 @@ public class LayerBrushMask extends AbstractExtentMask {
             BlockState previous = layers[depth - 1];
             BlockState previous2 = layers[depth - 2];
             for (BlockVector3 dir : BreadthFirstSearch.DEFAULT_DIRECTIONS) {
-                mutable.setComponents(pos.getBlockX() + dir.getBlockX(), pos.getBlockY() + dir.getBlockY(), pos.getBlockZ() + dir.getBlockZ());
-                if (visitor.isVisited(mutable) && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous) {
+                mutable.setComponents(
+                        pos.getBlockX() + dir.getBlockX(),
+                        pos.getBlockY() + dir.getBlockY(),
+                        pos.getBlockZ() + dir.getBlockZ()
+                );
+                if (visitor.isVisited(mutable) && editSession.getBlock(
+                        mutable.getBlockX(),
+                        mutable.getBlockY(),
+                        mutable.getBlockZ()
+                ) == previous) {
                     mutable.setComponents(pos.getBlockX() + dir.getBlockX() * 2, pos.getBlockY() + dir.getBlockY() * 2,
-                        pos.getBlockZ() + dir.getBlockZ() * 2);
+                            pos.getBlockZ() + dir.getBlockZ() * 2
+                    );
                     if (visitor.isVisited(mutable)
-                        && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
+                            && editSession.getBlock(mutable.getBlockX(), mutable.getBlockY(), mutable.getBlockZ()) == previous2) {
                         found = true;
                         break;
                     } else {
@@ -63,4 +72,5 @@ public class LayerBrushMask extends AbstractExtentMask {
     public Mask copy() {
         return new LayerBrushMask(editSession, visitor, layers.clone(), adjacent.copy());
     }
+
 }

@@ -39,4 +39,5 @@ public class TransientSessionException extends Exception {
     public TransientSessionException(Throwable cause) {
         super(cause);
     }
+
 }

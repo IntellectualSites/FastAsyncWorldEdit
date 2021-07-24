@@ -54,7 +54,7 @@ public class ChunkStoreHelper {
             Tag tag = nbt.readNamedTag().getTag();
             if (!(tag instanceof CompoundTag)) {
                 throw new ChunkStoreException("CompoundTag expected for chunk; got "
-                    + tag.getClass().getName());
+                        + tag.getClass().getName());
             }
 
             return (CompoundTag) tag;
@@ -79,7 +79,10 @@ public class ChunkStoreHelper {
                     tag = (CompoundTag) entry.getValue();
                     break;
                 } else {
-                    throw new ChunkStoreException("CompoundTag expected for 'Level'; got " + entry.getValue().getClass().getName());
+                    throw new ChunkStoreException("CompoundTag expected for 'Level'; got " + entry
+                            .getValue()
+                            .getClass()
+                            .getName());
                 }
             }
         }
@@ -94,11 +97,17 @@ public class ChunkStoreHelper {
         }
         final Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
         final int currentDataVersion = platform.getDataVersion();
-        if (tag.getValue().containsKey("Sections") && dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
+        if (tag
+                .getValue()
+                .containsKey("Sections") && dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
             final DataFixer dataFixer = platform.getDataFixer();
             if (dataFixer != null) {
                 //FAWE start - use Adventure
-                tag = (CompoundTag) ((CompoundTag) AdventureNBTConverter.fromAdventure(dataFixer.fixUp(DataFixer.FixTypes.CHUNK, rootTag.asBinaryTag(), dataVersion))).getValue().get("Level");
+                tag = (CompoundTag) ((CompoundTag) AdventureNBTConverter.fromAdventure(dataFixer.fixUp(
+                        DataFixer.FixTypes.CHUNK,
+                        rootTag.asBinaryTag(),
+                        dataVersion
+                ))).getValue().get("Level");
                 //FAWE end
                 dataVersion = currentDataVersion;
             }
@@ -120,4 +129,5 @@ public class ChunkStoreHelper {
 
     private ChunkStoreHelper() {
     }
+
 }

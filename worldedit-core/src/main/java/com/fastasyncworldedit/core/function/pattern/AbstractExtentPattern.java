@@ -17,4 +17,5 @@ public abstract class AbstractExtentPattern extends AbstractPattern {
     public final Extent getExtent() {
         return extent;
     }
+
 }

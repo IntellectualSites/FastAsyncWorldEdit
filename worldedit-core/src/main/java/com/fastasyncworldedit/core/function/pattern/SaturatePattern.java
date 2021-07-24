@@ -12,6 +12,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import java.awt.Color;
 
 public class SaturatePattern extends AbstractPattern {
+
     private final TextureHolder holder;
     private final int color;
     private final Extent extent;
@@ -47,4 +48,5 @@ public class SaturatePattern extends AbstractPattern {
         }
         return set.setBlock(extent, newBlock.getDefaultState());
     }
+
 }

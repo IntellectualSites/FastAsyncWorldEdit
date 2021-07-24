@@ -10,6 +10,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
 public class AngleColorPattern extends DataAnglePattern {
+
     protected transient TextureHolder holder;
 
     public AngleColorPattern(Extent extent, TextureHolder holder, int distance) {
@@ -79,4 +80,5 @@ public class AngleColorPattern extends DataAnglePattern {
         }
         return set.setBlock(extent, newBlock.getDefaultState());
     }
+
 }

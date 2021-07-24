@@ -126,4 +126,5 @@ public final class BitArrayUnstretched {
         }
         return buffer;
     }
+
 }

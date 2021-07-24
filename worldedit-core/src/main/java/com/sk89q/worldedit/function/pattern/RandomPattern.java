@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.fastasyncworldedit.core.util.collection.RandomCollection;
 import com.fastasyncworldedit.core.math.random.SimpleRandom;
 import com.fastasyncworldedit.core.math.random.TrueRandom;
+import com.fastasyncworldedit.core.util.collection.RandomCollection;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -76,7 +76,7 @@ public class RandomPattern extends AbstractPattern {
      * the sum of the probabilities of all added patterns.</p>
      *
      * @param pattern the pattern
-     * @param chance the chance, which can be any positive number
+     * @param chance  the chance, which can be any positive number
      */
     public void add(Pattern pattern, double chance) {
         checkNotNull(pattern);

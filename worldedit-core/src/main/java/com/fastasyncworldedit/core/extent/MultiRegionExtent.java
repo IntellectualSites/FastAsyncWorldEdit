@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.extent;
 
+import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.object.FaweLimit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
@@ -92,4 +92,5 @@ public class MultiRegionExtent extends FaweRegionExtent {
     public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         return intersection.postProcessSet(chunk, get, set);
     }
+
 }

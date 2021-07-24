@@ -1,21 +1,21 @@
 package com.fastasyncworldedit.core.extent.clipboard.io.schematic;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BlockState;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageOutputStream;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 
 public class PNGWriter implements ClipboardWriter {
 
@@ -104,8 +104,8 @@ public class PNGWriter implements ClipboardWriter {
                     mutableRight.mutY(y);
                     mutableLeft.mutY(y);
                     if (!clipboard.getBlock(mutableTop).getBlockType().getMaterial().isAir() &&
-                    !clipboard.getBlock(mutableRight).getBlockType().getMaterial().isAir() &&
-                    !clipboard.getBlock(mutableLeft).getBlockType().getMaterial().isAir() ) {
+                            !clipboard.getBlock(mutableRight).getBlockType().getMaterial().isAir() &&
+                            !clipboard.getBlock(mutableLeft).getBlockType().getMaterial().isAir()) {
                         continue;
                     }
                     double cpy = cpy2 - dpxi[y - y0];
@@ -162,4 +162,5 @@ public class PNGWriter implements ClipboardWriter {
     public void close() throws IOException {
         out.close();
     }
+
 }

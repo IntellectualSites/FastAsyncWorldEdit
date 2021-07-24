@@ -131,7 +131,7 @@ public final class NBTUtils {
                 return LongArrayTag.class;
             default:
                 throw new IllegalArgumentException("Invalid tag type : " + type
-                    + ".");
+                        + ".");
         }
     }
 
@@ -152,13 +152,14 @@ public final class NBTUtils {
     /**
      * Get child tag of a NBT structure.
      *
-     * @param items the map to read from
-     * @param key the key to look for
+     * @param items    the map to read from
+     * @param key      the key to look for
      * @param expected the expected NBT class type
      * @return child tag
      * @throws InvalidFormatException if the format of the items is invalid
      */
-    public static <T extends Tag> T getChildTag(Map<String, Tag> items, String key, Class<T> expected) throws InvalidFormatException {
+    public static <T extends Tag> T getChildTag(Map<String, Tag> items, String key, Class<T> expected) throws
+            InvalidFormatException {
         if (!items.containsKey(key)) {
             throw new InvalidFormatException("Missing a \"" + key + "\" tag");
         }

@@ -52,9 +52,9 @@ public class LayerVisitor implements Operation {
      * Create a new visitor.
      *
      * @param flatRegion the flat region to visit
-     * @param minY the minimum Y to stop the search at
-     * @param maxY the maximum Y to begin the search at
-     * @param function the layer function to apply t blocks
+     * @param minY       the minimum Y to stop the search at
+     * @param maxY       the maximum Y to begin the search at
+     * @param function   the layer function to apply t blocks
      */
     public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function) {
         checkNotNull(flatRegion);

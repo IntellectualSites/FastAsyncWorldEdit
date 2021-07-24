@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.Plugin;
 
 public class BrushListener implements Listener {
+
     public BrushListener(Plugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
@@ -53,7 +54,8 @@ public class BrushListener implements Listener {
     public void onPlayerMove(PlayerMoveEvent event) {
         Location from = event.getFrom();
         Location to = event.getTo();
-        if ((from.getYaw() != to.getYaw() &&  from.getPitch() != to.getPitch()) || from.getBlockX() != to.getBlockX() || from.getBlockZ() != to.getBlockZ() || from.getBlockY() != to.getBlockY()) {
+        if ((from.getYaw() != to.getYaw() && from.getPitch() != to.getPitch()) || from.getBlockX() != to.getBlockX() || from.getBlockZ() != to
+                .getBlockZ() || from.getBlockY() != to.getBlockY()) {
             Player bukkitPlayer = event.getPlayer();
             com.sk89q.worldedit.entity.Player player = BukkitAdapter.adapt(bukkitPlayer);
             LocalSession session = player.getSession();
@@ -83,4 +85,5 @@ public class BrushListener implements Listener {
             }
         }
     }
+
 }

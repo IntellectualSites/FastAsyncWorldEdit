@@ -42,7 +42,7 @@ public class EntityRemove implements Change {
      * Create a new instance.
      *
      * @param location the location
-     * @param state the state of the created entity
+     * @param state    the state of the created entity
      */
     public EntityRemove(Location location, BaseEntity state) {
         checkNotNull(location);

@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.extension.factory.parser.mask;
 
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -10,8 +10,8 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.mask.OffsetMask;
 import com.sk89q.worldedit.math.BlockVector3;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
 public class RichOffsetMaskParser extends RichParser<Mask> {
@@ -48,4 +48,5 @@ public class RichOffsetMaskParser extends RichParser<Mask> {
         OffsetMask offsetMask = new OffsetMask(submask, BlockVector3.at(x, y, z));
         return new MaskIntersection(offsetMask, Masks.negate(submask));
     }
+
 }

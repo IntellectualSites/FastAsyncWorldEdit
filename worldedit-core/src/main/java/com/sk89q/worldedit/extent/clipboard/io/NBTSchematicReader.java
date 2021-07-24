@@ -21,9 +21,9 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.sk89q.jnbt.Tag;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Base class for NBT schematic readers.
@@ -58,4 +58,5 @@ public abstract class NBTSchematicReader implements ClipboardReader {
 
         return expected.cast(test);
     }
+
 }

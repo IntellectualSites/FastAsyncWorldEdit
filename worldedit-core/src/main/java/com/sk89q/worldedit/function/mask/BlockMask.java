@@ -22,6 +22,7 @@ package com.sk89q.worldedit.function.mask;
 import com.fastasyncworldedit.core.function.mask.ABlockMask;
 import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
 import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -30,7 +31,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -87,7 +87,7 @@ public class BlockMask extends ABlockMask {
      * Create a new block mask.
      *
      * @param extent the extent
-     * @param block an array of blocks to match
+     * @param block  an array of blocks to match
      */
     public BlockMask(Extent extent, BaseBlock... block) {
         this(extent, Arrays.asList(checkNotNull(block)));
@@ -211,8 +211,8 @@ public class BlockMask extends ABlockMask {
     @Override
     public boolean replacesAir() {
         return ordinals[BlockTypes.AIR.getDefaultState().getOrdinal()]
-            || ordinals[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()]
-            || ordinals[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()];
+                || ordinals[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()]
+                || ordinals[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()];
     }
 
     @Override

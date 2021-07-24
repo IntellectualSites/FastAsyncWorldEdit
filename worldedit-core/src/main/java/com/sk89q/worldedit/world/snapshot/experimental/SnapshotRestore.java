@@ -51,9 +51,9 @@ public class SnapshotRestore {
     /**
      * Construct the snapshot restore operation.
      *
-     * @param snapshot The {@link Snapshot} to restore from
+     * @param snapshot    The {@link Snapshot} to restore from
      * @param editSession The {@link EditSession} to restore to
-     * @param region The {@link Region} to restore to
+     * @param region      The {@link Region} to restore to
      */
     public SnapshotRestore(Snapshot snapshot, EditSession editSession, Region region) {
         this.snapshot = snapshot;

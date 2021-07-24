@@ -1,17 +1,17 @@
 package com.fastasyncworldedit.core.queue.implementation.chunk;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
-import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.queue.Pool;
-import com.fastasyncworldedit.core.configuration.Settings;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -33,7 +33,11 @@ import java.util.concurrent.Future;
 @SuppressWarnings("rawtypes")
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
-    private static final Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(ChunkHolder.class, ChunkHolder::new, Settings.IMP.QUEUE.POOL);
+    private static final Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(
+            ChunkHolder.class,
+            ChunkHolder::new,
+            Settings.IMP.QUEUE.POOL
+    );
 
     public static ChunkHolder newInstance() {
         return POOL.poll();
@@ -186,14 +190,18 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome) {
+        public boolean setBiome(
+                ChunkHolder chunk, int x, int y, int z,
+                BiomeType biome
+        ) {
             return chunk.chunkSet.setBiome(x, y, z, biome);
         }
 
         @Override
-        public <B extends BlockStateHolder<B>> boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            B block) {
+        public <B extends BlockStateHolder<B>> boolean setBlock(
+                ChunkHolder chunk, int x, int y, int z,
+                B block
+        ) {
             return chunk.chunkSet.setBlock(x, y, z, block);
         }
 
@@ -228,7 +236,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.chunkSet.setSkyLightLayer(layer, toSet);
         }
 
-        @Override public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
+        @Override
+        public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
             chunk.chunkSet.setHeightMap(type, heightMap);
         }
 
@@ -285,7 +294,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             return chunk.chunkExisting.getOpacity(x, y, z);
         }
 
-        @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
+        @Override
+        public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
             return chunk.chunkExisting.getHeightMap(type);
         }
 
@@ -325,16 +335,20 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome) {
+        public boolean setBiome(
+                ChunkHolder chunk, int x, int y, int z,
+                BiomeType biome
+        ) {
             chunk.getOrCreateSet();
             chunk.delegate = BOTH;
             return chunk.setBiome(x, y, z, biome);
         }
 
         @Override
-        public <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z,
-            T block) {
+        public <T extends BlockStateHolder<T>> boolean setBlock(
+                ChunkHolder chunk, int x, int y, int z,
+                T block
+        ) {
             chunk.getOrCreateSet();
             chunk.delegate = BOTH;
             return chunk.setBlock(x, y, z, block);
@@ -382,7 +396,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.setSkyLightLayer(layer, toSet);
         }
 
-        @Override public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
+        @Override
+        public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
             chunk.getOrCreateSet();
             chunk.delegate = BOTH;
             chunk.setHeightMap(type, heightMap);
@@ -399,8 +414,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
+        public BaseBlock getFullBlock(
+                ChunkHolder chunk, int x, int y,
+                int z
+        ) {
             return chunk.chunkExisting.getFullBlock(x, y, z);
         }
 
@@ -424,7 +441,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             return chunk.chunkExisting.getOpacity(x, y, z);
         }
 
-        @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
+        @Override
+        public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
             return chunk.chunkExisting.getHeightMap(type);
         }
 
@@ -464,13 +482,21 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public boolean setBiome(ChunkHolder chunk, int x, int y, int z,
-            BiomeType biome) {
+        public boolean setBiome(
+                ChunkHolder chunk, int x, int y, int z,
+                BiomeType biome
+        ) {
             return chunk.chunkSet.setBiome(x, y, z, biome);
         }
 
         @Override
-        public <B extends BlockStateHolder<B>> boolean setBlock(ChunkHolder chunk, int x, @Range(from = 0, to = 255) int y, int z, B block) {
+        public <B extends BlockStateHolder<B>> boolean setBlock(
+                ChunkHolder chunk,
+                int x,
+                @Range(from = 0, to = 255) int y,
+                int z,
+                B block
+        ) {
             return chunk.chunkSet.setBlock(x, y, z, block);
         }
 
@@ -506,7 +532,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.chunkSet.setSkyLightLayer(layer, toSet);
         }
 
-        @Override public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
+        @Override
+        public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
             chunk.chunkSet.setHeightMap(type, heightMap);
         }
 
@@ -527,8 +554,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
+        public BaseBlock getFullBlock(
+                ChunkHolder chunk, int x, int y,
+                int z
+        ) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
             chunk.chunkExisting.trim(false);
@@ -585,7 +614,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             return chunk.getOpacity(x, y, z);
         }
 
-        @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
+        @Override
+        public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
             chunk.getOrCreateGet();
             chunk.delegate = BOTH;
             chunk.chunkExisting.trim(false);
@@ -673,8 +703,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public BaseBlock getFullBlock(ChunkHolder chunk, int x, int y,
-            int z) {
+        public BaseBlock getFullBlock(
+                ChunkHolder chunk, int x, int y,
+                int z
+        ) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
             chunk.chunkExisting.trim(false);
@@ -724,7 +756,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunk.setSkyLightLayer(layer, toSet);
         }
 
-        @Override public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
+        @Override
+        public void setHeightMap(ChunkHolder chunk, HeightMapType type, int[] heightMap) {
             chunk.getOrCreateSet();
             chunk.delegate = SET;
             chunk.setHeightMap(type, heightMap);
@@ -762,7 +795,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             return chunk.getOpacity(x, y, z);
         }
 
-        @Override public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
+        @Override
+        public int[] getHeightMap(ChunkHolder chunk, HeightMapType type) {
             chunk.getOrCreateGet();
             chunk.delegate = GET;
             chunk.chunkExisting.trim(false);
@@ -882,8 +916,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     /**
      * Create a wrapped set object
-     *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
-     *  - e.g., caching, optimizations, filtering
+     * - The purpose of wrapping is to allow different extents to intercept / alter behavior
+     * - e.g., caching, optimizations, filtering
      */
     private IChunkSet newWrappedSet() {
         return extent.getCachedSet(chunkX, chunkZ);
@@ -891,8 +925,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     /**
      * Create a wrapped get object
-     *  - The purpose of wrapping is to allow different extents to intercept / alter behavior
-     *  - e.g., caching, optimizations, filtering
+     * - The purpose of wrapping is to allow different extents to intercept / alter behavior
+     * - e.g., caching, optimizations, filtering
      */
     private synchronized IChunkGet newWrappedGet() {
         return extent.getCachedGet(chunkX, chunkZ);
@@ -1038,11 +1072,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return delegate.getOpacity(this, x, y, z);
     }
 
-    @Override public int[] getHeightMap(HeightMapType type) {
+    @Override
+    public int[] getHeightMap(HeightMapType type) {
         return delegate.getHeightMap(this, type);
     }
 
     public interface IBlockDelegate {
+
         <C extends Future<C>> IChunkGet get(ChunkHolder<C> chunk);
 
         IChunkSet set(ChunkHolder chunk);
@@ -1088,5 +1124,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         void setSkyLightingToGet(ChunkHolder chunk, char[][] lighting);
 
         void setHeightmapToGet(ChunkHolder chunk, HeightMapType type, int[] data);
+
     }
+
 }

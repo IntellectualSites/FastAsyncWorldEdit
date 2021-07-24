@@ -11,14 +11,14 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.AbstractRegion;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.World;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.Iterator;
 
 public class FuzzyRegion extends AbstractRegion {
 
     private final Mask mask;
-    private BlockVectorSet set = new BlockVectorSet();
+    private final BlockVectorSet set = new BlockVectorSet();
     private int minX;
     private int minY;
     private int minZ;
@@ -133,4 +133,5 @@ public class FuzzyRegion extends AbstractRegion {
         // TODO optimize (switch from BlockVectorSet to the new bitset)
         return false;
     }
+
 }

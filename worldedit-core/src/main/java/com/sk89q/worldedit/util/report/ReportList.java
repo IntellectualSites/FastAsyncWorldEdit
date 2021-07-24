@@ -174,7 +174,7 @@ public class ReportList implements Report, List<Report> {
                         .append(report.getTitle())
                         .append("\n================================")
                         .append("\n\n")
-                        .append(report.toString())
+                        .append(report)
                         .append("\n\n");
             }
             return builder.toString();

@@ -77,7 +77,7 @@ public abstract class AbstractSingleFilterBlock extends FilterBlock {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         if (x == this.getX() && y == this.getY() && z == this.getZ()) {
             setFullBlock(block.toBaseBlock());
             return true;
@@ -89,4 +89,5 @@ public abstract class AbstractSingleFilterBlock extends FilterBlock {
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return getExtent().setBiome(x, y, z, biome);
     }
+
 }

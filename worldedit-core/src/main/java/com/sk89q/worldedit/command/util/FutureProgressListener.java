@@ -69,7 +69,12 @@ public class FutureProgressListener implements Runnable {
         future.addListener(new FutureProgressListener(sender, message), MoreExecutors.directExecutor());
     }
 
-    public static void addProgressListener(ListenableFuture<?> future, Actor sender, Component message, Component workingMessage) {
+    public static void addProgressListener(
+            ListenableFuture<?> future,
+            Actor sender,
+            Component message,
+            Component workingMessage
+    ) {
         future.addListener(new FutureProgressListener(sender, message, workingMessage), MoreExecutors.directExecutor());
     }
 

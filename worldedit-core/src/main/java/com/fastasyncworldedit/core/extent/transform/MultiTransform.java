@@ -10,8 +10,8 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.Collection;
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 public class MultiTransform extends RandomTransform {
 
@@ -35,7 +35,7 @@ public class MultiTransform extends RandomTransform {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         // don't use streams for each block place, it'd be incredibly slow
         boolean result = false;
         for (AbstractDelegateExtent extent : extents) {
@@ -46,7 +46,7 @@ public class MultiTransform extends RandomTransform {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         // don't use streams for each block place, it'd be incredibly slow
         boolean result = false;
         for (AbstractDelegateExtent extent : extents) {
@@ -74,4 +74,5 @@ public class MultiTransform extends RandomTransform {
         }
         return created;
     }
+
 }

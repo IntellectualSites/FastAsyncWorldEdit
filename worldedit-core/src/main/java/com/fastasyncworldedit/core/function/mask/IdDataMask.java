@@ -6,6 +6,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class IdDataMask extends AbstractExtentMask implements ResettableMask {
+
     private transient int combined = -1;
 
     public IdDataMask(Extent extent) {

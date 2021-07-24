@@ -20,4 +20,5 @@ public class SupplyingExtent extends PassthroughExtent {
     public Extent getExtent() {
         return this.extentSupplier.get();
     }
+
 }

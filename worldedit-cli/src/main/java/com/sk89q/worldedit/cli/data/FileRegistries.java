@@ -45,12 +45,17 @@ public class FileRegistries {
     }
 
     public void loadDataFiles() {
-        ResourceLoader resourceLoader = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader();
+        ResourceLoader resourceLoader = WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.CONFIGURATION)
+                .getResourceLoader();
         try {
             URL url = resourceLoader.getResource(FileRegistries.class, app.getPlatform().getDataVersion() + ".json");
             this.dataFile = gson.fromJson(Resources.toString(url, StandardCharsets.UTF_8), DataFile.class);
         } catch (IOException e) {
-            throw new RuntimeException("The provided file is not compatible with this version of WorldEdit-CLI. Please update or report this.");
+            throw new RuntimeException(
+                    "The provided file is not compatible with this version of WorldEdit-CLI. Please update or report this.");
         }
     }
 
@@ -59,16 +64,21 @@ public class FileRegistries {
     }
 
     public static class BlockManifest {
+
         public String defaultstate;
         public Map<String, BlockProperty> properties;
+
     }
 
     public static class BlockProperty {
+
         public List<String> values;
         public String type;
+
     }
 
     public static class DataFile {
+
         public Map<String, List<String>> itemtags;
         public Map<String, List<String>> blocktags;
         public Map<String, List<String>> entitytags;
@@ -76,5 +86,7 @@ public class FileRegistries {
         public List<String> entities;
         public List<String> biomes;
         public Map<String, BlockManifest> blocks;
+
     }
+
 }

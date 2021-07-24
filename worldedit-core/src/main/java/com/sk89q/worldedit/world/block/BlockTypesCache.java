@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.world.block.BlockID;
 import com.google.common.primitives.Booleans;
@@ -9,7 +10,6 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.Registries;
@@ -20,8 +20,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -29,12 +29,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BlockTypesCache {
+
     /*
      -----------------------------------------------------
                     Settings
      -----------------------------------------------------
      */
     protected static final class Settings {
+
         protected final int internalId;
         protected final BlockState defaultState;
         protected final AbstractProperty<?>[] propertiesMapArr;
@@ -55,7 +57,8 @@ public class BlockTypesCache {
             }
 
             int maxInternalStateId = 0;
-            Map<String, ? extends Property<?>> properties = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getProperties(type);
+            Map<String, ? extends Property<?>> properties = WorldEdit.getInstance().getPlatformManager().queryCapability(
+                    Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getProperties(type);
             if (!properties.isEmpty()) {
                 // Ensure the properties are registered
                 int maxOrdinal = 0;
@@ -91,7 +94,13 @@ public class BlockTypesCache {
             }
             this.permutations = maxInternalStateId;
 
-            this.blockMaterial = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(type);
+            this.blockMaterial = WorldEdit
+                    .getInstance()
+                    .getPlatformManager()
+                    .queryCapability(Capability.GAME_HOOKS)
+                    .getRegistries()
+                    .getBlockRegistry()
+                    .getMaterial(type);
 
             if (!propertiesList.isEmpty()) {
                 this.stateOrdinals = generateStateOrdinals(internalId, states.size(), maxInternalStateId, propertiesList);
@@ -101,8 +110,13 @@ public class BlockTypesCache {
                     if (ordinal != -1) {
                         int stateId = internalId + (propId << BIT_OFFSET);
                         CompoundTag defaultNBT = blockMaterial.getDefaultTile();
-                        BlockState state = defaultNBT != null ? new BlockState(type, stateId, ordinal, blockMaterial.getDefaultTile()) :
-                            new BlockState(type, stateId, ordinal);
+                        BlockState state = defaultNBT != null ? new BlockState(
+                                type,
+                                stateId,
+                                ordinal,
+                                blockMaterial.getDefaultTile()
+                        ) :
+                                new BlockState(type, stateId, ordinal);
                         states.add(state);
                     }
                 }
@@ -111,8 +125,13 @@ public class BlockTypesCache {
                 this.defaultState = states.get(this.stateOrdinals[defaultPropId]);
             } else {
                 CompoundTag defaultNBT = blockMaterial.getDefaultTile();
-                this.defaultState = defaultNBT != null ? new BlockState(type, internalId, states.size(), blockMaterial.getDefaultTile()) :
-                    new BlockState(type, internalId, states.size());
+                this.defaultState = defaultNBT != null ? new BlockState(
+                        type,
+                        internalId,
+                        states.size(),
+                        blockMaterial.getDefaultTile()
+                ) :
+                        new BlockState(type, internalId, states.size());
                 states.add(this.defaultState);
             }
         }
@@ -128,6 +147,7 @@ public class BlockTypesCache {
             }
             return id;
         }
+
     }
 
 
@@ -192,7 +212,9 @@ public class BlockTypesCache {
             Registries registries = platform.getRegistries();
             BlockRegistry blockReg = registries.getBlockRegistry();
             Collection<String> blocks = blockReg.values();
-            Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
+            Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']'
+                    ? item.substring(0, item.indexOf('['))
+                    : item, item -> item));
 
             int size = blockMap.size() + 1;
             Field[] idFields = BlockID.class.getDeclaredFields();
@@ -230,7 +252,6 @@ public class BlockTypesCache {
                     String defaultState = entry.getValue();
                     // Skip already registered ids
                     for (; values[internalId] != null; internalId++) {
-                        ;
                     }
                     BlockType type = register(defaultState, internalId, stateList, tickList);
                     values[internalId] = type;
@@ -265,4 +286,5 @@ public class BlockTypesCache {
         $NAMESPACES.add(nameSpace);
         return existing;
     }
+
 }

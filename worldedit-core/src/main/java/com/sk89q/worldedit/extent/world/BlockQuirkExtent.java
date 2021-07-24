@@ -45,7 +45,7 @@ public class BlockQuirkExtent extends AbstractDelegateExtent {
      * Create a new instance.
      *
      * @param extent the extent
-     * @param world the world
+     * @param world  the world
      */
     public BlockQuirkExtent(Extent extent, World world) {
         super(extent);

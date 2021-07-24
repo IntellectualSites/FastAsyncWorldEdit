@@ -46,8 +46,8 @@ public class FileLegacyChunkStore extends LegacyChunkStore {
     /**
      * Get the input stream for a chunk file.
      *
-     * @param f1 the first part of the pathname
-     * @param f2 the second part of the pathname
+     * @param f1   the first part of the pathname
+     * @param f2   the second part of the pathname
      * @param name the name of the file
      * @return an input stream
      * @throws DataException if there is an error getting data for this chunk

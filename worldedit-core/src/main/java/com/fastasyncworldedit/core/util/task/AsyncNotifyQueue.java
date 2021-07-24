@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public class AsyncNotifyQueue implements Closeable {
+
     private final Lock lock = new ReentrantLock(true);
     private final Thread.UncaughtExceptionHandler handler;
     private boolean closed;
@@ -70,4 +71,5 @@ public class AsyncNotifyQueue implements Closeable {
     public boolean isClosed() {
         return closed;
     }
+
 }

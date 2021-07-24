@@ -78,4 +78,5 @@ public abstract class SimpleInputParser<E> extends InputParser<E> {
         }
         return Stream.empty();
     }
+
 }

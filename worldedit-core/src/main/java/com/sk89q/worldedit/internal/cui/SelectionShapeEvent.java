@@ -34,7 +34,7 @@ public class SelectionShapeEvent implements CUIEvent {
 
     @Override
     public String[] getParameters() {
-        return new String[] { shapeName };
+        return new String[]{shapeName};
     }
 
 }

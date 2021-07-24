@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Supplier;
 
 public class QueuePool<T> extends ConcurrentLinkedQueue<T> implements Pool<T> {
+
     private final Supplier<T> supplier;
 
     public QueuePool(Supplier<T> supplier) {
@@ -27,5 +28,6 @@ public class QueuePool<T> extends ConcurrentLinkedQueue<T> implements Pool<T> {
             super.clear();
         }
     }
+
 }
 

@@ -2,11 +2,11 @@ package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.regions.RegionWrapper;
-import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.extent.NullExtent;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
@@ -121,7 +121,7 @@ public class WEManager {
                     e.printStackTrace();
                 }
             } else {
-                player.printError(TextComponent.of("Missing permission " +  "fawe." + manager.getKey()));
+                player.printError(TextComponent.of("Missing permission " + "fawe." + manager.getKey()));
             }
         }
         LOGGER.debug("Region info for " + player.getName());
@@ -144,7 +144,7 @@ public class WEManager {
         BlockVector3 rg2P2 = region2.getMaximumPoint();
 
         return rg1P1.getBlockX() <= rg2P2.getBlockX() && rg1P2.getBlockX() >= rg2P1.getBlockX()
-            && rg1P1.getBlockZ() <= rg2P2.getBlockZ() && rg1P2.getBlockZ() >= rg2P1.getBlockZ();
+                && rg1P1.getBlockZ() <= rg2P2.getBlockZ() && rg1P2.getBlockZ() >= rg2P1.getBlockZ();
     }
 
     public boolean regionContains(Region selection, HashSet<Region> mask) {
@@ -155,4 +155,5 @@ public class WEManager {
         }
         return false;
     }
+
 }

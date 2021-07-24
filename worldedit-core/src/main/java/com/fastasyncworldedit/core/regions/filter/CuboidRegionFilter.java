@@ -66,4 +66,5 @@ public abstract class CuboidRegionFilter implements RegionFilter {
         int mcaZ = chunkZ >> 5;
         return occupiedRegions.containsKey(mcaX, mcaZ) && !unoccupiedChunks.containsKey(chunkX, chunkZ);
     }
+
 }

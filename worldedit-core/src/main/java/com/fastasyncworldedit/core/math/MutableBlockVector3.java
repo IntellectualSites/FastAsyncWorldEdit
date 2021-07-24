@@ -96,4 +96,5 @@ public class MutableBlockVector3 extends BlockVector3 {
         this.z = z;
         return this;
     }
+
 }

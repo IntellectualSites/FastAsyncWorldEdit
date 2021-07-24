@@ -1,10 +1,12 @@
 package com.fastasyncworldedit.core.extent.processor;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.extent.filter.block.ExtentFilterBlock;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.function.generator.GenBase;
+import com.fastasyncworldedit.core.function.generator.Resource;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -12,8 +14,6 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.fastasyncworldedit.core.function.generator.GenBase;
-import com.fastasyncworldedit.core.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -29,21 +29,22 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 public class LimitExtent extends AbstractDelegateExtent {
+
     private final FaweLimit limit;
 
     /**
-         * Create a new instance.
-         *
-         * @param extent the extent
-         */
+     * Create a new instance.
+     *
+     * @param extent the extent
+     */
     public LimitExtent(Extent extent, FaweLimit limit) {
         super(extent);
         this.limit = limit;
@@ -208,7 +209,16 @@ public class LimitExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
+    public int getNearestSurfaceTerrainBlock(
+            int x,
+            int z,
+            int y,
+            int minY,
+            int maxY,
+            int failedMin,
+            int failedMax,
+            boolean ignoreAir
+    ) {
         limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
@@ -235,7 +245,8 @@ public class LimitExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws
+            WorldEditException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         super.addSchems(region, mask, clipboards, rarity, rotate);
@@ -249,7 +260,8 @@ public class LimitExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws
+            WorldEditException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         super.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
@@ -299,7 +311,8 @@ public class LimitExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws
+            MaxChangedBlocksException {
         limit.THROW_MAX_CHECKS(region.getVolume());
         limit.THROW_MAX_CHANGES(region.getVolume());
         return super.replaceBlocks(region, filter, replacement);
@@ -521,4 +534,5 @@ public class LimitExtent extends AbstractDelegateExtent {
             return false;
         }
     }
+
 }

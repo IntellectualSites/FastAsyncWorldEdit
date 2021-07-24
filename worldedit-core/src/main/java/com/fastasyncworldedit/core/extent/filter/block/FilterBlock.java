@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 /**
  * A class representing a block with a position
- *  - Used for optimized block operations to avoid lookups
+ * - Used for optimized block operations to avoid lookups
  */
 public abstract class FilterBlock extends BlockVector3 implements Extent, TileEntityBlock {
 
@@ -185,7 +185,8 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
         return getBlockRelativeY(y);
     }
 
-    @Override @Nullable
+    @Override
+    @Nullable
     public BiomeType getBiome(BlockVector3 position) {
         return null;
     }
@@ -194,4 +195,5 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return setBiome(position.getX(), position.getY(), position.getZ(), biome);
     }
+
 }

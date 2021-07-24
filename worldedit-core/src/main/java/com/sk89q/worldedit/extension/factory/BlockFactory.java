@@ -51,7 +51,7 @@ public class BlockFactory extends AbstractFactory<BaseBlock> {
     /**
      * Return a set of blocks from a comma-delimited list of blocks.
      *
-     * @param input the input
+     * @param input   the input
      * @param context the context
      * @return a set of blocks
      * @throws InputParseException thrown in error with the input
@@ -61,7 +61,7 @@ public class BlockFactory extends AbstractFactory<BaseBlock> {
         //FAWE start
         // String[] splits = input.split(",");
         for (String token : StringUtil.split(input, ',', '[', ']')) {
-        //FAWE end
+            //FAWE end
             blocks.add(parseFromInput(token, context));
         }
         return blocks;

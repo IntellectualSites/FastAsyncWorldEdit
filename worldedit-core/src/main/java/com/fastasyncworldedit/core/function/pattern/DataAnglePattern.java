@@ -10,6 +10,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class DataAnglePattern extends AbstractPattern {
+
     public final double factor;
     public final Extent extent;
     public final int maxY;
@@ -30,11 +31,29 @@ public class DataAnglePattern extends AbstractPattern {
             return -1;
         }
         int slope = Math.abs(
-            extent.getNearestSurfaceTerrainBlock(x + distance, z, y, 0, maxY) - extent
-                .getNearestSurfaceTerrainBlock(x - distance, z, y, 0, maxY)) * 7;
-        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x, z + distance, y, 0, maxY) - extent.getNearestSurfaceTerrainBlock(x, z - distance, y, 0, maxY)) * 7;
-        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x + distance, z + distance, y, 0, maxY) - extent.getNearestSurfaceTerrainBlock(x - distance, z - distance, y, 0, maxY)) * 5;
-        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x - distance, z + distance, y, 0, maxY) - extent.getNearestSurfaceTerrainBlock(x + distance, z - distance, y, 0, maxY)) * 5;
+                extent.getNearestSurfaceTerrainBlock(x + distance, z, y, 0, maxY) - extent
+                        .getNearestSurfaceTerrainBlock(x - distance, z, y, 0, maxY)) * 7;
+        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(
+                x,
+                z + distance,
+                y,
+                0,
+                maxY
+        ) - extent.getNearestSurfaceTerrainBlock(x, z - distance, y, 0, maxY)) * 7;
+        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(
+                x + distance,
+                z + distance,
+                y,
+                0,
+                maxY
+        ) - extent.getNearestSurfaceTerrainBlock(x - distance, z - distance, y, 0, maxY)) * 5;
+        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(
+                x - distance,
+                z + distance,
+                y,
+                0,
+                maxY
+        ) - extent.getNearestSurfaceTerrainBlock(x + distance, z - distance, y, 0, maxY)) * 5;
         return slope;
     }
 
@@ -59,4 +78,5 @@ public class DataAnglePattern extends AbstractPattern {
         int data = Math.min(slope, 255) >> 4;
         return extent.setBlock(setPosition, block.withPropertyId(data));
     }
+
 }

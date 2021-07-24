@@ -43,7 +43,14 @@ public enum SelectionWand implements DoubleActionBlockTool {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     @Override
-    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
+    public boolean actSecondary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         RegionSelector selector = session.getRegionSelector(player.getWorld());
         BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
 
@@ -59,7 +66,14 @@ public enum SelectionWand implements DoubleActionBlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
+    public boolean actPrimary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         RegionSelector selector = session.getRegionSelector(player.getWorld());
         BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
 

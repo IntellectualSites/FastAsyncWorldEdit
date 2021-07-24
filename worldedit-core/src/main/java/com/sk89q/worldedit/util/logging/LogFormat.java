@@ -29,6 +29,7 @@ import java.util.logging.LogRecord;
  * A standard logging format for WorldEdit.
  */
 public class LogFormat extends Formatter {
+
     public static final String DEFAULT_FORMAT = "[%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s]: %5$s%6$s%n";
     private final Date dat = new Date();
     private final String format;
@@ -72,12 +73,15 @@ public class LogFormat extends Formatter {
             pw.close();
             throwable = sw.toString();
         }
-        return String.format(format,
+        return String.format(
+                format,
                 dat,
                 source,
                 record.getLoggerName(),
                 record.getLevel().getName(),
                 message,
-                throwable);
+                throwable
+        );
     }
+
 }

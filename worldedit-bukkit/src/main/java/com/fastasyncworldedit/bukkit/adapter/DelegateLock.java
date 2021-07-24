@@ -1,13 +1,14 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.annotation.Nonnull;
 
 public class DelegateLock extends ReentrantLockWithGetOwner {
+
     private final ReentrantLock parent;
     private volatile boolean modified;
     private final AtomicInteger count;
@@ -106,4 +107,5 @@ public class DelegateLock extends ReentrantLockWithGetOwner {
     public synchronized String toString() {
         return parent.toString();
     }
+
 }

@@ -20,4 +20,5 @@ public class SimplexNoiseGenerator implements NoiseGenerator {
         // we need to go from [-1, 1] to [0, 1] and from double to float
         return (float) ((d + 1) * 0.5);
     }
+
 }

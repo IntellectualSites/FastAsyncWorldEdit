@@ -8,6 +8,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import java.util.concurrent.Future;
 
 public class BatchProcessorHolder implements IBatchProcessorHolder {
+
     private IBatchProcessor processor = EmptyBatchProcessor.getInstance();
     private IBatchProcessor postProcessor = EmptyBatchProcessor.getInstance();
 
@@ -56,4 +57,5 @@ public class BatchProcessorHolder implements IBatchProcessorHolder {
     public ProcessorScope getScope() {
         return getProcessor().getScope();
     }
+
 }

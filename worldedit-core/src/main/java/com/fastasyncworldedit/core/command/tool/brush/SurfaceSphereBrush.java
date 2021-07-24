@@ -16,14 +16,20 @@ import com.sk89q.worldedit.math.BlockVector3;
 import java.util.Arrays;
 
 public class SurfaceSphereBrush implements Brush {
+
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         SurfaceMask surface = new SurfaceMask(editSession);
         final SolidBlockMask solid = new SolidBlockMask(editSession);
         final RadiusMask radius = new RadiusMask(0, (int) size);
-        RecursiveVisitor visitor = new RecursiveVisitor(new MaskIntersection(surface, radius), vector -> editSession.setBlock(vector, pattern));
+        RecursiveVisitor visitor = new RecursiveVisitor(
+                new MaskIntersection(surface, radius),
+                vector -> editSession.setBlock(vector, pattern)
+        );
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         Operations.completeBlindly(visitor);
     }
+
 }

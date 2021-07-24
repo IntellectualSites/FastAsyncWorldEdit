@@ -7,6 +7,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import java.util.function.Predicate;
 
 public class BlockTypeSwitchBuilder<T> {
+
     private final Object[] runnables;
     private T defaultTask;
 
@@ -42,4 +43,5 @@ public class BlockTypeSwitchBuilder<T> {
         }
         return new BlockTypeSwitch(runnables);
     }
+
 }

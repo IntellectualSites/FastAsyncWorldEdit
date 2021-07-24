@@ -63,4 +63,5 @@ public class NullRelighter implements Relighter {
     public void close() throws Exception {
 
     }
+
 }

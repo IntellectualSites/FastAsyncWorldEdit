@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.entity;
 
 import javax.annotation.Nonnull;
-
 import java.util.Map;
 
 public interface MapMetadatable extends Metadatable {
@@ -62,4 +61,5 @@ public interface MapMetadatable extends Metadatable {
     default <V> V deleteMeta(String key) {
         return (V) getRawMeta().remove(key);
     }
+
 }

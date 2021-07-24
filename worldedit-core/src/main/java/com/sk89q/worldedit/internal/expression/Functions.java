@@ -56,7 +56,8 @@ public final class Functions {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             DOUBLE_VALUE = lookup.findVirtual(Number.class, "doubleValue",
-                methodType(double.class));
+                    methodType(double.class)
+            );
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
@@ -68,8 +69,10 @@ public final class Functions {
         handle = handle.asType(handle.type().wrap());
         if (handle.type().returnType() != Double.class) {
             // Ensure that the handle returns a Double, even if originally a Number
-            checkState(Number.class.isAssignableFrom(handle.type().returnType()),
-                "Function does not return a number");
+            checkState(
+                    Number.class.isAssignableFrom(handle.type().returnType()),
+                    "Function does not return a number"
+            );
             handle = handle.asType(handle.type().changeReturnType(Number.class));
             handle = filterReturnValue(handle, DOUBLE_VALUE);
         }
@@ -83,94 +86,124 @@ public final class Functions {
     }
 
     private static void addMathHandles(
-        SetMultimap<String, MethodHandle> map,
-        MethodHandles.Lookup lookup
+            SetMultimap<String, MethodHandle> map,
+            MethodHandles.Lookup lookup
     ) throws NoSuchMethodException, IllegalAccessException {
         // double <name>(double) functions
         for (String name : ImmutableList.of(
-            "sin", "cos", "tan", "asin", "acos", "atan",
-            "sinh", "cosh", "tanh", "sqrt", "cbrt", "abs",
-            "ceil", "floor", "rint", "exp", "log", "log10"
+                "sin", "cos", "tan", "asin", "acos", "atan",
+                "sinh", "cosh", "tanh", "sqrt", "cbrt", "abs",
+                "ceil", "floor", "rint", "exp", "log", "log10"
         )) {
             map.put(name, lookup.findStatic(Math.class, name,
-                methodType(double.class, double.class)));
+                    methodType(double.class, double.class)
+            ));
         }
         // Alias ln -> log
         map.put("ln", lookup.findStatic(Math.class, "log",
-            methodType(double.class, double.class)));
+                methodType(double.class, double.class)
+        ));
         map.put("round", lookup.findStatic(Math.class, "round",
-            methodType(long.class, double.class)));
+                methodType(long.class, double.class)
+        ));
 
         map.put("atan2", lookup.findStatic(Math.class, "atan2",
-            methodType(double.class, double.class, double.class)));
+                methodType(double.class, double.class, double.class)
+        ));
 
         // Special cases: we accept varargs for these
         map.put("min", lookup.findStatic(Doubles.class, "min",
-            methodType(double.class, double[].class))
-            .asVarargsCollector(double[].class));
+                methodType(double.class, double[].class)
+        )
+                .asVarargsCollector(double[].class));
         map.put("max", lookup.findStatic(Doubles.class, "max",
-            methodType(double.class, double[].class))
-            .asVarargsCollector(double[].class));
+                methodType(double.class, double[].class)
+        )
+                .asVarargsCollector(double[].class));
     }
 
     private static void addStaticFunctionHandles(
-        SetMultimap<String, MethodHandle> map,
-        MethodHandles.Lookup lookup
+            SetMultimap<String, MethodHandle> map,
+            MethodHandles.Lookup lookup
     ) throws NoSuchMethodException, IllegalAccessException {
         map.put("rotate", lookup.findStatic(Functions.class, "rotate",
-            methodType(double.class, Variable.class, Variable.class, double.class)));
+                methodType(double.class, Variable.class, Variable.class, double.class)
+        ));
         map.put("swap", lookup.findStatic(Functions.class, "swap",
-            methodType(double.class, Variable.class, Variable.class)));
+                methodType(double.class, Variable.class, Variable.class)
+        ));
         map.put("gmegabuf", lookup.findStatic(Functions.class, "gmegabuf",
-            methodType(double.class, double.class)));
+                methodType(double.class, double.class)
+        ));
         map.put("gmegabuf", lookup.findStatic(Functions.class, "gmegabuf",
-            methodType(double.class, double.class, double.class)));
+                methodType(double.class, double.class, double.class)
+        ));
         map.put("gclosest", lookup.findStatic(Functions.class, "gclosest",
-            methodType(double.class, double.class, double.class, double.class, double.class,
-                double.class, double.class)));
+                methodType(double.class, double.class, double.class, double.class, double.class,
+                        double.class, double.class
+                )
+        ));
         map.put("random", lookup.findStatic(Functions.class, "random",
-            methodType(double.class)));
+                methodType(double.class)
+        ));
         map.put("randint", lookup.findStatic(Functions.class, "randint",
-            methodType(double.class, double.class)));
+                methodType(double.class, double.class)
+        ));
         map.put("perlin", lookup.findStatic(Functions.class, "perlin",
-            methodType(double.class, double.class, double.class, double.class, double.class,
-                double.class, double.class, double.class)));
+                methodType(double.class, double.class, double.class, double.class, double.class,
+                        double.class, double.class, double.class
+                )
+        ));
         map.put("voronoi", lookup.findStatic(Functions.class, "voronoi",
-            methodType(double.class, double.class, double.class, double.class, double.class,
-                double.class)));
+                methodType(double.class, double.class, double.class, double.class, double.class,
+                        double.class
+                )
+        ));
         map.put("ridgedmulti", lookup.findStatic(Functions.class, "ridgedmulti",
-            methodType(double.class, double.class, double.class, double.class, double.class,
-                double.class, double.class)));
+                methodType(double.class, double.class, double.class, double.class, double.class,
+                        double.class, double.class
+                )
+        ));
     }
 
     private void addInstanceFunctionHandles(
-        SetMultimap<String, MethodHandle> map,
-        MethodHandles.Lookup lookup
+            SetMultimap<String, MethodHandle> map,
+            MethodHandles.Lookup lookup
     ) throws NoSuchMethodException, IllegalAccessException {
         map.put("megabuf", lookup.findSpecial(Functions.class, "megabuf",
-            methodType(double.class, double.class), Functions.class)
-            .bindTo(this));
+                methodType(double.class, double.class), Functions.class
+        )
+                .bindTo(this));
         map.put("megabuf", lookup.findSpecial(Functions.class, "megabuf",
-            methodType(double.class, double.class, double.class), Functions.class)
-            .bindTo(this));
+                methodType(double.class, double.class, double.class), Functions.class
+        )
+                .bindTo(this));
         map.put("closest", lookup.findSpecial(Functions.class, "closest",
-            methodType(double.class, double.class, double.class, double.class, double.class,
-                double.class, double.class), Functions.class)
-            .bindTo(this));
+                methodType(double.class, double.class, double.class, double.class, double.class,
+                        double.class, double.class
+                ), Functions.class
+        )
+                .bindTo(this));
 
         // rely on expression field
         map.put("query", lookup.findSpecial(Functions.class, "query",
-            methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
-                LocalSlot.class), Functions.class)
-            .bindTo(this));
+                methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
+                        LocalSlot.class
+                ), Functions.class
+        )
+                .bindTo(this));
         map.put("queryAbs", lookup.findSpecial(Functions.class, "queryAbs",
-            methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
-                LocalSlot.class), Functions.class)
-            .bindTo(this));
+                methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
+                        LocalSlot.class
+                ), Functions.class
+        )
+                .bindTo(this));
         map.put("queryRel", lookup.findSpecial(Functions.class, "queryRel",
-            methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
-                LocalSlot.class), Functions.class)
-            .bindTo(this));
+                methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
+                        LocalSlot.class
+                ), Functions.class
+        )
+                .bindTo(this));
     }
 
     private static double rotate(Variable x, Variable y, double angle) {
@@ -212,7 +245,7 @@ public final class Functions {
             throw new IllegalStateException(e);
         }
         this.map = ImmutableSetMultimap.copyOf(
-            Multimaps.transformValues(map, Functions::clean)
+                Multimaps.transformValues(map, Functions::clean)
         );
     }
 
@@ -258,17 +291,25 @@ public final class Functions {
 
     private double closest(double x, double y, double z, double index, double count, double stride) {
         return findClosest(
-            megaBuffer, x, y, z, (int) index, (int) count, (int) stride
+                megaBuffer, x, y, z, (int) index, (int) count, (int) stride
         );
     }
 
     private static double gclosest(double x, double y, double z, double index, double count, double stride) {
         return findClosest(
-            globalMegaBuffer, x, y, z, (int) index, (int) count, (int) stride
+                globalMegaBuffer, x, y, z, (int) index, (int) count, (int) stride
         );
     }
 
-    private static double findClosest(Int2ObjectMap<double[]> megabuf, double x, double y, double z, int index, int count, int stride) {
+    private static double findClosest(
+            Int2ObjectMap<double[]> megabuf,
+            double x,
+            double y,
+            double z,
+            int index,
+            int count,
+            int stride
+    ) {
         int closestIndex = -1;
         double minDistanceSquared = Double.MAX_VALUE;
 
@@ -300,8 +341,10 @@ public final class Functions {
 
     private static final ThreadLocal<PerlinNoise> localPerlin = ThreadLocal.withInitial(PerlinNoise::new);
 
-    private static double perlin(double seed, double x, double y, double z,
-                                 double frequency, double octaves, double persistence) {
+    private static double perlin(
+            double seed, double x, double y, double z,
+            double frequency, double octaves, double persistence
+    ) {
         PerlinNoise perlin = localPerlin.get();
         try {
             perlin.setSeed((int) seed);
@@ -329,8 +372,10 @@ public final class Functions {
 
     private static final ThreadLocal<RidgedMultiFractalNoise> localRidgedMulti = ThreadLocal.withInitial(RidgedMultiFractalNoise::new);
 
-    private static double ridgedmulti(double seed, double x, double y, double z,
-                                      double frequency, double octaves) {
+    private static double ridgedmulti(
+            double seed, double x, double y, double z,
+            double frequency, double octaves
+    ) {
         RidgedMultiFractalNoise ridgedMulti = localRidgedMulti.get();
         try {
             ridgedMulti.setSeed((int) seed);
@@ -346,7 +391,7 @@ public final class Functions {
         // Compare to input values and determine return value
         // -1 is a wildcard, always true
         double ret = ((type.getValue() == -1 || typeId == type.getValue())
-            && (data.getValue() == -1 || dataValue == data.getValue())) ? 1.0 : 0.0;
+                && (data.getValue() == -1 || dataValue == data.getValue())) ? 1.0 : 0.0;
 
         if (type instanceof Variable) {
             ((Variable) type).setValue(typeId);

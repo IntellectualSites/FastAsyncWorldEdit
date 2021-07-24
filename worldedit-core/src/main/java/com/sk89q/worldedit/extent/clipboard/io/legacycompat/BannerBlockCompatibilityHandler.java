@@ -164,4 +164,5 @@ public class BannerBlockCompatibilityHandler implements NBTCompatibilityHandler 
         }
         return color + (isWall ? "_wall_banner" : "_banner");
     }
+
 }

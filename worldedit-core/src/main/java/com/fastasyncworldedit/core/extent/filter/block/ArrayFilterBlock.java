@@ -22,8 +22,10 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     private int z;
     private int index;
 
-    public ArrayFilterBlock(Extent extent, char[] blocks, byte[] heights, int width, int length,
-        int yOffset) {
+    public ArrayFilterBlock(
+            Extent extent, char[] blocks, byte[] heights, int width, int length,
+            int yOffset
+    ) {
         super(extent);
         this.blocks = blocks;
         this.width = width;
@@ -95,7 +97,7 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return getExtent().setBlock(x, y, z, block);
     }
 
@@ -103,4 +105,5 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return getExtent().setBiome(x, y, z, biome);
     }
+
 }

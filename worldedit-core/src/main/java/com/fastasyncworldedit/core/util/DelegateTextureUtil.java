@@ -9,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class DelegateTextureUtil extends TextureUtil {
+
     private final TextureUtil parent;
 
     public DelegateTextureUtil(TextureUtil parent) throws FileNotFoundException {
@@ -125,4 +126,5 @@ public class DelegateTextureUtil extends TextureUtil {
     public long getDistance(BufferedImage image, int c1) {
         return parent.getDistance(image, c1);
     }
+
 }

@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.extent.processor.lighting;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.world.World;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -19,10 +20,11 @@ public interface RelighterFactory {
      * If no valid Relighter can be created, {@link NullRelighter#INSTANCE} should be returned.
      *
      * @param relightMode the relight mode to use during relighting.
-     * @param world the world in which relighting should be done.
-     * @param queue the queue extent to work with.
+     * @param world       the world in which relighting should be done.
+     * @param queue       the queue extent to work with.
      * @return a new Relighter instance with the specified settings.
      */
     @Nonnull
     Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue);
+
 }

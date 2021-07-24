@@ -26,4 +26,5 @@ public class FalseMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) {
         return Masks.alwaysFalse();
     }
+
 }

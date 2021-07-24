@@ -25,10 +25,10 @@ import com.sk89q.worldedit.util.WeightedChoice.Choice;
 import com.sk89q.worldedit.util.function.LevenshteinDistance;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,8 +46,8 @@ public final class Biomes {
     /**
      * Find a biome that matches the given input name.
      *
-     * @param biomes a list of biomes
-     * @param name the name to test
+     * @param biomes   a list of biomes
+     * @param name     the name to test
      * @param registry a biome registry
      * @return a biome or null
      * @deprecated This uses the outdated name system. Find names by comparing with their ID instead.

@@ -20,21 +20,21 @@
 package com.sk89q.worldedit.regions;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
+import com.fastasyncworldedit.core.math.MutableBlockVector2;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector2;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -164,7 +164,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
                 // Project to the X-Z plane
                 new CuboidRegion(pos1.withY(min.getY()), pos2.withY(min.getY())),
-                new CuboidRegion(pos1.withY(max.getY()), pos2.withY(max.getY())));
+                new CuboidRegion(pos1.withY(max.getY()), pos2.withY(max.getY()))
+        );
     }
 
     /**
@@ -183,8 +184,15 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 new CuboidRegion(pos1.withX(max.getX()), pos2.withX(max.getX())),
 
                 // Project to X-Y plane
-                new CuboidRegion(pos1.withZ(min.getZ()).add(BlockVector3.UNIT_X), pos2.withZ(min.getZ()).subtract(BlockVector3.UNIT_X)),
-                new CuboidRegion(pos1.withZ(max.getZ()).add(BlockVector3.UNIT_X), pos2.withZ(max.getZ()).subtract(BlockVector3.UNIT_X)));
+                new CuboidRegion(
+                        pos1.withZ(min.getZ()).add(BlockVector3.UNIT_X),
+                        pos2.withZ(min.getZ()).subtract(BlockVector3.UNIT_X)
+                ),
+                new CuboidRegion(
+                        pos1.withZ(max.getZ()).add(BlockVector3.UNIT_X),
+                        pos2.withZ(max.getZ()).subtract(BlockVector3.UNIT_X)
+                )
+        );
     }
 
     @Override
@@ -642,14 +650,18 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     public static boolean contains(CuboidRegion region) {
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
-        return region.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ()) && region.contains(max.getBlockX(), max.getBlockY(), max.getBlockZ());
+        return region.contains(min.getBlockX(), min.getBlockY(), min.getBlockZ()) && region.contains(
+                max.getBlockX(),
+                max.getBlockY(),
+                max.getBlockZ()
+        );
     }
     //FAWE end
 
     /**
      * Make a cuboid from the center.
      *
-     * @param origin the origin
+     * @param origin  the origin
      * @param apothem the apothem, where 0 is the minimum value to make a 1x1 cuboid
      * @return a cuboid region
      */
@@ -678,7 +690,14 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     @Override
-    public void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, boolean full) {
+    public void filter(
+            final IChunk chunk,
+            final Filter filter,
+            ChunkFilterBlock block,
+            final IChunkGet get,
+            final IChunkSet set,
+            boolean full
+    ) {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
         block = block.initChunk(chunkX, chunkZ);

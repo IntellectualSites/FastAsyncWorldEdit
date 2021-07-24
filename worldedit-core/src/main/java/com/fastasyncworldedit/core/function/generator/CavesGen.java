@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.function.generator;
 
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -14,7 +14,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CavesGen extends GenBase {
 
-    private boolean evenCaveDistribution = false;
+    private final boolean evenCaveDistribution = false;
     private int caveFrequency = 40;
     private int caveRarity = 7;
     private int caveMinAltitude = 8;
@@ -29,7 +29,18 @@ public class CavesGen extends GenBase {
         super(caveSize);
     }
 
-    public CavesGen(int caveSize, int caveFrequency, int caveRarity, int caveMinAltitude, int caveMaxAltitude, int caveSystemFrequency, int individualCaveRarity, int caveSystemPocketChance, int caveSystemPocketMinSize, int caveSystemPocketMaxSize) {
+    public CavesGen(
+            int caveSize,
+            int caveFrequency,
+            int caveRarity,
+            int caveMinAltitude,
+            int caveMaxAltitude,
+            int caveSystemFrequency,
+            int individualCaveRarity,
+            int caveSystemPocketChance,
+            int caveSystemPocketMinSize,
+            int caveSystemPocketMaxSize
+    ) {
         super(caveSize);
         this.caveFrequency = caveFrequency;
         this.caveRarity = caveRarity;
@@ -42,12 +53,26 @@ public class CavesGen extends GenBase {
         this.caveSystemPocketMaxSize = caveSystemPocketMaxSize;
     }
 
-    protected void generateLargeCaveNode(long seed, BlockVector2 pos, Extent chunk, double x, double y, double z) throws WorldEditException {
+    protected void generateLargeCaveNode(long seed, BlockVector2 pos, Extent chunk, double x, double y, double z) throws
+            WorldEditException {
         generateCaveNode(seed, pos, chunk, x, y, z, 1.0F + ThreadLocalRandom.current().nextDouble()
-            * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
+                * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
     }
 
-    protected void generateCaveNode(long seed, BlockVector2 chunkPos, Extent chunk, double x, double y, double z, double paramdouble1, double paramdouble2, double paramdouble3, int angle, int maxAngle, double paramDouble4) throws WorldEditException {
+    protected void generateCaveNode(
+            long seed,
+            BlockVector2 chunkPos,
+            Extent chunk,
+            double x,
+            double y,
+            double z,
+            double paramdouble1,
+            double paramdouble2,
+            double paramdouble3,
+            int angle,
+            int maxAngle,
+            double paramDouble4
+    ) throws WorldEditException {
         int bx = chunkPos.getBlockX() << 4;
         int bz = chunkPos.getBlockZ() << 4;
         double real_x = bx + 7;
@@ -91,15 +116,41 @@ public class CavesGen extends GenBase {
             f2 *= 0.9F;
             f1 *= 0.75F;
             f2 += (ThreadLocalRandom.current().nextDouble() - ThreadLocalRandom.current()
-                .nextDouble()) * ThreadLocalRandom.current().nextDouble() * 2.0F;
+                    .nextDouble()) * ThreadLocalRandom.current().nextDouble() * 2.0F;
             f1 += (ThreadLocalRandom.current().nextDouble() - ThreadLocalRandom.current()
-                .nextDouble()) * ThreadLocalRandom.current().nextDouble() * 4.0F;
+                    .nextDouble()) * ThreadLocalRandom.current().nextDouble() * 4.0F;
 
             if (!isLargeCave && angle == j && paramdouble1 > 1.0F && maxAngle > 0) {
-                generateCaveNode(ThreadLocalRandom.current().nextLong(), chunkPos, chunk, x, y, z, ThreadLocalRandom
-                    .current().nextDouble() * 0.5F + 0.5F, paramdouble2 - (Math.PI/2), paramdouble3 / 3.0F, angle, maxAngle, 1.0D);
-                generateCaveNode(ThreadLocalRandom.current().nextLong(), chunkPos, chunk, x, y, z, ThreadLocalRandom
-                    .current().nextDouble() * 0.5F + 0.5F, paramdouble2 + (Math.PI/2), paramdouble3 / 3.0F, angle, maxAngle, 1.0D);
+                generateCaveNode(
+                        ThreadLocalRandom.current().nextLong(),
+                        chunkPos,
+                        chunk,
+                        x,
+                        y,
+                        z,
+                        ThreadLocalRandom
+                                .current().nextDouble() * 0.5F + 0.5F,
+                        paramdouble2 - (Math.PI / 2),
+                        paramdouble3 / 3.0F,
+                        angle,
+                        maxAngle,
+                        1.0D
+                );
+                generateCaveNode(
+                        ThreadLocalRandom.current().nextLong(),
+                        chunkPos,
+                        chunk,
+                        x,
+                        y,
+                        z,
+                        ThreadLocalRandom
+                                .current().nextDouble() * 0.5F + 0.5F,
+                        paramdouble2 + (Math.PI / 2),
+                        paramdouble3 / 3.0F,
+                        angle,
+                        maxAngle,
+                        1.0D
+                );
                 return;
             }
             if (!isLargeCave && ThreadLocalRandom.current().nextInt(4) == 0) {
@@ -117,7 +168,7 @@ public class CavesGen extends GenBase {
 
             //Boundaries check.
             if (x < real_x - 16.0D - d3 * 2.0D || z < real_z - 16.0D - d3 * 2.0D
-                || x > real_x + 16.0D + d3 * 2.0D || z > real_z + 16.0D + d3 * 2.0D) {
+                    || x > real_x + 16.0D + d3 * 2.0D || z > real_z + 16.0D + d3 * 2.0D) {
                 continue;
             }
 
@@ -162,7 +213,7 @@ public class CavesGen extends GenBase {
                                 waterFound = true;
                             }
                             if (local_y != i1 - 1 && local_x != m && local_x != n - 1 && local_z != i3
-                                && local_z != i4 - 1) {
+                                    && local_z != i4 - 1) {
                                 local_y = i1;
                             }
                         }
@@ -196,14 +247,24 @@ public class CavesGen extends GenBase {
                                     if (local_y - 1 < 10) {
                                         chunk.setBlock(bx + local_x, local_y, bz + local_z, BlockTypes.LAVA.getDefaultState());
                                     } else {
-                                        chunk.setBlock(bx + local_x, local_y, bz + local_z, BlockTypes.CAVE_AIR.getDefaultState());
+                                        chunk.setBlock(
+                                                bx + local_x,
+                                                local_y,
+                                                bz + local_z,
+                                                BlockTypes.CAVE_AIR.getDefaultState()
+                                        );
 
                                         // If grass was just deleted, try to
                                         // move it down
                                         if (grassFound) {
                                             BlockState block = chunk.getBlock(bx + local_x, local_y - 1, bz + local_z);
                                             if (block.getBlockType() == BlockTypes.DIRT) {
-                                                chunk.setBlock(bx + local_x, local_y - 1, bz + local_z, BlockTypes.STONE.getDefaultState());
+                                                chunk.setBlock(
+                                                        bx + local_x,
+                                                        local_y - 1,
+                                                        bz + local_z,
+                                                        BlockTypes.STONE.getDefaultState()
+                                                );
                                             }
                                         }
                                     }
@@ -236,7 +297,7 @@ public class CavesGen extends GenBase {
     @Override
     public void generateChunk(int chunkX, int chunkZ, BlockVector2 originChunk, Extent chunk) throws WorldEditException {
         int i = ThreadLocalRandom.current().nextInt(ThreadLocalRandom.current()
-            .nextInt(ThreadLocalRandom.current().nextInt(this.caveFrequency) + 1) + 1);
+                .nextInt(ThreadLocalRandom.current().nextInt(this.caveFrequency) + 1) + 1);
         if (this.evenCaveDistribution) {
             i = this.caveFrequency;
         }
@@ -253,8 +314,8 @@ public class CavesGen extends GenBase {
                 y = ThreadLocalRandom.current().nextInt(this.caveMinAltitude, this.caveMaxAltitude);
             } else {
                 y = ThreadLocalRandom.current()
-                    .nextInt(ThreadLocalRandom.current()
-                        .nextInt(this.caveMaxAltitude - this.caveMinAltitude + 1) + 1) + this.caveMinAltitude;
+                        .nextInt(ThreadLocalRandom.current()
+                                .nextInt(this.caveMaxAltitude - this.caveMinAltitude + 1) + 1) + this.caveMinAltitude;
             }
 
             double z = (chunkZ << 4) + ThreadLocalRandom.current().nextInt(16);
@@ -267,18 +328,19 @@ public class CavesGen extends GenBase {
             }
 
             if (largeCaveSpawned || ThreadLocalRandom.current().nextInt(100)
-                <= this.caveSystemPocketChance - 1) {
+                    <= this.caveSystemPocketChance - 1) {
                 count += ThreadLocalRandom.current()
-                    .nextInt(this.caveSystemPocketMinSize, this.caveSystemPocketMaxSize);
+                        .nextInt(this.caveSystemPocketMinSize, this.caveSystemPocketMaxSize);
             }
             while (count > 0) {
                 count--;
                 double f1 = ThreadLocalRandom.current().nextDouble() * Math.PI * 2.0F;
                 double f2 = (ThreadLocalRandom.current().nextDouble() - 0.5F) * 2.0F / 8.0F;
                 double f3 = ThreadLocalRandom.current().nextDouble() * 2.0F + ThreadLocalRandom
-                    .current().nextDouble();
+                        .current().nextDouble();
                 generateCaveNode(ThreadLocalRandom.current().nextLong(), originChunk, chunk, x, y, z, f3, f1, f2, 0, 0, 1.0D);
             }
         }
     }
+
 }

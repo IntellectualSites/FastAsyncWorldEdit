@@ -74,4 +74,5 @@ public class FaweInputStream extends DataInputStream {
         }
         parent.close();
     }
+
 }

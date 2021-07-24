@@ -120,7 +120,7 @@ public abstract class CommandsManager<T> {
      *
      * @param cls the class to register
      * @return A List of {@link Command} annotations from registered commands,
-     * for use in eg. a dynamic command registration system.
+     *         for use in eg. a dynamic command registration system.
      */
     public List<Command> registerAndReturn(Class<?> cls) {
         return registerMethods(cls, null);
@@ -130,7 +130,7 @@ public abstract class CommandsManager<T> {
      * Register the methods of a class. This will automatically construct
      * instances as necessary.
      *
-     * @param cls the class to register
+     * @param cls    the class to register
      * @param parent the parent method
      * @return Commands Registered
      */
@@ -151,9 +151,9 @@ public abstract class CommandsManager<T> {
     /**
      * Register the methods of a class.
      *
-     * @param cls the class to register
+     * @param cls    the class to register
      * @param parent the parent method
-     * @param obj the object whose methods will become commands if they are annotated
+     * @param obj    the object whose methods will become commands if they are annotated
      * @return a list of commands
      */
     private List<Command> registerMethods(Class<?> cls, Method parent, Object obj) {
@@ -287,9 +287,9 @@ public abstract class CommandsManager<T> {
     /**
      * Get the usage string for a command.
      *
-     * @param args the arguments
+     * @param args  the arguments
      * @param level the depth of the command
-     * @param cmd the command annotation
+     * @param cmd   the command annotation
      * @return the usage string
      */
     protected String getUsage(String[] args, int level, Command cmd) {
@@ -335,8 +335,8 @@ public abstract class CommandsManager<T> {
     /**
      * Get the usage string for a nested command.
      *
-     * @param args the arguments
-     * @param level the depth of the command
+     * @param args   the arguments
+     * @param level  the depth of the command
      * @param method the parent method
      * @param player the player
      * @return the usage string
@@ -389,9 +389,9 @@ public abstract class CommandsManager<T> {
      * Attempt to execute a command. This version takes a separate command
      * name (for the root command) and then a list of following arguments.
      *
-     * @param cmd command to run
-     * @param args arguments
-     * @param player command source
+     * @param cmd        command to run
+     * @param args       arguments
+     * @param player     command source
      * @param methodArgs method arguments
      * @throws CommandException thrown when the command throws an error
      */
@@ -409,8 +409,8 @@ public abstract class CommandsManager<T> {
     /**
      * Attempt to execute a command.
      *
-     * @param args the arguments
-     * @param player the player
+     * @param args       the arguments
+     * @param player     the player
      * @param methodArgs the arguments for the method
      * @throws CommandException thrown on command error
      */
@@ -423,11 +423,11 @@ public abstract class CommandsManager<T> {
     /**
      * Attempt to execute a command.
      *
-     * @param parent the parent method
-     * @param args an array of arguments
-     * @param player the player
+     * @param parent     the parent method
+     * @param args       an array of arguments
+     * @param player     the player
      * @param methodArgs the array of method arguments
-     * @param level the depth of the command
+     * @param level      the depth of the command
      * @throws CommandException thrown on a command error
      */
     public void executeMethod(Method parent, String[] args, T player, Object[] methodArgs, int level) throws CommandException {
@@ -440,8 +440,10 @@ public abstract class CommandsManager<T> {
             if (parent == null) { // Root
                 throw new UnhandledCommandException();
             } else {
-                throw new MissingNestedCommandException("Unknown command: " + cmdName,
-                        getNestedUsage(args, level - 1, parent, player));
+                throw new MissingNestedCommandException(
+                        "Unknown command: " + cmdName,
+                        getNestedUsage(args, level - 1, parent, player)
+                );
             }
         }
 
@@ -462,8 +464,10 @@ public abstract class CommandsManager<T> {
 
         if (executeNested) {
             if (argsCount == 0) {
-                throw new MissingNestedCommandException("Sub-command required.",
-                        getNestedUsage(args, level, method, player));
+                throw new MissingNestedCommandException(
+                        "Sub-command required.",
+                        getNestedUsage(args, level, method, player)
+                );
             } else {
                 executeMethod(method, args, player, methodArgs, level + 1);
             }
@@ -520,7 +524,15 @@ public abstract class CommandsManager<T> {
         }
     }
 
-    public void invokeMethod(Method parent, String[] args, T player, Method method, Object instance, Object[] methodArgs, int level) throws CommandException {
+    public void invokeMethod(
+            Method parent,
+            String[] args,
+            T player,
+            Method method,
+            Object instance,
+            Object[] methodArgs,
+            int level
+    ) throws CommandException {
         try {
             method.invoke(instance, methodArgs);
         } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -559,7 +571,7 @@ public abstract class CommandsManager<T> {
     /**
      * Returns whether a player permission..
      *
-     * @param player the player
+     * @param player     the player
      * @param permission the permission
      * @return true if permission is granted
      */
@@ -583,4 +595,5 @@ public abstract class CommandsManager<T> {
     public void setInjector(Injector injector) {
         this.injector = injector;
     }
+
 }

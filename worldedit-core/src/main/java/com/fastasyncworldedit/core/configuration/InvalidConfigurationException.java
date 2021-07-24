@@ -43,4 +43,5 @@ public class InvalidConfigurationException extends Exception {
     public InvalidConfigurationException(final String msg, final Throwable cause) {
         super(msg, cause);
     }
+
 }

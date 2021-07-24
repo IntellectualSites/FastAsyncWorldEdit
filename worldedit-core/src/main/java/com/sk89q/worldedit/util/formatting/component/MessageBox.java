@@ -83,7 +83,8 @@ public class MessageBox extends TextComponentProducer {
 
     private TextComponent createBorder(int count) {
         return TextComponent.of(Strings.repeat("-", count),
-                borderColor, Sets.newHashSet(TextDecoration.STRIKETHROUGH));
+                borderColor, Sets.newHashSet(TextDecoration.STRIKETHROUGH)
+        );
     }
 
     /**
@@ -100,4 +101,5 @@ public class MessageBox extends TextComponentProducer {
         append(contents.create());
         return super.create();
     }
+
 }

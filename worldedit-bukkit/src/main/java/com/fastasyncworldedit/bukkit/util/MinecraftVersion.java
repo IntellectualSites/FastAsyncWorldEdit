@@ -2,6 +2,7 @@ package com.fastasyncworldedit.bukkit.util;
 
 import com.google.common.collect.ComparisonChain;
 import org.bukkit.Bukkit;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -119,19 +120,28 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         MinecraftVersion that = (MinecraftVersion) o;
 
-        if (getMajor() != that.getMajor()) return false;
-        if (getMinor() != that.getMinor()) return false;
+        if (getMajor() != that.getMajor()) {
+            return false;
+        }
+        if (getMinor() != that.getMinor()) {
+            return false;
+        }
         return getRelease() == that.getRelease();
     }
 
     /**
      * Determines the server version based on the package path, e.g. {@code org.bukkit.craftbukkit.v1_16_R3},
-     * where v1_16_R3 is the resolved version.
+     * where v1_16_R3 is the resolved version. Note: as of Minecraft 1.17, NMS is no longer versioned thus this
+     * method may have poor results.
      *
      * @return The package version.
      */

@@ -52,7 +52,7 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
     // Number of chunks dispatched
     private int amountDispatch = 0;
     // Last size (to calculate speed)
-    private int lastSize = 0;
+    private final int lastSize = 0;
     // If the task is finished
     private boolean done = false;
 
@@ -113,12 +113,23 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
         int speed = total != 0 ? (int) (total / Math.max((System.currentTimeMillis() - start) / 1000d, 1)) : 0;
         String speedStr = StringMan.padRight(String.valueOf(speed), 3);
         String percent = StringMan.padRight(
-            String.valueOf(amountDispatch != 0 ? (amountDispatch * 100) / totalQueue : 0), 3);
+                String.valueOf(amountDispatch != 0 ? (amountDispatch * 100) / totalQueue : 0), 3);
         int remaining = speed != 0 ? amountQueue / speed : -1;
-        sendTile(TextComponent.empty(), Caption.of("fawe.progress.progress.message", queue, dispatch, percent, StringMan.padLeft("" + speed, 3), StringMan.padLeft("" + remaining, 3)));
+        sendTile(
+                TextComponent.empty(),
+                Caption.of(
+                        "fawe.progress.progress.message",
+                        queue,
+                        dispatch,
+                        percent,
+                        StringMan.padLeft("" + speed, 3),
+                        StringMan.padLeft("" + remaining, 3)
+                )
+        );
     }
 
     public void sendTile(Component title, Component sub) {
         player.sendTitle(title, sub);
     }
+
 }

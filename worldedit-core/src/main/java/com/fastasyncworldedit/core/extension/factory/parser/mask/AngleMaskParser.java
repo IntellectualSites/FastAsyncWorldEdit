@@ -1,16 +1,16 @@
 package com.fastasyncworldedit.core.extension.factory.parser.mask;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.function.mask.AngleMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
 public class AngleMaskParser extends RichParser<Mask> {
@@ -49,8 +49,10 @@ public class AngleMaskParser extends RichParser<Mask> {
                 if (flag.equals("-o")) {
                     overlay = true;
                 } else {
-                    throw new InputParseException(Caption.of("fawe.error.invalid-flag",
-                            TextComponent.of(flag)));
+                    throw new InputParseException(Caption.of(
+                            "fawe.error.invalid-flag",
+                            TextComponent.of(flag)
+                    ));
                 }
             }
         }
@@ -68,4 +70,5 @@ public class AngleMaskParser extends RichParser<Mask> {
 
         return new AngleMask(context.getExtent(), min, max, overlay, 1);
     }
+
 }

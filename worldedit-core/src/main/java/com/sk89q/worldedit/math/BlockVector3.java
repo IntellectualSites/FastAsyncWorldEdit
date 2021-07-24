@@ -85,13 +85,14 @@ public abstract class BlockVector3 {
 
     public static boolean isLongPackable(BlockVector3 location) {
         return isHorizontallyInBounds(location.getX())
-            && isHorizontallyInBounds(location.getZ())
-            && WORLD_Y_MIN <= location.getY() && location.getY() <= WORLD_Y_MAX;
+                && isHorizontallyInBounds(location.getZ())
+                && WORLD_Y_MIN <= location.getY() && location.getY() <= WORLD_Y_MAX;
     }
 
     public static void checkLongPackable(BlockVector3 location) {
         checkArgument(isLongPackable(location),
-            "Location exceeds long packing limits: %s", location);
+                "Location exceeds long packing limits: %s", location
+        );
     }
 
     private static final long BITS_26 = mask(26);
@@ -103,10 +104,12 @@ public abstract class BlockVector3 {
 
     // thread-safe initialization idiom
     private static final class YzxOrderComparator {
+
         private static final Comparator<BlockVector3> YZX_ORDER =
-            Comparator.comparingInt(BlockVector3::getY)
-                .thenComparingInt(BlockVector3::getZ)
-                .thenComparingInt(BlockVector3::getX);
+                Comparator.comparingInt(BlockVector3::getY)
+                        .thenComparingInt(BlockVector3::getZ)
+                        .thenComparingInt(BlockVector3::getX);
+
     }
 
     /**
@@ -583,9 +586,9 @@ public abstract class BlockVector3 {
     //FAWE start - getter
     public BlockVector3 cross(BlockVector3 other) {
         return new BlockVector3Imp(
-            getY() * other.getZ() - getZ() * other.getY(),
-            getZ() * other.getX() - getX() * other.getZ(),
-            getX() * other.getY() - getY() * other.getX()
+                getY() * other.getZ() - getZ() * other.getY(),
+                getZ() * other.getX() - getX() * other.getZ(),
+                getX() * other.getY() - getY() * other.getX()
         );
     }
     //FAWE end
@@ -600,7 +603,7 @@ public abstract class BlockVector3 {
     //FAWE start - getter
     public boolean containedWithin(BlockVector3 min, BlockVector3 max) {
         return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max
-            .getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
+                .getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
     }
     //FAWE end
 
@@ -671,9 +674,9 @@ public abstract class BlockVector3 {
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle in degrees
-     * @param aboutX about which x coordinate to rotate
-     * @param aboutZ about which z coordinate to rotate
+     * @param angle      in degrees
+     * @param aboutX     about which x coordinate to rotate
+     * @param aboutZ     about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
@@ -690,9 +693,9 @@ public abstract class BlockVector3 {
         double z2 = x * sin + z * cos;
 
         return BlockVector3.at(
-            x2 + aboutX + translateX,
-            getY(),
-            z2 + aboutZ + translateZ
+                x2 + aboutX + translateX,
+                getY(),
+                z2 + aboutZ + translateZ
         );
     }
     //FAWE end
@@ -861,6 +864,7 @@ public abstract class BlockVector3 {
 
     /**
      * Returns a string representation that is supported by the parser.
+     *
      * @return string
      */
     public String toParserString() {

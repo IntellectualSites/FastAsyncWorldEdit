@@ -65,7 +65,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
-        throws WorldEditException {
+            throws WorldEditException {
         return setBlock(location.getBlockX(), location.getBlockY(), location.getBlockZ(), block);
     }
 
@@ -76,7 +76,7 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block)
-        throws WorldEditException {
+            throws WorldEditException {
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
         if (hasNbt) {
             if (!limit.MAX_BLOCKSTATES()) {
@@ -106,4 +106,5 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
         }
         return super.setBiome(position, biome);
     }
+
 }

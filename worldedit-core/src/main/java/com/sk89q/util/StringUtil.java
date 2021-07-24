@@ -52,8 +52,8 @@ public final class StringUtil {
     /**
      * Join an array of strings into a string.
      *
-     * @param str the string array
-     * @param delimiter the delimiter
+     * @param str          the string array
+     * @param delimiter    the delimiter
      * @param initialIndex the initial index to start form
      * @return a new string
      */
@@ -71,14 +71,16 @@ public final class StringUtil {
     /**
      * Join an array of strings into a string.
      *
-     * @param str the string array
-     * @param delimiter the delimiter
+     * @param str          the string array
+     * @param delimiter    the delimiter
      * @param initialIndex the initial index to start form
-     * @param quote the character to put around each entry
+     * @param quote        the character to put around each entry
      * @return a new string
      */
-    public static String joinQuotedString(String[] str, String delimiter,
-            int initialIndex, String quote) {
+    public static String joinQuotedString(
+            String[] str, String delimiter,
+            int initialIndex, String quote
+    ) {
         if (str.length == 0) {
             return "";
         }
@@ -95,7 +97,7 @@ public final class StringUtil {
     /**
      * Join an array of strings into a string.
      *
-     * @param str the string array
+     * @param str       the string array
      * @param delimiter the delimiter
      * @return a new string
      */
@@ -106,8 +108,8 @@ public final class StringUtil {
     /**
      * Join an array of strings into a string.
      *
-     * @param str an array of objects
-     * @param delimiter the delimiter
+     * @param str          an array of objects
+     * @param delimiter    the delimiter
      * @param initialIndex the initial index to start form
      * @return a new string
      */
@@ -125,8 +127,8 @@ public final class StringUtil {
     /**
      * Join an array of strings into a string.
      *
-     * @param str a list of integers
-     * @param delimiter the delimiter
+     * @param str          a list of integers
+     * @param delimiter    the delimiter
      * @param initialIndex the initial index to start form
      * @return a new string
      */
@@ -136,7 +138,7 @@ public final class StringUtil {
         }
         StringBuilder buffer = new StringBuilder(Integer.toString(str[initialIndex]));
         for (int i = initialIndex + 1; i < str.length; ++i) {
-            buffer.append(delimiter).append(Integer.toString(str[i]));
+            buffer.append(delimiter).append(str[i]);
         }
         return buffer.toString();
     }
@@ -144,8 +146,8 @@ public final class StringUtil {
     /**
      * Join an list of strings into a string.
      *
-     * @param str a list of strings
-     * @param delimiter the delimiter
+     * @param str          a list of strings
+     * @param delimiter    the delimiter
      * @param initialIndex the initial index to start form
      * @return a new string
      */
@@ -197,8 +199,8 @@ public final class StringUtil {
      * StringUtil.getLevenshteinDistance("hello", "hallo")    = 1
      * </pre>
      *
-     * @param s  the first String, must not be null
-     * @param t  the second String, must not be null
+     * @param s the first String, must not be null
+     * @param t the second String, must not be null
      * @return result distance
      * @throws IllegalArgumentException if either String input {@code null}
      */
@@ -309,8 +311,10 @@ public final class StringUtil {
         return parseListInQuotes(input, delimiter, quoteOpen, quoteClose, false);
     }
 
-    public static List<String> parseListInQuotes(String[] input, char delimiter, char quoteOpen,
-        char quoteClose, boolean appendLeftover) {
+    public static List<String> parseListInQuotes(
+            String[] input, char delimiter, char quoteOpen,
+            char quoteClose, boolean appendLeftover
+    ) {
         List<String> parsableBlocks = new ArrayList<>();
         StringBuilder buffer = new StringBuilder();
         for (String split : input) {
@@ -333,14 +337,15 @@ public final class StringUtil {
         return parsableBlocks;
     }
 
-   //FAWE start
+    //FAWE start
+
     /**
      * Splits a string respecting enclosing quotes.
      *
-     * @param input the input to split.
+     * @param input     the input to split.
      * @param delimiter the delimiter to split on.
-     * @param open the opening quote character.
-     * @param close the closing quote character.
+     * @param open      the opening quote character.
+     * @param close     the closing quote character.
      * @return a list of split strings.
      */
     public static List<String> split(String input, char delimiter, char open, char close) {

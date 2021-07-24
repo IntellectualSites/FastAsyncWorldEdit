@@ -28,4 +28,5 @@ import com.sk89q.worldedit.event.Event;
  * <p>This event is fired once.</p>
  */
 public class PlatformInitializeEvent extends Event {
+
 }

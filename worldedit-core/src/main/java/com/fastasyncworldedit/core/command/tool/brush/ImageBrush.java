@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.function.mask.ImageBrushMask;
-import com.fastasyncworldedit.core.util.collection.SummedColorTable;
 import com.fastasyncworldedit.core.function.mask.SurfaceMask;
 import com.fastasyncworldedit.core.util.TextureUtil;
+import com.fastasyncworldedit.core.util.collection.SummedColorTable;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -12,6 +12,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 public class ImageBrush implements Brush {
+
     private final LocalSession session;
     private final SummedColorTable table;
     private final int width;
@@ -63,11 +65,14 @@ public class ImageBrush implements Brush {
     }
 
     public interface ColorFunction {
+
         int call(int x1, int z1, int x2, int z2, Extent extent, BlockVector3 pos);
+
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 center, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 center, Pattern pattern, double sizeDouble) throws
+            MaxChangedBlocksException {
         final Mask solid = new SurfaceMask(editSession);
 
         double scale = Math.max(width, height) / sizeDouble;
@@ -77,9 +82,20 @@ public class ImageBrush implements Brush {
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();
         RecursiveVisitor visitor = new RecursiveVisitor(
-            new ImageBrushMask(solid, center, transform, scale, centerImageX, centerImageZ, width, height, colorFunction, editSession,
-                session.getTextureUtil()), vector -> true, Integer.MAX_VALUE);
-        visitor.setDirections(Arrays.asList(visitor.DIAGONAL_DIRECTIONS));
+                new ImageBrushMask(
+                        solid,
+                        center,
+                        transform,
+                        scale,
+                        centerImageX,
+                        centerImageZ,
+                        width,
+                        height,
+                        colorFunction,
+                        editSession,
+                        session.getTextureUtil()
+                ), vector -> true, Integer.MAX_VALUE);
+        visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(center);
         Operations.completeBlindly(visitor);
     }

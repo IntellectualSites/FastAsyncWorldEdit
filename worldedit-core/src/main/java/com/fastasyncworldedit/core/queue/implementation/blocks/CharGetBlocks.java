@@ -46,4 +46,5 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
         super.reset();
         return null;
     }
+
 }

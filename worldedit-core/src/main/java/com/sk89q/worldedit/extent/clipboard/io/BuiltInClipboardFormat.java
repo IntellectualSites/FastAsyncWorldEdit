@@ -21,9 +21,9 @@ package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
 import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
-import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.PNGWriter;
+import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
@@ -52,7 +52,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     //FAWE start - register fast clipboard io
     FAST("fast", "fawe") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
@@ -94,7 +93,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
      * The Schematic format used by MCEdit.
      */
     MCEDIT_SCHEMATIC("mcedit", "mce", "schematic") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schematic";
@@ -122,11 +120,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
     },
 
     SPONGE_SCHEMATIC("sponge", "schem") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
         }
+
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
             NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(inputStream));
@@ -163,7 +161,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     //FAWE start - recover schematics with bad entity data & register other clipboard formats
     BROKENENTITY("brokenentity", "legacyentity", "le", "be", "brokenentities", "legacyentities") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
@@ -239,7 +236,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
      * Isometric PNG writer.
      */
     PNG("png", "image") {
-
         @Override
         public ClipboardReader getReader(InputStream inputStream) {
             return null;

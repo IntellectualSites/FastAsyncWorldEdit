@@ -37,9 +37,9 @@ import org.apache.logging.log4j.Logger;
 import org.enginehub.piston.exception.CommandException;
 import org.enginehub.piston.exception.CommandExecutionException;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -215,4 +215,5 @@ public final class AsyncCommandBuilder<T> {
         }
         return message;
     }
+
 }

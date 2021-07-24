@@ -2,6 +2,7 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.plotsquared.core.queue.LightingMode;
@@ -12,15 +13,14 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -29,7 +29,7 @@ public class FaweQueueCoordinator extends QueueCoordinator {
 
     public final IQueueExtent<IQueueChunk> instance;
     private final World world;
-    private BlockVector3 mutable = new MutableBlockVector3();
+    private final BlockVector3 mutable = new MutableBlockVector3();
     private boolean setbiome = false;
 
     public FaweQueueCoordinator(World world) {
@@ -202,4 +202,5 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     public boolean isSettingTiles() {
         return false;
     }
+
 }

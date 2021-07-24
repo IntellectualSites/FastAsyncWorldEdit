@@ -15,4 +15,5 @@ public class VoronoiPatternParser extends NoisePatternParser {
     public VoronoiPatternParser(WorldEdit worldEdit) {
         super(worldEdit, VORONOI_NAME, VoronoiNoise::new);
     }
+
 }

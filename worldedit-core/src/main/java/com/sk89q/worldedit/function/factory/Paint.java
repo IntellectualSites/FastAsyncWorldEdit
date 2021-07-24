@@ -50,8 +50,10 @@ public class Paint implements Contextual<Operation> {
         this(new NullExtent(), new NullRegion(), function, density);
     }
 
-    public Paint(Extent destination, Region region, Contextual<? extends RegionFunction> function,
-                 double density) {
+    public Paint(
+            Extent destination, Region region, Contextual<? extends RegionFunction> function,
+            double density
+    ) {
         checkNotNull(destination, "destination");
         checkNotNull(region, "region");
         checkNotNull(function, "function");

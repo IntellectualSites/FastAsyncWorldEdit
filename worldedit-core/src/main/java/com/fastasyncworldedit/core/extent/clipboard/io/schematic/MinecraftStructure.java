@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent.clipboard.io.schematic;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
@@ -17,7 +18,6 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
@@ -31,8 +31,8 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.apache.logging.log4j.Logger;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -215,12 +215,13 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                 int combined = block.getInternalId();
                 int index = indexes.get(combined);
                 List<Integer> pos = Arrays.asList(point.getX() - min.getX(),
-                    point.getY() - min.getY(), point.getZ() - min.getZ());
+                        point.getY() - min.getY(), point.getZ() - min.getZ()
+                );
                 if (!block.hasNbtData()) {
                     blocks.add(FaweCache.IMP.asMap("state", index, "pos", pos));
                 } else {
                     blocks.add(
-                        FaweCache.IMP.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
+                            FaweCache.IMP.asMap("state", index, "pos", pos, "nbt", block.getNbtData()));
                 }
             }
         }

@@ -47,15 +47,15 @@ public class BukkitImplLoader {
     private static final String CLASS_SUFFIX = ".class";
 
     private static final String LOAD_ERROR_MESSAGE =
-    //FAWE start - exchange WorldEdit to FAWE & suggest to update Fawe & the server software
-        "\n**********************************************\n"
-            + "** This FastAsyncWorldEdit version does not fully support your version of Bukkit.\n"
-            + "** You can fix this by:\n"
-            +  "** - Updating your server version (Check /version to see how many versions you are behind)\n** - Updating FAWE\n"
-            + "**\n" + "** When working with blocks or undoing, chests will be empty, signs\n"
-            + "** will be blank, and so on. There will be no support for entity\n"
-            + "** and block property-related functions.\n"
-            + "**********************************************\n";
+            //FAWE start - exchange WorldEdit to FAWE & suggest to update Fawe & the server software
+            "\n**********************************************\n"
+                    + "** This FastAsyncWorldEdit version does not fully support your version of Bukkit.\n"
+                    + "** You can fix this by:\n"
+                    + "** - Updating your server version (Check /version to see how many versions you are behind)\n** - Updating FAWE\n"
+                    + "**\n" + "** When working with blocks or undoing, chests will be empty, signs\n"
+                    + "** will be blank, and so on. There will be no support for entity\n"
+                    + "** and block property-related functions.\n"
+                    + "**********************************************\n";
     //FAWE end
 
     /**
@@ -164,10 +164,10 @@ public class BukkitImplLoader {
                 }
             } catch (ClassNotFoundException e) {
                 LOGGER.warn("Failed to load the Bukkit adapter class '" + className
-                    + "' that is not supposed to be missing", e);
+                        + "' that is not supposed to be missing", e);
             } catch (IllegalAccessException e) {
                 LOGGER.warn("Failed to load the Bukkit adapter class '" + className
-                    + "' that is not supposed to be raising this error", e);
+                        + "' that is not supposed to be raising this error", e);
             } catch (Throwable e) {
                 if (className.equals(customCandidate)) {
                     LOGGER.warn("Failed to load the Bukkit adapter class '" + className + "'", e);

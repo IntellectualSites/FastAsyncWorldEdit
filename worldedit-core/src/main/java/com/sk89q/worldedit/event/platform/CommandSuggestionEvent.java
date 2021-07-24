@@ -40,7 +40,7 @@ public class CommandSuggestionEvent extends Event {
     /**
      * Create a new instance.
      *
-     * @param actor the player
+     * @param actor     the player
      * @param arguments the arguments
      */
     public CommandSuggestionEvent(Actor actor, String arguments) {
@@ -73,8 +73,8 @@ public class CommandSuggestionEvent extends Event {
      * Get the list of suggestions that are to be presented.
      *
      * <p>
-     *     Each Substring holds the replacement as the substring,
-     *     and the replacement range as the original substring range.
+     * Each Substring holds the replacement as the substring,
+     * and the replacement range as the original substring range.
      * </p>
      *
      * @return the list of suggestions

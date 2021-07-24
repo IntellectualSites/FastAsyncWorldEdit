@@ -76,13 +76,17 @@ public class WorldEditListener implements Listener {
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
         InjectedValueStore store = MapBackedValueStore.create();
         store.injectValue(Key.of(Actor.class), context ->
-            Optional.of(plugin.wrapCommandSender(event.getPlayer())));
-        CommandManager commandManager = plugin.getWorldEdit().getPlatformManager().getPlatformCommandManager().getCommandManager();
+                Optional.of(plugin.wrapCommandSender(event.getPlayer())));
+        CommandManager commandManager = plugin
+                .getWorldEdit()
+                .getPlatformManager()
+                .getPlatformCommandManager()
+                .getCommandManager();
         event.getCommands().removeIf(name ->
-            // remove if in the manager and not satisfied
-            commandManager.getCommand(name)
-                .filter(command -> !command.getCondition().satisfied(store))
-                .isPresent()
+                // remove if in the manager and not satisfied
+                commandManager.getCommand(name)
+                        .filter(command -> !command.getCondition().satisfied(store))
+                        .isPresent()
         );
     }
 
@@ -151,4 +155,5 @@ public class WorldEditListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         plugin.getWorldEdit().getEventBus().post(new SessionIdleEvent(new BukkitPlayer.SessionKeyImpl(event.getPlayer())));
     }
+
 }

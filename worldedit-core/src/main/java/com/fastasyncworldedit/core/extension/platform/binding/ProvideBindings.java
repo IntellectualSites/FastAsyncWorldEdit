@@ -10,11 +10,11 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.argument.Arguments;
+import com.sk89q.worldedit.command.util.annotation.AllowedRegion;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.command.util.annotation.AllowedRegion;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.request.Request;
@@ -29,6 +29,7 @@ import java.net.URI;
 import java.util.Optional;
 
 public class ProvideBindings extends Bindings {
+
     public ProvideBindings(WorldEdit worldEdit) {
         super(worldEdit);
     }
@@ -96,6 +97,7 @@ public class ProvideBindings extends Bindings {
     }
 
     public static class ImageUri {
+
         public final URI uri;
         private BufferedImage image;
 
@@ -109,6 +111,7 @@ public class ProvideBindings extends Bindings {
             }
             return image = ImageUtil.load(uri);
         }
+
     }
 
     @Binding
@@ -129,4 +132,5 @@ public class ProvideBindings extends Bindings {
         }
         return editSession;
     }
+
 }

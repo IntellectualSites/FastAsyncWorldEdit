@@ -76,6 +76,7 @@ public class CommandListBox extends PaginationBox {
     }
 
     private class CommandEntry {
+
         private final String alias;
         private final Component description;
         private final String insertion;
@@ -90,7 +91,10 @@ public class CommandListBox extends PaginationBox {
             TextComponentProducer line = new TextComponentProducer();
             if (!hideHelp) {
                 line.append(SubtleFormat.wrap("? ")
-                        .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, CommandListBox.this.helpCommand + " " + insertion))
+                        .clickEvent(ClickEvent.of(
+                                ClickEvent.Action.RUN_COMMAND,
+                                CommandListBox.this.helpCommand + " " + insertion
+                        ))
                         .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Additional Help"))));
             }
             TextComponent command = TextComponent.of(alias, TextColor.GOLD);
@@ -103,5 +107,7 @@ public class CommandListBox extends PaginationBox {
             }
             return line.append(TextComponent.of(": ")).append(description).create();
         }
+
     }
+
 }

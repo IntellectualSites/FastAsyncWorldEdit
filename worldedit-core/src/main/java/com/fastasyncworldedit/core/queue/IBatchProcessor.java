@@ -7,8 +7,8 @@ import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -37,6 +37,7 @@ public interface IBatchProcessor {
 
     /**
      * Utility method to trim a chunk based on min and max Y.
+     *
      * @return false if chunk is empty of blocks
      */
     default boolean trimY(IChunkSet set, int minY, int maxY) {
@@ -99,7 +100,7 @@ public interface IBatchProcessor {
         Map<BlockVector3, CompoundTag> tiles = set.getTiles();
         if (!tiles.isEmpty()) {
             tiles.entrySet().removeIf(blockVector3CompoundTagEntry -> !contains
-                .apply(blockVector3CompoundTagEntry.getKey()));
+                    .apply(blockVector3CompoundTagEntry.getKey()));
         }
         return !tiles.isEmpty() || !ents.isEmpty();
     }
@@ -134,4 +135,5 @@ public interface IBatchProcessor {
     default ProcessorScope getScope() {
         return ProcessorScope.CUSTOM;
     }
+
 }

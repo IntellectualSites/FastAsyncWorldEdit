@@ -7,8 +7,8 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,13 +23,14 @@ import java.util.stream.Stream;
  * @param <E> the parse result.
  */
 public abstract class RichParser<E> extends InputParser<E> {
+
     private final String[] prefixes;
 
     /**
      * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
      *
      * @param worldEdit the worldedit instance.
-     * @param aliases    the prefix of this parser result.
+     * @param aliases   the prefix of this parser result.
      */
     protected RichParser(WorldEdit worldEdit, String... aliases) {
         super(worldEdit);
@@ -147,4 +148,5 @@ public abstract class RichParser<E> extends InputParser<E> {
         }
         return arguments.toArray(new String[0]);
     }
+
 }

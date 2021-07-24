@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.function.mask;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMap;
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
@@ -8,7 +9,6 @@ import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 
@@ -29,17 +29,19 @@ public class StencilBrushMask extends AbstractExtentMask {
     private final int maxY;
     private final Pattern pattern;
 
-    public StencilBrushMask(EditSession editSession,
-                            Mask solid,
-                            BlockVector3 center,
-                            Transform transform,
-                            int size2,
-                            HeightMap map,
-                            double scale,
-                            int add,
-                            int cutoff,
-                            int maxY,
-                            Pattern pattern) {
+    public StencilBrushMask(
+            EditSession editSession,
+            Mask solid,
+            BlockVector3 center,
+            Transform transform,
+            int size2,
+            HeightMap map,
+            double scale,
+            int add,
+            int cutoff,
+            int maxY,
+            Pattern pattern
+    ) {
         super(editSession);
         this.editSession = editSession;
         this.solid = solid;
@@ -90,6 +92,19 @@ public class StencilBrushMask extends AbstractExtentMask {
 
     @Override
     public Mask copy() {
-        return new StencilBrushMask(editSession, solid.copy(), center.toImmutable(), transform, size2, map, scale, add, cutoff, maxY, pattern);
+        return new StencilBrushMask(
+                editSession,
+                solid.copy(),
+                center.toImmutable(),
+                transform,
+                size2,
+                map,
+                scale,
+                add,
+                cutoff,
+                maxY,
+                pattern
+        );
     }
+
 }

@@ -5,8 +5,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,6 +24,7 @@ import java.util.Set;
  * </p>
  */
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements Set<BlockVector3> {
+
     private final Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
 
     @Override
@@ -118,7 +119,11 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
                 int pair = entry.getIntKey();
                 int cx = MathMan.unpairX(pair);
                 int cz = MathMan.unpairY(pair);
-                return mutable.setComponents((cx << 11) + localPos.getBlockX(), localPos.getBlockY(), (cz << 11) + localPos.getBlockZ());
+                return mutable.setComponents(
+                        (cx << 11) + localPos.getBlockX(),
+                        localPos.getBlockY(),
+                        (cz << 11) + localPos.getBlockZ()
+                );
             }
         };
     }
@@ -210,4 +215,5 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     public void clear() {
         localSets.clear();
     }
+
 }

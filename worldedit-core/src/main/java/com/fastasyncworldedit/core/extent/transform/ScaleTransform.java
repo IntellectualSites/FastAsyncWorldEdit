@@ -1,12 +1,12 @@
 package com.fastasyncworldedit.core.extent.transform;
 
 import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -62,7 +62,7 @@ public class ScaleTransform extends ResettableExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
-        throws WorldEditException {
+            throws WorldEditException {
         boolean result = false;
         MutableBlockVector3 pos = new MutableBlockVector3(getPos(location));
         double sx = pos.getX();
@@ -103,7 +103,7 @@ public class ScaleTransform extends ResettableExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x1, int y1, int z1, B block)
-        throws WorldEditException {
+            throws WorldEditException {
         boolean result = false;
         MutableBlockVector3 pos = new MutableBlockVector3(getPos(x1, y1, z1));
         double sx = pos.getX();
@@ -126,8 +126,10 @@ public class ScaleTransform extends ResettableExtent {
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
         Location newLoc = new Location(location.getExtent(),
-            getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()).toVector3(),
-            location.getYaw(), location.getPitch());
+                getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()).toVector3(),
+                location.getYaw(), location.getPitch()
+        );
         return super.createEntity(newLoc, entity);
     }
+
 }

@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.util.collection;
 import java.util.Map;
 
 public class MutablePair<K, V> implements Map.Entry<K, V> {
+
     private K key;
     private V value;
 
@@ -25,4 +26,5 @@ public class MutablePair<K, V> implements Map.Entry<K, V> {
     public void setKey(K key) {
         this.key = key;
     }
+
 }

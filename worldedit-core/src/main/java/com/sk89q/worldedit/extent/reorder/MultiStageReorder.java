@@ -170,7 +170,7 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
     /**
      * Create a new instance.
      *
-     * @param extent the extent
+     * @param extent  the extent
      * @param enabled true to enable
      */
     public MultiStageReorder(Extent extent, boolean enabled) {
@@ -225,7 +225,9 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
         PlacementPriority srcPriority = getPlacementPriority(existing);
 
         if (srcPriority != PlacementPriority.FIRST) {
-            BaseBlock replacement = (block.getBlockType().getMaterial().isAir() ? block : BlockTypes.AIR.getDefaultState()).toBaseBlock();
+            BaseBlock replacement = (block.getBlockType().getMaterial().isAir()
+                    ? block
+                    : BlockTypes.AIR.getDefaultState()).toBaseBlock();
 
             switch (srcPriority) {
                 case FINAL:
@@ -283,4 +285,5 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
 
         return new OperationQueue(operations);
     }
+
 }

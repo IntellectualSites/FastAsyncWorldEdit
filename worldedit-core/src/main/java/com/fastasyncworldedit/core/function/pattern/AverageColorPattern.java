@@ -11,7 +11,8 @@ import com.sk89q.worldedit.world.block.BlockType;
 import java.awt.Color;
 
 public class AverageColorPattern extends AbstractExtentPattern {
-    private transient TextureHolder holder;
+
+    private final transient TextureHolder holder;
     private final int color;
 
     public AverageColorPattern(Extent extent, int color, TextureHolder util) {
@@ -44,4 +45,5 @@ public class AverageColorPattern extends AbstractExtentPattern {
         }
         return set.setBlock(extent, newBlock.getDefaultState());
     }
+
 }

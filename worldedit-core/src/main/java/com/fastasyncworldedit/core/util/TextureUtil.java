@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.extent.filter.block.SingleFilterBlock;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.filter.block.SingleFilterBlock;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -20,7 +20,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import org.apache.logging.log4j.Logger;
-
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -47,8 +47,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import javax.imageio.ImageIO;
-
 import static org.apache.logging.log4j.LogManager.getLogger;
 
 // TODO FIXME
@@ -78,7 +76,7 @@ public class TextureUtil implements TextureHolder {
      * https://github.com/erich666/Mineways/blob/master/Win/biomes.cpp
      */
     protected BiomeColor[] validBiomes;
-    private BiomeColor[] biomes = new BiomeColor[]{
+    private final BiomeColor[] biomes = new BiomeColor[] {
         //    ID    Name             Temperature, rainfall, grass, foliage colors
         //    - note: the colors here are just placeholders, they are computed in the program
         new BiomeColor(0, "ocean", 0.5f, 0.5f, 0x92BD59, 0x77AB2F),
@@ -341,9 +339,8 @@ public class TextureUtil implements TextureHolder {
         new BiomeColor(252, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(253, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
         new BiomeColor(254, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
-        new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F)
-    };
-    private BlockType[] layerBuffer = new BlockType[2];
+        new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F)};
+    private final BlockType[] layerBuffer = new BlockType[2];
 
     public TextureUtil() throws FileNotFoundException {
         this(MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.TEXTURES));
@@ -354,9 +351,14 @@ public class TextureUtil implements TextureHolder {
         if (!folder.exists()) {
             try {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
-                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
-                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar").openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.17.1.jar")) {
+                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/")
+                    .mkdirs();
+                try (BufferedInputStream in = new BufferedInputStream(
+                    new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar")
+                        .openStream());
+                    FileOutputStream fileOutputStream = new FileOutputStream(
+                        Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/"
+                            + "/.minecraft/versions/1.17.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -364,12 +366,15 @@ public class TextureUtil implements TextureHolder {
                     }
                     LOGGER.info("Asset jar down has been downloaded successfully.");
                 } catch (IOException e) {
-                    LOGGER.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar in it.");
+                    LOGGER.error(
+                        "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar in it.");
                     LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
             } catch (AccessControlException e) {
-                LOGGER.error("Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
-                LOGGER.error("Please create the following folder manually: `FastAsyncWorldEdit/textures` with `.minecraft/versions` jar in it.");
+                LOGGER.error(
+                    "Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
+                LOGGER.error(
+                    "Please create the following folder manually: `FastAsyncWorldEdit/textures` with `.minecraft/versions` jar in it.");
 
             }
         }
@@ -410,8 +415,7 @@ public class TextureUtil implements TextureHolder {
         return fromBlocks(blocks);
     }
 
-    protected static int hueDistance(int red1, int green1, int blue1, int red2, int green2,
-        int blue2) {
+    protected static int hueDistance(int red1, int green1, int blue1, int red2, int green2, int blue2) {
         int total1 = (red1 + green1 + blue1);
         int total2 = (red2 + green2 + blue2);
         if (total1 == 0 || total2 == 0) {
@@ -425,8 +429,7 @@ public class TextureUtil implements TextureHolder {
         return (int) ((r * r + g * g + b * b) >> 25);
     }
 
-    @Override
-    public TextureUtil getTextureUtil() {
+    @Override public TextureUtil getTextureUtil() {
         return this;
     }
 
@@ -525,18 +528,13 @@ public class TextureUtil implements TextureHolder {
         return biomes[biome];
     }
 
-    public boolean getIsBlockCloserThanBiome(char[] blockAndBiomeIdOutput, int color,
-        int biomePriority) {
+    public boolean getIsBlockCloserThanBiome(char[] blockAndBiomeIdOutput, int color, int biomePriority) {
         BlockType block = getNearestBlock(color);
         TextureUtil.BiomeColor biome = getNearestBiome(color);
         int blockColor = getColor(block);
         blockAndBiomeIdOutput[0] = block.getDefaultState().getOrdinalChar();
         blockAndBiomeIdOutput[1] = (char) biome.id;
-        if (colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor,
-            color)) {
-            return true;
-        }
-        return false;
+        return colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor, color);
     }
 
     public int getBiomeMix(int[] biomeIdsOutput, int color) {
@@ -632,16 +630,22 @@ public class TextureUtil implements TextureHolder {
                 }
             }
             if (files.length == 0) {
-                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/").mkdirs();
-                try (BufferedInputStream in = new BufferedInputStream(new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar").openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/1.17.1.jar")) {
+                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/")
+                    .mkdirs();
+                try (BufferedInputStream in = new BufferedInputStream(
+                    new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar")
+                        .openStream());
+                    FileOutputStream fileOutputStream = new FileOutputStream(
+                        Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/"
+                            + "/.minecraft/versions/1.17.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                         fileOutputStream.write(dataBuffer, 0, bytesRead);
                     }
                 } catch (IOException e) {
-                    LOGGER.error("Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+                    LOGGER.error(
+                        "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
                     LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
             } else {
@@ -658,8 +662,7 @@ public class TextureUtil implements TextureHolder {
                         String name = entry.getName();
                         Path path = Paths.get(name);
                         if (path.startsWith("assets" + File.separator)) {
-                            String[] split =
-                                path.toString().split(Pattern.quote(File.separator));
+                            String[] split = path.toString().split(Pattern.quote(File.separator));
                             if (split.length > 1) {
                                 String modId = split[1];
                                 mods.add(modId);
@@ -693,8 +696,7 @@ public class TextureUtil implements TextureHolder {
 
                         String textureFileName;
                         try (InputStream is = zipFile.getInputStream(entry)) {
-                            JsonReader reader = new JsonReader(
-                                new InputStreamReader(is, StandardCharsets.UTF_8));
+                            JsonReader reader = new JsonReader(new InputStreamReader(is, StandardCharsets.UTF_8));
                             Map<String, Object> root = gson.fromJson(reader, typeToken);
                             Map<String, Object> textures = (Map) root.get("textures");
 
@@ -703,8 +705,7 @@ public class TextureUtil implements TextureHolder {
                             }
                             Set<String> models = new HashSet<>();
                             // Get models
-                            for (Map.Entry<String, Object> stringObjectEntry : textures
-                                .entrySet()) {
+                            for (Map.Entry<String, Object> stringObjectEntry : textures.entrySet()) {
                                 Object value = stringObjectEntry.getValue();
                                 if (value instanceof String) {
                                     models.add((String) value);
@@ -722,8 +723,7 @@ public class TextureUtil implements TextureHolder {
                             String[] texSplit = models.iterator().next().split(":");
                             String texture = texSplit[texSplit.length - 1];
 
-                            textureFileName =
-                                String.format(texturesDir, nameSpace, texture);
+                            textureFileName = String.format(texturesDir, nameSpace, texture);
                         }
 
                         BufferedImage image = readImage(zipFile, textureFileName);
@@ -738,8 +738,7 @@ public class TextureUtil implements TextureHolder {
                     }
                     Integer grass = null;
                     {
-                        String grassFileName =
-                            String.format(texturesDir, "minecraft", "grass_block_top");
+                        String grassFileName = String.format(texturesDir, "minecraft", "grass_block_top");
                         BufferedImage image = readImage(zipFile, grassFileName);
                         if (image != null) {
                             grass = ImageUtil.getColor(image);
@@ -747,17 +746,14 @@ public class TextureUtil implements TextureHolder {
                     }
                     if (grass != null) {
                         // assets\minecraft\textures\colormap
-                        ZipEntry grassEntry = getEntry(zipFile,
-                            "assets/minecraft/textures/colormap/grass_block.png");
+                        ZipEntry grassEntry = getEntry(zipFile, "assets/minecraft/textures/colormap/grass_block.png");
                         if (grassEntry != null) {
                             try (InputStream is = zipFile.getInputStream(grassEntry)) {
                                 BufferedImage image = ImageIO.read(is);
                                 // Update biome colors
                                 for (BiomeColor biome : biomes) {
-                                    float adjTemp =
-                                        MathMan.clamp(biome.temperature, 0.0f, 1.0f);
-                                    float adjRainfall =
-                                        MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
+                                    float adjTemp = MathMan.clamp(biome.temperature, 0.0f, 1.0f);
+                                    float adjRainfall = MathMan.clamp(biome.rainfall, 0.0f, 1.0f) * adjTemp;
                                     int x = (int) (255 - adjTemp * 255);
                                     int z = (int) (255 - adjRainfall * 255);
                                     biome.grass = image.getRGB(x, z);
@@ -767,10 +763,8 @@ public class TextureUtil implements TextureHolder {
                             biomes[6].grass = 0;
                             biomes[134].grass = 0;
                             // roofed forest: averaged w/ 0x28340A
-                            biomes[29].grass =
-                                multiplyColor(biomes[29].grass, 0x28340A + (255 << 24));
-                            biomes[157].grass =
-                                multiplyColor(biomes[157].grass, 0x28340A + (255 << 24));
+                            biomes[29].grass = multiplyColor(biomes[29].grass, 0x28340A + (255 << 24));
+                            biomes[157].grass = multiplyColor(biomes[157].grass, 0x28340A + (255 << 24));
                             // mesa : 0x90814D
                             biomes[37].grass = 0x90814D + (255 << 24);
                             biomes[38].grass = 0x90814D + (255 << 24);
@@ -781,8 +775,7 @@ public class TextureUtil implements TextureHolder {
                             List<BiomeColor> valid = new ArrayList<>();
                             for (BiomeColor biome : biomes) {
                                 //                                biome.grass = multiplyColor(biome.grass, grass);
-                                if (biome.grass != 0 && !biome.name
-                                    .equalsIgnoreCase("Unknown Biome")) {
+                                if (biome.grass != 0 && !biome.name.equalsIgnoreCase("Unknown Biome")) {
                                     valid.add(biome);
                                 }
                                 biome.grassCombined = multiplyColor(grass, biome.grass);
@@ -808,14 +801,11 @@ public class TextureUtil implements TextureHolder {
                                         BiomeColor c1 = uniqueColors.get(i);
                                         BiomeColor c2 = uniqueColors.get(j);
                                         BiomeColor c3 = uniqueColors.get(k);
-                                        int average =
-                                            averageColor(c1.grass, c2.grass, c3.grass);
+                                        int average = averageColor(c1.grass, c2.grass, c3.grass);
                                         if (uniqueBiomesColors.add(average)) {
                                             count++;
-                                            layerColors.add((long) average);
-                                            layerIds.add(
-                                                (long) ((c1.id) + (c2.id << 8) + (c3.id
-                                                    << 16)));
+                                            layerColors.add(average);
+                                            layerIds.add((c1.id) + (c2.id << 8) + (c3.id << 16));
                                         }
                                     }
                                 }
@@ -938,7 +928,7 @@ public class TextureUtil implements TextureHolder {
                     if (!hasAlpha(colorOther)) {
                         int combinedOther = validBlockIds[j];
                         int combinedColor = combineTransparency(color, colorOther);
-                        colorLayerMap.put(combinedColor, new int[]{combined, combinedOther});
+                        colorLayerMap.put(combinedColor, new int[] {combined, combinedOther});
                     }
                 }
             }
@@ -1022,8 +1012,7 @@ public class TextureUtil implements TextureHolder {
         int g = green1 - green2;
         int b = blue1 - blue2;
         int hd = hueDistance(red1, green1, blue1, red2, green2, blue2);
-        return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8) + (hd
-            * hd);
+        return (((512 + rmean) * r * r) >> 8) + 4 * g * g + (((767 - rmean) * b * b) >> 8) + (hd * hd);
     }
 
     public long getDistance(BufferedImage image, int c1) {
@@ -1058,8 +1047,7 @@ public class TextureUtil implements TextureHolder {
         public int grassCombined;
         public int foliage;
 
-        public BiomeColor(int id, String name, float temperature, float rainfall, int grass,
-            int foliage) {
+        public BiomeColor(int id, String name, float temperature, float rainfall, int grass, int foliage) {
             this.id = id;
             this.name = name;
             this.temperature = temperature;
@@ -1068,5 +1056,7 @@ public class TextureUtil implements TextureHolder {
             this.grassCombined = grass;
             this.foliage = foliage;
         }
+
     }
+
 }

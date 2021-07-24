@@ -51,4 +51,5 @@ public class AuthorizationException extends WorldEditException {
     public AuthorizationException(Throwable cause) {
         super(cause);
     }
+
 }

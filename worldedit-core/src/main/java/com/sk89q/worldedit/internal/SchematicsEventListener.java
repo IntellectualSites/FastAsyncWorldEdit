@@ -44,4 +44,5 @@ public class SchematicsEventListener {
             LOGGER.warn("Failed to create schematics directory", e);
         }
     }
+
 }

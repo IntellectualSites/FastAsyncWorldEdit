@@ -41,7 +41,7 @@ public class SelectionCylinderEvent implements CUIEvent {
 
     @Override
     public String[] getParameters() {
-        return new String[] {
+        return new String[]{
                 String.valueOf(pos.getBlockX()),
                 String.valueOf(pos.getBlockY()),
                 String.valueOf(pos.getBlockZ()),
@@ -49,4 +49,5 @@ public class SelectionCylinderEvent implements CUIEvent {
                 String.valueOf(radius.getZ())
         };
     }
+
 }

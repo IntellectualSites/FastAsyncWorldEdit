@@ -15,9 +15,7 @@ public enum Order {
             }
             return ((CuboidRegion) region).iterator_old();
         }
-    }
-
-    ;
+    };
 
     public abstract Iterator<BlockVector3> create(Region region);
 }

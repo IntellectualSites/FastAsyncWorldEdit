@@ -29,4 +29,5 @@ public class SurfaceMask extends AdjacentAnyMask {
         // The mask is not mutable. There is no need to clone it.
         return this;
     }
+
 }

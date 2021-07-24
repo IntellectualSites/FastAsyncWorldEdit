@@ -21,6 +21,7 @@ package com.sk89q.worldedit.function.visitor;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.math.BlockVectorSet;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.WorldEditException;
@@ -28,7 +29,6 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -195,7 +195,7 @@ public abstract class BreadthFirstSearch implements Operation {
      * Try to visit the given 'to' location.
      *
      * @param from the origin block
-     * @param to the block under question
+     * @param to   the block under question
      */
     private void visit(BlockVector3 from, BlockVector3 to) {
         if (!visited.contains(to)) {
@@ -229,7 +229,7 @@ public abstract class BreadthFirstSearch implements Operation {
      * 'from' block.
      *
      * @param from the origin block
-     * @param to the block under question
+     * @param to   the block under question
      * @return true if the 'to' block should be visited
      */
     protected abstract boolean isVisitable(BlockVector3 from, BlockVector3 to);

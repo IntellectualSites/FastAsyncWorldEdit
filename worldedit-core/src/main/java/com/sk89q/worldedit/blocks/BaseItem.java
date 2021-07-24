@@ -27,8 +27,8 @@ import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.item.ItemType;
 
-import java.io.IOException;
 import javax.annotation.Nullable;
+import java.io.IOException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -75,11 +75,12 @@ public class BaseItem implements NbtValued {
     }
 
     //FAWE start
+
     /**
      * Construct the object.
      *
      * @param itemType Type of the item
-     * @param nbtData NBT Compound tag
+     * @param nbtData  NBT Compound tag
      */
     @Deprecated
     public BaseItem(ItemType itemType, @Nullable CompoundTag nbtData) {
@@ -90,7 +91,7 @@ public class BaseItem implements NbtValued {
      * Construct the object.
      *
      * @param itemType Type of the item
-     * @param tag NBT Compound tag
+     * @param tag      NBT Compound tag
      */
     public BaseItem(ItemType itemType, @Nullable LazyReference<CompoundBinaryTag> tag) {
         checkNotNull(itemType);

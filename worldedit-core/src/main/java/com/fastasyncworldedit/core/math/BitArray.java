@@ -175,4 +175,5 @@ public final class BitArray {
         }
         return buffer;
     }
+
 }

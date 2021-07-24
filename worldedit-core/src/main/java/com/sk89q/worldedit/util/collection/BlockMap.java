@@ -86,14 +86,14 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
 
     private static long toGroupKey(BlockVector3 location) {
         return ((location.getX() >>> 6) & BITS_20)
-            | (((location.getZ() >>> 6) & BITS_20) << 20)
-            | (((location.getY() >>> 8) & BITS_24) << (20 + 20));
+                | (((location.getZ() >>> 6) & BITS_20) << 20)
+                | (((location.getY() >>> 8) & BITS_24) << (20 + 20));
     }
 
     private static int toInnerKey(BlockVector3 location) {
         return (location.getX() & BITS_6)
-            | ((location.getZ() & BITS_6) << 6)
-            | ((location.getY() & BITS_8) << (6 + 6));
+                | ((location.getZ() & BITS_6) << 6)
+                | ((location.getY() & BITS_8) << (6 + 6));
     }
 
     private static final long GROUP_X = BITS_20;
@@ -165,24 +165,24 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
     public V getOrDefault(Object key, V defaultValue) {
         BlockVector3 vec = (BlockVector3) key;
         return getOrEmptyMap(toGroupKey(vec))
-            .getOrDefault(toInnerKey(vec), defaultValue);
+                .getOrDefault(toInnerKey(vec), defaultValue);
     }
 
     @Override
     public void forEach(BiConsumer<? super BlockVector3, ? super V> action) {
         maps.forEach((groupKey, m) ->
-            m.forEach((innerKey, block) ->
-                action.accept(reconstructLocation(groupKey, innerKey), block)
-            )
+                m.forEach((innerKey, block) ->
+                        action.accept(reconstructLocation(groupKey, innerKey), block)
+                )
         );
     }
 
     @Override
     public void replaceAll(BiFunction<? super BlockVector3, ? super V, ? extends V> function) {
         maps.forEach((groupKey, m) ->
-            m.replaceAll((innerKey, block) ->
-                function.apply(reconstructLocation(groupKey, innerKey), block)
-            )
+                m.replaceAll((innerKey, block) ->
+                        function.apply(reconstructLocation(groupKey, innerKey), block)
+                )
         );
     }
 
@@ -194,14 +194,18 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
     @Override
     public boolean remove(Object key, Object value) {
         BlockVector3 vec = (BlockVector3) key;
-        return cleanlyModifyMap(toGroupKey(vec),
-            map -> map.remove(toInnerKey(vec), value));
+        return cleanlyModifyMap(
+                toGroupKey(vec),
+                map -> map.remove(toInnerKey(vec), value)
+        );
     }
 
     @Override
     public boolean replace(BlockVector3 key, V oldValue, V newValue) {
-        return cleanlyModifyMap(toGroupKey(key),
-            map -> map.replace(toInnerKey(key), oldValue, newValue));
+        return cleanlyModifyMap(
+                toGroupKey(key),
+                map -> map.replace(toInnerKey(key), oldValue, newValue)
+        );
     }
 
     @Override
@@ -211,26 +215,34 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
 
     @Override
     public V computeIfAbsent(BlockVector3 key, Function<? super BlockVector3, ? extends V> mappingFunction) {
-        return cleanlyModifyMap(toGroupKey(key),
-            map -> map.computeIfAbsent(toInnerKey(key), ik -> mappingFunction.apply(key)));
+        return cleanlyModifyMap(
+                toGroupKey(key),
+                map -> map.computeIfAbsent(toInnerKey(key), ik -> mappingFunction.apply(key))
+        );
     }
 
     @Override
     public V computeIfPresent(BlockVector3 key, BiFunction<? super BlockVector3, ? super V, ? extends V> remappingFunction) {
-        return cleanlyModifyMap(toGroupKey(key),
-            map -> map.computeIfPresent(toInnerKey(key), (ik, block) -> remappingFunction.apply(key, block)));
+        return cleanlyModifyMap(
+                toGroupKey(key),
+                map -> map.computeIfPresent(toInnerKey(key), (ik, block) -> remappingFunction.apply(key, block))
+        );
     }
 
     @Override
     public V compute(BlockVector3 key, BiFunction<? super BlockVector3, ? super V, ? extends V> remappingFunction) {
-        return cleanlyModifyMap(toGroupKey(key),
-            map -> map.compute(toInnerKey(key), (ik, block) -> remappingFunction.apply(key, block)));
+        return cleanlyModifyMap(
+                toGroupKey(key),
+                map -> map.compute(toInnerKey(key), (ik, block) -> remappingFunction.apply(key, block))
+        );
     }
 
     @Override
     public V merge(BlockVector3 key, V value, BiFunction<? super V, ? super V, ? extends V> remappingFunction) {
-        return cleanlyModifyMap(toGroupKey(key),
-            map -> map.merge(toInnerKey(key), value, remappingFunction));
+        return cleanlyModifyMap(
+                toGroupKey(key),
+                map -> map.merge(toInnerKey(key), value, remappingFunction)
+        );
     }
 
     @Override
@@ -243,7 +255,7 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
                     return new Iterator<Entry<BlockVector3, V>>() {
 
                         private final ObjectIterator<Long2ObjectMap.Entry<Int2ObjectMap<V>>> primaryIterator
-                            = Long2ObjectMaps.fastIterator(maps);
+                                = Long2ObjectMaps.fastIterator(maps);
                         private Long2ObjectMap.Entry<Int2ObjectMap<V>> currentPrimaryEntry;
                         private ObjectIterator<Int2ObjectMap.Entry<V>> secondaryIterator;
                         private boolean finished;
@@ -274,8 +286,10 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
                                 currentPrimaryEntry = primaryIterator.next();
                                 secondaryIterator = Int2ObjectMaps.fastIterator(currentPrimaryEntry.getValue());
                                 // be paranoid
-                                checkState(secondaryIterator.hasNext(),
-                                    "Should not have an empty map entry, it should have been removed!");
+                                checkState(
+                                        secondaryIterator.hasNext(),
+                                        "Should not have an empty map entry, it should have been removed!"
+                                );
                             }
                             Int2ObjectMap.Entry<V> next = secondaryIterator.next();
                             return new LazyEntry(currentPrimaryEntry.getLongKey(), next.getIntKey(), next.getValue());
@@ -354,8 +368,8 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
                 @SuppressWarnings("unchecked")
                 LazyEntry otherE = (LazyEntry) o;
                 return otherE.groupKey == groupKey
-                    && otherE.innerKey == innerKey
-                    && Objects.equals(value, e.getValue());
+                        && otherE.innerKey == innerKey
+                        && Objects.equals(value, e.getValue());
             }
             return Objects.equals(getKey(), e.getKey()) && Objects.equals(value, e.getValue());
         }
@@ -369,6 +383,7 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
         public String toString() {
             return getKey() + "=" + getValue();
         }
+
     }
 
     @Override
@@ -417,7 +432,7 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
         if (m instanceof BlockMap) {
             // optimize insertions:
             ((BlockMap<V>) m).maps.forEach((groupKey, map) ->
-                getOrCreateMap(groupKey).putAll(map)
+                    getOrCreateMap(groupKey).putAll(map)
             );
         } else {
             super.putAll(m);
@@ -445,8 +460,8 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
                 @Override
                 public Iterator<V> iterator() {
                     return maps.values().stream()
-                        .flatMap(m -> m.values().stream())
-                        .iterator();
+                            .flatMap(m -> m.values().stream())
+                            .iterator();
                 }
 
                 @Override
@@ -477,4 +492,5 @@ public class BlockMap<V> extends AbstractMap<BlockVector3, V> {
     public int hashCode() {
         return super.hashCode();
     }
+
 }

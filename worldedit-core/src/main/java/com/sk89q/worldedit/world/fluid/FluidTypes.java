@@ -47,4 +47,5 @@ public final class FluidTypes {
     public static FluidType get(final String id) {
         return FluidType.REGISTRY.get(id);
     }
+
 }

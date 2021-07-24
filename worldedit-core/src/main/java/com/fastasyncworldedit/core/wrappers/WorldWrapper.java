@@ -2,9 +2,9 @@ package com.fastasyncworldedit.core.wrappers;
 
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -38,9 +38,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 public class WorldWrapper extends AbstractWorld {
 
@@ -168,7 +168,7 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return parent.setBlock(x, y, z, block);
     }
 
@@ -193,12 +193,14 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws
+            WorldEditException {
         return parent.setBlock(position, block, notifyAndLight);
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws
+            WorldEditException {
         return parent.setBlock(position, block, sideEffects);
     }
 
@@ -249,7 +251,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
+    public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
+            MaxChangedBlocksException {
         return TaskManager.IMP.sync(() -> {
             try {
                 return parent.generateTree(type, editSession, position);
@@ -324,4 +327,5 @@ public class WorldWrapper extends AbstractWorld {
     public void flush() {
         parent.flush();
     }
+
 }

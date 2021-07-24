@@ -7,6 +7,7 @@ import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.world.World;
 
 public class MaskedTargetBlock extends TargetBlock {
+
     private final Mask mask;
     private final World world;
 
@@ -37,4 +38,5 @@ public class MaskedTargetBlock extends TargetBlock {
         Location currentBlock = getCurrentBlock();
         return currentBlock != null || !useLastBlock ? currentBlock : lastBlock;
     }
+
 }

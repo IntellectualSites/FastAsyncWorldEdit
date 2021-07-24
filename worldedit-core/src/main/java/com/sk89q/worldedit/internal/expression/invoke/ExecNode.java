@@ -24,6 +24,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import java.lang.invoke.MethodHandle;
 
 class ExecNode {
+
     final ParserRuleContext ctx;
     final MethodHandle handle;
 
@@ -31,4 +32,5 @@ class ExecNode {
         this.ctx = ctx;
         this.handle = handle;
     }
+
 }

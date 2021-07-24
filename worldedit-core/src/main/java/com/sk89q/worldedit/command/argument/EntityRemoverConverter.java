@@ -50,7 +50,7 @@ public class EntityRemoverConverter implements ArgumentConverter<EntityRemover> 
     @Override
     public Component describeAcceptableArguments() {
         return TextComponent.of(
-            "projectiles, items, paintings, itemframes, boats, minecarts, tnt, xp, or all"
+                "projectiles, items, paintings, itemframes, boats, minecarts, tnt, xp, or all"
         );
     }
 
@@ -67,4 +67,5 @@ public class EntityRemoverConverter implements ArgumentConverter<EntityRemover> 
             return FailedConversion.from(e);
         }
     }
+
 }

@@ -32,6 +32,7 @@ import java.util.Set;
  * blocks such as wool into separate ids.
  */
 public class BlockCategory extends Category<BlockType> implements Keyed {
+
     //FAWE start
     private boolean[] flatMap;
     //FAWE end
@@ -73,4 +74,5 @@ public class BlockCategory extends Category<BlockType> implements Keyed {
         return flatMap.length > typeId && flatMap[typeId];
         //FAWE end
     }
+
 }

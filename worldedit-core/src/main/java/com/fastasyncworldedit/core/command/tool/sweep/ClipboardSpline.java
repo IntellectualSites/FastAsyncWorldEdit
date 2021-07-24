@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.command.tool.sweep;
 
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.math.transform.RoundedTransform;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -11,37 +12,35 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Interpolation;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-import com.fastasyncworldedit.core.math.transform.RoundedTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
 /**
  * An implementation of a {@link Spline} using a Clipboard as source for the structure.
+ *
  * @author Schuwi
  * @version 1.0
  */
 public class ClipboardSpline extends Spline {
 
     private final Transform transform;
-    private ClipboardHolder clipboardHolder;
-    private BlockVector3 originalOrigin;
-    private Transform originalTransform;
+    private final ClipboardHolder clipboardHolder;
+    private final BlockVector3 originalOrigin;
+    private final Transform originalTransform;
 
     private BlockVector3 center;
-    private BlockVector3 centerOffset;
-    private LocalBlockVectorSet buffer;
+    private final BlockVector3 centerOffset;
+    private final LocalBlockVectorSet buffer;
 
     /**
      * Constructor without position-correction. Use this constructor for an interpolation
      * implementation which does not need position-correction.
      *
-     * @param editSession The EditSession which will be used when pasting the clipboard content
+     * @param editSession     The EditSession which will be used when pasting the clipboard content
      * @param clipboardHolder The clipboard that will be pasted along the spline
-     * @param interpolation An implementation of the interpolation algorithm used to calculate
-     *     the curve
-     * @apiNote Be advised that currently subsequent changes to the interpolation parameters may
-     *     not be supported.
+     * @param interpolation   An implementation of the interpolation algorithm used to calculate
+     *                        the curve
      */
     public ClipboardSpline(EditSession editSession, ClipboardHolder clipboardHolder, Interpolation interpolation) {
         this(editSession, clipboardHolder, interpolation, new AffineTransform(), -1);
@@ -64,15 +63,19 @@ public class ClipboardSpline extends Spline {
      * amount to 0.25 × 40 = 10 units of curve length between these two positions.
      * </p>
      *
-     * @param editSession The EditSession which will be used when pasting the clipboard content
+     * @param editSession     The EditSession which will be used when pasting the clipboard content
      * @param clipboardHolder The clipboard that will be pasted along the spline
-     * @param interpolation An implementation of the interpolation algorithm used to calculate
-     *     the curve
-     * @param nodeCount The number of nodes provided to the interpolation object
-     * @apiNote Be advised that currently subsequent changes to the interpolation parameters may
-     *     not be supported.
+     * @param interpolation   An implementation of the interpolation algorithm used to calculate
+     *                        the curve
+     * @param nodeCount       The number of nodes provided to the interpolation object
      */
-    public ClipboardSpline(EditSession editSession, ClipboardHolder clipboardHolder, Interpolation interpolation, Transform transform, int nodeCount) {
+    public ClipboardSpline(
+            EditSession editSession,
+            ClipboardHolder clipboardHolder,
+            Interpolation interpolation,
+            Transform transform,
+            int nodeCount
+    ) {
         super(editSession, interpolation, nodeCount);
         this.clipboardHolder = clipboardHolder;
 
@@ -126,4 +129,5 @@ public class ClipboardSpline extends Spline {
 
         return operation instanceof ForwardExtentCopy ? ((ForwardExtentCopy) operation).getAffected() : 0;
     }
+
 }

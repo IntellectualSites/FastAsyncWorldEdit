@@ -49,7 +49,8 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         Player player = editSession.getPlayer();
         if (player == null) {
             return;
@@ -117,4 +118,5 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             editSession.flushQueue();
         }
     }
+
 }

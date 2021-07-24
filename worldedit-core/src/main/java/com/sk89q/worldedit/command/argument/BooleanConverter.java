@@ -27,15 +27,16 @@ import org.enginehub.piston.inject.Key;
 public class BooleanConverter {
 
     public static void register(CommandManager commandManager) {
-        commandManager.registerConverter(Key.of(Boolean.class),
-            MultiKeyConverter.builder(
-                ImmutableSetMultimap.<Boolean, String>builder()
-                    .putAll(false, "off", "f", "false", "n", "no")
-                    .putAll(true, "on", "t", "true", "y", "yes")
-                    .build()
-            )
-                .errorMessage(arg -> "Not a boolean value: " + arg)
-                .build()
+        commandManager.registerConverter(
+                Key.of(Boolean.class),
+                MultiKeyConverter.builder(
+                        ImmutableSetMultimap.<Boolean, String>builder()
+                                .putAll(false, "off", "f", "false", "n", "no")
+                                .putAll(true, "on", "t", "true", "y", "yes")
+                                .build()
+                )
+                        .errorMessage(arg -> "Not a boolean value: " + arg)
+                        .build()
         );
     }
 

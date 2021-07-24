@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 public class StencilBrush extends HeightBrush {
+
     private final boolean onlyWhite;
 
     public StencilBrush(InputStream stream, int rotation, double yscale, boolean onlyWhite, Clipboard clipboard) {
@@ -26,7 +27,8 @@ public class StencilBrush extends HeightBrush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 center, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 center, Pattern pattern, double sizeDouble) throws
+            MaxChangedBlocksException {
         int size = (int) sizeDouble;
         int size2 = (int) (sizeDouble * sizeDouble);
         int maxY = editSession.getMaxY();
@@ -48,10 +50,24 @@ public class StencilBrush extends HeightBrush {
 
         double scale = (yscale / sizeDouble) * (maxY + 1);
         RecursiveVisitor visitor =
-            new RecursiveVisitor(new StencilBrushMask(editSession, solid, center, transform, size2, map, scale, add, cutoff, maxY, pattern),
-                vector -> true, Integer.MAX_VALUE);
+                new RecursiveVisitor(new StencilBrushMask(
+                        editSession,
+                        solid,
+                        center,
+                        transform,
+                        size2,
+                        map,
+                        scale,
+                        add,
+                        cutoff,
+                        maxY,
+                        pattern
+                ),
+                        vector -> true, Integer.MAX_VALUE
+                );
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(center);
         Operations.completeBlindly(visitor);
     }
+
 }

@@ -31,6 +31,7 @@ public class ChunkDeletionInfo {
     public List<ChunkBatch> batches;
 
     public static class ChunkBatch {
+
         public String worldPath;
         public boolean backup;
         public List<DeletionPredicate> deletionPredicates;
@@ -46,11 +47,15 @@ public class ChunkDeletionInfo {
             final BlockVector2 dist = maxChunk.subtract(minChunk).add(1, 1);
             return dist.getBlockX() * dist.getBlockZ();
         }
+
     }
 
     public static class DeletionPredicate {
+
         public String property;
         public String comparison;
         public String value;
+
     }
+
 }

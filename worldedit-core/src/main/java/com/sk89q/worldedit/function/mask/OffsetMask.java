@@ -37,7 +37,7 @@ public class OffsetMask extends AbstractMask {
     /**
      * Create a new instance.
      *
-     * @param mask the mask
+     * @param mask   the mask
      * @param offset the offset
      */
     public OffsetMask(Mask mask, BlockVector3 offset) {

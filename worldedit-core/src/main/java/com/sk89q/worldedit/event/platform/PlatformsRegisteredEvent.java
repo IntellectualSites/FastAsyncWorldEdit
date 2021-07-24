@@ -25,4 +25,5 @@ import com.sk89q.worldedit.event.Event;
  * Fired by a platform when it believes all available platforms should be registered.
  */
 public class PlatformsRegisteredEvent extends Event {
+
 }

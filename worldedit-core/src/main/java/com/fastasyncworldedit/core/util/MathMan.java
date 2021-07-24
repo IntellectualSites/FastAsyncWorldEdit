@@ -4,6 +4,7 @@ public class MathMan {
 
     /**
      * An optimized version of {@link Math#sqrt(double)} that accepts integers.
+     *
      * @param a a value
      * @return the positive square root of {@code a}.
      *         If the argument is NaN or less than zero, the result is NaN.
@@ -23,7 +24,7 @@ public class MathMan {
         return CachedMathMan.cosInexact(paramFloat);
     }
 
-    public static int log2nlz( int bits ) {
+    public static int log2nlz(int bits) {
         return Integer.SIZE - Integer.numberOfLeadingZeros(bits);
     }
 
@@ -141,6 +142,7 @@ public class MathMan {
 
     /**
      * Used to convert a set of coordinates into a packed long.
+     *
      * @param a typically, represents the x coordinate
      * @param b typically, represents the y coordinate
      * @return the packed coordinates
@@ -399,4 +401,5 @@ public class MathMan {
     public static boolean isPowerOfTwo(int a) {
         return (a & a - 1) == 0;
     }
+
 }

@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class NoYPattern extends AbstractPattern {
@@ -30,4 +30,5 @@ public class NoYPattern extends AbstractPattern {
         mutable.mutZ(get.getZ());
         return pattern.apply(extent, mutable, set);
     }
+
 }

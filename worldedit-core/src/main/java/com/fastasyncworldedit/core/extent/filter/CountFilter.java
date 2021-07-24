@@ -32,4 +32,5 @@ public class CountFilter extends ForkedFilter<CountFilter> {
     public int getTotal() {
         return total;
     }
+
 }

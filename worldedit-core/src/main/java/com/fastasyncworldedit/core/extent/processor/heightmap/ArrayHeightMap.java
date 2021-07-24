@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent.processor.heightmap;
 
 public class ArrayHeightMap extends ScalableHeightMap {
+
     // The heights
     private final byte[][] height;
     // The height map width/length
@@ -32,4 +33,5 @@ public class ArrayHeightMap extends ScalableHeightMap {
         return ((height[x][z] & 0xFF) * size) / 256d;
 
     }
+
 }

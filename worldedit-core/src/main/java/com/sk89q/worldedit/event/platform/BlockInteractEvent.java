@@ -43,9 +43,9 @@ public class BlockInteractEvent extends Event implements Cancellable {
     /**
      * Create a new event.
      *
-     * @param cause the causing actor
+     * @param cause    the causing actor
      * @param location the location of the block
-     * @param type the type of interaction
+     * @param type     the type of interaction
      */
     @Deprecated
     public BlockInteractEvent(Actor cause, Location location, Interaction type) {
@@ -55,10 +55,10 @@ public class BlockInteractEvent extends Event implements Cancellable {
     /**
      * Create a new event.
      *
-     * @param cause the causing actor
+     * @param cause    the causing actor
      * @param location the location of the block
-     * @param face the face of the block that was interacted with
-     * @param type the type of interaction
+     * @param face     the face of the block that was interacted with
+     * @param type     the type of interaction
      */
     public BlockInteractEvent(Actor cause, Location location, @Nullable Direction face, Interaction type) {
         checkNotNull(cause);
@@ -116,4 +116,5 @@ public class BlockInteractEvent extends Event implements Cancellable {
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
+
 }

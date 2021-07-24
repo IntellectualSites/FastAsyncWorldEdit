@@ -31,7 +31,15 @@ public class HeightBrush implements Brush {
         this(stream, rotation, yscale, layers, smooth, clipboard, ScalableHeightMap.Shape.CONE);
     }
 
-    public HeightBrush(InputStream stream, int rotation, double yscale, boolean layers, boolean smooth, Clipboard clipboard, ScalableHeightMap.Shape shape) {
+    public HeightBrush(
+            InputStream stream,
+            int rotation,
+            double yscale,
+            boolean layers,
+            boolean smooth,
+            Clipboard clipboard,
+            ScalableHeightMap.Shape shape
+    ) {
         this.rotation = (rotation / 90) % 4;
         this.yscale = yscale;
         this.layers = layers;
@@ -65,7 +73,8 @@ public class HeightBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws
+            MaxChangedBlocksException {
         int size = (int) sizeDouble;
         HeightMap map = getHeightMap();
         map.setSize(size);
@@ -76,4 +85,5 @@ public class HeightBrush implements Brush {
         }
         map.perform(editSession, mask, position, size, rotation, yscale, smooth, false, layers);
     }
+
 }

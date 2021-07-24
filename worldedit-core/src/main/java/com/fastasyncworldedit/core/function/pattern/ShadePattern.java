@@ -11,6 +11,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ShadePattern extends AbstractPattern {
+
     private final TextureUtil util;
     private final Extent extent;
     private final boolean darken;
@@ -37,4 +38,5 @@ public class ShadePattern extends AbstractPattern {
         }
         return false;
     }
+
 }

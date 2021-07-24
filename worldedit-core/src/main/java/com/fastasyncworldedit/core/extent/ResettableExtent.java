@@ -35,7 +35,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
         checkNotNull(extent);
         Extent next = getExtent();
         if (!(next instanceof NullExtent) && !(next instanceof World)
-            && next instanceof ResettableExtent) {
+                && next instanceof ResettableExtent) {
             ((ResettableExtent) next).setExtent(extent);
         } else {
             new ExtentTraverser(this).setNext(new AbstractDelegateExtent(extent));
@@ -54,7 +54,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
     }
 
     private void readObject(java.io.ObjectInputStream stream)
-        throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException {
         stream.defaultReadObject();
         if (stream.readBoolean()) {
             try {
@@ -65,4 +65,5 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
             }
         }
     }
+
 }

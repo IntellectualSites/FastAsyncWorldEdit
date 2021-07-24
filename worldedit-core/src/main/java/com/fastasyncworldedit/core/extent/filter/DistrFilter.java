@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.extent.filter;
 
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
-import com.sk89q.worldedit.extension.platform.Actor;
 import com.fastasyncworldedit.core.function.mask.ABlockMask;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -97,11 +97,14 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
     public void print(Actor actor, long size) {
         for (Countable<BlockState> c : getDistribution()) {
             final String name = c.getID().toString();
-            final String str = String.format("%-7s (%.3f%%) %s",
-                c.getAmount(),
-                c.getAmount() / (double) size * 100,
-                name);
+            final String str = String.format(
+                    "%-7s (%.3f%%) %s",
+                    c.getAmount(),
+                    c.getAmount() / (double) size * 100,
+                    name
+            );
             actor.printInfo(TextComponent.of(str));
         }
     }
+
 }

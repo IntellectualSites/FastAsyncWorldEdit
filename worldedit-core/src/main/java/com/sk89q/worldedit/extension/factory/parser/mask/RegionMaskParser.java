@@ -52,4 +52,5 @@ public class RegionMaskParser extends SimpleInputParser<Mask> {
             throw new InputParseException(Caption.of("worldedit.error.incomplete-region"));
         }
     }
+
 }

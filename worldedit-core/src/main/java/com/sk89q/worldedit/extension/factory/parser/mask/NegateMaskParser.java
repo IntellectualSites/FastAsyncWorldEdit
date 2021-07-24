@@ -58,4 +58,5 @@ public class NegateMaskParser extends InputParser<Mask> {
             throw new InputParseException(Caption.of("worldedit.error.parser.negate-nothing"));
         }
     }
+
 }

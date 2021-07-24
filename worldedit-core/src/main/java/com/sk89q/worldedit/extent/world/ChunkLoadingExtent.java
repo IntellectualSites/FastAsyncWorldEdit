@@ -40,8 +40,8 @@ public class ChunkLoadingExtent extends AbstractDelegateExtent {
     /**
      * Create a new instance.
      *
-     * @param extent the extent
-     * @param world the world
+     * @param extent  the extent
+     * @param world   the world
      * @param enabled true to enable
      */
     public ChunkLoadingExtent(Extent extent, World world, boolean enabled) {
@@ -55,7 +55,7 @@ public class ChunkLoadingExtent extends AbstractDelegateExtent {
      * Create a new instance with chunk loading enabled.
      *
      * @param extent the extent
-     * @param world the world
+     * @param world  the world
      */
     public ChunkLoadingExtent(Extent extent, World world) {
         this(extent, world, true);
@@ -76,4 +76,5 @@ public class ChunkLoadingExtent extends AbstractDelegateExtent {
         }
         return super.setBiome(position, biome);
     }
+
 }

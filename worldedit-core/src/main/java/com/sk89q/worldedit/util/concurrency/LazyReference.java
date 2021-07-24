@@ -33,11 +33,12 @@ public class LazyReference<T> {
     }
 
     //FAWE start
+
     /**
      * Pre-computed reference, for setting a lazy reference field with a known value.
      *
      * @param value the value of the reference
-     * @param <T> the type of the value
+     * @param <T>   the type of the value
      * @return the new reference
      */
     public static <T> LazyReference<T> computed(T value) {
@@ -50,12 +51,14 @@ public class LazyReference<T> {
     // it's no longer needed.
 
     private static final class RefInfo<T> {
+
         private final Lock lock = new ReentrantLock();
         private final Supplier<T> valueComputation;
 
         private RefInfo(Supplier<T> valueComputation) {
             this.valueComputation = valueComputation;
         }
+
     }
 
     private Object value;

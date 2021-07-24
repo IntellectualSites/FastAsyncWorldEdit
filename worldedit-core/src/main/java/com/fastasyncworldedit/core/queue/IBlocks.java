@@ -1,14 +1,14 @@
 package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import org.jetbrains.annotations.Range;
@@ -39,7 +39,7 @@ public interface IBlocks extends Trimable {
 
     default int getBitMask() {
         return IntStream.range(0, FaweCache.IMP.CHUNK_LAYERS).filter(this::hasSection)
-            .map(layer -> (1 << layer)).sum();
+                .map(layer -> (1 << layer)).sum();
     }
 
     void removeSectionLighting(int layer, boolean sky);
@@ -58,7 +58,7 @@ public interface IBlocks extends Trimable {
         }
 
         BlockRegistry registry = WorldEdit.getInstance().getPlatformManager()
-            .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
+                .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
         FastByteArrayOutputStream sectionByteArray = new FastByteArrayOutputStream(buffer);
         try (FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray)) {
             for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
@@ -86,7 +86,7 @@ public interface IBlocks extends Trimable {
                 sectionWriter.writeShort(nonEmpty); // non empty
                 FaweCache.Palette palette;
                 if (stretched) {
-                     palette = FaweCache.IMP.toPalette(0, ids);
+                    palette = FaweCache.IMP.toPalette(0, ids);
                 } else {
                     palette = FaweCache.IMP.toPaletteUnstretched(0, ids);
                 }
@@ -131,4 +131,5 @@ public interface IBlocks extends Trimable {
         }
         return sectionByteArray.toByteArray();
     }
+
 }

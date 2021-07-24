@@ -1,22 +1,23 @@
 package com.fastasyncworldedit.core.extent.processor;
 
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public class HeightmapProcessor implements IBatchProcessor {
+
     private static final HeightMapType[] TYPES = HeightMapType.values();
     private static final BlockType RESERVED = BlockTypes.__RESERVED__;
     private static final int SECTION_SIDE_LENGTH = 16;
@@ -54,13 +55,19 @@ public class HeightmapProcessor implements IBatchProcessor {
                         block = set.getBlock(x, y, z);
                     }
                     if (block == null || block.getBlockType() == RESERVED) {
-                        if (!hasSectionGet) continue;
+                        if (!hasSectionGet) {
+                            continue;
+                        }
                         block = get.getBlock(x, y, z);
                     }
                     // fast skip if block isn't relevant for any height map
-                    if (block.isAir()) continue;
+                    if (block.isAir()) {
+                        continue;
+                    }
                     for (int i = 0; i < TYPES.length; i++) {
-                        if ((skip & (1 << i)) != 0) continue; // skip finished height map
+                        if ((skip & (1 << i)) != 0) {
+                            continue; // skip finished height map
+                        }
                         HeightMapType type = TYPES[i];
                         int index = (z << 4) | x;
                         if (!updated[i].get(index) // ignore if that position was already set
@@ -77,7 +84,9 @@ public class HeightmapProcessor implements IBatchProcessor {
                     skip |= 1 << i;
                 }
             }
-            if (skip != allSkipped) continue;
+            if (skip != allSkipped) {
+                continue;
+            }
             break; // all maps are processed
         }
         for (int i = 0; i < TYPES.length; i++) {
@@ -92,7 +101,8 @@ public class HeightmapProcessor implements IBatchProcessor {
     }
 
     @Override
-    public @Nullable Extent construct(Extent child) {
+    @Nullable
+    public Extent construct(Extent child) {
         throw new UnsupportedOperationException("Processing only");
     }
 
@@ -100,4 +110,5 @@ public class HeightmapProcessor implements IBatchProcessor {
     public ProcessorScope getScope() {
         return ProcessorScope.READING_SET_BLOCKS;
     }
+
 }

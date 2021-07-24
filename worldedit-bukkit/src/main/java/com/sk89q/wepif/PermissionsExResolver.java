@@ -27,6 +27,7 @@ import ru.tehkode.permissions.PermissionManager;
 import ru.tehkode.permissions.PermissionUser;
 
 public class PermissionsExResolver extends DinnerPermsResolver {
+
     private final PermissionManager manager;
 
     public static PermissionsResolver factory(Server server, YAMLProcessor config) {
@@ -90,4 +91,5 @@ public class PermissionsExResolver extends DinnerPermsResolver {
     public String getDetectionMessage() {
         return "PermissionsEx detected! Using PermissionsEx for permissions.";
     }
+
 }

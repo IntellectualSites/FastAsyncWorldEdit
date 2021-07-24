@@ -21,9 +21,9 @@ package com.sk89q.worldedit.util.function;
 
 import com.google.common.base.Function;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,7 +42,7 @@ public class LevenshteinDistance implements Function<String, Integer> {
     /**
      * Create a new instance.
      *
-     * @param baseString the string to compare to
+     * @param baseString    the string to compare to
      * @param caseSensitive true to make case sensitive comparisons
      */
     public LevenshteinDistance(String baseString, boolean caseSensitive) {
@@ -52,8 +52,8 @@ public class LevenshteinDistance implements Function<String, Integer> {
     /**
      * Create a new instance.
      *
-     * @param baseString the string to compare to
-     * @param caseSensitive true to make case sensitive comparisons
+     * @param baseString     the string to compare to
+     * @param caseSensitive  true to make case sensitive comparisons
      * @param replacePattern pattern to match characters to be removed in both the input and test strings (may be null)
      */
     public LevenshteinDistance(String baseString, boolean caseSensitive, @Nullable Pattern replacePattern) {
@@ -112,8 +112,8 @@ public class LevenshteinDistance implements Function<String, Integer> {
      * distance("hello", "hallo")    = 1
      * </pre>
      *
-     * @param s  the first String, must not be null
-     * @param t  the second String, must not be null
+     * @param s the first String, must not be null
+     * @param t the second String, must not be null
      * @return result distance
      * @throws IllegalArgumentException if either String input {@code null}
      */

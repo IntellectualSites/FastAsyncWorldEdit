@@ -2,10 +2,10 @@ package com.fastasyncworldedit.core.history;
 
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.history.changeset.FaweStreamChangeSet;
-import com.fastasyncworldedit.core.internal.io.FaweInputStream;
-import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArraysInputStream;
+import com.fastasyncworldedit.core.internal.io.FaweInputStream;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
@@ -252,4 +252,5 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
     public void setRecordChanges(boolean recordChanges) {
         // TODO Auto-generated method stub
     }
+
 }

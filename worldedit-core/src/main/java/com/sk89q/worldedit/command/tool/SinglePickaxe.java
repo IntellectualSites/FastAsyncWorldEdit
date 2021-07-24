@@ -47,7 +47,14 @@ public class SinglePickaxe implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
+    public boolean actPrimary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         World world = (World) clicked.getExtent();
         BlockVector3 blockPoint = clicked.toBlockPoint();
         final BlockType blockType = world.getBlock(blockPoint).getBlockType();

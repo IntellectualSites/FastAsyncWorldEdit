@@ -1,13 +1,13 @@
 package com.fastasyncworldedit.core.function.mask;
 
 import com.fastasyncworldedit.core.command.tool.brush.ImageBrush;
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -27,17 +27,19 @@ public class ImageBrushMask extends AbstractExtentMask {
     private final EditSession session;
     private final TextureUtil texture;
 
-    public ImageBrushMask(Mask solid,
-                          BlockVector3 center,
-                          Transform transform,
-                          double scale,
-                          double centerImageX,
-                          double centerImageZ,
-                          int width,
-                          int height,
-                          ImageBrush.ColorFunction colorFunction,
-                          EditSession session,
-                          TextureUtil texture) {
+    public ImageBrushMask(
+            Mask solid,
+            BlockVector3 center,
+            Transform transform,
+            double scale,
+            double centerImageX,
+            double centerImageZ,
+            int width,
+            int height,
+            ImageBrush.ColorFunction colorFunction,
+            EditSession session,
+            TextureUtil texture
+    ) {
         super(session);
         this.solid = solid;
         this.center = center;
@@ -101,7 +103,19 @@ public class ImageBrushMask extends AbstractExtentMask {
 
     @Override
     public Mask copy() {
-        return new ImageBrushMask(solid.copy(), center.toImmutable(), transform, scale, centerImageX, centerImageZ, width, height, colorFunction,
-            session, texture);
+        return new ImageBrushMask(
+                solid.copy(),
+                center.toImmutable(),
+                transform,
+                scale,
+                centerImageX,
+                centerImageZ,
+                width,
+                height,
+                colorFunction,
+                session,
+                texture
+        );
     }
+
 }

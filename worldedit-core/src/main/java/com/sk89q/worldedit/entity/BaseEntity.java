@@ -54,7 +54,7 @@ public class BaseEntity implements NbtValued {
     /**
      * Create a new base entity.
      *
-     * @param type the entity type
+     * @param type    the entity type
      * @param nbtData NBT data
      * @deprecated Use {@link BaseEntity#BaseEntity(EntityType, LazyReference)}
      */
@@ -67,7 +67,7 @@ public class BaseEntity implements NbtValued {
     /**
      * Create a new base entity.
      *
-     * @param type the entity type
+     * @param type    the entity type
      * @param nbtData NBT data
      */
     public BaseEntity(EntityType type, LazyReference<CompoundBinaryTag> nbtData) {

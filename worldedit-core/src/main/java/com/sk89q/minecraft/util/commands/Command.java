@@ -91,8 +91,10 @@ public @interface Command {
     boolean anyFlags() default false;
 
     //FAWE start
+
     /**
      * Should the command be queued
+     *
      * @return true if so
      */
     boolean queued() default true;

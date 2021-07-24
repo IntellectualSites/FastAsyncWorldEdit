@@ -47,8 +47,8 @@ public class ListTagBuilder {
     ListTagBuilder(Class<? extends Tag> type) {
         checkNotNull(type);
         this.builder = type != EndTag.class
-            ? ListBinaryTag.builder((BinaryTagType<BinaryTag>) AdventureNBTConverter.getAdventureType(type))
-            : ListBinaryTag.builder();
+                ? ListBinaryTag.builder((BinaryTagType<BinaryTag>) AdventureNBTConverter.getAdventureType(type))
+                : ListBinaryTag.builder();
     }
 
     /**

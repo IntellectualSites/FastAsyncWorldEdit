@@ -7,6 +7,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import java.util.Locale;
 
 public class FaweException extends RuntimeException {
+
     // DEBUG
     public static final FaweException _enableQueue = new FaweException("enableQueue");
     public static final FaweException _disableQueue = new FaweException("disableQueue");
@@ -50,4 +51,5 @@ public class FaweException extends RuntimeException {
     public Throwable fillInStackTrace() {
         return this;
     }
+
 }

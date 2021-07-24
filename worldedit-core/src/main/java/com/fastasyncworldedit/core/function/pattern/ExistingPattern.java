@@ -6,6 +6,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class ExistingPattern extends AbstractExtentPattern {
+
     public ExistingPattern(Extent extent) {
         super(extent);
     }
@@ -22,4 +23,5 @@ public class ExistingPattern extends AbstractExtentPattern {
         }
         return set.setFullBlock(extent, get.getFullBlock(extent));
     }
+
 }

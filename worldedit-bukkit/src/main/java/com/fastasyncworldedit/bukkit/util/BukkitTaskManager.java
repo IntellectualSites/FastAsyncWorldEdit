@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import org.apache.commons.lang.mutable.MutableInt;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+
 import javax.annotation.Nonnull;
 
 public class BukkitTaskManager extends TaskManager {
@@ -52,4 +53,5 @@ public class BukkitTaskManager extends TaskManager {
             Bukkit.getScheduler().cancelTask(task);
         }
     }
+
 }

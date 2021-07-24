@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.registry.state;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 public class EnumProperty extends AbstractProperty<String> {
 
@@ -65,4 +65,5 @@ public class EnumProperty extends AbstractProperty<String> {
         }
         return getValues().get(offset);
     }
+
 }

@@ -20,13 +20,14 @@ import org.inventivetalent.mapmanager.controller.MultiMapController;
 import org.inventivetalent.mapmanager.manager.MapManager;
 import org.inventivetalent.mapmanager.wrapper.MapWrapper;
 
+import javax.annotation.Nullable;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collection;
-import javax.annotation.Nullable;
 
 public class BukkitImageViewer implements ImageViewer {
+
     private final MapManager mapManager;
     private final Player player;
     private BufferedImage last;
@@ -148,7 +149,13 @@ public class BukkitImageViewer implements ImageViewer {
             last = image;
             int width = frames.length;
             int height = frames[0].length;
-            BufferedImage scaled = ImageUtil.getScaledInstance(image, 128 * width, 128 * height, RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
+            BufferedImage scaled = ImageUtil.getScaledInstance(
+                    image,
+                    128 * width,
+                    128 * height,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR,
+                    false
+            );
             MapWrapper mapWrapper = mapManager.wrapMultiImage(scaled, width, height);
             MultiMapController controller = (MultiMapController) mapWrapper.getController();
             controller.addViewer(player);
@@ -169,7 +176,13 @@ public class BukkitImageViewer implements ImageViewer {
                 image = drawable.draw();
             }
             last = image;
-            BufferedImage scaled = ImageUtil.getScaledInstance(image, 128, 128, RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
+            BufferedImage scaled = ImageUtil.getScaledInstance(
+                    image,
+                    128,
+                    128,
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR,
+                    false
+            );
             MapWrapper mapWrapper = mapManager.wrapImage(scaled);
             MapController controller = mapWrapper.getController();
             controller.addViewer(player);
@@ -199,4 +212,5 @@ public class BukkitImageViewer implements ImageViewer {
     public void close() throws IOException {
         last = null;
     }
+
 }

@@ -49,7 +49,7 @@ public class BundledBlockRegistry implements BlockRegistry {
             return TextComponent.of(blockEntry.localizedName);
         }
         return Caption.of(
-            TranslationManager.makeTranslationKey("block", blockType.getId())
+                TranslationManager.makeTranslationKey("block", blockType.getId())
         );
     }
 

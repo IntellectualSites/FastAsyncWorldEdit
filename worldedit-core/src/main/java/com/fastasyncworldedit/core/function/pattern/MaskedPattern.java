@@ -12,7 +12,7 @@ public class MaskedPattern extends AbstractPattern {
 
     private final Pattern primary;
     private final Pattern secondary;
-    private Mask mask;
+    private final Mask mask;
 
     public MaskedPattern(Mask mask, Pattern primary, Pattern secondary) {
         this.mask = mask;
@@ -35,4 +35,5 @@ public class MaskedPattern extends AbstractPattern {
         }
         return secondary.apply(extent, get, set);
     }
+
 }

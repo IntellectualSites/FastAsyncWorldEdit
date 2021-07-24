@@ -25,9 +25,11 @@ package com.sk89q.worldedit.util.lifecycle;
  * @param <T> the inner object
  */
 class Token<T> {
+
     final T inner;
 
     Token(T inner) {
         this.inner = inner;
     }
+
 }

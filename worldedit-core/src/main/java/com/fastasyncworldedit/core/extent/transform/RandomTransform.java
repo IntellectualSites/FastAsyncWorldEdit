@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.extent.transform;
 
 import com.fastasyncworldedit.core.extent.ResettableExtent;
-import com.fastasyncworldedit.core.util.collection.RandomCollection;
 import com.fastasyncworldedit.core.math.random.SimpleRandom;
 import com.fastasyncworldedit.core.math.random.TrueRandom;
+import com.fastasyncworldedit.core.util.collection.RandomCollection;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 
@@ -19,8 +19,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RandomTransform extends SelectTransform {
 
-    private SimpleRandom random;
-    private Map<ResettableExtent, Double> weights = new HashMap<>();
+    private final SimpleRandom random;
+    private final Map<ResettableExtent, Double> weights = new HashMap<>();
 
     private transient RandomCollection<ResettableExtent> collection;
     private transient LinkedHashSet<ResettableExtent> extents = new LinkedHashSet<>();
@@ -50,7 +50,7 @@ public class RandomTransform extends SelectTransform {
             extents = new LinkedHashSet<>(weights.keySet());
         }
         for (ResettableExtent current : extents) {
-                current.setExtent(extent);
+            current.setExtent(extent);
         }
         return this;
     }
@@ -78,4 +78,5 @@ public class RandomTransform extends SelectTransform {
     public RandomCollection<ResettableExtent> getCollection() {
         return collection;
     }
+
 }

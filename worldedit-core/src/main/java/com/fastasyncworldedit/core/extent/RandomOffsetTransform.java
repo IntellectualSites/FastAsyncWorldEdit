@@ -33,7 +33,7 @@ public class RandomOffsetTransform extends ResettableExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 pos, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int y = pos.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
@@ -42,7 +42,7 @@ public class RandomOffsetTransform extends ResettableExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         x = x + random.nextInt(1 + (dx << 1)) - dx;
         y = y + random.nextInt(1 + (dy << 1)) - dy;
         z = z + random.nextInt(1 + (dz << 1)) - dz;
@@ -54,4 +54,5 @@ public class RandomOffsetTransform extends ResettableExtent {
         random = new SplittableRandom();
         return super.setExtent(extent);
     }
+
 }

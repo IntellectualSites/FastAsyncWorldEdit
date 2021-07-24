@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.queue;
 
-import com.fastasyncworldedit.core.queue.IChunk;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
 import com.sk89q.jnbt.IntArrayTag;
@@ -18,14 +17,16 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import org.jetbrains.annotations.Range;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.jetbrains.annotations.Range;
 
 public interface IChunkExtent<T extends IChunk> extends Extent {
+
     /**
      * Get the IChunk at a position (and cache it if it's not already)
      *
@@ -124,14 +125,14 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         final IChunk chunk = getOrCreateChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
         Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue()); //do not modify original entity data
         map.put("Id", new StringTag(entity.getType().getName()));
-        
+
         //Set pos
         List<DoubleTag> posList = new ArrayList<>();
         posList.add(new DoubleTag(location.getX()));
         posList.add(new DoubleTag(location.getY()));
         posList.add(new DoubleTag(location.getZ()));
         map.put("Pos", new ListTag(DoubleTag.class, posList));
-        
+
         //set new uuid
         UUID newuuid = UUID.randomUUID();
         int[] uuidArray = new int[4];
@@ -140,13 +141,13 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         uuidArray[2] = (int) (newuuid.getLeastSignificantBits() >> 32);
         uuidArray[3] = (int) newuuid.getLeastSignificantBits();
         map.put("UUID", new IntArrayTag(uuidArray));
-        
+
         map.put("UUIDMost", new LongTag(newuuid.getMostSignificantBits()));
         map.put("UUIDLeast", new LongTag(newuuid.getLeastSignificantBits()));
-        
+
         map.put("PersistentIDMSB", new LongTag(newuuid.getMostSignificantBits()));
         map.put("PersistentIDLSB", new LongTag(newuuid.getLeastSignificantBits()));
-        
+
         chunk.setEntity(new CompoundTag(map));
         return new IChunkEntity(this, location, newuuid, entity);
     }
@@ -156,7 +157,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         final IChunk chunk = getOrCreateChunk(x >> 4, z >> 4);
         chunk.removeEntity(uuid);
     }
-    
+
     class IChunkEntity implements Entity {
 
         private final Extent extent;
@@ -170,7 +171,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
             this.uuid = uuid;
             this.base = base;
         }
-        
+
         @Override
         public BaseEntity getState() {
             return base;
@@ -183,7 +184,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         }
 
         @Override
-        public <T> T getFacet(Class<? extends T> cls)  {
+        public <T> T getFacet(Class<? extends T> cls) {
             return null;
         }
 
@@ -201,5 +202,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         public Extent getExtent() {
             return extent;
         }
+
     }
+
 }

@@ -3,6 +3,9 @@ package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
+import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -13,8 +16,6 @@ import com.github.intellectualsites.plotsquared.plot.util.MainUtil;
 import com.github.intellectualsites.plotsquared.plot.util.SchematicHandler;
 import com.github.intellectualsites.plotsquared.plot.util.block.LocalBlockQueue;
 import com.sk89q.jnbt.CompoundTag;
-import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
-import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
@@ -22,7 +23,6 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
@@ -43,6 +43,7 @@ import java.util.UUID;
 import static org.bukkit.Bukkit.getWorld;
 
 public class FaweSchematicHandler extends SchematicHandler {
+
     @Override
     public boolean restoreTile(LocalBlockQueue queue, CompoundTag compoundTag, int x, int y, int z) {
         if (queue instanceof FaweLocalBlockQueue) {
@@ -59,8 +60,17 @@ public class FaweSchematicHandler extends SchematicHandler {
             Location pos1 = corners[0];
             Location pos2 = corners[1];
             World adaptedWorld = BukkitAdapter.adapt(getWorld(world));
-            final CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
-            final EditSession editSession = new EditSessionBuilder(adaptedWorld).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
+            final CuboidRegion region = new CuboidRegion(
+                    BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
+                    BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())
+            );
+            final EditSession editSession = new EditSessionBuilder(adaptedWorld)
+                    .checkMemory(false)
+                    .fastmode(true)
+                    .limitUnlimited()
+                    .changeSetNull()
+                    .autoQueue(false)
+                    .build();
 
             ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region, false, true);
 
@@ -84,17 +94,20 @@ public class FaweSchematicHandler extends SchematicHandler {
                 CompressedCompoundTag cTag = (CompressedCompoundTag) tag;
                 if (cTag instanceof CompressedSchematicTag) {
                     Clipboard clipboard = (Clipboard) cTag.getSource();
-                    try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new BufferedOutputStream(new ParallelGZIPOutputStream(stream)))) {
+                    try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new BufferedOutputStream(
+                            new ParallelGZIPOutputStream(stream)))) {
                         new FastSchematicWriter(output).write(clipboard);
                     }
                 } else {
-                    try (OutputStream stream = new FileOutputStream(tmp); BufferedOutputStream output = new BufferedOutputStream(new ParallelGZIPOutputStream(stream))) {
+                    try (OutputStream stream = new FileOutputStream(tmp); BufferedOutputStream output = new BufferedOutputStream(
+                            new ParallelGZIPOutputStream(stream))) {
                         LZ4BlockInputStream is = cTag.adapt(cTag.getSource());
                         IOUtil.copy(is, stream);
                     }
                 }
             } else {
-                try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new ParallelGZIPOutputStream(stream))) {
+                try (OutputStream stream = new FileOutputStream(tmp); NBTOutputStream output = new NBTOutputStream(new ParallelGZIPOutputStream(
+                        stream))) {
                     Map<String, Tag> map = tag.getValue();
                     output.writeNamedTag("Schematic", map.getOrDefault("Schematic", tag));
                 }
@@ -138,4 +151,5 @@ public class FaweSchematicHandler extends SchematicHandler {
             }
         }, whenDone);
     }
+
 }

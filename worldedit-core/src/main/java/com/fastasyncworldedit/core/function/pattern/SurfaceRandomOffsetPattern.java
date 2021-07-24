@@ -1,15 +1,16 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public class SurfaceRandomOffsetPattern extends AbstractPattern {
+
     private final Pattern pattern;
     private final int moves;
 
@@ -41,7 +42,11 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
             for (int i = 0; i < allowed.length; i++) {
                 next = buffer[i];
                 BlockVector3 dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];
-                next.setComponents(cur.getBlockX() + dir.getBlockX(), cur.getBlockY() + dir.getBlockY(), cur.getBlockZ() + dir.getBlockZ());
+                next.setComponents(
+                        cur.getBlockX() + dir.getBlockX(),
+                        cur.getBlockY() + dir.getBlockY(),
+                        cur.getBlockZ() + dir.getBlockZ()
+                );
                 if (allowed(next)) {
                     allowed[index++] = next;
                 }
@@ -104,4 +109,5 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         BaseBlock block = pattern.applyBlock(v);
         return !block.getBlockType().getMaterial().isMovementBlocker();
     }
+
 }

@@ -36,7 +36,7 @@ public class RegionOffset implements RegionFunction {
     /**
      * Create a new instance.
      *
-     * @param offset the offset
+     * @param offset   the offset
      * @param function the function that is called with the offset position
      */
     public RegionOffset(BlockVector3 offset, RegionFunction function) {

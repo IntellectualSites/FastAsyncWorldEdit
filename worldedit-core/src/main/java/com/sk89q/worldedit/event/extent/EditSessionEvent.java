@@ -30,7 +30,6 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,10 +79,10 @@ public class EditSessionEvent extends Event implements Cancellable {
     /**
      * Create a new event.
      *
-     * @param world the world
-     * @param actor the actor, or null if there is no actor specified
+     * @param world     the world
+     * @param actor     the actor, or null if there is no actor specified
      * @param maxBlocks the maximum number of block changes
-     * @param stage the stage
+     * @param stage     the stage
      */
     public EditSessionEvent(@Nullable World world, Actor actor, int maxBlocks, Stage stage) {
         this.world = world;
@@ -159,6 +158,7 @@ public class EditSessionEvent extends Event implements Cancellable {
      * Set tracing enabled, with the current extent as the "base".
      *
      * <em>Internal use only.</em>
+     *
      * @param tracing if tracing is enabled
      */
     public void setTracing(boolean tracing) {

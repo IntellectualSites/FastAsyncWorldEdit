@@ -10,20 +10,21 @@ public class NbtUtils {
     /**
      * Get child tag of a NBT structure.
      *
-     * @param tag the tag to read from
-     * @param key the key to look for
+     * @param tag      the tag to read from
+     * @param key      the key to look for
      * @param expected the expected NBT class type
      * @return child tag
      * @throws InvalidFormatException if the format of the items is invalid
      */
-    public static <T extends BinaryTag> T getChildTag(CompoundBinaryTag tag, String key, BinaryTagType<T> expected) throws InvalidFormatException {
+    public static <T extends BinaryTag> T getChildTag(CompoundBinaryTag tag, String key, BinaryTagType<T> expected) throws
+            InvalidFormatException {
         BinaryTag childTag = tag.get(key);
         if (childTag == null) {
             throw new InvalidFormatException("Missing a \"" + key + "\" tag");
         }
 
         if (childTag.type().id() != expected.id()) {
-            throw new InvalidFormatException(key + " tag is not of tag type " + expected.toString());
+            throw new InvalidFormatException(key + " tag is not of tag type " + expected);
         }
         // SAFETY: same binary tag type checked above
         @SuppressWarnings("unchecked")

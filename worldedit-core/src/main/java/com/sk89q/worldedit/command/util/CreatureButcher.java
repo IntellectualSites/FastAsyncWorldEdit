@@ -29,6 +29,7 @@ import com.sk89q.worldedit.function.EntityFunction;
 public class CreatureButcher {
 
     public final class Flags {
+
         @SuppressWarnings("PointlessBitwiseExpression")
         public static final int PETS = 1 << 0;
         public static final int NPCS = 1 << 1;
@@ -42,6 +43,7 @@ public class CreatureButcher {
 
         private Flags() {
         }
+
     }
 
     private final Actor player;

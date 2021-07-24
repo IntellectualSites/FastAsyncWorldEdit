@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.extent.inventory.OutOfBlocksException;
 import com.sk89q.worldedit.extent.inventory.OutOfSpaceException;
-import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockState;
 import org.bukkit.entity.Player;
@@ -35,7 +35,7 @@ import org.bukkit.inventory.ItemStack;
 public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag {
 //FAWE end
 
-    private Player player;
+    private final Player player;
     private ItemStack[] items;
 
     /**
@@ -194,7 +194,11 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
     @Override
     public void setItem(int slot, BaseItem block) {
         loadInventory();
-        BaseItemStack stack = block instanceof BaseItemStack ? (BaseItemStack) block : new BaseItemStack(block.getType(), block.getNbtData(), 1);
+        BaseItemStack stack = block instanceof BaseItemStack ? (BaseItemStack) block : new BaseItemStack(
+                block.getType(),
+                block.getNbtData(),
+                1
+        );
         items[slot] = BukkitAdapter.adapt(stack);
     }
     //FAWE end

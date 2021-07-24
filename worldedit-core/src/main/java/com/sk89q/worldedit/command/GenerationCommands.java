@@ -21,6 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.function.generator.CavesGen;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
@@ -34,7 +35,6 @@ import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.fastasyncworldedit.core.function.generator.CavesGen;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -58,7 +58,7 @@ import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.Switch;
 import org.jetbrains.annotations.Range;
 
-import java.awt.*;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
@@ -89,38 +89,42 @@ public class GenerationCommands {
     }
 
     @Command(
-        name = "/hcyl",
-        desc = "Generates a hollow cylinder."
+            name = "/hcyl",
+            desc = "Generates a hollow cylinder."
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
-    public int hcyl(Actor actor, LocalSession session, EditSession editSession,
-                    @Arg(desc = "The pattern of blocks to generate")
-                        Pattern pattern,
-                    @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
-                    @Radii(2)
-                        List<Double> radii,
-                    @Arg(desc = "The height of the cylinder", def = "1")
-                        int height) throws WorldEditException {
-       return cyl(actor, session, editSession, pattern, radii, height, true);
+    public int hcyl(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "The pattern of blocks to generate")
+                    Pattern pattern,
+            @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
+            @Radii(2)
+                    List<Double> radii,
+            @Arg(desc = "The height of the cylinder", def = "1")
+                    int height
+    ) throws WorldEditException {
+        return cyl(actor, session, editSession, pattern, radii, height, true);
     }
 
     @Command(
-        name = "/cyl",
-        desc = "Generates a cylinder."
+            name = "/cyl",
+            desc = "Generates a cylinder."
     )
     @CommandPermissions("worldedit.generation.cylinder")
     @Logging(PLACEMENT)
-    public int cyl(Actor actor, LocalSession session, EditSession editSession,
-                   @Arg(desc = "The pattern of blocks to generate")
-                           Pattern pattern,
-                   @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
-                   @Radii(2)
-                       List<Double> radii,
-                    @Arg(desc = "The height of the cylinder", def = "1")
-                               int height,
-                   @Switch(name = 'h', desc = "Make a hollow cylinder")
-                               boolean hollow) throws WorldEditException {
+    public int cyl(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "The pattern of blocks to generate")
+                    Pattern pattern,
+            @Arg(desc = "The radii of the cylinder. 1st is N/S, 2nd is E/W")
+            @Radii(2)
+                    List<Double> radii,
+            @Arg(desc = "The height of the cylinder", def = "1")
+                    int height,
+            @Switch(name = 'h', desc = "Make a hollow cylinder")
+                    boolean hollow
+    ) throws WorldEditException {
         final double radiusX;
         final double radiusZ;
         switch (radii.size()) {
@@ -149,38 +153,42 @@ public class GenerationCommands {
     }
 
     @Command(
-        name = "/hsphere",
-        desc = "Generates a hollow sphere."
+            name = "/hsphere",
+            desc = "Generates a hollow sphere."
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
-    public int hsphere(Actor actor, LocalSession session, EditSession editSession,
-                       @Arg(desc = "The pattern of blocks to generate")
-                           Pattern pattern,
-                       @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
-                       @Radii(3)
-                           List<Double> radii,
-                       @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
-                           boolean raised) throws WorldEditException {
-       return sphere(actor, session, editSession, pattern, radii, raised, true);
+    public int hsphere(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "The pattern of blocks to generate")
+                    Pattern pattern,
+            @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
+            @Radii(3)
+                    List<Double> radii,
+            @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
+                    boolean raised
+    ) throws WorldEditException {
+        return sphere(actor, session, editSession, pattern, radii, raised, true);
     }
 
     @Command(
-        name = "/sphere",
-        desc = "Generates a filled sphere."
+            name = "/sphere",
+            desc = "Generates a filled sphere."
     )
     @CommandPermissions("worldedit.generation.sphere")
     @Logging(PLACEMENT)
-    public int sphere(Actor actor, LocalSession session, EditSession editSession,
-        @Arg(desc = "The pattern of blocks to generate")
-            Pattern pattern,
-        @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
-        @Radii(3)
-            List<Double> radii,
-        @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
-            boolean raised,
-        @Switch(name = 'h', desc = "Make a hollow sphere")
-            boolean hollow) throws WorldEditException {
+    public int sphere(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "The pattern of blocks to generate")
+                    Pattern pattern,
+            @Arg(desc = "The radii of the sphere. Order is N/S, U/D, E/W")
+            @Radii(3)
+                    List<Double> radii,
+            @Switch(name = 'r', desc = "Raise the bottom of the sphere to the placement position")
+                    boolean raised,
+            @Switch(name = 'h', desc = "Make a hollow sphere")
+                    boolean hollow
+    ) throws WorldEditException {
         final double radiusX;
         final double radiusY;
         final double radiusZ;
@@ -217,19 +225,21 @@ public class GenerationCommands {
     }
 
     @Command(
-        name = "forestgen",
-        aliases = { "/forestgen" },
-        desc = "Generate a forest"
+            name = "forestgen",
+            aliases = {"/forestgen"},
+            desc = "Generate a forest"
     )
     @CommandPermissions("worldedit.generation.forest")
     @Logging(POSITION)
-    public int forestGen(Actor actor, LocalSession session, EditSession editSession,
-                         @Arg(desc = "The size of the forest, in blocks", def = "10")
-                             int size,
-                         @Arg(desc = "The type of forest", def = "tree")
-                             TreeType type,
-                         @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
-                             double density) throws WorldEditException {
+    public int forestGen(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "The size of the forest, in blocks", def = "10")
+                    int size,
+            @Arg(desc = "The type of forest", def = "tree")
+                    TreeType type,
+            @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
+                    double density
+    ) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
         density /= 100;
@@ -239,17 +249,19 @@ public class GenerationCommands {
     }
 
     @Command(
-        name = "pumpkins",
-        aliases = { "/pumpkins" },
-        desc = "Generate pumpkin patches"
+            name = "pumpkins",
+            aliases = {"/pumpkins"},
+            desc = "Generate pumpkin patches"
     )
     @CommandPermissions("worldedit.generation.pumpkins")
     @Logging(POSITION)
-    public int pumpkins(Actor actor, LocalSession session, EditSession editSession,
-                        @Arg(desc = "The size of the patch", def = "10")
-                            int size,
-                        @Arg(desc = "//TODO ", def = "0.02")
-                                    double density) throws WorldEditException {
+    public int pumpkins(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "The size of the patch", def = "10")
+                    int size,
+            @Arg(desc = "//TODO ", def = "0.02")
+                    double density
+    ) throws WorldEditException {
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
         int affected = editSession.makePumpkinPatches(session.getPlacementPosition(actor), size, density);
@@ -258,32 +270,36 @@ public class GenerationCommands {
     }
 
     @Command(
-        name = "/hpyramid",
-        desc = "Generate a hollow pyramid"
+            name = "/hpyramid",
+            desc = "Generate a hollow pyramid"
     )
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
-    public int hollowPyramid(Actor actor, LocalSession session, EditSession editSession,
-                             @Arg(desc = "The pattern of blocks to set")
-                                 Pattern pattern,
-                             @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The size of the pyramid")
-                                 int size) throws WorldEditException {
+    public int hollowPyramid(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "The pattern of blocks to set")
+                    Pattern pattern,
+            @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The size of the pyramid")
+                    int size
+    ) throws WorldEditException {
         return pyramid(actor, session, editSession, pattern, size, true);
     }
 
     @Command(
-        name = "/pyramid",
-        desc = "Generate a filled pyramid"
+            name = "/pyramid",
+            desc = "Generate a filled pyramid"
     )
     @CommandPermissions("worldedit.generation.pyramid")
     @Logging(PLACEMENT)
-    public int pyramid(Actor actor, LocalSession session, EditSession editSession,
-                       @Arg(desc = "The pattern of blocks to set")
-                           Pattern pattern,
-                        @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The size of the pyramid")
-                           int size,
-                       @Switch(name = 'h', desc = "Make a hollow pyramid")
-                           boolean hollow) throws WorldEditException {
+    public int pyramid(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "The pattern of blocks to set")
+                    Pattern pattern,
+            @Confirm(Confirm.Processor.RADIUS) @Arg(desc = "The size of the pyramid")
+                    int size,
+            @Switch(name = 'h', desc = "Make a hollow pyramid")
+                    boolean hollow
+    ) throws WorldEditException {
         worldEdit.checkMaxRadius(size);
         BlockVector3 pos = session.getPlacementPosition(actor);
         int affected = editSession.makePyramid(pos, pattern, size, !hollow);
@@ -295,28 +311,30 @@ public class GenerationCommands {
     }
 
     @Command(
-        name = "/generate",
-        aliases = { "/gen", "/g" },
-        desc = "Generates a shape according to a formula.",
-        descFooter = "See also https://tinyurl.com/weexpr."
+            name = "/generate",
+            aliases = {"/gen", "/g"},
+            desc = "Generates a shape according to a formula.",
+            descFooter = "See also https://tinyurl.com/weexpr."
     )
     @CommandPermissions("worldedit.generation.shape")
     @Logging(ALL)
     @Confirm(Confirm.Processor.REGION)
-    public int generate(Actor actor, LocalSession session, EditSession editSession,
-                        @Selection Region region,
-                        @Arg(desc = "The pattern of blocks to set")
-                            Pattern pattern,
-                        @Arg(desc = "Expression to test block placement locations and set block type", variable = true)
-                            List<String> expression,
-                        @Switch(name = 'h', desc = "Generate a hollow shape")
-                            boolean hollow,
-                        @Switch(name = 'r', desc = "Use the game's coordinate origin")
-                            boolean useRawCoords,
-                        @Switch(name = 'o', desc = "Use the placement's coordinate origin")
-                            boolean offset,
-                        @Switch(name = 'c', desc = "Use the selection's center as origin")
-                            boolean offsetCenter) throws WorldEditException {
+    public int generate(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Selection Region region,
+            @Arg(desc = "The pattern of blocks to set")
+                    Pattern pattern,
+            @Arg(desc = "Expression to test block placement locations and set block type", variable = true)
+                    List<String> expression,
+            @Switch(name = 'h', desc = "Generate a hollow shape")
+                    boolean hollow,
+            @Switch(name = 'r', desc = "Use the game's coordinate origin")
+                    boolean useRawCoords,
+            @Switch(name = 'o', desc = "Use the placement's coordinate origin")
+                    boolean offset,
+            @Switch(name = 'c', desc = "Use the selection's center as origin")
+                    boolean offsetCenter
+    ) throws WorldEditException {
 
         final Vector3 zero;
         Vector3 unit;
@@ -354,7 +372,15 @@ public class GenerationCommands {
         final Vector3 unit1 = unit;
 
         try {
-            final int affected = editSession.makeShape(region, zero, unit1, pattern, String.join(" ", expression), hollow, session.getTimeout());
+            final int affected = editSession.makeShape(
+                    region,
+                    zero,
+                    unit1,
+                    pattern,
+                    String.join(" ", expression),
+                    hollow,
+                    session.getTimeout()
+            );
             if (actor instanceof Player) {
                 ((Player) actor).findFreePosition();
             }
@@ -367,30 +393,32 @@ public class GenerationCommands {
     }
 
     @Command(
-        name = "/generatebiome",
-        aliases = { "/genbiome", "/gb" },
-        desc = "Sets biome according to a formula.",
-        descFooter = "Formula must return positive numbers (true) if the point is inside the shape\n"
-            + "Sets the biome of blocks in that shape.\n"
-            + "See also https://tinyurl.com/weexpr."
+            name = "/generatebiome",
+            aliases = {"/genbiome", "/gb"},
+            desc = "Sets biome according to a formula.",
+            descFooter = "Formula must return positive numbers (true) if the point is inside the shape\n"
+                    + "Sets the biome of blocks in that shape.\n"
+                    + "See also https://tinyurl.com/weexpr."
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
     @Confirm(Confirm.Processor.REGION)
-    public int generateBiome(Actor actor, LocalSession session, EditSession editSession,
-                             @Selection Region region,
-                             @Arg(desc = "The biome type to set")
-                                 BiomeType target,
-                             @Arg(desc = "Expression to test block placement locations and set biome type", variable = true)
-                                 List<String> expression,
-                             @Switch(name = 'h', desc = "Generate a hollow shape")
-                                 boolean hollow,
-                             @Switch(name = 'r', desc = "Use the game's coordinate origin")
-                                 boolean useRawCoords,
-                             @Switch(name = 'o', desc = "Use the placement's coordinate origin")
-                                 boolean offset,
-                             @Switch(name = 'c', desc = "Use the selection's center as origin")
-                                 boolean offsetCenter) throws WorldEditException {
+    public int generateBiome(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Selection Region region,
+            @Arg(desc = "The biome type to set")
+                    BiomeType target,
+            @Arg(desc = "Expression to test block placement locations and set biome type", variable = true)
+                    List<String> expression,
+            @Switch(name = 'h', desc = "Generate a hollow shape")
+                    boolean hollow,
+            @Switch(name = 'r', desc = "Use the game's coordinate origin")
+                    boolean useRawCoords,
+            @Switch(name = 'o', desc = "Use the placement's coordinate origin")
+                    boolean offset,
+            @Switch(name = 'c', desc = "Use the selection's center as origin")
+                    boolean offsetCenter
+    ) throws WorldEditException {
         final Vector3 zero;
         Vector3 unit;
 
@@ -426,7 +454,15 @@ public class GenerationCommands {
 
         final Vector3 unit1 = unit;
         try {
-            final int affected = editSession.makeBiomeShape(region, zero, unit1, target, String.join(" ", expression), hollow, session.getTimeout());
+            final int affected = editSession.makeBiomeShape(
+                    region,
+                    zero,
+                    unit1,
+                    target,
+                    String.join(" ", expression),
+                    hollow,
+                    session.getTimeout()
+            );
             actor.print(Caption.of("worldedit.generatebiome.changed", TextComponent.of(affected)));
             return affected;
         } catch (ExpressionException e) {
@@ -443,18 +479,31 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.caves")
     @Logging(PLACEMENT)
     @Confirm(Confirm.Processor.REGION)
-    public void caves(Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
-                      @Arg(name = "size", desc = "TODO", def = "8") int sizeOpt,
-                      @Arg(name = "frequency", desc = "TODO", def = "40") int frequencyOpt,
-                      @Arg(name = "rarity", desc = "TODO", def = "7") int rarityOpt,
-                      @Arg(name = "minY", desc = "TODO", def = "8") int minYOpt,
-                      @Arg(name = "maxY", desc = "TODO", def = "127") int maxYOpt,
-                      @Arg(name = "systemFrequency", desc = "TODO", def = "1") int systemFrequencyOpt,
-                      @Arg(name = "individualRarity", desc = "TODO", def = "25") int individualRarityOpt,
-                      @Arg(name = "pocketChance", desc = "TODO", def = "0") int pocketChanceOpt,
-                      @Arg(name = "pocketMin", desc = "TODO", def = "0") int pocketMinOpt,
-                      @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt) throws WorldEditException {
-        CavesGen gen = new CavesGen(sizeOpt, frequencyOpt, rarityOpt, minYOpt, maxYOpt, systemFrequencyOpt, individualRarityOpt, pocketChanceOpt, pocketMinOpt, pocketMaxOpt);
+    public void caves(
+            Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
+            @Arg(name = "size", desc = "TODO", def = "8") int sizeOpt,
+            @Arg(name = "frequency", desc = "TODO", def = "40") int frequencyOpt,
+            @Arg(name = "rarity", desc = "TODO", def = "7") int rarityOpt,
+            @Arg(name = "minY", desc = "TODO", def = "8") int minYOpt,
+            @Arg(name = "maxY", desc = "TODO", def = "127") int maxYOpt,
+            @Arg(name = "systemFrequency", desc = "TODO", def = "1") int systemFrequencyOpt,
+            @Arg(name = "individualRarity", desc = "TODO", def = "25") int individualRarityOpt,
+            @Arg(name = "pocketChance", desc = "TODO", def = "0") int pocketChanceOpt,
+            @Arg(name = "pocketMin", desc = "TODO", def = "0") int pocketMinOpt,
+            @Arg(name = "pocketMax", desc = "TODO", def = "3") int pocketMaxOpt
+    ) throws WorldEditException {
+        CavesGen gen = new CavesGen(
+                sizeOpt,
+                frequencyOpt,
+                rarityOpt,
+                minYOpt,
+                maxYOpt,
+                systemFrequencyOpt,
+                individualRarityOpt,
+                pocketChanceOpt,
+                pocketMinOpt,
+                pocketMaxOpt
+        );
         editSession.generate(region, gen);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
@@ -467,7 +516,13 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     @Confirm(Confirm.Processor.REGION)
-    public void ores(Actor actor, LocalSession session, EditSession editSession, @Selection Region region, @Arg(desc = "Mask") Mask mask) throws WorldEditException {
+    public void ores(
+            Actor actor,
+            LocalSession session,
+            EditSession editSession,
+            @Selection Region region,
+            @Arg(desc = "Mask") Mask mask
+    ) throws WorldEditException {
         if (mask instanceof AbstractExtentMask) {
             ((AbstractExtentMask) mask).setExtent(editSession);
         }
@@ -477,18 +532,20 @@ public class GenerationCommands {
 
     @Command(
             name = "/img",
-            aliases = { "/image", "image" },
+            aliases = {"/image", "image"},
             desc = "Generate an image"
     )
     @CommandPermissions("worldedit.generation.image")
     @Logging(PLACEMENT)
-    public void image(Actor actor,
-                      LocalSession session,
-                      EditSession editSession,
-                      @Arg(desc = "Image URL (imgur only)") String imageURL,
-                      @Arg(desc = "boolean", def = "true") boolean randomize,
-                      @Arg(desc = "TODO", def = "100") int threshold,
-                      @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions) throws WorldEditException, IOException {
+    public void image(
+            Actor actor,
+            LocalSession session,
+            EditSession editSession,
+            @Arg(desc = "Image URL (imgur only)") String imageURL,
+            @Arg(desc = "boolean", def = "true") boolean randomize,
+            @Arg(desc = "TODO", def = "100") int threshold,
+            @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions
+    ) throws WorldEditException, IOException {
         TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(imageURL);
         if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
@@ -497,7 +554,8 @@ public class GenerationCommands {
         BufferedImage image = MainUtil.readImage(url);
         if (dimensions != null) {
             image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR, false);
+                    RenderingHints.VALUE_INTERPOLATION_BILINEAR, false
+            );
         }
 
         BlockVector3 pos1 = session.getPlacementPosition(actor);
@@ -529,17 +587,19 @@ public class GenerationCommands {
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
     @Confirm(Confirm.Processor.REGION)
-    public void ore(Actor actor,
-                    LocalSession session,
-                    EditSession editSession,
-                    @Selection Region region,
-                    @Arg(desc = "Mask") Mask mask,
-                    @Arg(desc = "Pattern") Pattern material,
-                    @Arg(desc = "Ore vein size") @Range(from = 0, to = Integer.MAX_VALUE) int size,
-                    @Arg(desc = "Ore vein frequency (number of times to attempt to place ore)", def = "10") @Range(from = 0, to = Integer.MAX_VALUE) int freq,
-                    @Arg(desc = "Ore vein rarity (% chance each attempt is placed)", def = "100") @Range(from = 0, to = 100) int rarity,
-                    @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
-                    @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY) throws WorldEditException {
+    public void ore(
+            Actor actor,
+            LocalSession session,
+            EditSession editSession,
+            @Selection Region region,
+            @Arg(desc = "Mask") Mask mask,
+            @Arg(desc = "Pattern") Pattern material,
+            @Arg(desc = "Ore vein size") @Range(from = 0, to = Integer.MAX_VALUE) int size,
+            @Arg(desc = "Ore vein frequency (number of times to attempt to place ore)", def = "10") @Range(from = 0, to = Integer.MAX_VALUE) int freq,
+            @Arg(desc = "Ore vein rarity (% chance each attempt is placed)", def = "100") @Range(from = 0, to = 100) int rarity,
+            @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
+            @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY
+    ) throws WorldEditException {
         if (mask instanceof AbstractExtentMask) {
             ((AbstractExtentMask) mask).setExtent(editSession);
         }

@@ -4,6 +4,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 
 public class RoundedTransform implements Transform {
+
     private final Transform transform;
 
     public RoundedTransform(Transform transform) {
@@ -34,4 +35,5 @@ public class RoundedTransform implements Transform {
     public Transform getTransform() {
         return transform;
     }
+
 }

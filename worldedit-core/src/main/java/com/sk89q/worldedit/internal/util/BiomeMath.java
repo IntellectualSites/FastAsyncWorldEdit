@@ -52,9 +52,9 @@ public class BiomeMath {
     /**
      * Compute the index into the MC biome array, for extended-height worlds.
      *
-     * @param x the block x coordinate
-     * @param y the block y coordinate
-     * @param z the block z coordinate
+     * @param x    the block x coordinate
+     * @param y    the block y coordinate
+     * @param z    the block z coordinate
      * @param minY minimum y of the world
      * @param maxY maximum y of the world
      * @return the index into the standard MC biome array
@@ -67,4 +67,5 @@ public class BiomeMath {
                 | n << HORIZONTAL_SECTION_COUNT
                 | l;
     }
+
 }

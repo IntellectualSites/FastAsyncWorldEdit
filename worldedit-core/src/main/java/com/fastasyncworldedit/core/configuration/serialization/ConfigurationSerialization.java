@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
+
 /**
  * Utility class for storing and retrieving classes for {@link Configuration}.
  */
@@ -19,7 +20,7 @@ public class ConfigurationSerialization {
 
     public static final String SERIALIZED_TYPE_KEY = "==";
     private static final Map<String, Class<? extends ConfigurationSerializable>> aliases =
-        new HashMap<>();
+            new HashMap<>();
     private final Class<? extends ConfigurationSerializable> clazz;
 
     protected ConfigurationSerialization(Class<? extends ConfigurationSerializable> clazz) {
@@ -41,7 +42,10 @@ public class ConfigurationSerialization {
      * @param clazz Class to deserialize into
      * @return New instance of the specified class
      */
-    public static ConfigurationSerializable deserializeObject(Map<String, ?> args, Class<? extends ConfigurationSerializable> clazz) {
+    public static ConfigurationSerializable deserializeObject(
+            Map<String, ?> args,
+            Class<? extends ConfigurationSerializable> clazz
+    ) {
         return new ConfigurationSerialization(clazz).deserialize(args);
     }
 
@@ -199,26 +203,33 @@ public class ConfigurationSerialization {
             ConfigurationSerializable result = (ConfigurationSerializable) method.invoke(null, args);
 
             if (result == null) {
-                LOGGER.error("Could not call method '" + method.toString() + "' of " + this.clazz + " for deserialization: method returned null");
+                LOGGER.error("Could not call method '" + method + "' of " + this.clazz + " for deserialization: method returned null");
             } else {
                 return result;
             }
         } catch (Throwable ex) {
-            LOGGER.error("Could not call method '" + method.toString() + "' of " + this.clazz
+            LOGGER.error(
+                    "Could not call method '" + method.toString() + "' of " + this.clazz
                             + " for deserialization",
-                    ex instanceof InvocationTargetException ? ex.getCause() : ex);
+                    ex instanceof InvocationTargetException ? ex.getCause() : ex
+            );
         }
 
         return null;
     }
 
-    protected ConfigurationSerializable deserializeViaCtor(Constructor<? extends ConfigurationSerializable> ctor, Map<String, ?> args) {
+    protected ConfigurationSerializable deserializeViaCtor(
+            Constructor<? extends ConfigurationSerializable> ctor,
+            Map<String, ?> args
+    ) {
         try {
             return ctor.newInstance(args);
         } catch (Throwable ex) {
-            LOGGER.error("Could not call constructor '" + ctor.toString() + "' of " + this.clazz
+            LOGGER.error(
+                    "Could not call constructor '" + ctor.toString() + "' of " + this.clazz
                             + " for deserialization",
-                    ex instanceof InvocationTargetException ? ex.getCause() : ex);
+                    ex instanceof InvocationTargetException ? ex.getCause() : ex
+            );
         }
 
         return null;
@@ -253,4 +264,5 @@ public class ConfigurationSerialization {
 
         return result;
     }
+
 }

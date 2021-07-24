@@ -74,7 +74,7 @@ public class FileMcRegionChunkStore extends McRegionChunkStore {
     @Override
     public boolean isValid() {
         return new File(path, "region").isDirectory()
-            || new File(path, "DIM-1" + File.separator + "region").isDirectory();
+                || new File(path, "DIM-1" + File.separator + "region").isDirectory();
     }
 
 }

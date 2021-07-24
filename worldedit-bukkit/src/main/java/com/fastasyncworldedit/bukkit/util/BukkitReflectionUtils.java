@@ -7,6 +7,7 @@ import org.bukkit.Server;
 import java.lang.reflect.Method;
 
 public class BukkitReflectionUtils {
+
     /**
      * Prefix of Bukkit classes.
      */
@@ -55,4 +56,5 @@ public class BukkitReflectionUtils {
         final String packageName = Bukkit.getServer().getClass().getPackage().getName();
         return packageName.substring(packageName.lastIndexOf('.') + 1);
     }
+
 }

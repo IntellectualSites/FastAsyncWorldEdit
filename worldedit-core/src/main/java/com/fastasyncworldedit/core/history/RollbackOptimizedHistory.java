@@ -37,7 +37,15 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.time = System.currentTimeMillis();
     }
 
-    public RollbackOptimizedHistory(World world, UUID uuid, int index, long time, long size, CuboidRegion region, String command) {
+    public RollbackOptimizedHistory(
+            World world,
+            UUID uuid,
+            int index,
+            long time,
+            long size,
+            CuboidRegion region,
+            String command
+    ) {
         super(world, uuid, index);
         this.time = time;
         this.minX = region.getMinimumX();
@@ -135,4 +143,5 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
     public BlockVector3 getMaximumPoint() {
         return BlockVector3.at(maxX, maxY, maxZ);
     }
+
 }

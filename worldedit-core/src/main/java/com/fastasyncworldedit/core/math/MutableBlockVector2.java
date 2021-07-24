@@ -4,7 +4,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 
 public class MutableBlockVector2 extends BlockVector2 {
 
-    private static ThreadLocal<MutableBlockVector2> MUTABLE_CACHE = ThreadLocal.withInitial(MutableBlockVector2::new);
+    private static final ThreadLocal<MutableBlockVector2> MUTABLE_CACHE = ThreadLocal.withInitial(MutableBlockVector2::new);
 
     public static MutableBlockVector2 get(int x, int z) {
         return MUTABLE_CACHE.get().setComponents(x, z);
@@ -47,4 +47,5 @@ public class MutableBlockVector2 extends BlockVector2 {
         this.z = z;
         return this;
     }
+
 }

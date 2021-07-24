@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.queue.implementation.preloader;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.util.collection.MutablePair;
 import com.fastasyncworldedit.core.util.FaweTimer;
+import com.fastasyncworldedit.core.util.collection.MutablePair;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class AsyncPreloader implements Preloader, Runnable {
+
     private final ConcurrentHashMap<UUID, MutablePair<World, Set<BlockVector2>>> update;
 
     public AsyncPreloader() {
@@ -57,7 +58,10 @@ public class AsyncPreloader implements Preloader, Runnable {
                 return;
             }
             if (existing == null) {
-                MutablePair<World, Set<BlockVector2>> previous = update.putIfAbsent(player.getUniqueId(), existing = new MutablePair<>());
+                MutablePair<World, Set<BlockVector2>> previous = update.putIfAbsent(
+                        player.getUniqueId(),
+                        existing = new MutablePair<>()
+                );
                 if (previous != null) {
                     existing = previous;
                 }
@@ -110,4 +114,5 @@ public class AsyncPreloader implements Preloader, Runnable {
     public void queueLoad(World world, BlockVector2 chunk) {
         world.checkLoadedChunk(BlockVector3.at(chunk.getX() << 4, 0, chunk.getZ() << 4));
     }
+
 }

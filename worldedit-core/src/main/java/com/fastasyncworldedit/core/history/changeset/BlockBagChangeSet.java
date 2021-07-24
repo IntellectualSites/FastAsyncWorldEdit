@@ -11,15 +11,15 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 public class BlockBagChangeSet extends AbstractDelegateChangeSet {
 
     private final boolean mine;
-    private int[] missingBlocks = new int[BlockTypes.size()];
+    private final int[] missingBlocks = new int[BlockTypes.size()];
     private BlockBag blockBag;
 
     public BlockBagChangeSet(AbstractChangeSet parent, BlockBag blockBag, boolean mine) {
@@ -85,10 +85,10 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
             try {
                 blockBag.fetchPlacedBlock(typeTo.getDefaultState());
             } catch (UnplaceableBlockException e) {
-                throw FaweCache.IMP.BLOCK_BAG;
+                throw FaweCache.BLOCK_BAG;
             } catch (BlockBagException e) {
                 missingBlocks[typeTo.getInternalId()]++;
-                throw FaweCache.IMP.BLOCK_BAG;
+                throw FaweCache.BLOCK_BAG;
             }
         }
         if (mine) {
@@ -117,4 +117,5 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
         }
         super.addTileCreate(nbt);
     }
+
 }

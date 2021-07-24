@@ -23,12 +23,12 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -58,7 +58,7 @@ public class BlockTypeMask extends AbstractExtentMask {
      * Create a new block mask.
      *
      * @param extent the extent
-     * @param block an array of blocks to match
+     * @param block  an array of blocks to match
      */
     public BlockTypeMask(Extent extent, @Nonnull BlockType... block) {
         super(extent);

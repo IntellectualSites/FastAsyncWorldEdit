@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class AboveVisitor extends RecursiveVisitor {
 
-    private int baseY;
+    private final int baseY;
 
     /**
      * Create a new visitor.
@@ -34,12 +34,14 @@ public class AboveVisitor extends RecursiveVisitor {
         this.baseY = baseY;
 
         setDirections(BlockVector3.UNIT_MINUS_X, BlockVector3.UNIT_MINUS_Y,
-            BlockVector3.UNIT_MINUS_Z, BlockVector3.UNIT_X, BlockVector3.UNIT_Y,
-            BlockVector3.UNIT_Z);
+                BlockVector3.UNIT_MINUS_Z, BlockVector3.UNIT_X, BlockVector3.UNIT_Y,
+                BlockVector3.UNIT_Z
+        );
     }
 
     @Override
     public boolean isVisitable(BlockVector3 from, BlockVector3 to) {
         return (from.getBlockY() >= baseY) && super.isVisitable(from, to);
     }
+
 }

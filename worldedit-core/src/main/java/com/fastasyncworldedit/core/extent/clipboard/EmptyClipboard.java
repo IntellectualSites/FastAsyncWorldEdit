@@ -13,10 +13,12 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class EmptyClipboard implements Clipboard {
+
     private static final EmptyClipboard instance = new EmptyClipboard();
 
     public static EmptyClipboard getInstance() {

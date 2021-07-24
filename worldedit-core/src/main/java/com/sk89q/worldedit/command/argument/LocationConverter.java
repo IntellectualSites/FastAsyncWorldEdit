@@ -21,7 +21,7 @@ public class LocationConverter implements ArgumentConverter<Location> {
     public static void register(CommandManager commandManager) {
         commandManager.registerConverter(Key.of(Location.class), LOCATION_CONVERTER);
     }
-    
+
     public static final LocationConverter LOCATION_CONVERTER = new LocationConverter();
 
     private final WorldConverter worldConverter = WorldConverter.WORLD_CONVERTER;
@@ -66,4 +66,5 @@ public class LocationConverter implements ArgumentConverter<Location> {
         Location location = new Location(world.get().iterator().next(), vector.get().iterator().next().toVector3());
         return SuccessfulConversion.fromSingle(location);
     }
+
 }

@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.function.block;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 public class BiomeCopy implements RegionFunction {
 
@@ -25,10 +25,11 @@ public class BiomeCopy implements RegionFunction {
         int y = position.getBlockY();
         int z = position.getBlockZ();
         if (x != mutableVector.getBlockX() || z != mutableVector.getBlockZ() || y != mutableVector
-            .getBlockY()) {
+                .getBlockY()) {
             mutableVector.setComponents(x, y, z);
             return destination.setBiome(mutableVector, source.getBiome(mutableVector));
         }
         return false;
     }
+
 }

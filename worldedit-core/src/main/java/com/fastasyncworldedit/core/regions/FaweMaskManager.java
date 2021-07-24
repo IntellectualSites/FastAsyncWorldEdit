@@ -15,7 +15,7 @@ public abstract class FaweMaskManager {
         public static MaskType getDefaultMaskType() {
             try {
                 return MaskType
-                    .valueOf(Settings.IMP.REGION_RESTRICTIONS_OPTIONS.MODE.toUpperCase(Locale.ROOT));
+                        .valueOf(Settings.IMP.REGION_RESTRICTIONS_OPTIONS.MODE.toUpperCase(Locale.ROOT));
             } catch (Exception ignored) {
                 return MEMBER;
             }
@@ -56,4 +56,5 @@ public abstract class FaweMaskManager {
     public boolean isExclusive() {
         return false;
     }
+
 }

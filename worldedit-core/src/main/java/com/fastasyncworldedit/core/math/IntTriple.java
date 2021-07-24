@@ -42,4 +42,5 @@ public final class IntTriple {
         }
         return false;
     }
+
 }

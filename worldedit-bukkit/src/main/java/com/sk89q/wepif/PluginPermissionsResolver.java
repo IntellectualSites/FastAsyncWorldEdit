@@ -32,7 +32,8 @@ public class PluginPermissionsResolver implements PermissionsResolver {
 
     public static PermissionsResolver factory(Server server, YAMLProcessor config) {
         // Looking for service
-        RegisteredServiceProvider<PermissionsProvider> serviceProvider = server.getServicesManager().getRegistration(PermissionsProvider.class);
+        RegisteredServiceProvider<PermissionsProvider> serviceProvider = server.getServicesManager().getRegistration(
+                PermissionsProvider.class);
 
         if (serviceProvider != null) {
             return new PluginPermissionsResolver(serviceProvider.getProvider(), serviceProvider.getPlugin());

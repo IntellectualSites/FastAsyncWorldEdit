@@ -3,17 +3,17 @@ package com.fastasyncworldedit.core.database;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.history.RollbackOptimizedHistory;
+import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.collection.YieldIterable;
 import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
-import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 import org.intellij.lang.annotations.Language;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -71,7 +71,10 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         super((t, e) -> e.printStackTrace());
         this.prefix = "";
         this.world = world;
-        this.dbLocation = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + "summary.db");
+        this.dbLocation = MainUtil.getFile(
+                Fawe.imp().getDirectory(),
+                Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + "summary.db"
+        );
         connection = openConnection();
 
         // update vars
@@ -100,7 +103,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         return ByteBuffer.allocate(16).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits()).array();
     }
 
-    public  Future<Boolean> init() {
+    public Future<Boolean> init() {
         return call(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(createTable)) {
                 stmt.executeUpdate();
@@ -180,7 +183,14 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         return getEdits(null, 0, pos, pos, false, ascending);
     }
 
-    public Iterable<Supplier<RollbackOptimizedHistory>> getEdits(UUID uuid, long minTime, BlockVector3 pos1, BlockVector3 pos2, boolean delete, boolean ascending) {
+    public Iterable<Supplier<RollbackOptimizedHistory>> getEdits(
+            UUID uuid,
+            long minTime,
+            BlockVector3 pos1,
+            BlockVector3 pos2,
+            boolean delete,
+            boolean ascending
+    ) {
         YieldIterable<Supplier<RollbackOptimizedHistory>> yieldIterable = new YieldIterable<>();
 
         Future<Integer> future = call(() -> {
@@ -219,7 +229,11 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                         stmt.setInt(5, pos2.getBlockZ());
                         stmt.setByte(6, (byte) (pos1.getBlockY() - 128));
                         stmt.setByte(7, (byte) (pos2.getBlockY() - 128));
-                        byte[] uuidBytes = ByteBuffer.allocate(16).putLong(uuid.getMostSignificantBits()).putLong(uuid.getLeastSignificantBits()).array();
+                        byte[] uuidBytes = ByteBuffer
+                                .allocate(16)
+                                .putLong(uuid.getMostSignificantBits())
+                                .putLong(uuid.getLeastSignificantBits())
+                                .array();
                         stmt.setBytes(8, uuidBytes);
                     }
                 }
@@ -251,7 +265,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         }
 
         RollbackOptimizedHistory[] copy = IntStream.range(0, size)
-            .mapToObj(i -> historyChanges.poll()).toArray(RollbackOptimizedHistory[]::new);
+                .mapToObj(i -> historyChanges.poll()).toArray(RollbackOptimizedHistory[]::new);
 
         try (PreparedStatement stmt = connection.prepareStatement(insertEdit)) {
             // `player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)"
@@ -381,4 +395,5 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         }
         super.close();
     }
+
 }

@@ -48,10 +48,10 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * A null implementation of {@link World} that drops all changes and
@@ -75,7 +75,8 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws
+            WorldEditException {
         return false;
     }
 
@@ -94,6 +95,7 @@ public class NullWorld extends AbstractWorld {
     public boolean clearContainerBlockContents(BlockVector3 position) {
         return false;
     }
+
     @Override
     public boolean fullySupports3DBiomes() {
         return false;
@@ -240,6 +242,7 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public void flush() {}
+    public void flush() {
+    }
     //FAWE end
 }

@@ -37,10 +37,10 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -109,10 +109,10 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     /**
      * Create a new selector.
      *
-     * @param world the world
+     * @param world  the world
      * @param points a list of points
-     * @param minY the minimum Y
-     * @param maxY the maximum Y
+     * @param minY   the minimum Y
+     * @param maxY   the maximum Y
      */
     public Polygonal2DRegionSelector(@Nullable World world, List<BlockVector2> points, int minY, int maxY) {
         checkNotNull(points);

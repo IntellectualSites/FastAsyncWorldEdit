@@ -15,13 +15,13 @@ import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -219,4 +219,5 @@ public class PolyhedralRegionSelector implements RegionSelector, CUIRegion {
     public List<BlockVector3> getVertices() {
         return new ArrayList<>(region.getVertices());
     }
+
 }

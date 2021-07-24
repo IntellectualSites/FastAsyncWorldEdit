@@ -45,8 +45,9 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.enginehub.piston.CommandManager;
-import javax.annotation.Nonnull;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -55,7 +56,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
@@ -116,8 +116,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         if (!type.startsWith("minecraft:")) {
             return false;
         }
-        @SuppressWarnings("deprecation")
-        final EntityType entityType = EntityType.fromName(type.substring(10));
+        @SuppressWarnings("deprecation") final EntityType entityType = EntityType.fromName(type.substring(10));
         return entityType != null && entityType.isAlive();
     }
 
@@ -175,22 +174,29 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         BukkitCommandInspector inspector = new BukkitCommandInspector(plugin, dispatcher);
 
         dynamicCommands.register(dispatcher.getAllCommands()
-            .map(command -> {
-                String[] permissionsArray = command.getCondition()
-                    .as(PermissionCondition.class)
-                    .map(PermissionCondition::getPermissions)
-                    .map(s -> s.toArray(new String[0]))
-                    .orElseGet(() -> new String[0]);
+                .map(command -> {
+                    String[] permissionsArray = command.getCondition()
+                            .as(PermissionCondition.class)
+                            .map(PermissionCondition::getPermissions)
+                            .map(s -> s.toArray(new String[0]))
+                            .orElseGet(() -> new String[0]);
 
-                String[] aliases = Stream.concat(
-                    Stream.of(command.getName()),
-                    command.getAliases().stream()
-                ).toArray(String[]::new);
-                // TODO Handle localisation correctly
-                return new CommandInfo(reduceToText(command.getUsage(), WorldEdit.getInstance().getConfiguration().defaultLocale),
-                    reduceToText(command.getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale), aliases,
-                    inspector, permissionsArray);
-            }).collect(Collectors.toList()));
+                    String[] aliases = Stream.concat(
+                            Stream.of(command.getName()),
+                            command.getAliases().stream()
+                    ).toArray(String[]::new);
+                    // TODO Handle localisation correctly
+                    return new CommandInfo(
+                            reduceToText(
+                                    command.getUsage(),
+                                    WorldEdit.getInstance().getConfiguration().defaultLocale
+                            ),
+                            reduceToText(command.getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale),
+                            aliases,
+                            inspector,
+                            permissionsArray
+                    );
+                }).collect(Collectors.toList()));
     }
 
     @Override
@@ -264,7 +270,8 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     //FAWE start
     @Override
-    public @Nonnull RelighterFactory getRelighterFactory() {
+    public @Nonnull
+    RelighterFactory getRelighterFactory() {
         if (this.relighterFactory == null) {
             this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
             LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");

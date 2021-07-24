@@ -19,13 +19,13 @@
 
 package com.sk89q.worldedit.world.item;
 
+import com.fastasyncworldedit.core.registry.RegistryItem;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.fastasyncworldedit.core.registry.RegistryItem;
 import com.sk89q.worldedit.util.GuavaUtil;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -45,19 +45,19 @@ public class ItemType implements RegistryItem, Keyed {
     @SuppressWarnings("deprecation")
     private final LazyReference<String> name = LazyReference.from(() -> {
         String name = GuavaUtil.firstNonNull(
-            WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
-                .getRegistries().getItemRegistry().getName(this),
-            ""
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+                        .getRegistries().getItemRegistry().getName(this),
+                ""
         );
         return name.isEmpty() ? getId() : name;
     });
     private final LazyReference<Component> richName = LazyReference.from(() ->
-        WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
-            .getRegistries().getItemRegistry().getRichName(this)
+            WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+                    .getRegistries().getItemRegistry().getRichName(this)
     );
     private final LazyReference<ItemMaterial> itemMaterial = LazyReference.from(() ->
-        WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
-            .getRegistries().getItemRegistry().getMaterial(this)
+            WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
+                    .getRegistries().getItemRegistry().getMaterial(this)
     );
     //FAWE start
     private BlockType blockType;
@@ -163,4 +163,5 @@ public class ItemType implements RegistryItem, Keyed {
     public boolean equals(Object obj) {
         return obj instanceof ItemType && this.id.equals(((ItemType) obj).id);
     }
+
 }

@@ -34,6 +34,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
+
     private static final String MINECRAFT_NAMESPACE = "minecraft";
     private final Set<String> knownNamespaces = new HashSet<>();
     private final String defaultNamespace;

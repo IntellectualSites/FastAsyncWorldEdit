@@ -9,6 +9,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import javax.annotation.Nullable;
 
 public class InverseMask extends AbstractMask {
+
     private final Mask mask;
 
     public InverseMask(Mask other) {
@@ -45,4 +46,5 @@ public class InverseMask extends AbstractMask {
     public boolean replacesAir() {
         return mask.replacesAir();
     }
+
 }

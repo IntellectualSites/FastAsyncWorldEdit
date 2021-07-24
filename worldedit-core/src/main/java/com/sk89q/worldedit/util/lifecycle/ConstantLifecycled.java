@@ -27,6 +27,7 @@ import java.util.function.BiConsumer;
  * A {@link Lifecycled} that never invalidates.
  */
 public final class ConstantLifecycled<T> implements Lifecycled<T> {
+
     private final T value;
 
     public ConstantLifecycled(T value) {
@@ -52,4 +53,5 @@ public final class ConstantLifecycled<T> implements Lifecycled<T> {
             }
         };
     }
+
 }

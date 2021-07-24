@@ -3,6 +3,8 @@ package com.fastasyncworldedit.core.function.mask;
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.math.FastBitSet;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.registry.state.PropertyKeySet;
 import com.fastasyncworldedit.core.util.MutableCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -10,8 +12,6 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
-import com.fastasyncworldedit.core.registry.state.PropertyKeySet;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -34,6 +34,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class BlockMaskBuilder {
+
     private static final Operator GREATER = (a, b) -> a > b;
     private static final Operator LESS = (a, b) -> a < b;
     private static final Operator EQUAL = (a, b) -> a == b;
@@ -45,7 +46,9 @@ public class BlockMaskBuilder {
     private static final long[] ALL = new long[0];
 
     private interface Operator {
+
         boolean test(int left, int right);
+
     }
 
     private boolean filterRegex(BlockType blockType, PropertyKey key, String regex) {
@@ -159,7 +162,11 @@ public class BlockMaskBuilder {
                             suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
                         }
                         if (operator == null) {
-                            throw new SuggestInputParseException("No operator for " + input, "", () -> Arrays.asList("=", "~", "!", "<", ">", "<=", ">="));
+                            throw new SuggestInputParseException(
+                                    "No operator for " + input,
+                                    "",
+                                    () -> Arrays.asList("=", "~", "!", "<", ">", "<=", ">=")
+                            );
                         }
                         boolean filtered = false;
                         if (type != null) {
@@ -225,7 +232,11 @@ public class BlockMaskBuilder {
                         if (charSequence.length() > 0 || key == null) {
                             key = PropertyKey.getByName(charSequence);
                             if (key == null) {
-                                suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
+                                suggest(
+                                        input,
+                                        charSequence.toString(),
+                                        type != null ? Collections.singleton(type) : blockTypeList
+                                );
                             }
                         }
                         last = i + 1;
@@ -272,7 +283,7 @@ public class BlockMaskBuilder {
 
     ///// end internal /////
 
-    private long[][] bitSets;
+    private final long[][] bitSets;
     private boolean[] ordinals;
 
     private boolean optimizedStates = true;
@@ -370,7 +381,10 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public <T> BlockMaskBuilder filter(Predicate<BlockType> typePredicate, BiPredicate<BlockType, Map.Entry<Property<T>, T>> allowed) {
+    public <T> BlockMaskBuilder filter(
+            Predicate<BlockType> typePredicate,
+            BiPredicate<BlockType, Map.Entry<Property<T>, T>> allowed
+    ) {
         for (int i = 0; i < bitSets.length; i++) {
             long[] states = bitSets[i];
             if (states == null) {
@@ -460,7 +474,10 @@ public class BlockMaskBuilder {
         return this;
     }
 
-    public BlockMaskBuilder addAll(Predicate<BlockType> typePredicate, BiPredicate<BlockType, Map.Entry<Property<?>, ?>> propPredicate) {
+    public BlockMaskBuilder addAll(
+            Predicate<BlockType> typePredicate,
+            BiPredicate<BlockType, Map.Entry<Property<?>, ?>> propPredicate
+    ) {
         for (int i = 0; i < bitSets.length; i++) {
             long[] states = bitSets[i];
             if (states == ALL) {
@@ -638,4 +655,5 @@ public class BlockMaskBuilder {
     public BlockMask build(Extent extent) {
         return new BlockMask(extent, getOrdinals());
     }
+
 }

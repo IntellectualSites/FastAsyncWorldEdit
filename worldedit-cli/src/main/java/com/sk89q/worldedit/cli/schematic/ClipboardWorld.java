@@ -49,13 +49,13 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld {
 
@@ -97,13 +97,15 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws
+            WorldEditException {
         dirty = true;
         return clipboard.setBlock(position, block);
     }
 
     @Override
-    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) throws WorldEditException {
+    public Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) throws
+            WorldEditException {
         return ImmutableSet.of();
     }
 
@@ -251,4 +253,5 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
     }
+
 }

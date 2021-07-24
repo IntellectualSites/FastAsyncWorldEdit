@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.function.mask.SplatterBrushMask;
-import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.function.mask.SurfaceMask;
+import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -14,6 +14,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import java.util.Arrays;
 
 public class SplatterBrush extends ScatterBrush {
+
     private final boolean solid;
     private final int recursion;
 
@@ -24,7 +25,13 @@ public class SplatterBrush extends ScatterBrush {
     }
 
     @Override
-    public void apply(final EditSession editSession, final LocalBlockVectorSet placed, final BlockVector3 position, Pattern p, double size) throws MaxChangedBlocksException {
+    public void apply(
+            final EditSession editSession,
+            final LocalBlockVectorSet placed,
+            final BlockVector3 position,
+            Pattern p,
+            double size
+    ) throws MaxChangedBlocksException {
         final Pattern finalPattern;
         if (solid) {
             finalPattern = p.applyBlock(position);
@@ -35,10 +42,12 @@ public class SplatterBrush extends ScatterBrush {
         SurfaceMask surface = new SurfaceMask(editSession);
 
         RecursiveVisitor visitor = new RecursiveVisitor(new SplatterBrushMask(editSession, position, size2, surface, placed),
-            vector -> editSession.setBlock(vector, finalPattern), recursion);
+                vector -> editSession.setBlock(vector, finalPattern), recursion
+        );
         visitor.setMaxBranch(2);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(position);
         Operations.completeBlindly(visitor);
     }
+
 }

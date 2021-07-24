@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.util.collection;
 
 import javax.annotation.Nonnull;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -9,6 +8,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
+
     private final Map<K2, V2> parent;
     private final Function<V2, V> value2;
     private final Function<K2, K> key2;
@@ -17,7 +17,9 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
 
     private static final Function SAME = o -> o;
 
-    private static final Function IMMUTABLE = o -> { throw new UnsupportedOperationException("Immutable"); };
+    private static final Function IMMUTABLE = o -> {
+        throw new UnsupportedOperationException("Immutable");
+    };
 
     public static <K, K2, V> AdaptedMap<K, V, K2, V> keys(Map<K2, V> parent, Function<K, K2> key, Function<K2, K> key2) {
         return new AdaptedMap<K, V, K2, V>(parent, key, key2, SAME, SAME);
@@ -27,11 +29,21 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
         return new AdaptedMap<K, V, K, V2>(parent, SAME, SAME, value, value2);
     }
 
-    public static <K, K2, V, V2> AdaptedMap<K, V, K2, V2> immutable(Map<K2, V2> parent, Function<K2, K> key, Function<V2, V> value) {
+    public static <K, K2, V, V2> AdaptedMap<K, V, K2, V2> immutable(
+            Map<K2, V2> parent,
+            Function<K2, K> key,
+            Function<V2, V> value
+    ) {
         return new AdaptedMap<K, V, K2, V2>(parent, IMMUTABLE, key, IMMUTABLE, value);
     }
 
-    public AdaptedMap(Map<K2, V2> parent, Function<K, K2> key, Function<K2, K> key2, Function<V, V2> value, Function<V2, V> value2) {
+    public AdaptedMap(
+            Map<K2, V2> parent,
+            Function<K, K2> key,
+            Function<K2, K> key2,
+            Function<V, V2> value,
+            Function<V2, V> value2
+    ) {
         this.parent = parent;
         this.key = key;
         this.value = value;
@@ -70,17 +82,22 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
         if (isEmpty()) {
             return Collections.emptySet();
         }
-        return new AdaptedSetCollection<>(getParent().entrySet(), new com.google.common.base.Function<Entry<K2, V2>, Entry<K, V>>() {
-            private final AdaptedPair entry = new AdaptedPair();
-            @Override
-            public Entry<K, V> apply(@javax.annotation.Nullable Entry<K2, V2> input) {
-                entry.input = input;
-                return entry;
-            }
-        });
+        return new AdaptedSetCollection<>(
+                getParent().entrySet(),
+                new com.google.common.base.Function<Entry<K2, V2>, Entry<K, V>>() {
+                    private final AdaptedPair entry = new AdaptedPair();
+
+                    @Override
+                    public Entry<K, V> apply(@javax.annotation.Nullable Entry<K2, V2> input) {
+                        entry.input = input;
+                        return entry;
+                    }
+                }
+        );
     }
 
     public class AdaptedPair implements Entry<K, V> {
+
         private Entry<K2, V2> input;
 
         @Override
@@ -110,5 +127,7 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
         public int hashCode() {
             return 1337;
         }
+
     }
+
 }

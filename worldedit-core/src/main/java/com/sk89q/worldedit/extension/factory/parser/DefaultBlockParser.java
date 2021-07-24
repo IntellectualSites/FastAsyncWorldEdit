@@ -20,10 +20,12 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
 import com.fastasyncworldedit.core.jnbt.JSON2NBT;
 import com.fastasyncworldedit.core.jnbt.NBTException;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -43,7 +45,6 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
-import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -57,7 +58,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.FuzzyBlockState;
-import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
@@ -171,7 +171,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
     }
 
-    private static Map<Property<?>, Object> parseProperties(BlockType type, String[] stateProperties, ParserContext context) throws NoMatchException {
+    private static Map<Property<?>, Object> parseProperties(
+            BlockType type,
+            String[] stateProperties,
+            ParserContext context
+    ) throws NoMatchException {
         Map<Property<?>, Object> blockStates = new HashMap<>();
 
         if (stateProperties.length > 0) { // Block data not yet detected
@@ -181,8 +185,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     String[] parts = parseableData.split("=");
                     if (parts.length != 2) {
                         throw new InputParseException(
-                                Caption.of("worldedit.error.parser.bad-state-format",
-                                        TextComponent.of(parseableData))
+                                Caption.of(
+                                        "worldedit.error.parser.bad-state-format",
+                                        TextComponent.of(parseableData)
+                                )
                         );
                     }
 
@@ -302,7 +308,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             } else {
                 typeString = blockAndExtraData[0].substring(0, stateStart);
                 if (stateStart + 1 >= blockAndExtraData[0].length()) {
-                    throw new InputParseException(Caption.of("worldedit.error.parser.hanging-lbracket", TextComponent.of(stateStart)));
+                    throw new InputParseException(Caption.of(
+                            "worldedit.error.parser.hanging-lbracket",
+                            TextComponent.of(stateStart)
+                    ));
                 }
                 int stateEnd = blockAndExtraData[0].lastIndexOf(']');
                 if (stateEnd < 0) {
@@ -477,7 +486,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
-                throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(String.valueOf(holder))));
+                throw new DisallowedUsageException(Caption.of(
+                        "worldedit.error.disallowed-block",
+                        TextComponent.of(String.valueOf(holder))
+                ));
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {

@@ -18,8 +18,10 @@ public interface Filter {
      * @param chunkZ the z coordinate in the chunk
      * @return
      */
-    default boolean appliesChunk(@Range(from = 0, to = 15) int chunkX,
-        @Range(from = 0, to = 15) int chunkZ) {
+    default boolean appliesChunk(
+            @Range(from = 0, to = 15) int chunkX,
+            @Range(from = 0, to = 15) int chunkZ
+    ) {
         return true;
     }
 
@@ -68,4 +70,5 @@ public interface Filter {
     default void join() {
 
     }
+
 }

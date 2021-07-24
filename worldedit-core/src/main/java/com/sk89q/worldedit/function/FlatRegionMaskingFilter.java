@@ -38,7 +38,7 @@ public class FlatRegionMaskingFilter implements FlatRegionFunction {
     /**
      * Create a new masking filter.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the delegate function to call
      */
     public FlatRegionMaskingFilter(Mask2D mask, FlatRegionFunction function) {

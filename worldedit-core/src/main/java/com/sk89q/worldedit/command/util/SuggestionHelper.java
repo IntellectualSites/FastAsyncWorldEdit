@@ -46,6 +46,7 @@ import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
  * Internal class for generating common command suggestions.
  */
 public final class SuggestionHelper {
+
     private SuggestionHelper() {
     }
 
@@ -55,13 +56,17 @@ public final class SuggestionHelper {
         }
         if (tag.startsWith("##")) {
             if (tag.equals("##")) {
-                return Stream.concat(allowRandom ? Stream.of("##*") : Stream.empty(),
-                        getNamespacedRegistrySuggestions(BlockCategory.REGISTRY, tag.substring(2)).map(s -> "##" + s));
+                return Stream.concat(
+                        allowRandom ? Stream.of("##*") : Stream.empty(),
+                        getNamespacedRegistrySuggestions(BlockCategory.REGISTRY, tag.substring(2)).map(s -> "##" + s)
+                );
             } else if (tag.equals("##*") && allowRandom) {
                 return getNamespacedRegistrySuggestions(BlockCategory.REGISTRY, tag.substring(3)).map(s -> "##*" + s);
             } else {
                 boolean wild = tag.startsWith("##*") && allowRandom;
-                return getNamespacedRegistrySuggestions(BlockCategory.REGISTRY, tag.substring(wild ? 3 : 2)).map(s -> (wild ? "##*" : "##") + s);
+                return getNamespacedRegistrySuggestions(BlockCategory.REGISTRY, tag.substring(wild ? 3 : 2)).map(s -> (wild
+                        ? "##*"
+                        : "##") + s);
             }
         }
         return Stream.empty();
@@ -97,7 +102,7 @@ public final class SuggestionHelper {
                                     lastValidInput + prop + "=");
                         case 1:
                             return matchingProps.get(0).getValues().stream().map(val ->
-                                    lastValidInput +  matchingProps.get(0).getName() + "="
+                                    lastValidInput + matchingProps.get(0).getName() + "="
                                             + val.toString().toLowerCase(Locale.ROOT));
                         default:
                             return matchingProps.stream().map(p -> lastValidInput + p.getName() + "=");
@@ -107,9 +112,13 @@ public final class SuggestionHelper {
                     if (prop == null) {
                         return propertyMap.keySet().stream().map(p -> lastValidInput + p);
                     }
-                    final List<String> values = prop.getValues().stream().map(v -> v.toString().toLowerCase(Locale.ROOT)).collect(Collectors.toList());
+                    final List<String> values = prop.getValues().stream().map(v -> v.toString().toLowerCase(Locale.ROOT)).collect(
+                            Collectors.toList());
                     String matchVal = propVal[1].toLowerCase(Locale.ROOT);
-                    List<String> matchingVals = values.stream().filter(val -> val.startsWith(matchVal)).collect(Collectors.toList());
+                    List<String> matchingVals = values
+                            .stream()
+                            .filter(val -> val.startsWith(matchVal))
+                            .collect(Collectors.toList());
                     if (matchingVals.isEmpty()) {
                         return values.stream().map(val -> lastValidInput + prop.getName() + "=" + val);
                     } else {
@@ -150,7 +159,10 @@ public final class SuggestionHelper {
         return limitByPrefix(registry.keySet().stream(), input).stream();
     }
 
-    public static <V extends Keyed> Stream<String> getNamespacedRegistrySuggestions(NamespacedRegistry<V> registry, String input) {
+    public static <V extends Keyed> Stream<String> getNamespacedRegistrySuggestions(
+            NamespacedRegistry<V> registry,
+            String input
+    ) {
         if (input.isEmpty() || input.equals(":")) {
             final Set<String> namespaces = registry.getKnownNamespaces();
             if (namespaces.size() == 1) {
@@ -171,8 +183,10 @@ public final class SuggestionHelper {
             final String lowerSearch = input.toLowerCase(Locale.ROOT);
             String defKey = registry.getDefaultNamespace() + ":" + lowerSearch;
             int defLength = registry.getDefaultNamespace().length() + 1;
-            return Stream.concat(registry.keySet().stream().filter(s -> s.startsWith(defKey)).map(s -> s.substring(defLength)),
-                    registry.getKnownNamespaces().stream().filter(n -> n.startsWith(lowerSearch)).map(n -> n + ":"));
+            return Stream.concat(
+                    registry.keySet().stream().filter(s -> s.startsWith(defKey)).map(s -> s.substring(defLength)),
+                    registry.getKnownNamespaces().stream().filter(n -> n.startsWith(lowerSearch)).map(n -> n + ":")
+            );
         }
         // have a namespace - search that
         Predicate<String> search = byPrefix(input.toLowerCase(Locale.ROOT));
@@ -180,6 +194,7 @@ public final class SuggestionHelper {
     }
 
     //FAWE start
+
     /**
      * Returns a stream of suggestions for positive doubles.
      *

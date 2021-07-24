@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ExistingPatternParser extends SimpleInputParser<Pattern> {
+
     private final List<String> aliases = Collections.singletonList("#existing");
 
     public ExistingPatternParser(WorldEdit worldEdit) {
@@ -26,4 +27,5 @@ public class ExistingPatternParser extends SimpleInputParser<Pattern> {
     public Pattern parseFromSimpleInput(String input, ParserContext context) throws InputParseException {
         return new ExistingPattern(context.requireExtent());
     }
+
 }

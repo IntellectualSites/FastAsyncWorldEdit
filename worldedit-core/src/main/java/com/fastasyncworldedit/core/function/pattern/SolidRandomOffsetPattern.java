@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -14,6 +14,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import java.util.SplittableRandom;
 
 public class SolidRandomOffsetPattern extends AbstractPattern {
+
     private final int dx;
     private final int dy;
     private final int dz;
@@ -23,7 +24,7 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     private final int dy2;
     private final int dz2;
     private final MutableBlockVector3 mutable;
-    private SplittableRandom r;
+    private final SplittableRandom r;
 
     public static boolean[] getTypes() {
         boolean[] types = new boolean[BlockTypes.size()];
@@ -69,4 +70,5 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         }
         return pattern.apply(extent, get, set);
     }
+
 }

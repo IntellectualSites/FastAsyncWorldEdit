@@ -40,14 +40,19 @@ public class OperationFactoryBrush implements Brush {
         this(operationFactory, regionFactory, null);
     }
 
-    public OperationFactoryBrush(Contextual<? extends Operation> operationFactory, RegionFactory regionFactory, LocalSession session) {
+    public OperationFactoryBrush(
+            Contextual<? extends Operation> operationFactory,
+            RegionFactory regionFactory,
+            LocalSession session
+    ) {
         this.operationFactory = operationFactory;
         this.regionFactory = regionFactory;
         this.session = session;
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         EditContext context = new EditContext();
         context.setDestination(editSession);
         context.setRegion(regionFactory.createCenteredAt(position, size));

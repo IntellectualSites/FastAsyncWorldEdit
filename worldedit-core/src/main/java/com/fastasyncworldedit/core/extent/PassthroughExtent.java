@@ -1,5 +1,7 @@
 package com.fastasyncworldedit.core.extent;
 
+import com.fastasyncworldedit.core.function.generator.GenBase;
+import com.fastasyncworldedit.core.function.generator.Resource;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -7,8 +9,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.fastasyncworldedit.core.function.generator.GenBase;
-import com.fastasyncworldedit.core.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -22,9 +22,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 public class PassthroughExtent extends AbstractDelegateExtent {
 
@@ -78,7 +78,16 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
+    public int getNearestSurfaceTerrainBlock(
+            int x,
+            int z,
+            int y,
+            int minY,
+            int maxY,
+            int failedMin,
+            int failedMax,
+            boolean ignoreAir
+    ) {
         return getExtent().getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
     }
 
@@ -93,7 +102,8 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws
+            WorldEditException {
         getExtent().addSchems(region, mask, clipboards, rarity, rotate);
     }
 
@@ -108,7 +118,8 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws
+            WorldEditException {
         getExtent().addOre(region, mask, material, size, frequency, rarity, minY, maxY);
     }
 
@@ -153,7 +164,8 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws
+            MaxChangedBlocksException {
         return getExtent().replaceBlocks(region, filter, replacement);
     }
 
@@ -243,4 +255,5 @@ public class PassthroughExtent extends AbstractDelegateExtent {
     public <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {
         return getExtent().apply(positions, filter);
     }
+
 }

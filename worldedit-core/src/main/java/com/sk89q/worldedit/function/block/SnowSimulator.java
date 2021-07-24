@@ -39,7 +39,8 @@ public class SnowSimulator implements LayerFunction {
     private static final EnumProperty slab = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_SLAB.getProperty("type");
     private static final EnumProperty stair = (EnumProperty) (Property<?>) BlockTypes.SANDSTONE_STAIRS.getProperty("half");
     private static final EnumProperty trapdoor = (EnumProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty("half");
-    private static final BooleanProperty trapdoorOpen = (BooleanProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty("open");
+    private static final BooleanProperty trapdoorOpen = (BooleanProperty) (Property<?>) BlockTypes.ACACIA_TRAPDOOR.getProperty(
+            "open");
     //FAWE end
 
     private final BlockState ice = BlockTypes.ICE.getDefaultState();
@@ -115,14 +116,15 @@ public class SnowSimulator implements LayerFunction {
         if (!above.getBlockType().getMaterial().isAir() && (!stack || above.getBlockType() != BlockTypes.SNOW)) {
             return false;
             //FAWE start
-        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmittedLight(abovePosition) > 10) {
+        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && this.extent.getEmittedLight(
+                abovePosition) > 10) {
             return false;
         } else if (!block.getBlockType().getMaterial().isFullCube()) {
             Map<Property<?>, Object> states = block.getStates();
             if (states.containsKey(slab) && block.getState(slab).equalsIgnoreCase("bottom")) {
                 return false;
             } else if (states.containsKey(trapdoorOpen) && states.containsKey(trapdoor) && (block.getState(trapdoorOpen)
-                || block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
+                    || block.getState(trapdoor).equalsIgnoreCase("bottom"))) {
                 return false;
             } else if (states.containsKey(stair) && block.getState(stair).equalsIgnoreCase("bottom")) {
                 return false;
@@ -130,7 +132,10 @@ public class SnowSimulator implements LayerFunction {
                 return false;
             }
             //FAWE end
-        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && block.getBlockType().getMaterial().isTranslucent()) {
+        } else if (!block.getBlockType().getId().toLowerCase(Locale.ROOT).contains("ice") && block
+                .getBlockType()
+                .getMaterial()
+                .isTranslucent()) {
             return false;
         }
 
@@ -162,4 +167,5 @@ public class SnowSimulator implements LayerFunction {
         }
         return false;
     }
+
 }

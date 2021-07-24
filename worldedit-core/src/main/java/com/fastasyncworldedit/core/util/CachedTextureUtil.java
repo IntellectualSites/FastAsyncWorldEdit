@@ -6,6 +6,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import java.io.FileNotFoundException;
 
 public class CachedTextureUtil extends DelegateTextureUtil {
+
     private final TextureUtil parent;
     private final transient Int2ObjectOpenHashMap<BlockType> colorBlockMap;
     private final transient Int2ObjectOpenHashMap<Integer> colorBiomeMap;
@@ -57,4 +58,5 @@ public class CachedTextureUtil extends DelegateTextureUtil {
         }
         return result;
     }
+
 }

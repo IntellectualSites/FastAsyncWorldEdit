@@ -14,4 +14,5 @@ public class BufferedPattern2D extends BufferedPattern {
     public boolean set(BlockVector3 pos) {
         return set.add(pos.getBlockX(), 0, pos.getBlockY());
     }
+
 }

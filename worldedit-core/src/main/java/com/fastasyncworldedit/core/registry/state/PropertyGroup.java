@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Function;
 
 public class PropertyGroup<G, A> {
+
     public static final PropertyGroup<Integer, Integer> LEVEL = new PropertyGroupBuilder<Integer, Integer>()
             .add(PropertyKey.LEVEL)
             .add(PropertyKey.LAYERS, (Function<Integer, Integer>) o -> o << 1, (Function<Integer, Integer>) o -> o >> 1)
@@ -19,6 +20,7 @@ public class PropertyGroup<G, A> {
 
 
     private static class PropertyFunction<G, A> {
+
         private final Function<A, A> setFunc;
         private final Function<G, G> getFunc;
         private final Property key;
@@ -28,9 +30,11 @@ public class PropertyGroup<G, A> {
             this.getFunc = getProcessor;
             this.setFunc = setProcessor;
         }
+
     }
 
     public static class PropertyGroupBuilder<G, A> {
+
         private final List<Object[]> funcs = new ArrayList<>();
         private G defaultValue;
 
@@ -72,10 +76,12 @@ public class PropertyGroup<G, A> {
             }
             return new PropertyGroup(states, defaultValue);
         }
+
     }
 
     private final G defaultValue;
     private final PropertyFunction[] states;
+
     private PropertyGroup(PropertyFunction[] states, G defaultValue) {
         this.states = states;
         this.defaultValue = defaultValue;
@@ -102,4 +108,5 @@ public class PropertyGroup<G, A> {
         }
         return state;
     }
+
 }

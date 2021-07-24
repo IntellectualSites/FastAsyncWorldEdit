@@ -7,6 +7,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import java.util.SplittableRandom;
 
 public class RandomMask extends AbstractMask implements ResettableMask {
+
     private transient SplittableRandom random;
     private final double threshold;
 
@@ -29,4 +30,5 @@ public class RandomMask extends AbstractMask implements ResettableMask {
     public Mask copy() {
         return new RandomMask(threshold);
     }
+
 }

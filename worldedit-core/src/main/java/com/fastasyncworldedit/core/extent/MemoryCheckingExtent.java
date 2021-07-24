@@ -21,8 +21,10 @@ public class MemoryCheckingExtent extends PassthroughExtent {
     public Extent getExtent() {
         if (MemUtil.isMemoryLimited()) {
             if (this.player != null) {
-                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason",
-                        Caption.of("fawe.cancel.worldedit.cancel.reason.low.memory")));
+                player.print(Caption.of(
+                        "fawe.cancel.worldedit.cancel.reason",
+                        Caption.of("fawe.cancel.worldedit.cancel.reason.low.memory")
+                ));
                 if (Permission.hasPermission(this.player, "worldedit.fast")) {
                     this.player.print(Caption.of("fawe.info.worldedit.oom.admin"));
                 }
@@ -31,4 +33,5 @@ public class MemoryCheckingExtent extends PassthroughExtent {
         }
         return super.getExtent();
     }
+
 }

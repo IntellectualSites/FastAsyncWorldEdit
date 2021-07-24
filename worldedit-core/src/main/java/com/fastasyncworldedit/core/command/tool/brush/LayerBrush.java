@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
-import com.fastasyncworldedit.core.function.mask.LayerBrushMask;
-import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.function.mask.AdjacentAnyMask;
+import com.fastasyncworldedit.core.function.mask.LayerBrushMask;
 import com.fastasyncworldedit.core.function.mask.RadiusMask;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -30,8 +30,13 @@ public class LayerBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern ignore, double size) throws MaxChangedBlocksException {
-        final AdjacentAnyMask adjacent = new AdjacentAnyMask(new BlockMask(editSession).add(BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR));
+    public void build(EditSession editSession, BlockVector3 position, Pattern ignore, double size) throws
+            MaxChangedBlocksException {
+        final AdjacentAnyMask adjacent = new AdjacentAnyMask(new BlockMask(editSession).add(
+                BlockTypes.AIR,
+                BlockTypes.CAVE_AIR,
+                BlockTypes.VOID_AIR
+        ));
         final SolidBlockMask solid = new SolidBlockMask(editSession);
         final RadiusMask radius = new RadiusMask(0, (int) size);
         visitor = new RecursiveVisitor(new MaskIntersection(adjacent, solid, radius), function -> true);

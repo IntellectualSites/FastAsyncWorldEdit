@@ -15,4 +15,5 @@ public class RidgedMultiFractalPatternParser extends NoisePatternParser {
     public RidgedMultiFractalPatternParser(WorldEdit worldEdit) {
         super(worldEdit, RIDGED_MULTI_FRACTAL_NAME, RidgedMultiFractalNoise::new);
     }
+
 }

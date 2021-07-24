@@ -1,8 +1,9 @@
 package com.fastasyncworldedit.core.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
+import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntArrayTag;
@@ -18,7 +19,6 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
-import com.fastasyncworldedit.core.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
@@ -101,7 +101,10 @@ public class FastSchematicWriter implements ClipboardWriter {
 
         final DataOutput rawStream = outputStream.getOutputStream();
         outputStream.writeLazyCompoundTag("Schematic", out -> {
-            out.writeNamedTag("DataVersion", WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion());
+            out.writeNamedTag(
+                    "DataVersion",
+                    WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion()
+            );
             out.writeNamedTag("Version", CURRENT_VERSION);
             out.writeNamedTag("Width", (short) width);
             out.writeNamedTag("Height", (short) height);
@@ -109,9 +112,9 @@ public class FastSchematicWriter implements ClipboardWriter {
 
             // The Sponge format Offset refers to the 'min' points location in the world. That's our 'Origin'
             out.writeNamedTag("Offset", new int[]{
-                min.getBlockX(),
-                min.getBlockY(),
-                min.getBlockZ(),
+                    min.getBlockX(),
+                    min.getBlockY(),
+                    min.getBlockZ(),
             });
 
             out.writeLazyCompoundTag("Metadata", out1 -> {
@@ -157,9 +160,9 @@ public class FastSchematicWriter implements ClipboardWriter {
                     // Dum.
                     values.remove("id");
                     values.put("Pos", new IntArrayTag(new int[]{
-                        pos.getX(),
-                        pos.getY(),
-                        pos.getZ()
+                            pos.getX(),
+                            pos.getY(),
+                            pos.getZ()
                     }));
                     numTiles++;
 
@@ -307,4 +310,5 @@ public class FastSchematicWriter implements ClipboardWriter {
     public void close() throws IOException {
         outputStream.close();
     }
+
 }

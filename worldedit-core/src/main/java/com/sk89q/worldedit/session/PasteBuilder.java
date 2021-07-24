@@ -56,7 +56,7 @@ public class PasteBuilder {
     /**
      * Create a new instance.
      *
-     * @param holder the clipboard holder
+     * @param holder       the clipboard holder
      * @param targetExtent an extent
      */
     PasteBuilder(ClipboardHolder holder, Extent targetExtent) {

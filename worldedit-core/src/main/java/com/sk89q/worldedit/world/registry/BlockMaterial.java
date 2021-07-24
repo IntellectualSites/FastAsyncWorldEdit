@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.jnbt.CompoundTag;
+
 import javax.annotation.Nullable;
 
 /**
@@ -163,8 +164,10 @@ public interface BlockMaterial {
     boolean hasContainer();
 
     //FAWE start
+
     /**
      * Get the opacity of the block.
+     *
      * @return opacity
      */
     int getLightOpacity();
@@ -186,6 +189,7 @@ public interface BlockMaterial {
 
     /**
      * Get the map color.
+     *
      * @return or 0
      */
     int getMapColor();

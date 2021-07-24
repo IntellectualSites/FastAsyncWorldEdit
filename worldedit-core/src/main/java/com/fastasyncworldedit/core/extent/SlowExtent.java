@@ -7,7 +7,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class SlowExtent extends AbstractDelegateExtent {
-    private long THRESHOLD = 50 * 1000000; // 1 tick
+
+    private final long THRESHOLD = 50 * 1000000; // 1 tick
     private final long nanos;
     private long increment;
 
@@ -36,4 +37,5 @@ public class SlowExtent extends AbstractDelegateExtent {
             increment -= wait * 1000000;
         }
     }
+
 }

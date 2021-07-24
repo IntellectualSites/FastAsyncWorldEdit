@@ -37,9 +37,10 @@ class VectorPositionList implements PositionList {
     @Override
     public BlockVector3 get(int index) {
         return BlockVector3.at(
-            delegateX.getInt(index),
-            delegateY.getInt(index),
-            delegateZ.getInt(index));
+                delegateX.getInt(index),
+                delegateY.getInt(index),
+                delegateZ.getInt(index)
+        );
     }
 
     @Override
@@ -75,9 +76,10 @@ class VectorPositionList implements PositionList {
                     return endOfData();
                 }
                 return BlockVector3.at(
-                    iteratorX.nextInt(),
-                    iteratorY.nextInt(),
-                    iteratorZ.nextInt());
+                        iteratorX.nextInt(),
+                        iteratorY.nextInt(),
+                        iteratorZ.nextInt()
+                );
             }
         };
     }
@@ -96,10 +98,12 @@ class VectorPositionList implements PositionList {
                     return endOfData();
                 }
                 return BlockVector3.at(
-                    iteratorX.previousInt(),
-                    iteratorY.previousInt(),
-                    iteratorZ.previousInt());
+                        iteratorX.previousInt(),
+                        iteratorY.previousInt(),
+                        iteratorZ.previousInt()
+                );
             }
         };
     }
+
 }

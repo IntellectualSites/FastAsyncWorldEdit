@@ -54,4 +54,5 @@ public abstract class AbstractPlatform implements Platform {
     public DataFixer getDataFixer() {
         return null;
     }
+
 }

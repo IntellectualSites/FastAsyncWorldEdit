@@ -8,6 +8,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import java.net.URI;
 
 public class ActorSaveClipboardEvent extends Event implements Cancellable {
+
     private final Actor actor;
     private final Clipboard clipboard;
     private final URI source;
@@ -46,4 +47,5 @@ public class ActorSaveClipboardEvent extends Event implements Cancellable {
     public Actor getActor() {
         return actor;
     }
+
 }

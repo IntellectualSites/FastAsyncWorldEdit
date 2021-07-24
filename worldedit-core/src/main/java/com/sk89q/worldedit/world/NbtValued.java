@@ -49,6 +49,7 @@ public interface NbtValued {
     }
 
     //FAWE start
+
     /**
      * Get the object's NBT data (tile entity data). The returned tag, if
      * modified in any way, should be sent to {@link #setNbtData(CompoundTag)}
@@ -89,12 +90,10 @@ public interface NbtValued {
      * </p>
      *
      * @return compound tag, or null
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "getNbtData",
-        delegateParams = { }
+            delegateName = "getNbtData",
+            delegateParams = {}
     )
     @Nullable
     default LazyReference<CompoundBinaryTag> getNbtReference() {
@@ -108,8 +107,6 @@ public interface NbtValued {
      * Get the object's NBT data (tile entity data).
      *
      * @return compound tag, or null
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @Nullable
     default CompoundBinaryTag getNbt() {
@@ -121,12 +118,10 @@ public interface NbtValued {
      * Set the object's NBT data (tile entity data).
      *
      * @param nbtData NBT data, or null if no data
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "setNbtData",
-        delegateParams = { CompoundTag.class }
+            delegateName = "setNbtData",
+            delegateParams = {CompoundTag.class}
     )
     default void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
         DeprecationUtil.checkDelegatingOverride(getClass());

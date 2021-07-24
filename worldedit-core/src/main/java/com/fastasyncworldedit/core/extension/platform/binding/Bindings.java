@@ -53,7 +53,7 @@ public class Bindings {
         // Get the key
         Class<?> ret = method.getReturnType();
         Key key;
-        if ( annotations.length == 1) {
+        if (annotations.length == 1) {
             key = Key.of(ret);
         } else if (annotations.length == 2) {
             Annotation annotation = annotations[0] == binding ? annotations[1] : annotations[0];
@@ -112,7 +112,12 @@ public class Bindings {
         return true;
     }
 
-    private Object invoke(String arg, Function<InjectedValueAccess, Object>[] argsFunc, InjectedValueAccess access, Method method) {
+    private Object invoke(
+            String arg,
+            Function<InjectedValueAccess, Object>[] argsFunc,
+            InjectedValueAccess access,
+            Method method
+    ) {
         try {
             Object[] args = new Object[argsFunc.length];
             for (int i = 0; i < argsFunc.length; i++) {
@@ -132,4 +137,5 @@ public class Bindings {
             return null;
         }
     }
+
 }

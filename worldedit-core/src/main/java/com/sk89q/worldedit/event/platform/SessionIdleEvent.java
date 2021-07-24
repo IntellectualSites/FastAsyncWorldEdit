@@ -28,6 +28,7 @@ import com.sk89q.worldedit.session.SessionKey;
  * <p>This can happen when a player leaves the server.</p>
  */
 public final class SessionIdleEvent extends Event {
+
     private final SessionKey key;
 
     public SessionIdleEvent(SessionKey key) {
@@ -42,4 +43,5 @@ public final class SessionIdleEvent extends Event {
     public SessionKey getKey() {
         return this.key;
     }
+
 }

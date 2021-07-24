@@ -16,6 +16,7 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class CachedBukkitAdapter implements IBukkitAdapter {
+
     private int[] itemTypes;
     private int[] blockTypes;
 
@@ -98,4 +99,5 @@ public abstract class CachedBukkitAdapter implements IBukkitAdapter {
             throw e;
         }
     }
+
 }

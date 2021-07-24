@@ -19,6 +19,7 @@ import static com.fastasyncworldedit.core.command.tool.brush.BrushSettings.Setti
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BrushSettings {
+
     public enum SettingType {
         BRUSH,
         SIZE,
@@ -41,7 +42,7 @@ public class BrushSettings {
     private ResettableExtent transform;
     private Pattern material;
     private Expression size = DEFAULT_SIZE;
-    private Set<String> permissions;
+    private final Set<String> permissions;
     private Scroll scrollAction;
 
     public BrushSettings() {
@@ -273,4 +274,5 @@ public class BrushSettings {
         name = brush.getClass().getName();
         return name.substring(name.lastIndexOf('.') + 1);
     }
+
 }

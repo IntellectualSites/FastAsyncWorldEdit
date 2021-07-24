@@ -37,12 +37,13 @@ public class DownwardVisitor extends RecursiveVisitor {
     private final int baseY;
 
     //FAWE start
+
     /**
      * Create a new visitor.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the function
-     * @param baseY the base Y
+     * @param baseY    the base Y
      */
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
         this(mask, function, baseY, Integer.MAX_VALUE);
@@ -56,11 +57,11 @@ public class DownwardVisitor extends RecursiveVisitor {
         this.baseY = baseY;
 
         setDirections(
-            BlockVector3.UNIT_X,
-            BlockVector3.UNIT_MINUS_X,
-            BlockVector3.UNIT_Z,
-            BlockVector3.UNIT_MINUS_Z,
-            BlockVector3.UNIT_MINUS_Y
+                BlockVector3.UNIT_X,
+                BlockVector3.UNIT_MINUS_X,
+                BlockVector3.UNIT_Z,
+                BlockVector3.UNIT_MINUS_Z,
+                BlockVector3.UNIT_MINUS_Y
         );
     }
 
@@ -69,4 +70,5 @@ public class DownwardVisitor extends RecursiveVisitor {
         int fromY = from.getBlockY();
         return (fromY == baseY || to.subtract(from).getBlockY() < 0) && super.isVisitable(from, to);
     }
+
 }

@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.extent;
 
+import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.object.FaweLimit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 
@@ -54,4 +54,5 @@ public class SingleRegionExtent extends FaweRegionExtent {
     public boolean processGet(int chunkX, int chunkZ) {
         return region.containsChunk(chunkX, chunkZ);
     }
+
 }

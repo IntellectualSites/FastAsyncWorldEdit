@@ -81,4 +81,5 @@ public class BiomeMaskParser extends InputParser<Mask> {
 
         return new BiomeMask(context.requireExtent(), biomes);
     }
+
 }

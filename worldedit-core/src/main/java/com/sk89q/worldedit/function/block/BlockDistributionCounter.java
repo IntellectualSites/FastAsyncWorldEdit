@@ -73,4 +73,5 @@ public class BlockDistributionCounter implements RegionFunction {
         Collections.reverse(distribution);
         return this.distribution;
     }
+
 }

@@ -114,7 +114,7 @@ public class LongHashSet {
     }
 
     public long popFirst() {
-        for (long[][] outer: this.values) {
+        for (long[][] outer : this.values) {
             if (outer == null) {
                 continue;
             }
@@ -149,7 +149,7 @@ public class LongHashSet {
                     continue;
                 }
 
-                for (long entry: inner) {
+                for (long entry : inner) {
                     ret[index++] = entry;
                 }
                 outer[oIdx] = null;

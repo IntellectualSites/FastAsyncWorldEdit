@@ -6,6 +6,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class IdDataMaskPattern extends AbstractExtentPattern {
+
     private final Pattern pattern;
     private final int bitMask;
 
@@ -23,4 +24,5 @@ public class IdDataMaskPattern extends AbstractExtentPattern {
         int newData = newBlock.getInternalPropertiesId() + oldData - (oldData & bitMask);
         return newBlock.withPropertyId(newData).toBaseBlock();
     }
+
 }

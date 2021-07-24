@@ -54,4 +54,5 @@ public class NoiseMaskParser extends InputParser<Mask> {
         int i = Integer.parseInt(input.substring(1));
         return new NoiseFilter(new RandomNoise(), ((double) i) / 100);
     }
+
 }

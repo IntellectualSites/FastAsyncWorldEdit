@@ -71,7 +71,10 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                 } else if (split.length == 1) {
                     itemType = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(split[0]));
                 } else {
-                    itemType = LegacyMapper.getInstance().getItemFromLegacy(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
+                    itemType = LegacyMapper.getInstance().getItemFromLegacy(
+                            Integer.parseInt(split[0]),
+                            Integer.parseInt(split[1])
+                    );
                 }
                 if (itemType != null) {
                     item = new BaseItem(itemType);
@@ -90,7 +93,10 @@ public class DefaultItemParser extends InputParser<BaseItem> {
             } else {
                 typeString = input.substring(0, nbtStart);
                 if (nbtStart + 1 >= input.length()) {
-                    throw new InputParseException(TranslatableComponent.of("worldedit.error.parser.hanging-lbracket", TextComponent.of(nbtStart)));
+                    throw new InputParseException(TranslatableComponent.of(
+                            "worldedit.error.parser.hanging-lbracket",
+                            TextComponent.of(nbtStart)
+                    ));
                 }
                 int stateEnd = input.lastIndexOf('}');
                 if (stateEnd < 0) {
@@ -132,9 +138,9 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                     }
                 } catch (IOException e) {
                     throw new NoMatchException(TranslatableComponent.of(
-                        "worldedit.error.invalid-nbt",
-                        TextComponent.of(input),
-                        TextComponent.of(e.getMessage())
+                            "worldedit.error.invalid-nbt",
+                            TextComponent.of(input),
+                            TextComponent.of(e.getMessage())
                     ));
                 }
             }

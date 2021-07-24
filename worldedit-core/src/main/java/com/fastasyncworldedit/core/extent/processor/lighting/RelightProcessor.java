@@ -1,14 +1,14 @@
 package com.fastasyncworldedit.core.extent.processor.lighting;
 
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.configuration.Settings;
 import com.sk89q.worldedit.extent.Extent;
-import javax.annotation.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -51,7 +51,8 @@ public class RelightProcessor implements IBatchProcessor {
     }
 
     @Override
-    public @Nullable Extent construct(Extent child) {
+    public @Nullable
+    Extent construct(Extent child) {
         throw new UnsupportedOperationException("Processing only");
     }
 
@@ -59,4 +60,5 @@ public class RelightProcessor implements IBatchProcessor {
     public ProcessorScope getScope() {
         return ProcessorScope.READING_SET_BLOCKS;
     }
+
 }

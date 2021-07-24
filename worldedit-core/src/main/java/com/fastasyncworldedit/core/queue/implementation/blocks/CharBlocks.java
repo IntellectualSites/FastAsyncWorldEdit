@@ -167,7 +167,8 @@ public abstract class CharBlocks implements IBlocks {
         return sections[layer].get(this, layer, index);
     }
 
-    public synchronized final void set(@Range(from = 0, to = 15) int layer, int index, char value) throws ArrayIndexOutOfBoundsException {
+    public synchronized final void set(@Range(from = 0, to = 15) int layer, int index, char value) throws
+            ArrayIndexOutOfBoundsException {
         sections[layer].set(this, layer, index, value);
     }
 
@@ -191,5 +192,7 @@ public abstract class CharBlocks implements IBlocks {
         public final void set(CharBlocks blocks, @Range(from = 0, to = 15) int layer, int index, char value) {
             get(blocks, layer)[index] = value;
         }
+
     }
+
 }

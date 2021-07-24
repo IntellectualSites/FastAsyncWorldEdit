@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.extent.filter;
 
-import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.extent.filter.block.DelegateFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
 
 /**
  * Filter which links two Filters together for single-filter-input operations.
@@ -30,7 +30,8 @@ public final class LinkedFilter<T extends Filter, S extends Filter> extends Dele
     }
 
     @Override
-    public LinkedFilter<LinkedFilter<T,S>, Filter> newInstance(Filter other) {
+    public LinkedFilter<LinkedFilter<T, S>, Filter> newInstance(Filter other) {
         return new LinkedFilter<>(this, other);
     }
+
 }

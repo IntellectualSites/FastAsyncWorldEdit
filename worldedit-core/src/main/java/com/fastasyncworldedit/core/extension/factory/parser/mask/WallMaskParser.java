@@ -29,6 +29,10 @@ public class WallMaskParser extends SimpleInputParser<Mask> {
 
     @Override
     public Mask parseFromSimpleInput(String input, ParserContext context) throws InputParseException {
-        return new MaskIntersection(new ExistingBlockMask(context.getExtent()), new WallMask(new BlockMask(context.getExtent(), BlockTypes.AIR.getDefaultState().toBaseBlock()), 1, 8));
+        return new MaskIntersection(
+                new ExistingBlockMask(context.getExtent()),
+                new WallMask(new BlockMask(context.getExtent(), BlockTypes.AIR.getDefaultState().toBaseBlock()), 1, 8)
+        );
     }
+
 }

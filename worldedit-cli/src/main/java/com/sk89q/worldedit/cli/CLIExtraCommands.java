@@ -33,6 +33,7 @@ import java.util.concurrent.ExecutionException;
 
 @CommandContainer
 public class CLIExtraCommands {
+
     @Command(
             name = "selectworld",
             desc = "Select the entire world"
@@ -59,4 +60,5 @@ public class CLIExtraCommands {
             }
         }
     }
+
 }

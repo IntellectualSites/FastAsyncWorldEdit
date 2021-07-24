@@ -27,12 +27,10 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NullWorld;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 import org.bukkit.entity.EntityType;
 
-import java.lang.ref.WeakReference;
-import java.util.Locale;
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -136,4 +134,5 @@ public class BukkitEntity implements Entity {
             return null;
         }
     }
+
 }

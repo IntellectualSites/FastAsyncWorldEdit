@@ -44,11 +44,13 @@ public class SystemInfoReport extends DataReport {
         append("Java", "%s %s (%s)",
                 System.getProperty("java.vendor"),
                 System.getProperty("java.version"),
-                System.getProperty("java.vendor.url"));
+                System.getProperty("java.vendor.url")
+        );
         append("Operating System", "%s %s (%s)",
                 System.getProperty("os.name"),
                 System.getProperty("os.version"),
-                System.getProperty("os.arch"));
+                System.getProperty("os.arch")
+        );
         append("Available Processors", runtime.availableProcessors());
         append("Free Memory", runtime.freeMemory() / 1024 / 1024 + " MB");
         append("Max Memory", runtime.maxMemory() / 1024 / 1024 + " MB");

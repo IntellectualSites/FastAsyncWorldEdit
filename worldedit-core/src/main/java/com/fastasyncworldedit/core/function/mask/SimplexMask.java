@@ -6,6 +6,7 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class SimplexMask extends AbstractMask {
+
     private final double min;
     private final double max;
     private final double scale;
@@ -27,4 +28,5 @@ public class SimplexMask extends AbstractMask {
         // The mask is not mutable. There is no need to clone it.
         return this;
     }
+
 }

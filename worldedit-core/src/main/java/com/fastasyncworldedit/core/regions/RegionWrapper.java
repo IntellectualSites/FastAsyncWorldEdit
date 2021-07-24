@@ -5,7 +5,13 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 
 @Deprecated
 public class RegionWrapper extends CuboidRegion {
-    private static final RegionWrapper GLOBAL = new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+    private static final RegionWrapper GLOBAL = new RegionWrapper(
+            Integer.MIN_VALUE,
+            Integer.MAX_VALUE,
+            Integer.MIN_VALUE,
+            Integer.MAX_VALUE
+    );
 
     public int minX;
     public int maxX;
@@ -134,4 +140,5 @@ public class RegionWrapper extends CuboidRegion {
     public boolean contains(RegionWrapper current) {
         return current.minX >= minX && current.maxX <= maxX && current.minZ >= minZ && current.maxZ <= maxZ;
     }
+
 }

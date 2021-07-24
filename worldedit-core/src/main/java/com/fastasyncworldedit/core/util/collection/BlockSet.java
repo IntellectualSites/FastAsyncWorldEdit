@@ -117,4 +117,5 @@ public abstract class BlockSet extends AbstractRegion {
     public void contract(BlockVector3... changes) throws RegionOperationException {
 
     }
+
 }

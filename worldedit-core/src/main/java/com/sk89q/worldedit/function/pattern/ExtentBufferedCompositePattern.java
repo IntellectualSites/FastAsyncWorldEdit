@@ -42,7 +42,7 @@ public class ExtentBufferedCompositePattern extends AbstractExtentPattern {
      * <p>Note that all patterns passed which are ExtentPatterns should use the same extent as the one
      * passed to this constructor, or block changes may not be realized by those patterns.</p>
      *
-     * @param extent the extent to buffer changes to
+     * @param extent   the extent to buffer changes to
      * @param patterns the patterns to apply, in order
      */
     public ExtentBufferedCompositePattern(Extent extent, Pattern... patterns) {
@@ -63,4 +63,5 @@ public class ExtentBufferedCompositePattern extends AbstractExtentPattern {
         }
         return lastBlock;
     }
+
 }

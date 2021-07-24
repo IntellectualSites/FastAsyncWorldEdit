@@ -29,6 +29,7 @@ import java.util.function.BiConsumer;
  * Convenience class for implementing the callbacks of {@link Lifecycled}.
  */
 public class LifecycledCallbackHandler<T> implements Lifecycled.Events<T> {
+
     private final Lifecycled<T> lifecycled;
     private final Lock lock = new ReentrantLock();
     private final Map<Object, BiConsumer<?, ? super Lifecycled<T>>> onInvalidatedCallbacks =
@@ -111,4 +112,5 @@ public class LifecycledCallbackHandler<T> implements Lifecycled.Events<T> {
             lock.unlock();
         }
     }
+
 }

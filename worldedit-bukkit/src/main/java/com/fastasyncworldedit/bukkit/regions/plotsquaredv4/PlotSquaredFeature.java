@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
 import com.fastasyncworldedit.core.FaweAPI;
-import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
 import com.github.intellectualsites.plotsquared.plot.commands.MainCommand;
@@ -97,11 +97,11 @@ public class PlotSquaredFeature extends FaweMaskManager {
         }
         UUID uid = player.getUniqueId();
         return !Flags.NO_WORLDEDIT.isTrue(plot) && (plot.isOwner(uid)
-            || type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted()
-            .contains(DBFunc.EVERYONE)
-            || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE))
-            && player.hasPermission("fawe.plotsquared.member")) || player
-            .hasPermission("fawe.plotsquared.admin"));
+                || type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted()
+                .contains(DBFunc.EVERYONE)
+                || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE))
+                && player.hasPermission("fawe.plotsquared.member")) || player
+                .hasPermission("fawe.plotsquared.admin"));
     }
 
     @Override
@@ -119,7 +119,9 @@ public class PlotSquaredFeature extends FaweMaskManager {
             regions = WEManager.getMask(pp);
             if (regions.size() == 1) {
                 CuboidRegion region = regions.iterator().next();
-                if (region.getMinimumPoint().getX() == Integer.MIN_VALUE && region.getMaximumPoint().getX() == Integer.MAX_VALUE) {
+                if (region.getMinimumPoint().getX() == Integer.MIN_VALUE && region
+                        .getMaximumPoint()
+                        .getX() == Integer.MAX_VALUE) {
                     regions.clear();
                 }
             }
@@ -132,7 +134,14 @@ public class PlotSquaredFeature extends FaweMaskManager {
         int max = area != null ? Math.min(255, area.MAX_BUILD_HEIGHT) : 255;
         final HashSet<RegionWrapper> faweRegions = new HashSet<>();
         for (CuboidRegion current : regions) {
-            faweRegions.add(new RegionWrapper(current.getMinimumX(), current.getMaximumX(), min, max, current.getMinimumZ(), current.getMaximumZ()));
+            faweRegions.add(new RegionWrapper(
+                    current.getMinimumX(),
+                    current.getMaximumX(),
+                    min,
+                    max,
+                    current.getMinimumZ(),
+                    current.getMaximumZ()
+            ));
         }
         final CuboidRegion region = regions.iterator().next();
         final BlockVector3 pos1 = BlockVector3.at(region.getMinimumX(), min, region.getMinimumZ());
@@ -148,8 +157,12 @@ public class PlotSquaredFeature extends FaweMaskManager {
         } else {
             World world = FaweAPI.getWorld(area.worldname);
             List<Region> weRegions = regions.stream()
-                .map(r -> new CuboidRegion(world, BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()), BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())))
-                .collect(Collectors.toList());
+                    .map(r -> new CuboidRegion(
+                            world,
+                            BlockVector3.at(r.getMinimumX(), r.getMinimumY(), r.getMinimumZ()),
+                            BlockVector3.at(r.getMaximumX(), r.getMaximumY(), r.getMaximumZ())
+                    ))
+                    .collect(Collectors.toList());
             maskedRegion = new RegionIntersection(world, weRegions);
         }
 
@@ -172,4 +185,5 @@ public class PlotSquaredFeature extends FaweMaskManager {
         }
         return null;
     }
+
 }

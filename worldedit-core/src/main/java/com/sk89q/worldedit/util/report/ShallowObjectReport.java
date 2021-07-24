@@ -57,4 +57,5 @@ public class ShallowObjectReport extends DataReport {
             }
         }
     }
+
 }

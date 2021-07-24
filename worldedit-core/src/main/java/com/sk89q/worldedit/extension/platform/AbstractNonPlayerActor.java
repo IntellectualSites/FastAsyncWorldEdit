@@ -21,8 +21,8 @@ package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
-import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 
@@ -66,8 +66,8 @@ public abstract class AbstractNonPlayerActor implements Actor {
     }
 
     // Queue for async tasks
-    private AtomicInteger runningCount = new AtomicInteger();
-    private AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue((thread, throwable) -> {
+    private final AtomicInteger runningCount = new AtomicInteger();
+    private final AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue((thread, throwable) -> {
         while (throwable.getCause() != null) {
             throwable = throwable.getCause();
         }
@@ -86,9 +86,9 @@ public abstract class AbstractNonPlayerActor implements Actor {
     /**
      * Run a task either async, or on the current thread.
      *
-     * @param ifFree the task to run if free
+     * @param ifFree    the task to run if free
      * @param checkFree Whether to first check if a task is running
-     * @param async TODO Description
+     * @param async     TODO Description
      * @return false if the task was ran or queued
      */
     @Override

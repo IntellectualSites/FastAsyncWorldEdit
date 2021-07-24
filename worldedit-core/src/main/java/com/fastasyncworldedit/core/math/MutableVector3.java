@@ -19,7 +19,7 @@ public class MutableVector3 extends Vector3 {
     }
 
     public MutableVector3(float x, float y, float z) {
-        this((double) x, (double) y, (double) z);
+        this(x, y, (double) z);
     }
 
     public MutableVector3(Vector3 other) {

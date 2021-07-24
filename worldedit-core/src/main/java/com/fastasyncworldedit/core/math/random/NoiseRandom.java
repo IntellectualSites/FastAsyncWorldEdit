@@ -31,4 +31,5 @@ public class NoiseRandom implements SimpleRandom {
         }
         return d;
     }
+
 }

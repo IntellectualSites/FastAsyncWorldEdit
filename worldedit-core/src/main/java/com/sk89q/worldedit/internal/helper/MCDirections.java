@@ -103,10 +103,14 @@ public final class MCDirections {
 
     public static int fromLegacyHanging(byte i) {
         switch (i) {
-            case 0: return 2;
-            case 1: return 1;
-            case 2: return 0;
-            default: return 3;
+            case 0:
+                return 2;
+            case 1:
+                return 1;
+            case 2:
+                return 0;
+            default:
+                return 3;
         }
     }
 

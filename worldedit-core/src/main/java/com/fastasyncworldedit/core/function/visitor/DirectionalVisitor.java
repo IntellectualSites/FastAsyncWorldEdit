@@ -30,12 +30,12 @@ public class DirectionalVisitor extends RecursiveVisitor {
         this.dirVec = direction;
 
         setDirections(
-            BlockVector3.at(1, 0, 0),
-            BlockVector3.at(-1, 0, 0),
-            BlockVector3.at(0, 0, 1),
-            BlockVector3.at(0, 0, -1),
-            BlockVector3.at(0, -1, 0),
-            BlockVector3.at(0, 1, 0)
+                BlockVector3.at(1, 0, 0),
+                BlockVector3.at(-1, 0, 0),
+                BlockVector3.at(0, 0, 1),
+                BlockVector3.at(0, 0, -1),
+                BlockVector3.at(0, -1, 0),
+                BlockVector3.at(0, 1, 0)
         );
     }
 
@@ -62,4 +62,5 @@ public class DirectionalVisitor extends RecursiveVisitor {
         }
         return super.isVisitable(from, to);
     }
+
 }

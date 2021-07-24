@@ -29,6 +29,7 @@ import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.serializer.plain.PlainComponentSerializer;
 import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
@@ -188,4 +189,5 @@ public class CLICommandSender implements Actor {
     public Map<String, Object> getRawMeta() {
         return null;
     }
+
 }

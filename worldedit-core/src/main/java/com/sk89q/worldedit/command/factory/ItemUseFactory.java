@@ -29,6 +29,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.World;
 
 public final class ItemUseFactory implements Contextual<RegionFunction> {
+
     private final BaseItem item;
     private final Direction dir;
 
@@ -51,4 +52,5 @@ public final class ItemUseFactory implements Contextual<RegionFunction> {
     public String toString() {
         return "application of the item " + item.getType();
     }
+
 }

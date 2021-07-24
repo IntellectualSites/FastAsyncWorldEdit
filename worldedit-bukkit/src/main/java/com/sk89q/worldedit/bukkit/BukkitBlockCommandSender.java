@@ -33,10 +33,8 @@ import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
-import javax.annotation.Nonnull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
@@ -192,11 +190,13 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
                     updateActive();
                 } else {
                     // we should update it eventually
-                    Bukkit.getScheduler().callSyncMethod(plugin,
+                    Bukkit.getScheduler().callSyncMethod(
+                            plugin,
                             () -> {
                                 updateActive();
                                 return null;
-                            });
+                            }
+                    );
                 }
                 return active;
             }
@@ -212,4 +212,5 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
             }
         };
     }
+
 }

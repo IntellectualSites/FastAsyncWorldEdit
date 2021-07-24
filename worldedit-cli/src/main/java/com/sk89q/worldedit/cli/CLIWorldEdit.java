@@ -301,7 +301,10 @@ public class CLIWorldEdit {
             String fileArg = cmd.getOptionValue('f');
             File file;
             if (fileArg == null) {
-                String[] formats = Arrays.copyOf(ClipboardFormats.getFileExtensionArray(), ClipboardFormats.getFileExtensionArray().length + 1);
+                String[] formats = Arrays.copyOf(
+                        ClipboardFormats.getFileExtensionArray(),
+                        ClipboardFormats.getFileExtensionArray().length + 1
+                );
                 formats[formats.length - 1] = "dat";
                 file = app.commandSender.openFileOpenDialog(formats);
             } else {
@@ -322,7 +325,8 @@ public class CLIWorldEdit {
                                 Files.newInputStream(file.toPath(), StandardOpenOption.READ)
                         )) {
                             dataVersion = dataVersionReader.getDataVersion()
-                                    .orElseThrow(() -> new IllegalArgumentException("Failed to obtain data version from schematic."));
+                                    .orElseThrow(() -> new IllegalArgumentException(
+                                            "Failed to obtain data version from schematic."));
                         }
                     } else {
                         dataVersion = Constants.DATA_VERSION_MC_1_13_2;
@@ -330,7 +334,10 @@ public class CLIWorldEdit {
                     app.platform.setDataVersion(dataVersion);
                     app.onStarted();
                     ClipboardWorld world;
-                    try (ClipboardReader clipboardReader = format.getReader(Files.newInputStream(file.toPath(), StandardOpenOption.READ))) {
+                    try (ClipboardReader clipboardReader = format.getReader(Files.newInputStream(
+                            file.toPath(),
+                            StandardOpenOption.READ
+                    ))) {
                         world = new ClipboardWorld(
                                 file,
                                 clipboardReader.read(),
@@ -372,4 +379,5 @@ public class CLIWorldEdit {
 
         System.exit(exitCode);
     }
+
 }

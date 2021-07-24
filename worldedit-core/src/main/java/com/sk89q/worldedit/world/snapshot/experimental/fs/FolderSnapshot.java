@@ -32,6 +32,7 @@ import com.sk89q.worldedit.world.storage.McRegionChunkStore;
 import com.sk89q.worldedit.world.storage.McRegionReader;
 import com.sk89q.worldedit.world.storage.MissingChunkException;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -40,7 +41,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -68,11 +68,11 @@ public class FolderSnapshot implements Snapshot {
         // Might be in a DIM* folder
         try (Stream<Path> paths = Files.list(folder)) {
             Optional<Path> path = paths
-                .filter(Files::isDirectory)
-                .filter(p -> p.getFileName().toString().startsWith("DIM"))
-                .map(p -> p.resolve("region"))
-                .filter(Files::isDirectory)
-                .findFirst();
+                    .filter(Files::isDirectory)
+                    .filter(p -> p.getFileName().toString().startsWith("DIM"))
+                    .map(p -> p.resolve("region"))
+                    .filter(Files::isDirectory)
+                    .findFirst();
             if (path.isPresent()) {
                 return path.get();
             }
@@ -80,12 +80,12 @@ public class FolderSnapshot implements Snapshot {
         // Might be its own region folder, check if the appropriate files exist
         try (Stream<Path> paths = Files.list(folder)) {
             if (paths
-                .filter(Files::isRegularFile)
-                .anyMatch(p -> {
-                    String fileName = p.getFileName().toString();
-                    return fileName.startsWith("r") &&
-                        (fileName.endsWith(".mca") || fileName.endsWith(".mcr"));
-                })) {
+                    .filter(Files::isRegularFile)
+                    .anyMatch(p -> {
+                        String fileName = p.getFileName().toString();
+                        return fileName.startsWith("r") &&
+                                (fileName.endsWith(".mca") || fileName.endsWith(".mcr"));
+                    })) {
                 return folder;
             }
         }
@@ -139,14 +139,14 @@ public class FolderSnapshot implements Snapshot {
                 throw new MissingChunkException();
             }
             return ChunkStoreHelper.readCompoundTag(() ->
-                new GZIPInputStream(Files.newInputStream(chunkFile))
+                    new GZIPInputStream(Files.newInputStream(chunkFile))
             );
         }
         Path regionFile = regFolder.get().resolve(McRegionChunkStore.getFilename(pos));
         if (!Files.exists(regionFile)) {
             // Try mcr as well
             regionFile = regionFile.resolveSibling(
-                regionFile.getFileName().toString().replace(".mca", ".mcr")
+                    regionFile.getFileName().toString().replace(".mca", ".mcr")
             );
             if (!Files.exists(regionFile)) {
                 throw new MissingChunkException();
@@ -164,4 +164,5 @@ public class FolderSnapshot implements Snapshot {
             closeCallback.close();
         }
     }
+
 }

@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.function.mask.IdMask;
 import com.fastasyncworldedit.core.function.visitor.DFSRecursiveVisitor;
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -14,7 +15,6 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.Node;
 
@@ -25,7 +25,7 @@ import java.util.List;
 public class SplineBrush implements Brush, ResettableTool {
 
     public static int MAX_POINTS = 15;
-    private ArrayList<ArrayList<BlockVector3>> positionSets;
+    private final ArrayList<ArrayList<BlockVector3>> positionSets;
     private int numSplines;
 
     private final Player player;
@@ -193,4 +193,5 @@ public class SplineBrush implements Brush, ResettableTool {
         }
         return dir.normalize();
     }
+
 }

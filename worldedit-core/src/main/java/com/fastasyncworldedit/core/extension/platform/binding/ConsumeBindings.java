@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Time;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
@@ -14,7 +15,6 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.annotation.Selection;
-import com.sk89q.worldedit.command.util.annotation.Time;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -31,6 +31,7 @@ import org.enginehub.piston.inject.InjectedValueAccess;
 import java.util.UUID;
 
 public class ConsumeBindings extends Bindings {
+
     private final PlatformCommandManager manager;
 
     public ConsumeBindings(WorldEdit worldEdit, PlatformCommandManager manager) {
@@ -158,4 +159,5 @@ public class ConsumeBindings extends Bindings {
             throw new InputParseException(Caption.of(e.getMessage()));
         }
     }
+
 }

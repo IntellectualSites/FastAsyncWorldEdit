@@ -7,6 +7,7 @@ package com.fastasyncworldedit.core.world.block;
  */
 @Deprecated(forRemoval = true)
 public class BlockID {
+
     public static final int __RESERVED__ = 0;
     public static final int AIR = 1;
     public static final int CAVE_AIR = 2;
@@ -690,4 +691,5 @@ public class BlockID {
     // Deprecated
     public static final int SIGN = OAK_SIGN;
     public static final int WALL_SIGN = OAK_WALL_SIGN;
+
 }

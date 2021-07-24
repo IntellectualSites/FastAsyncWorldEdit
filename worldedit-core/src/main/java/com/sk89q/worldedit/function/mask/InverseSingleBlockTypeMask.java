@@ -9,6 +9,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class InverseSingleBlockTypeMask extends ABlockMask {
+
     private final int internalId;
     private final boolean replacesAir;
 
@@ -42,4 +43,5 @@ public class InverseSingleBlockTypeMask extends ABlockMask {
     public boolean replacesAir() {
         return replacesAir;
     }
+
 }

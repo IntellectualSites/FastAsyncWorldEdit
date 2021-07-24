@@ -6,4 +6,5 @@ public interface ResettablePattern extends Resettable {
 
     @Override
     void reset();
+
 }

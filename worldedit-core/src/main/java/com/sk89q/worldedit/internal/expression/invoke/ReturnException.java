@@ -38,4 +38,5 @@ public class ReturnException extends RuntimeException {
     public Double getResult() {
         return result;
     }
+
 }

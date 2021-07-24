@@ -47,4 +47,5 @@ public class BiomeQuirkExtent extends AbstractDelegateExtent {
         }
         return super.setBiome(position, biome) || success;
     }
+
 }

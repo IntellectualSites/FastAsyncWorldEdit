@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.queue.implementation.blocks;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
-import com.fastasyncworldedit.core.queue.Pool;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.BlockVector3ChunkMap;
+import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.Pool;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -23,7 +23,12 @@ import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
-    private static final Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(CharSetBlocks.class, CharSetBlocks::new, Settings.IMP.QUEUE.POOL);
+
+    private static final Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(
+            CharSetBlocks.class,
+            CharSetBlocks::new,
+            Settings.IMP.QUEUE.POOL
+    );
 
     public static CharSetBlocks newInstance() {
         return POOL.poll();
@@ -109,7 +114,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return setBlock(position.getX(), position.getY(), position.getZ(), block);
     }
 
@@ -122,7 +127,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         return true;
     }
 
-    @Override public void setBlockLight(int x, int y, int z, int value) {
+    @Override
+    public void setBlockLight(int x, int y, int z, int value) {
         if (light == null) {
             light = new char[16][];
         }
@@ -136,7 +142,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         light[y >> 4][index] = (char) value;
     }
 
-    @Override public void setSkyLight(int x, int y, int z, int value) {
+    @Override
+    public void setSkyLight(int x, int y, int z, int value) {
         if (skyLight == null) {
             skyLight = new char[16][];
         }
@@ -150,36 +157,42 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         skyLight[y >> 4][index] = (char) value;
     }
 
-    @Override public void setHeightMap(HeightMapType type, int[] heightMap) {
+    @Override
+    public void setHeightMap(HeightMapType type, int[] heightMap) {
         if (heightMaps == null) {
             heightMaps = new HashMap<>();
         }
         heightMaps.put(type, heightMap);
     }
 
-    @Override public void setLightLayer(int layer, char[] toSet) {
+    @Override
+    public void setLightLayer(int layer, char[] toSet) {
         if (light == null) {
             light = new char[16][];
         }
         light[layer] = toSet;
     }
 
-    @Override public void setSkyLightLayer(int layer, char[] toSet) {
+    @Override
+    public void setSkyLightLayer(int layer, char[] toSet) {
         if (skyLight == null) {
             skyLight = new char[16][];
         }
         skyLight[layer] = toSet;
     }
 
-    @Override public char[][] getLight() {
+    @Override
+    public char[][] getLight() {
         return light;
     }
 
-    @Override public char[][] getSkyLight() {
+    @Override
+    public char[][] getSkyLight() {
         return skyLight;
     }
 
-    @Override public void removeSectionLighting(int layer, boolean sky) {
+    @Override
+    public void removeSectionLighting(int layer, boolean sky) {
         if (light == null) {
             light = new char[16][];
         }
@@ -198,7 +211,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         }
     }
 
-    @Override public void setFullBright(int layer) {
+    @Override
+    public void setFullBright(int layer) {
         if (light == null) {
             light = new char[16][];
         }
@@ -273,4 +287,5 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         super.reset();
         return null;
     }
+
 }

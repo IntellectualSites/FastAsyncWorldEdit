@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 public class MaskTraverser {
+
     private final Mask mask;
 
     public MaskTraverser(Mask start) {
@@ -71,4 +72,5 @@ public class MaskTraverser {
             current = current.getSuperclass();
         }
     }
+
 }

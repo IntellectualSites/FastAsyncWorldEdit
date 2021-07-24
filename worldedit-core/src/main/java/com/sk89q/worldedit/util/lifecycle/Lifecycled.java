@@ -51,6 +51,7 @@ import java.util.function.Predicate;
 public interface Lifecycled<T> {
 
     interface Events<T> {
+
         /**
          * Add a callback for when this lifecycled is given a new value. Will be called immediately
          * if this lifecycled is currently valid.
@@ -61,7 +62,7 @@ public interface Lifecycled<T> {
          * loop.
          * </p>
          *
-         * @param owner when the owner is GC'd, the callback is removed
+         * @param owner    when the owner is GC'd, the callback is removed
          * @param callback the callback, will be passed the lifecycled object
          */
         <O> void onNewValue(O owner, BiConsumer<O, ? super Lifecycled<T>> callback);
@@ -76,10 +77,11 @@ public interface Lifecycled<T> {
          * loop.
          * </p>
          *
-         * @param owner when the owner is GC'd, the callback is removed
+         * @param owner    when the owner is GC'd, the callback is removed
          * @param callback the callback, will be passed the lifecycled object
          */
         <O> void onInvalidated(O owner, BiConsumer<O, ? super Lifecycled<T>> callback);
+
     }
 
     /**
@@ -119,7 +121,7 @@ public interface Lifecycled<T> {
      * Map the value.
      *
      * @param mapper the mapper function
-     * @param <U> the new type
+     * @param <U>    the new type
      * @return the downstream lifecycled
      */
     default <U> Lifecycled<U> map(Function<T, U> mapper) {
@@ -148,4 +150,5 @@ public interface Lifecycled<T> {
     default <U> Lifecycled<U> flatMap(Function<T, Lifecycled<U>> mapper) {
         return new FlatMapLifecycled<>(this, mapper);
     }
+
 }

@@ -6,12 +6,13 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import java.util.concurrent.Future;
 
 public final class NullProcessor implements IBatchProcessor {
+
     private static final NullProcessor instance = new NullProcessor();
 
     public static NullProcessor getInstance() {

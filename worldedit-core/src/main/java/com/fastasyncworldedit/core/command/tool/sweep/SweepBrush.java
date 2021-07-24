@@ -24,9 +24,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SweepBrush implements Brush, ResettableTool {
-    private List<BlockVector3> positions;
+
+    private final List<BlockVector3> positions;
     private BlockVector3 position;
-    private int copies;
+    private final int copies;
 
     private static final double tension = 0D;
     private static final double bias = 0D;
@@ -38,7 +39,8 @@ public class SweepBrush implements Brush, ResettableTool {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
 
         boolean newPos = !position.equals(this.position);
         this.position = position;
@@ -100,7 +102,7 @@ public class SweepBrush implements Brush, ResettableTool {
                 break;
             }
             default: {
-                for (double pos = 0D; pos <= 1D; pos += 1D / (copies -  1)) {
+                for (double pos = 0D; pos <= 1D; pos += 1D / (copies - 1)) {
                     spline.pastePosition(pos);
                 }
                 break;
@@ -116,4 +118,5 @@ public class SweepBrush implements Brush, ResettableTool {
         position = null;
         return true;
     }
+
 }

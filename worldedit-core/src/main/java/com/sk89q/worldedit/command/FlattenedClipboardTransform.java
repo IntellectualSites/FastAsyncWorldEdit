@@ -49,7 +49,7 @@ public class FlattenedClipboardTransform {
     /**
      * Create a new instance.
      *
-     * @param original the original clipboard
+     * @param original  the original clipboard
      * @param transform the transform
      */
     private FlattenedClipboardTransform(Clipboard original, Transform transform) {
@@ -73,9 +73,10 @@ public class FlattenedClipboardTransform {
                 new CombinedTransform(
                         new AffineTransform().translate(original.getOrigin().multiply(-1)),
                         transform,
-                        new AffineTransform().translate(original.getOrigin()));
+                        new AffineTransform().translate(original.getOrigin())
+                );
 
-        Vector3[] corners = new Vector3[] {
+        Vector3[] corners = new Vector3[]{
                 minimum,
                 maximum,
                 minimum.withX(maximum.getX()),
@@ -119,7 +120,13 @@ public class FlattenedClipboardTransform {
             extent = new BlockTransformExtent(original, transform);
         }
         //FAWE end
-        ForwardExtentCopy copy = new ForwardExtentCopy(extent, original.getRegion(), original.getOrigin(), target, original.getOrigin());
+        ForwardExtentCopy copy = new ForwardExtentCopy(
+                extent,
+                original.getRegion(),
+                original.getOrigin(),
+                target,
+                original.getOrigin()
+        );
         copy.setTransform(transform);
         if (original.hasBiomes()) {
             copy.setCopyingBiomes(true);
@@ -130,7 +137,7 @@ public class FlattenedClipboardTransform {
     /**
      * Create a new instance to bake the transform with.
      *
-     * @param original the original clipboard
+     * @param original  the original clipboard
      * @param transform the transform
      * @return a builder
      */

@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.sk89q.worldedit.WorldEditException;
@@ -20,8 +20,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.Collection;
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 public abstract class FaweRegionExtent extends ResettableExtent implements IBatchProcessor {
 
@@ -72,7 +72,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block)
-        throws WorldEditException {
+            throws WorldEditException {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
@@ -153,4 +153,5 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     public ProcessorScope getScope() {
         return ProcessorScope.READING_SET_BLOCKS;
     }
+
 }

@@ -44,4 +44,5 @@ public final class FluidCategories {
     public static FluidCategory get(final String id) {
         return FluidCategory.REGISTRY.get(id);
     }
+
 }

@@ -1,6 +1,13 @@
 package com.fastasyncworldedit.core.queue.implementation;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
+import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -10,13 +17,6 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharSetBlocks;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.queue.implementation.chunk.NullChunk;
-import com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock;
-import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
-import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.google.common.util.concurrent.Futures;
@@ -68,7 +68,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private void checkThread() {
         if (Thread.currentThread() != currentThread && currentThread != null) {
             throw new UnsupportedOperationException(
-                "This class must be used from a single thread. Use multiple queues for concurrent operations");
+                    "This class must be used from a single thread. Use multiple queues for concurrent operations");
         }
     }
 
@@ -128,14 +128,15 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     /**
      * Initialize the queue
-     *
      */
     @Override
     public synchronized void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set) {
         reset();
         currentThread = Thread.currentThread();
         if (get == null) {
-            get = (x, z) -> { throw new UnsupportedOperationException(); };
+            get = (x, z) -> {
+                throw new UnsupportedOperationException();
+            };
         }
         if (set == null) {
             set = (x, z) -> CharSetBlocks.newInstance();
@@ -186,7 +187,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
 
         if (Fawe.isMainThread()) {
-            V result = (V)chunk.call();
+            V result = (V) chunk.call();
             if (result == null) {
                 return (V) (Future) Futures.immediateFuture(null);
             } else {
@@ -258,7 +259,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             // If queueing is enabled AND either of the following
             //  - memory is low & queue size > num threads + 8
             //  - queue size > target size and primary queue has less than num threads submissions
-            if (enabledQueue && ((lowMem && size > Settings.IMP.QUEUE.PARALLEL_THREADS + 8) || (size > Settings.IMP.QUEUE.TARGET_SIZE && Fawe.get().getQueueHandler().isUnderutilized()))) {
+            if (enabledQueue && ((lowMem && size > Settings.IMP.QUEUE.PARALLEL_THREADS + 8) || (size > Settings.IMP.QUEUE.TARGET_SIZE && Fawe
+                    .get()
+                    .getQueueHandler()
+                    .isUnderutilized()))) {
                 chunk = chunks.removeFirst();
                 final Future future = submitUnchecked(chunk);
                 if (future != null && !future.isDone()) {
@@ -347,7 +351,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                             } else {
                                 e.printStackTrace();
                             }
-                            LOGGER.error("Please report this error on our issue tracker: https://github.com/IntellectualSites/FastAsyncWorldEdit/issues");
+                            LOGGER.error(
+                                    "Please report this error on our issue tracker: https://github.com/IntellectualSites/FastAsyncWorldEdit/issues");
                             e.getCause().printStackTrace();
                         } catch (InterruptedException e) {
                             e.printStackTrace();
@@ -403,4 +408,5 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     public ProcessorScope getScope() {
         return ProcessorScope.ADDING_BLOCKS;
     }
+
 }

@@ -14,6 +14,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import java.util.UUID;
 
 public class BufferedPattern extends AbstractPattern implements ResettablePattern {
+
     protected final LocalBlockVectorSet set = new LocalBlockVectorSet();
     protected final FaweTimer timer;
     protected final long[] actionTime;
@@ -59,4 +60,5 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
         actionTime[1] = actionTime[0];
         actionTime[0] = now;
     }
+
 }

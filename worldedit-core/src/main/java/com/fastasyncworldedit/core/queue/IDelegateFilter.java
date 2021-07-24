@@ -49,4 +49,5 @@ public interface IDelegateFilter extends Filter {
     }
 
     Filter newInstance(Filter other);
+
 }

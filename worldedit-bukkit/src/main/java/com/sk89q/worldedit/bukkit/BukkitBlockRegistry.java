@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
@@ -30,11 +30,11 @@ import com.sk89q.worldedit.world.registry.PassthroughBlockMaterial;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.OptionalInt;
-import javax.annotation.Nullable;
 
 public class BukkitBlockRegistry extends BundledBlockRegistry {
 
@@ -144,6 +144,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         public boolean isTranslucent() {
             return material.isTransparent();
         }
+
     }
 
     //FAWE start

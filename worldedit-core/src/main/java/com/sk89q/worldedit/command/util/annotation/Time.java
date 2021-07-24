@@ -11,4 +11,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @InjectAnnotation
 public @interface Time {
+
 }

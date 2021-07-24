@@ -12,4 +12,5 @@ public abstract class BukkitMaskManager extends FaweMaskManager {
     public boolean hasMemberPermission(Permissible player) {
         return player.hasPermission("fawe." + getKey() + ".member");
     }
+
 }

@@ -38,6 +38,7 @@ public class EngineHubPaste implements Paster {
     }
 
     private static final class PasteTask implements Callable<URL> {
+
         private final String content;
 
         private PasteTask(String content) {
@@ -49,10 +50,10 @@ public class EngineHubPaste implements Paster {
             URL initialUrl = HttpRequest.url("https://paste.enginehub.org/signed_paste");
 
             SignedPasteResponse response = GSON.fromJson(HttpRequest.get(initialUrl)
-                .execute()
-                .expectResponseCode(200)
-                .returnContent()
-                .asString("UTF-8"), TypeToken.get(SignedPasteResponse.class).getType());
+                    .execute()
+                    .expectResponseCode(200)
+                    .returnContent()
+                    .asString("UTF-8"), TypeToken.get(SignedPasteResponse.class).getType());
 
             HttpRequest.Form form = HttpRequest.Form.create();
             for (Map.Entry<String, String> entry : response.uploadFields.entrySet()) {
@@ -69,11 +70,15 @@ public class EngineHubPaste implements Paster {
 
             return new URL(response.viewUrl);
         }
+
     }
 
     private static final class SignedPasteResponse {
+
         String viewUrl;
         String uploadUrl;
         Map<String, String> uploadFields;
+
     }
+
 }

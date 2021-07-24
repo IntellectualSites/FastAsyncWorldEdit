@@ -11,6 +11,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import java.util.Comparator;
 
 public class DelegateBlockVector3 extends BlockVector3 {
+
     private BlockVector3 parent;
 
     public DelegateBlockVector3 init(BlockVector3 parent) {
@@ -396,4 +397,5 @@ public class DelegateBlockVector3 extends BlockVector3 {
     public BlockVector3 plus(BlockVector3 other) {
         return parent.plus(other);
     }
+
 }

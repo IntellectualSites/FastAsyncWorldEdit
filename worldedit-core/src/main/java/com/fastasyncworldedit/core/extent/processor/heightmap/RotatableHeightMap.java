@@ -1,10 +1,11 @@
 package com.fastasyncworldedit.core.extent.processor.heightmap;
 
-import com.sk89q.worldedit.math.BlockVector3;
 import com.fastasyncworldedit.core.math.MutableVector3;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 public class RotatableHeightMap extends AbstractDelegateHeightMap {
+
     private AffineTransform transform;
     private final MutableVector3 mutable;
 
@@ -25,4 +26,5 @@ public class RotatableHeightMap extends AbstractDelegateHeightMap {
         BlockVector3 pos = transform.apply(mutable.setComponents(x, 0, z)).toBlockPoint();
         return super.getHeight(pos.getBlockX(), pos.getBlockZ());
     }
+
 }

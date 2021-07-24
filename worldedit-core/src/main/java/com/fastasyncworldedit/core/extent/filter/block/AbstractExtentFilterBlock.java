@@ -17,4 +17,5 @@ public abstract class AbstractExtentFilterBlock extends FilterBlock {
     public final Extent getExtent() {
         return extent;
     }
+
 }

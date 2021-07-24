@@ -41,4 +41,5 @@ public class Snow implements Contextual<LayerFunction> {
     public String toString() {
         return "snow" + (this.stack ? " stacker" : "");
     }
+
 }
