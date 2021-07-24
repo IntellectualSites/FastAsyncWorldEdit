@@ -48,7 +48,9 @@ public class ApplyRegion implements Contextual<Operation> {
 
     @Override
     public Operation createFromContext(EditContext context) {
-        return new RegionVisitor(firstNonNull(context.getRegion(), region), function.createFromContext(context));
+        //FAWE start > add extent to RegionVisitor to allow chunk preloading
+        return new RegionVisitor(firstNonNull(context.getRegion(), region), function.createFromContext(context), context.getDestination());
+        //FAWE end
     }
 
     @Override
