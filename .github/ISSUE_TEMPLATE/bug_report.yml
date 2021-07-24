@@ -82,7 +82,7 @@ body:
     attributes:
       label: Fawe Version
       description: What version of Fawe are you running? (`/version FastAsyncWorldEdit`)
-      placeholder: "For example: FastAsyncWorldEdit version 1.16-606;4a6af71"
+      placeholder: "For example: FastAsyncWorldEdit version 1.17-89;8c01959"
     validations:
       required: true
       
