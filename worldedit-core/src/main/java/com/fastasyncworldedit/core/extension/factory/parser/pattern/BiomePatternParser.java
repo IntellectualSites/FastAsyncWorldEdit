@@ -11,8 +11,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
 public class BiomePatternParser extends RichParser<Pattern> {
@@ -62,7 +62,7 @@ public class BiomePatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
+    protected Pattern parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 1) {
             throw new InputParseException(Caption.of("fawe.error.invalid-arguments", TextComponent.of("#biome[<biome>]")));
         }

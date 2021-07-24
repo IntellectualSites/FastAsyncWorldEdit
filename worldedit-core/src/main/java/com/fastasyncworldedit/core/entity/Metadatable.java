@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.entity;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public interface Metadatable {
 
@@ -39,8 +39,8 @@ public interface Metadatable {
      * @param defaultValue the value to return if there is no metadata for the given key
      * @return the metadata value for the key, if present; else the default value
      */
-    @NotNull
-    default <V> V getMeta(String key, @NotNull V defaultValue) {
+    @Nonnull
+    default <V> V getMeta(String key, @Nonnull V defaultValue) {
         V value = getMeta(key);
         return value == null ? defaultValue : value;
     }
@@ -52,7 +52,8 @@ public interface Metadatable {
      * @param key the key identifying the metadata to remove.
      * @return the previous value associated with they given key
      */
-    @Nullable <V> V deleteMeta(String key);
+    @Nullable
+    <V> V deleteMeta(String key);
 
     final class METADATA_KEYS {
 

@@ -12,8 +12,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -42,7 +42,7 @@ public class Linear2DPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
+    protected Pattern parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length == 0 || arguments.length > 3) {
             throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",

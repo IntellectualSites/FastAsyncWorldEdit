@@ -27,6 +27,7 @@ import com.sk89q.worldedit.regions.iterator.RegionIterator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
+import javax.annotation.Nullable;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -39,9 +40,10 @@ import java.util.Set;
 public abstract class AbstractRegion extends AbstractSet<BlockVector3> implements Region {
 //FAWE end
 
+    @Nullable
     protected World world;
 
-    public AbstractRegion(World world) {
+    public AbstractRegion(@Nullable World world) {
         this.world = world;
     }
 
@@ -68,7 +70,8 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     }
 
     @Override
-    public World getWorld() {
+    public @Nullable
+    World getWorld() {
         return world;
     }
 
@@ -218,11 +221,15 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     // Sub-class utilities
 
     protected final int getWorldMinY() {
-        return world == null ? Integer.MIN_VALUE : world.getMinY();
+        //FAWE start > Integer.MIN_VALUE -> 0 (to avoid crazy for loops...) TODO: See if there's a way to find a "server default"
+        return world == null ? 0 : world.getMinY();
+        //FAWE end
     }
 
     protected final int getWorldMaxY() {
-        return world == null ? Integer.MAX_VALUE : world.getMaxY();
+        //FAWE start > Integer.MAX_VALUE -> 255 (to avoid crazy for loops...) TODO: See if there's a way to find a "server default"
+        return world == null ? 255 : world.getMaxY();
+        //FAWE end
     }
 
     //FAWE start

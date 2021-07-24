@@ -7,8 +7,8 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
@@ -51,7 +51,8 @@ public class RelightProcessor implements IBatchProcessor {
     }
 
     @Override
-    public @Nullable Extent construct(Extent child) {
+    public @Nullable
+    Extent construct(Extent child) {
         throw new UnsupportedOperationException("Processing only");
     }
 

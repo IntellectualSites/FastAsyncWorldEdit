@@ -19,8 +19,8 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private FaweBukkit plugin;
-    private Plugin residence;
+    private final FaweBukkit plugin;
+    private final Plugin residence;
 
     public ResidenceFeature(final Plugin residencePlugin, final FaweBukkit p3) {
         super(residencePlugin.getName());

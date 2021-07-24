@@ -23,8 +23,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
@@ -50,7 +50,7 @@ public class BlockTypeMask extends AbstractExtentMask {
      * @param extent the extent
      * @param blocks a list of blocks to match
      */
-    public BlockTypeMask(Extent extent, @NotNull Collection<BlockType> blocks) {
+    public BlockTypeMask(Extent extent, @Nonnull Collection<BlockType> blocks) {
         this(extent, blocks.toArray(new BlockType[0]));
     }
 
@@ -60,7 +60,7 @@ public class BlockTypeMask extends AbstractExtentMask {
      * @param extent the extent
      * @param block  an array of blocks to match
      */
-    public BlockTypeMask(Extent extent, @NotNull BlockType... block) {
+    public BlockTypeMask(Extent extent, @Nonnull BlockType... block) {
         super(extent);
         this.types = new boolean[BlockTypes.size()];
         for (BlockType type : block) {
@@ -81,7 +81,7 @@ public class BlockTypeMask extends AbstractExtentMask {
      *
      * @param blocks a list of blocks
      */
-    public void add(@NotNull Collection<BlockType> blocks) {
+    public void add(@Nonnull Collection<BlockType> blocks) {
         checkNotNull(blocks);
         //FAWE start
         for (BlockType type : blocks) {
@@ -95,7 +95,7 @@ public class BlockTypeMask extends AbstractExtentMask {
      *
      * @param block an array of blocks
      */
-    public void add(@NotNull BlockType... block) {
+    public void add(@Nonnull BlockType... block) {
         //FAWE start - get internal id
         for (BlockType type : block) {
             if (!hasAir && (type == BlockTypes.AIR || type == BlockTypes.CAVE_AIR || type == BlockTypes.VOID_AIR)) {

@@ -243,7 +243,7 @@ public class EllipsoidRegion extends AbstractRegion {
         }
         int cy = y - center.getBlockY();
         int cy2 = cy * cy;
-        if (radiusSqr.getBlockY() < world.getMaxY() && cy2 > radiusSqr.getBlockY()) {
+        if (radiusSqr.getBlockY() < getWorldMaxY() && cy2 > radiusSqr.getBlockY()) {
             return false;
         }
         if (sphere) {
@@ -320,7 +320,7 @@ public class EllipsoidRegion extends AbstractRegion {
             filterSpherePartial(minSection, 0, 15, bx, bz, filter, block, get, set);
         }
 
-        if (yStart != world.getMinY()) {
+        if (yStart != getWorldMinY()) {
             filterSpherePartial(minSection, yStart, 15, bx, bz, filter, block, get, set);
             minSection++;
         }
@@ -418,28 +418,28 @@ public class EllipsoidRegion extends AbstractRegion {
             int cy = center.getBlockY();
             int diffYFull = MathMan.usqrt(diffY2);
 
-            int yBotFull = Math.max(world.getMinY(), cy - diffYFull);
-            int yTopFull = Math.min(world.getMaxY(), cy + diffYFull);
+            int yBotFull = Math.max(getWorldMinY(), cy - diffYFull);
+            int yTopFull = Math.min(getWorldMaxY(), cy + diffYFull);
 
             if (yBotFull == yTopFull || yBotFull > yTopFull) {
             }
             // Set those layers
             filter(chunk, filter, block, get, set, yBotFull, yTopFull, full);
 
-            if (yBotFull == world.getMinY() && yTopFull == world.getMaxY()) {
+            if (yBotFull == getWorldMinY() && yTopFull == getWorldMaxY()) {
                 return;
             }
 
             int diffYPartial = MathMan.usqrt(radiusLengthSqr - cxMin * cxMin - czMin * czMin);
 
             //Fill the remaining layers
-            if (yBotFull != world.getMinY()) {
-                int yBotPartial = Math.max(world.getMinY(), cy - diffYPartial);
+            if (yBotFull != getWorldMinY()) {
+                int yBotPartial = Math.max(getWorldMinY(), cy - diffYPartial);
                 filterSpherePartial(yBotPartial, yBotFull - 1, bx, bz, filter, block, get, set);
             }
 
-            if (yTopFull != world.getMaxY()) {
-                int yTopPartial = Math.min(world.getMaxY(), cy + diffYPartial);
+            if (yTopFull != getWorldMaxY()) {
+                int yTopPartial = Math.min(getWorldMaxY(), cy + diffYPartial);
                 filterSpherePartial(yTopFull + 1, yTopPartial, bx, bz, filter, block, get, set);
             }
 

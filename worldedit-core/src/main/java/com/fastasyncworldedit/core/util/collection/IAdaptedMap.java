@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.util.collection;
 
 import com.google.common.base.Function;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -58,7 +58,7 @@ public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
     }
 
     @Override
-    default void putAll(@NotNull Map<? extends K, ? extends V> m) {
+    default void putAll(@Nonnull Map<? extends K, ? extends V> m) {
         for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
             put(entry.getKey(), entry.getValue());
         }
@@ -69,7 +69,7 @@ public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
         getParent().clear();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     default Set<K> keySet() {
         if (isEmpty()) {
@@ -78,7 +78,7 @@ public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
         return new AdaptedSetCollection<>(getParent().keySet(), this::adaptKey2);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     default Collection<V> values() {
         if (isEmpty()) {
@@ -87,7 +87,7 @@ public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
         return new AdaptedSetCollection<>(getParent().values(), this::adaptValue2);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     default Set<Entry<K, V>> entrySet() {
         if (isEmpty()) {

@@ -267,7 +267,8 @@ public class NMSRelighter implements Relighter {
             MutableBlockVector3 node = (MutableBlockVector3) val[0];
             int lightLevel = (int) val[1];
 
-            this.computeRemoveBlockLight(node.getX() - 1,
+            this.computeRemoveBlockLight(
+                    node.getX() - 1,
                     node.getY(),
                     node.getZ(),
                     lightLevel,
@@ -276,7 +277,8 @@ public class NMSRelighter implements Relighter {
                     removalVisited,
                     visited
             );
-            this.computeRemoveBlockLight(node.getX() + 1,
+            this.computeRemoveBlockLight(
+                    node.getX() + 1,
                     node.getY(),
                     node.getZ(),
                     lightLevel,
@@ -286,7 +288,8 @@ public class NMSRelighter implements Relighter {
                     visited
             );
             if (node.getY() > 0) {
-                this.computeRemoveBlockLight(node.getX(),
+                this.computeRemoveBlockLight(
+                        node.getX(),
                         node.getY() - 1,
                         node.getZ(),
                         lightLevel,
@@ -297,7 +300,8 @@ public class NMSRelighter implements Relighter {
                 );
             }
             if (node.getY() < 255) {
-                this.computeRemoveBlockLight(node.getX(),
+                this.computeRemoveBlockLight(
+                        node.getX(),
                         node.getY() + 1,
                         node.getZ(),
                         lightLevel,
@@ -307,7 +311,8 @@ public class NMSRelighter implements Relighter {
                         visited
                 );
             }
-            this.computeRemoveBlockLight(node.getX(),
+            this.computeRemoveBlockLight(
+                    node.getX(),
                     node.getY(),
                     node.getZ() - 1,
                     lightLevel,
@@ -316,7 +321,8 @@ public class NMSRelighter implements Relighter {
                     removalVisited,
                     visited
             );
-            this.computeRemoveBlockLight(node.getX(),
+            this.computeRemoveBlockLight(
+                    node.getX(),
                     node.getY(),
                     node.getZ() + 1,
                     lightLevel,

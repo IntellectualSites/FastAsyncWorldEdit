@@ -3,8 +3,8 @@ package com.fastasyncworldedit.core.math;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.zaxxer.sparsebits.SparseBitSet;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
@@ -121,7 +121,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return null;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Iterator<BlockVector3> iterator() {
         return new Iterator<BlockVector3>() {
@@ -158,13 +158,13 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         };
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Object[] toArray() {
         return toArray((Object[]) null);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public <T> T[] toArray(T[] array) {
         int size = size();
@@ -275,7 +275,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     }
 
     @Override
-    public boolean retainAll(@NotNull Collection<?> c) {
+    public boolean retainAll(@Nonnull Collection<?> c) {
         boolean result = false;
         int size = size();
         int index = -1;

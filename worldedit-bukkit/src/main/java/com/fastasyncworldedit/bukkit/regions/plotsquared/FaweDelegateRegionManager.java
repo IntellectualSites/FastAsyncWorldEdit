@@ -33,9 +33,9 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -88,9 +88,9 @@ public class FaweDelegateRegionManager {
     }
 
     public boolean handleClear(
-            @NotNull Plot plot,
+            @Nonnull Plot plot,
             @Nullable Runnable whenDone,
-            @NotNull PlotManager manager
+            @Nonnull PlotManager manager
     ) {
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
@@ -174,7 +174,8 @@ public class FaweDelegateRegionManager {
 
                 // Be verbose in editsession flushing
                 editSession.flushQueue();
-                FaweAPI.fixLighting(world,
+                FaweAPI.fixLighting(
+                        world,
                         new CuboidRegion(plot.getBottomAbs().getBlockVector3(), plot.getTopAbs().getBlockVector3()),
                         null,
                         RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE)

@@ -13,8 +13,9 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public final class EmptyClipboard implements Clipboard {
 
@@ -24,58 +25,58 @@ public final class EmptyClipboard implements Clipboard {
         return instance;
     }
 
-    @NotNull
+    @Nonnull
     public Region getRegion() {
         return new CuboidRegion(BlockVector3.ZERO, BlockVector3.ZERO);
     }
 
-    @NotNull
+    @Nonnull
     public BlockVector3 getDimensions() {
         return BlockVector3.ZERO;
     }
 
-    @NotNull
+    @Nonnull
     public BlockVector3 getOrigin() {
         return BlockVector3.ZERO;
     }
 
-    public void setOrigin(@NotNull BlockVector3 origin) {
+    public void setOrigin(@Nonnull BlockVector3 origin) {
     }
 
-    public void removeEntity(@NotNull Entity entity) {
+    public void removeEntity(@Nonnull Entity entity) {
     }
 
-    @NotNull
+    @Nonnull
     public BlockVector3 getMinimumPoint() {
         return BlockVector3.ZERO;
     }
 
-    @NotNull
+    @Nonnull
     public BlockVector3 getMaximumPoint() {
         return BlockVector3.ZERO;
     }
 
-    @NotNull
-    public BaseBlock getFullBlock(@NotNull BlockVector3 position) {
+    @Nonnull
+    public BaseBlock getFullBlock(@Nonnull BlockVector3 position) {
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
 
-    @NotNull
-    public BlockState getBlock(@NotNull BlockVector3 position) {
+    @Nonnull
+    public BlockState getBlock(@Nonnull BlockVector3 position) {
         return BlockTypes.AIR.getDefaultState();
     }
 
     @Nullable
-    public BiomeType getBiome(@NotNull BlockVector3 position) {
+    public BiomeType getBiome(@Nonnull BlockVector3 position) {
         return null;
     }
 
-    @NotNull
+    @Nonnull
     public int[] getHeightMap(@Nullable HeightMapType type) {
         return new int[256];
     }
 
-    public boolean setBlock(@NotNull BlockVector3 position, BlockStateHolder block) throws WorldEditException {
+    public boolean setBlock(@Nonnull BlockVector3 position, BlockStateHolder block) throws WorldEditException {
         return false;
     }
 
@@ -83,11 +84,11 @@ public final class EmptyClipboard implements Clipboard {
         return false;
     }
 
-    public boolean setTile(int x, int y, int z, @NotNull CompoundTag tile) throws WorldEditException {
+    public boolean setTile(int x, int y, int z, @Nonnull CompoundTag tile) throws WorldEditException {
         return false;
     }
 
-    public boolean setBiome(@NotNull BlockVector3 position, @NotNull BiomeType biome) {
+    public boolean setBiome(@Nonnull BlockVector3 position, @Nonnull BiomeType biome) {
         return false;
     }
 
@@ -95,7 +96,7 @@ public final class EmptyClipboard implements Clipboard {
         return false;
     }
 
-    public boolean setBiome(int x, int y, int z, @NotNull BiomeType biome) {
+    public boolean setBiome(int x, int y, int z, @Nonnull BiomeType biome) {
         return false;
     }
 

@@ -194,7 +194,7 @@ public interface IBukkitAdapter {
     default BlockType asBlockType(Material material) {
         checkNotNull(material);
         if (!material.isBlock()) {
-            throw new IllegalArgumentException(material.getKey().toString() + " is not a block!") {
+            throw new IllegalArgumentException(material.getKey() + " is not a block!") {
                 @Override
                 public synchronized Throwable fillInStackTrace() {
                     return this;

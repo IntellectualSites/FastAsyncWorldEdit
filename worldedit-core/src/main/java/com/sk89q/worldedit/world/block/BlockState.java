@@ -45,8 +45,8 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
@@ -79,7 +79,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         this.emptyBaseBlock = new BlanketBaseBlock(this);
     }
 
-    public BlockState(BlockType blockType, int internalId, int ordinal, @NotNull CompoundTag tile) {
+    public BlockState(BlockType blockType, int internalId, int ordinal, @Nonnull CompoundTag tile) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
@@ -344,7 +344,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         BlockType type = this.getBlockType();
         // Lazily initialize the map
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
-        return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
+        return Collections.unmodifiableMap(map);
     }
     //FAWE end
 

@@ -46,8 +46,8 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -475,7 +475,7 @@ public class BlockTransformExtent extends ResettableExtent {
             BLOCK_TRANSFORM_INVERSE[i] = ALL;
             BlockType type = BlockTypes.get(i);
             int bitMask = 0;
-            for (AbstractProperty property : (Collection<AbstractProperty>) (Collection) type.getProperties()) {
+            for (AbstractProperty property : (Collection<AbstractProperty>) type.getProperties()) {
                 if (isDirectional(property)) {
                     BLOCK_TRANSFORM[i] = null;
                     BLOCK_TRANSFORM_INVERSE[i] = null;
@@ -556,7 +556,7 @@ public class BlockTransformExtent extends ResettableExtent {
      * @param transform the transform
      * @return the same block
      */
-    public static <B extends BlockStateHolder<B>> B transform(@NotNull B block, @NotNull Transform transform) {
+    public static <B extends BlockStateHolder<B>> B transform(@Nonnull B block, @Nonnull Transform transform) {
         //FAWE start - use own logic
         // performance critical
         BlockState state = block.toImmutableState();

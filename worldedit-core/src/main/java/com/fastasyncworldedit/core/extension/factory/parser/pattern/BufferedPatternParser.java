@@ -8,8 +8,8 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
 public class BufferedPatternParser extends RichParser<Pattern> {
@@ -32,7 +32,7 @@ public class BufferedPatternParser extends RichParser<Pattern> {
     }
 
     @Override
-    protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
+    protected Pattern parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 1) {
             throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",

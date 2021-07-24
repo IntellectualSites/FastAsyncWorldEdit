@@ -30,8 +30,8 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -202,59 +202,59 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
+    public void incrementStatistic(@Nonnull Statistic statistic) throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
+    public void decrementStatistic(@Nonnull Statistic statistic) throws IllegalArgumentException {
 
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic, int amount)
+    public void incrementStatistic(@Nonnull Statistic statistic, int amount)
             throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic, int amount)
+    public void decrementStatistic(@Nonnull Statistic statistic, int amount)
             throws IllegalArgumentException {
 
     }
 
     @Override
-    public void setStatistic(@NotNull Statistic statistic, int newValue)
+    public void setStatistic(@Nonnull Statistic statistic, int newValue)
             throws IllegalArgumentException {
 
     }
 
     @Override
-    public int getStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
+    public int getStatistic(@Nonnull Statistic statistic) throws IllegalArgumentException {
         return 0;
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic, @NotNull Material material)
+    public void incrementStatistic(@Nonnull Statistic statistic, @Nonnull Material material)
             throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic, @NotNull Material material)
+    public void decrementStatistic(@Nonnull Statistic statistic, @Nonnull Material material)
             throws IllegalArgumentException {
 
     }
 
     @Override
-    public int getStatistic(@NotNull Statistic statistic, @NotNull Material material)
+    public int getStatistic(@Nonnull Statistic statistic, @Nonnull Material material)
             throws IllegalArgumentException {
         return 0;
     }
 
     @Override
     public void incrementStatistic(
-            @NotNull Statistic statistic, @NotNull Material material,
+            @Nonnull Statistic statistic, @Nonnull Material material,
             int amount
     ) throws IllegalArgumentException {
 
@@ -262,39 +262,39 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
 
     @Override
     public void decrementStatistic(
-            @NotNull Statistic statistic, @NotNull Material material,
+            @Nonnull Statistic statistic, @Nonnull Material material,
             int amount
     ) throws IllegalArgumentException {
 
     }
 
     @Override
-    public void setStatistic(@NotNull Statistic statistic, @NotNull Material material, int newValue)
+    public void setStatistic(@Nonnull Statistic statistic, @Nonnull Material material, int newValue)
             throws IllegalArgumentException {
 
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType)
+    public void incrementStatistic(@Nonnull Statistic statistic, @Nonnull EntityType entityType)
             throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType)
+    public void decrementStatistic(@Nonnull Statistic statistic, @Nonnull EntityType entityType)
             throws IllegalArgumentException {
 
     }
 
     @Override
-    public int getStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType)
+    public int getStatistic(@Nonnull Statistic statistic, @Nonnull EntityType entityType)
             throws IllegalArgumentException {
         return 0;
     }
 
     @Override
     public void incrementStatistic(
-            @NotNull Statistic statistic, @NotNull EntityType entityType,
+            @Nonnull Statistic statistic, @Nonnull EntityType entityType,
             int amount
     ) throws IllegalArgumentException {
 
@@ -302,7 +302,7 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
 
     @Override
     public void decrementStatistic(
-            @NotNull Statistic statistic, @NotNull EntityType entityType,
+            @Nonnull Statistic statistic, @Nonnull EntityType entityType,
             int amount
     ) {
 
@@ -310,7 +310,7 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
 
     @Override
     public void setStatistic(
-            @NotNull Statistic statistic, @NotNull EntityType entityType,
+            @Nonnull Statistic statistic, @Nonnull EntityType entityType,
             int newValue
     ) {
 

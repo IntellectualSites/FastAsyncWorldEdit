@@ -10,8 +10,8 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.BitSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -101,7 +101,8 @@ public class HeightmapProcessor implements IBatchProcessor {
     }
 
     @Override
-    public @Nullable Extent construct(Extent child) {
+    @Nullable
+    public Extent construct(Extent child) {
         throw new UnsupportedOperationException("Processing only");
     }
 

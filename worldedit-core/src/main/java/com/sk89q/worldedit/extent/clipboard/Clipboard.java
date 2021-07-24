@@ -47,8 +47,8 @@ import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
@@ -163,7 +163,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     default Iterator<BlockVector3> iterator() {
         return getRegion().iterator();
     }

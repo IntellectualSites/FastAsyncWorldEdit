@@ -5,8 +5,8 @@ import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.AbstractSet;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -89,7 +89,7 @@ public final class MemBlockSet extends BlockSet {
     @Override
     public Set<BlockVector2> getChunks() {
         return new AbstractSet<BlockVector2>() {
-            @NotNull
+            @Nonnull
             @Override
             public Iterator<BlockVector2> iterator() {
                 return new Iterator<BlockVector2>() {

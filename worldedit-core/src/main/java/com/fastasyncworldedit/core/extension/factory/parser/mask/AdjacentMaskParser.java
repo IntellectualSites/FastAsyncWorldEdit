@@ -8,8 +8,8 @@ import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
 public class AdjacentMaskParser extends RichParser<Mask> {
@@ -29,7 +29,7 @@ public class AdjacentMaskParser extends RichParser<Mask> {
     }
 
     @Override
-    protected Mask parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
+    protected Mask parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length == 0) {
             return null;
         }

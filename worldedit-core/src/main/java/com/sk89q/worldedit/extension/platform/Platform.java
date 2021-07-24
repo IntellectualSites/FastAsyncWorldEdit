@@ -31,8 +31,8 @@ import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
@@ -233,7 +233,7 @@ public interface Platform extends Keyed {
      *
      * @return the relighter factory to be used.
      */
-    @NotNull
+    @Nonnull
     RelighterFactory getRelighterFactory();
     //FAWE end
 }

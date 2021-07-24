@@ -45,8 +45,8 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.enginehub.piston.CommandManager;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -186,10 +186,11 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
                             command.getAliases().stream()
                     ).toArray(String[]::new);
                     // TODO Handle localisation correctly
-                    return new CommandInfo(reduceToText(
-                            command.getUsage(),
-                            WorldEdit.getInstance().getConfiguration().defaultLocale
-                    ),
+                    return new CommandInfo(
+                            reduceToText(
+                                    command.getUsage(),
+                                    WorldEdit.getInstance().getConfiguration().defaultLocale
+                            ),
                             reduceToText(command.getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale),
                             aliases,
                             inspector,
@@ -269,7 +270,8 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     //FAWE start
     @Override
-    public @NotNull RelighterFactory getRelighterFactory() {
+    public @Nonnull
+    RelighterFactory getRelighterFactory() {
         if (this.relighterFactory == null) {
             this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
             LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");

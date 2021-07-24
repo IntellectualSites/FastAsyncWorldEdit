@@ -14,8 +14,8 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -57,7 +57,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
         close();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Iterator<BlockVector3> iterator() {
         return iterator(Order.YZX);

@@ -33,8 +33,8 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -337,7 +337,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
         //FAWE start
         return new AbstractSet<BlockVector2>() {
-            @NotNull
+            @Nonnull
             @Override
             public Iterator<BlockVector2> iterator() {
                 return new Iterator<BlockVector2>() {
@@ -771,7 +771,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {
                         int indexY = 0;
-                        for (int y = world.getMinY(); y < 16; y++, indexY += world.getMaxY()) {
+                        for (int y = getWorldMinY(); y < 16; y++, indexY += getWorldMaxY()) {
                             int index;
                             if (trimZ) {
                                 index = indexY;

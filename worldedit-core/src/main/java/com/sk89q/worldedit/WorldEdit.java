@@ -768,7 +768,8 @@ public final class WorldEdit {
         }
 
         LocalSession session = getSessionManager().get(player);
-        CraftScriptContext scriptContext = new CraftScriptContext(this,
+        CraftScriptContext scriptContext = new CraftScriptContext(
+                this,
                 getPlatformManager().queryCapability(Capability.USER_COMMANDS),
                 getConfiguration(),
                 session,

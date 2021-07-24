@@ -20,8 +20,8 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
@@ -445,7 +445,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     private interface SetDelegate {
 
-        void set(@NotNull CharFilterBlock block, char value);
+        void set(@Nonnull CharFilterBlock block, char value);
 
     }
 

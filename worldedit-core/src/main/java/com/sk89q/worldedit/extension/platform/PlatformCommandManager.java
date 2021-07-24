@@ -151,8 +151,8 @@ import org.enginehub.piston.part.SubCommandPart;
 import org.enginehub.piston.suggestion.Suggestion;
 import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
@@ -394,7 +394,7 @@ public final class PlatformCommandManager {
     private <CI> void registerSubCommands(
             String name, List<String> aliases, String desc,
             Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
-            @NotNull Consumer<CommandManager> additionalConfig
+            @Nonnull Consumer<CommandManager> additionalConfig
     ) {
         commandManager.register(name, cmd -> {
             cmd.aliases(aliases);

@@ -37,8 +37,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
@@ -283,7 +283,7 @@ public class BlockArrayClipboard implements Clipboard {
         return getParent().getBiomeType(x, y, z);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Iterator<BlockVector3> iterator() {
         OffsetBlockVector3 mutable = new OffsetBlockVector3(origin);

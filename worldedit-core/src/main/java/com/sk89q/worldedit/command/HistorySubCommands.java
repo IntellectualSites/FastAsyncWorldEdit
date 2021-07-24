@@ -45,9 +45,9 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.lang.ref.Reference;
@@ -304,12 +304,8 @@ public class HistorySubCommands {
             List<Supplier<? extends ChangeSet>> histories,
             BlockVector3 origin
     ) {
-        return PaginationBox.fromStrings(
-                "Edits:",
-                pageCommand,
-                histories,
-                new Function<Supplier<? extends ChangeSet>, Component>() {
-                    @NotNull
+        return PaginationBox.fromStrings("Edits:", pageCommand, histories, new Function<>() {
+                    @Nonnull
                     @Override
                     public Component apply(@Nullable Supplier<? extends ChangeSet> input) {
                         ChangeSet edit = input.get();
@@ -325,14 +321,8 @@ public class HistorySubCommands {
                             BlockVector3 pos1 = rollback.getMinimumPoint();
                             BlockVector3 pos2 = rollback.getMaximumPoint();
 
-                            double distanceX = Math.min(
-                                    Math.abs(pos1.getX() - origin.getX()),
-                                    Math.abs(pos2.getX() - origin.getX())
-                            );
-                            double distanceZ = Math.min(
-                                    Math.abs(pos1.getZ() - origin.getZ()),
-                                    Math.abs(pos2.getZ() - origin.getZ())
-                            );
+                            double distanceX = Math.min(Math.abs(pos1.getX() - origin.getX()), Math.abs(pos2.getX() - origin.getX()));
+                            double distanceZ = Math.min(Math.abs(pos1.getZ() - origin.getZ()), Math.abs(pos2.getZ() - origin.getZ()));
                             int distance = (int) Math.sqrt(distanceX * distanceX + distanceZ * distanceZ);
 
                             BlockVector2 dirVec = BlockVector2.at(

@@ -43,8 +43,8 @@ import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
@@ -55,7 +55,7 @@ public class EditSessionBuilder {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    @NotNull
+    @Nonnull
     private World world;
     private Player player;
     private FaweLimit limit;
@@ -65,7 +65,7 @@ public class EditSessionBuilder {
     private Boolean fastmode;
     private Boolean checkMemory;
     private Boolean combineStages;
-    @NotNull
+    @Nonnull
     private EventBus eventBus = WorldEdit.getInstance().getEventBus();
     private BlockBag blockBag;
     private EditSessionEvent event;
@@ -89,7 +89,7 @@ public class EditSessionBuilder {
      *
      * @param world A world must be provided for all EditSession(s)
      */
-    public EditSessionBuilder(@NotNull World world) {
+    public EditSessionBuilder(@Nonnull World world) {
         checkNotNull(world);
         this.world = world;
     }
@@ -108,7 +108,7 @@ public class EditSessionBuilder {
         return limit(FaweLimit.MAX.copy());
     }
 
-    public EditSessionBuilder limitUnprocessed(@NotNull Player player) {
+    public EditSessionBuilder limitUnprocessed(@Nonnull Player player) {
         checkNotNull(player);
         limitUnlimited();
         FaweLimit tmp = player.getLimit();
@@ -125,7 +125,7 @@ public class EditSessionBuilder {
         return changeSet(new NullChangeSet(world));
     }
 
-    public EditSessionBuilder world(@NotNull World world) {
+    public EditSessionBuilder world(@Nonnull World world) {
         checkNotNull(world);
         this.world = world;
         return setDirty();
@@ -199,7 +199,7 @@ public class EditSessionBuilder {
         return setDirty();
     }
 
-    public EditSessionBuilder eventBus(@NotNull EventBus eventBus) {
+    public EditSessionBuilder eventBus(@Nonnull EventBus eventBus) {
         this.eventBus = eventBus;
         return setDirty();
     }
@@ -445,7 +445,7 @@ public class EditSessionBuilder {
         return new EditSession(this);
     }
 
-    @NotNull
+    @Nonnull
     public World getWorld() {
         return world;
     }
@@ -466,7 +466,7 @@ public class EditSessionBuilder {
         return bypassAll;
     }
 
-    @NotNull
+    @Nonnull
     public FaweLimit getLimit() {
         return limit;
     }

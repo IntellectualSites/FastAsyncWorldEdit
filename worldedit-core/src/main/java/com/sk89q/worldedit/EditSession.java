@@ -141,9 +141,9 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -248,7 +248,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @Deprecated
     public EditSession(
-            @NotNull EventBus bus, World world, @Nullable Player player,
+            @Nonnull EventBus bus, World world, @Nullable Player player,
             @Nullable FaweLimit limit, @Nullable AbstractChangeSet changeSet,
             @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue,
             @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages,
@@ -280,7 +280,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     //FAWE start - EditSessionEvent
     public EditSession(
-            @NotNull EventBus eventBus,
+            @Nonnull EventBus eventBus,
             World world,
             int maxBlocks,
             @Nullable BlockBag blockBag,

@@ -12,9 +12,9 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +29,7 @@ public final class NullChunkGet implements IChunkGet {
         return instance;
     }
 
-    @NotNull
+    @Nonnull
     public BaseBlock getFullBlock(int x, int y, int z) {
         return BlockTypes.AIR.getDefaultState().toBaseBlock();
     }
@@ -43,12 +43,12 @@ public final class NullChunkGet implements IChunkGet {
     public void removeSectionLighting(int layer, boolean sky) {
     }
 
-    @NotNull
+    @Nonnull
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypes.AIR.getDefaultState();
     }
 
-    @NotNull
+    @Nonnull
     public Map<BlockVector3, CompoundTag> getTiles() {
         return Collections.emptyMap();
     }
@@ -64,7 +64,7 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Nullable
-    public CompoundTag getEntity(@NotNull UUID uuid) {
+    public CompoundTag getEntity(@Nonnull UUID uuid) {
         return null;
     }
 
@@ -98,11 +98,11 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Nullable
-    public <T extends Future<T>> T call(@NotNull IChunkSet set, @NotNull Runnable finalize) {
+    public <T extends Future<T>> T call(@Nonnull IChunkSet set, @Nonnull Runnable finalize) {
         return null;
     }
 
-    @NotNull
+    @Nonnull
     public char[] load(int layer) {
         return FaweCache.IMP.EMPTY_CHAR_4096;
     }
@@ -119,7 +119,7 @@ public final class NullChunkGet implements IChunkGet {
         return 15;
     }
 
-    @NotNull
+    @Nonnull
     public int[] getHeightMap(@Nullable HeightMapType type) {
         return new int[256];
     }

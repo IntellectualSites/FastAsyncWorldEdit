@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.scripting;
 
-import javax.script.ScriptException;
 import java.util.Map;
 
 public interface CraftScriptEngine {

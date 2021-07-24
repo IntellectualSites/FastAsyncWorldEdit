@@ -33,8 +33,8 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.EOFException;
@@ -193,7 +193,7 @@ public class FaweDelegateSchematicHandler {
         }, whenDone);
     }
 
-    public Schematic getSchematic(@NotNull InputStream is) {
+    public Schematic getSchematic(@Nonnull InputStream is) {
         try {
             FastSchematicReader schematicReader = new FastSchematicReader(
                     new NBTInputStream(new BufferedInputStream(new GZIPInputStream(new BufferedInputStream(is)))));

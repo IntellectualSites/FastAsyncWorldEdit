@@ -92,7 +92,7 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     }
 
     @Override
-    public void sendFakeChunk(@org.jetbrains.annotations.Nullable Player player, ChunkPacket packet) {
+    public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
 
     }
 

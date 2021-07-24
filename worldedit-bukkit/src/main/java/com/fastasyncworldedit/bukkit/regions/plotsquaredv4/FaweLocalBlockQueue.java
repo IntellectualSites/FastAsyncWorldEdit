@@ -20,7 +20,7 @@ public class FaweLocalBlockQueue extends LocalBlockQueue {
 
     public final IQueueExtent<IQueueChunk> instance;
     private final World world;
-    private BlockVector3 mutable = new MutableBlockVector3();
+    private final BlockVector3 mutable = new MutableBlockVector3();
 
     public FaweLocalBlockQueue(String worldName) {
         super(worldName);

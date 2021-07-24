@@ -74,7 +74,7 @@ public class PlotSetBiome extends Command {
             String biomes = StringMan
                     .join(BiomeType.REGISTRY.values(), Captions.BLOCK_LIST_SEPARATOR.getTranslated());
             Captions.NEED_BIOME.send(player);
-            MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER.toString() + biomes);
+            MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER + biomes);
             return CompletableFuture.completedFuture(false);
         }
         confirm.run(this, () -> {

@@ -23,7 +23,7 @@ import static org.bukkit.Bukkit.getWorld;
 
 public class FaweChunkManager extends ChunkManager {
 
-    private ChunkManager parent;
+    private final ChunkManager parent;
 
     public FaweChunkManager(ChunkManager parent) {
         this.parent = parent;

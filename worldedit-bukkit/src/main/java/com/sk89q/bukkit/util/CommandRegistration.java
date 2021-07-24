@@ -74,7 +74,8 @@ public class CommandRegistration {
             return false;
         }
         for (CommandInfo command : registered) {
-            DynamicPluginCommand cmd = new DynamicPluginCommand(command.getAliases(),
+            DynamicPluginCommand cmd = new DynamicPluginCommand(
+                    command.getAliases(),
                     command.getDesc(),
                     "/" + command.getAliases()[0] + " " + command.getUsage(),
                     executor,

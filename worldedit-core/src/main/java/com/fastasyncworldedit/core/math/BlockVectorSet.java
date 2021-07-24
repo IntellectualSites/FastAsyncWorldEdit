@@ -5,8 +5,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.Collections;
@@ -84,7 +84,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
         return false;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Iterator<BlockVector3> iterator() {
         final ObjectIterator<Int2ObjectMap.Entry<LocalBlockVectorSet>> entries = localSets.int2ObjectEntrySet().iterator();
@@ -188,7 +188,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     }
 
     @Override
-    public boolean retainAll(@NotNull Collection<?> c) {
+    public boolean retainAll(@Nonnull Collection<?> c) {
         Objects.requireNonNull(c);
         boolean modified = false;
         Iterator<BlockVector3> it = iterator();

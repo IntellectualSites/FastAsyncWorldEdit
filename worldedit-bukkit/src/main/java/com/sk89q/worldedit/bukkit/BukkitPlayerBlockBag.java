@@ -35,7 +35,7 @@ import org.bukkit.inventory.ItemStack;
 public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag {
 //FAWE end
 
-    private Player player;
+    private final Player player;
     private ItemStack[] items;
 
     /**

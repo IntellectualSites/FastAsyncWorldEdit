@@ -50,7 +50,7 @@ public abstract class ChunkListener implements Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     protected int rateLimit = 0;
     protected Location lastCancelPos;
-    private int[] badLimit = new int[]{Settings.IMP.TICK_LIMITER.PHYSICS_MS,
+    private final int[] badLimit = new int[]{Settings.IMP.TICK_LIMITER.PHYSICS_MS,
             Settings.IMP.TICK_LIMITER.FALLING, Settings.IMP.TICK_LIMITER.ITEMS};
 
     public ChunkListener() {
@@ -93,7 +93,7 @@ public abstract class ChunkListener implements Listener {
     public static boolean itemFreeze = false;
 
     protected final Long2ObjectOpenHashMap<Boolean> badChunks = new Long2ObjectOpenHashMap<>();
-    private Long2ObjectOpenHashMap<int[]> counter = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectOpenHashMap<int[]> counter = new Long2ObjectOpenHashMap<>();
     private int lastX = Integer.MIN_VALUE;
     private int lastZ = Integer.MIN_VALUE;
     private int[] lastCount;

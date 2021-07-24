@@ -49,9 +49,9 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -402,8 +402,8 @@ public enum BukkitAdapter {
         //FAWE end
     }
 
-    private static EnumMap<Material, BlockType> materialBlockTypeCache = new EnumMap<>(Material.class);
-    private static EnumMap<Material, ItemType> materialItemTypeCache = new EnumMap<>(Material.class);
+    private static final EnumMap<Material, BlockType> materialBlockTypeCache = new EnumMap<>(Material.class);
+    private static final EnumMap<Material, ItemType> materialItemTypeCache = new EnumMap<>(Material.class);
 
     /**
      * Converts a Material to a BlockType.
@@ -431,8 +431,8 @@ public enum BukkitAdapter {
         //FAWE end
     }
 
-    private static Int2ObjectMap<BlockState> blockStateCache = new Int2ObjectOpenHashMap<>();
-    private static Map<String, BlockState> blockStateStringCache = new HashMap<>();
+    private static final Int2ObjectMap<BlockState> blockStateCache = new Int2ObjectOpenHashMap<>();
+    private static final Map<String, BlockState> blockStateStringCache = new HashMap<>();
 
     /**
      * Create a WorldEdit BlockState from a Bukkit BlockData.
@@ -440,13 +440,13 @@ public enum BukkitAdapter {
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
      */
-    public static BlockState adapt(@NotNull BlockData blockData) {
+    public static BlockState adapt(@Nonnull BlockData blockData) {
         //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().adapt(blockData);
         //FAWE end
     }
 
-    private static Int2ObjectMap<BlockData> blockDataCache = new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<BlockData> blockDataCache = new Int2ObjectOpenHashMap<>();
 
     /**
      * Create a Bukkit BlockData from a WorldEdit BlockStateHolder.
@@ -454,7 +454,7 @@ public enum BukkitAdapter {
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
      */
-    public static BlockData adapt(@NotNull BlockStateHolder block) {
+    public static BlockData adapt(@Nonnull BlockStateHolder block) {
         //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().adapt(block);
         //FAWE end

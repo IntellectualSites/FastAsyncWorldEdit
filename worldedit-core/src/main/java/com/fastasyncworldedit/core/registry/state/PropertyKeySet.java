@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.registry.state;
 
-import org.jetbrains.annotations.NotNull;
-
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
@@ -58,21 +57,21 @@ public class PropertyKeySet implements Set<PropertyKey> {
         return this.bits.get(((PropertyKey) o).getId());
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Iterator<PropertyKey> iterator() {
         return new PropertyKeyIterator();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Object[] toArray() {
         return toArray(new Object[0]);
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public <T> T[] toArray(@NotNull T[] a) {
+    public <T> T[] toArray(@Nonnull T[] a) {
         T[] array = Arrays.copyOf(a, this.bits.cardinality());
         Iterator<PropertyKey> iter = iterator();
         for (int i = 0; i < array.length && iter.hasNext(); i++) {
@@ -104,7 +103,7 @@ public class PropertyKeySet implements Set<PropertyKey> {
     }
 
     @Override
-    public boolean containsAll(@NotNull Collection<?> c) {
+    public boolean containsAll(@Nonnull Collection<?> c) {
         if (c instanceof PropertyKeySet) {
             return ((PropertyKeySet) c).bits.intersects(this.bits);
         }
@@ -120,7 +119,7 @@ public class PropertyKeySet implements Set<PropertyKey> {
     }
 
     @Override
-    public boolean addAll(@NotNull Collection<? extends PropertyKey> c) {
+    public boolean addAll(@Nonnull Collection<? extends PropertyKey> c) {
         int cardinality = this.bits.cardinality();
         if (c instanceof PropertyKeySet) {
             this.bits.or(((PropertyKeySet) c).bits);
@@ -133,7 +132,7 @@ public class PropertyKeySet implements Set<PropertyKey> {
     }
 
     @Override
-    public boolean retainAll(@NotNull Collection<?> c) {
+    public boolean retainAll(@Nonnull Collection<?> c) {
         int cardinality = this.bits.cardinality();
         BitSet removal;
         if (c instanceof PropertyKeySet) {
@@ -151,7 +150,7 @@ public class PropertyKeySet implements Set<PropertyKey> {
     }
 
     @Override
-    public boolean removeAll(@NotNull Collection<?> c) {
+    public boolean removeAll(@Nonnull Collection<?> c) {
         int cardinality = this.bits.cardinality();
         if (c instanceof PropertyKeySet) {
             this.bits.andNot(((PropertyKeySet) c).bits);

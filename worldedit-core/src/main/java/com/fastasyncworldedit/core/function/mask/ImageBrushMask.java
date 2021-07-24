@@ -103,7 +103,8 @@ public class ImageBrushMask extends AbstractExtentMask {
 
     @Override
     public Mask copy() {
-        return new ImageBrushMask(solid.copy(),
+        return new ImageBrushMask(
+                solid.copy(),
                 center.toImmutable(),
                 transform,
                 scale,

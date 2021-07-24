@@ -155,7 +155,9 @@ public class AbstractDelegateExtent implements Extent {
             return new OperationQueue(ours, other);
         } else if (ours != null) {
             return ours;
-        } else return other;
+        } else {
+            return other;
+        }
     }
 
     //FAWE start

@@ -54,7 +54,10 @@ public class ImgurUtility {
         String imageString = Base64.getEncoder().encodeToString(image);
         URL url = new URL("https://api.imgur.com/3/image");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        String data = URLEncoder.encode("image", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(imageString, StandardCharsets.UTF_8);
+        String data = URLEncoder.encode("image", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(
+                imageString,
+                StandardCharsets.UTF_8
+        );
         conn.setDoOutput(true);
         conn.setDoInput(true);
         conn.setRequestMethod("POST");

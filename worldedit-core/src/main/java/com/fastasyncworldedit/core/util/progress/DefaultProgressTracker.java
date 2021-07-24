@@ -17,8 +17,8 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
 
     private final Player player;
     private final long start;
-    private int delay = Settings.IMP.QUEUE.PROGRESS.DELAY;
-    private int interval = Settings.IMP.QUEUE.PROGRESS.INTERVAL;
+    private int delay = Settings.QUEUE.PROGRESS.DELAY;
+    private int interval = Settings.QUEUE.PROGRESS.INTERVAL;
 
     public DefaultProgressTracker(Player player) {
         this.start = System.currentTimeMillis();
@@ -117,7 +117,8 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
         int remaining = speed != 0 ? amountQueue / speed : -1;
         sendTile(
                 TextComponent.empty(),
-                Caption.of("fawe.progress.progress.message",
+                Caption.of(
+                        "fawe.progress.progress.message",
                         queue,
                         dispatch,
                         percent,

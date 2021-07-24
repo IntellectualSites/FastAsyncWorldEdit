@@ -8,12 +8,14 @@ import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.world.World;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 public class NMSRelighterFactory implements RelighterFactory {
 
     @Override
-    public @NotNull Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue) {
+    public @Nonnull
+    Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue) {
         return new NMSRelighter(
                 queue,
                 relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE)
