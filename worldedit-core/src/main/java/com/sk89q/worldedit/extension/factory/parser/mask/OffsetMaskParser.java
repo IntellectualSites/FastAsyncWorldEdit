@@ -66,4 +66,5 @@ public class OffsetMaskParser extends InputParser<Mask> {
         OffsetMask offsetMask = new OffsetMask(submask, BlockVector3.at(0, firstChar == '>' ? -1 : 1, 0));
         return new MaskIntersection(offsetMask, Masks.negate(submask));
     }
+
 }

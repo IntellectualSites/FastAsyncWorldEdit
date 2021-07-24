@@ -91,8 +91,10 @@ public class Expression implements Cloneable {
 
         for (String variableName : variableNames) {
             slots.initVariable(variableName)
-                .orElseThrow(() -> new ExpressionException(-1,
-                    "Tried to overwrite identifier '" + variableName + "'"));
+                    .orElseThrow(() -> new ExpressionException(
+                            -1,
+                            "Tried to overwrite identifier '" + variableName + "'"
+                    ));
         }
         this.providedSlots = ImmutableList.copyOf(variableNames);
 
@@ -124,8 +126,10 @@ public class Expression implements Cloneable {
 
         for (String variableName : variableNames) {
             slots.initVariable(variableName)
-                .orElseThrow(() -> new ExpressionException(-1,
-                    "Tried to overwrite identifier '" + variableName + "'"));
+                    .orElseThrow(() -> new ExpressionException(
+                            -1,
+                            "Tried to overwrite identifier '" + variableName + "'"
+                    ));
         }
         this.providedSlots = ImmutableList.copyOf(variableNames);
 
@@ -155,8 +159,10 @@ public class Expression implements Cloneable {
         for (int i = 0; i < values.length; ++i) {
             String slotName = providedSlots.get(i);
             LocalSlot.Variable slot = slots.getVariable(slotName)
-                .orElseThrow(() -> new EvaluationException(-1,
-                    "Tried to assign to non-variable " + slotName + "."));
+                    .orElseThrow(() -> new EvaluationException(
+                            -1,
+                            "Tried to assign to non-variable " + slotName + "."
+                    ));
 
             slot.setValue(values[i]);
         }

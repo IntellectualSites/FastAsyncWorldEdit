@@ -10,6 +10,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class URIClipboardHolder extends ClipboardHolder {
+
     private final URI uri;
 
     public URIClipboardHolder(URI uri, Clipboard clipboard) {
@@ -25,8 +26,9 @@ public class URIClipboardHolder extends ClipboardHolder {
 
     /**
      * Get the original clipboard source, typically a file or uri.
-     * @deprecated If a holder has multiple sources, this will return an empty URI
+     *
      * @return the source of the clipboard
+     * @deprecated If a holder has multiple sources, this will return an empty URI
      */
     @Deprecated
     public URI getUri() {
@@ -40,4 +42,5 @@ public class URIClipboardHolder extends ClipboardHolder {
     public URI getURI(Clipboard clipboard) {
         return getClipboard() == clipboard ? getUri() : null;
     }
+
 }

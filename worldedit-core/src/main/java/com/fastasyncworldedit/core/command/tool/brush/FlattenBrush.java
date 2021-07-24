@@ -14,12 +14,21 @@ import java.io.InputStream;
 
 public class FlattenBrush extends HeightBrush {
 
-    public FlattenBrush(InputStream stream, int rotation, double yscale, boolean layers, boolean smooth, Clipboard clipboard, ScalableHeightMap.Shape shape) {
+    public FlattenBrush(
+            InputStream stream,
+            int rotation,
+            double yscale,
+            boolean layers,
+            boolean smooth,
+            Clipboard clipboard,
+            ScalableHeightMap.Shape shape
+    ) {
         super(stream, rotation, yscale, layers, smooth, clipboard, shape);
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double sizeDouble) throws
+            MaxChangedBlocksException {
         int size = (int) sizeDouble;
         Mask mask = editSession.getMask();
         if (mask == Masks.alwaysTrue() || mask == Masks.alwaysTrue2D()) {
@@ -29,4 +38,5 @@ public class FlattenBrush extends HeightBrush {
         map.setSize(size);
         map.perform(editSession, mask, position, size, rotation, yscale, smooth, true, layers);
     }
+
 }

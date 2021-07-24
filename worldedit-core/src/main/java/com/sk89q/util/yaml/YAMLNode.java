@@ -24,11 +24,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
 import com.sk89q.worldedit.math.Vector3;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Represents a configuration node.
@@ -193,7 +193,7 @@ public class YAMLNode {
      * Set the property at a location. This will override existing
      * configuration data to have it conform to key/value mappings.
      *
-     * @param path the path
+     * @param path  the path
      * @param value the new value
      */
     @SuppressWarnings("unchecked")
@@ -314,7 +314,7 @@ public class YAMLNode {
      * actually a string, it will be converted to its string representation.
      *
      * @param path path to node (dot notation)
-     * @param def default value
+     * @param def  default value
      * @return string or default
      */
     public Vector3 getVector(String path, Vector3 def) {
@@ -334,7 +334,7 @@ public class YAMLNode {
      * actually a string, it will be converted to its string representation.
      *
      * @param path path to node (dot notation)
-     * @param def default value
+     * @param def  default value
      * @return string or default
      */
     public String getString(String path, String def) {
@@ -359,11 +359,7 @@ public class YAMLNode {
      */
     public Integer getInt(String path) {
         Integer o = castInt(getProperty(path));
-        if (o == null) {
-            return null;
-        } else {
-            return o;
-        }
+        return o;
     }
 
     /**
@@ -373,7 +369,7 @@ public class YAMLNode {
      * number types will be casted to an integer.
      *
      * @param path path to node (dot notation)
-     * @param def default value
+     * @param def  default value
      * @return Integer or default
      */
     public int getInt(String path, int def) {
@@ -399,11 +395,7 @@ public class YAMLNode {
      */
     public Double getDouble(String path) {
         Double o = castDouble(getProperty(path));
-        if (o == null) {
-            return null;
-        } else {
-            return o;
-        }
+        return o;
     }
 
     /**
@@ -413,7 +405,7 @@ public class YAMLNode {
      * number types will be casted to a Double.
      *
      * @param path path to node (dot notation)
-     * @param def default value
+     * @param def  default value
      * @return Double or default
      */
     public double getDouble(String path, double def) {
@@ -438,11 +430,7 @@ public class YAMLNode {
      */
     public Boolean getBoolean(String path) {
         Boolean o = castBoolean(getProperty(path));
-        if (o == null) {
-            return null;
-        } else {
-            return o;
-        }
+        return o;
     }
 
     /**
@@ -451,7 +439,7 @@ public class YAMLNode {
      * actually a Boolean, the default value will be returned.
      *
      * @param path path to node (dot notation)
-     * @param def default value
+     * @param def  default value
      * @return Boolean or default
      */
     public boolean getBoolean(String path, boolean def) {
@@ -516,7 +504,7 @@ public class YAMLNode {
      * an actual list and not just a String.
      *
      * @param path path to node (dot notation)
-     * @param def default value or null for an empty list as default
+     * @param def  default value or null for an empty list as default
      * @return list of Strings
      */
     public List<String> getStringList(String path, List<String> def) {
@@ -548,7 +536,7 @@ public class YAMLNode {
      * an actual list and not just an integer.
      *
      * @param path path to node (dot notation)
-     * @param def default value or null for an empty list as default
+     * @param def  default value or null for an empty list as default
      * @return list of Integers
      */
     public List<Integer> getIntList(String path, List<Integer> def) {
@@ -579,7 +567,7 @@ public class YAMLNode {
      * an actual list and cannot be just a Double.
      *
      * @param path path to node (dot notation)
-     * @param def default value or null for an empty list as default
+     * @param def  default value or null for an empty list as default
      * @return list of Doubles
      */
     public List<Double> getDoubleList(String path, List<Double> def) {
@@ -610,7 +598,7 @@ public class YAMLNode {
      * an actual list and cannot be just a Boolean.
      *
      * @param path path to node (dot notation)
-     * @param def default value or null for an empty list as default
+     * @param def  default value or null for an empty list as default
      * @return list of Booleans
      */
     public List<Boolean> getBooleanList(String path, List<Boolean> def) {
@@ -641,7 +629,7 @@ public class YAMLNode {
      * an actual node and cannot be just a vector.
      *
      * @param path path to node (dot notation)
-     * @param def default value or null for an empty list as default
+     * @param def  default value or null for an empty list as default
      * @return list of vectors
      */
     public List<Vector3> getVectorList(String path, List<Vector3> def) {
@@ -671,7 +659,7 @@ public class YAMLNode {
      * an actual node and cannot be just a vector.
      *
      * @param path path to node (dot notation)
-     * @param def default value or null for an empty list as default
+     * @param def  default value or null for an empty list as default
      * @return list of vectors
      */
     public List<Vector2> getVector2List(String path, List<Vector2> def) {
@@ -701,7 +689,7 @@ public class YAMLNode {
      * an actual node and cannot be just a vector.
      *
      * @param path path to node (dot notation)
-     * @param def default value or null for an empty list as default
+     * @param def  default value or null for an empty list as default
      * @return list of vectors
      */
     public List<BlockVector2> getBlockVector2List(String path, List<BlockVector2> def) {
@@ -731,7 +719,7 @@ public class YAMLNode {
      * an actual node and cannot be just a {@code YAMLNode}.
      *
      * @param path path to node (dot notation)
-     * @param def default value or null for an empty list as default
+     * @param def  default value or null for an empty list as default
      * @return list of nodes
      */
     @SuppressWarnings("unchecked")
@@ -791,8 +779,10 @@ public class YAMLNode {
 
             for (Map.Entry<String, Object> entry : ((Map<String, Object>) o).entrySet()) {
                 if (entry.getValue() instanceof Map) {
-                    nodes.put(entry.getKey(),
-                            new YAMLNode((Map<String, Object>) entry.getValue(), writeDefaults));
+                    nodes.put(
+                            entry.getKey(),
+                            new YAMLNode((Map<String, Object>) entry.getValue(), writeDefaults)
+                    );
                 }
             }
 

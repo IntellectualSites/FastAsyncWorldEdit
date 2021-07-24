@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 public class PatternTraverser {
+
     private final Object pattern;
 
     public PatternTraverser(Object start) {
@@ -68,4 +69,5 @@ public class PatternTraverser {
             current = current.getSuperclass();
         }
     }
+
 }

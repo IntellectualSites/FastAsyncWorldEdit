@@ -33,9 +33,9 @@ import it.unimi.dsi.fastutil.objects.AbstractObjectSet;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 
+import javax.annotation.Nonnull;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
-import javax.annotation.Nonnull;
 
 /**
  * Int-to-BaseBlock map, but with optimizations for common cases.
@@ -88,9 +88,9 @@ class Int2BaseBlockMap extends AbstractInt2ObjectMap<BaseBlock> {
                 return new ObjectIterator<Entry<BaseBlock>>() {
 
                     private final ObjectIterator<Int2IntMap.Entry> commonIter
-                        = Int2IntMaps.fastIterator(commonMap);
+                            = Int2IntMaps.fastIterator(commonMap);
                     private final ObjectIterator<Entry<BaseBlock>> uncommonIter
-                        = Int2ObjectMaps.fastIterator(uncommonMap);
+                            = Int2ObjectMaps.fastIterator(uncommonMap);
                     private boolean lastNextFromCommon = false;
 
                     @Override
@@ -104,7 +104,7 @@ class Int2BaseBlockMap extends AbstractInt2ObjectMap<BaseBlock> {
                             Int2IntMap.Entry e = commonIter.next();
                             lastNextFromCommon = true;
                             return new BasicEntry<>(
-                                e.getIntKey(), assumeAsBlock(e.getIntValue())
+                                    e.getIntKey(), assumeAsBlock(e.getIntValue())
                             );
                         }
                         if (uncommonIter.hasNext()) {
@@ -208,4 +208,5 @@ class Int2BaseBlockMap extends AbstractInt2ObjectMap<BaseBlock> {
             }
         }
     }
+
 }

@@ -1,23 +1,23 @@
 package com.fastasyncworldedit.core.queue.implementation;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.Filter;
-import com.fastasyncworldedit.core.queue.IQueueChunk;
-import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.queue.IQueueWrapper;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.NullExtent;
+import com.fastasyncworldedit.core.extent.PassthroughExtent;
+import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.extent.filter.CountFilter;
 import com.fastasyncworldedit.core.extent.filter.DistrFilter;
 import com.fastasyncworldedit.core.extent.filter.LinkedFilter;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.BatchProcessorHolder;
-import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
-import com.fastasyncworldedit.core.extent.NullExtent;
+import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IQueueChunk;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.queue.IQueueWrapper;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.fastasyncworldedit.core.extent.PassthroughExtent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
-import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
@@ -138,16 +138,18 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     @Override
     public int countBlocks(Region region, Mask searchMask) {
         return
-            // Apply a filter over a region
-            apply(region, searchMask
-                .toFilter(new CountFilter()), searchMask.replacesAir()) // Adapt the mask to a filter which counts
-                .getParent() // Get the counter of this mask
-                .getTotal(); // Get the total from the counter
+                // Apply a filter over a region
+                apply(region, searchMask
+                        .toFilter(new CountFilter()), searchMask.replacesAir()) // Adapt the mask to a filter which counts
+                        .getParent() // Get the counter of this mask
+                        .getTotal(); // Get the total from the counter
     }
 
     @Override
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        return this.changes = apply(region, new BlockMaskBuilder().add(block).build(this).toFilter(new CountFilter())).getParent().getTotal();
+        return this.changes = apply(region, new BlockMaskBuilder().add(block).build(this).toFilter(new CountFilter()))
+                .getParent()
+                .getTotal();
     }
 
     @Override
@@ -171,7 +173,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
 
     @Override
     public int replaceBlocks(Region region, Mask mask, Pattern pattern)
-        throws MaxChangedBlocksException {
+            throws MaxChangedBlocksException {
         boolean full = mask.replacesAir();
         return this.changes = apply(region, mask.toFilter(pattern), full).getBlocksApplied();
     }
@@ -202,7 +204,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     /**
      * Count the number of blocks of a list of types in a region.
      *
-     * @param region the region
+     * @param region       the region
      * @param searchBlocks the list of blocks to search
      * @return the number of blocks that matched the block
      */
@@ -216,14 +218,15 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
      * Replaces all the blocks matching a given filter, within a given region, to a block
      * returned by a given pattern.
      *
-     * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param region      the region to replace the blocks within
+     * @param filter      a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
      * @param replacement the replacement block
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
     @Override
-    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws
+            MaxChangedBlocksException {
         return replaceBlocks(region, filter, new BlockPattern(replacement));
     }
 
@@ -231,8 +234,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
      * Replaces all the blocks matching a given filter, within a given region, to a block
      * returned by a given pattern.
      *
-     * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param region  the region to replace the blocks within
+     * @param filter  a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
      * @param pattern the pattern that provides the new blocks
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -242,4 +245,5 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
         Mask mask = filter == null ? new ExistingBlockMask(this) : new BlockMask(this, filter);
         return replaceBlocks(region, mask, pattern);
     }
+
 }

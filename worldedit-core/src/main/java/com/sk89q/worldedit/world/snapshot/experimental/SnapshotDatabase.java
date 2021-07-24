@@ -64,17 +64,17 @@ public interface SnapshotDatabase {
 
     default Stream<Snapshot> getSnapshotsBefore(String worldName, ZonedDateTime date) throws IOException {
         return takeWhile(
-            // sorted from oldest -> newest, so all `before` are at the front
-            getSnapshotsOldestFirst(worldName),
-            snap -> snap.getInfo().getDateTime().isBefore(date)
+                // sorted from oldest -> newest, so all `before` are at the front
+                getSnapshotsOldestFirst(worldName),
+                snap -> snap.getInfo().getDateTime().isBefore(date)
         );
     }
 
     default Stream<Snapshot> getSnapshotsAfter(String worldName, ZonedDateTime date) throws IOException {
         return takeWhile(
-            // sorted from newest -> oldest, so all `after` are at the front
-            getSnapshotsNewestFirst(worldName),
-            snap -> snap.getInfo().getDateTime().isAfter(date)
+                // sorted from newest -> oldest, so all `after` are at the front
+                getSnapshotsNewestFirst(worldName),
+                snap -> snap.getInfo().getDateTime().isAfter(date)
         );
     }
 

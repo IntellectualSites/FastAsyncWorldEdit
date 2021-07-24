@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.extent;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
-import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -94,14 +94,14 @@ public class TransformExtent extends BlockTransformExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return super.setBlock(getPos(x, y, z), transformInverse(block));
     }
 
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
-        throws WorldEditException {
+            throws WorldEditException {
         return super.setBlock(getPos(location), transformInverse(block));
     }
 
@@ -110,4 +110,5 @@ public class TransformExtent extends BlockTransformExtent {
         BlockVector3 p = getPos(x, y, z);
         return super.setBiome(p.getX(), p.getY(), p.getZ(), biome);
     }
+
 }

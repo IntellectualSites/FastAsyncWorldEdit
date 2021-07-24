@@ -33,7 +33,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,7 +54,7 @@ public final class ChunkDeleter {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Comparator<BlockVector2> chunkSorter = Comparator.comparing(
-        pos -> (pos.getBlockX() & 31) + (pos.getBlockZ() & 31) * 32
+            pos -> (pos.getBlockX() & 31) + (pos.getBlockZ() & 31) * 32
     );
 
     private static final Gson chunkDeleterGson = new GsonBuilder()
@@ -69,7 +68,8 @@ public final class ChunkDeleter {
     }
 
     public static void writeInfo(ChunkDeletionInfo info, Path chunkFile) throws IOException, JsonIOException {
-        String json = chunkDeleterGson.toJson(info, new TypeToken<ChunkDeletionInfo>() {}.getType());
+        String json = chunkDeleterGson.toJson(info, new TypeToken<ChunkDeletionInfo>() {
+        }.getType());
         try (BufferedWriter writer = Files.newBufferedWriter(chunkFile)) {
             writer.write(json);
         }
@@ -88,7 +88,8 @@ public final class ChunkDeleter {
         if (chunkDeleter.runDeleter()) {
             LOGGER.info("Successfully deleted {} matching chunks (out of {}, taking {} ms).",
                     chunkDeleter.getDeletedChunkCount(), chunkDeleter.getDeletionsRequested(),
-                    System.currentTimeMillis() - start);
+                    System.currentTimeMillis() - start
+            );
             if (deleteOnSuccess) {
                 boolean deletedFile = false;
                 try {
@@ -97,12 +98,12 @@ public final class ChunkDeleter {
                 }
                 if (!deletedFile) {
                     LOGGER.warn("Chunk deletion file could not be cleaned up. This may have unintended consequences"
-                        + " on next startup, or if /delchunks is used again.");
+                            + " on next startup, or if /delchunks is used again.");
                 }
             }
         } else {
             LOGGER.error("Error occurred while deleting chunks. "
-                + "If world errors occur, stop the server and restore the *.bak backup files.");
+                    + "If world errors occur, stop the server and restore the *.bak backup files.");
         }
     }
 
@@ -159,10 +160,11 @@ public final class ChunkDeleter {
         Path worldPath = Paths.get(chunkBatch.worldPath);
         if (chunkBatch.chunks != null) {
             return chunkBatch.chunks.stream()
-                .collect(Collectors.groupingBy(RegionFilePos::new))
-                .entrySet().stream().collect(Collectors.toMap(
-                    e -> worldPath.resolve("region").resolve(e.getKey().getFileName()),
-                    e -> e.getValue().stream().sorted(chunkSorter)));
+                    .collect(Collectors.groupingBy(RegionFilePos::new))
+                    .entrySet().stream().collect(Collectors.toMap(
+                            e -> worldPath.resolve("region").resolve(e.getKey().getFileName()),
+                            e -> e.getValue().stream().sorted(chunkSorter)
+                    ));
         } else {
             final BlockVector2 minChunk = chunkBatch.minChunk;
             final BlockVector2 maxChunk = chunkBatch.maxChunk;
@@ -184,18 +186,20 @@ public final class ChunkDeleter {
                     int minZ = Math.max(Math.min(startZ, endZ), minChunk.getBlockZ());
                     int maxX = Math.min(Math.max(startX, endX), maxChunk.getBlockX());
                     int maxZ = Math.min(Math.max(startZ, endZ), maxChunk.getBlockZ());
-                    Stream<BlockVector2> stream = Stream.iterate(BlockVector2.at(minX, minZ),
-                        bv2 -> {
-                            int nextX = bv2.getBlockX();
-                            int nextZ = bv2.getBlockZ();
-                            if (++nextX > maxX) {
-                                nextX = minX;
-                                if (++nextZ > maxZ) {
-                                    return null;
+                    Stream<BlockVector2> stream = Stream.iterate(
+                            BlockVector2.at(minX, minZ),
+                            bv2 -> {
+                                int nextX = bv2.getBlockX();
+                                int nextZ = bv2.getBlockZ();
+                                if (++nextX > maxX) {
+                                    nextX = minX;
+                                    if (++nextZ > maxZ) {
+                                        return null;
+                                    }
                                 }
+                                return BlockVector2.at(nextX, nextZ);
                             }
-                            return BlockVector2.at(nextX, nextZ);
-                        });
+                    );
                     groupedChunks.put(regionPath, stream);
                 }
             }
@@ -251,10 +255,12 @@ public final class ChunkDeleter {
         backedUpRegions.add(backupFile);
     }
 
-    private boolean deleteChunks(Path regionFile, Stream<BlockVector2> chunks,
-                                 BiPredicate<RegionAccess, BlockVector2> deletionPredicate) {
+    private boolean deleteChunks(
+            Path regionFile, Stream<BlockVector2> chunks,
+            BiPredicate<RegionAccess, BlockVector2> deletionPredicate
+    ) {
         try (RegionAccess region = new RegionAccess(regionFile, shouldPreload)) {
-            for (Iterator<BlockVector2> iterator = chunks.iterator(); iterator.hasNext();) {
+            for (Iterator<BlockVector2> iterator = chunks.iterator(); iterator.hasNext(); ) {
                 BlockVector2 chunk = iterator.next();
                 if (chunk == null) {
                     break;
@@ -285,6 +291,7 @@ public final class ChunkDeleter {
     }
 
     private static class BlockVector2Adapter extends TypeAdapter<BlockVector2> {
+
         @Override
         public void write(JsonWriter out, BlockVector2 value) throws IOException {
             out.beginArray();
@@ -301,9 +308,11 @@ public final class ChunkDeleter {
             in.endArray();
             return BlockVector2.at(x, z);
         }
+
     }
 
     private static class RegionFilePos {
+
         private final int x;
         private final int z;
 
@@ -358,5 +367,7 @@ public final class ChunkDeleter {
         public String toString() {
             return "(" + x + ", " + z + ")";
         }
+
     }
+
 }

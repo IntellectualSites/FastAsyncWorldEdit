@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.extent;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
-import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -90,4 +90,5 @@ public class PositionTransformExtent extends ResettableExtent {
     public void setTransform(Transform transform) {
         this.transform = transform;
     }
+
 }

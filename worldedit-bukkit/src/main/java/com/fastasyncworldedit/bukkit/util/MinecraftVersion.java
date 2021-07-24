@@ -119,13 +119,21 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         MinecraftVersion that = (MinecraftVersion) o;
 
-        if (getMajor() != that.getMajor()) return false;
-        if (getMinor() != that.getMinor()) return false;
+        if (getMajor() != that.getMajor()) {
+            return false;
+        }
+        if (getMinor() != that.getMinor()) {
+            return false;
+        }
         return getRelease() == that.getRelease();
     }
 

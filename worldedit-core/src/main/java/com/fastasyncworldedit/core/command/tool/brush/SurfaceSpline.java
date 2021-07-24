@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -9,7 +10,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.interpolation.KochanekBartelsInterpolation;
 import com.sk89q.worldedit.math.interpolation.Node;
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SurfaceSpline implements Brush {
+
     private final double tension;
     private final double bias;
     private final double continuity;
@@ -30,13 +31,20 @@ public class SurfaceSpline implements Brush {
         this.quality = quality;
     }
 
-    private ArrayList<BlockVector3> path = new ArrayList<>();
+    private final ArrayList<BlockVector3> path = new ArrayList<>();
 
     @Override
-    public void build(EditSession editSession, BlockVector3 pos, Pattern pattern, double radius) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 pos, Pattern pattern, double radius) throws
+            MaxChangedBlocksException {
         int maxY = editSession.getMaxY();
         if (path.isEmpty() || !pos.equals(path.get(path.size() - 1))) {
-            int max = editSession.getNearestSurfaceTerrainBlock(pos.getBlockX(), pos.getBlockZ(), pos.getBlockY(), 0, editSession.getMaxY());
+            int max = editSession.getNearestSurfaceTerrainBlock(
+                    pos.getBlockX(),
+                    pos.getBlockZ(),
+                    pos.getBlockY(),
+                    0,
+                    editSession.getMaxY()
+            );
             if (max == -1) {
                 return;
             }
@@ -103,4 +111,5 @@ public class SurfaceSpline implements Brush {
         }
         editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.spline.secondary"));
     }
+
 }

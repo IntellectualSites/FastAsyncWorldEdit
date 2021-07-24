@@ -1,15 +1,16 @@
 package com.fastasyncworldedit.core.function.generator;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 import java.util.Random;
 
 public class OreGen implements Resource {
+
     private final int maxSize;
     private final double maxSizeO8;
     private final double maxSizeO16;
@@ -19,7 +20,7 @@ public class OreGen implements Resource {
     private final Pattern pattern;
     private final Extent extent;
     private final Mask mask;
-    private MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     private final double ONE_2 = 1 / 2F;
     private final double ONE_8 = 1 / 8F;
@@ -114,4 +115,5 @@ public class OreGen implements Resource {
         }
         return true;
     }
+
 }

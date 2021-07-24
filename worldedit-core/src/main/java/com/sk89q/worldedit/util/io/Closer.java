@@ -59,7 +59,8 @@ public final class Closer implements Closeable {
     private final Deque<ZipFile> zipStack = new ArrayDeque<>(4);
     private Throwable thrown;
 
-    @VisibleForTesting Closer(Suppressor suppressor) {
+    @VisibleForTesting
+    Closer(Suppressor suppressor) {
         this.suppressor = checkNotNull(suppressor); // checkNotNull to satisfy null tests
     }
 
@@ -139,10 +140,12 @@ public final class Closer implements Closeable {
      *
      * @return this method does not return; it always throws
      * @throws IOException when the given throwable is an IOException
-     * @throws X when the given throwable is of the declared type X
+     * @throws X           when the given throwable is of the declared type X
      */
-    public <X extends Exception> RuntimeException rethrow(Throwable e,
-                                                          Class<X> declaredType) throws IOException, X {
+    public <X extends Exception> RuntimeException rethrow(
+            Throwable e,
+            Class<X> declaredType
+    ) throws IOException, X {
         thrown = e;
         Throwables.propagateIfPossible(e, IOException.class);
         Throwables.propagateIfPossible(e, declaredType);
@@ -162,11 +165,12 @@ public final class Closer implements Closeable {
      *
      * @return this method does not return; it always throws
      * @throws IOException when the given throwable is an IOException
-     * @throws X1 when the given throwable is of the declared type X1
-     * @throws X2 when the given throwable is of the declared type X2
+     * @throws X1          when the given throwable is of the declared type X1
+     * @throws X2          when the given throwable is of the declared type X2
      */
     public <X1 extends Exception, X2 extends Exception> RuntimeException rethrow(
-            Throwable e, Class<X1> declaredType1, Class<X2> declaredType2) throws IOException, X1, X2 {
+            Throwable e, Class<X1> declaredType1, Class<X2> declaredType2
+    ) throws IOException, X1, X2 {
         thrown = e;
         Throwables.propagateIfPossible(e, IOException.class);
         Throwables.propagateIfPossible(e, declaredType1, declaredType2);
@@ -220,19 +224,23 @@ public final class Closer implements Closeable {
     /**
      * Suppression strategy interface.
      */
-    @VisibleForTesting interface Suppressor {
+    @VisibleForTesting
+    interface Suppressor {
+
         /**
          * Suppresses the given exception ({@code suppressed}) which was thrown when attempting to close
          * the given closeable. {@code thrown} is the exception that is actually being thrown from the
          * method. Implementations of this method should not throw under any circumstances.
          */
         void suppress(Object closeable, Throwable thrown, Throwable suppressed);
+
     }
 
     /**
      * Suppresses exceptions by logging them.
      */
-    @VisibleForTesting static final class LoggingSuppressor implements Suppressor {
+    @VisibleForTesting
+    static final class LoggingSuppressor implements Suppressor {
 
         static final LoggingSuppressor INSTANCE = new LoggingSuppressor();
 
@@ -241,13 +249,15 @@ public final class Closer implements Closeable {
             // log to the same place as Closeables
             LOGGER.warn("Suppressing exception thrown when closing " + closeable, suppressed);
         }
+
     }
 
     /**
      * Suppresses exceptions by adding them to the exception that will be thrown using JDK7's
      * addSuppressed(Throwable) mechanism.
      */
-    @VisibleForTesting static final class SuppressingSuppressor implements Suppressor {
+    @VisibleForTesting
+    static final class SuppressingSuppressor implements Suppressor {
 
         static final SuppressingSuppressor INSTANCE = new SuppressingSuppressor();
 
@@ -278,5 +288,7 @@ public final class Closer implements Closeable {
                 LoggingSuppressor.INSTANCE.suppress(closeable, thrown, suppressed);
             }
         }
+
     }
+
 }

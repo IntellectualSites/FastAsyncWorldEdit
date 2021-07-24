@@ -10,9 +10,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class SingleThreadIntervalQueue<T> {
+
     private final ConcurrentMap<T, Long> objMap = new ConcurrentHashMap<>();
     private final Runnable task;
-    private AtomicBoolean queued = new AtomicBoolean();
+    private final AtomicBoolean queued = new AtomicBoolean();
 
     public SingleThreadIntervalQueue(int interval) {
         this.task = new Runnable() {
@@ -57,4 +58,5 @@ public abstract class SingleThreadIntervalQueue<T> {
             }
         }
     }
+
 }

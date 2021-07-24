@@ -1,15 +1,15 @@
 package com.fastasyncworldedit.core.extent.processor.lighting;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
-import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
-import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.EnumProperty;
 import com.sk89q.worldedit.registry.state.Property;
@@ -79,7 +79,8 @@ public class NMSRelighter implements Relighter {
         this.lightingLock = new ReentrantLock();
     }
 
-    @Override public boolean isEmpty() {
+    @Override
+    public boolean isEmpty() {
         return skyToRelight.isEmpty() && lightQueue.isEmpty() && extendSkyToRelight.isEmpty() && concurrentLightQueue.isEmpty();
     }
 
@@ -93,7 +94,8 @@ public class NMSRelighter implements Relighter {
         return finished.get();
     }
 
-    @Override public synchronized void removeAndRelight(boolean sky) {
+    @Override
+    public synchronized void removeAndRelight(boolean sky) {
         removeFirst = true;
         fixLightingSafe(sky);
         removeFirst = false;
@@ -245,7 +247,7 @@ public class NMSRelighter implements Relighter {
                                         MutableBlockVector3 node = new MutableBlockVector3(x, y, z);
                                         if (newLevel < oldLevel) {
                                             removalVisited.put(node, present);
-                                            lightRemovalQueue.add(new Object[] {node, oldLevel});
+                                            lightRemovalQueue.add(new Object[]{node, oldLevel});
                                         } else {
                                             visited.put(node, present);
                                             lightPropagationQueue.add(node);
@@ -265,22 +267,64 @@ public class NMSRelighter implements Relighter {
             MutableBlockVector3 node = (MutableBlockVector3) val[0];
             int lightLevel = (int) val[1];
 
-            this.computeRemoveBlockLight(node.getX() - 1, node.getY(), node.getZ(), lightLevel, lightRemovalQueue, lightPropagationQueue,
-                removalVisited, visited);
-            this.computeRemoveBlockLight(node.getX() + 1, node.getY(), node.getZ(), lightLevel, lightRemovalQueue, lightPropagationQueue,
-                removalVisited, visited);
+            this.computeRemoveBlockLight(node.getX() - 1,
+                    node.getY(),
+                    node.getZ(),
+                    lightLevel,
+                    lightRemovalQueue,
+                    lightPropagationQueue,
+                    removalVisited,
+                    visited
+            );
+            this.computeRemoveBlockLight(node.getX() + 1,
+                    node.getY(),
+                    node.getZ(),
+                    lightLevel,
+                    lightRemovalQueue,
+                    lightPropagationQueue,
+                    removalVisited,
+                    visited
+            );
             if (node.getY() > 0) {
-                this.computeRemoveBlockLight(node.getX(), node.getY() - 1, node.getZ(), lightLevel, lightRemovalQueue, lightPropagationQueue,
-                    removalVisited, visited);
+                this.computeRemoveBlockLight(node.getX(),
+                        node.getY() - 1,
+                        node.getZ(),
+                        lightLevel,
+                        lightRemovalQueue,
+                        lightPropagationQueue,
+                        removalVisited,
+                        visited
+                );
             }
             if (node.getY() < 255) {
-                this.computeRemoveBlockLight(node.getX(), node.getY() + 1, node.getZ(), lightLevel, lightRemovalQueue, lightPropagationQueue,
-                    removalVisited, visited);
+                this.computeRemoveBlockLight(node.getX(),
+                        node.getY() + 1,
+                        node.getZ(),
+                        lightLevel,
+                        lightRemovalQueue,
+                        lightPropagationQueue,
+                        removalVisited,
+                        visited
+                );
             }
-            this.computeRemoveBlockLight(node.getX(), node.getY(), node.getZ() - 1, lightLevel, lightRemovalQueue, lightPropagationQueue,
-                removalVisited, visited);
-            this.computeRemoveBlockLight(node.getX(), node.getY(), node.getZ() + 1, lightLevel, lightRemovalQueue, lightPropagationQueue,
-                removalVisited, visited);
+            this.computeRemoveBlockLight(node.getX(),
+                    node.getY(),
+                    node.getZ() - 1,
+                    lightLevel,
+                    lightRemovalQueue,
+                    lightPropagationQueue,
+                    removalVisited,
+                    visited
+            );
+            this.computeRemoveBlockLight(node.getX(),
+                    node.getY(),
+                    node.getZ() + 1,
+                    lightLevel,
+                    lightRemovalQueue,
+                    lightPropagationQueue,
+                    removalVisited,
+                    visited
+            );
         }
 
         while (!lightPropagationQueue.isEmpty()) {
@@ -302,27 +346,39 @@ public class NMSRelighter implements Relighter {
                 boolean top = state.getState(stairHalf).equalsIgnoreCase("top");
                 Direction direction = getStairDir(state);
                 String shape = getStairShape(state);
-                computeStair(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited, top, direction, shape);
+                computeStair(
+                        node.getX(),
+                        node.getY(),
+                        node.getZ(),
+                        lightLevel,
+                        lightPropagationQueue,
+                        visited,
+                        top,
+                        direction,
+                        shape
+                );
             } else {
                 computeNormal(node.getX(), node.getY(), node.getZ(), lightLevel, lightPropagationQueue, visited);
             }
         }
     }
 
-    private void computeStair(int x,
-                              int y,
-                              int z,
-                              int currentLight,
-                              Queue<MutableBlockVector3> queue,
-                              Map<MutableBlockVector3, Object> visited,
-                              boolean top,
-                              Direction direction,
-                              String shape) {
+    private void computeStair(
+            int x,
+            int y,
+            int z,
+            int currentLight,
+            Queue<MutableBlockVector3> queue,
+            Map<MutableBlockVector3, Object> visited,
+            boolean top,
+            Direction direction,
+            String shape
+    ) {
         east:
         {
             // Block East
             if (direction != Direction.WEST && !((direction == Direction.NORTH && !shape.equals("inner_left")) || (direction == Direction.SOUTH
-                && !shape.equals("inner_right")) || (direction == Direction.EAST && shape.contains("outer")))) {
+                    && !shape.equals("inner_right")) || (direction == Direction.EAST && shape.contains("outer")))) {
                 break east;
             }
             BlockState state = this.queue.getBlock(x + 1, y, z);
@@ -336,9 +392,11 @@ public class NMSRelighter implements Relighter {
             Direction otherDir = getStairDir(state);
             String otherShape = getStairShape(state);
             boolean b1 =
-                (otherDir == Direction.NORTH && !otherShape.equals("outer_right")) || (otherDir == Direction.EAST && otherShape.equals("inner_left"));
+                    (otherDir == Direction.NORTH && !otherShape.equals("outer_right")) || (otherDir == Direction.EAST && otherShape
+                            .equals("inner_left"));
             boolean b2 =
-                (otherDir == Direction.SOUTH && !otherShape.equals("outer_left")) || (otherDir == Direction.EAST && otherShape.equals("inner_right"));
+                    (otherDir == Direction.SOUTH && !otherShape.equals("outer_left")) || (otherDir == Direction.EAST && otherShape
+                            .equals("inner_right"));
             switch (direction) {
                 case EAST:
                     if (shape.equals("outer_right") && b1) {
@@ -373,7 +431,7 @@ public class NMSRelighter implements Relighter {
         {
             // Block West
             if (direction != Direction.EAST && !((direction == Direction.SOUTH && !shape.equals("inner_left")) || (direction == Direction.NORTH
-                && !shape.equals("inner_right")) || (direction == Direction.WEST && shape.contains("outer")))) {
+                    && !shape.equals("inner_right")) || (direction == Direction.WEST && shape.contains("outer")))) {
                 break west;
             }
             BlockState state = this.queue.getBlock(x - 1, y, z);
@@ -387,9 +445,11 @@ public class NMSRelighter implements Relighter {
             Direction otherDir = getStairDir(state);
             String otherShape = getStairShape(state);
             boolean b1 =
-                (otherDir == Direction.SOUTH && !otherShape.equals("outer_right")) || (otherDir == Direction.WEST && otherShape.equals("inner_left"));
+                    (otherDir == Direction.SOUTH && !otherShape.equals("outer_right")) || (otherDir == Direction.WEST && otherShape
+                            .equals("inner_left"));
             boolean b2 =
-                (otherDir == Direction.NORTH && !otherShape.equals("outer_left")) || (otherDir == Direction.WEST && otherShape.equals("inner_right"));
+                    (otherDir == Direction.NORTH && !otherShape.equals("outer_left")) || (otherDir == Direction.WEST && otherShape
+                            .equals("inner_right"));
             switch (direction) {
                 case WEST:
                     if (shape.equals("outer_right") && b1) {
@@ -424,7 +484,7 @@ public class NMSRelighter implements Relighter {
         {
             // Block South
             if (direction != Direction.NORTH && !((direction == Direction.WEST && !shape.equals("inner_left")) || (direction == Direction.EAST
-                && !shape.equals("inner_right")) || (direction == Direction.SOUTH && shape.contains("outer")))) {
+                    && !shape.equals("inner_right")) || (direction == Direction.SOUTH && shape.contains("outer")))) {
                 break south;
             }
             BlockState state = this.queue.getBlock(x, y, z + 1);
@@ -438,9 +498,11 @@ public class NMSRelighter implements Relighter {
             Direction otherDir = getStairDir(state);
             String otherShape = getStairShape(state);
             boolean b1 =
-                (otherDir == Direction.EAST && !otherShape.equals("outer_right")) || (otherDir == Direction.SOUTH && otherShape.equals("inner_left"));
+                    (otherDir == Direction.EAST && !otherShape.equals("outer_right")) || (otherDir == Direction.SOUTH && otherShape
+                            .equals("inner_left"));
             boolean b2 =
-                (otherDir == Direction.WEST && !otherShape.equals("outer_left")) || (otherDir == Direction.SOUTH && otherShape.equals("inner_right"));
+                    (otherDir == Direction.WEST && !otherShape.equals("outer_left")) || (otherDir == Direction.SOUTH && otherShape
+                            .equals("inner_right"));
             switch (direction) {
                 case SOUTH:
                     if (shape.equals("outer_right") && b1) {
@@ -475,7 +537,7 @@ public class NMSRelighter implements Relighter {
         {
             // Block North
             if (direction != Direction.SOUTH && !((direction == Direction.EAST && !shape.equals("inner_left")) || (direction == Direction.WEST
-                && !shape.equals("inner_right")) || (direction == Direction.NORTH && shape.contains("outer")))) {
+                    && !shape.equals("inner_right")) || (direction == Direction.NORTH && shape.contains("outer")))) {
                 break north;
             }
             BlockState state = this.queue.getBlock(x, y, z - 1);
@@ -489,9 +551,11 @@ public class NMSRelighter implements Relighter {
             Direction otherDir = getStairDir(state);
             String otherShape = getStairShape(state);
             boolean b1 =
-                (otherDir == Direction.WEST && !otherShape.equals("outer_right")) || (otherDir == Direction.NORTH && otherShape.equals("inner_left"));
+                    (otherDir == Direction.WEST && !otherShape.equals("outer_right")) || (otherDir == Direction.NORTH && otherShape
+                            .equals("inner_left"));
             boolean b2 =
-                (otherDir == Direction.EAST && !otherShape.equals("outer_left")) || (otherDir == Direction.NORTH && otherShape.equals("inner_right"));
+                    (otherDir == Direction.EAST && !otherShape.equals("outer_left")) || (otherDir == Direction.NORTH && otherShape
+                            .equals("inner_right"));
             switch (direction) {
                 case NORTH:
                     if (shape.equals("outer_right") && b1) {
@@ -526,13 +590,15 @@ public class NMSRelighter implements Relighter {
 
     }
 
-    private void computeSlab(int x,
-                             int y,
-                             int z,
-                             int currentLight,
-                             Queue<MutableBlockVector3> queue,
-                             Map<MutableBlockVector3, Object> visited,
-                             boolean top) {
+    private void computeSlab(
+            int x,
+            int y,
+            int z,
+            int currentLight,
+            Queue<MutableBlockVector3> queue,
+            Map<MutableBlockVector3, Object> visited,
+            boolean top
+    ) {
         {
             // Block East
             BlockState state = this.queue.getBlock(x + 1, y, z);
@@ -564,13 +630,15 @@ public class NMSRelighter implements Relighter {
         computeUpDown(x, y, z, currentLight, queue, visited, top);
     }
 
-    private void computeUpDown(int x,
-                               int y,
-                               int z,
-                               int currentLight,
-                               Queue<MutableBlockVector3> queue,
-                               Map<MutableBlockVector3, Object> visited,
-                               boolean top) {
+    private void computeUpDown(
+            int x,
+            int y,
+            int z,
+            int currentLight,
+            Queue<MutableBlockVector3> queue,
+            Map<MutableBlockVector3, Object> visited,
+            boolean top
+    ) {
         BlockState state = this.queue.getBlock(x, y - 1, z);
         if (y > 0 && top && isSlabOrTrueValue(state, "bottom") && isStairOrTrueTop(state, false)) {
             this.computeSpreadBlockLight(x, y - 1, z, currentLight, queue, visited);
@@ -581,7 +649,14 @@ public class NMSRelighter implements Relighter {
         }
     }
 
-    private void computeNormal(int x, int y, int z, int currentLight, Queue<MutableBlockVector3> queue, Map<MutableBlockVector3, Object> visited) {
+    private void computeNormal(
+            int x,
+            int y,
+            int z,
+            int currentLight,
+            Queue<MutableBlockVector3> queue,
+            Map<MutableBlockVector3, Object> visited
+    ) {
         {
             // Block East
             BlockState state = this.queue.getBlock(x + 1, y, z);
@@ -708,14 +783,16 @@ public class NMSRelighter implements Relighter {
         return !state.getBlockType().getId().contains("slab") || state.getState(slabHalf).equals(value);
     }
 
-    private void computeRemoveBlockLight(int x,
-                                         int y,
-                                         int z,
-                                         int currentLight,
-                                         Queue<Object[]> queue,
-                                         Queue<MutableBlockVector3> spreadQueue,
-                                         Map<MutableBlockVector3, Object> visited,
-                                         Map<MutableBlockVector3, Object> spreadVisited) {
+    private void computeRemoveBlockLight(
+            int x,
+            int y,
+            int z,
+            int currentLight,
+            Queue<Object[]> queue,
+            Queue<MutableBlockVector3> spreadQueue,
+            Map<MutableBlockVector3, Object> visited,
+            Map<MutableBlockVector3, Object> spreadVisited
+    ) {
         ChunkHolder<?> iChunk = (ChunkHolder<?>) this.queue.getOrCreateChunk(x >> 4, z >> 4);
         if (!iChunk.isInit()) {
             iChunk.init(this.queue, x >> 4, z >> 4);
@@ -727,7 +804,7 @@ public class NMSRelighter implements Relighter {
                 if (!visited.containsKey(mutableBlockPos)) {
                     MutableBlockVector3 index = new MutableBlockVector3(x, y, z);
                     visited.put(index, present);
-                    queue.add(new Object[] {index, current});
+                    queue.add(new Object[]{index, current});
                 }
             }
         } else if (current >= currentLight) {
@@ -740,12 +817,14 @@ public class NMSRelighter implements Relighter {
         }
     }
 
-    private void computeSpreadBlockLight(int x,
-                                         int y,
-                                         int z,
-                                         int currentLight,
-                                         Queue<MutableBlockVector3> queue,
-                                         Map<MutableBlockVector3, Object> visited) {
+    private void computeSpreadBlockLight(
+            int x,
+            int y,
+            int z,
+            int currentLight,
+            Queue<MutableBlockVector3> queue,
+            Map<MutableBlockVector3, Object> visited
+    ) {
         BlockMaterial material = this.queue.getBlock(x, y, z).getMaterial();
         boolean solidNeedsLight = (!material.isSolid() || !material.isFullCube()) && material.getLightOpacity() > 0 && material.getLightValue() == 0;
         currentLight = !solidNeedsLight ? currentLight - Math.max(1, material.getLightOpacity()) : currentLight - 1;
@@ -935,7 +1014,7 @@ public class NMSRelighter implements Relighter {
                 int x = chunk.x;
                 int z = chunk.z;
                 if (tmpSet.contains(x + 1, 0, z) && tmpSet.contains(x - 1, 0, z) && tmpSet.contains(x, 0, z + 1) && tmpSet
-                    .contains(x, 0, z - 1)) {
+                        .contains(x, 0, z - 1)) {
                     chunkSet.add(x, 0, z);
                 }
             }
@@ -997,7 +1076,10 @@ public class NMSRelighter implements Relighter {
                         case 14:
                             if (opacity >= value) {
                                 mask[j] = 0;
-                                if (!isStairOrTrueTop(state, true) || !(isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(state, "double"))) {
+                                if (!isStairOrTrueTop(state, true) || !(isSlabOrTrueValue(
+                                        state,
+                                        "top"
+                                ) || isSlabOrTrueValue(state, "double"))) {
                                     iChunk.setSkyLight(x, y, z, value);
                                 } else {
                                     iChunk.setSkyLight(x, y, z, 0);
@@ -1015,7 +1097,10 @@ public class NMSRelighter implements Relighter {
                                 value -= opacity;
                                 mask[j] = value;
                             }
-                            if (!isStairOrTrueTop(state, true) || !(isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(state, "double"))) {
+                            if (!isStairOrTrueTop(state, true) || !(isSlabOrTrueValue(state, "top") || isSlabOrTrueValue(
+                                    state,
+                                    "double"
+                            ))) {
                                 iChunk.setSkyLight(x, y, z, value + opacity);
                             } else {
                                 iChunk.setSkyLight(x, y, z, value);
@@ -1144,6 +1229,7 @@ public class NMSRelighter implements Relighter {
     }
 
     private class RelightSkyEntry implements Comparable<RelightSkyEntry> {
+
         public final int x;
         public final int z;
         public final byte[] mask;
@@ -1166,11 +1252,13 @@ public class NMSRelighter implements Relighter {
             }
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return x + "," + z;
         }
 
-        @Override public int compareTo(RelightSkyEntry o) {
+        @Override
+        public int compareTo(RelightSkyEntry o) {
             if (o.x < x) {
                 return 1;
             }
@@ -1185,5 +1273,7 @@ public class NMSRelighter implements Relighter {
             }
             return 0;
         }
+
     }
+
 }

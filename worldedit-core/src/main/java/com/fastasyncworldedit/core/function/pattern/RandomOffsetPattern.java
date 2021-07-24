@@ -1,26 +1,27 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.SplittableRandom;
 
 public class RandomOffsetPattern extends AbstractPattern {
+
     private final int dx;
     private final int dy;
     private final int dz;
     private final Pattern pattern;
 
-    private transient int dx2;
-    private transient int dy2;
-    private transient int dz2;
-    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
-    private transient SplittableRandom r;
+    private final transient int dx2;
+    private final transient int dy2;
+    private final transient int dz2;
+    private final transient MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final transient SplittableRandom r;
 
     public RandomOffsetPattern(Pattern pattern, int dx, int dy, int dz) {
         this.pattern = pattern;
@@ -49,4 +50,5 @@ public class RandomOffsetPattern extends AbstractPattern {
         mutable.mutZ((set.getZ() + r.nextInt(dz2) - dz));
         return pattern.apply(extent, get, mutable);
     }
+
 }

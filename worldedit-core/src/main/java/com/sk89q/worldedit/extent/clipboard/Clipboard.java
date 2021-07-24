@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
-import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
+import com.fastasyncworldedit.core.function.visitor.Order;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
@@ -38,7 +39,6 @@ import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ForwardExtentCopy;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.fastasyncworldedit.core.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.Transform;
@@ -49,6 +49,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,7 +58,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -69,10 +69,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     //FAWE start
     static Clipboard create(Region region) {
         checkNotNull(region);
-        checkNotNull(region.getWorld(),
-            "World cannot be null (use the other constructor for the region)");
+        checkNotNull(
+                region.getWorld(),
+                "World cannot be null (use the other constructor for the region)"
+        );
         EditSession session = new EditSessionBuilder(region.getWorld()).allowedRegionsEverywhere()
-            .autoQueue(false).build();
+                .autoQueue(false).build();
         return ReadOnlyClipboard.of(session, region);
     }
 
@@ -130,6 +132,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     }
 
     //FAWE start
+
     /**
      * Remove entity from clipboard.
      */
@@ -216,16 +219,20 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         }
     }
 
-    default EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
-        @Nullable Transform transform) {
+    default EditSession paste(
+            World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
+            @Nullable Transform transform
+    ) {
         return paste(world, to, allowUndo, pasteAir, true, transform);
     }
 
     /**
      * Paste this schematic in a world.
      */
-    default EditSession paste(World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
-        boolean copyEntities, @Nullable Transform transform) {
+    default EditSession paste(
+            World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
+            boolean copyEntities, @Nullable Transform transform
+    ) {
         checkNotNull(world);
         checkNotNull(to);
         EditSession editSession;
@@ -233,7 +240,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             editSession = (EditSession) world;
         } else {
             EditSessionBuilder builder = new EditSessionBuilder(world).autoQueue(true)
-                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
+                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
             if (allowUndo) {
                 editSession = builder.build();
             } else {
@@ -250,7 +257,8 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             return editSession;
         }
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, this.getRegion(),
-            this.getOrigin(), editSession, to);
+                this.getOrigin(), editSession, to
+        );
         if (transform != null && !transform.isIdentity()) {
             copy.setTransform(transform);
         }
@@ -272,11 +280,13 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         return editSession;
     }
 
-    default void paste(Extent extent, BlockVector3 to, boolean pasteAir,
-        @Nullable Transform transform) {
+    default void paste(
+            Extent extent, BlockVector3 to, boolean pasteAir,
+            @Nullable Transform transform
+    ) {
         if (extent instanceof World) {
             EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
-                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
+                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
             extent = builder.build();
         }
 
@@ -285,7 +295,8 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             source = new BlockTransformExtent(this, transform);
         }
         ForwardExtentCopy copy = new ForwardExtentCopy(source, this.getRegion(), this.getOrigin(),
-            extent, to);
+                extent, to
+        );
         if (transform != null) {
             copy.setTransform(transform);
         }
@@ -312,7 +323,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
         if (extent instanceof World) {
             EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
-                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
+                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
             extent = builder.build();
         }
 
@@ -350,13 +361,14 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             for (Entity entity : this.getEntities()) {
                 // skip players on pasting schematic
                 if (entity.getState() != null && entity.getState().getType().getId()
-                    .equals("minecraft:player")) {
+                        .equals("minecraft:player")) {
                     continue;
                 }
                 Location pos = entity.getLocation();
                 Location newPos = new Location(pos.getExtent(), pos.getX() + entityOffsetX,
-                    pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
-                    pos.getPitch());
+                        pos.getY() + entityOffsetY, pos.getZ() + entityOffsetZ, pos.getYaw(),
+                        pos.getPitch()
+                );
                 extent.createEntity(newPos, entity.getState());
             }
         }

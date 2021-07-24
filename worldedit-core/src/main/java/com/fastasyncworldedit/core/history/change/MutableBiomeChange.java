@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.history.change;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 
 public class MutableBiomeChange implements Change {
@@ -32,4 +32,5 @@ public class MutableBiomeChange implements Change {
     public void redo(UndoContext context) throws WorldEditException {
         context.getExtent().setBiome(mutable, BiomeTypes.get(to));
     }
+
 }

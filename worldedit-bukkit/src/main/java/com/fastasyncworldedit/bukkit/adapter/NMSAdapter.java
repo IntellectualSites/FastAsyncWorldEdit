@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
-import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
@@ -13,8 +13,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class NMSAdapter implements FAWEPlatformAdapterImpl {
-    public static int createPalette(int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy,
-        int[] num_palette_buffer, char[] set, Map<BlockVector3, Integer> ticking_blocks, boolean fastmode) {
+
+    public static int createPalette(
+            int[] blockToPalette, int[] paletteToBlock, int[] blocksCopy,
+            int[] num_palette_buffer, char[] set, Map<BlockVector3, Integer> ticking_blocks, boolean fastmode
+    ) {
         int air = 0;
         int num_palette = 0;
         char lastOrdinal = BlockID.__RESERVED__;
@@ -43,9 +46,11 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                         if (ticking) {
                             BlockState state = BlockState.getFromOrdinal(ordinal);
                             ticking_blocks
-                                .put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
-                                    WorldEditPlugin.getInstance().getBukkitImplAdapter()
-                                        .getInternalBlockStateId(state).orElse(0));
+                                    .put(
+                                            BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                                            WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                                                    .getInternalBlockStateId(state).orElse(0)
+                                    );
                         }
                     }
             }
@@ -61,9 +66,11 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         return air;
     }
 
-    public static int createPalette(int layer, int[] blockToPalette, int[] paletteToBlock,
-        int[] blocksCopy, int[] num_palette_buffer, Function<Integer, char[]> get, char[] set,
-        Map<BlockVector3, Integer> ticking_blocks, boolean fastmode) {
+    public static int createPalette(
+            int layer, int[] blockToPalette, int[] paletteToBlock,
+            int[] blocksCopy, int[] num_palette_buffer, Function<Integer, char[]> get, char[] set,
+            Map<BlockVector3, Integer> ticking_blocks, boolean fastmode
+    ) {
         int air = 0;
         int num_palette = 0;
         char[] getArr = null;
@@ -100,9 +107,11 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                                 if (ticking) {
                                     BlockState state = BlockState.getFromOrdinal(ordinal);
                                     ticking_blocks
-                                        .put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
-                                            WorldEditPlugin.getInstance().getBukkitImplAdapter()
-                                                .getInternalBlockStateId(state).orElse(0));
+                                            .put(
+                                                    BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                                                    WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                                                            .getInternalBlockStateId(state).orElse(0)
+                                            );
                                 }
                             }
                     }
@@ -126,9 +135,11 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                 }
                 if (ticking) {
                     BlockState state = BlockState.getFromOrdinal(ordinal);
-                    ticking_blocks.put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
-                        WorldEditPlugin.getInstance().getBukkitImplAdapter()
-                            .getInternalBlockStateId(state).orElse(0));
+                    ticking_blocks.put(
+                            BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                            WorldEditPlugin.getInstance().getBukkitImplAdapter()
+                                    .getInternalBlockStateId(state).orElse(0)
+                    );
                 }
             }
             int palette = blockToPalette[ordinal];
@@ -192,4 +203,5 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         }
         ((BukkitGetBlocks) chunk).send(mask, lighting);
     }
+
 }

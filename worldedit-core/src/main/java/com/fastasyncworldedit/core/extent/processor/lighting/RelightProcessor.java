@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.extent.processor.lighting;
 
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.configuration.Settings;
 import com.sk89q.worldedit.extent.Extent;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,4 +59,5 @@ public class RelightProcessor implements IBatchProcessor {
     public ProcessorScope getScope() {
         return ProcessorScope.READING_SET_BLOCKS;
     }
+
 }

@@ -6,6 +6,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
 public abstract class SimpleClipboard implements Clipboard {
+
     private final BlockVector3 size;
     private final int area;
     private final int volume;
@@ -80,4 +81,5 @@ public abstract class SimpleClipboard implements Clipboard {
     public int getVolume() {
         return volume;
     }
+
 }

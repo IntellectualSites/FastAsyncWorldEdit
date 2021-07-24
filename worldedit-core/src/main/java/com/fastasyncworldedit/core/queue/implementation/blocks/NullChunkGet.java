@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.queue.implementation.blocks;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 public final class NullChunkGet implements IChunkGet {
+
     private static final NullChunkGet instance = new NullChunkGet();
 
     public static NullChunkGet getInstance() {
@@ -39,7 +40,8 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public void removeSectionLighting(int layer, boolean sky) {}
+    public void removeSectionLighting(int layer, boolean sky) {
+    }
 
     @NotNull
     public BlockState getBlock(int x, int y, int z) {
@@ -66,20 +68,26 @@ public final class NullChunkGet implements IChunkGet {
         return null;
     }
 
-    @Override public void setCreateCopy(boolean createCopy) {}
+    @Override
+    public void setCreateCopy(boolean createCopy) {
+    }
 
-    @Override public boolean isCreateCopy() {
+    @Override
+    public boolean isCreateCopy() {
         return false;
     }
 
     @Override
-    public void setLightingToGet(char[][] lighting) {}
+    public void setLightingToGet(char[][] lighting) {
+    }
 
     @Override
-    public void setSkyLightingToGet(char[][] lighting) {}
+    public void setSkyLightingToGet(char[][] lighting) {
+    }
 
     @Override
-    public void setHeightmapToGet(HeightMapType type, int[] data) {}
+    public void setHeightmapToGet(HeightMapType type, int[] data) {
+    }
 
     public boolean trim(boolean aggressive) {
         return true;

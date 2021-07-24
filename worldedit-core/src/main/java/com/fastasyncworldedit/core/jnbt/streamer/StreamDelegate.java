@@ -44,7 +44,11 @@ public class StreamDelegate {
 
     private StreamDelegate add(String name, StreamDelegate scope) {
         if (valueReader != null) {
-            LOGGER.warn("Scope {} | {} may not run, as the stream is only read once, and a value reader is already set", name, scope);
+            LOGGER.warn(
+                    "Scope {} | {} may not run, as the stream is only read once, and a value reader is already set",
+                    name,
+                    scope
+            );
         }
         byte[] bytes = name.getBytes(NBTConstants.CHARSET);
         int maxSize = bytes.length;
@@ -116,7 +120,7 @@ public class StreamDelegate {
                 }
                 if (index != keys.length - 1) {
                     int max;
-                    for (max = index + 1; max < keys.length;) {
+                    for (max = index + 1; max < keys.length; ) {
                         byte[] key = keys[max];
                         if (key.length == nameLength) {
                             max++;
@@ -228,4 +232,5 @@ public class StreamDelegate {
         }
         return false;
     }
+
 }

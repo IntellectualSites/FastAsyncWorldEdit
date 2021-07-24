@@ -61,7 +61,14 @@ public class FloodFillTool implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
+    public boolean actPrimary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         World world = (World) clicked.getExtent();
 
         BlockVector3 origin = clicked.toVector().toBlockPoint();
@@ -94,8 +101,10 @@ public class FloodFillTool implements BlockTool {
         return true;
     }
 
-    private void recurse(EditSession editSession, BlockVector3 pos, BlockVector3 origin, int size, BlockType initialType,
-            Set<BlockVector3> visited) throws MaxChangedBlocksException {
+    private void recurse(
+            EditSession editSession, BlockVector3 pos, BlockVector3 origin, int size, BlockType initialType,
+            Set<BlockVector3> visited
+    ) throws MaxChangedBlocksException {
 
         if (origin.distance(pos) > size || visited.contains(pos)) {
             return;
@@ -110,17 +119,23 @@ public class FloodFillTool implements BlockTool {
         }
 
         recurse(editSession, pos.add(1, 0, 0),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(editSession, pos.add(-1, 0, 0),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(editSession, pos.add(0, 0, 1),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(editSession, pos.add(0, 0, -1),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(editSession, pos.add(0, 1, 0),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(editSession, pos.add(0, -1, 0),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
     }
 
 }

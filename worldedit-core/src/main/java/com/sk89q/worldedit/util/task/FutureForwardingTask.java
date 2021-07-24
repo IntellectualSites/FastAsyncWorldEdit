@@ -22,11 +22,11 @@ package com.sk89q.worldedit.util.task;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.sk89q.worldedit.util.task.progress.Progress;
 
+import javax.annotation.Nullable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -109,9 +109,9 @@ public class FutureForwardingTask<V> extends AbstractTask<V> {
      * Create a new instance.
      *
      * @param future the future
-     * @param name the name of the task
-     * @param owner the owner of the task, or {@code null}
-     * @param <V> the type returned by the future
+     * @param name   the name of the task
+     * @param owner  the owner of the task, or {@code null}
+     * @param <V>    the type returned by the future
      * @return a new instance
      */
     public static <V> FutureForwardingTask<V> create(ListenableFuture<V> future, String name, @Nullable Object owner) {

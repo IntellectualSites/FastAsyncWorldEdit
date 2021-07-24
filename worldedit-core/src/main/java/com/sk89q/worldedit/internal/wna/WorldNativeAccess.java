@@ -38,13 +38,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Natively access and perform operations on the world.
  *
- * @param <NC> the native chunk type
+ * @param <NC>  the native chunk type
  * @param <NBS> the native block state type
- * @param <NP> the native position type
+ * @param <NP>  the native position type
  */
 public interface WorldNativeAccess<NC, NBS, NP> {
 
-    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws
+            WorldEditException {
         checkNotNull(position);
         checkNotNull(block);
         setCurrentSideEffectSet(sideEffects);
@@ -73,10 +74,10 @@ public interface WorldNativeAccess<NC, NBS, NP> {
                 CompoundBinaryTag tag = baseBlock.getNbt();
                 if (tag != null) {
                     tag = tag.put(ImmutableMap.of(
-                        "id", StringBinaryTag.of(baseBlock.getNbtId()),
-                        "x", IntBinaryTag.of(position.getX()),
-                        "y", IntBinaryTag.of(position.getY()),
-                        "z", IntBinaryTag.of(position.getZ())
+                            "id", StringBinaryTag.of(baseBlock.getNbtId()),
+                            "x", IntBinaryTag.of(position.getX()),
+                            "y", IntBinaryTag.of(position.getY()),
+                            "z", IntBinaryTag.of(position.getZ())
                     ));
 
                     // update if TE changed as well

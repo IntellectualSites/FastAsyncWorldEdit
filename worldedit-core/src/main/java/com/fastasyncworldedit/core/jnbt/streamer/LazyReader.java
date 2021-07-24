@@ -6,5 +6,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 
 public interface LazyReader extends StreamReader<DataInputStream> {
+
     void apply(int index, NBTInputStream stream) throws IOException;
+
 }

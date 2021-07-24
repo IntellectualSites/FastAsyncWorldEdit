@@ -5,6 +5,7 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class IntersectRegionFunction implements RegionFunction {
+
     private final RegionFunction[] functions;
 
     public IntersectRegionFunction(RegionFunction... functions) {
@@ -23,4 +24,5 @@ public class IntersectRegionFunction implements RegionFunction {
         }
         return ret;
     }
+
 }

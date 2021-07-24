@@ -66,6 +66,7 @@ public abstract class Vector3 {
 
     // thread-safe initialization idiom
     private static final class YzxOrderComparator {
+
         private static final Comparator<Vector3> YZX_ORDER = (a, b) -> {
             return ComparisonChain.start()
                     .compare(a.getY(), b.getY())
@@ -73,6 +74,7 @@ public abstract class Vector3 {
                     .compare(a.getX(), b.getX())
                     .result();
         };
+
     }
 
     /**
@@ -87,6 +89,7 @@ public abstract class Vector3 {
     }
 
     //FAWE start
+
     /**
      * Gets the x coordinate rounded, accounting for negative coordinates
      *
@@ -484,9 +487,9 @@ public abstract class Vector3 {
     //FAWE start - getter
     public Vector3 cross(Vector3 other) {
         return Vector3.at(
-            getY() * other.getZ() - getZ() * other.getY(),
-            getZ() * other.getX() - getX() * other.getZ(),
-            getX() * other.getY() - getY() * other.getX()
+                getY() * other.getZ() - getZ() * other.getY(),
+                getZ() * other.getX() - getX() * other.getZ(),
+                getX() * other.getY() - getY() * other.getX()
         );
     }
     //FAWE end
@@ -500,7 +503,8 @@ public abstract class Vector3 {
      */
     //FAWE start - getter
     public boolean containedWithin(Vector3 min, Vector3 max) {
-        return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max.getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
+        return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max.getY() && getZ() >= min.getZ() && getZ() <= max
+                .getZ();
     }
     //FAWE end
 
@@ -585,9 +589,9 @@ public abstract class Vector3 {
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle in degrees
-     * @param aboutX about which x coordinate to rotate
-     * @param aboutZ about which z coordinate to rotate
+     * @param angle      in degrees
+     * @param aboutX     about which x coordinate to rotate
+     * @param aboutZ     about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
@@ -604,9 +608,9 @@ public abstract class Vector3 {
         double z2 = x * sin + z * cos;
 
         return Vector3.at(
-            x2 + aboutX + translateX,
-            getY(),
-            z2 + aboutZ + translateZ
+                x2 + aboutX + translateX,
+                getY(),
+                z2 + aboutZ + translateZ
         );
     }
     //FAWE end
@@ -724,6 +728,7 @@ public abstract class Vector3 {
     }
 
     //FAWE start
+
     /**
      * Tests if vectors are equal, accounting for floating point errors
      *
@@ -742,10 +747,7 @@ public abstract class Vector3 {
         if (Math.abs(getY() - other.getY()) > 0.000001d) {
             return false;
         }
-        if (Math.abs(getZ() - other.getZ()) > 0.000001d) {
-            return false;
-        }
-        return true;
+        return !(Math.abs(getZ() - other.getZ()) > 0.000001d);
     }
     //FAWE end
 
@@ -767,6 +769,7 @@ public abstract class Vector3 {
 
     /**
      * Returns a string representation that is supported by the parser.
+     *
      * @return string
      */
     //FAWE start - getter

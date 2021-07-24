@@ -85,6 +85,7 @@ public interface ChangeSet extends Closeable {
     int size();
 
     //FAWE start
+
     /**
      * Close the changeset.
      */
@@ -108,6 +109,7 @@ public interface ChangeSet extends Closeable {
 
     /**
      * Get if the changeset is empty (i.e. size == 0)
+     *
      * @return is empty
      */
     default boolean isEmpty() {

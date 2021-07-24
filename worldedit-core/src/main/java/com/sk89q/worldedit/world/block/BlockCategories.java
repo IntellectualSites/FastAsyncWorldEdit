@@ -26,6 +26,7 @@ package com.sk89q.worldedit.world.block;
  */
 @SuppressWarnings("unused")
 public final class BlockCategories {
+
     public static final BlockCategory ACACIA_LOGS = get("minecraft:acacia_logs");
     public static final BlockCategory ANVIL = get("minecraft:anvil");
     public static final BlockCategory BAMBOO_PLANTABLE_ON = get("minecraft:bamboo_plantable_on");
@@ -57,7 +58,8 @@ public final class BlockCategories {
     public static final BlockCategory DEEPSLATE_ORE_REPLACEABLES = get("minecraft:deepslate_ore_replaceables");
     public static final BlockCategory DIAMOND_ORES = get("minecraft:diamond_ores");
     public static final BlockCategory DIRT = get("minecraft:dirt");
-    @Deprecated public static final BlockCategory DIRT_LIKE = get("minecraft:dirt_like");
+    @Deprecated
+    public static final BlockCategory DIRT_LIKE = get("minecraft:dirt_like");
     public static final BlockCategory DOORS = get("minecraft:doors");
     public static final BlockCategory DRAGON_IMMUNE = get("minecraft:dragon_immune");
     public static final BlockCategory DRIPSTONE_REPLACEABLE_BLOCKS = get("minecraft:dripstone_replaceable_blocks");
@@ -163,4 +165,5 @@ public final class BlockCategories {
         }
         return entry;
     }
+
 }

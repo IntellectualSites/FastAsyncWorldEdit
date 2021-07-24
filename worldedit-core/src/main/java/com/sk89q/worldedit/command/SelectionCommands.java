@@ -109,15 +109,17 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/pos1",
-        aliases = "/1",
-        desc = "Set position 1"
+            name = "/pos1",
+            aliases = "/1",
+            desc = "Set position 1"
     )
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.pos")
-    public void pos1(Actor actor, World world, LocalSession session,
-                     @Arg(desc = "Coordinates to set position 1 to", def = "")
-                         BlockVector3 coordinates) throws WorldEditException {
+    public void pos1(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "Coordinates to set position 1 to", def = "")
+                    BlockVector3 coordinates
+    ) throws WorldEditException {
         Location pos;
         //FAWE start - clamp
         if (coordinates != null) {
@@ -140,15 +142,17 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/pos2",
+            name = "/pos2",
             aliases = "/2",
-        desc = "Set position 2"
+            desc = "Set position 2"
     )
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.pos")
-    public void pos2(Actor actor, World world, LocalSession session,
-                     @Arg(desc = "Coordinates to set position 2 to", def = "")
-                         BlockVector3 coordinates) throws WorldEditException {
+    public void pos2(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "Coordinates to set position 2 to", def = "")
+                    BlockVector3 coordinates
+    ) throws WorldEditException {
         Location pos;
         if (coordinates != null) {
             //FAWE start - clamp
@@ -161,7 +165,10 @@ public class SelectionCommands {
             return;
         }
 
-        if (!session.getRegionSelector(world).selectSecondary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(actor))) {
+        if (!session.getRegionSelector(world).selectSecondary(
+                pos.toVector().toBlockPoint(),
+                ActorSelectorLimits.forActor(actor)
+        )) {
             actor.print(Caption.of("worldedit.pos.already-set"));
             return;
         }
@@ -171,8 +178,8 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/hpos1",
-        desc = "Set position 1 to targeted block"
+            name = "/hpos1",
+            desc = "Set position 1 to targeted block"
     )
     @CommandPermissions("worldedit.selection.hpos")
     public void hpos1(Player player, LocalSession session) throws WorldEditException {
@@ -180,7 +187,10 @@ public class SelectionCommands {
         Location pos = player.getBlockTrace(300);
 
         if (pos != null) {
-            if (!session.getRegionSelector(player.getWorld()).selectPrimary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(player))) {
+            if (!session.getRegionSelector(player.getWorld()).selectPrimary(
+                    pos.toVector().toBlockPoint(),
+                    ActorSelectorLimits.forActor(player)
+            )) {
                 player.print(Caption.of("worldedit.hpos.already-set"));
                 return;
             }
@@ -193,8 +203,8 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/hpos2",
-        desc = "Set position 2 to targeted block"
+            name = "/hpos2",
+            desc = "Set position 2 to targeted block"
     )
     @CommandPermissions("worldedit.selection.hpos")
     public void hpos2(Player player, LocalSession session) throws WorldEditException {
@@ -202,7 +212,10 @@ public class SelectionCommands {
         Location pos = player.getBlockTrace(300);
 
         if (pos != null) {
-            if (!session.getRegionSelector(player.getWorld()).selectSecondary(pos.toVector().toBlockPoint(), ActorSelectorLimits.forActor(player))) {
+            if (!session.getRegionSelector(player.getWorld()).selectSecondary(
+                    pos.toVector().toBlockPoint(),
+                    ActorSelectorLimits.forActor(player)
+            )) {
                 player.print(Caption.of("worldedit.hpos.already-set"));
                 return;
             }
@@ -215,19 +228,21 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/chunk",
-        desc = "Set the selection to your current chunk.",
-        descFooter = "This command selects 256-block-tall areas,\nwhich can be specified by the y-coordinate.\nE.g. -c x,1,z will select from y=256 to y=511."
+            name = "/chunk",
+            desc = "Set the selection to your current chunk.",
+            descFooter = "This command selects 256-block-tall areas,\nwhich can be specified by the y-coordinate.\nE.g. -c x,1,z will select from y=256 to y=511."
     )
     @Logging(POSITION)
     @CommandPermissions("worldedit.selection.chunk")
-    public void chunk(Actor actor, World world, LocalSession session,
-                      @Arg(desc = "The chunk to select", def = "")
-                          BlockVector3 coordinates,
-                      @Switch(name = 's', desc = "Expand your selection to encompass all chunks that are part of it")
-                          boolean expandSelection,
-                      @Switch(name = 'c', desc = "Use chunk coordinates instead of block coordinates")
-                          boolean useChunkCoordinates) throws WorldEditException {
+    public void chunk(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "The chunk to select", def = "")
+                    BlockVector3 coordinates,
+            @Switch(name = 's', desc = "Expand your selection to encompass all chunks that are part of it")
+                    boolean expandSelection,
+            @Switch(name = 'c', desc = "Use chunk coordinates instead of block coordinates")
+                    boolean useChunkCoordinates
+    ) throws WorldEditException {
         final BlockVector3 min;
         final BlockVector3 max;
         if (expandSelection) {
@@ -258,8 +273,8 @@ public class SelectionCommands {
             if (coordinates != null) {
                 // coords specified
                 minChunk = useChunkCoordinates
-                    ? coordinates
-                    : ChunkStore.toChunk3d(coordinates);
+                        ? coordinates
+                        : ChunkStore.toChunk3d(coordinates);
             } else {
                 // use player loc
                 if (actor instanceof Locatable) {
@@ -272,10 +287,12 @@ public class SelectionCommands {
             min = minChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS);
             max = min.add(15, world.getMaxY(), 15);
 
-            actor.print(Caption.of("worldedit.chunk.selected",
+            actor.print(Caption.of(
+                    "worldedit.chunk.selected",
                     TextComponent.of(minChunk.getBlockX()),
                     TextComponent.of(minChunk.getBlockY()),
-                    TextComponent.of(minChunk.getBlockZ())));
+                    TextComponent.of(minChunk.getBlockZ())
+            ));
         }
 
         final CuboidRegionSelector selector;
@@ -293,12 +310,14 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/wand",
-        desc = "Get the wand object"
+            name = "/wand",
+            desc = "Get the wand object"
     )
     @CommandPermissions("worldedit.wand")
-    public void wand(Player player, LocalSession session,
-                        @Switch(name = 'n', desc = "Get a navigation wand") boolean navWand) throws WorldEditException {
+    public void wand(
+            Player player, LocalSession session,
+            @Switch(name = 'n', desc = "Get a navigation wand") boolean navWand
+    ) throws WorldEditException {
         //FAWE start
         session.loadDefaults(player, true);
         //FAWE end
@@ -324,9 +343,9 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "toggleeditwand",
-        aliases = { "/toggleeditwand" },
-        desc = "Remind the user that the wand is now a tool and can be unbound with /tool none."
+            name = "toggleeditwand",
+            aliases = {"/toggleeditwand"},
+            desc = "Remind the user that the wand is now a tool and can be unbound with /tool none."
     )
     @CommandPermissions("worldedit.wand.toggle")
     public void toggleWand(Player player) {
@@ -344,19 +363,21 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/contract",
-        desc = "Contract the selection area"
+            name = "/contract",
+            desc = "Contract the selection area"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.selection.contract")
-    public void contract(Actor actor, World world, LocalSession session,
-                         @Arg(desc = "Amount to contract the selection by")
-                             int amount,
-                         @Arg(desc = "Amount to contract the selection by in the other direction", def = "0")
-                             int reverseAmount,
-                         @Arg(desc = "Direction to contract", def = Direction.AIM)
-                         @MultiDirection
-                             List<BlockVector3> direction) throws WorldEditException {
+    public void contract(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "Amount to contract the selection by")
+                    int amount,
+            @Arg(desc = "Amount to contract the selection by in the other direction", def = "0")
+                    int reverseAmount,
+            @Arg(desc = "Direction to contract", def = Direction.AIM)
+            @MultiDirection
+                    List<BlockVector3> direction
+    ) throws WorldEditException {
         try {
             Region region = session.getSelection(world);
             long oldSize = region.getVolume();
@@ -381,17 +402,19 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/shift",
-        desc = "Shift the selection area"
+            name = "/shift",
+            desc = "Shift the selection area"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.selection.shift")
-    public void shift(Actor actor, World world, LocalSession session,
-                      @Arg(desc = "Amount to shift the selection by")
-                          int amount,
-                      @Arg(desc = "Direction to contract", def = Direction.AIM)
-                      @MultiDirection
-                          List<BlockVector3> direction) throws WorldEditException {
+    public void shift(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "Amount to shift the selection by")
+                    int amount,
+            @Arg(desc = "Direction to contract", def = Direction.AIM)
+            @MultiDirection
+                    List<BlockVector3> direction
+    ) throws WorldEditException {
         try {
             Region region = session.getSelection(world);
 
@@ -410,18 +433,20 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/outset",
-        desc = "Outset the selection area"
+            name = "/outset",
+            desc = "Outset the selection area"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.selection.outset")
-    public void outset(Actor actor, World world, LocalSession session,
-                       @Arg(desc = "Amount to expand the selection by in all directions")
-                           int amount,
-                       @Switch(name = 'h', desc = "Only expand horizontally")
-                           boolean onlyHorizontal,
-                       @Switch(name = 'v', desc = "Only expand vertically")
-                           boolean onlyVertical) throws WorldEditException {
+    public void outset(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "Amount to expand the selection by in all directions")
+                    int amount,
+            @Switch(name = 'h', desc = "Only expand horizontally")
+                    boolean onlyHorizontal,
+            @Switch(name = 'v', desc = "Only expand vertically")
+                    boolean onlyVertical
+    ) throws WorldEditException {
         Region region = session.getSelection(world);
         region.expand(getChangesForEachDir(amount, onlyHorizontal, onlyVertical));
         session.getRegionSelector(world).learnChanges();
@@ -430,18 +455,20 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/inset",
-        desc = "Inset the selection area"
+            name = "/inset",
+            desc = "Inset the selection area"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.selection.inset")
-    public void inset(Actor actor, World world, LocalSession session,
-                      @Arg(desc = "Amount to contract the selection by in all directions")
-                          int amount,
-                      @Switch(name = 'h', desc = "Only contract horizontally")
-                          boolean onlyHorizontal,
-                      @Switch(name = 'v', desc = "Only contract vertically")
-                          boolean onlyVertical) throws WorldEditException {
+    public void inset(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "Amount to contract the selection by in all directions")
+                    int amount,
+            @Switch(name = 'h', desc = "Only contract horizontally")
+                    boolean onlyHorizontal,
+            @Switch(name = 'v', desc = "Only contract vertically")
+                    boolean onlyVertical
+    ) throws WorldEditException {
         Region region = session.getSelection(world);
         region.contract(getChangesForEachDir(amount, onlyHorizontal, onlyVertical));
         session.getRegionSelector(world).learnChanges();
@@ -468,13 +495,15 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/size",
-        desc = "Get information about the selection"
+            name = "/size",
+            desc = "Get information about the selection"
     )
     @CommandPermissions("worldedit.selection.size")
-    public void size(Actor actor, World world, LocalSession session,
-                     @Switch(name = 'c', desc = "Get clipboard info instead")
-                         boolean clipboardInfo) throws WorldEditException {
+    public void size(
+            Actor actor, World world, LocalSession session,
+            @Switch(name = 'c', desc = "Get clipboard info instead")
+                    boolean clipboardInfo
+    ) throws WorldEditException {
         Region region;
         if (clipboardInfo) {
             //FAWE start - Modify for cross server clipboards
@@ -503,7 +532,13 @@ public class SelectionCommands {
                 String originStr = origin.getBlockX() + "," + origin.getBlockY() + "," + origin.getBlockZ();
 
                 long numBlocks = ((long) size.getBlockX() * size.getBlockY() * size.getBlockZ());
-                actor.print(Caption.of("worldedit.size.offset", TextComponent.of(name), TextComponent.of(sizeStr), TextComponent.of(originStr), TextComponent.of(numBlocks)));
+                actor.print(Caption.of(
+                        "worldedit.size.offset",
+                        TextComponent.of(name),
+                        TextComponent.of(sizeStr),
+                        TextComponent.of(originStr),
+                        TextComponent.of(numBlocks)
+                ));
                 index++;
             }
             return;
@@ -522,35 +557,42 @@ public class SelectionCommands {
                 .add(1, 1, 1);
 
         actor.print(Caption.of("worldedit.size.size", TextComponent.of(size.toString())));
-        actor.print(Caption.of("worldedit.size.distance", TextComponent.of(region.getMaximumPoint().distance(region.getMinimumPoint()))));
+        actor.print(Caption.of(
+                "worldedit.size.distance",
+                TextComponent.of(region.getMaximumPoint().distance(region.getMinimumPoint()))
+        ));
         actor.print(Caption.of("worldedit.size.blocks", TextComponent.of(region.getVolume())));
     }
 
     @Command(
-        name = "/count",
-        desc = "Counts the number of blocks matching a mask"
+            name = "/count",
+            desc = "Counts the number of blocks matching a mask"
     )
     @CommandPermissions("worldedit.analysis.count")
-    public int count(Actor actor, World world, LocalSession session, EditSession editSession,
-                      @Arg(desc = "The mask of blocks to match")
-                          Mask mask) throws WorldEditException {
+    public int count(
+            Actor actor, World world, LocalSession session, EditSession editSession,
+            @Arg(desc = "The mask of blocks to match")
+                    Mask mask
+    ) throws WorldEditException {
         int count = editSession.countBlocks(session.getSelection(world), mask);
         actor.print(Caption.of("worldedit.count.counted", TextComponent.of(count)));
         return count;
     }
 
     @Command(
-        name = "/distr",
-        desc = "Get the distribution of blocks in the selection"
+            name = "/distr",
+            desc = "Get the distribution of blocks in the selection"
     )
     @CommandPermissions("worldedit.analysis.distr")
-    public void distr(Actor actor, World world, LocalSession session,
-                      @Switch(name = 'c', desc = "Get the distribution of the clipboard instead")
-                          boolean clipboardDistr,
-                      @Switch(name = 'd', desc = "Separate blocks by state")
-                          boolean separateStates,
-                      @ArgFlag(name = 'p', desc = "Gets page from a previous distribution.")
-                          Integer page) throws WorldEditException {
+    public void distr(
+            Actor actor, World world, LocalSession session,
+            @Switch(name = 'c', desc = "Get the distribution of the clipboard instead")
+                    boolean clipboardDistr,
+            @Switch(name = 'd', desc = "Separate blocks by state")
+                    boolean separateStates,
+            @ArgFlag(name = 'p', desc = "Gets page from a previous distribution.")
+                    Integer page
+    ) throws WorldEditException {
         List<Countable<BlockState>> distribution;
 
         if (page == null) {
@@ -588,18 +630,20 @@ public class SelectionCommands {
     }
 
     @Command(
-        name = "/sel",
-        aliases = { ";", "/desel", "/deselect" },
-        desc = "Choose a region selector"
+            name = "/sel",
+            aliases = {";", "/desel", "/deselect"},
+            desc = "Choose a region selector"
     )
     //FAWE start
     @CommandPermissions("worldedit.analysis.sel")
     //FAWE end
-    public void select(Actor actor, World world, LocalSession session,
-                       @Arg(desc = "Selector to switch to", def = "")
-                           SelectorChoice selector,
-                       @Switch(name = 'd', desc = "Set default selector")
-                           boolean setDefaultSelector) throws WorldEditException {
+    public void select(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "Selector to switch to", def = "")
+                    SelectorChoice selector,
+            @Switch(name = 'd', desc = "Set default selector")
+                    boolean setDefaultSelector
+    ) throws WorldEditException {
         if (selector == null) {
             session.getRegionSelector(world).clear();
             session.dispatchCUISelection(actor);
@@ -623,7 +667,10 @@ public class SelectionCommands {
                 newSelector = new Polygonal2DRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.poly.message"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolygonVertexLimit();
-                limit.ifPresent(integer -> actor.print(Caption.of("worldedit.select.poly.limit-message", TextComponent.of(integer))));
+                limit.ifPresent(integer -> actor.print(Caption.of(
+                        "worldedit.select.poly.limit-message",
+                        TextComponent.of(integer)
+                )));
                 break;
             }
             case ELLIPSOID:
@@ -644,7 +691,10 @@ public class SelectionCommands {
                 newSelector = new ConvexPolyhedralRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.convex.message"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
-                limit.ifPresent(integer -> actor.print(Caption.of("worldedit.select.convex.limit-message", TextComponent.of(integer))));
+                limit.ifPresent(integer -> actor.print(Caption.of(
+                        "worldedit.select.convex.limit-message",
+                        TextComponent.of(integer)
+                )));
                 break;
             }
             //FAWE start
@@ -767,5 +817,7 @@ public class SelectionCommands {
                     .append(TextComponent.newline());
             return super.create(page);
         }
+
     }
+
 }

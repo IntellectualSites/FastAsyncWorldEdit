@@ -17,7 +17,8 @@ public class ReflectionUtils {
         return t.isInstance(o) ? t.cast(o) : null;
     }
 
-    public static void setAccessibleNonFinal(Field field) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public static void setAccessibleNonFinal(Field field) throws IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
         // let's make the field accessible
         field.setAccessible(true);
 
@@ -31,15 +32,16 @@ public class ReflectionUtils {
 
                 // blank out the final bit in the modifiers int
                 ((MethodHandles.Lookup) lookupField.get(null))
-                    .findSetter(Field.class, "modifiers", int.class)
-                    .invokeExact(field, field.getModifiers() & ~Modifier.FINAL);
+                        .findSetter(Field.class, "modifiers", int.class)
+                        .invokeExact(field, field.getModifiers() & ~Modifier.FINAL);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void setFailsafeFieldValue(Field field, Object target, Object value) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public static void setFailsafeFieldValue(Field field, Object target, Object value) throws IllegalAccessException,
+            NoSuchMethodException, InvocationTargetException {
         setAccessibleNonFinal(field);
         field.set(target, value);
     }
@@ -110,4 +112,5 @@ public class ReflectionUtils {
             return null;
         }
     }
+
 }

@@ -21,15 +21,15 @@ package com.sk89q.worldedit.internal.util;
 
 import com.sk89q.worldedit.WorldEditManifest;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.UIManager;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class InfoEntryPoint {
 
@@ -68,6 +68,7 @@ public class InfoEntryPoint {
     }
 
     private static class NavigableEditorPane extends JTextPane {
+
         public NavigableEditorPane(String htmlBody) {
             super(new HTMLDocument());
             setEditorKit(new HTMLEditorKit());
@@ -86,5 +87,7 @@ public class InfoEntryPoint {
             setEditable(false);
             setBorder(null);
         }
+
     }
+
 }

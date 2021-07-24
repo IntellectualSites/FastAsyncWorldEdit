@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.extent.filter.MaskFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.InverseMask;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.math.BlockVector3;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,9 +52,11 @@ public interface Mask {
     }
 
     //FAWE start
+
     /**
      * Returns null if no optimization took place
      * otherwise a new/same mask
+     *
      * @return
      */
     @Nullable
@@ -105,6 +107,7 @@ public interface Mask {
 
     /**
      * Returns a copy of the mask. Usually for multi-threaded operation
+     *
      * @return a clone of the mask
      */
     Mask copy();

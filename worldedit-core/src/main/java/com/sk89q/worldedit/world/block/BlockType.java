@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
-import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -32,7 +33,6 @@ import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.item.ItemType;
@@ -41,6 +41,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,6 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -62,7 +62,7 @@ public class BlockType implements Keyed, Pattern {
     private final String id;
     private final BlockTypesCache.Settings settings;
     private final LazyReference<FuzzyBlockState> emptyFuzzy
-        = LazyReference.from(() -> new FuzzyBlockState(this));
+            = LazyReference.from(() -> new FuzzyBlockState(this));
 
     //FAWE start
     private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
@@ -106,7 +106,7 @@ public class BlockType implements Keyed, Pattern {
 
     public Component getRichName() {
         return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
-            .getRegistries().getBlockRegistry().getRichName(this);
+                .getRegistries().getBlockRegistry().getRichName(this);
     }
 
     //FAWE start
@@ -148,12 +148,20 @@ public class BlockType implements Keyed, Pattern {
         if (settings.stateOrdinals == null) {
             return settings.defaultState;
         } else if (propertyId >= settings.stateOrdinals.length || propertyId < 0) {
-            LOGGER.error("Attempted to load blockstate with id {} of type {} outside of state ordinals length. Using default state.", propertyId, getId());
+            LOGGER.error(
+                    "Attempted to load blockstate with id {} of type {} outside of state ordinals length. Using default state.",
+                    propertyId,
+                    getId()
+            );
             return settings.defaultState;
         }
         int ordinal = settings.stateOrdinals[propertyId];
         if (ordinal >= BlockTypesCache.states.length || ordinal < 0) {
-            LOGGER.error("Attempted to load blockstate with ordinal {} of type {} outside of states length. Using default state. Using default state.", ordinal, getId());
+            LOGGER.error(
+                    "Attempted to load blockstate with ordinal {} of type {} outside of states length. Using default state. Using default state.",
+                    ordinal,
+                    getId()
+            );
             return settings.defaultState;
         }
         return BlockTypesCache.states[ordinal];
@@ -244,7 +252,8 @@ public class BlockType implements Keyed, Pattern {
         if (settings.stateOrdinals == null) {
             return Collections.singletonList(getDefaultState());
         }
-        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
+        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(
+                Collectors.toList());
         //FAWE end
     }
 
@@ -311,7 +320,7 @@ public class BlockType implements Keyed, Pattern {
 
     /**
      * Gets the legacy ID. Needed for legacy reasons.
-     *
+     * <p>
      * DO NOT USE THIS.
      *
      * @return legacy id or 0, if unknown
@@ -326,7 +335,7 @@ public class BlockType implements Keyed, Pattern {
 
     /**
      * Gets the legacy data. Needed for legacy reasons.
-     *
+     * <p>
      * DO NOT USE THIS.
      *
      * @return legacy data or 0, if unknown
@@ -364,6 +373,7 @@ public class BlockType implements Keyed, Pattern {
     }
 
     //FAWE start
+
     /**
      * The internal index of this type.
      *

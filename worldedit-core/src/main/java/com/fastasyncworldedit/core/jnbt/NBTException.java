@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.jnbt;
 
 public class NBTException extends RuntimeException {
+
     public NBTException(String message) {
         super(message);
     }
@@ -14,4 +15,5 @@ public class NBTException extends RuntimeException {
     public Throwable fillInStackTrace() {
         return this;
     }
+
 }

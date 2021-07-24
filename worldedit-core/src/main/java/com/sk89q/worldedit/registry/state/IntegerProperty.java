@@ -21,9 +21,9 @@ package com.sk89q.worldedit.registry.state;
 
 import com.fastasyncworldedit.core.util.StringMan;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 
 public class IntegerProperty extends AbstractProperty<Integer> {
 
@@ -85,4 +85,5 @@ public class IntegerProperty extends AbstractProperty<Integer> {
             throw new IllegalArgumentException("Invalid int value: " + string + ". Not an int.");
         }
     }
+
 }

@@ -44,6 +44,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -53,7 +54,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -221,7 +221,8 @@ public class SessionManager {
         return false;
     }
 
-    private void setDefaultWand(String sessionItem, String configItem, LocalSession session, Tool wand) throws InvalidToolBindException {
+    private void setDefaultWand(String sessionItem, String configItem, LocalSession session, Tool wand) throws
+            InvalidToolBindException {
         ItemType wandItem = null;
         if (sessionItem != null) {
             wandItem = ItemTypes.get(sessionItem);
@@ -373,6 +374,7 @@ public class SessionManager {
      * Stores the owner of a session, the session, and the last active time.
      */
     private static final class SessionHolder {
+
         private final SessionKey key;
         private final LocalSession session;
         private long lastActive = System.currentTimeMillis();
@@ -382,6 +384,7 @@ public class SessionManager {
             this.key = key;
             this.session = session;
         }
+
     }
 
     /**
@@ -389,12 +392,14 @@ public class SessionManager {
      * of time. Commits them as well.
      */
     private class SessionTracker extends TimerTask {
+
         @Override
         public void run() {
             synchronized (SessionManager.this) {
                 saveChangedSessions();
             }
         }
+
     }
 
 }

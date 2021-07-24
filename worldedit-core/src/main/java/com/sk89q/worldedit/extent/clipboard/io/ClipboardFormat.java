@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -100,10 +100,12 @@ public interface ClipboardFormat {
     Set<String> getFileExtensions();
 
     //FAWE start
+
     /**
      * Sets the actor's clipboard.
-     * @param actor the actor
-     * @param uri the URI of the schematic to hold
+     *
+     * @param actor       the actor
+     * @param uri         the URI of the schematic to hold
      * @param inputStream the input stream
      * @throws IOException thrown on I/O error
      */

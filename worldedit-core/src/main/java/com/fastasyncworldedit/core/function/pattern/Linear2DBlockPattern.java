@@ -36,4 +36,5 @@ public class Linear2DBlockPattern extends AbstractPattern {
         }
         return patternsArray[index].apply(extent, get, set);
     }
+
 }

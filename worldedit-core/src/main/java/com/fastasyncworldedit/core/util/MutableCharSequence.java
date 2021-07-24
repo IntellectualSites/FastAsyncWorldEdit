@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 public class MutableCharSequence implements CharSequence {
+
     private String str;
     private int start;
     private int length;
@@ -80,4 +81,5 @@ public class MutableCharSequence implements CharSequence {
         }
         return false;
     }
+
 }

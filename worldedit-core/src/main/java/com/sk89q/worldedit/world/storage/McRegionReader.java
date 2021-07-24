@@ -115,7 +115,7 @@ public class McRegionReader {
      *
      * @param position chunk position
      * @return an input stream
-     * @throws IOException if there is an error getting the chunk data
+     * @throws IOException   if there is an error getting the chunk data
      * @throws DataException if there is an error getting the chunk data
      */
     public synchronized InputStream getChunkInputStream(BlockVector2 position) throws IOException, DataException {
@@ -190,4 +190,5 @@ public class McRegionReader {
     public void close() throws IOException {
         stream.close();
     }
+
 }

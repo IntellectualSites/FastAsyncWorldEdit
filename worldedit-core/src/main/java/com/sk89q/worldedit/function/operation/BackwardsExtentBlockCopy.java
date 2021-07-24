@@ -1,13 +1,11 @@
 package com.sk89q.worldedit.function.operation;
 
-import com.sk89q.worldedit.WorldEditException;
-import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.function.operation.Operation;
-import com.sk89q.worldedit.function.operation.RunContext;
-import com.sk89q.worldedit.function.visitor.RegionVisitor;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.math.MutableVector3;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -16,6 +14,7 @@ import com.sk89q.worldedit.regions.Region;
 import java.util.List;
 
 public class BackwardsExtentBlockCopy extends RegionVisitor implements Operation {
+
     private final Region region;
     private final Transform transform;
     private final RegionFunction function;
@@ -53,9 +52,9 @@ public class BackwardsExtentBlockCopy extends RegionVisitor implements Operation
         BlockVector3 max = BlockVector3.at(Integer.MIN_VALUE, Integer.MIN_VALUE, Integer.MIN_VALUE);
         BlockVector3 pos1 = region.getMinimumPoint();
         BlockVector3 pos2 = region.getMaximumPoint();
-        for (int x : new int[] { pos1.getBlockX(), pos2.getBlockX() }) {
-            for (int y : new int[] { pos1.getBlockY(), pos2.getBlockY() }) {
-                for (int z : new int[] { pos1.getBlockZ(), pos2.getBlockZ() }) {
+        for (int x : new int[]{pos1.getBlockX(), pos2.getBlockX()}) {
+            for (int y : new int[]{pos1.getBlockY(), pos2.getBlockY()}) {
+                for (int z : new int[]{pos1.getBlockZ(), pos2.getBlockZ()}) {
                     BlockVector3 pt = transform(transform, BlockVector3.at(x, y, z));
                     min = min.getMinimum(pt);
                     max = max.getMaximum(pt);
@@ -89,4 +88,5 @@ public class BackwardsExtentBlockCopy extends RegionVisitor implements Operation
     public void addStatusMessages(List<String> messages) {
 
     }
+
 }

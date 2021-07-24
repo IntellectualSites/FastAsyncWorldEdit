@@ -36,4 +36,5 @@ public class LinearBlockPattern extends AbstractPattern implements ResettablePat
     public void reset() {
         index = 0;
     }
+
 }

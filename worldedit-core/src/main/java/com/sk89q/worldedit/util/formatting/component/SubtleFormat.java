@@ -48,4 +48,5 @@ public class SubtleFormat extends TextComponentProducer {
 
         return subtle.create();
     }
+
 }

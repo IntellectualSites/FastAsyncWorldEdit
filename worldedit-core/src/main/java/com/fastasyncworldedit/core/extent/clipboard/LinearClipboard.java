@@ -1,12 +1,12 @@
 package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.extent.filter.block.AbstractFilterBlock;
+import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
-import com.fastasyncworldedit.core.function.visitor.Order;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
@@ -49,7 +49,8 @@ public abstract class LinearClipboard extends SimpleClipboard {
 
     public abstract Collection<CompoundTag> getTileEntities();
 
-    public void flush() {}
+    public void flush() {
+    }
 
     @Override
     protected void finalize() {
@@ -103,6 +104,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
     }
 
     private class LinearFilter extends AbstractFilterBlock {
+
         private int index = -1;
         private BlockVector3 position;
 
@@ -111,6 +113,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
             index++;
             return this;
         }
+
         @Override
         public BaseBlock getFullBlock() {
             return LinearClipboard.this.getFullBlock(index);
@@ -130,5 +133,7 @@ public abstract class LinearClipboard extends SimpleClipboard {
         public Extent getExtent() {
             return LinearClipboard.this;
         }
+
     }
+
 }

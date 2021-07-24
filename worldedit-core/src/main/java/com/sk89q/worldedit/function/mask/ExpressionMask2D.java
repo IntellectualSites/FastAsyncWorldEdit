@@ -24,8 +24,8 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector2;
 
-import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
+import java.util.function.IntSupplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class YieldIterable<T> implements Iterable<T>, Consumer<T>, Closeable {
+
     private static final Object END_MARKER = new Object();
     private final LinkedBlockingQueue<T> queue;
     private Future future;
@@ -70,4 +71,5 @@ public class YieldIterable<T> implements Iterable<T>, Consumer<T>, Closeable {
     public void close() {
         queue.add((T) END_MARKER);
     }
+
 }

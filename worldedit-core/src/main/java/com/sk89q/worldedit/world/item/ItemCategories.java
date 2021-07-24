@@ -26,6 +26,7 @@ package com.sk89q.worldedit.world.item;
  */
 @SuppressWarnings("unused")
 public final class ItemCategories {
+
     public static final ItemCategory ACACIA_LOGS = get("minecraft:acacia_logs");
     public static final ItemCategory ANVIL = get("minecraft:anvil");
     public static final ItemCategory ARROWS = get("minecraft:arrows");
@@ -53,7 +54,8 @@ public final class ItemCategories {
     public static final ItemCategory FLOWERS = get("minecraft:flowers");
     public static final ItemCategory FOX_FOOD = get("minecraft:fox_food");
     public static final ItemCategory FREEZE_IMMUNE_WEARABLES = get("minecraft:freeze_immune_wearables");
-    @Deprecated public static final ItemCategory FURNACE_MATERIALS = get("minecraft:furnace_materials");
+    @Deprecated
+    public static final ItemCategory FURNACE_MATERIALS = get("minecraft:furnace_materials");
     public static final ItemCategory GOLD_ORES = get("minecraft:gold_ores");
     public static final ItemCategory IGNORED_BY_PIGLIN_BABIES = get("minecraft:ignored_by_piglin_babies");
     public static final ItemCategory IRON_ORES = get("minecraft:iron_ores");
@@ -110,4 +112,5 @@ public final class ItemCategories {
         }
         return entry;
     }
+
 }

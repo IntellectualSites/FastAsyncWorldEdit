@@ -5,7 +5,6 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 public final class EmptyBatchProcessor implements IBatchProcessor {
+
     private static final EmptyBatchProcessor instance = new EmptyBatchProcessor();
 
     public static EmptyBatchProcessor getInstance() {

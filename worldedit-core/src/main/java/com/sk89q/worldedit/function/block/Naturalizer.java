@@ -105,4 +105,5 @@ public class Naturalizer implements LayerFunction {
 
         return true;
     }
+
 }

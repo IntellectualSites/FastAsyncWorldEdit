@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.queue.implementation;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.World;
@@ -188,4 +187,5 @@ public class Flood {
     public boolean get(long[] bits, int i) {
         return (bits[i >> 6] & 1L << (i & 0x3F)) != 0;
     }
+
 }

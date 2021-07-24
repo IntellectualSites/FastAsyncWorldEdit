@@ -7,10 +7,10 @@ public interface Relighter extends AutoCloseable {
     /**
      * Add a chunk to be relit when {@link Relighter#removeLighting} etc are called.
      *
-     * @param cx chunk x
-     * @param cz chunk z
+     * @param cx         chunk x
+     * @param cz         chunk z
      * @param skipReason byte array of {@link SkipReason} for each chunksection in the chunk. Use case? No idea.
-     * @param bitmask Initial bitmask of the chunk (if being edited beforehand)
+     * @param bitmask    Initial bitmask of the chunk (if being edited beforehand)
      * @return Was the chunk added
      */
     boolean addChunk(int cx, int cz, byte[] skipReason, int bitmask);
@@ -78,8 +78,11 @@ public interface Relighter extends AutoCloseable {
     boolean isFinished();
 
     class SkipReason {
+
         public static final byte NONE = 0;
         public static final byte AIR = 1;
         public static final byte SOLID = 2;
+
     }
+
 }

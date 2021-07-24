@@ -47,7 +47,7 @@ public class SelectionPointEvent implements CUIEvent {
 
     @Override
     public String[] getParameters() {
-        return new String[] {
+        return new String[]{
                 String.valueOf(id),
                 String.valueOf(pos.getBlockX()),
                 String.valueOf(pos.getBlockY()),

@@ -55,9 +55,9 @@ public class SnapshotRestore {
     /**
      * Construct the snapshot restore operation.
      *
-     * @param chunkStore The {@link ChunkStore} to restore from
+     * @param chunkStore  The {@link ChunkStore} to restore from
      * @param editSession The {@link EditSession} to restore to
-     * @param region The {@link Region} to restore to
+     * @param region      The {@link Region} to restore to
      */
     public SnapshotRestore(ChunkStore chunkStore, EditSession editSession, Region region) {
         this.chunkStore = chunkStore;

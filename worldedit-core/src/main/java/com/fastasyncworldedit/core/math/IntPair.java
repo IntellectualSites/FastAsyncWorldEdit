@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.math;
 
 public final class IntPair {
+
     public int x;
     public int z;
 
@@ -30,4 +31,5 @@ public final class IntPair {
         final IntPair other = (IntPair) obj;
         return (this.x == other.x) && (this.z == other.z);
     }
+
 }

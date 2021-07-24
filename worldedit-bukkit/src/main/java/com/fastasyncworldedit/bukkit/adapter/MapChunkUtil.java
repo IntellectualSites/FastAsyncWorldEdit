@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public abstract class MapChunkUtil<T> {
+
     protected Field fieldX;
     protected Field fieldZ;
     protected Field fieldHeightMap;
@@ -50,4 +51,5 @@ public abstract class MapChunkUtil<T> {
             return null;
         }
     }
+
 }

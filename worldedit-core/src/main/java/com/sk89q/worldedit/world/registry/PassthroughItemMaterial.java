@@ -42,4 +42,5 @@ public class PassthroughItemMaterial implements ItemMaterial {
     public int getMaxDamage() {
         return itemMaterial.getMaxDamage();
     }
+
 }

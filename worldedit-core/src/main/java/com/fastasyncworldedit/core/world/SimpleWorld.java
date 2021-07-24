@@ -22,21 +22,23 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 /**
  * An abstract implementation of {@link World}.
  */
 public interface SimpleWorld extends World {
+
     @Override
     default boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
         return false;
     }
 
     @Override
-    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws
+            WorldEditException {
         return setBlock(position, block);
     }
 
@@ -48,7 +50,9 @@ public interface SimpleWorld extends World {
     @Override
     <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 pt, B block) throws WorldEditException;
 
-    @Nullable @Override default Path getStoragePath() {
+    @Nullable
+    @Override
+    default Path getStoragePath() {
         return null;
     }
 
@@ -88,7 +92,11 @@ public interface SimpleWorld extends World {
 
     @Override
     default boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
-        Fawe.get().getQueueHandler().sync((Supplier<Boolean>) () -> playEffect(position, 2001, blockType.getLegacyCombinedId() >> 4));
+        Fawe.get().getQueueHandler().sync((Supplier<Boolean>) () -> playEffect(
+                position,
+                2001,
+                blockType.getLegacyCombinedId() >> 4
+        ));
         return true;
     }
 
@@ -104,7 +112,8 @@ public interface SimpleWorld extends World {
 
 
     @Override
-    default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException {
+    default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
+            MaxChangedBlocksException {
         return false;
     }
 
@@ -136,4 +145,5 @@ public interface SimpleWorld extends World {
     default void setWeather(WeatherType weatherType, long duration) {
 
     }
+
 }

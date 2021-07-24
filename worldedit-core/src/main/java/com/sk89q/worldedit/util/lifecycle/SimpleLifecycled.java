@@ -19,15 +19,16 @@
 
 package com.sk89q.worldedit.util.lifecycle;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 /**
  * A {@link Lifecycled} that can be directly called to {@linkplain #invalidate() invalidate} it or
  * set a {@linkplain #newValue(Object) new value}.
  */
 public final class SimpleLifecycled<T> implements Lifecycled<T> {
+
     public static <T> SimpleLifecycled<T> valid(T value) {
         return new SimpleLifecycled<>(Objects.requireNonNull(value));
     }
@@ -76,4 +77,5 @@ public final class SimpleLifecycled<T> implements Lifecycled<T> {
     public Events<T> events() {
         return events;
     }
+
 }

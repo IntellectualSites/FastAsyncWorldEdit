@@ -46,4 +46,5 @@ public class ExistingMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) throws InputParseException {
         return new ExistingBlockMask(context.requireExtent());
     }
+
 }

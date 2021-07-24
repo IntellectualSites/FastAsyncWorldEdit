@@ -3,10 +3,10 @@ package com.fastasyncworldedit.core.extent.filter.block;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.FilterBlockMask;
-import com.fastasyncworldedit.core.queue.implementation.Flood;
 import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.Flood;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -84,8 +84,10 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void flood(IChunkGet iget, IChunkSet iset, int layer, Flood flood,
-        FilterBlockMask mask) {
+    public void flood(
+            IChunkGet iget, IChunkSet iset, int layer, Flood flood,
+            FilterBlockMask mask
+    ) {
         final int maxDepth = flood.getMaxDepth();
         final boolean checkDepth = maxDepth < Character.MAX_VALUE;
         if (initLayer(iget, iset, layer) != null) { // TODO replace with hasSection
@@ -424,7 +426,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return getExtent().setBlock(x, y, z, block);
     }
 
@@ -444,5 +446,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     private interface SetDelegate {
 
         void set(@NotNull CharFilterBlock block, char value);
+
     }
+
 }

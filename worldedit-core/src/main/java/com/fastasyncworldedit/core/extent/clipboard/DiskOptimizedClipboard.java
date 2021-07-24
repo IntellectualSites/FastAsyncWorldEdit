@@ -67,17 +67,30 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     private boolean canHaveBiomes = true;
 
     public DiskOptimizedClipboard(Region region, UUID uuid) {
-        this(region.getDimensions(), MainUtil.getFile(Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."), Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"));
+        this(
+                region.getDimensions(),
+                MainUtil.getFile(
+                        Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."),
+                        Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"
+                )
+        );
     }
 
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
-        this(dimensions, MainUtil.getFile(Fawe.imp() != null ? Fawe.imp().getDirectory() : new File("."), Settings.IMP.PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"));
+        this(
+                dimensions,
+                MainUtil.getFile(
+                        Fawe.imp() != null ? Fawe.imp().getDirectory() : new File("."),
+                        Settings.IMP.PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"
+                )
+        );
     }
 
     public DiskOptimizedClipboard(BlockVector3 dimensions, File file) {
         super(dimensions);
         if (HEADER_SIZE + ((long) getVolume() << 1) >= Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Dimensions too large for this clipboard format. Use //lazycopy for large selections.");
+            throw new IllegalArgumentException(
+                    "Dimensions too large for this clipboard format. Use //lazycopy for large selections.");
         } else if (HEADER_SIZE + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1) >= Integer.MAX_VALUE) {
             LOGGER.error("Dimensions are too large for biomes to be stored in a DiskOptimizedClipboard");
             canHaveBiomes = false;
@@ -219,7 +232,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         }
         int mbbIndex = HEADER_SIZE + (getVolume() << 1);
         try {
-            for (int y = 0; y < getHeight(); y ++) {
+            for (int y = 0; y < getHeight(); y++) {
                 for (int z = 0; z < getLength(); z++) {
                     for (int x = 0; x < getWidth(); x++) {
                         int biome = byteBuffer.get(mbbIndex + getBiomeIndex(x, y, z)) & 0xFF;
@@ -245,7 +258,10 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     public BlockArrayClipboard toClipboard() {
         try {
-            CuboidRegion region = new CuboidRegion(BlockVector3.at(0, 0, 0), BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1));
+            CuboidRegion region = new CuboidRegion(
+                    BlockVector3.at(0, 0, 0),
+                    BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1)
+            );
             int ox = byteBuffer.getShort(8);
             int oy = byteBuffer.getShort(10);
             int oz = byteBuffer.getShort(12);
@@ -441,7 +457,10 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        return new ArrayList<>(entities.stream().filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList()));
+        return new ArrayList<>(entities
+                .stream()
+                .filter(e -> region.contains(e.getLocation().toBlockPoint()))
+                .collect(Collectors.toList()));
     }
 
     @Override
@@ -466,4 +485,5 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             }
         }
     }
+
 }

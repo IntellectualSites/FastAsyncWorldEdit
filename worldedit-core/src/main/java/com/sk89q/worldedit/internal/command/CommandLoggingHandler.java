@@ -53,7 +53,7 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
      * Create a new instance.
      *
      * @param worldEdit an instance of WorldEdit
-     * @param logger the logger to send messages to
+     * @param logger    the logger to send messages to
      */
     public CommandLoggingHandler(WorldEdit worldEdit, Logger logger) {
         checkNotNull(worldEdit);
@@ -98,10 +98,10 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
         builder.append(": ").append(parameters.getMetadata().getCalledName());
 
         builder.append(": ")
-            .append(Stream.concat(
-                Stream.of(parameters.getMetadata().getCalledName()),
-                parameters.getMetadata().getArguments().stream()
-            ).collect(Collectors.joining(" ")));
+                .append(Stream.concat(
+                        Stream.of(parameters.getMetadata().getCalledName()),
+                        parameters.getMetadata().getArguments().stream()
+                ).collect(Collectors.joining(" ")));
 
         if (logMode != null && actor instanceof Player) {
             Player player = (Player) actor;
@@ -132,7 +132,7 @@ public class CommandLoggingHandler implements CommandCallListener, AutoCloseable
                 case REGION:
                     try {
                         builder.append(" - Region: ")
-                            .append(session.getSelection(world));
+                                .append(session.getSelection(world));
                     } catch (IncompleteRegionException e) {
                         break;
                     }

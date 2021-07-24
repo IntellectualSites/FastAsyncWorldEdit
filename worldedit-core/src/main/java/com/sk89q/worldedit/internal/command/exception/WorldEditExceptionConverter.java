@@ -76,7 +76,10 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
         final Matcher matcher = numberFormat.matcher(e.getMessage());
 
         if (matcher.matches()) {
-            throw newCommandException(Caption.of("worldedit.error.invalid-number.matches", TextComponent.of(matcher.group(1))), e);
+            throw newCommandException(
+                    Caption.of("worldedit.error.invalid-number.matches", TextComponent.of(matcher.group(1))),
+                    e
+            );
         } else {
             throw newCommandException(Caption.of("worldedit.error.invalid-number"), e);
         }

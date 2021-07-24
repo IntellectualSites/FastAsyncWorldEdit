@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.function.pattern.Linear2DBlockPattern;
 import com.google.common.base.Preconditions;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -44,8 +44,10 @@ public class Linear2DPatternParser extends RichParser<Pattern> {
     @Override
     protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length == 0 || arguments.length > 3) {
-            throw new InputParseException(Caption.of("fawe.error.command.syntax",
-                    TextComponent.of(getPrefix() + "[pattern] (e.g. " + getPrefix() + "[stone,dirt])")));
+            throw new InputParseException(Caption.of(
+                    "fawe.error.command.syntax",
+                    TextComponent.of(getPrefix() + "[pattern] (e.g. " + getPrefix() + "[stone,dirt])")
+            ));
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(arguments[0], context);
         if (inner instanceof BlockStateHolder) {
@@ -68,4 +70,5 @@ public class Linear2DPatternParser extends RichParser<Pattern> {
         throw new InputParseException(TextComponent.of("Pattern " + inner.getClass().getSimpleName()
                 + " cannot be used with " + getPrefix()));
     }
+
 }

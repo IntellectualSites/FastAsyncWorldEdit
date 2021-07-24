@@ -20,8 +20,8 @@
 package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.function.pattern.PatternTraverser;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -51,6 +51,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -59,7 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -113,8 +113,12 @@ public class PlatformManager {
         // Make sure that versions are in sync
         if (firstSeenVersion != null) {
             if (!firstSeenVersion.equals(platform.getVersion())) {
-                LOGGER.warn("Multiple ports of WorldEdit are installed but they report different versions ({} and {}). "
-                                + "If these two versions are truly different, then you may run into unexpected crashes and errors.", firstSeenVersion, platform.getVersion());
+                LOGGER.warn(
+                        "Multiple ports of WorldEdit are installed but they report different versions ({} and {}). "
+                                + "If these two versions are truly different, then you may run into unexpected crashes and errors.",
+                        firstSeenVersion,
+                        platform.getVersion()
+                );
             }
         } else {
             firstSeenVersion = platform.getVersion();
@@ -205,7 +209,8 @@ public class PlatformManager {
 
         // Fire configuration event
         if (preferences.containsKey(Capability.CONFIGURATION) && configured.compareAndSet(false, true)) {
-            worldEdit.getEventBus().post(new ConfigurationLoadEvent(queryCapability(Capability.CONFIGURATION).getConfiguration()));
+            worldEdit.getEventBus().post(new ConfigurationLoadEvent(queryCapability(Capability.CONFIGURATION)
+                    .getConfiguration()));
         }
     }
 
@@ -290,7 +295,7 @@ public class PlatformManager {
     }
 
     //FAWE start
-    private <T extends Player> T  proxyFawe(T player) {
+    private <T extends Player> T proxyFawe(T player) {
         return (T) new LocationMaskedPlayerWrapper(player, player.getLocation(), true);
     }
     //FAWE end
@@ -389,8 +394,9 @@ public class PlatformManager {
                     if (superPickaxe != null && superPickaxe.canUse(player)) {
                         //FAWE start - run async
                         player.runAction(() -> reset(superPickaxe)
-                            .actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                        getConfiguration(), player, session, location, event.getFace()), false, true);
+                                .actPrimary(queryCapability(Capability.WORLD_EDITING),
+                                        getConfiguration(), player, session, location, event.getFace()
+                                ), false, true);
                         //FAWE end
                         event.setCancelled(true);
                         return;
@@ -401,8 +407,9 @@ public class PlatformManager {
                 if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
                     //FAWE start - run async
                     player.runAction(() -> reset((DoubleActionBlockTool) tool)
-                        .actSecondary(queryCapability(Capability.WORLD_EDITING),
-                                      getConfiguration(), player, session, location, event.getFace()), false, true);
+                            .actSecondary(queryCapability(Capability.WORLD_EDITING),
+                                    getConfiguration(), player, session, location, event.getFace()
+                            ), false, true);
                     //FAWE end
                     event.setCancelled(true);
                 }
@@ -419,7 +426,8 @@ public class PlatformManager {
                                 blockTool = reset(blockTool);
                             }
                             blockTool.actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                                 getConfiguration(), player, session, location, event.getFace());
+                                    getConfiguration(), player, session, location, event.getFace()
+                            );
                         }, false, true);
                         //FAWE end
                         event.setCancelled(true);
@@ -459,8 +467,10 @@ public class PlatformManager {
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
                         //FAWE start - run async
-                        player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),
-                            getConfiguration(), player, session));
+                        player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool)
+                                .actSecondary(queryCapability(Capability.WORLD_EDITING),
+                                        getConfiguration(), player, session
+                                ));
                         //FAWE end
                         event.setCancelled(true);
                         return;
@@ -475,7 +485,8 @@ public class PlatformManager {
                         //FAWE start - run async
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true
                         player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),
-                            getConfiguration(), player, session), false, true);
+                                getConfiguration(), player, session
+                        ), false, true);
                         //FAWE end
                         event.setCancelled(true);
                         return;

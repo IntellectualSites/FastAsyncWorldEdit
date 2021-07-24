@@ -78,8 +78,8 @@ public abstract class ArbitraryBiomeShape {
     /**
      * Override this function to specify the shape to generate.
      *
-     * @param x X coordinate to be queried
-     * @param z Z coordinate to be queried
+     * @param x                X coordinate to be queried
+     * @param z                Z coordinate to be queried
      * @param defaultBaseBiome The default biome for the current column.
      * @return material to place or null to not place anything.
      */
@@ -120,8 +120,8 @@ public abstract class ArbitraryBiomeShape {
      * Generates the shape.
      *
      * @param editSession The EditSession to use.
-     * @param baseBiome The default biome type.
-     * @param hollow Specifies whether to generate a hollow shape.
+     * @param baseBiome   The default biome type.
+     * @param hollow      Specifies whether to generate a hollow shape.
      * @return number of affected blocks.
      */
     public int generate(EditSession editSession, BiomeType baseBiome, boolean hollow) {

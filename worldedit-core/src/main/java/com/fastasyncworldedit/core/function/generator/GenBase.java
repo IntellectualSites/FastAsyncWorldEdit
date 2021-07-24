@@ -36,4 +36,5 @@ public abstract class GenBase {
     }
 
     public abstract void generateChunk(int x, int z, BlockVector2 originChunk, Extent chunk) throws WorldEditException;
+
 }

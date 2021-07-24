@@ -89,6 +89,7 @@ public interface BlockRegistry {
     OptionalInt getInternalBlockStateId(BlockState state);
 
     //FAWE start
+
     /**
      * Register all blocks.
      */

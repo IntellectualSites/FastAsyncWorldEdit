@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 public class PluginPreloader extends PluginBase {
+
     private World world;
     private Set<BlockVector2> loaded;
     private int index;
@@ -79,7 +80,7 @@ public class PluginPreloader extends PluginBase {
                 return;
             }
             Fawe.get().getQueueHandler().syncWhenFree(() -> {
-                for (; iter.hasNext() && invalidator.get();index++) {
+                for (; iter.hasNext() && invalidator.get(); index++) {
                     BlockVector2 chunk = iter.next();
                     if (!world.isChunkLoaded(chunk.getX(), chunk.getZ())) {
                         world.addPluginChunkTicket(chunk.getX(), chunk.getZ(), this);
@@ -199,7 +200,13 @@ public class PluginPreloader extends PluginBase {
 
     @Override
     @Nullable
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(
+            @NotNull CommandSender sender,
+            @NotNull Command command,
+            @NotNull String alias,
+            String[] args
+    ) {
         return null;
     }
+
 }

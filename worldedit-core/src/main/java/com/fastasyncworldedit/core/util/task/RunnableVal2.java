@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.util.task;
 import java.util.function.BiConsumer;
 
 public abstract class RunnableVal2<T, U> implements Runnable, BiConsumer<T, U> {
+
     public T value1;
     public U value2;
 
@@ -30,4 +31,5 @@ public abstract class RunnableVal2<T, U> implements Runnable, BiConsumer<T, U> {
     public void accept(T t, U u) {
         run(t, u);
     }
+
 }

@@ -1,19 +1,20 @@
 package com.fastasyncworldedit.core.function;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector2;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 public class SurfaceRegionFunction implements FlatRegionFunction {
+
     private final Extent extent;
     private final RegionFunction function;
     private final int minY;
     private final int maxY;
     private int lastY;
-    private MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public SurfaceRegionFunction(Extent extent, RegionFunction function, int minY, int maxY) {
         this.extent = extent;
@@ -34,4 +35,5 @@ public class SurfaceRegionFunction implements FlatRegionFunction {
         }
         return false;
     }
+
 }

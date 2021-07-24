@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.jnbt;
 
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArraysInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 

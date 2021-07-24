@@ -14,9 +14,9 @@ import java.util.stream.Stream;
 
 /**
  * Adapt a collection to a set.
- * @apiNote It's assumed that the collection is set like, otherwise behavior will be weird
  */
 public class AdaptedSetCollection<T, V> implements Set<V> {
+
     private final Collection<V> adapted;
     private final Collection<T> original;
 
@@ -131,4 +131,5 @@ public class AdaptedSetCollection<T, V> implements Set<V> {
     public void forEach(Consumer<? super V> action) {
         adapted.forEach(action);
     }
+
 }

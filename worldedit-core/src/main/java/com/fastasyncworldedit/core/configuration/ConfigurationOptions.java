@@ -5,6 +5,7 @@ package com.fastasyncworldedit.core.configuration;
  * Configuration}
  */
 public class ConfigurationOptions {
+
     private char pathSeparator = '.';
     private boolean copyDefaults = false;
     private final Configuration configuration;
@@ -87,4 +88,5 @@ public class ConfigurationOptions {
         copyDefaults = value;
         return this;
     }
+
 }

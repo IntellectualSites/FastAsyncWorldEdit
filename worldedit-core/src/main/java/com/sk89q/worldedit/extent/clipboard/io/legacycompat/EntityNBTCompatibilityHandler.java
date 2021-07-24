@@ -23,7 +23,9 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.entity.EntityType;
 
 public interface EntityNBTCompatibilityHandler {
+
     boolean isAffectedEntity(EntityType type, CompoundTag entityTag);
 
     CompoundTag updateNBT(EntityType type, CompoundTag entityTag);
+
 }

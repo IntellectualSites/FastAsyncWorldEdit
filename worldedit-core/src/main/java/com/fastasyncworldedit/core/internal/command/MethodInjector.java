@@ -9,9 +9,11 @@ import org.enginehub.piston.util.ValueProvider;
 import java.lang.reflect.Method;
 
 public class MethodInjector implements CommandCallListener {
+
     @Override
     public void beforeCall(Method commandMethod, CommandParameters parameters) {
         InjectedValueStore store = parameters.injectedValue(Key.of(InjectedValueStore.class)).get();
         store.injectValue(Key.of(Method.class), ValueProvider.constant(commandMethod));
     }
+
 }

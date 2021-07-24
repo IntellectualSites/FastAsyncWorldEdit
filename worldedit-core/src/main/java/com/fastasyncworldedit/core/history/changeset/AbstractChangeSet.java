@@ -2,15 +2,16 @@ package com.fastasyncworldedit.core.history.changeset;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.extent.HistoryExtent;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.world.block.BlockID;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -27,7 +28,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import java.io.IOException;
@@ -202,7 +202,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                         if (newBiome != null) {
                             BiomeType oldBiome = get.getBiomeType(x, y, z);
                             if (oldBiome != newBiome) {
-                                addBiomeChange(bx + (x << 2), y << 2,bz + (z << 2), oldBiome, newBiome);
+                                addBiomeChange(bx + (x << 2), y << 2, bz + (z << 2), oldBiome, newBiome);
                             }
                         }
                     }
@@ -213,7 +213,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     @Override
-    public Future<IChunkSet> postProcessSet(final IChunk chunk, final IChunkGet get,final  IChunkSet set) {
+    public Future<IChunkSet> postProcessSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
         return (Future<IChunkSet>) addWriteTask(() -> processSet(chunk, get, set));
     }
 
@@ -244,8 +244,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public EditSession toEditSession(Player player, Region[] regions) {
         EditSessionBuilder builder =
-            new EditSessionBuilder(getWorld()).player(player).autoQueue(false).fastmode(false)
-                .checkMemory(false).changeSet(this).limitUnlimited();
+                new EditSessionBuilder(getWorld()).player(player).autoQueue(false).fastmode(false)
+                        .checkMemory(false).changeSet(this).limitUnlimited();
         if (regions != null) {
             builder.allowedRegions(regions);
         } else {
@@ -364,4 +364,5 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             return Fawe.get().getQueueHandler().submit(wrappedTask);
         }
     }
+
 }

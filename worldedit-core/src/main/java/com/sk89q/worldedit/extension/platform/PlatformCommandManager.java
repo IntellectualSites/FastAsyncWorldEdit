@@ -22,10 +22,15 @@ package com.sk89q.worldedit.extension.platform;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extension.platform.binding.Bindings;
+import com.fastasyncworldedit.core.extension.platform.binding.ConsumeBindings;
+import com.fastasyncworldedit.core.extension.platform.binding.PrimitiveBindings;
+import com.fastasyncworldedit.core.extension.platform.binding.ProvideBindings;
+import com.fastasyncworldedit.core.internal.command.MethodInjector;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
-import com.fastasyncworldedit.core.util.task.ThrowableSupplier;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.task.ThrowableSupplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -100,22 +105,17 @@ import com.sk89q.worldedit.command.argument.ZonedDateTimeConverter;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
+import com.sk89q.worldedit.command.util.annotation.ConfirmHandler;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.Event;
 import com.sk89q.worldedit.event.platform.CommandEvent;
 import com.sk89q.worldedit.event.platform.CommandSuggestionEvent;
-import com.fastasyncworldedit.core.extension.platform.binding.Bindings;
-import com.fastasyncworldedit.core.extension.platform.binding.ConsumeBindings;
-import com.fastasyncworldedit.core.extension.platform.binding.PrimitiveBindings;
-import com.fastasyncworldedit.core.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
-import com.sk89q.worldedit.command.util.annotation.ConfirmHandler;
-import com.fastasyncworldedit.core.internal.command.MethodInjector;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -153,6 +153,7 @@ import org.enginehub.piston.util.HelpGenerator;
 import org.enginehub.piston.util.ValueProvider;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -167,7 +168,6 @@ import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -182,7 +182,7 @@ public final class PlatformCommandManager {
     public static final Pattern COMMAND_CLEAN_PATTERN = Pattern.compile("^[/]+");
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final java.util.logging.Logger COMMAND_LOG =
-        java.util.logging.Logger.getLogger("com.sk89q.worldedit.CommandLog");
+            java.util.logging.Logger.getLogger("com.sk89q.worldedit.CommandLog");
 
     private final WorldEdit worldEdit;
     private final PlatformManager platformManager;
@@ -216,12 +216,12 @@ public final class PlatformCommandManager {
         this.commandManager = commandManagerService.newCommandManager();
         this.globalInjectedValues = MapBackedValueStore.create();
         this.registration = new CommandRegistrationHandler(
-            ImmutableList.of(
-                new CommandLoggingHandler(worldEdit, COMMAND_LOG),
-                new MethodInjector(),
-                new ConfirmHandler()
+                ImmutableList.of(
+                        new CommandLoggingHandler(worldEdit, COMMAND_LOG),
+                        new MethodInjector(),
+                        new ConfirmHandler()
 
-            ));
+                ));
         // setup separate from main constructor
         // ensures that everything is definitely assigned
         initialize();
@@ -245,10 +245,11 @@ public final class PlatformCommandManager {
         DirectionConverter.register(worldEdit, commandManager);
         FactoryConverter.register(worldEdit, commandManager);
         for (int count = 2; count <= 3; count++) {
-            commandManager.registerConverter(Key.of(double.class, Annotations.radii(count)),
-                CommaSeparatedValuesConverter.wrapAndLimit(ArgumentConverters.get(
-                    TypeToken.of(double.class)
-                ), count)
+            commandManager.registerConverter(
+                    Key.of(double.class, Annotations.radii(count)),
+                    CommaSeparatedValuesConverter.wrapAndLimit(ArgumentConverters.get(
+                            TypeToken.of(double.class)
+                    ), count)
             );
         }
         VectorConverter.register(commandManager);
@@ -266,9 +267,11 @@ public final class PlatformCommandManager {
         HeightConverter.register(commandManager);
         OffsetConverter.register(worldEdit, commandManager);
         //FAWE start
-        commandManager.registerConverter(Key.of(com.sk89q.worldedit.function.pattern.Pattern.class, Annotations.patternList()),
-            CommaSeparatedValuesConverter.wrap(commandManager.getConverter(Key.of(
-                com.sk89q.worldedit.function.pattern.Pattern.class)).get()));
+        commandManager.registerConverter(
+                Key.of(com.sk89q.worldedit.function.pattern.Pattern.class, Annotations.patternList()),
+                CommaSeparatedValuesConverter.wrap(commandManager.getConverter(Key.of(
+                        com.sk89q.worldedit.function.pattern.Pattern.class)).get())
+        );
 
         registerBindings(new ConsumeBindings(worldEdit, this));
         registerBindings(new PrimitiveBindings(worldEdit));
@@ -283,7 +286,8 @@ public final class PlatformCommandManager {
     //FAWE end
 
     private void registerAlwaysInjectedValues() {
-        globalInjectedValues.injectValue(Key.of(Region.class, Selection.class),
+        globalInjectedValues.injectValue(
+                Key.of(Region.class, Selection.class),
                 context -> {
                     LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
                             .orElseThrow(() -> new IllegalStateException("No LocalSession"));
@@ -296,7 +300,8 @@ public final class PlatformCommandManager {
                                     throw new AssertionError("Should have thrown a new exception.", e);
                                 }
                             });
-                });
+                }
+        );
         //FAWE start
         /*
         globalInjectedValues.injectValue(Key.of(EditSession.class),
@@ -317,7 +322,8 @@ public final class PlatformCommandManager {
 //                context -> context.injectedValue(Key.of(Actor.class))
 //                        .orElseThrow(() -> new IllegalStateException("No CFI Settings")).getMeta("CFISettings"));
         //FAWE end
-        globalInjectedValues.injectValue(Key.of(World.class),
+        globalInjectedValues.injectValue(
+                Key.of(World.class),
                 context -> {
                     LocalSession localSession = context.injectedValue(Key.of(LocalSession.class))
                             .orElseThrow(() -> new IllegalStateException("No LocalSession"));
@@ -336,7 +342,8 @@ public final class PlatformCommandManager {
                                     throw new AssertionError("Should have thrown a new exception.", e);
                                 }
                             });
-                });
+                }
+        );
         //FAWE start
         globalInjectedValues.injectValue(Key.of(InjectedValueAccess.class), Optional::of);
         //FAWE end
@@ -345,15 +352,19 @@ public final class PlatformCommandManager {
     /**
      * Internal use only.
      */
-    public <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-                                         CommandRegistration<CI> registration, CI instance) {
+    public <CI> void registerSubCommands(
+            String name, List<String> aliases, String desc,
+            CommandRegistration<CI> registration, CI instance
+    ) {
         registerSubCommands(name, aliases, desc, registration, instance, m -> {
         });
     }
 
-    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-                                          CommandRegistration<CI> registration, CI instance,
-                                          Consumer<CommandManager> additionalConfig) {
+    private <CI> void registerSubCommands(
+            String name, List<String> aliases, String desc,
+            CommandRegistration<CI> registration, CI instance,
+            Consumer<CommandManager> additionalConfig
+    ) {
         commandManager.register(name, cmd -> {
             cmd.aliases(aliases);
             cmd.description(TextComponent.of(desc));
@@ -361,26 +372,30 @@ public final class PlatformCommandManager {
 
             CommandManager manager = commandManagerService.newCommandManager();
             this.registration.register(
-                manager,
-                registration,
-                instance
+                    manager,
+                    registration,
+                    instance
             );
             additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
-            cmd.addPart(SubCommandPart.builder(Caption.of("worldedit.argument.action"),
-                TextComponent.of("Sub-command to run."))
-                .withCommands(subCommands)
-                .required()
-                .build());
+            cmd.addPart(SubCommandPart.builder(
+                    Caption.of("worldedit.argument.action"),
+                    TextComponent.of("Sub-command to run.")
+            )
+                    .withCommands(subCommands)
+                    .required()
+                    .build());
 
             cmd.condition(new SubCommandPermissionCondition.Generator(subCommands).build());
         });
     }
 
-    private <CI> void registerSubCommands(String name, List<String> aliases, String desc,
-                                          Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
-                                          @NotNull Consumer<CommandManager> additionalConfig) {
+    private <CI> void registerSubCommands(
+            String name, List<String> aliases, String desc,
+            Consumer<BiConsumer<CommandRegistration, CI>> handlerInstance,
+            @NotNull Consumer<CommandManager> additionalConfig
+    ) {
         commandManager.register(name, cmd -> {
             cmd.aliases(aliases);
             cmd.description(TextComponent.of(desc));
@@ -391,16 +406,18 @@ public final class PlatformCommandManager {
             //FAWE start
             handlerInstance.accept((handler, instance) ->
                     this.registration.register(
-                    manager,
-                    handler,
-                    instance
-            ));
+                            manager,
+                            handler,
+                            instance
+                    ));
             //FAWE end
             additionalConfig.accept(manager);
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
-            cmd.addPart(SubCommandPart.builder(Caption.of("worldedit.argument.action"),
-                    TextComponent.of("Sub-command to run."))
+            cmd.addPart(SubCommandPart.builder(
+                    Caption.of("worldedit.argument.action"),
+                    TextComponent.of("Sub-command to run.")
+            )
                     .withCommands(subCommands)
                     .required()
                     .build());
@@ -434,27 +451,27 @@ public final class PlatformCommandManager {
 //                TransformCommandsRegistration.builder(),
 //                new TransformCommands()
 //            );
-        //FAWE end
+            //FAWE end
             registerSubCommands(
-                "schematic",
-                ImmutableList.of("schem", "/schematic", "/schem"),
-                "Schematic commands for saving/loading areas",
-                SchematicCommandsRegistration.builder(),
-                new SchematicCommands(worldEdit)
+                    "schematic",
+                    ImmutableList.of("schem", "/schematic", "/schem"),
+                    "Schematic commands for saving/loading areas",
+                    SchematicCommandsRegistration.builder(),
+                    new SchematicCommands(worldEdit)
             );
             registerSubCommands(
-                "snapshot",
-                ImmutableList.of("snap"),
-                "Snapshot commands for restoring backups",
-                SnapshotCommandsRegistration.builder(),
-                new SnapshotCommands(worldEdit)
+                    "snapshot",
+                    ImmutableList.of("snap"),
+                    "Snapshot commands for restoring backups",
+                    SnapshotCommandsRegistration.builder(),
+                    new SnapshotCommands(worldEdit)
             );
             registerSubCommands(
-                "superpickaxe",
-                ImmutableList.of("pickaxe", "sp"),
-                "Super-pickaxe commands",
-                SuperPickaxeCommandsRegistration.builder(),
-                new SuperPickaxeCommands(worldEdit)
+                    "superpickaxe",
+                    ImmutableList.of("pickaxe", "sp"),
+                    "Super-pickaxe commands",
+                    SuperPickaxeCommandsRegistration.builder(),
+                    new SuperPickaxeCommands(worldEdit)
             );
             registerSubCommands(
                     "brush",
@@ -473,28 +490,28 @@ public final class PlatformCommandManager {
                     }
             );
             registerSubCommands(
-                "worldedit",
-                //FAWE start - register fawe
-                ImmutableList.of("we", "fawe", "fastasyncworldedit"),
-                //FAWE end
-                "WorldEdit commands",
-                WorldEditCommandsRegistration.builder(),
-                new WorldEditCommands(worldEdit)
+                    "worldedit",
+                    //FAWE start - register fawe
+                    ImmutableList.of("we", "fawe", "fastasyncworldedit"),
+                    //FAWE end
+                    "WorldEdit commands",
+                    WorldEditCommandsRegistration.builder(),
+                    new WorldEditCommands(worldEdit)
             );
             this.registration.register(
-                commandManager,
-                BiomeCommandsRegistration.builder(),
-                new BiomeCommands()
+                    commandManager,
+                    BiomeCommandsRegistration.builder(),
+                    new BiomeCommands()
             );
             this.registration.register(
-                commandManager,
-                ChunkCommandsRegistration.builder(),
-                new ChunkCommands(worldEdit)
+                    commandManager,
+                    ChunkCommandsRegistration.builder(),
+                    new ChunkCommands(worldEdit)
             );
             this.registration.register(
-                commandManager,
-                ClipboardCommandsRegistration.builder(),
-                new ClipboardCommands()
+                    commandManager,
+                    ClipboardCommandsRegistration.builder(),
+                    new ClipboardCommands()
             );
             GeneralCommands.register(
                     registration,
@@ -515,43 +532,43 @@ public final class PlatformCommandManager {
                     history
             );
             registerSubCommands(
-                "/history",
-                ImmutableList.of("/frb"),
-                "Manage your history",
-                HistorySubCommandsRegistration.builder(),
-                new HistorySubCommands(history)
+                    "/history",
+                    ImmutableList.of("/frb"),
+                    "Manage your history",
+                    HistorySubCommandsRegistration.builder(),
+                    new HistorySubCommands(history)
             );
             //FAWE end
             this.registration.register(
-                commandManager,
-                NavigationCommandsRegistration.builder(),
-                new NavigationCommands(worldEdit)
+                    commandManager,
+                    NavigationCommandsRegistration.builder(),
+                    new NavigationCommands(worldEdit)
             );
             this.registration.register(
-                commandManager,
-                RegionCommandsRegistration.builder(),
-                new RegionCommands()
+                    commandManager,
+                    RegionCommandsRegistration.builder(),
+                    new RegionCommands()
             );
             this.registration.register(
-                commandManager,
-                ScriptingCommandsRegistration.builder(),
-                new ScriptingCommands(worldEdit)
+                    commandManager,
+                    ScriptingCommandsRegistration.builder(),
+                    new ScriptingCommands(worldEdit)
             );
             this.registration.register(
-                commandManager,
-                SelectionCommandsRegistration.builder(),
-                new SelectionCommands(worldEdit)
+                    commandManager,
+                    SelectionCommandsRegistration.builder(),
+                    new SelectionCommands(worldEdit)
             );
             ExpandCommands.register(registration, commandManager, commandManagerService);
             this.registration.register(
-                commandManager,
-                SnapshotUtilCommandsRegistration.builder(),
-                new SnapshotUtilCommands(worldEdit)
+                    commandManager,
+                    SnapshotUtilCommandsRegistration.builder(),
+                    new SnapshotUtilCommands(worldEdit)
             );
             this.registration.register(
-                commandManager,
-                ToolCommandsRegistration.builder(),
-                new ToolCommands(worldEdit)
+                    commandManager,
+                    ToolCommandsRegistration.builder(),
+                    new ToolCommands(worldEdit)
             );
             this.registration.register(
                     commandManager,
@@ -559,9 +576,9 @@ public final class PlatformCommandManager {
                     new ToolUtilCommands(worldEdit)
             );
             this.registration.register(
-                commandManager,
-                UtilityCommandsRegistration.builder(),
-                new UtilityCommands(worldEdit)
+                    commandManager,
+                    UtilityCommandsRegistration.builder(),
+                    new UtilityCommands(worldEdit)
             );
         }
     }
@@ -681,8 +698,8 @@ public final class PlatformCommandManager {
     public void handleCommandOnCurrentThread(CommandEvent event) {
         Actor actor = platformManager.createProxyActor(event.getActor());
         String[] split = parseArgs(event.getArguments())
-            .map(Substring::getSubstring)
-            .toArray(String[]::new);
+                .map(Substring::getSubstring)
+                .toArray(String[]::new);
 
         // No command found!
         if (!commandManager.containsCommand(split[0])) {
@@ -705,7 +722,12 @@ public final class PlatformCommandManager {
         handleCommandTask(task, context, session, event);
     }
 
-    public void handleCommandTask(ThrowableSupplier<Throwable> task, InjectedValueAccess context, @Nullable LocalSession session, CommandEvent event) {
+    public void handleCommandTask(
+            ThrowableSupplier<Throwable> task,
+            InjectedValueAccess context,
+            @Nullable LocalSession session,
+            CommandEvent event
+    ) {
         Actor actor = context.injectedValue(Key.of(Actor.class)).orElseThrow(() -> new IllegalStateException("No player"));
 
         long start = System.currentTimeMillis();
@@ -729,7 +751,10 @@ public final class PlatformCommandManager {
             }
         } catch (ConditionFailedException e) {
             if (e.getCondition() instanceof PermissionCondition) {
-                actor.printError(Caption.of("fawe.error.no-perm", StringMan.getString(((PermissionCondition) e.getCondition()).getPermissions())));
+                actor.printError(Caption.of(
+                        "fawe.error.no-perm",
+                        StringMan.getString(((PermissionCondition) e.getCondition()).getPermissions())
+                ));
             } else {
                 actor.print(e.getRichMessage());
             }
@@ -738,12 +763,15 @@ public final class PlatformCommandManager {
         } catch (UsageException e) {
             ImmutableList<Command> cmd = e.getCommands();
             if (!cmd.isEmpty()) {
-                actor.print(Caption.of("fawe.error.command.syntax", HelpGenerator.create(e.getCommandParseResult()).getFullHelp()));
+                actor.print(Caption.of(
+                        "fawe.error.command.syntax",
+                        HelpGenerator.create(e.getCommandParseResult()).getFullHelp()
+                ));
             }
             actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {
             if (e.getCause() instanceof FaweException) {
-                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", ((FaweException)e.getCause()).getComponent()));
+                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", ((FaweException) e.getCause()).getComponent()));
             } else {
                 handleUnknownException(actor, e.getCause());
             }
@@ -806,7 +834,8 @@ public final class PlatformCommandManager {
 
     private void printUsage(Actor actor, List<String> arguments) {
         PrintCommandHelp.help(arguments, 0, false,
-                getCommandManager(), actor, "//help");
+                getCommandManager(), actor, "//help"
+        );
     }
     //FAWE end
 
@@ -823,12 +852,14 @@ public final class PlatformCommandManager {
             });
         }
         store.injectValue(Key.of(Arguments.class), ValueProvider.constant(arguments));
-        store.injectValue(Key.of(LocalSession.class),
-            context -> {
-                LocalSession localSession = worldEdit.getSessionManager().get(actor);
-                localSession.tellVersion(actor);
-                return Optional.of(localSession);
-            });
+        store.injectValue(
+                Key.of(LocalSession.class),
+                context -> {
+                    LocalSession localSession = worldEdit.getSessionManager().get(actor);
+                    localSession.tellVersion(actor);
+                    return Optional.of(localSession);
+                }
+        );
         store.injectValue(Key.of(boolean.class), context -> Optional.of(isSuggestions));
         store.injectValue(Key.of(InjectedValueStore.class), ValueProvider.constant(store));
         store.injectValue(Key.of(Event.class), ValueProvider.constant(event));
@@ -854,8 +885,8 @@ public final class PlatformCommandManager {
             //FAWE end
             List<Substring> split = parseArgs(arguments).collect(Collectors.toList());
             List<String> argStrings = split.stream()
-                .map(Substring::getSubstring)
-                .collect(Collectors.toList());
+                    .map(Substring::getSubstring)
+                    .collect(Collectors.toList());
             //FAWE start - event & suggestion
             MemoizingValueAccess access = initializeInjectedValues(() -> arguments, event.getActor(), event, true);
             //FAWE end
@@ -871,17 +902,17 @@ public final class PlatformCommandManager {
             }
 
             event.setSuggestions(suggestions.stream()
-                .map(suggestion -> {
-                    int noSlashLength = arguments.length();
-                    Substring original = suggestion.getReplacedArgument() == split.size()
-                        ? Substring.from(arguments, noSlashLength, noSlashLength)
-                        : split.get(suggestion.getReplacedArgument());
-                    return Substring.wrap(
-                        suggestion.getSuggestion(),
-                        original.getStart() + posOffset,
-                        original.getEnd() + posOffset
-                    );
-                }).collect(Collectors.toList()));
+                    .map(suggestion -> {
+                        int noSlashLength = arguments.length();
+                        Substring original = suggestion.getReplacedArgument() == split.size()
+                                ? Substring.from(arguments, noSlashLength, noSlashLength)
+                                : split.get(suggestion.getReplacedArgument());
+                        return Substring.wrap(
+                                suggestion.getSuggestion(),
+                                original.getStart() + posOffset,
+                                original.getEnd() + posOffset
+                        );
+                    }).collect(Collectors.toList()));
         } catch (ConditionFailedException e) {
             if (e.getCondition() instanceof PermissionCondition) {
                 event.setSuggestions(new ArrayList<>());

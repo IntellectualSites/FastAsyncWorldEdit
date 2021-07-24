@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.internal.io;
 import java.io.InputStream;
 
 public class FastByteArraysInputStream extends InputStream {
+
     private final byte[][] buffers;
     private final int length;
 
@@ -107,4 +108,5 @@ public class FastByteArraysInputStream extends InputStream {
     public long length() {
         return this.length;
     }
+
 }

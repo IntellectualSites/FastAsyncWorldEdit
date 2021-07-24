@@ -5,6 +5,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
 
 public class LocationMaskedPlayerWrapper extends AsyncPlayer {
+
     private final boolean allowTeleport;
     private Location position;
 
@@ -120,4 +121,5 @@ public class LocationMaskedPlayerWrapper extends AsyncPlayer {
             update();
         }
     }
+
 }

@@ -23,11 +23,11 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -58,7 +58,7 @@ public class BiomeMask extends AbstractExtentMask {
      * Create a new biome mask.
      *
      * @param extent the extent
-     * @param biome an array of biomes to match
+     * @param biome  an array of biomes to match
      */
     public BiomeMask(Extent extent, BiomeType... biome) {
         this(extent, Arrays.asList(checkNotNull(biome)));
@@ -116,4 +116,5 @@ public class BiomeMask extends AbstractExtentMask {
         BiomeType biome = getExtent().getBiome(position);
         return biomes.contains(biome);
     }
+
 }

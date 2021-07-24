@@ -32,7 +32,8 @@ class BreakException extends RuntimeException {
 
     private BreakException(boolean doContinue) {
         super(doContinue ? "'continue' encountered outside a loop" : "'break' encountered outside a loop",
-            null, true, false);
+                null, true, false
+        );
 
         this.doContinue = doContinue;
     }

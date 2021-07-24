@@ -174,4 +174,5 @@ public class DinnerPermsResolver implements PermissionsResolver {
     public String getDetectionMessage() {
         return "Using the Bukkit Permissions API.";
     }
+
 }

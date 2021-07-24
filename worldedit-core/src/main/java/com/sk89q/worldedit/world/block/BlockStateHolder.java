@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.queue.ITileInput;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.OutputExtent;
@@ -28,10 +29,9 @@ import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
-import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.world.registry.BlockMaterial;
 
 import java.util.Locale;
 import java.util.Map;
@@ -49,6 +49,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     BlockType getBlockType();
 
     //FAWE start
+
     /**
      * Magic number (legacy uses).
      */
@@ -86,7 +87,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      * Returns a BlockState with the given state and value applied.
      *
      * @param property The state
-     * @param value The value
+     * @param value    The value
      * @return The modified state, or same if could not be applied
      */
     <V> B with(final Property<V> property, final V value);
@@ -95,7 +96,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      * Returns a BlockStateHolder with the given state and value applied.
      *
      * @param property The property key
-     * @param value The value
+     * @param value    The value
      * @return The modified state, or same if could not be applied
      */
     <V> B with(final PropertyKey property, final V value);
@@ -146,6 +147,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     BaseBlock toBaseBlock();
 
     //FAWE start
+
     /**
      * Gets a {@link BaseBlock} from this BlockStateHolder.
      *
@@ -163,12 +165,10 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      *
      * @param compoundTag The NBT Data to apply
      * @return The BaseBlock
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "toBaseBlock",
-        delegateParams = { CompoundTag.class }
+            delegateName = "toBaseBlock",
+            delegateParams = {CompoundTag.class}
     )
     default BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
         DeprecationUtil.checkDelegatingOverride(getClass());
@@ -203,11 +203,12 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
             return this.getBlockType().getId();
         } else {
             String properties = getStates().entrySet().stream()
-                .map(entry -> entry.getKey().getName()
-                    + "="
-                    + entry.getValue().toString().toLowerCase(Locale.ROOT))
-                .collect(Collectors.joining(","));
+                    .map(entry -> entry.getKey().getName()
+                            + "="
+                            + entry.getValue().toString().toLowerCase(Locale.ROOT))
+                    .collect(Collectors.joining(","));
             return this.getBlockType().getId() + "[" + properties + "]";
         }
     }
+
 }

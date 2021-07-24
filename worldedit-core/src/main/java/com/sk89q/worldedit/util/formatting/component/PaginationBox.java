@@ -71,7 +71,7 @@ public abstract class PaginationBox extends MessageBox {
     /**
      * Creates a Paginated component
      *
-     * @param title The title
+     * @param title       The title
      * @param pageCommand The command to run to switch page, with %page% representing page number
      */
     protected PaginationBox(String title, @Nullable String pageCommand) {
@@ -117,14 +117,20 @@ public abstract class PaginationBox extends MessageBox {
             TextComponentProducer navProducer = new TextComponentProducer();
             if (page > 1) {
                 TextComponent prevComponent = TextComponent.of("<<< ", TextColor.GOLD)
-                        .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, pageCommand.replace("%page%", String.valueOf(page - 1))))
+                        .clickEvent(ClickEvent.of(
+                                ClickEvent.Action.RUN_COMMAND,
+                                pageCommand.replace("%page%", String.valueOf(page - 1))
+                        ))
                         .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to navigate")));
                 navProducer.append(prevComponent);
             }
             navProducer.append(pageNumberComponent);
             if (page < pageCount) {
                 TextComponent nextComponent = TextComponent.of(" >>>", TextColor.GOLD)
-                        .clickEvent(ClickEvent.of(ClickEvent.Action.RUN_COMMAND, pageCommand.replace("%page%", String.valueOf(page + 1))))
+                        .clickEvent(ClickEvent.of(
+                                ClickEvent.Action.RUN_COMMAND,
+                                pageCommand.replace("%page%", String.valueOf(page + 1))
+                        ))
                         .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to navigate")));
                 navProducer.append(nextComponent);
             }
@@ -140,14 +146,19 @@ public abstract class PaginationBox extends MessageBox {
         throw new IllegalStateException("Pagination components must be created with a page");
     }
 
-    public static <T> PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection<T> lines, Function<T, Component> adapt) {
+    public static <T> PaginationBox fromStrings(
+            String header,
+            @Nullable String pageCommand,
+            Collection<T> lines,
+            Function<T, Component> adapt
+    ) {
         return fromComponents(header, pageCommand, Collections2.transform(lines, adapt));
     }
 
     public static PaginationBox fromStrings(String header, @Nullable String pageCommand, Collection<String> lines) {
         return fromComponents(header, pageCommand, lines.stream()
-            .map(TextComponent::of)
-            .collect(Collectors.toList()));
+                .map(TextComponent::of)
+                .collect(Collectors.toList()));
     }
 
     public static PaginationBox fromComponents(String header, @Nullable String pageCommand, Collection<Component> lines) {
@@ -155,6 +166,7 @@ public abstract class PaginationBox extends MessageBox {
     }
 
     private static class ListPaginationBox extends PaginationBox {
+
         private final List<Component> lines;
 
         ListPaginationBox(String header, String pageCommand, Collection<Component> lines) {
@@ -171,10 +183,12 @@ public abstract class PaginationBox extends MessageBox {
         public int getComponentsSize() {
             return lines.size();
         }
+
     }
 
     //FAWE start
     public static class MergedPaginationBox extends PaginationBox {
+
         private final PaginationBox[] values;
 
         public MergedPaginationBox(String header, String pageCommand, PaginationBox... values) {
@@ -212,6 +226,7 @@ public abstract class PaginationBox extends MessageBox {
             }
             return size;
         }
+
     }
     //FAWE end
 }

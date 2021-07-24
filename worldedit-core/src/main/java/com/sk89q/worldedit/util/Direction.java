@@ -22,13 +22,13 @@ package com.sk89q.worldedit.util;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.OptionalInt;
-import javax.annotation.Nullable;
 
 /**
  * A collection of cardinal, ordinal, and secondary-ordinal directions.
@@ -192,7 +192,7 @@ public enum Direction {
      * Find the closest direction to the given direction vector.
      *
      * @param vector the vector
-     * @param flags the only flags that are permitted (use bitwise math)
+     * @param flags  the only flags that are permitted (use bitwise math)
      * @return the closest direction, or null if no direction can be returned
      */
     @Nullable
@@ -240,7 +240,7 @@ public enum Direction {
      * Converts a rotation index into a Direction.
      *
      * <p>
-     *     Rotation indexes are used in BlockStates, such as sign posts.
+     * Rotation indexes are used in BlockStates, such as sign posts.
      * </p>
      *
      * @param rotation The rotation index
@@ -328,6 +328,7 @@ public enum Direction {
      * Flags to use with {@link #findClosest(Vector3, int)}.
      */
     public static final class Flag {
+
         public static int CARDINAL = 0x1;
         public static int ORDINAL = 0x2;
         public static int SECONDARY_ORDINAL = 0x4;
@@ -342,6 +343,7 @@ public enum Direction {
 
         private Flag() {
         }
+
     }
 
 }

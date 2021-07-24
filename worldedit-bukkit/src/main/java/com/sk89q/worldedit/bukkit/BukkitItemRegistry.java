@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 class BukkitItemRegistry extends BundledItemRegistry {
+
     @Override
     public Component getRichName(ItemType itemType) {
         if (WorldEditPlugin.getInstance().getBukkitImplAdapter() != null) {

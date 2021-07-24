@@ -68,4 +68,5 @@ public class PasteEvent extends Event implements Cancellable {
         PasteEvent clone = new PasteEvent(actor, clipboard, uri, extent, to);
         return clone;
     }
+
 }

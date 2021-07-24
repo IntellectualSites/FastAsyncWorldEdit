@@ -1,13 +1,15 @@
 package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
+import com.fastasyncworldedit.core.function.generator.GenBase;
+import com.fastasyncworldedit.core.function.generator.Resource;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.object.FaweLimit;
-import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -15,8 +17,6 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.fastasyncworldedit.core.function.generator.GenBase;
-import com.fastasyncworldedit.core.function.generator.Resource;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -34,12 +34,12 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
 
 //todo This should be removed in favor of com.sk89q.worldedit.extent.NullExtent
 public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
@@ -127,7 +127,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return false;
     }
 
@@ -243,7 +243,8 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+    public <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws
+            MaxChangedBlocksException {
         throw reason;
     }
 
@@ -293,7 +294,16 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
+    public int getNearestSurfaceTerrainBlock(
+            int x,
+            int z,
+            int y,
+            int minY,
+            int maxY,
+            int failedMin,
+            int failedMax,
+            boolean ignoreAir
+    ) {
         throw reason;
     }
 
@@ -308,7 +318,8 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
-    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+    public void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws
+            WorldEditException {
         throw reason;
     }
 
@@ -318,7 +329,8 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
-    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+    public void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws
+            WorldEditException {
         throw reason;
     }
 
@@ -361,4 +373,5 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     public ProcessorScope getScope() {
         return ProcessorScope.ADDING_BLOCKS;
     }
+
 }

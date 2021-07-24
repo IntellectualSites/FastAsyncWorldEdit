@@ -62,7 +62,10 @@ public class RandomPatternParser extends InputParser<Pattern> {
                 String[] p = token.split("%", 2);
 
                 if (p.length < 2) {
-                    throw new InputParseException(Caption.of("worldedit.error.parser.missing-random-type", TextComponent.of(input)));
+                    throw new InputParseException(Caption.of(
+                            "worldedit.error.parser.missing-random-type",
+                            TextComponent.of(input)
+                    ));
                 } else {
                     chance = Double.parseDouble(p[0]);
                     innerPattern = worldEdit.getPatternFactory().parseFromInput(p[1], context);
@@ -77,4 +80,5 @@ public class RandomPatternParser extends InputParser<Pattern> {
 
         return randomPattern;
     }
+
 }

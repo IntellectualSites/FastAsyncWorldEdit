@@ -3,6 +3,10 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
+import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.plotsquared.core.PlotSquared;
@@ -15,16 +19,12 @@ import com.plotsquared.core.util.SchematicHandler;
 import com.plotsquared.core.util.task.RunnableVal;
 import com.plotsquared.core.util.task.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
-import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
-import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
-import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
 import com.sk89q.worldedit.extent.clipboard.io.MCEditSchematicReader;
 import com.sk89q.worldedit.extent.clipboard.io.SpongeSchematicReader;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -56,13 +56,15 @@ public class FaweDelegateSchematicHandler {
 
     private static final AtomicBoolean exportingAll = new AtomicBoolean();
 
-    public void paste(final Schematic schematic,
-                      final Plot plot,
-                      final int xOffset,
-                      final int yOffset,
-                      final int zOffset,
-                      final boolean autoHeight,
-                      final RunnableVal<Boolean> whenDone) {
+    public void paste(
+            final Schematic schematic,
+            final Plot plot,
+            final int xOffset,
+            final int yOffset,
+            final int zOffset,
+            final boolean autoHeight,
+            final RunnableVal<Boolean> whenDone
+    ) {
         Runnable r = () -> {
             if (whenDone != null) {
                 whenDone.value = false;
@@ -78,8 +80,8 @@ public class FaweDelegateSchematicHandler {
             // Validate dimensions
             CuboidRegion region = plot.getLargestRegion();
             if (((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
-                (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
-                > 256)) {
+                    (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
+                    > 256)) {
                 TaskManager.runTask(whenDone);
                 return;
             }
@@ -94,8 +96,9 @@ public class FaweDelegateSchematicHandler {
                         y_offset_actual = yOffset + ((ClassicPlotWorld) pw).PLOT_HEIGHT;
                     } else {
                         y_offset_actual = yOffset + 1 + PlotSquared.platform().worldUtil()
-                            .getHighestBlockSynchronous(plot.getWorldName(), region.getMinimumPoint().getX() + 1,
-                                region.getMinimumPoint().getZ() + 1);
+                                .getHighestBlockSynchronous(plot.getWorldName(), region.getMinimumPoint().getX() + 1,
+                                        region.getMinimumPoint().getZ() + 1
+                                );
                     }
                 }
             } else {
@@ -103,10 +106,10 @@ public class FaweDelegateSchematicHandler {
             }
 
             final BlockVector3 to = BlockVector3
-                .at(region.getMinimumPoint().getX() + xOffset, y_offset_actual, region.getMinimumPoint().getZ() + zOffset);
+                    .at(region.getMinimumPoint().getX() + xOffset, y_offset_actual, region.getMinimumPoint().getZ() + zOffset);
 
             try (EditSession editSession = new EditSessionBuilder(FaweAPI.getWorld(plot.getWorldName())).checkMemory(false)
-                .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+                    .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
                 final Clipboard clipboard = schematic.getClipboard();
                 clipboard.paste(editSession, to, true, false, true);
                 if (whenDone != null) {
@@ -135,20 +138,20 @@ public class FaweDelegateSchematicHandler {
                 if (cTag instanceof CompressedSchematicTag) {
                     Clipboard clipboard = (Clipboard) cTag.getSource();
                     try (OutputStream stream = new FileOutputStream(tmp);
-                        NBTOutputStream output = new NBTOutputStream(
-                            new BufferedOutputStream(new ParallelGZIPOutputStream(stream)))) {
+                         NBTOutputStream output = new NBTOutputStream(
+                                 new BufferedOutputStream(new ParallelGZIPOutputStream(stream)))) {
                         new FastSchematicWriter(output).write(clipboard);
                     }
                 } else {
                     try (OutputStream stream = new FileOutputStream(tmp);
-                        BufferedOutputStream output = new BufferedOutputStream(new ParallelGZIPOutputStream(stream))) {
+                         BufferedOutputStream output = new BufferedOutputStream(new ParallelGZIPOutputStream(stream))) {
                         LZ4BlockInputStream is = cTag.adapt(cTag.getSource());
                         IOUtil.copy(is, output);
                     }
                 }
             } else {
                 try (OutputStream stream = new FileOutputStream(tmp);
-                    NBTOutputStream output = new NBTOutputStream(new ParallelGZIPOutputStream(stream))) {
+                     NBTOutputStream output = new NBTOutputStream(new ParallelGZIPOutputStream(stream))) {
                     Map<String, Tag> map = tag.getValue();
                     output.writeNamedTag("Schematic", map.getOrDefault("Schematic", tag));
                 }
@@ -193,7 +196,7 @@ public class FaweDelegateSchematicHandler {
     public Schematic getSchematic(@NotNull InputStream is) {
         try {
             FastSchematicReader schematicReader = new FastSchematicReader(
-                new NBTInputStream(new BufferedInputStream(new GZIPInputStream(new BufferedInputStream(is)))));
+                    new NBTInputStream(new BufferedInputStream(new GZIPInputStream(new BufferedInputStream(is)))));
             Clipboard clip = schematicReader.read();
             return new Schematic(clip);
         } catch (IOException e) {
@@ -203,7 +206,7 @@ public class FaweDelegateSchematicHandler {
             }
             try {
                 SpongeSchematicReader schematicReader =
-                    new SpongeSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
+                        new SpongeSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
                 Clipboard clip = schematicReader.read();
                 return new Schematic(clip);
             } catch (IOException e2) {
@@ -213,17 +216,18 @@ public class FaweDelegateSchematicHandler {
                 }
                 try {
                     MCEditSchematicReader schematicReader =
-                        new MCEditSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
+                            new MCEditSchematicReader(new NBTInputStream(new GZIPInputStream(is)));
                     Clipboard clip = schematicReader.read();
                     return new Schematic(clip);
                 } catch (IOException e3) {
                     e.printStackTrace();
                     LOGGER.warn(
-                        is + " | " + is.getClass().getCanonicalName() + " is not in GZIP format : " + e
-                            .getMessage());
+                            is + " | " + is.getClass().getCanonicalName() + " is not in GZIP format : " + e
+                                    .getMessage());
                 }
             }
         }
         return null;
     }
+
 }

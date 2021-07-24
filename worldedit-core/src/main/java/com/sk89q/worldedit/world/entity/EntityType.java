@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world.entity;
 
+import com.fastasyncworldedit.core.registry.RegistryItem;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.fastasyncworldedit.core.registry.RegistryItem;
 
 //FAWE start - implements RegistryItem
 public class EntityType implements RegistryItem, Keyed {

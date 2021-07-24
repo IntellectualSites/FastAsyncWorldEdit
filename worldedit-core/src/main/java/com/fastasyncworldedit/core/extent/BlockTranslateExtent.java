@@ -1,20 +1,21 @@
 package com.fastasyncworldedit.core.extent;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 public class BlockTranslateExtent extends AbstractDelegateExtent {
+
     private final int dx;
     private final int dy;
     private final int dz;
-    private MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public BlockTranslateExtent(Extent extent, int dx, int dy, int dz) {
         super(extent);
@@ -65,4 +66,5 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     public BaseBlock getFullBlock(BlockVector3 pos) {
         return super.getFullBlock(pos.add(dx, dy, dz));
     }
+
 }

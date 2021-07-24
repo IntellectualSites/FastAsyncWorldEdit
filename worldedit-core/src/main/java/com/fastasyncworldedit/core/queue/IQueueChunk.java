@@ -5,8 +5,10 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
+
     /**
      * Reset (defaults to just calling init)
+     *
      * @return
      */
     @Override
@@ -28,6 +30,7 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
     /**
      * Call and join
      * - Should be done async, if at all
+     *
      * @throws ExecutionException
      * @throws InterruptedException
      */
@@ -37,4 +40,5 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
             future = future.get();
         }
     }
+
 }

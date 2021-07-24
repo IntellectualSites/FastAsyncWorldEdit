@@ -5,6 +5,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class ExtentFilterBlock extends AbstractFilterBlock {
+
     private final Extent extent;
     private BlockVector3 pos;
 
@@ -37,4 +38,5 @@ public class ExtentFilterBlock extends AbstractFilterBlock {
     public Extent getExtent() {
         return extent;
     }
+
 }

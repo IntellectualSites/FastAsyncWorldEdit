@@ -35,14 +35,15 @@ public interface Metadatable {
      * Gets the metadata value to which the specified key is mapped,
      * or the default value if no metadata exists for the key.
      *
-     * @param key the key of the metadata value to retrieve
+     * @param key          the key of the metadata value to retrieve
      * @param defaultValue the value to return if there is no metadata for the given key
      * @return the metadata value for the key, if present; else the default value
      */
     @NotNull
     default <V> V getMeta(String key, @NotNull V defaultValue) {
         V value = getMeta(key);
-        return value == null ? defaultValue : value;    }
+        return value == null ? defaultValue : value;
+    }
 
     /**
      * Deletes the given metadata key from object. Do not delete metadata set by another plugin
@@ -51,12 +52,13 @@ public interface Metadatable {
      * @param key the key identifying the metadata to remove.
      * @return the previous value associated with they given key
      */
-    @Nullable
-    <V> V deleteMeta(String key);
+    @Nullable <V> V deleteMeta(String key);
 
     final class METADATA_KEYS {
 
         public static final String ANVIL_CLIPBOARD = "anvil-clipboard";
         public static final String ROLLBACK = "rollback";
+
     }
+
 }

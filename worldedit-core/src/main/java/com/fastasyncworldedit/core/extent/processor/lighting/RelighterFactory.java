@@ -19,10 +19,11 @@ public interface RelighterFactory {
      * If no valid Relighter can be created, {@link NullRelighter#INSTANCE} should be returned.
      *
      * @param relightMode the relight mode to use during relighting.
-     * @param world the world in which relighting should be done.
-     * @param queue the queue extent to work with.
+     * @param world       the world in which relighting should be done.
+     * @param queue       the queue extent to work with.
      * @return a new Relighter instance with the specified settings.
      */
     @NotNull
     Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue);
+
 }

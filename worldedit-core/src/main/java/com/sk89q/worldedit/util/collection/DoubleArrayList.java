@@ -83,11 +83,13 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
         if (reversed) {
             return new ReverseEntryIterator<>(
                     listA.listIterator(listA.size()),
-                    listB.listIterator(listB.size()));
+                    listB.listIterator(listB.size())
+            );
         } else {
             return new ForwardEntryIterator<>(
                     listA.iterator(),
-                    listB.iterator());
+                    listB.iterator()
+            );
         }
     }
 
@@ -124,6 +126,7 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+
     }
 
     /**
@@ -154,12 +157,14 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+
     }
 
     /**
      * Class to masquerade as Map.Entry.
      */
     public class Entry<C, D> implements Map.Entry<A, B> {
+
         private final A key;
         private final B value;
 
@@ -182,6 +187,7 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
         public B setValue(B value) {
             throw new UnsupportedOperationException();
         }
+
     }
 
 }

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.Future;
 
 public final class NullProcessor implements IBatchProcessor {
+
     private static final NullProcessor instance = new NullProcessor();
 
     public static NullProcessor getInstance() {

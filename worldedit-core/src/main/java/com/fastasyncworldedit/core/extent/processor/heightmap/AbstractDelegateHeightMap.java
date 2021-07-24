@@ -17,4 +17,5 @@ public class AbstractDelegateHeightMap implements HeightMap {
     public void setSize(int size) {
         parent.setSize(size);
     }
+
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
+
     Map<K2, V2> getParent();
 
     K2 adaptKey(K key);
@@ -93,7 +94,8 @@ public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
             return Collections.emptySet();
         }
         return new AdaptedSetCollection<>(getParent().entrySet(), new Function<Entry<K2, V2>, Entry<K, V>>() {
-            private MutablePair<K, V> entry = new MutablePair<>();
+            private final MutablePair<K, V> entry = new MutablePair<>();
+
             @Override
             public Entry<K, V> apply(@javax.annotation.Nullable Entry<K2, V2> input) {
                 entry.setKey(adaptKey2(input.getKey()));
@@ -102,4 +104,5 @@ public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
             }
         });
     }
+
 }

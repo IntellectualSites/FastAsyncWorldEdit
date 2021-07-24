@@ -15,6 +15,7 @@ import java.util.Set;
  * - This will use 8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
  */
 public class LocalBlockVectorSet implements Set<BlockVector3> {
+
     private int offsetX;
     private int offsetZ;
     private final SparseBitSet set;
@@ -70,7 +71,8 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
                 int b2 = (byte) (index >> 8) & 0x7F;
                 int b3 = (byte) (index >> 15) & 0xFF;
                 int b4 = (byte) (index >> 23) & 0xFF;
-                if (Math.abs((offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21)) - x) <= radius && Math.abs((offsetZ + (((b4 + ((MathMan.unpair8y(b2)) << 8)) << 21) >> 21)) - z) <= radius && Math.abs((b1) - y) <= radius) {
+                if (Math.abs((offsetX + (((b3 + ((MathMan.unpair8x(b2)) << 8)) << 21) >> 21)) - x) <= radius && Math.abs((offsetZ + (((b4 + ((MathMan
+                        .unpair8y(b2)) << 8)) << 21) >> 21)) - z) <= radius && Math.abs((b1) - y) <= radius) {
                     return true;
                 }
             }
@@ -119,12 +121,13 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return null;
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public Iterator<BlockVector3> iterator() {
         return new Iterator<BlockVector3>() {
             int index = set.nextSetBit(0);
             int previous = -1;
-            MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
+            final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
 
             @Override
             public void remove() {
@@ -155,12 +158,14 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         };
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public Object[] toArray() {
         return toArray((Object[]) null);
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public <T> T[] toArray(T[] array) {
         int size = size();
         if (array == null || array.length < size) {
@@ -201,7 +206,8 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         int relX = x - offsetX;
         int relZ = z - offsetZ;
         if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024) {
-            throw new UnsupportedOperationException("LocalVectorSet can only contain vectors within 1024 blocks (cuboid) of the first entry. ");
+            throw new UnsupportedOperationException(
+                    "LocalVectorSet can only contain vectors within 1024 blocks (cuboid) of the first entry. ");
         }
         if (y < 0 || y > 255) {
             throw new UnsupportedOperationException("LocalVectorSet can only contain vectors from y elem:[0,255]");
@@ -317,7 +323,9 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     }
 
     public interface BlockVectorSetVisitor {
+
         void run(int x, int y, int z, int index);
+
     }
 
     @Override
@@ -326,4 +334,5 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         offsetX = Integer.MAX_VALUE;
         set.clear();
     }
+
 }

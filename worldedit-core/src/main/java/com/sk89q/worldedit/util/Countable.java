@@ -27,7 +27,7 @@ public class Countable<T> implements Comparable<Countable<T>> {
     /**
      * Construct the object.
      *
-     * @param id the ID
+     * @param id     the ID
      * @param amount the count of
      */
     public Countable(T id, int amount) {
@@ -69,4 +69,5 @@ public class Countable<T> implements Comparable<Countable<T>> {
     public int compareTo(Countable<T> other) {
         return Integer.compare(amount, other.amount);
     }
+
 }

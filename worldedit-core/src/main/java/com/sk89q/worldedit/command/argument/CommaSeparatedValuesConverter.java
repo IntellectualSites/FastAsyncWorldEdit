@@ -50,8 +50,10 @@ public class CommaSeparatedValuesConverter<T> implements ArgumentConverter<T> {
     private final int maximum;
 
     private CommaSeparatedValuesConverter(ArgumentConverter<T> delegate, int maximum) {
-        checkArgument(maximum == -1 || maximum > 1,
-            "Maximum must be bigger than 1, or exactly -1");
+        checkArgument(
+                maximum == -1 || maximum > 1,
+                "Maximum must be bigger than 1, or exactly -1"
+        );
         this.delegate = delegate;
         this.maximum = maximum;
     }
@@ -61,11 +63,11 @@ public class CommaSeparatedValuesConverter<T> implements ArgumentConverter<T> {
         TextComponent.Builder result = TextComponent.builder("");
         if (maximum > -1) {
             result.append(TextComponent.of("up to "))
-                .append(TextComponent.of(maximum))
-                .append(space());
+                    .append(TextComponent.of(maximum))
+                    .append(space());
         }
         result.append(TextComponent.of("comma separated values of: "))
-            .append(delegate.describeAcceptableArguments());
+                .append(delegate.describeAcceptableArguments());
         return result.build();
     }
 

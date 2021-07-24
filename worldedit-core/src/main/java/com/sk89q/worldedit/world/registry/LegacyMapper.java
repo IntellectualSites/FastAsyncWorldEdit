@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
@@ -35,7 +36,6 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.Vector3;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 import com.sk89q.worldedit.util.io.ResourceLoader;
 import com.sk89q.worldedit.world.DataFixer;
@@ -47,12 +47,12 @@ import com.sk89q.worldedit.world.item.ItemTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 public final class LegacyMapper {
 
@@ -74,7 +74,11 @@ public final class LegacyMapper {
      * Create a new instance.
      */
     private LegacyMapper() {
-        this.resourceLoader = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader();
+        this.resourceLoader = WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.CONFIGURATION)
+                .getResourceLoader();
 
         try {
             loadFromResource();
@@ -97,7 +101,8 @@ public final class LegacyMapper {
             throw new IOException("Could not find legacy.json");
         }
         String data = Resources.toString(url, Charset.defaultCharset());
-        LegacyDataFile dataFile = gson.fromJson(data, new TypeToken<LegacyDataFile>() {}.getType());
+        LegacyDataFile dataFile = gson.fromJson(data, new TypeToken<LegacyDataFile>() {
+        }.getType());
 
         DataFixer fixer = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataFixer();
         ParserContext parserContext = new ParserContext();
@@ -123,7 +128,7 @@ public final class LegacyMapper {
                 }
             } catch (InputParseException f) {
                 BlockFactory blockFactory = WorldEdit.getInstance().getBlockFactory();
-            //FAWE end
+                //FAWE end
 
                 // if fixer is available, try using that first, as some old blocks that were renamed share names with new blocks
                 if (fixer != null) {
@@ -154,7 +159,7 @@ public final class LegacyMapper {
             //FAWE start
             if (state != null) {
                 blockArr[combinedId] = state.getInternalId();
-                blockStateToLegacyId4Data.put(state.getInternalId(), (Integer) combinedId);
+                blockStateToLegacyId4Data.put(state.getInternalId(), combinedId);
                 blockStateToLegacyId4Data.putIfAbsent(state.getInternalBlockTypeId(), combinedId);
             }
         }
@@ -313,7 +318,7 @@ public final class LegacyMapper {
     @Deprecated
     public int[] getLegacyFromBlock(BlockState blockState) {
         Integer combinedId = getLegacyCombined(blockState);
-        return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
+        return combinedId == null ? null : new int[]{combinedId >> 4, combinedId & 0xF};
     }
 
     public static LegacyMapper getInstance() {
@@ -325,7 +330,10 @@ public final class LegacyMapper {
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
     private static class LegacyDataFile {
+
         private Map<String, String> blocks;
         private Map<String, String> items;
+
     }
+
 }

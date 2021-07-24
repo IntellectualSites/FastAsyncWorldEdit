@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.extent.inventory;
 import com.sk89q.worldedit.blocks.BaseItem;
 
 public interface SlottableBlockBag {
+
     BaseItem getItem(int slot);
 
     void setItem(int slot, BaseItem block);
@@ -14,4 +15,5 @@ public interface SlottableBlockBag {
     default int getSelectedSlot() {
         return -1;
     }
+
 }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.chunk;
 
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -27,7 +28,6 @@ import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.util.nbt.IntBinaryTag;
 import com.sk89q.worldedit.util.nbt.ListBinaryTag;
-import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -54,6 +54,7 @@ public class OldChunk implements Chunk {
     private Map<BlockVector3, CompoundBinaryTag> tileEntities;
 
     //FAWE start
+
     /**
      * Construct the chunk with a compound tag.
      *
@@ -162,9 +163,6 @@ public class OldChunk implements Chunk {
         }
 
         CompoundBinaryTag values = tileEntities.get(position);
-        if (values == null) {
-            return null;
-        }
         return values;
     }
 

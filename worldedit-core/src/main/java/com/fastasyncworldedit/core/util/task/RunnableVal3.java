@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util.task;
 
 public abstract class RunnableVal3<T, U, V> implements Runnable {
+
     public T value1;
     public U value2;
     public V value3;
@@ -20,4 +21,5 @@ public abstract class RunnableVal3<T, U, V> implements Runnable {
     }
 
     public abstract void run(T value1, U value2, V value3);
+
 }

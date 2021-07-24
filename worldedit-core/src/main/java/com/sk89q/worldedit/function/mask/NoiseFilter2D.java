@@ -38,7 +38,7 @@ public class NoiseFilter2D extends AbstractMask2D {
      * Create a new noise filter.
      *
      * @param noiseGenerator the noise generator
-     * @param density the density
+     * @param density        the density
      */
     public NoiseFilter2D(NoiseGenerator noiseGenerator, double density) {
         setNoiseGenerator(noiseGenerator);

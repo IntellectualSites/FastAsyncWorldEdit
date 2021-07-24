@@ -28,7 +28,8 @@ public class MultiBatchProcessor implements IBatchProcessor {
 
     private IBatchProcessor[] processors;
     private final LoadingCache<Class<?>, Map<Long, Filter>> classToThreadIdToFilter =
-        FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
+            FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
+
     public MultiBatchProcessor(IBatchProcessor... processors) {
         this.processors = processors;
     }
@@ -75,10 +76,14 @@ public class MultiBatchProcessor implements IBatchProcessor {
             IChunkSet chunkSet = set;
             for (IBatchProcessor processor : processors) {
                 if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
-                    ordered.merge(processor.getScope().intValue(), new HashSet<>(Collections.singleton(processor)), (existing, theNew) -> {
-                        existing.add(processor);
-                        return existing;
-                    });
+                    ordered.merge(
+                            processor.getScope().intValue(),
+                            new HashSet<>(Collections.singleton(processor)),
+                            (existing, theNew) -> {
+                                existing.add(processor);
+                                return existing;
+                            }
+                    );
                     continue;
                 }
                 chunkSet = processSet(processor, chunk, get, chunkSet);
@@ -90,7 +95,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
                         continue;
                     }
                     for (IBatchProcessor processor : processors) {
-                        chunkSet = processSet(processor,chunk, get, chunkSet);
+                        chunkSet = processSet(processor, chunk, get, chunkSet);
                         if (chunkSet == null) {
                             return null;
                         }
@@ -108,7 +113,11 @@ public class MultiBatchProcessor implements IBatchProcessor {
     private IChunkSet processSet(IBatchProcessor processor, IChunk chunk, IChunkGet get, IChunkSet chunkSet) {
         if (processor instanceof Filter) {
             chunkSet = ((IBatchProcessor) classToThreadIdToFilter.getUnchecked(processor.getClass())
-                .computeIfAbsent(Thread.currentThread().getId(), k -> ((Filter) processor).fork())).processSet(chunk, get, chunkSet);
+                    .computeIfAbsent(Thread.currentThread().getId(), k -> ((Filter) processor).fork())).processSet(
+                    chunk,
+                    get,
+                    chunkSet
+            );
         } else {
             chunkSet = processor.processSet(chunk, get, chunkSet);
         }
@@ -204,4 +213,5 @@ public class MultiBatchProcessor implements IBatchProcessor {
         }
         return ProcessorScope.valueOf(0);
     }
+
 }

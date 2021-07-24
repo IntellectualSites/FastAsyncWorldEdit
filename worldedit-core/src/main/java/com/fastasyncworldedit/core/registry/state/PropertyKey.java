@@ -53,7 +53,7 @@ public class PropertyKey implements Comparable<PropertyKey> {
     public static final PropertyKey NORTH = getOrCreate("north");
     public static final PropertyKey NOTE = getOrCreate("note");
     public static final PropertyKey OCCUPIED = getOrCreate("occupied");
-    public static final PropertyKey OPEN =getOrCreate("open");
+    public static final PropertyKey OPEN = getOrCreate("open");
     public static final PropertyKey PART = getOrCreate("part");
     public static final PropertyKey PERSISTENT = getOrCreate("persistent");
     public static final PropertyKey PICKLES = getOrCreate("pickles");
@@ -105,6 +105,7 @@ public class PropertyKey implements Comparable<PropertyKey> {
 
     /**
      * Get or create the property key.
+     *
      * @param id The name of the property (e.g., `waterlogged`)
      * @return PropertyKey enum
      */
@@ -124,4 +125,5 @@ public class PropertyKey implements Comparable<PropertyKey> {
     public int compareTo(@NotNull PropertyKey o) {
         return Integer.compare(this.id, o.id);
     }
+
 }

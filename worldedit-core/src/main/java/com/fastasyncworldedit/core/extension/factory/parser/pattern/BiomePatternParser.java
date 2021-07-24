@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.function.pattern.BiomeApplyingPattern;
 import com.sk89q.worldedit.WorldEdit;
-import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.stream.Stream;
 
 public class BiomePatternParser extends RichParser<Pattern> {
+
     private final static String BIOME_PREFIX = "$";
 
     /**
@@ -71,4 +72,5 @@ public class BiomePatternParser extends RichParser<Pattern> {
         }
         return new BiomeApplyingPattern(context.requireExtent(), biomeType);
     }
+
 }

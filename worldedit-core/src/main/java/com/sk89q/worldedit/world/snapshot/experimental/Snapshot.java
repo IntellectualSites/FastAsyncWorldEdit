@@ -59,4 +59,5 @@ public interface Snapshot extends Closeable {
      */
     @Override
     void close() throws IOException;
+
 }

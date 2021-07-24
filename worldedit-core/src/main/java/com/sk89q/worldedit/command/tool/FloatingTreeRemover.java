@@ -46,6 +46,7 @@ import java.util.Set;
  * to anything else).
  */
 public class FloatingTreeRemover implements BlockTool {
+
     private final int rangeSq;
 
     public FloatingTreeRemover() {
@@ -67,9 +68,11 @@ public class FloatingTreeRemover implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config,
-                              Player player, LocalSession session, Location clicked,
-                              @Nullable Direction face) {
+    public boolean actPrimary(
+            Platform server, LocalConfiguration config,
+            Player player, LocalSession session, Location clicked,
+            @Nullable Direction face
+    ) {
 
         final World world = (World) clicked.getExtent();
         final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
@@ -115,7 +118,7 @@ public class FloatingTreeRemover implements BlockTool {
     /**
      * Helper method.
      *
-     * @param world the world that contains the tree
+     * @param world  the world that contains the tree
      * @param origin any point contained in the floating tree
      * @return a set containing all blocks in the tree/shroom or null if this is not a floating tree/shroom.
      */
@@ -143,7 +146,7 @@ public class FloatingTreeRemover implements BlockTool {
                     if (visited.add(next)) {
                         BlockState state = world.getBlock(next);
                         if (state.getBlockType().getMaterial().isAir()
-                            || state.getBlockType() == BlockTypes.SNOW) {
+                                || state.getBlockType() == BlockTypes.SNOW) {
                             continue;
                         }
                         if (isTreeBlock(state.getBlockType())) {
@@ -152,7 +155,7 @@ public class FloatingTreeRemover implements BlockTool {
                             // we hit something solid - evaluate where we came from
                             final BlockType currentType = world.getBlock(current).getBlockType();
                             if (!BlockCategories.LEAVES.contains(currentType)
-                                && currentType != BlockTypes.VINE) {
+                                    && currentType != BlockTypes.VINE) {
                                 // log/shroom touching a wall/the ground => this is not a floating tree, bail out
                                 return null;
                             }
@@ -164,4 +167,5 @@ public class FloatingTreeRemover implements BlockTool {
 
         return visited;
     }
+
 }

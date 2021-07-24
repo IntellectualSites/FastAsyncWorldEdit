@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 public class CachedMathMan {
+
     private static final int ATAN2_BITS = 7;
     private static final int ATAN2_BITS2 = ATAN2_BITS << 1;
     private static final int ATAN2_MASK = ~(-1 << ATAN2_BITS2);
@@ -87,4 +88,5 @@ public class CachedMathMan {
 
         return (atan2[(yi * ATAN2_DIM) + xi] + add) * mul;
     }
+
 }

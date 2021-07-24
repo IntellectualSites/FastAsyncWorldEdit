@@ -22,13 +22,13 @@ package com.sk89q.worldedit.util.time;
 import com.google.common.collect.Streams;
 import com.sk89q.worldedit.util.io.file.MorePaths;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.StreamSupport;
-import javax.annotation.Nullable;
 
 /**
  * Parses date-times by looking at the file name. File names without a time
@@ -65,11 +65,11 @@ public class FileNameDateTimeParser implements SnapshotDateTimeParser {
     private static final String SEP = "[ \\-_:]";
 
     private static final Pattern BASIC_FILTER = Pattern.compile(
-        "^(?<year>\\d{4})" + SEP + "(?<month>\\d{1,2})" + SEP + "(?<day>\\d{1,2})"
-            // Optionally:
-            + "(?:" + "[ \\-_:T]"
-            + "(?<hour>\\d{1,2})" + SEP + "(?<minute>\\d{1,2})" + SEP + "(?<second>\\d{1,2})"
-            + ")?"
+            "^(?<year>\\d{4})" + SEP + "(?<month>\\d{1,2})" + SEP + "(?<day>\\d{1,2})"
+                    // Optionally:
+                    + "(?:" + "[ \\-_:T]"
+                    + "(?<hour>\\d{1,2})" + SEP + "(?<minute>\\d{1,2})" + SEP + "(?<second>\\d{1,2})"
+                    + ")?"
     );
 
     private FileNameDateTimeParser() {
@@ -80,9 +80,9 @@ public class FileNameDateTimeParser implements SnapshotDateTimeParser {
     public ZonedDateTime detectDateTime(Path path) {
         // Make this perform a little better:
         Matcher matcher = Streams.findLast(
-            StreamSupport.stream(MorePaths.optimizedSpliterator(path), false)
-                .map(p -> BASIC_FILTER.matcher(p.toString()))
-                .filter(Matcher::find)
+                StreamSupport.stream(MorePaths.optimizedSpliterator(path), false)
+                        .map(p -> BASIC_FILTER.matcher(p.toString()))
+                        .filter(Matcher::find)
         ).orElse(null);
         if (matcher != null) {
             int year = matchAndParseOrZero(matcher, "year");
@@ -92,7 +92,8 @@ public class FileNameDateTimeParser implements SnapshotDateTimeParser {
             int minute = matchAndParseOrZero(matcher, "minute");
             int second = matchAndParseOrZero(matcher, "second");
             return ZonedDateTime.of(year, month, day, hour, minute, second,
-                0, ZoneId.systemDefault());
+                    0, ZoneId.systemDefault()
+            );
         }
         return null;
     }

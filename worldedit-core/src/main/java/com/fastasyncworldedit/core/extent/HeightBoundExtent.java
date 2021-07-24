@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.extent;
 
+import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
@@ -43,8 +43,9 @@ public class HeightBoundExtent extends FaweRegionExtent {
     @Override
     public Collection<Region> getRegions() {
         return Collections.singletonList(
-            new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, min, max, Integer.MIN_VALUE,
-                Integer.MAX_VALUE));
+                new RegionWrapper(Integer.MIN_VALUE, Integer.MAX_VALUE, min, max, Integer.MIN_VALUE,
+                        Integer.MAX_VALUE
+                ));
     }
 
     @Override
@@ -59,4 +60,5 @@ public class HeightBoundExtent extends FaweRegionExtent {
     public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         return CompletableFuture.completedFuture(set);
     }
+
 }

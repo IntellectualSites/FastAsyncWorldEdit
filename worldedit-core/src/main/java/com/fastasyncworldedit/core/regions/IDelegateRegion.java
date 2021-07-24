@@ -8,16 +8,17 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.world.World;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 public interface IDelegateRegion extends Region {
 
     Region getRegion();
 
-    @NotNull @Override
+    @NotNull
+    @Override
     default Iterator<BlockVector3> iterator() {
         return getRegion().iterator();
     }
@@ -107,4 +108,5 @@ public interface IDelegateRegion extends Region {
     default List<BlockVector2> polygonize(int maxPoints) {
         return getRegion().polygonize(maxPoints);
     }
+
 }

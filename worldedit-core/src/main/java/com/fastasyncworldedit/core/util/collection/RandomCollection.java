@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @param <T> the type of values the collection holds.
  */
 public abstract class RandomCollection<T> {
+
     private SimpleRandom random;
 
     protected RandomCollection(SimpleRandom random) {
@@ -45,4 +46,5 @@ public abstract class RandomCollection<T> {
     }
 
     public abstract T next(int x, int y, int z);
+
 }

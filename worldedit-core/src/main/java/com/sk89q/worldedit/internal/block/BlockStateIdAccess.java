@@ -30,6 +30,7 @@ public final class BlockStateIdAccess {
 
     /**
      * An invalid internal ID, for verification purposes.
+     *
      * @return an internal ID which is never valid
      */
     public static int invalidId() {

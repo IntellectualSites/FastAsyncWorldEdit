@@ -1,14 +1,15 @@
 package com.fastasyncworldedit.core.function.mask;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 import java.util.Arrays;
 
 public class AngleMask extends SolidBlockMask implements ResettableMask {
+
     public static double ADJACENT_MOD = 0.5;
     public static double DIAGONAL_MOD = 1 / Math.sqrt(8);
 
@@ -105,10 +106,12 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
                     * ADJACENT_MOD);
             slope = Math.max(slope, Math.abs(
                     getHeight(extent, x + distance, y, z + distance) - getHeight(extent,
-                            x - distance, y, z - distance)) * DIAGONAL_MOD);
+                            x - distance, y, z - distance
+                    )) * DIAGONAL_MOD);
             slope = Math.max(slope, Math.abs(
                     getHeight(extent, x - distance, y, z + distance) - getHeight(extent,
-                            x + distance, y, z - distance)) * DIAGONAL_MOD);
+                            x + distance, y, z - distance
+                    )) * DIAGONAL_MOD);
             return lastValue = (slope >= min);
         } else {
             slope = Math.max(slope, Math.abs(
@@ -116,10 +119,12 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
                     * ADJACENT_MOD);
             slope = Math.max(slope, Math.abs(
                     getHeight(extent, x + distance, y, z + distance) - getHeight(extent,
-                            x - distance, y, z - distance)) * DIAGONAL_MOD);
+                            x - distance, y, z - distance
+                    )) * DIAGONAL_MOD);
             slope = Math.max(slope, Math.abs(
                     getHeight(extent, x - distance, y, z + distance) - getHeight(extent,
-                            x + distance, y, z - distance)) * DIAGONAL_MOD);
+                            x + distance, y, z - distance
+                    )) * DIAGONAL_MOD);
             return lastValue = (slope >= min && slope <= max);
         }
     }
@@ -143,10 +148,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         if (y < 255 && !mask.test(x, y + 1, z)) {
             return true;
         }
-        if (y > 0 && !mask.test(x, y - 1, z)) {
-            return true;
-        }
-        return false;
+        return y > 0 && !mask.test(x, y - 1, z);
     }
 
     @Override

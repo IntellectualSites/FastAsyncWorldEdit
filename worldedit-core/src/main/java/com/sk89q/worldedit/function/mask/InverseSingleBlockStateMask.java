@@ -7,6 +7,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 
 public class InverseSingleBlockStateMask extends ABlockMask {
+
     private final char ordinal;
     private final boolean isAir;
 
@@ -53,4 +54,5 @@ public class InverseSingleBlockStateMask extends ABlockMask {
     public Mask copy() {
         return new InverseSingleBlockStateMask(getExtent(), ordinal, isAir);
     }
+
 }

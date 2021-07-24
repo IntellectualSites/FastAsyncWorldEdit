@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.bukkit.listener;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.FaweTimer;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -51,7 +51,7 @@ public abstract class ChunkListener implements Listener {
     protected int rateLimit = 0;
     protected Location lastCancelPos;
     private int[] badLimit = new int[]{Settings.IMP.TICK_LIMITER.PHYSICS_MS,
-        Settings.IMP.TICK_LIMITER.FALLING, Settings.IMP.TICK_LIMITER.ITEMS};
+            Settings.IMP.TICK_LIMITER.FALLING, Settings.IMP.TICK_LIMITER.ITEMS};
 
     public ChunkListener() {
         if (Settings.IMP.TICK_LIMITER.ENABLED) {
@@ -62,7 +62,7 @@ public abstract class ChunkListener implements Listener {
                 Location tmpLoc = lastCancelPos;
                 if (tmpLoc != null) {
                     LOGGER.debug("[FAWE Tick Limiter] Detected and cancelled physics lag source at "
-                        + tmpLoc);
+                            + tmpLoc);
                 }
                 rateLimit--;
                 physicsFreeze = false;
@@ -248,7 +248,7 @@ public abstract class ChunkListener implements Listener {
                 physStart = System.currentTimeMillis();
                 return;
             } else if (System.currentTimeMillis() - physStart
-                < Settings.IMP.TICK_LIMITER.PHYSICS_MS) {
+                    < Settings.IMP.TICK_LIMITER.PHYSICS_MS) {
                 return;
             }
         }
@@ -281,7 +281,7 @@ public abstract class ChunkListener implements Listener {
                 String methodName = elem.getMethodName();
                 // setAir | setTypeAndData (hacky, but this needs to be efficient)
                 if (methodName.charAt(0) == 's' && methodName.length() == 6
-                    || methodName.length() == 14) {
+                        || methodName.length() == 14) {
                     return true;
                 }
             }
@@ -370,16 +370,16 @@ public abstract class ChunkListener implements Listener {
                 String className = elem.getClassName();
                 int len = className.length();
                 if (len > 15 && className.charAt(len - 15) == 'E' && className
-                    .endsWith("EntityFireworks")) {
+                        .endsWith("EntityFireworks")) {
                     for (Entity ent : world.getEntities()) {
                         if (ent.getType() == EntityType.FIREWORK) {
                             Vector velocity = ent.getVelocity();
                             double vertical = Math.abs(velocity.getY());
                             if (Math.abs(velocity.getX()) > vertical
-                                || Math.abs(velocity.getZ()) > vertical) {
+                                    || Math.abs(velocity.getZ()) > vertical) {
                                 LOGGER.warn(
-                                    "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at "
-                                        + ent.getLocation());
+                                        "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at "
+                                                + ent.getLocation());
                                 ent.remove();
                             }
                         }
@@ -409,9 +409,10 @@ public abstract class ChunkListener implements Listener {
             if (rateLimit <= 0) {
                 rateLimit = 20;
                 LOGGER.warn(
-                    "[FAWE `tick-limiter`] Detected and cancelled item lag source at " + loc);
+                        "[FAWE `tick-limiter`] Detected and cancelled item lag source at " + loc);
             }
             event.setCancelled(true);
         }
     }
+
 }

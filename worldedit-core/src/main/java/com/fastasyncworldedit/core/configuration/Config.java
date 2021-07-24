@@ -124,6 +124,7 @@ public class Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface Create {
+
     }
 
     /**
@@ -132,6 +133,7 @@ public class Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface Final {
+
     }
 
     /**
@@ -140,7 +142,9 @@ public class Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
     public @interface Comment {
+
         String[] value();
+
     }
 
     /**
@@ -149,7 +153,9 @@ public class Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
     public @interface BlockName {
+
         String[] value();
+
     }
 
     /**
@@ -158,12 +164,13 @@ public class Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD, ElementType.TYPE})
     public @interface Ignore {
+
     }
 
     @Ignore // This is not part of the config
     public static class ConfigBlock<T> {
 
-        private HashMap<String, T> INSTANCES = new HashMap<>();
+        private final HashMap<String, T> INSTANCES = new HashMap<>();
 
         public T remove(String key) {
             return INSTANCES.remove(key);
@@ -188,6 +195,7 @@ public class Config {
         private Map<String, T> getRaw() {
             return INSTANCES;
         }
+
     }
 
     /**
@@ -297,7 +305,10 @@ public class Config {
                     save(writer, current, value, indent + 2);
                     continue;
                 } else {
-                    writer.write(spacing + toNodeName(field.getName() + ": ") + toYamlString(field.get(instance), spacing) + CTRF);
+                    writer.write(spacing + toNodeName(field.getName() + ": ") + toYamlString(
+                            field.get(instance),
+                            spacing
+                    ) + CTRF);
                 }
             }
         } catch (Throwable e) {
@@ -321,8 +332,6 @@ public class Config {
     /**
      * Get the field for a specific config node and instance.
      *
-     * @apiNote As expiry can have multiple blocks there will be multiple instances
-     *
      * @param split    the node (split by period)
      * @param instance the instance
      */
@@ -332,7 +341,9 @@ public class Config {
             setAccessible(field);
             return field;
         } catch (Throwable ignored) {
-            LOGGER.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance.getClass().getSimpleName()));
+            LOGGER.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance
+                    .getClass()
+                    .getSimpleName()));
             return null;
         }
     }
@@ -437,4 +448,5 @@ public class Config {
             modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
         }
     }
+
 }

@@ -59,4 +59,5 @@ public class RecurseBrush implements Brush {
             Operations.completeBlindly(visitor);
         }
     }
+
 }

@@ -36,11 +36,11 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockState;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 /**
  * A mode that cycles the data values of supported blocks.
@@ -54,8 +54,10 @@ public class BlockDataCyler implements DoubleActionBlockTool {
 
     private final Map<UUID, Property<?>> selectedProperties = new HashMap<>();
 
-    private boolean handleCycle(LocalConfiguration config, Player player, LocalSession session,
-                                Location clicked, boolean forward) {
+    private boolean handleCycle(
+            LocalConfiguration config, Player player, LocalSession session,
+            Location clicked, boolean forward
+    ) {
 
         World world = (World) clicked.getExtent();
 
@@ -117,12 +119,26 @@ public class BlockDataCyler implements DoubleActionBlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
+    public boolean actPrimary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         return handleCycle(config, player, session, clicked, true);
     }
 
     @Override
-    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
+    public boolean actSecondary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         return handleCycle(config, player, session, clicked, false);
     }
 

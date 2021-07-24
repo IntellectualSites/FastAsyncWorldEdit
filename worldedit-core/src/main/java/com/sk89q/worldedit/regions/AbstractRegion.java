@@ -95,7 +95,8 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     @Override
     public List<BlockVector2> polygonize(int maxPoints) {
         if (maxPoints >= 0 && maxPoints < 4) {
-            throw new IllegalArgumentException("Cannot polygonize an AbstractRegion with no overridden polygonize method into less than 4 points.");
+            throw new IllegalArgumentException(
+                    "Cannot polygonize an AbstractRegion with no overridden polygonize method into less than 4 points.");
         }
 
         final BlockVector3 min = getMinimumPoint();
@@ -117,8 +118,8 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         BlockVector3 max = getMaximumPoint();
 
         return (max.getX() - min.getX() + 1L)
-            * (max.getY() - min.getY() + 1L)
-            * (max.getZ() - min.getZ() + 1L);
+                * (max.getY() - min.getY() + 1L)
+                * (max.getZ() - min.getZ() + 1L);
     }
 
     /**
@@ -203,9 +204,9 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
                     }
 
                     chunks.add(BlockVector3.at(
-                        x >> ChunkStore.CHUNK_SHIFTS,
-                        y >> ChunkStore.CHUNK_SHIFTS,
-                        z >> ChunkStore.CHUNK_SHIFTS
+                            x >> ChunkStore.CHUNK_SHIFTS,
+                            y >> ChunkStore.CHUNK_SHIFTS,
+                            z >> ChunkStore.CHUNK_SHIFTS
                     ));
                 }
             }
@@ -245,13 +246,10 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         }
         Region region = ((Region) o);
 
-        if (Objects.equals(this.getWorld(), region.getWorld())
-            && this.getMinimumPoint().equals(region.getMinimumPoint())
-            && this.getMaximumPoint().equals(region.getMaximumPoint())
-            && this.getVolume() == region.getVolume()) {
-            return true;
-        }
-        return false;
+        return Objects.equals(this.getWorld(), region.getWorld())
+                && this.getMinimumPoint().equals(region.getMinimumPoint())
+                && this.getMaximumPoint().equals(region.getMaximumPoint())
+                && this.getVolume() == region.getVolume();
     }
     //FAWE end
 

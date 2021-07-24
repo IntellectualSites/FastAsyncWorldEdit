@@ -2,11 +2,11 @@ package com.fastasyncworldedit.core.extent.filter.block;
 
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.FilterBlockMask;
-import com.fastasyncworldedit.core.queue.implementation.Flood;
 import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.Flood;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 
@@ -32,8 +32,10 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
      */
     public abstract ChunkFilterBlock initLayer(IBlocks iget, IChunkSet iset, int layer);
 
-    public abstract void flood(IChunkGet iget, IChunkSet iset, int layer,
-                               Flood flood, FilterBlockMask mask);
+    public abstract void flood(
+            IChunkGet iget, IChunkSet iset, int layer,
+            Flood flood, FilterBlockMask mask
+    );
 
 
     /**
@@ -44,8 +46,10 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
     /**
      * Filter a cuboid region.
      */
-    public abstract void filter(Filter filter, int minX, int minY, int minZ, int maxX, int maxY,
-        int maxZ);
+    public abstract void filter(
+            Filter filter, int minX, int minY, int minZ, int maxX, int maxY,
+            int maxZ
+    );
 
     /**
      * Filter everything in the layer.
@@ -93,4 +97,5 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
         }
         return set;
     }
+
 }

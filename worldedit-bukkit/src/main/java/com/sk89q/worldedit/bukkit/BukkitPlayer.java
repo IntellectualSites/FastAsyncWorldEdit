@@ -21,8 +21,8 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.VaultResolver;
 import com.sk89q.worldedit.WorldEdit;
@@ -63,14 +63,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.PermissionAttachment;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -236,7 +236,14 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         org.bukkit.World finalWorld = world;
         //FAWE end
-        return TaskManager.IMP.sync(() -> player.teleport(new Location(finalWorld, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch)));
+        return TaskManager.IMP.sync(() -> player.teleport(new Location(
+                finalWorld,
+                pos.getX(),
+                pos.getY(),
+                pos.getZ(),
+                yaw,
+                pitch
+        )));
     }
 
     @Override
@@ -263,7 +270,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public boolean hasPermission(String perm) {
         return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp())
                 || plugin.getPermissionsResolver().hasPermission(
-                    player.getWorld().getName(), player, perm);
+                player.getWorld().getName(), player, perm);
     }
 
     //FAWE start
@@ -333,7 +340,8 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 getWorld(),
                 position,
                 nativeLocation.getYaw(),
-                nativeLocation.getPitch());
+                nativeLocation.getPitch()
+        );
     }
 
     @Override
@@ -350,9 +358,11 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public void sendAnnouncements() {
         if (WorldEditPlugin.getInstance().getLifecycledBukkitImplAdapter() == null) {
             //FAWE start - swap out EH download url with ours
-            print(Caption.of("worldedit.version.bukkit.unsupported-adapter",
+            print(Caption.of(
+                    "worldedit.version.bukkit.unsupported-adapter",
                     TextComponent.of("https://intellectualsites.github.io/download/fawe.html", TextColor.AQUA)
-                        .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
+                            .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))
+            ));
             //FAWE end
         }
     }

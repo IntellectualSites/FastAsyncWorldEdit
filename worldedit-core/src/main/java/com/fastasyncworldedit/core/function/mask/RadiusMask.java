@@ -42,10 +42,7 @@ public class RadiusMask extends AbstractMask implements ResettableMask {
         }
         int dy = pos.getBlockY() - to.getBlockY();
         d += dy * dy;
-        if (d < minSqr || d > maxSqr) {
-            return false;
-        }
-        return true;
+        return d >= minSqr && d <= maxSqr;
     }
 
     @Override

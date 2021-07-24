@@ -46,4 +46,5 @@ public class LazyRegionMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) {
         return new RegionMask(new RequestSelection());
     }
+
 }

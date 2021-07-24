@@ -35,8 +35,10 @@ public class Triangle {
         radius[1] = RADIUS;
         radius[2] = RADIUS;
         this.normalVec = pos2.subtract(pos1).cross(pos3.subtract(pos1)).normalize();
-        this.b = Math.max(Math.max(this.normalVec.dot(pos1), this.normalVec.dot(pos2)),
-            this.normalVec.dot(pos3));
+        this.b = Math.max(
+                Math.max(this.normalVec.dot(pos1), this.normalVec.dot(pos2)),
+                this.normalVec.dot(pos3)
+        );
     }
 
     public boolean above(BlockVector3 pt) {
@@ -47,13 +49,16 @@ public class Triangle {
     public Edge getEdge(int index) {
         if (index == this.verts.length - 1) {
             return new Edge(
-                Vector3.at(this.verts[index][0], this.verts[index][1], this.verts[index][2]),
-                Vector3.at(this.verts[0][0], this.verts[0][1], this.verts[0][2]));
+                    Vector3.at(this.verts[index][0], this.verts[index][1], this.verts[index][2]),
+                    Vector3.at(this.verts[0][0], this.verts[0][1], this.verts[0][2])
+            );
         } else {
             return new Edge(
-                Vector3.at(this.verts[index][0], this.verts[index][1], this.verts[index][2]),
-                Vector3.at(this.verts[index + 1][0], this.verts[index + 1][1],
-                    this.verts[index + 1][2]));
+                    Vector3.at(this.verts[index][0], this.verts[index][1], this.verts[index][2]),
+                    Vector3.at(this.verts[index + 1][0], this.verts[index + 1][1],
+                            this.verts[index + 1][2]
+                    )
+            );
         }
     }
 
@@ -284,4 +289,5 @@ public class Triangle {
         }
         return dot(normal, vmax) >= 0.0f;
     }
+
 }

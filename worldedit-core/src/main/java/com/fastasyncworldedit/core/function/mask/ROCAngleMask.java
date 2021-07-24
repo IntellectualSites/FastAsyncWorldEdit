@@ -19,19 +19,22 @@ public class ROCAngleMask extends AngleMask {
                         * ADJACENT_MOD;
 
         double tmp = (getHeight(extent, x, y, z + distance) - base - (base - getHeight(extent, x, y,
-                z - distance))) * ADJACENT_MOD;
+                z - distance
+        ))) * ADJACENT_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) {
             slope = tmp;
         }
 
         tmp = (getHeight(extent, x + distance, y, z + distance) - base - (base - getHeight(extent, x - distance, y,
-                z - distance))) * DIAGONAL_MOD;
+                z - distance
+        ))) * DIAGONAL_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) {
             slope = tmp;
         }
 
         tmp = (getHeight(extent, x - distance, y, z + distance) - base - (base - getHeight(extent, x + distance, y,
-                z - distance))) * DIAGONAL_MOD;
+                z - distance
+        ))) * DIAGONAL_MOD;
         if (Math.abs(tmp) > Math.abs(slope)) {
             slope = tmp;
         }
@@ -43,4 +46,5 @@ public class ROCAngleMask extends AngleMask {
     public Mask copy() {
         return new ROCAngleMask(getExtent(), min, max, overlay, distance);
     }
+
 }

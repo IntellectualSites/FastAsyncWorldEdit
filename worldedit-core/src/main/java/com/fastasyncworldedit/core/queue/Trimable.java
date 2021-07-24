@@ -17,4 +17,5 @@ public interface Trimable {
 
     default void recycle() {
     }
+
 }

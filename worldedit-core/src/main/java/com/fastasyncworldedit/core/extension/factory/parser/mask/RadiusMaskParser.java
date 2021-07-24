@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.extension.factory.parser.mask;
 
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.function.mask.RadiusMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -34,4 +34,5 @@ public class RadiusMaskParser extends RichParser<Mask> {
         int max = Integer.parseInt(arguments[1]);
         return new RadiusMask(min, max);
     }
+
 }

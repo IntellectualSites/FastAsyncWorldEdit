@@ -20,15 +20,22 @@
 package com.sk89q.worldedit.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.Filter;
-import com.fastasyncworldedit.core.queue.IBatchProcessor;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.NullExtent;
+import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.extent.filter.block.ExtentFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.function.generator.CavesGen;
+import com.fastasyncworldedit.core.function.generator.GenBase;
+import com.fastasyncworldedit.core.function.generator.OreGen;
+import com.fastasyncworldedit.core.function.generator.Resource;
+import com.fastasyncworldedit.core.function.generator.SchemGen;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
-import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
-import com.fastasyncworldedit.core.extent.NullExtent;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
+import com.fastasyncworldedit.core.registry.state.PropertyGroup;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
@@ -37,11 +44,6 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.block.BlockReplace;
-import com.fastasyncworldedit.core.function.generator.CavesGen;
-import com.fastasyncworldedit.core.function.generator.GenBase;
-import com.fastasyncworldedit.core.function.generator.OreGen;
-import com.fastasyncworldedit.core.function.generator.Resource;
-import com.fastasyncworldedit.core.function.generator.SchemGen;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -53,11 +55,9 @@ import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.MathUtils;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.fastasyncworldedit.core.registry.state.PropertyGroup;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
@@ -69,13 +69,13 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -138,7 +138,7 @@ public interface Extent extends InputExtent, OutputExtent {
     /**
      * Create an entity at the given location.
      *
-     * @param entity the entity
+     * @param entity   the entity
      * @param location the location
      * @return a reference to the created entity, or null if the entity could not be created
      */
@@ -148,15 +148,17 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     //FAWE start
+
     /**
      * Create an entity at the given location.
      *
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param z the z coordinate
+     * @param x    the x coordinate
+     * @param y    the y coordinate
+     * @param z    the z coordinate
      * @param uuid the unique identifier of the entity
      */
-    default void removeEntity(int x, int y, int z, UUID uuid) {}
+    default void removeEntity(int x, int y, int z, UUID uuid) {
+    }
 
     /*
     Queue based methods
@@ -314,7 +316,16 @@ public interface Extent extends InputExtent, OutputExtent {
         return state ? failedMin : failedMax;
     }
 
-    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, boolean ignoreAir) {
+    default int getNearestSurfaceTerrainBlock(
+            int x,
+            int z,
+            int y,
+            int minY,
+            int maxY,
+            int failedMin,
+            int failedMax,
+            boolean ignoreAir
+    ) {
         y = Math.max(minY, Math.min(maxY, y));
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
@@ -369,7 +380,8 @@ public interface Extent extends InputExtent, OutputExtent {
         }
     }
 
-    default void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws WorldEditException {
+    default void addSchems(Region region, Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean rotate) throws
+            WorldEditException {
         spawnResource(region, new SchemGen(mask, this, clipboards, rotate), rarity, 1);
     }
 
@@ -393,7 +405,16 @@ public interface Extent extends InputExtent, OutputExtent {
         return pt.containedWithin(min, max);
     }
 
-    default void addOre(Region region, Mask mask, Pattern material, int size, int frequency, int rarity, int minY, int maxY) throws WorldEditException {
+    default void addOre(
+            Region region,
+            Mask mask,
+            Pattern material,
+            int size,
+            int frequency,
+            int rarity,
+            int minY,
+            int maxY
+    ) throws WorldEditException {
         spawnResource(region, new OreGen(this, mask, material, size, minY, maxY), rarity, frequency);
     }
 
@@ -532,7 +553,7 @@ public interface Extent extends InputExtent, OutputExtent {
     /**
      * Count the number of blocks of a list of types in a region.
      *
-     * @param region the region
+     * @param region       the region
      * @param searchBlocks the list of blocks to search
      * @return the number of blocks that matched the block
      */
@@ -544,7 +565,7 @@ public interface Extent extends InputExtent, OutputExtent {
     /**
      * Count the number of blocks of a list of types in a region.
      *
-     * @param region the region
+     * @param region     the region
      * @param searchMask mask to match
      * @return the number of blocks that matched the mask
      */
@@ -558,11 +579,11 @@ public interface Extent extends InputExtent, OutputExtent {
      * Sets all the blocks inside a region to a given block type.
      *
      * @param region the region
-     * @param block the block
+     * @param block  the block
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    default  <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
+    default <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
         checkNotNull(region);
         checkNotNull(block);
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
@@ -579,7 +600,7 @@ public interface Extent extends InputExtent, OutputExtent {
     /**
      * Sets all the blocks inside a region to a given pattern.
      *
-     * @param region the region
+     * @param region  the region
      * @param pattern the pattern that provides the replacement block
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -606,13 +627,14 @@ public interface Extent extends InputExtent, OutputExtent {
      * Replaces all the blocks matching a given filter, within a given region, to a block
      * returned by a given pattern.
      *
-     * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param region      the region to replace the blocks within
+     * @param filter      a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
      * @param replacement the replacement block
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
      */
-    default  <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws MaxChangedBlocksException {
+    default <B extends BlockStateHolder<B>> int replaceBlocks(Region region, Set<BaseBlock> filter, B replacement) throws
+            MaxChangedBlocksException {
         return replaceBlocks(region, filter, (Pattern) replacement);
     }
 
@@ -620,8 +642,8 @@ public interface Extent extends InputExtent, OutputExtent {
      * Replaces all the blocks matching a given filter, within a given region, to a block
      * returned by a given pattern.
      *
-     * @param region the region to replace the blocks within
-     * @param filter a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
+     * @param region  the region to replace the blocks within
+     * @param filter  a list of block types to match, or null to use {@link com.sk89q.worldedit.function.mask.ExistingBlockMask}
      * @param pattern the pattern that provides the new blocks
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -635,8 +657,8 @@ public interface Extent extends InputExtent, OutputExtent {
      * Replaces all the blocks matching a given mask, within a given region, to a block
      * returned by a given pattern.
      *
-     * @param region the region to replace the blocks within
-     * @param mask the mask that blocks must match
+     * @param region  the region to replace the blocks within
+     * @param mask    the mask that blocks must match
      * @param pattern the pattern that provides the new blocks
      * @return number of blocks affected
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -659,7 +681,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * If the center sits between two blocks on a certain axis, then two blocks
      * will be placed to mark the center.
      *
-     * @param region the region to find the center of
+     * @param region  the region to find the center of
      * @param pattern the replacement pattern
      * @return the number of blocks placed
      * @throws MaxChangedBlocksException thrown if too many blocks are changed
@@ -673,7 +695,9 @@ public interface Extent extends InputExtent, OutputExtent {
                 this instanceof World ? (World) this : null, // Causes clamping of Y range
                 BlockVector3.at(((int) center.getX()), ((int) center.getY()), ((int) center.getZ())),
                 BlockVector3.at(MathUtils.roundHalfUp(center.getX()),
-                        center.getY(), MathUtils.roundHalfUp(center.getZ())));
+                        center.getY(), MathUtils.roundHalfUp(center.getZ())
+                )
+        );
         return setBlocks(centerRegion, pattern);
     }
 
@@ -704,7 +728,8 @@ public interface Extent extends InputExtent, OutputExtent {
 
     /**
      * Have an extent processed
-     *  - Either block (Extent) processing or chunk processing
+     * - Either block (Extent) processing or chunk processing
+     *
      * @param processor
      * @return processed Extent
      */
@@ -732,7 +757,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default <T extends Filter> T apply(Region region, T filter, boolean full) {
-        return apply((Iterable<BlockVector3>) region, filter);
+        return apply(region, filter);
     }
 
     default <T extends Filter> T apply(Iterable<BlockVector3> positions, T filter) {

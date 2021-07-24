@@ -15,4 +15,5 @@ public abstract class DelegateFilter<T extends Filter> implements IDelegateFilte
     public final T getParent() {
         return (T) parent;
     }
+
 }

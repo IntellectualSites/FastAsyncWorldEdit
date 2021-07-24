@@ -62,6 +62,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     }
 
     public interface FaweStreamPositionDelegate {
+
         void write(OutputStream out, int x, int y, int z) throws IOException;
 
         int readX(FaweInputStream in) throws IOException;
@@ -69,14 +70,17 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         int readY(FaweInputStream in) throws IOException;
 
         int readZ(FaweInputStream in) throws IOException;
+
     }
 
     public interface FaweStreamIdDelegate {
+
         void writeChange(FaweOutputStream out, int from, int to) throws IOException;
 
         void readCombined(FaweInputStream in, MutableBlockChange change, boolean dir) throws IOException;
 
         void readCombined(FaweInputStream in, MutableFullBlockChange change) throws IOException;
+
     }
 
     protected void setupStreamDelegates(int mode) {
@@ -150,7 +154,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     out.write(b4);
                 }
 
-                byte[] buffer = new byte[4];
+                final byte[] buffer = new byte[4];
 
                 @Override
                 public int readX(FaweInputStream in) throws IOException {
@@ -516,7 +520,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         return getIterator(redo);
     }
 
-    public Iterator<MutableFullBlockChange> getFullBlockIterator(BlockBag blockBag, int inventory, final boolean dir) throws IOException {
+    public Iterator<MutableFullBlockChange> getFullBlockIterator(BlockBag blockBag, int inventory, final boolean dir) throws
+            IOException {
         final FaweInputStream is = new FaweInputStream(getBlockIS());
         final MutableFullBlockChange change = new MutableFullBlockChange(blockBag, inventory, dir);
         return new Iterator<MutableFullBlockChange>() {
@@ -677,7 +682,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             final Iterator<MutableBiomeChange> biomeChange = getBiomeIterator(dir);
 
             return new Iterator<Change>() {
-                Iterator<Change>[] iterators = new Iterator[]{tileCreate, tileRemove, entityCreate, entityRemove, blockChange, biomeChange};
+                final Iterator<Change>[] iterators = new Iterator[]{tileCreate, tileRemove, entityCreate, entityRemove, blockChange, biomeChange};
                 int i = 0;
                 Iterator<Change> current = iterators[0];
 
@@ -757,4 +762,5 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         }
         return summary;
     }
+
 }

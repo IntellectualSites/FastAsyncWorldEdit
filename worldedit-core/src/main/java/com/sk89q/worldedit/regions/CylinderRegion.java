@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -74,11 +74,11 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     /**
      * Construct the region.
      *
-     * @param world the world
+     * @param world  the world
      * @param center the center position
      * @param radius the radius along the X and Z axes
-     * @param minY the minimum Y, inclusive
-     * @param maxY the maximum Y, inclusive
+     * @param minY   the minimum Y, inclusive
+     * @param maxY   the maximum Y, inclusive
      */
     public CylinderRegion(World world, BlockVector3 center, Vector2 radius, int minY, int maxY) {
         super(world);
@@ -94,8 +94,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      *
      * @param center the center position
      * @param radius the radius along the X and Z axes
-     * @param minY the minimum Y, inclusive
-     * @param maxY the maximum Y, inclusive
+     * @param minY   the minimum Y, inclusive
+     * @param maxY   the maximum Y, inclusive
      */
     public CylinderRegion(BlockVector3 center, Vector2 radius, int minY, int maxY) {
         super(null);
@@ -409,8 +409,10 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     //FAWE start
     @Override
-    public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
-        final IChunkGet get, final IChunkSet set, boolean full) {
+    public void filter(
+            final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
+            final IChunkGet get, final IChunkSet set, boolean full
+    ) {
         int bcx = chunk.getX() >> 4;
         int bcz = chunk.getZ() >> 4;
         int tcx = bcx + 15;

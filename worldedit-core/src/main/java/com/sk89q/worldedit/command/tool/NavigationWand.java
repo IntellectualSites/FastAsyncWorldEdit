@@ -29,29 +29,29 @@ import com.sk89q.worldedit.util.Location;
 
 //FAWE start - enum-ized
 public enum NavigationWand implements DoubleActionTraceTool {
-  INSTANCE;
+    INSTANCE;
 //FAWE end
 
     private static final String PRIMARY_PERMISSION = "worldedit.navigation.thru.tool";
     private static final String SECONDARY_PERMISSION = "worldedit.navigation.jumpto.tool";
 
-  @Override
-  public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-      if (!player.hasPermission(SECONDARY_PERMISSION)) {
-          return false;
-      }
-      final int maxDist = config.navigationWandMaxDistance;
-      if (maxDist <= 0) {
-          return false;
-      }
-      Location pos = player.getSolidBlockTrace(maxDist);
-      if (pos != null) {
-          player.findFreePosition(pos);
-      } else {
-          player.print(Caption.of("worldedit.jumpto.none"));
-      }
-      return true;
-  }
+    @Override
+    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+        if (!player.hasPermission(SECONDARY_PERMISSION)) {
+            return false;
+        }
+        final int maxDist = config.navigationWandMaxDistance;
+        if (maxDist <= 0) {
+            return false;
+        }
+        Location pos = player.getSolidBlockTrace(maxDist);
+        if (pos != null) {
+            player.findFreePosition(pos);
+        } else {
+            player.print(Caption.of("worldedit.jumpto.none"));
+        }
+        return true;
+    }
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {

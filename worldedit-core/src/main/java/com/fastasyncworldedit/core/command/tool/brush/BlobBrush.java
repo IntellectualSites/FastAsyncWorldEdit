@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.fastasyncworldedit.core.math.random.SimplexNoise;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.EditSession;
@@ -7,13 +8,13 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public class BlobBrush implements Brush {
+
     private final double amplitude;
     private final double frequency;
     private final Vector3 radius;
@@ -27,7 +28,8 @@ public class BlobBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         double seedX = ThreadLocalRandom.current().nextDouble();
         double seedY = ThreadLocalRandom.current().nextDouble();
         double seedZ = ThreadLocalRandom.current().nextDouble();
@@ -64,9 +66,9 @@ public class BlobBrush implements Brush {
             }
         } else {
             AffineTransform transform = new AffineTransform()
-                .rotateX(ThreadLocalRandom.current().nextInt(360))
-                .rotateY(ThreadLocalRandom.current().nextInt(360))
-                .rotateZ(ThreadLocalRandom.current().nextInt(360));
+                    .rotateX(ThreadLocalRandom.current().nextInt(360))
+                    .rotateY(ThreadLocalRandom.current().nextInt(360))
+                    .rotateZ(ThreadLocalRandom.current().nextInt(360));
 
             double manScaleX = 1.25 + seedX * 0.5;
             double manScaleY = 1.25 + seedY * 0.5;
@@ -93,9 +95,18 @@ public class BlobBrush implements Brush {
                         double manDist = xScaled + yScaled + zScaled;
                         double distSqr = x * x * modX + z * z * modZ + y * y * modY;
 
-                        double distance = Math.sqrt(distSqr) * sphericity + MathMan.max(manDist, xScaled * manScaleX, yScaled * manScaleY, zScaled * manScaleZ) * roughness;
+                        double distance = Math.sqrt(distSqr) * sphericity + MathMan.max(
+                                manDist,
+                                xScaled * manScaleX,
+                                yScaled * manScaleY,
+                                zScaled * manScaleZ
+                        ) * roughness;
 
-                        double noise = this.amplitude * SimplexNoise.noise(seedX + x * distort, seedZ + z * distort, seedZ + z * distort);
+                        double noise = this.amplitude * SimplexNoise.noise(
+                                seedX + x * distort,
+                                seedZ + z * distort,
+                                seedZ + z * distort
+                        );
                         if (distance + distance * noise < radius) {
                             editSession.setBlock(px + xr, py + yr, pz + zr, pattern);
                         }
@@ -104,4 +115,5 @@ public class BlobBrush implements Brush {
             }
         }
     }
+
 }

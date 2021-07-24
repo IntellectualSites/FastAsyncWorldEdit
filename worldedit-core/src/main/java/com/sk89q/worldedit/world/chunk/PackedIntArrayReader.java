@@ -22,6 +22,7 @@ package com.sk89q.worldedit.world.chunk;
 import static com.google.common.base.Preconditions.checkElementIndex;
 
 public class PackedIntArrayReader {
+
     private static final int[] FACTORS = new int[64];
 
     static {

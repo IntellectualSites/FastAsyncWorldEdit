@@ -50,7 +50,13 @@ public class FaweChunkManager extends ChunkManager {
     }
 
     @Override
-    public void swap(final Location pos1, final Location pos2, final Location pos3, final Location pos4, final Runnable whenDone) {
+    public void swap(
+            final Location pos1,
+            final Location pos2,
+            final Location pos3,
+            final Location pos4,
+            final Runnable whenDone
+    ) {
         if (!Settings.IMP.PLOTSQUARED_INTEGRATION.COPY_AND_SWAP) {
             parent.swap(pos1, pos2, pos3, pos4, whenDone);
         }
@@ -60,11 +66,29 @@ public class FaweChunkManager extends ChunkManager {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
                 WorldEdit.getInstance().getEditSessionFactory().getEditSession(
-                    pos1World,-1);
-                EditSession sessionA = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
-                EditSession sessionB = new EditSessionBuilder(pos3World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
-                CuboidRegion regionA = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
-                CuboidRegion regionB = new CuboidRegion(BlockVector3.at(pos3.getX(), pos3.getY(), pos3.getZ()), BlockVector3.at(pos4.getX(), pos4.getY(), pos4.getZ()));
+                        pos1World, -1);
+                EditSession sessionA = new EditSessionBuilder(pos1World)
+                        .checkMemory(false)
+                        .fastmode(true)
+                        .limitUnlimited()
+                        .changeSetNull()
+                        .autoQueue(false)
+                        .build();
+                EditSession sessionB = new EditSessionBuilder(pos3World)
+                        .checkMemory(false)
+                        .fastmode(true)
+                        .limitUnlimited()
+                        .changeSetNull()
+                        .autoQueue(false)
+                        .build();
+                CuboidRegion regionA = new CuboidRegion(
+                        BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
+                        BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())
+                );
+                CuboidRegion regionB = new CuboidRegion(
+                        BlockVector3.at(pos3.getX(), pos3.getY(), pos3.getZ()),
+                        BlockVector3.at(pos4.getX(), pos4.getY(), pos4.getZ())
+                );
                 ForwardExtentCopy copyA = new ForwardExtentCopy(sessionA, regionA, sessionB, regionB.getMinimumPoint());
                 ForwardExtentCopy copyB = new ForwardExtentCopy(sessionB, regionB, sessionA, regionA.getMinimumPoint());
                 try {
@@ -89,10 +113,30 @@ public class FaweChunkManager extends ChunkManager {
             synchronized (FaweChunkManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
-                EditSession from = new EditSessionBuilder(pos1World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
-                EditSession to = new EditSessionBuilder(pos3World).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build();
-                CuboidRegion region = new CuboidRegion(BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()), BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
-                ForwardExtentCopy copy = new ForwardExtentCopy(from, region, to, BlockVector3.at(pos3.getX(), pos3.getY(), pos3.getZ()));
+                EditSession from = new EditSessionBuilder(pos1World)
+                        .checkMemory(false)
+                        .fastmode(true)
+                        .limitUnlimited()
+                        .changeSetNull()
+                        .autoQueue(false)
+                        .build();
+                EditSession to = new EditSessionBuilder(pos3World)
+                        .checkMemory(false)
+                        .fastmode(true)
+                        .limitUnlimited()
+                        .changeSetNull()
+                        .autoQueue(false)
+                        .build();
+                CuboidRegion region = new CuboidRegion(
+                        BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
+                        BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())
+                );
+                ForwardExtentCopy copy = new ForwardExtentCopy(
+                        from,
+                        region,
+                        to,
+                        BlockVector3.at(pos3.getX(), pos3.getY(), pos3.getZ())
+                );
                 try {
                     Operations.completeLegacy(copy);
                     to.flushQueue();
@@ -111,10 +155,11 @@ public class FaweChunkManager extends ChunkManager {
             synchronized (FaweChunkManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 try (EditSession editSession = new EditSessionBuilder(pos1World).checkMemory(false)
-                    .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+                        .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
                     CuboidRegion region = new CuboidRegion(
-                        BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
-                        BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ()));
+                            BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
+                            BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())
+                    );
                     editSession.regenerate(region);
                     editSession.flushQueue();
                 }
@@ -123,4 +168,5 @@ public class FaweChunkManager extends ChunkManager {
         });
         return true;
     }
+
 }

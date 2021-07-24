@@ -29,10 +29,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 public class NonRisingVisitor extends RecursiveVisitor {
 
     //FAWE start - max int
+
     /**
      * Create a new recursive visitor.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the function
      */
     public NonRisingVisitor(Mask mask, RegionFunction function) {
@@ -44,11 +45,11 @@ public class NonRisingVisitor extends RecursiveVisitor {
     public NonRisingVisitor(Mask mask, RegionFunction function, int depth) {
         super(mask, function, depth);
         setDirections(
-            BlockVector3.UNIT_X,
-            BlockVector3.UNIT_MINUS_X,
-            BlockVector3.UNIT_Z,
-            BlockVector3.UNIT_MINUS_Z,
-            BlockVector3.UNIT_MINUS_Y
+                BlockVector3.UNIT_X,
+                BlockVector3.UNIT_MINUS_X,
+                BlockVector3.UNIT_Z,
+                BlockVector3.UNIT_MINUS_Z,
+                BlockVector3.UNIT_MINUS_Y
         );
     }
     //FAWE end

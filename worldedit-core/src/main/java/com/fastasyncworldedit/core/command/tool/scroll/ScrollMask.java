@@ -6,6 +6,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.mask.Mask;
 
 public class ScrollMask extends Scroll {
+
     private final Mask[] masks;
     private int index;
 
@@ -23,4 +24,5 @@ public class ScrollMask extends Scroll {
         }
         return false;
     }
+
 }

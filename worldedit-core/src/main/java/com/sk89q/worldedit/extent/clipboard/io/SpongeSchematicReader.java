@@ -93,7 +93,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         Map<String, Tag> schematic = schematicTag.getValue();
 
         final Platform platform = WorldEdit.getInstance().getPlatformManager()
-            .queryCapability(Capability.WORLD_EDITING);
+                .queryCapability(Capability.WORLD_EDITING);
         int liveDataVersion = platform.getDataVersion();
 
         if (schematicVersion == 1) {
@@ -103,22 +103,28 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         } else if (schematicVersion == 2) {
             dataVersion = requireTag(schematic, "DataVersion", IntTag.class).getValue();
             if (dataVersion < 0) {
-                LOGGER.warn("Schematic has an unknown data version ({}). Data may be incompatible.",
-                    dataVersion);
+                LOGGER.warn(
+                        "Schematic has an unknown data version ({}). Data may be incompatible.",
+                        dataVersion
+                );
                 // Do not DFU unknown data
                 dataVersion = liveDataVersion;
             }
             if (dataVersion > liveDataVersion) {
                 LOGGER.warn("Schematic was made in a newer Minecraft version ({} > {}). Data may be incompatible.",
-                    dataVersion, liveDataVersion);
+                        dataVersion, liveDataVersion
+                );
             } else if (dataVersion < liveDataVersion) {
                 fixer = platform.getDataFixer();
                 if (fixer != null) {
                     LOGGER.debug("Schematic was made in an older Minecraft version ({} < {}), will attempt DFU.",
-                        dataVersion, liveDataVersion);
+                            dataVersion, liveDataVersion
+                    );
                 } else {
                     LOGGER.info("Schematic was made in an older Minecraft version ({} < {}), but DFU is not available. Data may be incompatible.",
-                        dataVersion, liveDataVersion);
+                            dataVersion,
+                            liveDataVersion
+                    );
                 }
             }
 
@@ -174,11 +180,11 @@ public class SpongeSchematicReader extends NBTSchematicReader {
         int[] offsetParts;
         if (offsetTag != null) {
             offsetParts = offsetTag.getValue();
-            if  (offsetParts.length != 3) {
+            if (offsetParts.length != 3) {
                 throw new IOException("Invalid offset specified in schematic.");
             }
         } else {
-            offsetParts = new int[] {0, 0, 0};
+            offsetParts = new int[]{0, 0, 0};
         }
 
         BlockVector3 min = BlockVector3.at(offsetParts[0], offsetParts[1], offsetParts[2]);
@@ -252,7 +258,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 if (fixer != null) {
                     //FAWE start
                     tileEntity = ((CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY,
-                            new CompoundTag(values).asBinaryTag(), dataVersion))).getValue();
+                            new CompoundTag(values).asBinaryTag(), dataVersion
+                    ))).getValue();
                     //FAWE end
                 } else {
                     tileEntity = values;
@@ -291,7 +298,10 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             BlockVector3 pt = BlockVector3.at(x, y, z);
             try {
                 if (tileEntitiesMap.containsKey(pt)) {
-                    clipboard.setBlock(clipboard.getMinimumPoint().add(pt), state.toBaseBlock(new CompoundTag(tileEntitiesMap.get(pt))));
+                    clipboard.setBlock(
+                            clipboard.getMinimumPoint().add(pt),
+                            state.toBaseBlock(new CompoundTag(tileEntitiesMap.get(pt)))
+                    );
                 } else {
                     clipboard.setBlock(clipboard.getMinimumPoint().add(pt), state);
                 }
@@ -334,7 +344,7 @@ public class SpongeSchematicReader extends NBTSchematicReader {
             BiomeType biome = BiomeTypes.get(key);
             if (biome == null) {
                 LOGGER.warn("Unknown biome type :" + key
-                    + " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
+                        + " in palette. Are you missing a mod or using a schematic made in a newer version of Minecraft?");
             }
             Tag idTag = palettePart.getValue();
             if (!(idTag instanceof IntTag)) {
@@ -392,15 +402,21 @@ public class SpongeSchematicReader extends NBTSchematicReader {
 
             if (fixer != null) {
                 //FAWE start
-                entityTag = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(DataFixer.FixTypes.ENTITY, entityTag.asBinaryTag(), dataVersion));
+                entityTag = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                        DataFixer.FixTypes.ENTITY,
+                        entityTag.asBinaryTag(),
+                        dataVersion
+                ));
                 //FAWE end
             }
 
             EntityType entityType = EntityTypes.get(id);
             if (entityType != null) {
-                Location location = NBTConversions.toLocation(clipboard,
+                Location location = NBTConversions.toLocation(
+                        clipboard,
                         requireTag(tags, "Pos", ListTag.class),
-                        requireTag(tags, "Rotation", ListTag.class));
+                        requireTag(tags, "Rotation", ListTag.class)
+                );
                 BaseEntity state = new BaseEntity(entityType, entityTag);
                 clipboard.createEntity(location, state);
             } else {
@@ -413,4 +429,5 @@ public class SpongeSchematicReader extends NBTSchematicReader {
     public void close() throws IOException {
         inputStream.close();
     }
+
 }

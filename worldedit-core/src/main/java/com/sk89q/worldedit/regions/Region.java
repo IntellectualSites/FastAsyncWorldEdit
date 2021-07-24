@@ -19,15 +19,15 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.fastasyncworldedit.core.extent.SingleRegionExtent;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
+import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.object.FaweLimit;
-import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -36,11 +36,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
 
 /**
  * Represents a physical shape.
@@ -95,12 +95,10 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      * Get the number of blocks in the region.
      *
      * @return number of blocks
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "getArea",
-        delegateParams = {}
+            delegateName = "getArea",
+            delegateParams = {}
     )
     default long getVolume() {
         DeprecationUtil.checkDelegatingOverride(getClass());
@@ -116,6 +114,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         return (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1);
     }
     */
+
     /**
      * Get X-size.
      *
@@ -188,7 +187,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
      *
      * @return the world, or null
      */
-    @Nullable World getWorld();
+    @Nullable
+    World getWorld();
 
     /**
      * Sets the world that the selection is in.
@@ -224,7 +224,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     default boolean isGlobal() {
         BlockVector3 pos1 = getMinimumPoint();
         BlockVector3 pos2 = getMaximumPoint();
-        return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2.getBlockZ() == Integer.MAX_VALUE && pos1.getBlockY() <= 0 && pos2.getBlockY() >= 255;
+        return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2
+                .getBlockZ() == Integer.MAX_VALUE && pos1.getBlockY() <= 0 && pos2.getBlockY() >= 255;
     }
 
     default int getMinimumY() {
@@ -235,7 +236,14 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         return getMaximumPoint().getY();
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, boolean full) {
+    default void filter(
+            final IChunk chunk,
+            final Filter filter,
+            ChunkFilterBlock block,
+            final IChunkGet get,
+            final IChunkSet set,
+            boolean full
+    ) {
         int minSection = Math.max(0, getMinimumY() >> 4);
         int maxSection = Math.min(15, getMaximumY() >> 4);
         block = block.initChunk(chunk.getX(), chunk.getZ());
@@ -248,7 +256,16 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         }
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, final int minY, final int maxY, boolean full) {
+    default void filter(
+            final IChunk chunk,
+            final Filter filter,
+            ChunkFilterBlock block,
+            final IChunkGet get,
+            final IChunkSet set,
+            final int minY,
+            final int maxY,
+            boolean full
+    ) {
         int minSection = minY >> 4;
         int maxSection = maxY >> 4;
         int yStart = (minY & 15);
@@ -272,7 +289,15 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         }
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, boolean full) {
+    default void filter(
+            final IChunk chunk,
+            final Filter filter,
+            ChunkFilterBlock block,
+            final IChunkGet get,
+            final IChunkSet set,
+            int layer,
+            boolean full
+    ) {
         if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
             return;
         }
@@ -280,7 +305,21 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         block.filter(filter);
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, boolean full) {
+    default void filter(
+            final IChunk chunk,
+            final Filter filter,
+            ChunkFilterBlock block,
+            final IChunkGet get,
+            final IChunkSet set,
+            int layer,
+            int minX,
+            int minY,
+            int minZ,
+            int maxX,
+            int maxY,
+            int maxZ,
+            boolean full
+    ) {
         if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
             return;
         }
@@ -288,7 +327,17 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         block.filter(filter, minX, minY, minZ, maxX, maxY, maxZ);
     }
 
-    default void filter(final IChunk chunk, final Filter filter, ChunkFilterBlock block, final IChunkGet get, final IChunkSet set, int layer, int yStart, int yEnd, boolean full) {
+    default void filter(
+            final IChunk chunk,
+            final Filter filter,
+            ChunkFilterBlock block,
+            final IChunkGet get,
+            final IChunkSet set,
+            int layer,
+            int yStart,
+            int yEnd,
+            boolean full
+    ) {
         if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
             return;
         }
@@ -298,13 +347,13 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
 
     default boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         return contains(bx, by, bz)
-            && contains(bx, by, tz)
-            && contains(tx, by, bz)
-            && contains(tx, by, tz)
-            && contains(bx, ty, bz)
-            && contains(bx, ty, tz)
-            && contains(tx, ty, bz)
-            && contains(tx, ty, tz);
+                && contains(bx, by, tz)
+                && contains(tx, by, bz)
+                && contains(tx, by, tz)
+                && contains(bx, ty, bz)
+                && contains(bx, ty, tz)
+                && contains(tx, ty, bz)
+                && contains(tx, ty, tz);
     }
 
     default boolean containsChunk(int chunkX, int chunkZ) {
@@ -375,4 +424,5 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     default ProcessorScope getScope() {
         return ProcessorScope.REMOVING_BLOCKS;
     }
+
 }

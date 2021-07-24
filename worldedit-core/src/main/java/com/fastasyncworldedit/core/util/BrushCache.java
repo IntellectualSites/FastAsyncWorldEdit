@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 public final class BrushCache {
+
     private static final WeakHashMap<Object, BrushTool> brushCache = new WeakHashMap<>();
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -96,4 +97,5 @@ public final class BrushCache {
         Map<String, Tag> displayMap;
         return tool;
     }
+
 }

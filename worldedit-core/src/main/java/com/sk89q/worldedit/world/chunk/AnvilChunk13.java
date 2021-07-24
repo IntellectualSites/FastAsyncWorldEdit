@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.chunk;
 
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -27,7 +28,6 @@ import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.util.nbt.IntBinaryTag;
 import com.sk89q.worldedit.util.nbt.ListBinaryTag;
-import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -35,9 +35,9 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * The chunk format for Minecraft 1.13 to 1.15
@@ -55,6 +55,7 @@ public class AnvilChunk13 implements Chunk {
 
 
     //FAWE start
+
     /**
      * Construct the chunk with a compound tag.
      *
@@ -122,7 +123,9 @@ public class AnvilChunk13 implements Chunk {
                             try {
                                 blockState = getBlockStateWith(blockState, property, value);
                             } catch (IllegalArgumentException e) {
-                                throw new InvalidFormatException("Invalid block state for " + blockState.getBlockType().getId() + ", " + property.getName() + ": " + value);
+                                throw new InvalidFormatException("Invalid block state for " + blockState
+                                        .getBlockType()
+                                        .getId() + ", " + property.getName() + ": " + value);
                             }
                         }
                     }
@@ -141,7 +144,8 @@ public class AnvilChunk13 implements Chunk {
         }
     }
 
-    protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws InvalidFormatException {
+    protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws
+            InvalidFormatException {
         int paletteBits = 4;
         while ((1 << paletteBits) < palette.length) {
             ++paletteBits;
@@ -224,9 +228,6 @@ public class AnvilChunk13 implements Chunk {
         }
 
         CompoundBinaryTag values = tileEntities.get(position);
-        if (values == null) {
-            return null;
-        }
 
         return values;
     }

@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.extent.processor.heightmap;
 
 import com.fastasyncworldedit.core.math.IntPair;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import java.awt.image.BufferedImage;
@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.HashSet;
 
 public class ScalableHeightMap implements HeightMap {
+
     public int size2;
     public int size;
 
@@ -113,4 +114,5 @@ public class ScalableHeightMap implements HeightMap {
         }
         return new ArrayHeightMap(array);
     }
+
 }

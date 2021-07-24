@@ -13,12 +13,13 @@ import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 public class StripNBTExtent extends AbstractDelegateExtent {
+
     private final String[] strip;
 
     /**
@@ -75,4 +76,5 @@ public class StripNBTExtent extends AbstractDelegateExtent {
         entity.setNbtData(new CompoundTag(value));
         return entity;
     }
+
 }

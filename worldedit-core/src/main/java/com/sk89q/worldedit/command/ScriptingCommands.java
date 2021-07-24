@@ -58,17 +58,19 @@ public class ScriptingCommands {
     }
 
     @Command(
-        name = "cs",
-        aliases = { "/cs" },
-        desc = "Execute a CraftScript"
+            name = "cs",
+            aliases = {"/cs"},
+            desc = "Execute a CraftScript"
     )
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void execute(Player player, LocalSession session,
-                        @Arg(desc = "Filename of the CraftScript to load")
-                            String filename,
-                        @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
-                            List<String> args) throws WorldEditException {
+    public void execute(
+            Player player, LocalSession session,
+            @Arg(desc = "Filename of the CraftScript to load")
+                    String filename,
+            @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
+                    List<String> args
+    ) throws WorldEditException {
         if (!player.hasPermission("worldedit.scripting.execute." + filename)) {
             player.print(Caption.of("worldedit.execute.script-permissions"));
             return;
@@ -80,19 +82,21 @@ public class ScriptingCommands {
         File f = worldEdit.getSafeOpenFile(player, dir, filename, "js", "js");
 
         worldEdit.runScript(player, f, Stream.concat(Stream.of(filename), args.stream())
-            .toArray(String[]::new));
+                .toArray(String[]::new));
     }
 
     @Command(
-        name = ".s",
-        aliases = { "/.s" },
-        desc = "Execute last CraftScript"
+            name = ".s",
+            aliases = {"/.s"},
+            desc = "Execute last CraftScript"
     )
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void executeLast(Player player, LocalSession session,
-                            @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
-                                List<String> args) throws WorldEditException {
+    public void executeLast(
+            Player player, LocalSession session,
+            @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
+                    List<String> args
+    ) throws WorldEditException {
 
         String lastScript = session.getLastScript();
 
@@ -110,6 +114,7 @@ public class ScriptingCommands {
         File f = worldEdit.getSafeOpenFile(player, dir, lastScript, "js", "js");
 
         worldEdit.runScript(player, f, Stream.concat(Stream.of(lastScript), args.stream())
-            .toArray(String[]::new));
+                .toArray(String[]::new));
     }
+
 }

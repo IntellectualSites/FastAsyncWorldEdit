@@ -28,9 +28,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 @Deprecated
 public class BlockStateMask extends AbstractExtentMask {
@@ -45,7 +45,7 @@ public class BlockStateMask extends AbstractExtentMask {
      * @param extent the extent to get blocks from
      * @param states the desired states (property -> value) that a block should have to match the mask
      * @param strict true to only match blocks that have all properties and values, false to also match blocks that
-     *              do not have the properties (but only fail blocks with the properties but wrong values)
+     *               do not have the properties (but only fail blocks with the properties but wrong values)
      */
     public BlockStateMask(Extent extent, Map<String, String> states, boolean strict) {
         super(extent);

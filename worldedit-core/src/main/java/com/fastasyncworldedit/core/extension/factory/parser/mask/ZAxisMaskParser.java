@@ -26,4 +26,5 @@ public class ZAxisMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) {
         return new ZAxisMask();
     }
+
 }

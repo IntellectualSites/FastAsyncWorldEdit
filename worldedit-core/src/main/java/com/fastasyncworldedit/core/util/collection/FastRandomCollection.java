@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class FastRandomCollection<T> extends RandomCollection<T> {
+
     private final T[] values;
 
     private FastRandomCollection(T[] values, SimpleRandom random) {
@@ -21,10 +22,10 @@ public class FastRandomCollection<T> extends RandomCollection<T> {
      * {@code Optional} in any case.
      *
      * @param weights the weight of the values.
-     * @param random the random generator to use for this collection.
-     * @param <T> the value type.
+     * @param random  the random generator to use for this collection.
+     * @param <T>     the value type.
      * @return an {@link Optional} containing the new collection if it could be created, {@link
-     *     Optional#empty()} otherwise.
+     *         Optional#empty()} otherwise.
      * @see RandomCollection for API usage.
      */
     public static <T> Optional<RandomCollection<T>> create(Map<T, Double> weights, SimpleRandom random) {
@@ -62,4 +63,5 @@ public class FastRandomCollection<T> extends RandomCollection<T> {
     public T next(int x, int y, int z) {
         return values[getRandom().nextInt(x, y, z, values.length)];
     }
+
 }

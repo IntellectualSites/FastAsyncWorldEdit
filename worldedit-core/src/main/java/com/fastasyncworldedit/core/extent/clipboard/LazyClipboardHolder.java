@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.UUID;
 
 public class LazyClipboardHolder extends URIClipboardHolder {
+
     private final ByteSource source;
     private final ClipboardFormat format;
     private final UUID uuid;
@@ -18,7 +19,6 @@ public class LazyClipboardHolder extends URIClipboardHolder {
 
     /**
      * Create a new instance with the given clipboard.
-     *
      */
     public LazyClipboardHolder(URI uri, ByteSource source, ClipboardFormat format, UUID uuid) {
         super(uri, EmptyClipboard.getInstance());
@@ -56,8 +56,9 @@ public class LazyClipboardHolder extends URIClipboardHolder {
     @Override
     public synchronized void close() {
         if (clipboard instanceof BlockArrayClipboard) {
-            ((BlockArrayClipboard) clipboard).close();
+            clipboard.close();
         }
         clipboard = null;
     }
+
 }

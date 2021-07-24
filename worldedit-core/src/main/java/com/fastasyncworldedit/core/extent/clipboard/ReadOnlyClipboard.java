@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class ReadOnlyClipboard extends SimpleClipboard {
+
     public final Region region;
 
     public ReadOnlyClipboard(Region region) {
@@ -106,4 +107,5 @@ public abstract class ReadOnlyClipboard extends SimpleClipboard {
     public void removeEntity(Entity entity) {
         throw new UnsupportedOperationException("Clipboard is immutable");
     }
+
 }

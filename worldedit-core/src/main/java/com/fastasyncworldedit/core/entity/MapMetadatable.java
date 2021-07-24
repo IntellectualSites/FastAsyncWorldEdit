@@ -62,4 +62,5 @@ public interface MapMetadatable extends Metadatable {
     default <V> V deleteMeta(String key) {
         return (V) getRawMeta().remove(key);
     }
+
 }

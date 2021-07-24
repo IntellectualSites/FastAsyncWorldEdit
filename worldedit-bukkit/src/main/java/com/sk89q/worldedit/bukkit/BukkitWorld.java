@@ -177,6 +177,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     //FAWE start
+
     /**
      * Get the world handle.
      *
@@ -332,7 +333,8 @@ public class BukkitWorld extends AbstractWorld {
             pt = pt.add(0, 1, 0); // bukkit skips the feature gen which does this offset normally, so we have to add it back
         }
         return type != null && world.generateTree(BukkitAdapter.adapt(world, pt), bukkitType,
-                new EditSessionBlockChangeDelegate(editSession));
+                new EditSessionBlockChangeDelegate(editSession)
+        );
     }
 
     @Override
@@ -505,7 +507,7 @@ public class BukkitWorld extends AbstractWorld {
             } catch (Exception e) {
                 if (block instanceof BaseBlock && ((BaseBlock) block).getNbt() != null) {
                     LOGGER.warn("Tried to set a corrupt tile entity at " + position.toString()
-                        + ": " + ((BaseBlock) block).getNbt(), e);
+                            + ": " + ((BaseBlock) block).getNbt(), e);
                 } else {
                     LOGGER.warn("Failed to set block via adapter, falling back to generic", e);
                 }
@@ -527,8 +529,10 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public Set<SideEffect> applySideEffects(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType,
-            SideEffectSet sideEffectSet) {
+    public Set<SideEffect> applySideEffects(
+            BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType,
+            SideEffectSet sideEffectSet
+    ) {
         if (worldNativeAccess != null) {
             worldNativeAccess.applySideEffects(position, previousType, sideEffectSet);
             return Sets.intersection(

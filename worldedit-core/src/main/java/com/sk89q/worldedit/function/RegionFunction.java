@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.function;
 
-import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 

@@ -52,4 +52,5 @@ public class BukkitTaskManager extends TaskManager {
             Bukkit.getScheduler().cancelTask(task);
         }
     }
+
 }

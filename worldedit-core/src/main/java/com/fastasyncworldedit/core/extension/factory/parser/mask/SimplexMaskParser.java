@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.extension.factory.parser.mask;
 
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.function.mask.SimplexMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.stream.Stream;
 
 public class SimplexMaskParser extends RichParser<Mask> {
+
     private static final String SIMPLEX_PREFIX = "#simplex";
 
     public SimplexMaskParser(WorldEdit worldEdit) {
@@ -39,4 +40,5 @@ public class SimplexMaskParser extends RichParser<Mask> {
         max = (max - 50d) / 50d;
         return new SimplexMask(scale, min, max);
     }
+
 }

@@ -35,4 +35,5 @@ public class MutableTileChange implements Change {
         int z = tag.getInt("z");
         context.getExtent().setTile(x, y, z, tag);
     }
+
 }

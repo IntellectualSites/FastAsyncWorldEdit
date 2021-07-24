@@ -163,8 +163,10 @@ public interface BlockMaterial {
     boolean hasContainer();
 
     //FAWE start
+
     /**
      * Get the opacity of the block.
+     *
      * @return opacity
      */
     int getLightOpacity();
@@ -186,6 +188,7 @@ public interface BlockMaterial {
 
     /**
      * Get the map color.
+     *
      * @return or 0
      */
     int getMapColor();

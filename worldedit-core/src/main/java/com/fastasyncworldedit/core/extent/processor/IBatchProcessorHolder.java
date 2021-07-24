@@ -13,12 +13,14 @@ import java.util.concurrent.Future;
  * (Join and remove operations affect the held processor)
  */
 public interface IBatchProcessorHolder extends IBatchProcessor {
+
     IBatchProcessor getProcessor();
 
     IBatchProcessor getPostProcessor();
 
     /**
      * Set the held processor
+     *
      * @param set
      */
     void setProcessor(IBatchProcessor set);
@@ -62,4 +64,5 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
         setProcessor(getProcessor().remove(clazz));
         return this;
     }
+
 }

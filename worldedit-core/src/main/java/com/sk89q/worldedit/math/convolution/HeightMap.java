@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.math.convolution;
 
+import com.fastasyncworldedit.core.registry.state.PropertyGroup;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -26,13 +27,12 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.Regions;
-import com.fastasyncworldedit.core.registry.state.PropertyGroup;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import java.util.Iterator;
 import javax.annotation.Nullable;
+import java.util.Iterator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -58,7 +58,7 @@ public class HeightMap {
      * Constructs the HeightMap.
      *
      * @param session an edit session
-     * @param region the region
+     * @param region  the region
      */
     //FAWE start
     public HeightMap(EditSession session, Region region) {
@@ -112,9 +112,26 @@ public class HeightMap {
             for (int z = 0; z < height; ++z) {
                 for (int x = 0; x < width; ++x, index++) {
                     if (mask != null) {
-                        yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE, mask);
+                        yTmp = session.getNearestSurfaceTerrainBlock(
+                                x + minX,
+                                z + minZ,
+                                yTmp,
+                                minY,
+                                maxY,
+                                Integer.MIN_VALUE,
+                                Integer.MAX_VALUE,
+                                mask
+                        );
                     } else {
-                        yTmp = session.getNearestSurfaceTerrainBlock(x + minX, z + minZ, yTmp, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE);
+                        yTmp = session.getNearestSurfaceTerrainBlock(
+                                x + minX,
+                                z + minZ,
+                                yTmp,
+                                minY,
+                                maxY,
+                                Integer.MIN_VALUE,
+                                Integer.MAX_VALUE
+                        );
                     }
                     switch (yTmp) {
                         case Integer.MIN_VALUE:
@@ -151,7 +168,7 @@ public class HeightMap {
     /**
      * Apply the filter 'iterations' amount times.
      *
-     * @param filter the filter
+     * @param filter     the filter
      * @param iterations the number of iterations
      * @return number of blocks affected
      * @throws MaxChangedBlocksException if the maximum block change limit is exceeded

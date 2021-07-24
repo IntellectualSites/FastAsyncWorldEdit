@@ -22,6 +22,7 @@ package com.sk89q.wepif;
 import org.bukkit.OfflinePlayer;
 
 public interface PermissionsProvider {
+
     boolean hasPermission(String name, String permission);
 
     boolean hasPermission(String worldName, String name, String permission);
@@ -37,4 +38,5 @@ public interface PermissionsProvider {
     boolean inGroup(OfflinePlayer player, String group);
 
     String[] getGroups(OfflinePlayer player);
+
 }

@@ -14,21 +14,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ABlockMask extends AbstractExtentMask {
+
     public ABlockMask(Extent extent) {
         super(extent);
     }
 
-    @Override public boolean test(Extent extent, BlockVector3 vector) {
+    @Override
+    public boolean test(Extent extent, BlockVector3 vector) {
         return test(extent.getBlock(vector));
     }
 
-    @Override public boolean test(BlockVector3 vector) {
+    @Override
+    public boolean test(BlockVector3 vector) {
         return test(getExtent().getBlock(vector));
     }
 
     public abstract boolean test(BlockState state);
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         List<String> strings = new ArrayList<>();
         for (BlockType type : BlockTypesCache.values) {
             if (type != null) {
@@ -49,7 +53,8 @@ public abstract class ABlockMask extends AbstractExtentMask {
         return StringMan.join(strings, ",");
     }
 
-    @Override public Mask tryCombine(Mask mask) {
+    @Override
+    public Mask tryCombine(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             BlockMask newMask = new BlockMask(getExtent());
@@ -69,7 +74,8 @@ public abstract class ABlockMask extends AbstractExtentMask {
         return null;
     }
 
-    @Override public Mask tryOr(Mask mask) {
+    @Override
+    public Mask tryOr(Mask mask) {
         if (mask instanceof ABlockMask) {
             ABlockMask other = (ABlockMask) mask;
             BlockMask newMask = new BlockMask(getExtent());
@@ -88,4 +94,5 @@ public abstract class ABlockMask extends AbstractExtentMask {
         }
         return null;
     }
+
 }

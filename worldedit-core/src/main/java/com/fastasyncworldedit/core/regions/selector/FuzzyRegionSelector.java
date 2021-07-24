@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.regions.selector;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.PassthroughExtent;
 import com.fastasyncworldedit.core.regions.FuzzyRegion;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
@@ -10,7 +11,6 @@ import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.fastasyncworldedit.core.extent.PassthroughExtent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -18,17 +18,17 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 
 public class FuzzyRegionSelector extends PassthroughExtent implements RegionSelector {
 
     private final Player player;
     private FuzzyRegion region;
-    private ArrayList<BlockVector3> positions;
+    private final ArrayList<BlockVector3> positions;
 
     public FuzzyRegionSelector(Player player, @Nullable World world, Mask mask) {
         super(new EditSessionBuilder(world)
@@ -148,7 +148,7 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
     @Override
     public List<String> getInformationLines() {
         return IntStream.range(0, positions.size())
-            .mapToObj(i -> "Position " + i + ": " + positions.get(i)).collect(Collectors.toList());
+                .mapToObj(i -> "Position " + i + ": " + positions.get(i)).collect(Collectors.toList());
     }
 
     @Override

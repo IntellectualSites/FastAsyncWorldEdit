@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 
 public abstract class Scroll implements ScrollTool {
+
     private BrushTool tool;
 
     public enum Action {
@@ -38,7 +39,14 @@ public abstract class Scroll implements ScrollTool {
         return fromArguments(tool, player, session, mode, args, message);
     }
 
-    public static Scroll fromArguments(BrushTool tool, Player player, LocalSession session, Action mode, List<String> arguments, boolean message) throws InputParseException {
+    public static Scroll fromArguments(
+            BrushTool tool,
+            Player player,
+            LocalSession session,
+            Action mode,
+            List<String> arguments,
+            boolean message
+    ) throws InputParseException {
         ParserContext parserContext = new ParserContext();
         parserContext.setActor(player);
         parserContext.setWorld(player.getWorld());
@@ -114,4 +122,5 @@ public abstract class Scroll implements ScrollTool {
     public BrushTool getTool() {
         return tool;
     }
+
 }

@@ -16,7 +16,13 @@ public class SplatterBrushMask extends AbstractExtentMask {
     private final Mask surface;
     private final LocalBlockVectorSet placed;
 
-    public SplatterBrushMask(EditSession editSession, BlockVector3 position, int size2, Mask surface, LocalBlockVectorSet placed) {
+    public SplatterBrushMask(
+            EditSession editSession,
+            BlockVector3 position,
+            int size2,
+            Mask surface,
+            LocalBlockVectorSet placed
+    ) {
         super(editSession);
         this.position = position;
         this.size2 = size2;
@@ -46,4 +52,5 @@ public class SplatterBrushMask extends AbstractExtentMask {
         // There should not be multiple instances to be thread safe
         return this;
     }
+
 }

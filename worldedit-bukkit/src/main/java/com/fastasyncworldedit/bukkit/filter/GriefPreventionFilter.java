@@ -14,13 +14,14 @@ import java.util.function.Supplier;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GriefPreventionFilter extends CuboidRegionFilter {
+
     private final Collection<Claim> claims;
     private final World world;
 
     public GriefPreventionFilter(World world) {
         checkNotNull(world);
         this.claims = TaskManager.IMP.sync(
-            (Supplier<Collection<Claim>>) () -> new ArrayDeque<>(GriefPrevention.instance.dataStore.getClaims()));
+                (Supplier<Collection<Claim>>) () -> new ArrayDeque<>(GriefPrevention.instance.dataStore.getClaims()));
         this.world = world;
     }
 
@@ -36,4 +37,5 @@ public class GriefPreventionFilter extends CuboidRegionFilter {
             }
         }
     }
+
 }

@@ -80,4 +80,5 @@ public class SuggestInputParseException extends InputParseException {
         this.prefix = input + prefix;
         return this;
     }
+
 }

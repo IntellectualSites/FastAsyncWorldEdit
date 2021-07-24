@@ -48,8 +48,10 @@ public class ClipboardBrush implements Brush {
         this.sourceMask = null;
     }
 
-    public ClipboardBrush(ClipboardHolder holder, boolean ignoreAirBlocks, boolean usingOrigin, boolean pasteEntities,
-                          boolean pasteBiomes, Mask sourceMask) {
+    public ClipboardBrush(
+            ClipboardHolder holder, boolean ignoreAirBlocks, boolean usingOrigin, boolean pasteEntities,
+            boolean pasteBiomes, Mask sourceMask
+    ) {
         this.holder = holder;
         this.ignoreAirBlocks = ignoreAirBlocks;
         this.usingOrigin = usingOrigin;
@@ -59,7 +61,8 @@ public class ClipboardBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
         BlockVector3 centerOffset = region.getCenter().toBlockPoint().subtract(clipboard.getOrigin());

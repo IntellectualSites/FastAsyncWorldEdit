@@ -34,8 +34,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class RequestExtent implements Extent {
 
@@ -99,7 +99,7 @@ public class RequestExtent implements Extent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return getExtent().setBlock(x, y, z, block);
     }
 
@@ -132,4 +132,5 @@ public class RequestExtent implements Extent {
         request = null;
         return commit;
     }
+
 }

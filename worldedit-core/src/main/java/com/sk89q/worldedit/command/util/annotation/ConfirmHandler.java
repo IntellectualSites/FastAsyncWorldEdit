@@ -1,7 +1,6 @@
 package com.sk89q.worldedit.command.util.annotation;
 
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.CommandParameters;
@@ -16,6 +15,7 @@ import java.util.Optional;
  * Logs called commands to a logger.
  */
 public class ConfirmHandler implements CommandCallListener {
+
     @Override
     public void beforeCall(Method method, CommandParameters parameters) {
         Confirm confirmAnnotation = method.getAnnotation(Confirm.class);
@@ -36,4 +36,5 @@ public class ConfirmHandler implements CommandCallListener {
             throw new StopExecutionException(TextComponent.empty());
         }
     }
+
 }

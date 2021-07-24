@@ -73,7 +73,10 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     private void init(UUID uuid, String worldName) {
-        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid);
+        final File folder = MainUtil.getFile(
+                Fawe.imp().getDirectory(),
+                Settings.IMP.PATHS.HISTORY + File.separator + worldName + File.separator + uuid
+        );
 
         final int max = NEXT_INDEX.computeIfAbsent(worldName, _worldName -> new ConcurrentHashMap<>())
                 .compute(uuid, (_uuid, id) -> (id == null ? MainUtil.getMaxFileId(folder) : id) + 1) - 1;
@@ -105,7 +108,10 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     private void init(UUID uuid, int i) {
         this.uuid = uuid;
         this.index = i;
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + getWorld().getName() + File.separator + uuid);
+        File folder = MainUtil.getFile(
+                Fawe.imp().getDirectory(),
+                Settings.IMP.PATHS.HISTORY + File.separator + getWorld().getName() + File.separator + uuid
+        );
         initFiles(folder);
     }
 
@@ -437,4 +443,5 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         // TODO Auto-generated method stub
 
     }
+
 }

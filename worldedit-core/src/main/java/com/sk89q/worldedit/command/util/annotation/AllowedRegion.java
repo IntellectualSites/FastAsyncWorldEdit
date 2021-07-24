@@ -12,5 +12,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.PARAMETER, ElementType.METHOD})
 @InjectAnnotation
 public @interface AllowedRegion {
+
     FaweMaskManager.MaskType value() default FaweMaskManager.MaskType.OWNER;
+
 }

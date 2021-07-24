@@ -63,7 +63,8 @@ public class TargetBlock {
     public TargetBlock(Player player) {
         this.world = player.getWorld();
         this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(),
-                300, 1.65, 0.2);
+                300, 1.65, 0.2
+        );
         this.stopMask = new ExistingBlockMask(world);
         this.solidMask = new SolidBlockMask(world);
     }
@@ -71,8 +72,8 @@ public class TargetBlock {
     /**
      * Constructor requiring a player, max distance and a checking distance.
      *
-     * @param player Player to work with
-     * @param maxDistance how far it checks for blocks
+     * @param player        Player to work with
+     * @param maxDistance   how far it checks for blocks
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
     public TargetBlock(Player player, int maxDistance, double checkDistance) {
@@ -84,7 +85,14 @@ public class TargetBlock {
     //FAWE start - Extend > World
     public TargetBlock(Player player, Extent extent, int maxDistance, double checkDistance) {
         this.world = player.getWorld();
-        this.setValues(player.getLocation().toVector(), player.getLocation().getYaw(), player.getLocation().getPitch(), maxDistance, 1.65, checkDistance);
+        this.setValues(
+                player.getLocation().toVector(),
+                player.getLocation().getYaw(),
+                player.getLocation().getPitch(),
+                maxDistance,
+                1.65,
+                checkDistance
+        );
         this.stopMask = new ExistingBlockMask(world);
         this.solidMask = new SolidBlockMask(world);
     }
@@ -121,14 +129,21 @@ public class TargetBlock {
     /**
      * Set the values, all constructors uses this function.
      *
-     * @param loc location of the view
-     * @param rotationX the X rotation
-     * @param rotationY the Y rotation
-     * @param maxDistance how far it checks for blocks
-     * @param viewHeight where the view is positioned in y-axis
+     * @param loc           location of the view
+     * @param rotationX     the X rotation
+     * @param rotationY     the Y rotation
+     * @param maxDistance   how far it checks for blocks
+     * @param viewHeight    where the view is positioned in y-axis
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
-    private void setValues(Vector3 loc, double rotationX, double rotationY, int maxDistance, double viewHeight, double checkDistance) {
+    private void setValues(
+            Vector3 loc,
+            double rotationX,
+            double rotationY,
+            int maxDistance,
+            double viewHeight,
+            double checkDistance
+    ) {
         this.maxDistance = maxDistance;
         this.checkDistance = checkDistance;
         this.curDistance = 0;
@@ -137,9 +152,11 @@ public class TargetBlock {
 
         double h = (checkDistance * Math.cos(Math.toRadians(rotationY)));
 
-        offset = Vector3.at((h * Math.cos(Math.toRadians(rotationX))),
-                            (checkDistance * Math.sin(Math.toRadians(rotationY))),
-                            (h * Math.sin(Math.toRadians(rotationX))));
+        offset = Vector3.at(
+                (h * Math.cos(Math.toRadians(rotationX))),
+                (checkDistance * Math.sin(Math.toRadians(rotationY))),
+                (h * Math.sin(Math.toRadians(rotationX)))
+        );
 
         targetPosDouble = loc.add(0, viewHeight, 0);
         targetPos = targetPosDouble.toBlockPoint();
@@ -207,9 +224,11 @@ public class TargetBlock {
         do {
             curDistance += checkDistance;
 
-            targetPosDouble = offset.add(targetPosDouble.getX(),
-                                         targetPosDouble.getY(),
-                                         targetPosDouble.getZ());
+            targetPosDouble = offset.add(
+                    targetPosDouble.getX(),
+                    targetPosDouble.getY(),
+                    targetPosDouble.getZ()
+            );
             targetPos = targetPosDouble.toBlockPoint();
         } while (curDistance <= maxDistance
                 && targetPos.getBlockX() == prevPos.getBlockX()

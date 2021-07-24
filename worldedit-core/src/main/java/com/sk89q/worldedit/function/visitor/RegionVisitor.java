@@ -32,6 +32,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 /**
  * Utility class to apply region functions to {@link com.sk89q.worldedit.regions.Region}.
+ *
  * @deprecated - FAWE deprecation: Let the queue iterate, not the region function which lacks any kind of optimizations / parallelism
  */
 @Deprecated

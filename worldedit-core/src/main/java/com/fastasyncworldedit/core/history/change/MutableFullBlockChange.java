@@ -56,4 +56,5 @@ public class MutableFullBlockChange implements Change {
         }
         context.getExtent().setBlock(x, y, z, fromState);
     }
+
 }

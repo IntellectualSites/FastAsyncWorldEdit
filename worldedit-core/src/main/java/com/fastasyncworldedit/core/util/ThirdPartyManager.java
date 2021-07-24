@@ -10,16 +10,21 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
-/** An internal FAWE class not meant for public use. **/
+/**
+ * An internal FAWE class not meant for public use.
+ **/
 public enum ThirdPartyManager {
 
     MapManager(
-        "https://github.com/InventivetalentDev/MapManager/releases/download/1.7.8-SNAPSHOT/MapManager_v1.7.8-SNAPSHOT.jar",
-        "m3YLUqZz66k2DmvdcYLeu38u3zKRKhrAXqGGpVKfO6g=", 544000),
+            "https://github.com/InventivetalentDev/MapManager/releases/download/1.7.8-SNAPSHOT/MapManager_v1.7.8-SNAPSHOT.jar",
+            "m3YLUqZz66k2DmvdcYLeu38u3zKRKhrAXqGGpVKfO6g=", 544000
+    ),
 
     PacketListenerAPI(
-        "https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.6-SNAPSHOT/PacketListenerAPI_v3.7.6-SNAPSHOT.jar",
-        "etdBRzLn5pRVDfr/mSQdPm6Jjer3wQOKhcn8fUxo5zM=", 143000),
+            "https://github.com/InventivetalentDev/PacketListenerAPI/releases/download/3.7.6-SNAPSHOT/PacketListenerAPI_v3.7.6-SNAPSHOT.jar",
+            "etdBRzLn5pRVDfr/mSQdPm6Jjer3wQOKhcn8fUxo5zM=",
+            143000
+    ),
 
     ;
 
@@ -30,8 +35,8 @@ public enum ThirdPartyManager {
     public final String digest;
 
     /**
-     * @param url Where this jar can be found and downloaded
-     * @param digest The Base64-encoded SHA-256 digest
+     * @param url      Where this jar can be found and downloaded
+     * @param digest   The Base64-encoded SHA-256 digest
      * @param fileSize Size of this jar in bytes
      */
     ThirdPartyManager(String url, String digest, int fileSize) {

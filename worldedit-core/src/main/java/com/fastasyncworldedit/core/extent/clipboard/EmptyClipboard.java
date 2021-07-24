@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class EmptyClipboard implements Clipboard {
+
     private static final EmptyClipboard instance = new EmptyClipboard();
 
     public static EmptyClipboard getInstance() {

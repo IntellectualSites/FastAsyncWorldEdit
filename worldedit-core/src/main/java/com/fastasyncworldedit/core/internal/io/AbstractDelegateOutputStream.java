@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class AbstractDelegateOutputStream extends OutputStream {
+
     private final OutputStream parent;
 
     @Override
@@ -34,4 +35,5 @@ public class AbstractDelegateOutputStream extends OutputStream {
     public AbstractDelegateOutputStream(OutputStream os) {
         this.parent = os;
     }
+
 }

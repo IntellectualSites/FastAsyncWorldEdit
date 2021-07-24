@@ -6,4 +6,5 @@ public interface ResettableMask extends Resettable {
 
     @Override
     void reset();
+
 }

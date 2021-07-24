@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -42,8 +42,8 @@ public interface Pattern extends Filter {
      */
     @Deprecated
     @NonAbstractForCompatibility(
-        delegateName = "applyBlock",
-        delegateParams = { BlockVector3.class }
+            delegateName = "applyBlock",
+            delegateParams = {BlockVector3.class}
     )
     default BaseBlock apply(BlockVector3 position) {
         return applyBlock(position);
@@ -65,8 +65,7 @@ public interface Pattern extends Filter {
      *
      * @param position the position
      * @return a block
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     BaseBlock applyBlock(BlockVector3 position);
+
 }

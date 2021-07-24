@@ -11,6 +11,7 @@ import com.sk89q.worldedit.math.Vector3;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class RockBrush implements Brush {
+
     private final double amplitude;
     private final double frequency;
     private final Vector3 radius;
@@ -22,7 +23,8 @@ public class RockBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         double seedX = ThreadLocalRandom.current().nextDouble();
         double seedY = ThreadLocalRandom.current().nextDouble();
         double seedZ = ThreadLocalRandom.current().nextDouble();
@@ -56,4 +58,5 @@ public class RockBrush implements Brush {
             }
         }
     }
+
 }

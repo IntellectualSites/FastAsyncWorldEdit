@@ -21,10 +21,11 @@ package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
-import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
+import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
@@ -34,7 +35,6 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
@@ -62,11 +62,11 @@ import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.Nullable;
 
 /**
  * An abstract implementation of both a {@link Actor} and a {@link Player}
@@ -74,27 +74,28 @@ import javax.annotation.Nullable;
  * players that make use of WorldEdit.
  */
 public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
+
     //FAWE start
     private final Map<String, Object> meta;
 
     // Queue for async tasks
     private final AtomicInteger runningCount = new AtomicInteger();
     private final AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue(
-        (thread, throwable) -> {
-            while (throwable.getCause() != null) {
-                throwable = throwable.getCause();
-            }
-            if (throwable instanceof WorldEditException) {
-                printError(Caption.of(throwable.getLocalizedMessage()));
-            } else {
-                FaweException fe = FaweException.get(throwable);
-                if (fe != null) {
-                    printError(fe.getComponent());
-                } else {
-                    throwable.printStackTrace();
+            (thread, throwable) -> {
+                while (throwable.getCause() != null) {
+                    throwable = throwable.getCause();
                 }
-            }
-        });
+                if (throwable instanceof WorldEditException) {
+                    printError(Caption.of(throwable.getLocalizedMessage()));
+                } else {
+                    FaweException fe = FaweException.get(throwable);
+                    if (fe != null) {
+                        printError(fe.getComponent());
+                    } else {
+                        throwable.printStackTrace();
+                    }
+                }
+            });
 
     public AbstractPlayerActor(Map<String, Object> meta) {
         this.meta = meta;
@@ -212,7 +213,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             final BlockVector3 pos = BlockVector3.at(x, y, z);
             final BlockState id = world.getBlock(pos);
             if (id.getBlockType().getMaterial().isMovementBlocker()
-                && trySetPosition(Vector3.at(x + 0.5, y + 1, z + 0.5))) {
+                    && trySetPosition(Vector3.at(x + 0.5, y + 1, z + 0.5))) {
                 return;
             }
 
@@ -232,7 +233,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     private boolean isPlayerHarmingBlock(BlockVector3 location) {
         BlockType type = getWorld().getBlock(location).getBlockType();
         return type.getMaterial().isMovementBlocker() || type == BlockTypes.LAVA
-            || BlockCategories.FIRE.contains(type);
+                || BlockCategories.FIRE.contains(type);
     }
 
     /**
@@ -249,7 +250,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             return false;
         }
         return getWorld().getBlock(location.add(0, -1, 0)).getBlockType().getMaterial()
-                         .isMovementBlocker();
+                .isMovementBlocker();
     }
 
     @Override
@@ -453,6 +454,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     //FAWE start
+
     /**
      * Get the player's current allowed WorldEdit regions.
      *
@@ -492,7 +494,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
             selector = new Polygonal2DRegionSelector((Polygonal2DRegion) region);
         } else {
             selector = new CuboidRegionSelector(null, region.getMinimumPoint(),
-                region.getMaximumPoint());
+                    region.getMaximumPoint()
+            );
         }
         selector.setWorld(region.getWorld());
 
@@ -612,12 +615,13 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     //FAWE start
+
     /**
      * Run a task either async, or on the current thread.
      *
-     * @param ifFree the task to run if free
+     * @param ifFree    the task to run if free
      * @param checkFree Whether to first check if a task is running
-     * @param async TODO description
+     * @param async     TODO description
      * @return false if the task was ran or queued
      */
     @Override
@@ -703,4 +707,5 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     public <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, B block) {
 
     }
+
 }

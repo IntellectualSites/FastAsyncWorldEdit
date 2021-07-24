@@ -1,7 +1,8 @@
 package com.fastasyncworldedit.core.function.pattern;
 
-import com.fastasyncworldedit.core.util.MutableCharSequence;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.MutableCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -10,7 +11,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PropertyPattern extends AbstractExtentPattern {
+
     private final int[] transformed;
 
     public PropertyPattern(Extent extent, String[] properties) {
@@ -45,19 +46,29 @@ public class PropertyPattern extends AbstractExtentPattern {
     private static final Operator XOR = (length, value, index) -> index ^ value;
 
     private interface Operator {
+
         int apply(int length, int value, int index);
+
     }
 
     private Operator getOp(char c) {
         switch (c) {
-            case '=': return EQUAL;
-            case '+': return PLUS;
-            case '-': return MINUS;
-            case '%': return MODULO;
-            case '&': return AND;
-            case '|': return OR;
-            case '^': return XOR;
-            default: return null;
+            case '=':
+                return EQUAL;
+            case '+':
+                return PLUS;
+            case '-':
+                return MINUS;
+            case '%':
+                return MODULO;
+            case '&':
+                return AND;
+            case '|':
+                return OR;
+            case '^':
+                return XOR;
+            default:
+                return null;
         }
     }
 
@@ -108,7 +119,14 @@ public class PropertyPattern extends AbstractExtentPattern {
         }
     }
 
-    private void applyRecursive(BlockType type, AbstractProperty property, List<Property> properties, int propertiesIndex, int stateId, int index) {
+    private void applyRecursive(
+            BlockType type,
+            AbstractProperty property,
+            List<Property> properties,
+            int propertiesIndex,
+            int stateId,
+            int index
+    ) {
         AbstractProperty current = (AbstractProperty) properties.get(propertiesIndex);
         List values = current.getValues();
         if (propertiesIndex + 1 < properties.size()) {
@@ -123,7 +141,7 @@ public class PropertyPattern extends AbstractExtentPattern {
 
                 int existingOrdinal = transformed[state.getOrdinal()];
                 int existing = BlockTypesCache.states[existingOrdinal].getInternalId();
-                        //states[statesIndex] << BlockTypesCache.BIT_OFFSET;
+                //states[statesIndex] << BlockTypesCache.BIT_OFFSET;
                 BlockState newState = state.withPropertyId(property.modifyIndex(existing, index) >> BlockTypesCache.BIT_OFFSET);
                 transformed[state.getOrdinal()] = newState.getOrdinal();
             }
@@ -237,4 +255,5 @@ public class PropertyPattern extends AbstractExtentPattern {
         }
         return false;
     }
+
 }

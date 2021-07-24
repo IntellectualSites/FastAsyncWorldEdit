@@ -19,21 +19,46 @@ public interface HeightMap {
     void setSize(int size);
 
 
-    default void perform(EditSession session, Mask mask, BlockVector3 pos, int size, int rotationMode, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
+    default void perform(
+            EditSession session,
+            Mask mask,
+            BlockVector3 pos,
+            int size,
+            int rotationMode,
+            double yscale,
+            boolean smooth,
+            boolean towards,
+            boolean layers
+    ) throws MaxChangedBlocksException {
         int[][] data = generateHeightData(session, mask, pos, size, rotationMode, yscale, smooth, towards, layers);
         applyHeightMapData(data, session, pos, size, yscale, smooth, towards, layers);
     }
 
-    default void applyHeightMapData(int[][] data, EditSession session, BlockVector3 pos, int size, double yscale, boolean smooth, boolean towards, boolean layers) throws MaxChangedBlocksException {
+    default void applyHeightMapData(
+            int[][] data,
+            EditSession session,
+            BlockVector3 pos,
+            int size,
+            double yscale,
+            boolean smooth,
+            boolean towards,
+            boolean layers
+    ) throws MaxChangedBlocksException {
         BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
         Location min = new Location(session.getWorld(), pos.subtract(size, maxY, size).toVector3());
         BlockVector3 max = pos.add(size, maxY, size);
         Region region = new CuboidRegion(session.getWorld(), min.toBlockPoint(), max);
-        com.sk89q.worldedit.math.convolution.HeightMap heightMap = new com.sk89q.worldedit.math.convolution.HeightMap(session, region, data[0], layers);
+        com.sk89q.worldedit.math.convolution.HeightMap heightMap = new com.sk89q.worldedit.math.convolution.HeightMap(
+                session,
+                region,
+                data[0],
+                layers
+        );
         if (smooth) {
             try {
-                HeightMapFilter filter = (HeightMapFilter) HeightMapFilter.class.getConstructors()[0].newInstance(GaussianKernel.class.getConstructors()[0].newInstance(5, 1));
+                HeightMapFilter filter = (HeightMapFilter) HeightMapFilter.class.getConstructors()[0].newInstance(GaussianKernel.class
+                        .getConstructors()[0].newInstance(5, 1));
                 int diameter = 2 * size + 1;
                 data[1] = filter.filter(data[1], diameter, diameter);
             } catch (Throwable e) {
@@ -47,7 +72,17 @@ public interface HeightMap {
         }
     }
 
-    default int[][] generateHeightData(EditSession session, Mask mask, BlockVector3 pos, int size, final int rotationMode, double yscale, boolean smooth, boolean towards, final boolean layers) {
+    default int[][] generateHeightData(
+            EditSession session,
+            Mask mask,
+            BlockVector3 pos,
+            int size,
+            final int rotationMode,
+            double yscale,
+            boolean smooth,
+            boolean towards,
+            final boolean layers
+    ) {
         BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
         int diameter = 2 * size + 1;
@@ -102,7 +137,8 @@ public interface HeightMap {
                     int diff = targetY - height;
                     double raiseScaled = diff * (raisePow * sizePowInv);
                     double raiseScaledAbs = Math.abs(raiseScaled);
-                    int random = ThreadLocalRandom.current().nextInt(256) < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(raiseScaledAbs)) * 256) ? (diff > 0 ? 1 : -1) : 0;
+                    int random = ThreadLocalRandom.current().nextInt(256) < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(
+                            raiseScaledAbs)) * 256) ? (diff > 0 ? 1 : -1) : 0;
                     int raiseScaledInt = (int) raiseScaled + random;
                     newData[index] = height + raiseScaledInt;
                 }
@@ -151,4 +187,5 @@ public interface HeightMap {
         }
         return new int[][]{oldData, newData};
     }
+
 }

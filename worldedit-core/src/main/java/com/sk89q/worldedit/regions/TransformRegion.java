@@ -27,10 +27,10 @@ import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,7 +47,7 @@ public class TransformRegion extends AbstractRegion {
     /**
      * Create a new instance.
      *
-     * @param region the region
+     * @param region    the region
      * @param transform the transform
      */
     public TransformRegion(Region region, Transform transform) {
@@ -57,8 +57,8 @@ public class TransformRegion extends AbstractRegion {
     /**
      * Create a new instance.
      *
-     * @param world the world, which may be null
-     * @param region the region
+     * @param world     the world, which may be null
+     * @param region    the region
      * @param transform the transform
      */
     public TransformRegion(@Nullable World world, Region region, Transform transform) {
@@ -188,4 +188,5 @@ public class TransformRegion extends AbstractRegion {
             }
         };
     }
+
 }

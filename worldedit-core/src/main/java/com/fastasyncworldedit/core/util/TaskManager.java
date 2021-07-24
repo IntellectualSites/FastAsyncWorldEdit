@@ -1,13 +1,14 @@
 package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
@@ -15,7 +16,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public abstract class TaskManager {
 
@@ -60,7 +60,6 @@ public abstract class TaskManager {
      * Get the public ForkJoinPool.
      * - ONLY SUBMIT SHORT LIVED TASKS<br>
      * - DO NOT USE SLEEP/WAIT/LOCKS IN ANY SUBMITTED TASKS<br>
-     *
      */
     public ForkJoinPool getPublicForkJoinPool() {
         return pool;
@@ -151,7 +150,7 @@ public abstract class TaskManager {
      * - If it's already the main thread, it will just call run()
      *
      * @param runnable the task to run
-     * @param async whether the task should run on the main thread
+     * @param async    whether the task should run on the main thread
      */
     public void taskNow(@NotNull final Runnable runnable, boolean async) {
         if (async) {
@@ -189,7 +188,7 @@ public abstract class TaskManager {
      * Run a task on the main thread at the next tick or now async.
      *
      * @param runnable the task to run.
-     * @param async whether the task should run on the main thread
+     * @param async    whether the task should run on the main thread
      */
     public void taskSoonMain(@NotNull final Runnable runnable, boolean async) {
         if (async) {
@@ -204,7 +203,7 @@ public abstract class TaskManager {
      * Run a task later on the main thread.
      *
      * @param runnable the task to run
-     * @param delay in ticks
+     * @param delay    in ticks
      */
     public abstract void later(@NotNull final Runnable runnable, final int delay);
 
@@ -212,7 +211,7 @@ public abstract class TaskManager {
      * Run a task later asynchronously.
      *
      * @param runnable the task to run
-     * @param delay in ticks
+     * @param delay    in ticks
      */
     public abstract void laterAsync(@NotNull final Runnable runnable, final int delay);
 
@@ -340,4 +339,5 @@ public abstract class TaskManager {
             throw new RuntimeException(e);
         }
     }
+
 }

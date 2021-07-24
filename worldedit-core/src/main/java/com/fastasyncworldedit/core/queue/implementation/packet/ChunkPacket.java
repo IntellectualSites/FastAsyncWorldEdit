@@ -2,9 +2,9 @@ package com.fastasyncworldedit.core.queue.implementation.packet;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.IBlocks;
-import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.queue.IBlocks;
 import com.sk89q.jnbt.CompoundTag;
 
 import java.util.HashMap;
@@ -124,4 +124,5 @@ public class ChunkPacket implements Function<byte[], byte[]>, Supplier<byte[]> {
             throw new RuntimeException(e);
         }
     }
+
 }

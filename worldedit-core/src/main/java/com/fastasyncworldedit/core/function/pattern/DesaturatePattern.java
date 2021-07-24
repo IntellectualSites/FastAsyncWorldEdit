@@ -10,6 +10,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
 
 public class DesaturatePattern extends AbstractPattern {
+
     private final TextureHolder holder;
     private final Extent extent;
     private final double value;
@@ -55,4 +56,5 @@ public class DesaturatePattern extends AbstractPattern {
         }
         return set.setBlock(extent, newType.getDefaultState());
     }
+
 }

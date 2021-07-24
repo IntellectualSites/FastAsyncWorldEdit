@@ -26,4 +26,5 @@ public class TrueMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) {
         return Masks.alwaysTrue();
     }
+
 }

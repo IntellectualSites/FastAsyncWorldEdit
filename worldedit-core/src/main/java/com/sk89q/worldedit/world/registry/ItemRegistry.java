@@ -70,6 +70,7 @@ public interface ItemRegistry {
     ItemMaterial getMaterial(ItemType itemType);
 
     //FAWE start
+
     /**
      * Register all items.
      */

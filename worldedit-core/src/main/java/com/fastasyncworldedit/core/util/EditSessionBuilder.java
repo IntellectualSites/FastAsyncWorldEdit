@@ -2,32 +2,32 @@ package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.IQueueChunk;
-import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
-import com.fastasyncworldedit.core.extent.processor.lighting.RelightProcessor;
-import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
-import com.fastasyncworldedit.core.extent.processor.HeightmapProcessor;
-import com.fastasyncworldedit.core.extent.processor.LimitExtent;
-import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.history.RollbackOptimizedHistory;
-import com.fastasyncworldedit.core.object.FaweLimit;
-import com.fastasyncworldedit.core.extent.HistoryExtent;
-import com.fastasyncworldedit.core.history.changeset.NullChangeSet;
-import com.fastasyncworldedit.core.regions.RegionWrapper;
-import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
-import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
-import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
-import com.fastasyncworldedit.core.history.DiskStorageHistory;
-import com.fastasyncworldedit.core.history.MemoryOptimizedHistory;
 import com.fastasyncworldedit.core.extent.FaweRegionExtent;
+import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.extent.MultiRegionExtent;
 import com.fastasyncworldedit.core.extent.NullExtent;
 import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.extent.SlowExtent;
 import com.fastasyncworldedit.core.extent.StripNBTExtent;
+import com.fastasyncworldedit.core.extent.processor.HeightmapProcessor;
+import com.fastasyncworldedit.core.extent.processor.LimitExtent;
+import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelightProcessor;
+import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
+import com.fastasyncworldedit.core.history.DiskStorageHistory;
+import com.fastasyncworldedit.core.history.MemoryOptimizedHistory;
+import com.fastasyncworldedit.core.history.RollbackOptimizedHistory;
+import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
+import com.fastasyncworldedit.core.history.changeset.NullChangeSet;
+import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.queue.IQueueChunk;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
+import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -219,7 +219,12 @@ public class EditSessionBuilder {
         return this;
     }
 
-    private Extent wrapExtent(final Extent extent, final EventBus eventBus, EditSessionEvent event, final EditSession.Stage stage) {
+    private Extent wrapExtent(
+            final Extent extent,
+            final EventBus eventBus,
+            EditSessionEvent event,
+            final EditSession.Stage stage
+    ) {
         event = event.clone(stage);
         event.setExtent(extent);
         eventBus.post(event);
@@ -240,16 +245,25 @@ public class EditSessionBuilder {
             }
             if (Settings.IMP.EXTENT.DEBUG) {
                 if (event.getActor() != null) {
-                    event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn.getClass().getName()));
-                    event.getActor().printDebug(TextComponent.of(" - For area restrictions and block logging, it is recommended to use the FaweAPI"));
-                    event.getActor().printDebug(TextComponent.of(" - To allow " + toReturn.getClass().getName() + ", add it to the FAWE `allowed-plugins` list in config.yml"));
-                    event.getActor().printDebug(TextComponent.of(" - If you are unsure which plugin tries to use the extent, you can find some additional information below:"));
+                    event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn
+                            .getClass()
+                            .getName()));
+                    event.getActor().printDebug(TextComponent.of(
+                            " - For area restrictions and block logging, it is recommended to use the FaweAPI"));
+                    event.getActor().printDebug(TextComponent.of(" - To allow " + toReturn
+                            .getClass()
+                            .getName() + ", add it to the FAWE `allowed-plugins` list in config.yml"));
+                    event.getActor().printDebug(TextComponent.of(
+                            " - If you are unsure which plugin tries to use the extent, you can find some additional information below:"));
                     event.getActor().printDebug(TextComponent.of(" - " + toReturn.getClass().getClassLoader()));
                 } else {
                     LOGGER.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
                     LOGGER.debug(" - For area restrictions and block logging, it is recommended to use the FaweAPI");
-                    LOGGER.debug(" - To allow " + toReturn.getClass().getName() + ", add it to the FAWE `allowed-plugins` list in config.yml");
-                    LOGGER.debug(" - If you are unsure which plugin tries to use the extent, you can find some additional information below:");
+                    LOGGER.debug(" - To allow " + toReturn
+                            .getClass()
+                            .getName() + ", add it to the FAWE `allowed-plugins` list in config.yml");
+                    LOGGER.debug(
+                            " - If you are unsure which plugin tries to use the extent, you can find some additional information below:");
                     LOGGER.debug(" - " + toReturn.getClass().getClassLoader());
                 }
             }
@@ -481,4 +495,5 @@ public class EditSessionBuilder {
     public Region[] getAllowedRegions() {
         return allowedRegions;
     }
+
 }

@@ -17,11 +17,12 @@ package com.fastasyncworldedit.core.math.random;
  */
 
 public class SimplexNoise {
-    private static Grad grad3[] = {new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0),
+
+    private static final Grad[] grad3 = {new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0),
             new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1),
             new Grad(0, 1, 1), new Grad(0, -1, 1), new Grad(0, 1, -1), new Grad(0, -1, -1)};
 
-    private static Grad grad4[] = {new Grad(0, 1, 1, 1), new Grad(0, 1, 1, -1), new Grad(0, 1, -1, 1), new Grad(0, 1, -1, -1),
+    private static final Grad[] grad4 = {new Grad(0, 1, 1, 1), new Grad(0, 1, 1, -1), new Grad(0, 1, -1, 1), new Grad(0, 1, -1, -1),
             new Grad(0, -1, 1, 1), new Grad(0, -1, 1, -1), new Grad(0, -1, -1, 1), new Grad(0, -1, -1, -1),
             new Grad(1, 0, 1, 1), new Grad(1, 0, 1, -1), new Grad(1, 0, -1, 1), new Grad(1, 0, -1, -1),
             new Grad(-1, 0, 1, 1), new Grad(-1, 0, 1, -1), new Grad(-1, 0, -1, 1), new Grad(-1, 0, -1, -1),
@@ -30,7 +31,7 @@ public class SimplexNoise {
             new Grad(1, 1, 1, 0), new Grad(1, 1, -1, 0), new Grad(1, -1, 1, 0), new Grad(1, -1, -1, 0),
             new Grad(-1, 1, 1, 0), new Grad(-1, 1, -1, 0), new Grad(-1, -1, 1, 0), new Grad(-1, -1, -1, 0)};
 
-    private static short p[] = {151, 160, 137, 91, 90, 15,
+    private static final short[] p = {151, 160, 137, 91, 90, 15,
             131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
             190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
             88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
@@ -44,8 +45,8 @@ public class SimplexNoise {
             49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
             138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180};
     // To remove the need for index wrapping, double the permutation table length
-    private static short perm[] = new short[512];
-    private static short permMod12[] = new short[512];
+    private static final short[] perm = new short[512];
+    private static final short[] permMod12 = new short[512];
 
     static {
         for (int i = 0; i < 512; i++) {
@@ -119,20 +120,23 @@ public class SimplexNoise {
         int gi2 = permMod12[ii + 1 + perm[jj + 1]];
         // Calculate the contribution from the three corners
         double t0 = 0.5 - x0 * x0 - y0 * y0;
-        if (t0 < 0) n0 = 0.0;
-        else {
+        if (t0 < 0) {
+            n0 = 0.0;
+        } else {
             t0 *= t0;
             n0 = t0 * t0 * dot(grad3[gi0], x0, y0);  // (x,y) of grad3 used for 2D gradient
         }
         double t1 = 0.5 - x1 * x1 - y1 * y1;
-        if (t1 < 0) n1 = 0.0;
-        else {
+        if (t1 < 0) {
+            n1 = 0.0;
+        } else {
             t1 *= t1;
             n1 = t1 * t1 * dot(grad3[gi1], x1, y1);
         }
         double t2 = 0.5 - x2 * x2 - y2 * y2;
-        if (t2 < 0) n2 = 0.0;
-        else {
+        if (t2 < 0) {
+            n2 = 0.0;
+        } else {
             t2 *= t2;
             n2 = t2 * t2 * dot(grad3[gi2], x2, y2);
         }
@@ -235,26 +239,30 @@ public class SimplexNoise {
         int gi3 = permMod12[ii + 1 + perm[jj + 1 + perm[kk + 1]]];
         // Calculate the contribution from the four corners
         double t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
-        if (t0 < 0) n0 = 0.0;
-        else {
+        if (t0 < 0) {
+            n0 = 0.0;
+        } else {
             t0 *= t0;
             n0 = t0 * t0 * dot(grad3[gi0], x0, y0, z0);
         }
         double t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
-        if (t1 < 0) n1 = 0.0;
-        else {
+        if (t1 < 0) {
+            n1 = 0.0;
+        } else {
             t1 *= t1;
             n1 = t1 * t1 * dot(grad3[gi1], x1, y1, z1);
         }
         double t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
-        if (t2 < 0) n2 = 0.0;
-        else {
+        if (t2 < 0) {
+            n2 = 0.0;
+        } else {
             t2 *= t2;
             n2 = t2 * t2 * dot(grad3[gi2], x2, y2, z2);
         }
         double t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
-        if (t3 < 0) n3 = 0.0;
-        else {
+        if (t3 < 0) {
+            n3 = 0.0;
+        } else {
             t3 *= t3;
             n3 = t3 * t3 * dot(grad3[gi3], x3, y3, z3);
         }
@@ -292,18 +300,36 @@ public class SimplexNoise {
         int ranky = 0;
         int rankz = 0;
         int rankw = 0;
-        if (x0 > y0) rankx++;
-        else ranky++;
-        if (x0 > z0) rankx++;
-        else rankz++;
-        if (x0 > w0) rankx++;
-        else rankw++;
-        if (y0 > z0) ranky++;
-        else rankz++;
-        if (y0 > w0) ranky++;
-        else rankw++;
-        if (z0 > w0) rankz++;
-        else rankw++;
+        if (x0 > y0) {
+            rankx++;
+        } else {
+            ranky++;
+        }
+        if (x0 > z0) {
+            rankx++;
+        } else {
+            rankz++;
+        }
+        if (x0 > w0) {
+            rankx++;
+        } else {
+            rankw++;
+        }
+        if (y0 > z0) {
+            ranky++;
+        } else {
+            rankz++;
+        }
+        if (y0 > w0) {
+            ranky++;
+        } else {
+            rankw++;
+        }
+        if (z0 > w0) {
+            rankz++;
+        } else {
+            rankw++;
+        }
         int i1, j1, k1, l1; // The integer offsets for the second simplex corner
         int i2, j2, k2, l2; // The integer offsets for the third simplex corner
         int i3, j3, k3, l3; // The integer offsets for the fourth simplex corner
@@ -353,32 +379,37 @@ public class SimplexNoise {
         int gi4 = perm[ii + 1 + perm[jj + 1 + perm[kk + 1 + perm[ll + 1]]]] % 32;
         // Calculate the contribution from the five corners
         double t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0 - w0 * w0;
-        if (t0 < 0) n0 = 0.0;
-        else {
+        if (t0 < 0) {
+            n0 = 0.0;
+        } else {
             t0 *= t0;
             n0 = t0 * t0 * dot(grad4[gi0], x0, y0, z0, w0);
         }
         double t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
-        if (t1 < 0) n1 = 0.0;
-        else {
+        if (t1 < 0) {
+            n1 = 0.0;
+        } else {
             t1 *= t1;
             n1 = t1 * t1 * dot(grad4[gi1], x1, y1, z1, w1);
         }
         double t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
-        if (t2 < 0) n2 = 0.0;
-        else {
+        if (t2 < 0) {
+            n2 = 0.0;
+        } else {
             t2 *= t2;
             n2 = t2 * t2 * dot(grad4[gi2], x2, y2, z2, w2);
         }
         double t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
-        if (t3 < 0) n3 = 0.0;
-        else {
+        if (t3 < 0) {
+            n3 = 0.0;
+        } else {
             t3 *= t3;
             n3 = t3 * t3 * dot(grad4[gi3], x3, y3, z3, w3);
         }
         double t4 = 0.6 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
-        if (t4 < 0) n4 = 0.0;
-        else {
+        if (t4 < 0) {
+            n4 = 0.0;
+        } else {
             t4 *= t4;
             n4 = t4 * t4 * dot(grad4[gi4], x4, y4, z4, w4);
         }
@@ -389,6 +420,7 @@ public class SimplexNoise {
     // Inner class to speed upp gradient computations
     // (In Java, array access is a lot slower than member access)
     private static class Grad {
+
         double x, y, z, w;
 
         Grad(double x, double y, double z) {
@@ -403,5 +435,7 @@ public class SimplexNoise {
             this.z = z;
             this.w = w;
         }
+
     }
+
 }

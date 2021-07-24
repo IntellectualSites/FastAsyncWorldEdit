@@ -19,4 +19,5 @@ public class SimpleBlockCopy implements RegionFunction {
     public boolean apply(BlockVector3 position) throws WorldEditException {
         return destination.setBlock(position, source.getFullBlock(position));
     }
+
 }

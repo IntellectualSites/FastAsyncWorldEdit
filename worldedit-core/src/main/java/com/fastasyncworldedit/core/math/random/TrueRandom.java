@@ -15,4 +15,5 @@ public class TrueRandom implements SimpleRandom {
     public int nextInt(int x, int y, int z, int len) {
         return random.nextInt(len);
     }
+
 }

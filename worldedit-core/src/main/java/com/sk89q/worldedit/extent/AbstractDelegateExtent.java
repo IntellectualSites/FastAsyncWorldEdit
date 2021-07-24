@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -43,9 +43,9 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Range;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.logging.log4j.LogManager.getLogger;
@@ -155,11 +155,7 @@ public class AbstractDelegateExtent implements Extent {
             return new OperationQueue(ours, other);
         } else if (ours != null) {
             return ours;
-        } else if (other != null) {
-            return other;
-        } else {
-            return null;
-        }
+        } else return other;
     }
 
     //FAWE start
@@ -318,8 +314,10 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, @Range(from = 0, to = 255) int y,
-                                                            int z, T block) throws WorldEditException {
+    public <T extends BlockStateHolder<T>> boolean setBlock(
+            int x, @Range(from = 0, to = 255) int y,
+            int z, T block
+    ) throws WorldEditException {
         return extent.setBlock(x, y, z, block);
     }
 

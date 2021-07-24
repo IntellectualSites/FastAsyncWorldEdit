@@ -26,4 +26,5 @@ public class LiquidMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) {
         return new LiquidMask(context.getExtent());
     }
+
 }

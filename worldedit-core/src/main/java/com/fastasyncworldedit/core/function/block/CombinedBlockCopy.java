@@ -25,4 +25,5 @@ public class CombinedBlockCopy implements RegionFunction {
         function.apply(position);
         return destination.setBlock(position, block);
     }
+
 }

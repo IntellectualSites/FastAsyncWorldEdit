@@ -29,6 +29,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
 
 public class ReplaceFactory implements Contextual<RegionFunction> {
+
     private final Pattern fill;
 
     public ReplaceFactory(Pattern fill) {
@@ -38,12 +39,14 @@ public class ReplaceFactory implements Contextual<RegionFunction> {
     @Override
     public RegionFunction createFromContext(EditContext context) {
         return new BlockReplace(
-            firstNonNull(context.getDestination(), new NullExtent()),
-            firstNonNull(context.getFill(), fill));
+                firstNonNull(context.getDestination(), new NullExtent()),
+                firstNonNull(context.getFill(), fill)
+        );
     }
 
     @Override
     public String toString() {
         return "replace blocks";
     }
+
 }

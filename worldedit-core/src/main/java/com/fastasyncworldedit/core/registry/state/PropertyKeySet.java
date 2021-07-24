@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class PropertyKeySet implements Set<PropertyKey> {
+
     private final BitSet bits = new BitSet(PropertyKey.getCount()); // still resizable
 
     public static PropertyKeySet empty() {
@@ -51,7 +52,9 @@ public class PropertyKeySet implements Set<PropertyKey> {
 
     @Override
     public boolean contains(Object o) {
-        if (!(o instanceof PropertyKey)) return false;
+        if (!(o instanceof PropertyKey)) {
+            return false;
+        }
         return this.bits.get(((PropertyKey) o).getId());
     }
 
@@ -81,15 +84,21 @@ public class PropertyKeySet implements Set<PropertyKey> {
 
     @Override
     public boolean add(PropertyKey propertyKey) {
-        if (this.bits.get(propertyKey.getId())) return false;
+        if (this.bits.get(propertyKey.getId())) {
+            return false;
+        }
         this.bits.set(propertyKey.getId());
         return true;
     }
 
     @Override
     public boolean remove(Object o) {
-        if (!(o instanceof PropertyKey)) return false;
-        if (!this.bits.get(((PropertyKey) o).getId())) return false;
+        if (!(o instanceof PropertyKey)) {
+            return false;
+        }
+        if (!this.bits.get(((PropertyKey) o).getId())) {
+            return false;
+        }
         this.bits.clear(((PropertyKey) o).getId());
         return true;
     }
@@ -100,8 +109,12 @@ public class PropertyKeySet implements Set<PropertyKey> {
             return ((PropertyKeySet) c).bits.intersects(this.bits);
         }
         for (Object o : c) {
-            if (!(o instanceof PropertyKey)) return false;
-            if (!this.bits.get(((PropertyKey) o).getId())) return false;
+            if (!(o instanceof PropertyKey)) {
+                return false;
+            }
+            if (!this.bits.get(((PropertyKey) o).getId())) {
+                return false;
+            }
         }
         return false;
     }
@@ -168,10 +181,14 @@ public class PropertyKeySet implements Set<PropertyKey> {
 
         @Override
         public PropertyKey next() {
-            if (!hasNext()) throw new NoSuchElementException();
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
             PropertyKey next = PropertyKey.getById(this.current);
             this.current = bits.nextSetBit(this.current + 1);
             return next;
         }
+
     }
+
 }

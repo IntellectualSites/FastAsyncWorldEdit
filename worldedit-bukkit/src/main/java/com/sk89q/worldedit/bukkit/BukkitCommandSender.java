@@ -30,9 +30,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -114,7 +114,8 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
     }
 
     //FAWE start
-    @Override public void setPermission(String permission, boolean value) {
+    @Override
+    public void setPermission(String permission, boolean value) {
     }
     //FAWE end
 
@@ -162,4 +163,5 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
             }
         };
     }
+
 }

@@ -40,9 +40,10 @@ public class ClipboardPattern extends RepeatingExtentPattern {
      * Create a new clipboard pattern.
      *
      * @param clipboard the clipboard
-     * @param offset the offset
+     * @param offset    the offset
      */
     public ClipboardPattern(Clipboard clipboard, BlockVector3 offset) {
         super(clipboard, clipboard.getMinimumPoint(), offset);
     }
+
 }

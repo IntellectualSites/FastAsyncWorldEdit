@@ -63,8 +63,8 @@ public class ChangeSetExecutor implements Operation {
      * Create a new instance.
      *
      * @param changeSet the change set
-     * @param type type of change
-     * @param context the undo context
+     * @param type      type of change
+     * @param context   the undo context
      */
     //FAWE start - BlockBag & inventory
     private ChangeSetExecutor(ChangeSet changeSet, Type type, UndoContext context, BlockBag blockBag, int inventory) {
@@ -100,7 +100,13 @@ public class ChangeSetExecutor implements Operation {
     }
 
     //FAWE start
-    public static ChangeSetExecutor create(ChangeSet changeSet, UndoContext context, Type type, BlockBag blockBag, int inventory) {
+    public static ChangeSetExecutor create(
+            ChangeSet changeSet,
+            UndoContext context,
+            Type type,
+            BlockBag blockBag,
+            int inventory
+    ) {
         return new ChangeSetExecutor(changeSet, type, context, blockBag, inventory);
     }
     //FAWE end
@@ -109,7 +115,7 @@ public class ChangeSetExecutor implements Operation {
      * Create a new undo operation.
      *
      * @param changeSet the change set
-     * @param context an undo context
+     * @param context   an undo context
      * @return an operation
      */
     public static ChangeSetExecutor createUndo(ChangeSet changeSet, UndoContext context) {
@@ -120,7 +126,7 @@ public class ChangeSetExecutor implements Operation {
      * Create a new redo operation.
      *
      * @param changeSet the change set
-     * @param context an undo context
+     * @param context   an undo context
      * @return an operation
      */
     public static ChangeSetExecutor createRedo(ChangeSet changeSet, UndoContext context) {

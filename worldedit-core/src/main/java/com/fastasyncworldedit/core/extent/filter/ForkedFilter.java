@@ -37,4 +37,5 @@ public abstract class ForkedFilter<T extends ForkedFilter<T>> implements Filter 
     }
 
     public abstract void join(T filter);
+
 }

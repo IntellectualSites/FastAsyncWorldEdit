@@ -41,4 +41,5 @@ public interface CLIWorld {
      * @param dirty if dirty
      */
     void setDirty(boolean dirty);
+
 }

@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class OffsetPattern extends AbstractPattern {
@@ -13,7 +13,7 @@ public class OffsetPattern extends AbstractPattern {
     private final int dx;
     private final int dy;
     private final int dz;
-    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private final Pattern pattern;
 
     public OffsetPattern(Pattern pattern, int dx, int dy, int dz) {
@@ -38,4 +38,5 @@ public class OffsetPattern extends AbstractPattern {
         mutable.mutZ(get.getZ() + dz);
         return pattern.apply(extent, get, mutable);
     }
+
 }

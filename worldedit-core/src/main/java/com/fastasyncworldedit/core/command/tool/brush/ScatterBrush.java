@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
-import com.fastasyncworldedit.core.math.BlockVectorSet;
-import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.function.mask.AdjacentAnyMask;
 import com.fastasyncworldedit.core.function.mask.RadiusMask;
 import com.fastasyncworldedit.core.function.mask.SurfaceMask;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
+import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -41,7 +41,8 @@ public class ScatterBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         this.mask = editSession.getMask();
         if (this.mask == null) {
             this.mask = Masks.alwaysTrue();
@@ -95,7 +96,9 @@ public class ScatterBrush implements Brush {
         return surface.direction(pt);
     }
 
-    public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws MaxChangedBlocksException {
+    public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 pt, Pattern p, double size) throws
+            MaxChangedBlocksException {
         editSession.setBlock(pt, p);
     }
+
 }

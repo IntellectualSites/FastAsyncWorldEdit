@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.chunk;
 
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -27,7 +28,6 @@ import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.util.nbt.IntBinaryTag;
 import com.sk89q.worldedit.util.nbt.ListBinaryTag;
-import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -35,9 +35,9 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 public class AnvilChunk implements Chunk {
 
@@ -54,6 +54,7 @@ public class AnvilChunk implements Chunk {
 
 
     //FAWE start
+
     /**
      * Construct the chunk with a compound tag.
      *
@@ -102,14 +103,17 @@ public class AnvilChunk implements Chunk {
             }
 
             blocks[y] = NbtUtils.getChildTag(sectionTag,
-                    "Blocks", BinaryTagTypes.BYTE_ARRAY).value();
+                    "Blocks", BinaryTagTypes.BYTE_ARRAY
+            ).value();
             data[y] = NbtUtils.getChildTag(sectionTag, "Data",
-                BinaryTagTypes.BYTE_ARRAY).value();
+                    BinaryTagTypes.BYTE_ARRAY
+            ).value();
 
             // 4096 ID block support
             if (sectionTag.get("Add") != null) {
                 blocksAdd[y] = NbtUtils.getChildTag(sectionTag,
-                        "Add", BinaryTagTypes.BYTE_ARRAY).value();
+                        "Add", BinaryTagTypes.BYTE_ARRAY
+                ).value();
             }
         }
 
@@ -263,9 +267,6 @@ public class AnvilChunk implements Chunk {
         }
 
         CompoundBinaryTag values = tileEntities.get(position);
-        if (values == null) {
-            return null;
-        }
 
         return values;
     }

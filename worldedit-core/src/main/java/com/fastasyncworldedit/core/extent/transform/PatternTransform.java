@@ -18,7 +18,8 @@ public class PatternTransform extends ResettableExtent {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
-        throws WorldEditException {
+            throws WorldEditException {
         return pattern.apply(getExtent(), location, location);
     }
+
 }

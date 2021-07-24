@@ -47,4 +47,5 @@ public class AirMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) throws InputParseException {
         return Masks.negate(new ExistingBlockMask(context.requireExtent()));
     }
+
 }

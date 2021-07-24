@@ -134,7 +134,7 @@ public class NijiPermissionsResolver implements PermissionsResolver {
             } catch (Throwable t) {
                 String group = Permissions.Security.getGroup(player.getWorld().getName(), player.getName());
                 if (group != null) {
-                    groups = new String[] { group };
+                    groups = new String[]{group};
                 }
             }
             if (groups == null) {

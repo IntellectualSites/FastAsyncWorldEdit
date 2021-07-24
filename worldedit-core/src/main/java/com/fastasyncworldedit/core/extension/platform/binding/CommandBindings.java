@@ -7,4 +7,5 @@ public class CommandBindings extends Bindings {
     public CommandBindings(WorldEdit worldEdit) {
         super(worldEdit);
     }
+
 }

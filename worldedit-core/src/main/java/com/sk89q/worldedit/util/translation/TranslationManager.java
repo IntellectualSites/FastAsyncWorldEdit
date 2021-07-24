@@ -66,7 +66,8 @@ import static java.util.stream.Collectors.toMap;
 public class TranslationManager {
 
     private static final Gson gson = new GsonBuilder().create();
-    private static final Type STRING_MAP_TYPE = new TypeToken<Map<String, String>>() {}.getType();
+    private static final Type STRING_MAP_TYPE = new TypeToken<Map<String, String>>() {
+    }.getType();
 
     public static String makeTranslationKey(String type, String id) {
         String[] parts = id.split(":", 2);
@@ -75,14 +76,14 @@ public class TranslationManager {
 
     private final Map<Locale, Map<String, String>> translationMap = new ConcurrentHashMap<>();
     private final TranslatableComponentRenderer<Locale> friendlyComponentRenderer = TranslatableComponentRenderer.from(
-        (locale, key) -> {
-            String translation = getTranslationMap(locale).get(key);
-            if (translation == null) {
-                // let it pass through (for e.g. MC messages)
-                return null;
+            (locale, key) -> {
+                String translation = getTranslationMap(locale).get(key);
+                if (translation == null) {
+                    // let it pass through (for e.g. MC messages)
+                    return null;
+                }
+                return new MessageFormat(translation, locale);
             }
-            return new MessageFormat(translation, locale);
-        }
     );
     private Locale defaultLocale = Locale.ENGLISH;
 
@@ -101,9 +102,9 @@ public class TranslationManager {
 
     private Map<String, String> filterTranslations(Map<String, String> translations) {
         return translations.entrySet().stream()
-            .filter(e -> !e.getValue().isEmpty())
-            .map(e -> Maps.immutableEntry(e.getKey(), e.getValue().replace("'", "''")))
-            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .filter(e -> !e.getValue().isEmpty())
+                .map(e -> Maps.immutableEntry(e.getKey(), e.getValue().replace("'", "''")))
+                .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private Map<String, String> parseTranslationFile(InputStream inputStream) throws IOException {
@@ -163,7 +164,7 @@ public class TranslationManager {
         }
         if (locale.equals(defaultLocale)) {
             translationMap.put(Locale.ENGLISH, loadTranslationFile("strings.json").orElseThrow(
-                () -> new RuntimeException("Failed to load WorldEdit strings!")
+                    () -> new RuntimeException("Failed to load WorldEdit strings!")
             ));
             return true;
         }
@@ -191,4 +192,5 @@ public class TranslationManager {
     public Locale getDefaultLocale() {
         return defaultLocale;
     }
+
 }

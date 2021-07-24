@@ -35,13 +35,13 @@ public abstract class SelectTransform extends ResettableExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return getExtent(x, y, z).setBlock(x, y, z, block);
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return getExtent(position).setBlock(position, block);
     }
 
@@ -49,11 +49,12 @@ public abstract class SelectTransform extends ResettableExtent {
     @Override
     public Entity createEntity(Location position, BaseEntity entity) {
         return getExtent(position.getBlockX(), position.getBlockY(), position.getBlockZ())
-            .createEntity(position, entity);
+                .createEntity(position, entity);
     }
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return getExtent(position).setBiome(position, biome);
     }
+
 }

@@ -35,7 +35,8 @@ public class GravityBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         //FAWE start - Ours operates differently to upstream, but does the same
         double endY = position.getY() + size;
         double startPerformY = Math.max(0, position.getY() - size);
@@ -44,11 +45,11 @@ public class GravityBrush implements Brush {
             for (double z = position.getZ() + size; z > position.getZ() - size; --z) {
                 double freeSpot = startCheckY;
                 for (double y = startCheckY; y <= endY; y++) {
-                    BlockState block = editSession.getBlock((int)x, (int)y, (int)z);
+                    BlockState block = editSession.getBlock((int) x, (int) y, (int) z);
                     if (!block.getBlockType().getMaterial().isAir()) {
                         if (y != freeSpot) {
-                            editSession.setBlock((int)x, (int)y, (int)z, BlockTypes.AIR.getDefaultState());
-                            editSession.setBlock((int)x, (int)freeSpot, (int)z, block);
+                            editSession.setBlock((int) x, (int) y, (int) z, BlockTypes.AIR.getDefaultState());
+                            editSession.setBlock((int) x, (int) freeSpot, (int) z, block);
                         }
                         freeSpot = y + 1;
                     }
@@ -57,4 +58,5 @@ public class GravityBrush implements Brush {
         }
         //FAWE end
     }
+
 }

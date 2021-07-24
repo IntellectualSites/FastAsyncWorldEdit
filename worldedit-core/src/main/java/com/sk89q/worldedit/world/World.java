@@ -48,10 +48,10 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * Represents a world (dimension).
@@ -122,13 +122,14 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * <p>On implementations where the world is not simulated, the
      * {@code notifyAndLight} parameter has no effect either way.</p>
      *
-     * @param position position of the block
-     * @param block block to set
+     * @param position       position of the block
+     * @param block          block to set
      * @param notifyAndLight true to to notify and light
      * @return true if the block was successfully set (return value may not be accurate)
      */
     @Deprecated
-    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws
+            WorldEditException {
         return setBlock(position, block, notifyAndLight ? SideEffectSet.defaults() : SideEffectSet.none());
     }
 
@@ -142,18 +143,19 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * {@link Platform#getSupportedSideEffects()} for a list of supported side effects.
      * Non-supported side effects will be ignored.</p>
      *
-     * @param position position of the block
-     * @param block block to set
+     * @param position    position of the block
+     * @param block       block to set
      * @param sideEffects which side effects to perform
      * @return true if the block was successfully set (return value may not be accurate)
      */
-    <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException;
+    <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws
+            WorldEditException;
 
     /**
      * Notifies the simulation that the block at the given location has
      * been changed and it must be re-lighted (and issue other events).
      *
-     * @param position position of the block
+     * @param position     position of the block
      * @param previousType the type of the previous block that was there
      * @return true if the block was successfully notified
      */
@@ -165,12 +167,13 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     /**
      * Applies a set of side effects on the given block.
      *
-     * @param position position of the block
-     * @param previousType the type of the previous block that was there
+     * @param position      position of the block
+     * @param previousType  the type of the previous block that was there
      * @param sideEffectSet which side effects to perform
      * @return a set of side effects that were applied
      */
-    Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) throws WorldEditException;
+    Set<SideEffect> applySideEffects(BlockVector3 position, BlockState previousType, SideEffectSet sideEffectSet) throws
+            WorldEditException;
 
     /**
      * Get the light level at the given block.
@@ -194,8 +197,8 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * Drop an item at the given position.
      *
      * @param position the position
-     * @param item the item to drop
-     * @param count the number of individual stacks to drop (number of item entities)
+     * @param item     the item to drop
+     * @param count    the number of individual stacks to drop (number of item entities)
      */
     void dropItem(Vector3 position, BaseItemStack item, int count);
 
@@ -203,7 +206,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * Drop one stack of the item at the given position.
      *
      * @param position the position
-     * @param item the item to drop
+     * @param item     the item to drop
      * @see #dropItem(Vector3, BaseItemStack, int) shortcut method to specify the number of stacks
      */
     void dropItem(Vector3 position, BaseItemStack item);
@@ -218,7 +221,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     /**
      * Gets whether the given {@link BlockState} can be placed here.
      *
-     * @param position The position
+     * @param position   The position
      * @param blockState The blockstate
      * @return If it can be placed
      */
@@ -229,7 +232,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     /**
      * Regenerate an area.
      *
-     * @param region the region
+     * @param region      the region
      * @param editSession the {@link EditSession}
      * @return true if re-generation was successful
      */
@@ -251,16 +254,14 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     /**
      * Regenerate an area.
      *
-     * @param region the region
-     * @param extent the {@link Extent}
+     * @param region  the region
+     * @param extent  the {@link Extent}
      * @param options the regeneration options
      * @return true if regeneration was successful
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
             delegateName = "regenerate",
-            delegateParams = { Region.class, EditSession.class }
+            delegateParams = {Region.class, EditSession.class}
     )
     default boolean regenerate(Region region, Extent extent, RegenOptions options) {
         DeprecationUtil.checkDelegatingOverride(getClass());
@@ -275,13 +276,14 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     /**
      * Generate a tree at the given position.
      *
-     * @param type the tree type
+     * @param type        the tree type
      * @param editSession the {@link EditSession}
-     * @param position the position
+     * @param position    the position
      * @return true if generation was successful
      * @throws MaxChangedBlocksException thrown if too many blocks were changed
      */
-    boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws MaxChangedBlocksException;
+    boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
+            MaxChangedBlocksException;
 
     /**
      * Load the chunk at the given position if it isn't loaded.
@@ -314,8 +316,8 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * Play the given effect.
      *
      * @param position the position
-     * @param type the effect type
-     * @param data the effect data
+     * @param type     the effect type
+     * @param data     the effect data
      * @return true if the effect was played
      */
     boolean playEffect(Vector3 position, int type, int data);
@@ -323,10 +325,10 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     /**
      * Queue a block break effect.
      *
-     * @param server the server
-     * @param position the position
+     * @param server    the server
+     * @param position  the position
      * @param blockType the block type
-     * @param priority the priority
+     * @param priority  the priority
      * @return true if the effect was played
      */
     boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority);
@@ -356,7 +358,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * Sets the weather type of the world.
      *
      * @param weatherType The weather type
-     * @param duration The duration of the weather
+     * @param duration    The duration of the weather
      */
     void setWeather(WeatherType weatherType, long duration);
 
@@ -396,12 +398,14 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
 
     /**
      * Send a fake chunk to a player.
+     *
      * @param player may be null to send to everyone
      * @param packet the chunk packet
      */
     void sendFakeChunk(@Nullable Player player, ChunkPacket packet);
 
-    @Override @Nullable
+    @Override
+    @Nullable
     default BiomeType getBiome(BlockVector3 position) {
         return null;
     }

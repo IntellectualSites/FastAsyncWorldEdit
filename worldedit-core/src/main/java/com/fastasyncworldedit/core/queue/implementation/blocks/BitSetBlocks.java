@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.queue.implementation.blocks;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.collection.MemBlockSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -198,4 +198,5 @@ public class BitSetBlocks implements IChunkSet {
     public boolean trim(boolean aggressive, int layer) {
         return false;
     }
+
 }

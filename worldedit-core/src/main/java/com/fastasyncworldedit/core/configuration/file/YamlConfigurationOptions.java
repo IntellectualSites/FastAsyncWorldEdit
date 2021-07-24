@@ -4,6 +4,7 @@ package com.fastasyncworldedit.core.configuration.file;
  * Various settings for controlling the input and output of a {@link YamlConfiguration}.
  */
 public class YamlConfigurationOptions extends FileConfigurationOptions {
+
     private int indent = 2;
 
     protected YamlConfigurationOptions(final YamlConfiguration configuration) {
@@ -58,6 +59,7 @@ public class YamlConfigurationOptions extends FileConfigurationOptions {
      * <p>
      * The minimum value this may be is 2, and the maximum is 9.
      * </p>
+     *
      * @param value New indent
      * @return This object, for chaining
      */
@@ -72,4 +74,5 @@ public class YamlConfigurationOptions extends FileConfigurationOptions {
         indent = value;
         return this;
     }
+
 }

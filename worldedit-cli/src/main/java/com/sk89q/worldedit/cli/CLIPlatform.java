@@ -34,6 +34,7 @@ import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -41,7 +42,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import javax.annotation.Nullable;
 
 class CLIPlatform extends AbstractPlatform {
 
@@ -171,4 +171,5 @@ class CLIPlatform extends AbstractPlatform {
     public void addWorld(World world) {
         worlds.add(world);
     }
+
 }

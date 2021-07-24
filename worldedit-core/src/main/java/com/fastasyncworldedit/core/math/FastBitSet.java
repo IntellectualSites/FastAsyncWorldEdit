@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.math;
 import java.util.Arrays;
 
 public final class FastBitSet {
+
     private final int size;
     private final long[] bits;
 
@@ -245,6 +246,7 @@ public final class FastBitSet {
     }
 
     public final class IntIterator {
+
         int index = 0;
         long bitBuffer = 0;
         int value = 0;
@@ -267,5 +269,7 @@ public final class FastBitSet {
         public int getValue() {
             return value;
         }
+
     }
+
 }

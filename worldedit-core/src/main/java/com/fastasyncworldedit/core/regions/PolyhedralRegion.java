@@ -7,13 +7,13 @@ import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.regions.polyhedron.Edge;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -175,7 +175,11 @@ public class PolyhedralRegion extends AbstractRegion {
         // Add triangles between the remembered edges and the new vertex.
         for (Edge edge : borderEdges) {
             com.sk89q.worldedit.regions.polyhedron.Triangle triangle = edge.createTriangle(vertex.toVector3());
-            Triangle fTria = new Triangle(triangle.getVertex(0).toBlockPoint(), triangle.getVertex(1).toBlockPoint(), triangle.getVertex(2).toBlockPoint());
+            Triangle fTria = new Triangle(
+                    triangle.getVertex(0).toBlockPoint(),
+                    triangle.getVertex(1).toBlockPoint(),
+                    triangle.getVertex(2).toBlockPoint()
+            );
             triangles.add(fTria);
         }
 
@@ -318,4 +322,5 @@ public class PolyhedralRegion extends AbstractRegion {
     public AbstractRegion clone() {
         return new PolyhedralRegion(this);
     }
+
 }

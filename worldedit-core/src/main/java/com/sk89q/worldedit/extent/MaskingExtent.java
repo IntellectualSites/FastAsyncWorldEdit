@@ -20,15 +20,15 @@
 package com.sk89q.worldedit.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock;
-import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -55,7 +55,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
      * Create a new instance.
      *
      * @param extent the extent
-     * @param mask the mask
+     * @param mask   the mask
      */
     public MaskingExtent(Extent extent, Mask mask) {
         super(extent);

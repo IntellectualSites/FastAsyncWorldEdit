@@ -9,10 +9,10 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import org.jetbrains.annotations.Range;
 
+import javax.annotation.Nullable;
 import java.io.Flushable;
 import java.util.Set;
 import java.util.concurrent.Future;
-import javax.annotation.Nullable;
 
 /**
  * TODO: implement Extent (need to refactor Extent first) Interface for a queue based extent which
@@ -40,6 +40,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 
     /**
      * Initialize the queue (for reusability)
+     *
      * @param extent
      * @param get
      * @param set
@@ -49,6 +50,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     /**
      * Get the cached get object. This is faster than getting the object using NMS and allows for
      * wrapping.
+     *
      * @param chunkX
      * @param chunkZ
      * @return
@@ -57,6 +59,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 
     /**
      * Get the cached chunk set object.
+     *
      * @param chunkX
      * @param chunkZ
      * @return
@@ -89,7 +92,6 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      * Create a new root IChunk object. Full chunks will be reused, so a more optimized chunk can be
      * returned in that case.
      *
-     * @apiNote Don't wrap the chunk, that should be done in {@link IQueueExtent#wrap(IChunk)}
      * @param isFull true if a more optimized chunk should be returned
      * @return a more optimized chunk object
      */
@@ -113,7 +115,6 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 
     /**
      * Flush all changes to the world.
-     * @apiNote Best to call this async, so it doesn't hang the server.
      */
     @Override
     void flush();
@@ -169,4 +170,5 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
         flush();
         return filter;
     }
+
 }

@@ -46,4 +46,5 @@ public class VectorAdapter implements JsonDeserializer<Vector3> {
 
         return Vector3.at(x, y, z);
     }
+
 }

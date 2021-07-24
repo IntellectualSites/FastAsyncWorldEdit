@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.command;
 
-import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
 import com.fastasyncworldedit.core.command.tool.TargetMode;
+import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
 import com.fastasyncworldedit.core.command.tool.scroll.Scroll;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.collect.Iterables;
@@ -55,6 +55,7 @@ import java.util.Locale;
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ToolUtilCommands {
+
     private final WorldEdit we;
 
     public ToolUtilCommands(WorldEdit we) {
@@ -63,16 +64,18 @@ public class ToolUtilCommands {
 
     //FAWE start - destination mask > mask
     @Command(
-        name = "mask",
-        aliases = "/mask",
-        desc = "Set the brush destination mask"
+            name = "mask",
+            aliases = "/mask",
+            desc = "Set the brush destination mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
-    public void mask(Player player, LocalSession session,
-                     @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                         boolean offHand,
-                     @Arg(desc = "The destination mask", def = "")
-                         Mask maskOpt, Arguments arguments) throws WorldEditException {
+    public void mask(
+            Player player, LocalSession session,
+            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
+                    boolean offHand,
+            @Arg(desc = "The destination mask", def = "")
+                    Mask maskOpt, Arguments arguments
+    ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(Caption.of("fawe.worldedit.brush.brush.none"));
@@ -84,7 +87,7 @@ public class ToolUtilCommands {
         } else {
             BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
             String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get()))
-                .getSubstring();
+                    .getSubstring();
             settings.addSetting(BrushSettings.SettingType.MASK, lastArg);
             settings.setMask(maskOpt);
             tool.update();
@@ -94,17 +97,19 @@ public class ToolUtilCommands {
     //FAWE end
 
     @Command(
-        name = "material",
-        aliases = {"mat", "/material", "pattern"},
-        desc = "Set the brush material"
+            name = "material",
+            aliases = {"mat", "/material", "pattern"},
+            desc = "Set the brush material"
     )
     @CommandPermissions("worldedit.brush.options.material")
-    public void material(Player player, LocalSession session,
-                         @Arg(desc = "The pattern of blocks to use")
-                             Pattern pattern,
-                         //FAWE start - add offhand
-                         @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                             boolean offHand, Arguments arguments) throws WorldEditException {
+    public void material(
+            Player player, LocalSession session,
+            @Arg(desc = "The pattern of blocks to use")
+                    Pattern pattern,
+            //FAWE start - add offhand
+            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
+                    boolean offHand, Arguments arguments
+    ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(Caption.of("fawe.worldedit.brush.brush.none"));
@@ -124,26 +129,30 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "range",
-        aliases = "/range",
-        desc = "Set the brush range"
-        )
+            name = "range",
+            aliases = "/range",
+            desc = "Set the brush range"
+    )
     @CommandPermissions("worldedit.brush.options.range")
-    public void range(Player player, LocalSession session,
-                      @Arg(desc = "The range of the brush")
-                          int range) throws WorldEditException {
+    public void range(
+            Player player, LocalSession session,
+            @Arg(desc = "The range of the brush")
+                    int range
+    ) throws WorldEditException {
         session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setRange(range);
         player.print(Caption.of("worldedit.tool.range.set"));
     }
 
     @Command(
-        name = "size",
-        desc = "Set the brush size"
+            name = "size",
+            desc = "Set the brush size"
     )
     @CommandPermissions("worldedit.brush.options.size")
-    public void size(Player player, LocalSession session,
-                     @Arg(desc = "The size of the brush")
-                         int size) throws WorldEditException {
+    public void size(
+            Player player, LocalSession session,
+            @Arg(desc = "The size of the brush")
+                    int size
+    ) throws WorldEditException {
         we.checkMaxBrushRadius(size);
 
         session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(size);
@@ -151,14 +160,16 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "tracemask",
-        aliases = {"tarmask", "tm", "targetmask"},
-        desc = "Set the mask used to stop tool traces"
+            name = "tracemask",
+            aliases = {"tarmask", "tm", "targetmask"},
+            desc = "Set the mask used to stop tool traces"
     )
     @CommandPermissions("worldedit.brush.options.tracemask")
-    public void traceMask(Player player, LocalSession session,
-                          @Arg(desc = "The trace mask to set", def = "")
-                             Mask maskOpt) throws WorldEditException {
+    public void traceMask(
+            Player player, LocalSession session,
+            @Arg(desc = "The trace mask to set", def = "")
+                    Mask maskOpt
+    ) throws WorldEditException {
         session.getBrushTool(player, false).setTraceMask(maskOpt);
         if (maskOpt == null) {
             player.print(Caption.of("worldedit.tool.tracemask.disabled"));
@@ -168,17 +179,21 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "/superpickaxe",
-        aliases = {",", "/sp", "/pickaxe", "/"},
-        desc = "Toggle the super pickaxe function"
+            name = "/superpickaxe",
+            aliases = {",", "/sp", "/pickaxe", "/"},
+            desc = "Toggle the super pickaxe function"
     )
     @CommandPermissions("worldedit.superpickaxe")
-    public void togglePickaxe(Player player, LocalSession session,
-                              @Arg(desc = "The new super pickaxe state", def = "")
-                                  Boolean superPickaxe) {
+    public void togglePickaxe(
+            Player player, LocalSession session,
+            @Arg(desc = "The new super pickaxe state", def = "")
+                    Boolean superPickaxe
+    ) {
         boolean hasSuperPickAxe = session.hasSuperPickAxe();
         if (superPickaxe != null && superPickaxe == hasSuperPickAxe) {
-            player.print(Caption.of(superPickaxe ? "worldedit.tool.superpickaxe.enabled.already" : "worldedit.tool.superpickaxe.disabled.already"));
+            player.print(Caption.of(superPickaxe
+                    ? "worldedit.tool.superpickaxe.enabled.already"
+                    : "worldedit.tool.superpickaxe.disabled.already"));
             return;
         }
         if (hasSuperPickAxe) {
@@ -192,14 +207,16 @@ public class ToolUtilCommands {
 
     //FAWE start
     @Command(
-        name = "primary",
-        aliases = { "/primary" },
-        desc = "Set the right click brush",
-        descFooter = "Set the right click brush"
+            name = "primary",
+            aliases = {"/primary"},
+            desc = "Set the right click brush",
+            descFooter = "Set the right click brush"
     )
     @CommandPermissions("worldedit.brush.primary")
-    public void primary(Player player, LocalSession session,
-                        @Arg(desc = "The brush command", variable = true) List<String> commandStr) throws WorldEditException {
+    public void primary(
+            Player player, LocalSession session,
+            @Arg(desc = "The brush command", variable = true) List<String> commandStr
+    ) throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         BrushTool tool = session.getBrushTool(player, false);
         session.setTool(item, null, player);
@@ -213,15 +230,17 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "secondary",
-        aliases = { "/secondary" },
-        desc = "Set the left click brush",
-        descFooter = "Set the left click brush"
+            name = "secondary",
+            aliases = {"/secondary"},
+            desc = "Set the left click brush",
+            descFooter = "Set the left click brush"
     )
     @CommandPermissions("worldedit.brush.secondary")
-    public void secondary(Player player, LocalSession session,
-                          @Arg(desc = "The brush command", variable = true)
-                              List<String> commandStr) throws WorldEditException {
+    public void secondary(
+            Player player, LocalSession session,
+            @Arg(desc = "The brush command", variable = true)
+                    List<String> commandStr
+    ) throws WorldEditException {
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
         BrushTool tool = session.getBrushTool(player, false);
         session.setTool(item, null, player);
@@ -235,14 +254,16 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "target",
-        aliases = {"tar", "/target", "/tar"},
-        desc = "Toggle between different target modes"
+            name = "target",
+            aliases = {"tar", "/target", "/tar"},
+            desc = "Toggle between different target modes"
     )
     @CommandPermissions("worldedit.brush.target")
-    public void target(Player player, LocalSession session,
-                       @Arg(name = "mode", desc = "int", def = "0")
-                           int mode) throws WorldEditException {
+    public void target(
+            Player player, LocalSession session,
+            @Arg(name = "mode", desc = "int", def = "0")
+                    int mode
+    ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(Caption.of("fawe.worldedit.brush.brush.none"));
@@ -255,13 +276,15 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "targetoffset",
-        aliases = {"to"},
-        desc = "Set the targeting mask"
+            name = "targetoffset",
+            aliases = {"to"},
+            desc = "Set the targeting mask"
     )
     @CommandPermissions("worldedit.brush.targetoffset")
-    public void targetOffset(Player player, EditSession editSession, LocalSession session,
-                             @Arg(name = "offset", desc = "offset", def = "0") int offset) throws WorldEditException {
+    public void targetOffset(
+            Player player, EditSession editSession, LocalSession session,
+            @Arg(name = "offset", desc = "offset", def = "0") int offset
+    ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(Caption.of("fawe.worldedit.brush.brush.none"));
@@ -272,17 +295,19 @@ public class ToolUtilCommands {
     }
 
     @Command(
-        name = "scroll",
-        desc = "Toggle between different target modes"
+            name = "scroll",
+            desc = "Toggle between different target modes"
     )
     @CommandPermissions("worldedit.brush.scroll")
-    public void scroll(Player player, EditSession editSession, LocalSession session,
-                       @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                           boolean offHand,
-                       @Arg(desc = "Target Modes", def = "none")
-                           Scroll.Action mode,
-                       @Arg(desc = "The scroll action", variable = true)
-                           List<String> commandStr) throws WorldEditException {
+    public void scroll(
+            Player player, EditSession editSession, LocalSession session,
+            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
+                    boolean offHand,
+            @Arg(desc = "Target Modes", def = "none")
+                    Scroll.Action mode,
+            @Arg(desc = "The scroll action", variable = true)
+                    List<String> commandStr
+    ) throws WorldEditException {
         BrushTool bt = session.getBrushTool(player, false);
         if (bt == null) {
             player.print(Caption.of("fawe.worldedit.brush.brush.none"));
@@ -303,20 +328,21 @@ public class ToolUtilCommands {
     }
 
 
-
     @Command(
-        name = "smask",
-        aliases = {"/smask", "/sourcemask", "sourcemask"},
-        desc = "Set the brush source mask",
-        descFooter = "Set the brush source mask"
+            name = "smask",
+            aliases = {"/smask", "/sourcemask", "sourcemask"},
+            desc = "Set the brush source mask",
+            descFooter = "Set the brush source mask"
     )
     @CommandPermissions({"worldedit.brush.options.mask", "worldedit.mask.brush"})
-    public void smask(Player player, LocalSession session, EditSession editSession,
-                      @Arg(desc = "The destination mask", def = "")
-                          Mask maskArg,
-                      @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                          boolean offHand,
-                      Arguments arguments) throws WorldEditException {
+    public void smask(
+            Player player, LocalSession session, EditSession editSession,
+            @Arg(desc = "The destination mask", def = "")
+                    Mask maskArg,
+            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
+                    boolean offHand,
+            Arguments arguments
+    ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(Caption.of("fawe.worldedit.brush.brush.none"));

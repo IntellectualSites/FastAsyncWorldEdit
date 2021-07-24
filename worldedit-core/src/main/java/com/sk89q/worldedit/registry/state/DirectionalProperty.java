@@ -21,10 +21,10 @@ package com.sk89q.worldedit.registry.state;
 
 import com.sk89q.worldedit.util.Direction;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import javax.annotation.Nullable;
 
 public class DirectionalProperty extends AbstractProperty<Direction> {
 
@@ -73,4 +73,5 @@ public class DirectionalProperty extends AbstractProperty<Direction> {
         }
         return direction;
     }
+
 }

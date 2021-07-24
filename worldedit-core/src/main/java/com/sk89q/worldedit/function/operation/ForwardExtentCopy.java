@@ -22,9 +22,11 @@ package com.sk89q.worldedit.function.operation;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.BlockTranslateExtent;
 import com.fastasyncworldedit.core.extent.PositionTransformExtent;
+import com.fastasyncworldedit.core.function.RegionMaskTestFunction;
 import com.fastasyncworldedit.core.function.block.BiomeCopy;
 import com.fastasyncworldedit.core.function.block.CombinedBlockCopy;
 import com.fastasyncworldedit.core.function.block.SimpleBlockCopy;
+import com.fastasyncworldedit.core.function.visitor.IntersectRegionFunction;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -34,13 +36,11 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
-import com.fastasyncworldedit.core.function.RegionMaskTestFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
-import com.fastasyncworldedit.core.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -92,10 +92,10 @@ public class ForwardExtentCopy implements Operation {
      * Create a new copy using the region's lowest minimum point as the
      * "from" position.
      *
-     * @param source the source extent
-     * @param region the region to copy
+     * @param source      the source extent
+     * @param region      the region to copy
      * @param destination the destination extent
-     * @param to the destination position
+     * @param to          the destination position
      * @see #ForwardExtentCopy(Extent, Region, BlockVector3, Extent, BlockVector3) the main constructor
      */
     public ForwardExtentCopy(Extent source, Region region, Extent destination, BlockVector3 to) {
@@ -105,11 +105,11 @@ public class ForwardExtentCopy implements Operation {
     /**
      * Create a new copy.
      *
-     * @param source the source extent
-     * @param region the region to copy
-     * @param from the source position
+     * @param source      the source extent
+     * @param region      the region to copy
+     * @param from        the source position
      * @param destination the destination extent
-     * @param to the destination position
+     * @param to          the destination position
      */
     public ForwardExtentCopy(Extent source, Region region, BlockVector3 from, Extent destination, BlockVector3 to) {
         checkNotNull(source);
@@ -302,11 +302,16 @@ public class ForwardExtentCopy implements Operation {
         BlockVector3 translation = to.subtract(from);
 
         if (!translation.equals(BlockVector3.ZERO)) {
-            finalDest = new BlockTranslateExtent(finalDest, translation.getBlockX(), translation.getBlockY(), translation.getBlockZ());
+            finalDest = new BlockTranslateExtent(
+                    finalDest,
+                    translation.getBlockX(),
+                    translation.getBlockY(),
+                    translation.getBlockZ()
+            );
         }
         //FAWE end
 
-       //FAWE start - RegionVisitor > ExtentBlockCopy
+        //FAWE start - RegionVisitor > ExtentBlockCopy
         RegionFunction copy;
         RegionVisitor blockCopy = null;
         PositionTransformExtent transExt = null;
@@ -342,7 +347,8 @@ public class ForwardExtentCopy implements Operation {
             if (sourceFunction != null) {
                 BlockVector3 disAbs = translation.abs();
                 BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-                boolean overlap = (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size.getBlockZ());
+                boolean overlap = (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size
+                        .getBlockZ());
 
                 RegionFunction copySrcFunc = sourceFunction;
                 if (overlap && translation.length() != 0) {
@@ -352,7 +358,11 @@ public class ForwardExtentCopy implements Operation {
                     int z = translation.getBlockZ();
 
                     maskFunc = position -> {
-                        BlockVector3 bv = BlockVector3.at(position.getBlockX() + x, position.getBlockY() + y, position.getBlockZ() + z);
+                        BlockVector3 bv = BlockVector3.at(
+                                position.getBlockX() + x,
+                                position.getBlockY() + y,
+                                position.getBlockZ() + z
+                        );
                         if (region.contains(bv)) {
                             return sourceFunction.apply(bv);
                         }
@@ -360,7 +370,11 @@ public class ForwardExtentCopy implements Operation {
                     };
 
                     copySrcFunc = position -> {
-                        BlockVector3 bv = BlockVector3.at(position.getBlockX() - x, position.getBlockY() - y, position.getBlockZ() - z);
+                        BlockVector3 bv = BlockVector3.at(
+                                position.getBlockX() - x,
+                                position.getBlockY() - y,
+                                position.getBlockZ() - z
+                        );
                         if (!region.contains(bv)) {
                             return sourceFunction.apply(position);
                         }
@@ -403,7 +417,13 @@ public class ForwardExtentCopy implements Operation {
             Operations.completeBlindly(blockCopy);
 
             if (!entities.isEmpty()) {
-                ExtentEntityCopy entityCopy = new ExtentEntityCopy(source, from.toVector3(), destination, to.toVector3(), currentTransform);
+                ExtentEntityCopy entityCopy = new ExtentEntityCopy(
+                        source,
+                        from.toVector3(),
+                        destination,
+                        to.toVector3(),
+                        currentTransform
+                );
                 entityCopy.setRemoving(removingEntities);
                 List<? extends Entity> entities2 = Lists.newArrayList(source.getEntities(region));
                 entities2.removeIf(entity -> {
@@ -433,12 +453,18 @@ public class ForwardExtentCopy implements Operation {
     @Override
     public Iterable<Component> getStatusMessages() {
         return ImmutableList.of(
-                Caption.of("worldedit.operation.affected.block",
-                        TextComponent.of(affectedBlocks)),
-                Caption.of("worldedit.operation.affected.biome",
-                        TextComponent.of(affectedBiomeCols)),
-                Caption.of("worldedit.operation.affected.entity",
-                        TextComponent.of(affectedEntities))
+                Caption.of(
+                        "worldedit.operation.affected.block",
+                        TextComponent.of(affectedBlocks)
+                ),
+                Caption.of(
+                        "worldedit.operation.affected.biome",
+                        TextComponent.of(affectedBiomeCols)
+                ),
+                Caption.of(
+                        "worldedit.operation.affected.entity",
+                        TextComponent.of(affectedEntities)
+                )
         );
     }
 

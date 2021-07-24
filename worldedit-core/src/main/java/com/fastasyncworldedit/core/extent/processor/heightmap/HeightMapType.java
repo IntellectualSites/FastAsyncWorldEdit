@@ -1,13 +1,13 @@
 package com.fastasyncworldedit.core.extent.processor.heightmap;
 
-import com.sk89q.worldedit.registry.state.Property;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
 
 /**
  * This enum represents the different types of height maps available in minecraft.
- *
+ * <p>
  * Heightmaps are used to describe the highest position for given {@code (x, z)} coordinates.
  * What's considered as highest position depends on the height map type and the blocks at that column.
  * The highest position is a {@code max(y + 1)} such that the block at {@code (x, y, z)} is
@@ -55,10 +55,16 @@ public enum HeightMapType {
      * @return {@code true} if the block state has any fluid present.
      */
     private static boolean hasFluid(BlockState state) {
-        if (state.getMaterial().isLiquid()) return true;
-        if (!state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) return false;
+        if (state.getMaterial().isLiquid()) {
+            return true;
+        }
+        if (!state.getBlockType().hasProperty(PropertyKey.WATERLOGGED)) {
+            return false;
+        }
         Property<Boolean> waterlogged = state.getBlockType().getProperty(PropertyKey.WATERLOGGED);
-        if (waterlogged == null) return false;
+        if (waterlogged == null) {
+            return false;
+        }
         return state.getState(waterlogged);
     }
 

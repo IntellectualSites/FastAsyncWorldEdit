@@ -40,4 +40,5 @@ public class Linear3DBlockPattern extends AbstractPattern {
         }
         return patternsArray[index].apply(extent, get, set);
     }
+
 }

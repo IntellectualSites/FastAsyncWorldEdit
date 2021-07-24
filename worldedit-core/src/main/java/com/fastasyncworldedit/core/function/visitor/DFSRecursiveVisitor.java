@@ -21,11 +21,13 @@ public class DFSRecursiveVisitor extends DFSVisitor {
     /**
      * Create a new recursive visitor.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the function
      */
-    public DFSRecursiveVisitor(final Mask mask, final RegionFunction function, int maxDepth,
-        int maxBranching) {
+    public DFSRecursiveVisitor(
+            final Mask mask, final RegionFunction function, int maxDepth,
+            int maxBranching
+    ) {
         super(function, maxDepth, maxBranching);
         checkNotNull(mask);
         this.mask = mask;
@@ -35,4 +37,5 @@ public class DFSRecursiveVisitor extends DFSVisitor {
     public boolean isVisitable(final BlockVector3 from, final BlockVector3 to) {
         return this.mask.test(to);
     }
+
 }

@@ -22,12 +22,12 @@ package com.sk89q.worldedit;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.internal.io.FaweInputStream;
-import com.fastasyncworldedit.core.object.FaweLimit;
-import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
-import com.fastasyncworldedit.core.history.DiskStorageHistory;
-import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
+import com.fastasyncworldedit.core.history.DiskStorageHistory;
+import com.fastasyncworldedit.core.internal.io.FaweInputStream;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.util.BrushCache;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MainUtil;
@@ -79,6 +79,8 @@ import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import com.zaxxer.sparsebits.SparseBitSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -96,8 +98,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -163,7 +163,7 @@ public class LocalSession implements TextureHolder {
 
     private transient BlockVector3 cuiTemporaryBlock;
     @SuppressWarnings("unused")
-    private transient EditSession.ReorderMode reorderMode = EditSession.ReorderMode.MULTI_STAGE;
+    private final transient EditSession.ReorderMode reorderMode = EditSession.ReorderMode.MULTI_STAGE;
     private transient List<Countable<BlockState>> lastDistribution;
     private transient World worldOverride;
     private transient boolean tickingWatchdog = false;
@@ -240,7 +240,10 @@ public class LocalSession implements TextureHolder {
 
     private boolean loadHistoryChangeSets(UUID uuid, World world) {
         SparseBitSet set = new SparseBitSet();
-        final File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid);
+        final File folder = MainUtil.getFile(
+                Fawe.imp().getDirectory(),
+                Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid
+        );
         if (folder.isDirectory()) {
             folder.listFiles(pathname -> {
                 String name = pathname.getName();
@@ -275,7 +278,10 @@ public class LocalSession implements TextureHolder {
         if (!Settings.IMP.HISTORY.USE_DISK) {
             return;
         }
-        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index");
+        File file = MainUtil.getFile(
+                Fawe.imp().getDirectory(),
+                Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index"
+        );
         if (file.exists()) {
             try (FaweInputStream is = new FaweInputStream(new FileInputStream(file))) {
                 historyNegativeIndex = Math.min(Math.max(0, is.readInt()), history.size());
@@ -291,7 +297,10 @@ public class LocalSession implements TextureHolder {
         if (world == null || !Settings.IMP.HISTORY.USE_DISK) {
             return;
         }
-        File file = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index");
+        File file = MainUtil.getFile(
+                Fawe.imp().getDirectory(),
+                Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index"
+        );
         if (getHistoryNegativeIndex() != 0) {
             try {
                 if (!file.exists()) {
@@ -345,10 +354,7 @@ public class LocalSession implements TextureHolder {
         if (defaultSelector == RegionSelectorType.CUBOID) {
             defaultSelector = null;
         }
-        if (lastScript != null || defaultSelector != null) {
-            return true;
-        }
-        return false;
+        return lastScript != null || defaultSelector != null;
     }
     //FAWE end
 
@@ -425,7 +431,10 @@ public class LocalSession implements TextureHolder {
             return cs;
         }
         if (o instanceof Integer) {
-            File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid);
+            File folder = MainUtil.getFile(
+                    Fawe.imp().getDirectory(),
+                    Settings.IMP.PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid
+            );
             File specific = new File(folder, o.toString());
             if (specific.isDirectory()) {
                 // TODO NOT IMPLEMENTED
@@ -473,7 +482,8 @@ public class LocalSession implements TextureHolder {
             }
             if (limit != null) {
                 int limitMb = limit.MAX_HISTORY;
-                while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
+                while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
+                        .size() > 1) {
                     ChangeSet item = (ChangeSet) history.remove(0);
                     item.delete();
                     long size = MainUtil.getSize(item);
@@ -536,7 +546,8 @@ public class LocalSession implements TextureHolder {
             } else {
                 history.add(0, changeSet);
             }
-            while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history.size() > 1) {
+            while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
+                    .size() > 1) {
                 ChangeSet item = (ChangeSet) history.remove(0);
                 item.delete();
                 long size = MainUtil.getSize(item);
@@ -552,7 +563,7 @@ public class LocalSession implements TextureHolder {
      * Performs an undo.
      *
      * @param newBlockBag a new block bag
-     * @param actor the actor
+     * @param actor       the actor
      * @return whether anything was undone
      */
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
@@ -563,12 +574,12 @@ public class LocalSession implements TextureHolder {
         if (getHistoryNegativeIndex() < history.size()) {
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
             EditSessionBuilder builder = new EditSessionBuilder(world)
-                .checkMemory(false)
-                .changeSetNull()
-                .fastmode(false)
-                .limitUnprocessed((Player)actor)
-                .player((Player)actor)
-                .blockBag(getBlockBag((Player)actor));
+                    .checkMemory(false)
+                    .changeSetNull()
+                    .fastmode(false)
+                    .limitUnprocessed((Player) actor)
+                    .player((Player) actor)
+                    .blockBag(getBlockBag((Player) actor));
             if (!actor.getLimit().RESTRICT_HISTORY_TO_REGIONS) {
                 builder.allowedRegionsEverywhere();
             }
@@ -593,7 +604,7 @@ public class LocalSession implements TextureHolder {
      * Performs a redo
      *
      * @param newBlockBag a new block bag
-     * @param actor the actor
+     * @param actor       the actor
      * @return whether anything was redone
      */
     //FAWE start - use our logic
@@ -610,9 +621,9 @@ public class LocalSession implements TextureHolder {
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed((Player)actor)
-                    .player((Player)actor)
-                    .blockBag(getBlockBag((Player)actor))
+                    .limitUnprocessed((Player) actor)
+                    .player((Player) actor)
+                    .blockBag(getBlockBag((Player) actor))
                     .build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
                 return newEditSession;
@@ -686,7 +697,7 @@ public class LocalSession implements TextureHolder {
     /**
      * Set the region selector.
      *
-     * @param world the world
+     * @param world    the world
      * @param selector the selector
      */
     public void setRegionSelector(World world, RegionSelector selector) {
@@ -779,7 +790,7 @@ public class LocalSession implements TextureHolder {
             if (clipboard == null) {
                 throw new EmptyClipboardException();
             }
-        //FAWE end
+            //FAWE end
             return clipboard;
         }
     }
@@ -804,7 +815,7 @@ public class LocalSession implements TextureHolder {
             for (ClipboardHolder holder : toAppend.getHolders()) {
                 multi.add(holder);
             }
-        } else  {
+        } else {
             multi = toAppend;
             if (existing != null) {
                 multi.add(existing);
@@ -974,7 +985,7 @@ public class LocalSession implements TextureHolder {
         checkNotNull(player);
         //FAWE start - inventory mode
         if (!useInventory && player.getLimit().INVENTORY_MODE == 0) {
-        //FAWE end
+            //FAWE end
             return null;
         }
         return player.getInventoryBlockBag();
@@ -1098,15 +1109,16 @@ public class LocalSession implements TextureHolder {
     //FAWE end
 
     //FAWE start - see deprecation note
+
     /**
      * Get the brush tool assigned to the item. If there is no tool assigned
      * or the tool is not assigned, the slot will be replaced with the
      * brush tool.
      *
-     * @deprecated FAWE binds to the item, not the type - this allows brushes to persist
      * @param item the item type
      * @return the tool, or {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
+     * @deprecated FAWE binds to the item, not the type - this allows brushes to persist
      */
     @Deprecated
     public BrushTool getBrushTool(ItemType item) throws InvalidToolBindException {
@@ -1141,6 +1153,7 @@ public class LocalSession implements TextureHolder {
     //FAWE end
 
     //FAWE start - see note of getBrushTool
+
     /**
      * Set the tool.
      *
@@ -1309,12 +1322,12 @@ public class LocalSession implements TextureHolder {
         BaseBlock block = ServerCUIHandler.createStructureBlock(player);
         if (block != null) {
             CompoundBinaryTag tags = Objects.requireNonNull(
-                block.getNbt(), "createStructureBlock should return nbt"
+                    block.getNbt(), "createStructureBlock should return nbt"
             );
             BlockVector3 tempCuiTemporaryBlock = BlockVector3.at(
-                tags.getInt("x"),
-                tags.getInt("y"),
-                tags.getInt("z")
+                    tags.getInt("x"),
+                    tags.getInt("y"),
+                    tags.getInt("z")
             );
             // If it's null, we don't need to do anything. The old was already removed.
             if (cuiTemporaryBlock != null && !tempCuiTemporaryBlock.equals(cuiTemporaryBlock)) {
@@ -1432,7 +1445,7 @@ public class LocalSession implements TextureHolder {
         String[] split = text.split("\\|", 2);
         if (split.length > 1 && split[0].equalsIgnoreCase("v")) { // enough fields and right message
             if (split[1].length() > 4) {
-                this.failedCuiAttempts ++;
+                this.failedCuiAttempts++;
                 return;
             }
 
@@ -1441,7 +1454,7 @@ public class LocalSession implements TextureHolder {
                 version = Integer.parseInt(split[1]);
             } catch (NumberFormatException e) {
                 WorldEdit.logger.warn("Error while reading CUI init message: " + e.getMessage());
-                this.failedCuiAttempts ++;
+                this.failedCuiAttempts++;
                 return;
             }
             setCUISupport(true);
@@ -1635,6 +1648,7 @@ public class LocalSession implements TextureHolder {
     }
 
     //FAWE start
+
     /**
      * Get the mask.
      *
@@ -1655,6 +1669,7 @@ public class LocalSession implements TextureHolder {
     }
 
     //FAWE start
+
     /**
      * Set a mask.
      *
@@ -1686,6 +1701,7 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the preferred wand item for this user, or {@code null} to use the default
+     *
      * @return item id of wand item, or {@code null}
      */
     public String getWandItem() {
@@ -1694,6 +1710,7 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the preferred navigation wand item for this user, or {@code null} to use the default
+     *
      * @return item id of nav wand item, or {@code null}
      */
     public String getNavWandItem() {
@@ -1735,4 +1752,5 @@ public class LocalSession implements TextureHolder {
         this.hasCUISupport = false;
         this.failedCuiAttempts = 0;
     }
+
 }

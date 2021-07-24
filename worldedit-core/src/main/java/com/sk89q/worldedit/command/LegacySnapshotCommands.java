@@ -74,11 +74,11 @@ class LegacySnapshotCommands {
 
                 try {
                     WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
-                        + dir.getCanonicalPath());
+                            + dir.getCanonicalPath());
                 } catch (IOException e) {
                     WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
-                        + "(NON-RESOLVABLE PATH - does it exist?): "
-                        + dir.getPath());
+                            + "(NON-RESOLVABLE PATH - does it exist?): "
+                            + dir.getPath());
                 }
             }
         } catch (MissingWorldException ex) {
@@ -147,8 +147,9 @@ class LegacySnapshotCommands {
 
             if (snapshot == null) {
                 actor.print(Caption.of(
-                    "worldedit.snapshot.none-before",
-                    TextComponent.of(dateFormat.withZone(session.getTimeZone()).format(date)))
+                        "worldedit.snapshot.none-before",
+                        TextComponent.of(dateFormat.withZone(session.getTimeZone()).format(date))
+                        )
                 );
             } else {
                 session.setSnapshot(snapshot);
@@ -166,8 +167,9 @@ class LegacySnapshotCommands {
             Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, world.getName());
             if (snapshot == null) {
                 actor.print(Caption.of(
-                    "worldedit.snapshot.none-after",
-                    TextComponent.of(dateFormat.withZone(session.getTimeZone()).format(date)))
+                        "worldedit.snapshot.none-after",
+                        TextComponent.of(dateFormat.withZone(session.getTimeZone()).format(date))
+                        )
                 );
             } else {
                 session.setSnapshot(snapshot);
@@ -179,6 +181,7 @@ class LegacySnapshotCommands {
     }
 
     private static class SnapshotListBox extends PaginationBox {
+
         private final List<Snapshot> snapshots;
 
         SnapshotListBox(String world, List<Snapshot> snapshots) {
@@ -199,5 +202,7 @@ class LegacySnapshotCommands {
         public int getComponentsSize() {
             return snapshots.size();
         }
+
     }
+
 }

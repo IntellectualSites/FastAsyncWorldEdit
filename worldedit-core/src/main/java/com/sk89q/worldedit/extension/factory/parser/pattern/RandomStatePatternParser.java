@@ -31,6 +31,7 @@ import com.sk89q.worldedit.world.block.FuzzyBlockState;
 import java.util.stream.Stream;
 
 public class RandomStatePatternParser extends InputParser<Pattern> {
+
     public RandomStatePatternParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
@@ -66,4 +67,5 @@ public class RandomStatePatternParser extends InputParser<Pattern> {
             return null; // only should happen if parseLogic changes
         }
     }
+
 }

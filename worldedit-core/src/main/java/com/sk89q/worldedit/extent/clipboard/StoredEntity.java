@@ -40,7 +40,7 @@ abstract class StoredEntity implements Entity {
      * Create a new instance.
      *
      * @param location the location
-     * @param entity the entity (which will be copied)
+     * @param entity   the entity (which will be copied)
      */
     StoredEntity(Location location, BaseEntity entity) {
         checkNotNull(location);

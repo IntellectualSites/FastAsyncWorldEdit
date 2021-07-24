@@ -13,7 +13,8 @@ import java.util.Arrays;
 public class BlendBall implements Brush {
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         final int outsetSize = (int) (size + 1);
         double brushSizeSquared = size * size;
 

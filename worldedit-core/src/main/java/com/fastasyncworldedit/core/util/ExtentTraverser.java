@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 
 public class ExtentTraverser<T extends Extent> {
+
     private final T root;
     private final ExtentTraverser<T> parent;
 
@@ -105,4 +106,5 @@ public class ExtentTraverser<T extends Extent> {
             return null;
         }
     }
+
 }

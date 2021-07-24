@@ -22,8 +22,9 @@ public class OffsetExtent extends ResettableExtent {
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return getExtent()
-            .setBiome(position.getBlockX() + dx, position.getBlockY() + dy, position.getBlockZ() + dz,
-                biome);
+                .setBiome(position.getBlockX() + dx, position.getBlockY() + dy, position.getBlockZ() + dz,
+                        biome
+                );
     }
 
     @Override
@@ -33,14 +34,16 @@ public class OffsetExtent extends ResettableExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return getExtent().setBlock(location.getBlockX() + dx, location.getBlockY() + dy,
-            location.getBlockZ() + dz, block);
+                location.getBlockZ() + dz, block
+        );
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return getExtent().setBlock(x + dx, y + dy, z + dz, block);
     }
+
 }

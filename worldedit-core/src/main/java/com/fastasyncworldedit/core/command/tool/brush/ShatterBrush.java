@@ -1,7 +1,8 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
-import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.function.mask.SurfaceMask;
+import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -9,11 +10,11 @@ import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public class ShatterBrush extends ScatterBrush {
+
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public ShatterBrush(int count) {
@@ -21,11 +22,23 @@ public class ShatterBrush extends ScatterBrush {
     }
 
     @Override
-    public void apply(final EditSession editSession, final LocalBlockVectorSet placed, final BlockVector3 position, Pattern p, double size) throws MaxChangedBlocksException {
+    public void apply(
+            final EditSession editSession,
+            final LocalBlockVectorSet placed,
+            final BlockVector3 position,
+            Pattern p,
+            double size
+    ) throws MaxChangedBlocksException {
     }
 
     @Override
-    public void finish(EditSession editSession, LocalBlockVectorSet placed, final BlockVector3 position, Pattern pattern, double size) {
+    public void finish(
+            EditSession editSession,
+            LocalBlockVectorSet placed,
+            final BlockVector3 position,
+            Pattern pattern,
+            double size
+    ) {
         int radius2 = (int) (size * size);
         // Individual frontier for each point
         LocalBlockVectorSet[] frontiers = new LocalBlockVectorSet[placed.size()];
@@ -76,7 +89,7 @@ public class ShatterBrush extends ScatterBrush {
                         int dSqr = (dx * dx) + (dy * dy) + (dz * dz);
                         if (dSqr <= radius2) {
                             BlockVector3 bv = mutable.setComponents(x2, y2, z2);
-                            if (surfaceTest.test(bv) && finalMask.test( bv)) {
+                            if (surfaceTest.test(bv) && finalMask.test(bv)) {
                                 // (collision) If it's visited and part of another frontier, set the block
                                 if (!placed.add(x2, y2, z2)) {
                                     if (!frontierVisited.contains(x2, y2, z2)) {
@@ -98,4 +111,5 @@ public class ShatterBrush extends ScatterBrush {
             }
         }
     }
+
 }

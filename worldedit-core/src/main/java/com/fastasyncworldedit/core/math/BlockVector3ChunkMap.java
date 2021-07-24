@@ -8,6 +8,7 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectArrayMap;
 import java.util.Map;
 
 public class BlockVector3ChunkMap<T> implements IAdaptedMap<BlockVector3, T, Short, T> {
+
     private final Short2ObjectArrayMap<T> map = new Short2ObjectArrayMap<>();
 
     @Override
@@ -58,4 +59,5 @@ public class BlockVector3ChunkMap<T> implements IAdaptedMap<BlockVector3, T, Sho
         short key = MathMan.tripleBlockCoord(x, y, z);
         return map.containsKey(key);
     }
+
 }

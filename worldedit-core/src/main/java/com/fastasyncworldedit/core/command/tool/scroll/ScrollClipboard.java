@@ -9,6 +9,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import java.util.List;
 
 public class ScrollClipboard extends Scroll {
+
     private final List<ClipboardHolder> clipboards;
     private final LocalSession session;
     private int index = 0;
@@ -26,4 +27,5 @@ public class ScrollClipboard extends Scroll {
         session.setClipboard(clipboard);
         return true;
     }
+
 }

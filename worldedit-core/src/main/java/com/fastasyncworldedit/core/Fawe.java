@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core;
 
-import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.CachedTextureUtil;
 import com.fastasyncworldedit.core.util.CleanTextureUtil;
 import com.fastasyncworldedit.core.util.FaweTimer;
@@ -16,6 +16,9 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.NotificationEmitter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,28 +32,25 @@ import java.lang.management.MemoryUsage;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Nullable;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.NotificationEmitter;
 
 /**
  * [ WorldEdit action]
- *  |
+ * |
  * \|/
  * [ EditSession ] - The change is processed (area restrictions, change limit, block type)
- *  |
+ * |
  * \|/
  * [Block change] - A block change from some location
- *  |
+ * |
  * \|/
  * [ Set Queue ] - The SetQueue manages the implementation specific queue
- *  |
+ * |
  * \|/
  * [ Fawe Queue] - A queue of chunks - check if the queue has the chunk for a change
- *  |
+ * |
  * \|/
  * [ Fawe Chunk Implementation ] - Otherwise create a new FaweChunk object which is a wrapper around the Chunk object
- *  |
+ * |
  * \|/
  * [ Execution ] - When done, the queue then sets the blocks for the chunk, performs lighting updates and sends the chunk packet to the clients
  * <p>
@@ -131,10 +131,18 @@ public class Fawe {
         TaskManager.IMP = this.implementation.getTaskManager();
 
         TaskManager.IMP.async(() -> {
-            MainUtil.deleteOlder(MainUtil.getFile(this.implementation
-                                                      .getDirectory(), Settings.IMP.PATHS.HISTORY), TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS), false);
-            MainUtil.deleteOlder(MainUtil.getFile(this.implementation
-                                                      .getDirectory(), Settings.IMP.PATHS.CLIPBOARD), TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS), false);
+            MainUtil.deleteOlder(
+                    MainUtil.getFile(this.implementation
+                            .getDirectory(), Settings.IMP.PATHS.HISTORY),
+                    TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS),
+                    false
+            );
+            MainUtil.deleteOlder(
+                    MainUtil.getFile(this.implementation
+                            .getDirectory(), Settings.IMP.PATHS.CLIPBOARD),
+                    TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS),
+                    false
+            );
         });
 
         /*
@@ -208,7 +216,6 @@ public class Fawe {
     /**
      * The FAWE version.
      *
-     * @apiNote Unofficial jars may be lacking version information
      * @return FaweVersion
      */
     @Nullable
@@ -226,7 +233,7 @@ public class Fawe {
         File file = new File(this.implementation.getDirectory(), "config.yml");
         Settings.IMP.PLATFORM = implementation.getPlatform().replace("\"", "");
         try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
+             BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
             String commitString = br.readLine();
             String dateString = br.readLine();
@@ -263,14 +270,14 @@ public class Fawe {
                     Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
                     Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
                     LOGGER.error("ZSTD Compression Binding Not Found.\n"
-                                  + "FAWE will still work but compression won't work as well.\n", e);
+                            + "FAWE will still work but compression won't work as well.\n", e);
                 }
             }
             try {
                 net.jpountz.util.Native.load();
             } catch (Throwable e) {
                 LOGGER.error("LZ4 Compression Binding Not Found.\n"
-                              + "FAWE will still work but compression will be slower.\n", e);
+                        + "FAWE will still work but compression will be slower.\n", e);
             }
         }
 
@@ -313,8 +320,8 @@ public class Fawe {
             }
         } catch (Throwable ignored) {
             LOGGER.error("FAWE encountered an error trying to listen to JVM memory.\n"
-                          + "Please change your Java security settings or disable this message by"
-                          + "changing 'max-memory-percent' in the config files to '-1'.");
+                    + "Please change your Java security settings or disable this message by"
+                    + "changing 'max-memory-percent' in the config files to '-1'.");
         }
     }
 
@@ -335,4 +342,5 @@ public class Fawe {
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();
     }
+
 }

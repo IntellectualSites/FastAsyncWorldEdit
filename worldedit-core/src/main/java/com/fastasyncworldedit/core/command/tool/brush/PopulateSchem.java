@@ -15,6 +15,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import java.util.List;
 
 public class PopulateSchem implements Brush {
+
     private final Mask mask;
     private final boolean randomRotate;
     private final List<ClipboardHolder> clipboards;
@@ -28,14 +29,20 @@ public class PopulateSchem implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         new MaskTraverser(mask).reset(editSession);
         int size1 = MathMan.roundInt(size);
-        CuboidRegion cuboid = new CuboidRegion(editSession.getWorld(), position.subtract(size1, size1, size1), position.add(size1, size1, size1));
+        CuboidRegion cuboid = new CuboidRegion(
+                editSession.getWorld(),
+                position.subtract(size1, size1, size1),
+                position.add(size1, size1, size1)
+        );
         try {
             editSession.addSchems(cuboid, mask, clipboards, rarity, randomRotate);
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
     }
+
 }

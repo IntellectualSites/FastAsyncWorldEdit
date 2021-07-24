@@ -20,12 +20,12 @@
 package com.sk89q.worldedit.regions;
 
 
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
-import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -73,7 +73,7 @@ public class EllipsoidRegion extends AbstractRegion {
     /**
      * Construct a new instance of this ellipsoid region.
      *
-     * @param world the world
+     * @param world  the world
      * @param center the center
      * @param radius the radius
      */
@@ -219,8 +219,8 @@ public class EllipsoidRegion extends AbstractRegion {
                 }
 
                 chunks.add(BlockVector2.at(
-                    x >> ChunkStore.CHUNK_SHIFTS,
-                    z >> ChunkStore.CHUNK_SHIFTS
+                        x >> ChunkStore.CHUNK_SHIFTS,
+                        z >> ChunkStore.CHUNK_SHIFTS
                 ));
             }
         }
@@ -307,8 +307,10 @@ public class EllipsoidRegion extends AbstractRegion {
     }
 
     //FAWE start
-    private void filterSpherePartial(int y1, int y2, int bx, int bz, Filter filter,
-        ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+    private void filterSpherePartial(
+            int y1, int y2, int bx, int bz, Filter filter,
+            ChunkFilterBlock block, IChunkGet get, IChunkSet set
+    ) {
         int minSection = y1 >> 4;
         int maxSection = y2 >> 4;
         int yStart = (y1 & 15);
@@ -333,8 +335,10 @@ public class EllipsoidRegion extends AbstractRegion {
         }
     }
 
-    private void filterSpherePartial(int layer, int y1, int y2, int bx, int bz, Filter filter,
-        ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+    private void filterSpherePartial(
+            int layer, int y1, int y2, int bx, int bz, Filter filter,
+            ChunkFilterBlock block, IChunkGet get, IChunkSet set
+    ) {
         int cx = center.getBlockX();
         int cy = center.getBlockY();
         int cz = center.getBlockZ();
@@ -366,8 +370,10 @@ public class EllipsoidRegion extends AbstractRegion {
     }
 
     @Override
-    public void filter(IChunk chunk, Filter filter, ChunkFilterBlock block, IChunkGet get,
-        IChunkSet set, boolean full) {
+    public void filter(
+            IChunk chunk, Filter filter, ChunkFilterBlock block, IChunkGet get,
+            IChunkSet set, boolean full
+    ) {
         // Check bounds
         // This needs to be able to perform 50M blocks/sec otherwise it becomes a bottleneck
         int cx = center.getBlockX();

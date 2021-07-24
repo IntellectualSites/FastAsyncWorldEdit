@@ -83,4 +83,5 @@ public abstract class Category<T extends Keyed> implements RegistryItem {
     public String toString() {
         return getId();
     }
+
 }

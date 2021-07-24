@@ -14,6 +14,7 @@ import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import java.util.List;
 
 public class ScatterCommand extends ScatterBrush {
+
     private final String command;
 
     public ScatterCommand(int count, int distance, String command) {
@@ -22,9 +23,14 @@ public class ScatterCommand extends ScatterBrush {
     }
 
     @Override
-    public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 position, Pattern p, double size) throws MaxChangedBlocksException {
+    public void apply(EditSession editSession, LocalBlockVectorSet placed, BlockVector3 position, Pattern p, double size) throws
+            MaxChangedBlocksException {
         int radius = getDistance();
-        CuboidRegionSelector selector = new CuboidRegionSelector(editSession.getWorld(), position.subtract(radius, radius, radius), position.add(radius, radius, radius));
+        CuboidRegionSelector selector = new CuboidRegionSelector(
+                editSession.getWorld(),
+                position.subtract(radius, radius, radius),
+                position.add(radius, radius, radius)
+        );
         String replaced = command.replace("{x}", position.getBlockX() + "")
                 .replace("{y}", Integer.toString(position.getBlockY()))
                 .replace("{z}", Integer.toString(position.getBlockZ()))
@@ -39,4 +45,5 @@ public class ScatterCommand extends ScatterBrush {
             PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
     }
+
 }

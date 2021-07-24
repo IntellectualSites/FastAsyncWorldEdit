@@ -25,4 +25,5 @@ public final class BlanketBaseBlock extends BaseBlock {
         }
         return this;
     }
+
 }

@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.command;
 
-import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.command.tool.brush.InspectBrush;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.Collections2;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -76,27 +76,29 @@ public class ToolCommands {
             .clickEvent(ClickEvent.suggestCommand("/tool unbind"))
             .build();
 
-    public static void register(CommandRegistrationHandler registration,
-                                CommandManager commandManager,
-                                CommandManagerService commandManagerService,
-                                WorldEdit worldEdit) {
+    public static void register(
+            CommandRegistrationHandler registration,
+            CommandManager commandManager,
+            CommandManagerService commandManagerService,
+            WorldEdit worldEdit
+    ) {
         // Collect the tool commands
         CommandManager collect = commandManagerService.newCommandManager();
 
         registration.register(
-            collect,
-            ToolCommandsRegistration.builder(),
-            new ToolCommands(worldEdit)
+                collect,
+                ToolCommandsRegistration.builder(),
+                new ToolCommands(worldEdit)
         );
 
         // Register deprecated global commands
         Set<org.enginehub.piston.Command> commands = collect.getAllCommands()
-            .collect(Collectors.toSet());
+                .collect(Collectors.toSet());
         for (org.enginehub.piston.Command command : commands) {
             if (command.getAliases().contains("unbind")) {
                 // Don't register new /tool <whatever> alias
                 command = command.toBuilder().aliases(
-                    Collections2.filter(command.getAliases(), alias -> !"unbind".equals(alias))
+                        Collections2.filter(command.getAliases(), alias -> !"unbind".equals(alias))
                 ).build();
             }
             if (command.getName().equals("stacker")) {
@@ -104,45 +106,47 @@ public class ToolCommands {
                 continue;
             }
             commandManager.register(CommandUtil.deprecate(
-                command, "Global tool names cause conflicts "
-                    + "and will be removed in WorldEdit 8",
-                CommandUtil.ReplacementMessageGenerator.forNewCommand(ToolCommands::asNonGlobal)
+                    command, "Global tool names cause conflicts "
+                            + "and will be removed in WorldEdit 8",
+                    CommandUtil.ReplacementMessageGenerator.forNewCommand(ToolCommands::asNonGlobal)
             ));
         }
 
         // Remove aliases with / in them, since it doesn't make sense for sub-commands.
         Set<org.enginehub.piston.Command> nonGlobalCommands = commands.stream()
-            .map(command ->
-                command.toBuilder().aliases(
-                    Collections2.filter(command.getAliases(), alias -> !alias.startsWith("/"))
-                ).build()
-            )
-            .collect(Collectors.toSet());
+                .map(command ->
+                        command.toBuilder().aliases(
+                                Collections2.filter(command.getAliases(), alias -> !alias.startsWith("/"))
+                        ).build()
+                )
+                .collect(Collectors.toSet());
         commandManager.register("tool", command -> {
             command.addPart(SubCommandPart.builder(
                     Caption.of("tool"),
-                TextComponent.of("The tool to bind")
+                    TextComponent.of("The tool to bind")
             )
-                .withCommands(nonGlobalCommands)
-                .required()
-                .build());
+                    .withCommands(nonGlobalCommands)
+                    .required()
+                    .build());
             command.description(TextComponent.of("Binds a tool to the item in your hand"));
 
             command.condition(new SubCommandPermissionCondition.Generator(nonGlobalCommands).build());
         });
     }
 
-    private static String asNonGlobal(org.enginehub.piston.Command oldCommand,
-                                      CommandParameters oldParameters) {
+    private static String asNonGlobal(
+            org.enginehub.piston.Command oldCommand,
+            CommandParameters oldParameters
+    ) {
         String name = Optional.ofNullable(oldParameters.getMetadata())
-            .map(CommandMetadata::getCalledName)
-            .filter(n -> !n.startsWith("/"))
-            .orElseGet(oldCommand::getName);
+                .map(CommandMetadata::getCalledName)
+                .filter(n -> !n.startsWith("/"))
+                .orElseGet(oldCommand::getName);
         return "/tool " + name;
     }
 
     static void setToolNone(Player player, LocalSession session, boolean isBrush)
-        throws InvalidToolBindException {
+            throws InvalidToolBindException {
         //FAWE start
         isBrush = session.getTool(player) instanceof BrushTool;
         session.setTool(player.getItemInHand(HandSide.MAIN_HAND).getType(), null);
@@ -154,8 +158,10 @@ public class ToolCommands {
         sender.print(Caption.of("worldedit.tool.unbind-instruction", commandComponent));
     }
 
-    private static void setTool(Player player, LocalSession session, Tool tool,
-                                String translationKey) throws InvalidToolBindException {
+    private static void setTool(
+            Player player, LocalSession session, Tool tool,
+            String translationKey
+    ) throws InvalidToolBindException {
         BaseItemStack itemStack = player.getItemInHand(HandSide.MAIN_HAND);
         session.setTool(itemStack.getType(), tool);
         player.print(Caption.of(translationKey, itemStack.getRichName()));
@@ -169,9 +175,9 @@ public class ToolCommands {
     }
 
     @Command(
-        name = "none",
-        aliases = "unbind",
-        desc = "Unbind a bound tool from your current item"
+            name = "none",
+            aliases = "unbind",
+            desc = "Unbind a bound tool from your current item"
     )
     @CommandPermissions("worldedit.tool.none")
     public void none(Player player, LocalSession session) throws WorldEditException {
@@ -179,9 +185,9 @@ public class ToolCommands {
     }
 
     @Command(
-        name = "selwand",
-        aliases = "/selwand",
-        desc = "Selection wand tool"
+            name = "selwand",
+            aliases = "/selwand",
+            desc = "Selection wand tool"
     )
     @CommandPermissions("worldedit.setwand")
     public void selwand(Player player, LocalSession session) throws WorldEditException {
@@ -191,9 +197,9 @@ public class ToolCommands {
     }
 
     @Command(
-        name = "navwand",
-        aliases = "/navwand",
-        desc = "Navigation wand tool"
+            name = "navwand",
+            aliases = "/navwand",
+            desc = "Navigation wand tool"
     )
     @CommandPermissions("worldedit.setwand")
     public void navwand(Player player, LocalSession session) throws WorldEditException {
@@ -203,9 +209,9 @@ public class ToolCommands {
     }
 
     @Command(
-        name = "info",
-        aliases = { "/info" },
-        desc = "Block information tool"
+            name = "info",
+            aliases = {"/info"},
+            desc = "Block information tool"
     )
     @CommandPermissions("worldedit.tool.info")
     public void info(Player player, LocalSession session) throws WorldEditException {
@@ -215,7 +221,7 @@ public class ToolCommands {
     //FAWE start
     @Command(
             name = "inspect",
-            aliases = { "/inspect" },
+            aliases = {"/inspect"},
             desc = "Inspect edits within a radius"
     )
     @CommandPermissions("worldedit.tool.inspect")
@@ -225,46 +231,52 @@ public class ToolCommands {
     //FAWE end
 
     @Command(
-        name = "tree",
-        aliases = { "/tree" },
-        desc = "Tree generator tool"
+            name = "tree",
+            aliases = {"/tree"},
+            desc = "Tree generator tool"
     )
     @CommandPermissions("worldedit.tool.tree")
-    public void tree(Player player, LocalSession session,
-                     @Arg(desc = "Type of tree to generate", def = "tree")
-                     TreeGenerator.TreeType type) throws WorldEditException {
+    public void tree(
+            Player player, LocalSession session,
+            @Arg(desc = "Type of tree to generate", def = "tree")
+                    TreeGenerator.TreeType type
+    ) throws WorldEditException {
         setTool(player, session, new TreePlanter(type), "worldedit.tool.tree.equip");
     }
 
     @Command(
-        name = "stacker",
-        desc = "Block stacker tool"
+            name = "stacker",
+            desc = "Block stacker tool"
     )
     @CommandPermissions("worldedit.tool.stack")
-    public void stacker(Player player, LocalSession session,
-                        @Arg(desc = "The max range of the stack", def = "10")
-                            int range,
-                        @Arg(desc = "The mask to stack until", def = "!#existing")
-                            Mask mask) throws WorldEditException {
+    public void stacker(
+            Player player, LocalSession session,
+            @Arg(desc = "The max range of the stack", def = "10")
+                    int range,
+            @Arg(desc = "The mask to stack until", def = "!#existing")
+                    Mask mask
+    ) throws WorldEditException {
         setTool(player, session, new StackTool(range, mask), "worldedit.tool.stack.equip");
     }
 
     @Command(
-        name = "repl",
-        aliases = { "/repl" },
-        desc = "Block replacer tool"
+            name = "repl",
+            aliases = {"/repl"},
+            desc = "Block replacer tool"
     )
     @CommandPermissions("worldedit.tool.replacer")
-    public void repl(Player player, LocalSession session,
-                     @Arg(desc = "The pattern of blocks to place")
-                         Pattern pattern) throws WorldEditException {
+    public void repl(
+            Player player, LocalSession session,
+            @Arg(desc = "The pattern of blocks to place")
+                    Pattern pattern
+    ) throws WorldEditException {
         setTool(player, session, new BlockReplacer(pattern), "worldedit.tool.repl.equip");
     }
 
     @Command(
-        name = "cycler",
-        aliases = { "/cycler" },
-        desc = "Block data cycler tool"
+            name = "cycler",
+            aliases = {"/cycler"},
+            desc = "Block data cycler tool"
     )
     @CommandPermissions("worldedit.tool.data-cycler")
     public void cycler(Player player, LocalSession session) throws WorldEditException {
@@ -272,16 +284,18 @@ public class ToolCommands {
     }
 
     @Command(
-        name = "floodfill",
-        aliases = { "flood", "/flood", "/floodfill" },
-        desc = "Flood fill tool"
+            name = "floodfill",
+            aliases = {"flood", "/flood", "/floodfill"},
+            desc = "Flood fill tool"
     )
     @CommandPermissions("worldedit.tool.flood-fill")
-    public void floodFill(Player player, LocalSession session,
-                          @Arg(desc = "The pattern to flood fill")
-                              Pattern pattern,
-                          @Arg(desc = "The range to perform the fill")
-                              int range) throws WorldEditException {
+    public void floodFill(
+            Player player, LocalSession session,
+            @Arg(desc = "The pattern to flood fill")
+                    Pattern pattern,
+            @Arg(desc = "The range to perform the fill")
+                    int range
+    ) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
@@ -293,9 +307,9 @@ public class ToolCommands {
     }
 
     @Command(
-        name = "deltree",
-        aliases = { "/deltree" },
-        desc = "Floating tree remover tool"
+            name = "deltree",
+            aliases = {"/deltree"},
+            desc = "Floating tree remover tool"
     )
     @CommandPermissions("worldedit.tool.deltree")
     public void deltree(Player player, LocalSession session) throws WorldEditException {
@@ -303,9 +317,9 @@ public class ToolCommands {
     }
 
     @Command(
-        name = "farwand",
-        aliases = { "/warwand" },
-        desc = "Wand at a distance tool"
+            name = "farwand",
+            aliases = {"/warwand"},
+            desc = "Wand at a distance tool"
     )
     @CommandPermissions("worldedit.tool.farwand")
     public void farwand(Player player, LocalSession session) throws WorldEditException {
@@ -313,16 +327,18 @@ public class ToolCommands {
     }
 
     @Command(
-        name = "lrbuild",
-        aliases = { "/lrbuild" },
-        desc = "Long-range building tool"
+            name = "lrbuild",
+            aliases = {"/lrbuild"},
+            desc = "Long-range building tool"
     )
     @CommandPermissions("worldedit.tool.lrbuild")
-    public void longrangebuildtool(Player player, LocalSession session,
-                                   @Arg(desc = "Pattern to set on left-click")
-                                       Pattern primary,
-                                   @Arg(desc = "Pattern to set on right-click")
-                                       Pattern secondary) throws WorldEditException {
+    public void longrangebuildtool(
+            Player player, LocalSession session,
+            @Arg(desc = "Pattern to set on left-click")
+                    Pattern primary,
+            @Arg(desc = "Pattern to set on right-click")
+                    Pattern secondary
+    ) throws WorldEditException {
         setTool(player, session, new LongRangeBuildTool(primary, secondary), "worldedit.tool.lrbuild.equip");
         Component primaryName;
         Component secondaryName;
@@ -338,4 +354,5 @@ public class ToolCommands {
         }
         player.print(Caption.of("worldedit.tool.lrbuild.set", primaryName, secondaryName));
     }
+
 }

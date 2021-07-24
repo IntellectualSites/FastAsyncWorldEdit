@@ -1,17 +1,18 @@
 package com.fastasyncworldedit.core.extent;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class SourceMaskExtent extends TemporalExtent {
+
     private Mask mask;
-    private MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public SourceMaskExtent(Extent extent, Mask mask) {
         super(extent);
@@ -52,4 +53,5 @@ public class SourceMaskExtent extends TemporalExtent {
         mutable.mutZ(z);
         return mask.test(mutable) && super.setBlock(x, y, z, block);
     }
+
 }

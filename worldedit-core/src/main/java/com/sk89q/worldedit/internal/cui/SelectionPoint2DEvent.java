@@ -66,7 +66,7 @@ public class SelectionPoint2DEvent implements CUIEvent {
 
     @Override
     public String[] getParameters() {
-        return new String[] {
+        return new String[]{
                 String.valueOf(id),
                 String.valueOf(blockX),
                 String.valueOf(blockZ),

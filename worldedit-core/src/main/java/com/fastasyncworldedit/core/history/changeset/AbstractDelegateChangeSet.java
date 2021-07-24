@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.concurrent.Future;
 
 public class AbstractDelegateChangeSet extends AbstractChangeSet {
+
     public final AbstractChangeSet parent;
 
     public AbstractDelegateChangeSet(AbstractChangeSet parent) {
@@ -186,4 +187,5 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     public ChangeSetSummary summarize(Region region, boolean shallow) {
         return parent.summarize(region, shallow);
     }
+
 }

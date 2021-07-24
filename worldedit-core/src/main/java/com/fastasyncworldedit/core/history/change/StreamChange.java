@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public interface StreamChange {
+
     void flushChanges(FaweOutputStream out) throws IOException;
 
     void undoChanges(FaweInputStream in) throws IOException;
@@ -49,4 +50,5 @@ public interface StreamChange {
             }
         }
     }
+
 }

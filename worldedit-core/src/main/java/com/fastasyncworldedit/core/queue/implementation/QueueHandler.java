@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.queue.implementation;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -10,10 +11,9 @@ import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.Trimable;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
-import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.worldedit.world.World;
@@ -302,7 +302,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
         boolean result = true;
         synchronized (chunkGetCache) {
             final Iterator<Map.Entry<World, WeakReference<IChunkCache<IChunkGet>>>> iter = chunkGetCache
-                .entrySet().iterator();
+                    .entrySet().iterator();
             while (iter.hasNext()) {
                 final Map.Entry<World, WeakReference<IChunkCache<IChunkGet>>> entry = iter.next();
                 final WeakReference<IChunkCache<IChunkGet>> value = entry.getValue();
@@ -316,4 +316,5 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
         return result;
     }
+
 }

@@ -1,13 +1,13 @@
 package com.fastasyncworldedit.core.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
-import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
-import com.fastasyncworldedit.core.internal.io.FaweInputStream;
-import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.extent.clipboard.LinearClipboard;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArraysInputStream;
+import com.fastasyncworldedit.core.internal.io.FaweInputStream;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
+import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
 import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -251,7 +251,7 @@ public class FastSchematicReader extends NBTSchematicReader {
 
         BlockVector3 dimensions = BlockVector3.at(width, height, length);
         BlockVector3 origin;
-        if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE  && offsetZ != Integer.MIN_VALUE) {
+        if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE && offsetZ != Integer.MIN_VALUE) {
             origin = BlockVector3.at(-offsetX, -offsetY, -offsetZ);
         } else {
             origin = BlockVector3.ZERO;
@@ -303,7 +303,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++) {
                         BiomeType biome = getBiomeType(fis);
-                        for (int y = 0; y < height; y ++) {
+                        for (int y = 0; y < height; y++) {
                             clipboard.setBiome(x, y, z, biome);
                         }
                     }
@@ -342,7 +342,12 @@ public class FastSchematicReader extends NBTSchematicReader {
                 values.remove("Id");
                 values.remove("Pos");
 
-                clipboard.setTile(x, y, z, (CompoundTag) AdventureNBTConverter.fromAdventure(fixBlockEntity(new CompoundTag(values))));
+                clipboard.setTile(
+                        x,
+                        y,
+                        z,
+                        (CompoundTag) AdventureNBTConverter.fromAdventure(fixBlockEntity(new CompoundTag(values)))
+                );
             }
         }
 
@@ -375,12 +380,12 @@ public class FastSchematicReader extends NBTSchematicReader {
                         int locZ = loc.getBlockZ();
                         BlockVector3 max = min.add(dimensions).subtract(BlockVector3.ONE);
                         if (locX < min.getX() || locY < min.getY() || locZ < min.getZ()
-                            || locX > max.getX() || locY > max.getY() || locZ > max.getZ()) {
+                                || locX > max.getX() || locY > max.getY() || locZ > max.getZ()) {
                             for (Entity e : clipboard.getEntities()) {
                                 clipboard.removeEntity(e);
                             }
                             LOGGER.error("Detected schematic entity outside clipboard region. FAWE will not load entities. "
-                                + "Please try loading the schematic with the format \"legacyentity\"");
+                                    + "Please try loading the schematic with the format \"legacyentity\"");
                             break;
                         }
                     }
@@ -403,4 +408,5 @@ public class FastSchematicReader extends NBTSchematicReader {
     public void close() throws IOException {
         inputStream.close();
     }
+
 }

@@ -10,6 +10,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class DataPattern extends AbstractExtentPattern {
+
     private final Pattern pattern;
 
     public DataPattern(Extent extent, Pattern parent) {
@@ -42,4 +43,5 @@ public class DataPattern extends AbstractExtentPattern {
         }
         return false;
     }
+
 }

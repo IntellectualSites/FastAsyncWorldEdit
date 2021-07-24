@@ -33,4 +33,5 @@ public class MutableBlockChange implements Change {
     public void create(UndoContext context) {
         context.getExtent().setBlock(x, y, z, BlockState.getFromOrdinal(ordinal));
     }
+
 }

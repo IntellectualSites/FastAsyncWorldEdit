@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -27,17 +28,16 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -59,10 +59,12 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     //FAWE end
 
     //FAWE start
+
     /**
      * Construct a block with the given type and default data.
-     * @deprecated Just use the BlockType.getDefaultState()
+     *
      * @param blockType The block type
+     * @deprecated Just use the BlockType.getDefaultState()
      */
     @Deprecated
     public BaseBlock(BlockType blockType) {
@@ -71,6 +73,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     //FAWE end
 
     //FAWE start - made public from protected
+
     /**
      * Construct a block with a state.
      *
@@ -83,10 +86,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     //FAWE end
 
     //FAWE start - deprecated upstream method and replaced CompoundTag with LR
+
     /**
      * Construct a block with the given ID, data value and NBT data structure.
      *
-     * @param state The block state
+     * @param state   The block state
      * @param nbtData NBT data, which must be provided
      */
     @Deprecated
@@ -99,7 +103,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     /**
      * Construct a block with the given ID, data value and NBT data structure.
      *
-     * @param state The block state
+     * @param state   The block state
      * @param nbtData NBT data, which must be provided
      */
     protected BaseBlock(BlockState state, LazyReference<CompoundBinaryTag> nbtData) {
@@ -109,10 +113,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     //FAWE start
+
     /**
      * Construct a block with the given ID and data value.
      *
-     * @param id ID value
+     * @param id   ID value
      * @param data data value
      */
     @Deprecated

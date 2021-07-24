@@ -86,7 +86,7 @@ public class RenderListener implements Listener {
         } else {
             int[] val = views.get(uuid);
             if (val == null) {
-                val = new int[] {value, (int) Fawe.get().getTimer().getTick()};
+                val = new int[]{value, (int) Fawe.get().getTimer().getTick()};
                 UUID uid = player.getUniqueId();
                 views.put(uid, val);
             } else {
@@ -136,4 +136,5 @@ public class RenderListener implements Listener {
         UUID uid = player.getUniqueId();
         views.remove(uid);
     }
+
 }

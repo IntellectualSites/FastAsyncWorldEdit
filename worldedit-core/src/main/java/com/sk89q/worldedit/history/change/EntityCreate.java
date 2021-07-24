@@ -42,8 +42,8 @@ public class EntityCreate implements Change {
      * Create a new instance.
      *
      * @param location the location
-     * @param state the state of the created entity
-     * @param entity the entity that was created
+     * @param state    the state of the created entity
+     * @param entity   the entity that was created
      */
     public EntityCreate(Location location, BaseEntity state, Entity entity) {
         checkNotNull(location);

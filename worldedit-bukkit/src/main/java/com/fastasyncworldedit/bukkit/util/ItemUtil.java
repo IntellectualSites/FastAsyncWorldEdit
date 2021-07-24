@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.bukkit.util;
 
 import com.fastasyncworldedit.core.util.ReflectionUtils;
-
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -39,7 +38,10 @@ public class ItemUtil {
         this.fieldHandle = ReflectionUtils.setAccessible(classCraftItemStack.getDeclaredField("handle"));
         Class<?> classNBTTagCompound = BukkitReflectionUtils.getNmsClass("NBTTagCompound");
         this.methodSetTag = ReflectionUtils.setAccessible(classNMSItem.getDeclaredMethod("setTag", classNBTTagCompound));
-        this.methodAsBukkitCopy = ReflectionUtils.setAccessible(classCraftItemStack.getDeclaredMethod("asBukkitCopy", classNMSItem));
+        this.methodAsBukkitCopy = ReflectionUtils.setAccessible(classCraftItemStack.getDeclaredMethod(
+                "asBukkitCopy",
+                classNMSItem
+        ));
     }
 
     public Object getNMSItem(ItemStack item) {
@@ -54,7 +56,6 @@ public class ItemUtil {
         }
         return null;
     }
-
 
 
     public CompoundTag getNBT(ItemStack item) {
@@ -113,4 +114,5 @@ public class ItemUtil {
         }
         return null;
     }
+
 }

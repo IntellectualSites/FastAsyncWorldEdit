@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent.processor.heightmap;
 
 public class FlatScalableHeightMap extends ScalableHeightMap {
+
     public FlatScalableHeightMap() {
         super();
     }
@@ -15,4 +16,5 @@ public class FlatScalableHeightMap extends ScalableHeightMap {
         }
         return size;
     }
+
 }

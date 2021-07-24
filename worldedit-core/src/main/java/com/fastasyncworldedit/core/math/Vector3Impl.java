@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.math;
 import com.sk89q.worldedit.math.Vector3;
 
 public class Vector3Impl extends Vector3 {
+
     private final double x;
     private final double y;
     private final double z;
@@ -31,4 +32,5 @@ public class Vector3Impl extends Vector3 {
     public final double getZ() {
         return z;
     }
+
 }

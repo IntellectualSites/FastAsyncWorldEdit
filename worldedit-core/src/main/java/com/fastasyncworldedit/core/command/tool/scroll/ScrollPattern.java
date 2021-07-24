@@ -6,6 +6,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.function.pattern.Pattern;
 
 public class ScrollPattern extends Scroll {
+
     private final Pattern[] patterns;
     private int index;
 
@@ -23,4 +24,5 @@ public class ScrollPattern extends Scroll {
         }
         return false;
     }
+
 }

@@ -1,7 +1,10 @@
 package com.fastasyncworldedit.core;
 
-/** An internal FAWE class not meant for public use. **/
+/**
+ * An internal FAWE class not meant for public use.
+ **/
 public class FaweVersion {
+
     public final int year;
     public final int month;
     public final int day;
@@ -40,7 +43,8 @@ public class FaweVersion {
         }
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         if (hash == 0 && build == 0) {
             return "FastAsyncWorldEdit-1.17-NoVer-SNAPSHOT";
         } else {
@@ -51,4 +55,5 @@ public class FaweVersion {
     public boolean isNewer(FaweVersion other) {
         return other.build < this.build;
     }
+
 }

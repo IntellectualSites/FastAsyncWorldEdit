@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.registry;
 
 public interface ItemMaterial {
+
     /**
      * Gets the the maximum quantity of this item that can be in a single stack.
      *
@@ -33,4 +34,5 @@ public interface ItemMaterial {
      * @return the maximum damage, or 0 if not applicable
      */
     int getMaxDamage();
+
 }

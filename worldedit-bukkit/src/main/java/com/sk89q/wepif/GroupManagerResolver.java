@@ -28,6 +28,7 @@ import org.bukkit.World;
 import org.bukkit.permissions.Permissible;
 
 public class GroupManagerResolver extends DinnerPermsResolver {
+
     private final WorldsHolder worldsHolder;
 
     public static PermissionsResolver factory(Server server, YAMLProcessor config) {
@@ -128,4 +129,5 @@ public class GroupManagerResolver extends DinnerPermsResolver {
     public String getDetectionMessage() {
         return "GroupManager detected! Using GroupManager for permissions.";
     }
+
 }

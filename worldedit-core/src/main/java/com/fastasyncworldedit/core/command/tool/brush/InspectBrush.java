@@ -70,8 +70,10 @@ public class InspectBrush extends BrushTool {
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
-            player.print(Caption.of("fawe.error.setting.disable",
-                "history.use-database (Import with /history import )"));
+            player.print(Caption.of(
+                    "fawe.error.setting.disable",
+                    "history.use-database (Import with /history import )"
+            ));
             LOGGER.debug("No db");
             return false;
         }
@@ -101,7 +103,13 @@ public class InspectBrush extends BrushTool {
                     String ageFormatted = MainUtil.secToTime(age / 1000);
                     BlockState blockFrom = BlockState.getFromOrdinal(from);
                     BlockState blockTo = BlockState.getFromOrdinal(to);
-                    TranslatableComponent msg = Caption.of("fawe.worldedit.tool.tool.inspect.info", name, blockFrom, blockTo, ageFormatted);
+                    TranslatableComponent msg = Caption.of(
+                            "fawe.worldedit.tool.tool.inspect.info",
+                            name,
+                            blockFrom,
+                            blockTo,
+                            ageFormatted
+                    );
 
                     TextComponent hover = TextComponent.of("/tool inspect", TextColor.GOLD);
                     String infoCmd = "//history summary " + uuid + " " + index;
@@ -121,4 +129,5 @@ public class InspectBrush extends BrushTool {
     public boolean canUse(Actor actor) {
         return actor.hasPermission("worldedit.tool.inspect");
     }
+
 }

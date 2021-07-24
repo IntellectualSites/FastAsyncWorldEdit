@@ -53,9 +53,14 @@ public class BlockCategoryMaskParser extends InputParser<Mask> {
         // This means it's a tag mask.
         BlockCategory category = BlockCategory.REGISTRY.get(input.substring(2).toLowerCase(Locale.ROOT));
         if (category == null) {
-            throw new InputParseException(Caption.of("fawe.error.unrecognised-tag", TextComponent.of(input.substring(2)), TextComponent.of("\\")));
+            throw new InputParseException(Caption.of(
+                    "fawe.error.unrecognised-tag",
+                    TextComponent.of(input.substring(2)),
+                    TextComponent.of("\\")
+            ));
         } else {
             return new BlockCategoryMask(context.requireExtent(), category);
         }
     }
+
 }

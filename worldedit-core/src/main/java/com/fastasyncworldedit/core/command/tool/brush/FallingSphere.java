@@ -8,8 +8,10 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class FallingSphere implements Brush {
+
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         int px = position.getBlockX();
         int py = position.getBlockY();
         int pz = position.getBlockZ();
@@ -54,4 +56,5 @@ public class FallingSphere implements Brush {
             }
         }
     }
+
 }

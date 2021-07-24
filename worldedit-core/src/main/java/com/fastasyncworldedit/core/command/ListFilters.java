@@ -15,7 +15,9 @@ import java.util.regex.PatternSyntaxException;
 
 //@CommandContainer
 public class ListFilters {
+
     public class Filter {
+
         public boolean listPrivate() {
             return true;
         }
@@ -31,6 +33,7 @@ public class ListFilters {
         public boolean applies(File file) {
             return true;
         }
+
     }
 
     @Command(
@@ -128,4 +131,5 @@ public class ListFilters {
             };
         }
     }
+
 }

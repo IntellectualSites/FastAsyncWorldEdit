@@ -42,7 +42,7 @@ public class RecursiveVisitor extends BreadthFirstSearch {
     /**
      * Create a new recursive visitor.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the function
      */
     public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth) {
@@ -55,4 +55,5 @@ public class RecursiveVisitor extends BreadthFirstSearch {
     protected boolean isVisitable(BlockVector3 from, BlockVector3 to) {
         return mask.test(to);
     }
+
 }

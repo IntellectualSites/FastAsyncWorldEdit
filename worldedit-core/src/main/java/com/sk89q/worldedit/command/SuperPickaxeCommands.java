@@ -37,6 +37,7 @@ import org.enginehub.piston.annotation.param.Arg;
 
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class SuperPickaxeCommands {
+
     private final WorldEdit we;
 
     public SuperPickaxeCommands(WorldEdit we) {
@@ -44,8 +45,8 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-        name = "single",
-        desc = "Enable the single block super pickaxe mode"
+            name = "single",
+            desc = "Enable the single block super pickaxe mode"
     )
     @CommandPermissions("worldedit.superpickaxe")
     public void single(Player player, LocalSession session) throws WorldEditException {
@@ -55,13 +56,15 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-        name = "area",
-        desc = "Enable the area super pickaxe pickaxe mode"
+            name = "area",
+            desc = "Enable the area super pickaxe pickaxe mode"
     )
     @CommandPermissions("worldedit.superpickaxe.area")
-    public void area(Player player, LocalSession session,
-                     @Arg(desc = "The range of the area pickaxe")
-                         int range) throws WorldEditException {
+    public void area(
+            Player player, LocalSession session,
+            @Arg(desc = "The range of the area pickaxe")
+                    int range
+    ) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
@@ -75,14 +78,16 @@ public class SuperPickaxeCommands {
     }
 
     @Command(
-        name = "recursive",
-        aliases = { "recur" },
-        desc = "Enable the recursive super pickaxe pickaxe mode"
+            name = "recursive",
+            aliases = {"recur"},
+            desc = "Enable the recursive super pickaxe pickaxe mode"
     )
     @CommandPermissions("worldedit.superpickaxe.recursive")
-    public void recursive(Player player, LocalSession session,
-                          @Arg(desc = "The range of the recursive pickaxe")
-                              double range) throws WorldEditException {
+    public void recursive(
+            Player player, LocalSession session,
+            @Arg(desc = "The range of the recursive pickaxe")
+                    double range
+    ) throws WorldEditException {
 
         LocalConfiguration config = we.getConfiguration();
 
@@ -95,4 +100,5 @@ public class SuperPickaxeCommands {
         session.enableSuperPickAxe();
         player.print(Caption.of("worldedit.tool.superpickaxe.mode.recursive"));
     }
+
 }

@@ -41,7 +41,7 @@ public class ForestGenerator implements RegionFunction {
      * Create a new instance.
      *
      * @param editSession the edit session
-     * @param treeType a tree generator
+     * @param treeType    a tree generator
      */
     public ForestGenerator(EditSession editSession, TreeGenerator.TreeType treeType) {
         this.editSession = editSession;
@@ -71,4 +71,5 @@ public class ForestGenerator implements RegionFunction {
             return false;
         }
     }
+
 }

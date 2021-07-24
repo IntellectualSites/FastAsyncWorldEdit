@@ -26,4 +26,5 @@ public class XAxisMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) {
         return new XAxisMask(context.getExtent());
     }
+
 }

@@ -49,10 +49,13 @@ import java.util.Set;
  */
 public class PropertiesConfiguration extends LocalConfiguration {
 
-    @Unreported private static final Logger LOGGER = LogManagerCompat.getLogger();
+    @Unreported
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    @Unreported protected Properties properties;
-    @Unreported protected File path;
+    @Unreported
+    protected Properties properties;
+    @Unreported
+    protected File path;
 
     /**
      * Construct the object. The configuration isn't loaded yet.

@@ -38,4 +38,5 @@ public class SimpleItemMaterial implements ItemMaterial {
     public int getMaxDamage() {
         return maxDamage;
     }
+
 }

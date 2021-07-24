@@ -19,7 +19,11 @@ import java.util.Arrays;
 
 public class ErodeBrush implements Brush {
 
-    private static final BlockVector3[] FACES_TO_CHECK = Direction.valuesOf(Direction.Flag.CARDINAL).stream().map(Direction::toBlockVector).toArray(BlockVector3[]::new);
+    private static final BlockVector3[] FACES_TO_CHECK = Direction
+            .valuesOf(Direction.Flag.CARDINAL)
+            .stream()
+            .map(Direction::toBlockVector)
+            .toArray(BlockVector3[]::new);
     private final int erodeFaces;
     private final int erodeRecursion;
     private final int fillFaces;
@@ -37,11 +41,20 @@ public class ErodeBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         this.erosion(editSession, erodeFaces, erodeRecursion, fillFaces, fillRecursion, position, size);
     }
 
-    public void erosion(final EditSession es, int erodeFaces, int erodeRecursion, int fillFaces, int fillRecursion, BlockVector3 target, double size) {
+    public void erosion(
+            final EditSession es,
+            int erodeFaces,
+            int erodeRecursion,
+            int fillFaces,
+            int fillRecursion,
+            BlockVector3 target,
+            double size
+    ) {
         int brushSize = (int) size;
         int brushSizeSquared = (int) (size * size);
         Location min = new Location(es.getWorld(), target.toVector3().subtract(size, size, size));
@@ -69,12 +82,24 @@ public class ErodeBrush implements Brush {
 
         int swap = 0;
         for (int i = 0; i < erodeRecursion; ++i) {
-            erosionIteration(brushSize, brushSizeSquared, erodeFaces, swap % 2 == 0 ? buffer1 : buffer2, swap % 2 == 1 ? buffer1 : buffer2);
+            erosionIteration(
+                    brushSize,
+                    brushSizeSquared,
+                    erodeFaces,
+                    swap % 2 == 0 ? buffer1 : buffer2,
+                    swap % 2 == 1 ? buffer1 : buffer2
+            );
             swap++;
         }
 
         for (int i = 0; i < fillRecursion; ++i) {
-            fillIteration(brushSize, brushSizeSquared, fillFaces, swap % 2 == 0 ? buffer1 : buffer2, swap % 2 == 1 ? buffer1 : buffer2);
+            fillIteration(
+                    brushSize,
+                    brushSizeSquared,
+                    fillFaces,
+                    swap % 2 == 0 ? buffer1 : buffer2,
+                    swap % 2 == 1 ? buffer1 : buffer2
+            );
             swap++;
         }
         Clipboard finalBuffer = swap % 2 == 0 ? buffer1 : buffer2;
@@ -85,8 +110,10 @@ public class ErodeBrush implements Brush {
         }
     }
 
-    private void fillIteration(int brushSize, int brushSizeSquared, int fillFaces,
-                               Clipboard current, Clipboard target) {
+    private void fillIteration(
+            int brushSize, int brushSizeSquared, int fillFaces,
+            Clipboard current, Clipboard target
+    ) {
         int[] frequency = null;
         for (int x = -brushSize, relx = 0; x <= brushSize; x++, relx++) {
             int x2 = x * x;
@@ -111,7 +138,11 @@ public class ErodeBrush implements Brush {
                     int total = 0;
                     int highest = 1;
                     for (BlockVector3 offs : FACES_TO_CHECK) {
-                        BaseBlock next = current.getFullBlock(relx + offs.getBlockX(), rely + offs.getBlockY(), relz + offs.getBlockZ());
+                        BaseBlock next = current.getFullBlock(
+                                relx + offs.getBlockX(),
+                                rely + offs.getBlockY(),
+                                relz + offs.getBlockZ()
+                        );
                         if (!next.getBlockType().getMaterial().isMovementBlocker()) {
                             continue;
                         }
@@ -130,8 +161,10 @@ public class ErodeBrush implements Brush {
         }
     }
 
-    private void erosionIteration(int brushSize, int brushSizeSquared, int erodeFaces,
-                                  Clipboard current, Clipboard target) {
+    private void erosionIteration(
+            int brushSize, int brushSizeSquared, int erodeFaces,
+            Clipboard current, Clipboard target
+    ) {
         int[] frequency = null;
         for (int x = -brushSize, relx = 0; x <= brushSize; x++, relx++) {
             int x2 = x * x;
@@ -156,7 +189,11 @@ public class ErodeBrush implements Brush {
                     int highest = 1;
                     int total = 0;
                     for (BlockVector3 offs : FACES_TO_CHECK) {
-                        BaseBlock next = current.getFullBlock(relx + offs.getBlockX(), rely + offs.getBlockY(), relz + offs.getBlockZ());
+                        BaseBlock next = current.getFullBlock(
+                                relx + offs.getBlockX(),
+                                rely + offs.getBlockY(),
+                                relz + offs.getBlockZ()
+                        );
                         if (next.getMaterial().isMovementBlocker()) {
                             continue;
                         }
@@ -174,4 +211,5 @@ public class ErodeBrush implements Brush {
             }
         }
     }
+
 }

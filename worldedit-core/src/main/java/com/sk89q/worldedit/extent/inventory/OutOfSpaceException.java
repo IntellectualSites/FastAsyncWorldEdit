@@ -45,4 +45,5 @@ public class OutOfSpaceException extends BlockBagException {
     public BlockType getType() {
         return this.type;
     }
+
 }

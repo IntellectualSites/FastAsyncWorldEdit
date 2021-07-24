@@ -49,7 +49,8 @@ public class SmoothBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         Vector3 posDouble = position.toVector3();
         Location min = new Location(editSession.getWorld(), posDouble.subtract(size, size, size));
         BlockVector3 max = posDouble.add(size, size + 10, size).toBlockPoint();

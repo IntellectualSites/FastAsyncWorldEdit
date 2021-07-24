@@ -21,6 +21,8 @@ package com.sk89q.worldedit.extent.transform;
 
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.registry.state.PropertyKeySet;
 import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -36,8 +38,6 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.DirectionalProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
-import com.fastasyncworldedit.core.registry.state.PropertyKeySet;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -48,6 +48,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -56,7 +57,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.util.Direction.ASCENDING_EAST;
@@ -206,7 +206,10 @@ public class BlockTransformExtent extends ResettableExtent {
                     return null;
                 }
                 case "hinge": {
-                    return adapt(combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST), combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST));
+                    return adapt(
+                            combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST),
+                            combine(NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
+                    );
                 }
                 case "shape": {
                     if (values.contains("left")) {
@@ -221,16 +224,32 @@ public class BlockTransformExtent extends ResettableExtent {
                                     result.add(combine(NORTH, EAST, SOUTH, WEST));
                                     continue;
                                 case "inner_left":
-                                    result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
+                                    result.add(orIndex(
+                                            combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST),
+                                            property.getIndexFor("outer_right"),
+                                            property.getIndexFor("outer_left")
+                                    ));
                                     continue;
                                 case "inner_right":
-                                    result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("outer_right"), property.getIndexFor("outer_left")));
+                                    result.add(orIndex(
+                                            combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST),
+                                            property.getIndexFor("outer_right"),
+                                            property.getIndexFor("outer_left")
+                                    ));
                                     continue;
                                 case "outer_left":
-                                    result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
+                                    result.add(orIndex(
+                                            combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST),
+                                            property.getIndexFor("inner_left"),
+                                            property.getIndexFor("inner_right")
+                                    ));
                                     continue;
                                 case "outer_right":
-                                    result.add(orIndex(combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST), property.getIndexFor("inner_left"), property.getIndexFor("inner_right")));
+                                    result.add(orIndex(
+                                            combine(NORTHEAST, NORTHWEST, SOUTHWEST, SOUTHEAST),
+                                            property.getIndexFor("inner_left"),
+                                            property.getIndexFor("inner_right")
+                                    ));
                                     continue;
                                 default:
                                     LOGGER.warn("Unknown direction {}", value);
@@ -377,7 +396,10 @@ public class BlockTransformExtent extends ResettableExtent {
                     applyAbsolute.mutY(applyAbsolute.getY() - applyOrigin.getY());
                     applyAbsolute.mutZ(applyAbsolute.getZ() - applyOrigin.getZ());
 
-                    Direction newDirection = Direction.findClosest(applyAbsolute, Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL);
+                    Direction newDirection = Direction.findClosest(
+                            applyAbsolute,
+                            Direction.Flag.CARDINAL | Direction.Flag.ORDINAL | Direction.Flag.SECONDARY_ORDINAL
+                    );
 
                     if (newDirection != null) {
                         Map<String, Tag> values = new HashMap<>(tag.getValue());
@@ -396,7 +418,8 @@ public class BlockTransformExtent extends ResettableExtent {
 
         BlockType type = state.getBlockType();
         // Rotate North, East, South, West
-        if (type.hasProperty(PropertyKey.NORTH) && type.hasProperty(PropertyKey.EAST) && type.hasProperty(PropertyKey.SOUTH) && type.hasProperty(PropertyKey.WEST)) {
+        if (type.hasProperty(PropertyKey.NORTH) && type.hasProperty(PropertyKey.EAST) && type.hasProperty(PropertyKey.SOUTH) && type
+                .hasProperty(PropertyKey.WEST)) {
             Direction newNorth = findClosest(transform.apply(NORTH.toVector()), Flag.CARDINAL);
             Direction newEast = findClosest(transform.apply(EAST.toVector()), Flag.CARDINAL);
             Direction newSouth = findClosest(transform.apply(SOUTH.toVector()), Flag.CARDINAL);
@@ -424,7 +447,11 @@ public class BlockTransformExtent extends ResettableExtent {
                     int oldIndex = property.getIndex(state.getInternalId());
                     if (oldIndex >= directions.length) {
                         if (Settings.IMP.ENABLED_COMPONENTS.DEBUG) {
-                            LOGGER.warn(String.format("Index outside direction array length found for block:{%s} property:{%s}", state.getBlockType().getId(), property.getName()));
+                            LOGGER.warn(String.format(
+                                    "Index outside direction array length found for block:{%s} property:{%s}",
+                                    state.getBlockType().getId(),
+                                    property.getName()
+                            ));
                         }
                         continue;
                     }
@@ -448,7 +475,7 @@ public class BlockTransformExtent extends ResettableExtent {
             BLOCK_TRANSFORM_INVERSE[i] = ALL;
             BlockType type = BlockTypes.get(i);
             int bitMask = 0;
-            for (AbstractProperty property : (Collection<AbstractProperty>) (Collection) type.getProperties()) {
+            for (AbstractProperty property : (Collection<AbstractProperty>) type.getProperties()) {
                 if (isDirectional(property)) {
                     BLOCK_TRANSFORM[i] = null;
                     BLOCK_TRANSFORM_INVERSE[i] = null;
@@ -474,7 +501,7 @@ public class BlockTransformExtent extends ResettableExtent {
     /**
      * Transform a block without making a copy.
      *
-     * @param block the block
+     * @param block   the block
      * @param reverse true to transform in the opposite direction
      * @return the same block
      */
@@ -525,7 +552,7 @@ public class BlockTransformExtent extends ResettableExtent {
      *
      * <p>The provided block is <em>not</em> modified.</p>
      *
-     * @param block the block
+     * @param block     the block
      * @param transform the transform
      * @return the same block
      */

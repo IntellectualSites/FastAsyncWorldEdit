@@ -71,4 +71,5 @@ public class SignCompatibilityHandler implements NBTCompatibilityHandler {
         }
         return block;
     }
+
 }

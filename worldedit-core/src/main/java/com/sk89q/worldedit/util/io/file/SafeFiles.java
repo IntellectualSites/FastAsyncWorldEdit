@@ -21,6 +21,7 @@ package com.sk89q.worldedit.util.io.file;
 
 import com.google.common.collect.ImmutableSet;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -32,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 public class SafeFiles {
 
@@ -151,7 +151,7 @@ public class SafeFiles {
 
     static {
         if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
-            OWNER_ONLY_FILE_ATTRS = new FileAttribute<?>[] {
+            OWNER_ONLY_FILE_ATTRS = new FileAttribute<?>[]{
                     PosixFilePermissions.asFileAttribute(
                             ImmutableSet.of(
                                     PosixFilePermission.OWNER_READ,
@@ -159,7 +159,7 @@ public class SafeFiles {
                             )
                     )
             };
-            OWNER_ONLY_DIR_ATTRS = new FileAttribute<?>[] {
+            OWNER_ONLY_DIR_ATTRS = new FileAttribute<?>[]{
                     PosixFilePermissions.asFileAttribute(
                             ImmutableSet.of(
                                     PosixFilePermission.OWNER_READ,
@@ -196,4 +196,5 @@ public class SafeFiles {
 
     private SafeFiles() {
     }
+
 }

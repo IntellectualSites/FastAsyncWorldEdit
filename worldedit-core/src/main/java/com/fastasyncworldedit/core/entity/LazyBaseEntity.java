@@ -6,11 +6,13 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.world.entity.EntityType;
 
-import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 public class LazyBaseEntity extends BaseEntity {
+
     private Supplier<CompoundTag> saveTag;
+
     public LazyBaseEntity(EntityType type, Supplier<CompoundTag> saveTag) {
         super(type);
         this.saveTag = saveTag;
@@ -30,4 +32,5 @@ public class LazyBaseEntity extends BaseEntity {
         }
         return super.getNbtData();
     }
+
 }

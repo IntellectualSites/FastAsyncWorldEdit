@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class CleanableThreadLocal<T> extends ThreadLocal<T> implements AutoCloseable {
+
     private final Supplier<T> supplier;
     private final Function<T, T> modifier;
     private final LongAdder count = new LongAdder(); // what is that supposed to do?
@@ -48,4 +49,5 @@ public class CleanableThreadLocal<T> extends ThreadLocal<T> implements AutoClose
     public void close() throws IOException {
         clean();
     }
+
 }

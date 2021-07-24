@@ -26,9 +26,14 @@ public class CommandBrush implements Brush {
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         int radius = (int) size;
-        CuboidRegionSelector selector = new CuboidRegionSelector(editSession.getWorld(), position.subtract(radius, radius, radius), position.add(radius, radius, radius));
+        CuboidRegionSelector selector = new CuboidRegionSelector(
+                editSession.getWorld(),
+                position.subtract(radius, radius, radius),
+                position.add(radius, radius, radius)
+        );
         String replaced = command.replace("{x}", position.getBlockX() + "")
                 .replace("{y}", Integer.toString(position.getBlockY()))
                 .replace("{z}", Integer.toString(position.getBlockZ()))
@@ -43,11 +48,15 @@ public class CommandBrush implements Brush {
             position = position.add(face.getDirection().toBlockPoint());
         }
         player.setSelection(selector);
-        AsyncPlayer wePlayer = new SilentPlayerWrapper(new LocationMaskedPlayerWrapper(player, new Location(player.getExtent(), position.toVector3())));
+        AsyncPlayer wePlayer = new SilentPlayerWrapper(new LocationMaskedPlayerWrapper(
+                player,
+                new Location(player.getExtent(), position.toVector3())
+        ));
         List<String> cmds = StringMan.split(replaced, ';');
         for (String cmd : cmds) {
             CommandEvent event = new CommandEvent(wePlayer, cmd);
             PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
     }
+
 }

@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent.processor.heightmap;
 
 public class AverageHeightMapFilter {
+
     private int[] inData;
     private int[] buffer;
     private final int width;
@@ -46,4 +47,5 @@ public class AverageHeightMapFilter {
         }
         return val;
     }
+
 }

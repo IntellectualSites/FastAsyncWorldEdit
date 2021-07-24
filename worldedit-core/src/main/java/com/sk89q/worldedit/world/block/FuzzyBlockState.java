@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.registry.state.Property;
-import com.fastasyncworldedit.core.registry.state.PropertyKey;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -101,7 +101,8 @@ public class FuzzyBlockState extends BlockState {
         return true;
     }
 
-    @Override public BaseBlock toBaseBlock() {
+    @Override
+    public BaseBlock toBaseBlock() {
         if (props == null || props.isEmpty()) {
             return super.toBaseBlock();
         }
@@ -144,6 +145,7 @@ public class FuzzyBlockState extends BlockState {
      * Builder for FuzzyBlockState
      */
     public static class Builder {
+
         private BlockType type;
         private final Map<Property<?>, Object> values = new HashMap<>();
 
@@ -175,8 +177,8 @@ public class FuzzyBlockState extends BlockState {
          * Adds a property to the fuzzy BlockState
          *
          * @param property The property
-         * @param value The value
-         * @param <V> The property type
+         * @param value    The value
+         * @param <V>      The property type
          * @return The builder, for chaining
          */
         public <V> Builder withProperty(Property<V> property, V value) {
@@ -211,5 +213,7 @@ public class FuzzyBlockState extends BlockState {
             this.values.clear();
             return this;
         }
+
     }
+
 }

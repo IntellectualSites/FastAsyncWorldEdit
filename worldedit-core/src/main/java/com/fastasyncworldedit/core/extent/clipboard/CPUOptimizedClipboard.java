@@ -70,7 +70,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
             return;
         }
         try {
-            for (int y = 0; y < getHeight(); y ++) {
+            for (int y = 0; y < getHeight(); y++) {
                 for (int z = 0; z < getLength(); z++) {
                     for (int x = 0; x < getWidth(); x++) {
                         task.applyInt(getIndex(x, y, z), biomes[getBiomeIndex(x, y, z)].getInternalId());
@@ -177,7 +177,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        nbtMapLoc.put(new IntTriple(x, y, z),  new CompoundTag(tag.getValue()));
+        nbtMapLoc.put(new IntTriple(x, y, z), new CompoundTag(tag.getValue()));
         return true;
     }
 

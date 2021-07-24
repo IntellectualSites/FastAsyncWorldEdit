@@ -36,7 +36,7 @@ public class FlatRegionOffset implements FlatRegionFunction {
     /**
      * Create a new instance.
      *
-     * @param offset the offset
+     * @param offset   the offset
      * @param function the function that is called with the offset position
      */
     public FlatRegionOffset(BlockVector2 offset, FlatRegionFunction function) {
@@ -68,4 +68,5 @@ public class FlatRegionOffset implements FlatRegionFunction {
     public boolean apply(BlockVector2 position) throws WorldEditException {
         return function.apply(position.add(offset));
     }
+
 }

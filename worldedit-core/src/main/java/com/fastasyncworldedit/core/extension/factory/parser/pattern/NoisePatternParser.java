@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.math.random.NoiseRandom;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -49,8 +49,10 @@ public abstract class NoisePatternParser extends RichParser<Pattern> {
     @Override
     protected Pattern parseFromInput(@NotNull String[] arguments, ParserContext context) {
         if (arguments.length != 2) {
-            throw new InputParseException(Caption.of("fawe.error.command.syntax",
-                    TextComponent.of(getPrefix() + "[scale][pattern] (e.g. " + getPrefix() + "[5][dirt,stone])")));
+            throw new InputParseException(Caption.of(
+                    "fawe.error.command.syntax",
+                    TextComponent.of(getPrefix() + "[scale][pattern] (e.g. " + getPrefix() + "[5][dirt,stone])")
+            ));
         }
         double scale = parseScale(arguments[0]);
         Pattern inner = worldEdit.getPatternFactory().parseFromInput(arguments[1], context);
@@ -74,4 +76,5 @@ public abstract class NoisePatternParser extends RichParser<Pattern> {
         double scale = Double.parseDouble(argument);
         return 1d / Math.max(1, scale);
     }
+
 }

@@ -26,4 +26,5 @@ public class YAxisMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) {
         return new YAxisMask(context.getExtent());
     }
+
 }

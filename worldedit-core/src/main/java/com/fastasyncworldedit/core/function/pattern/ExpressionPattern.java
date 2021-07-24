@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * greater than {@code 0}.</p>
  */
 public class ExpressionPattern extends AbstractPattern {
+
     private final Expression expression;
 
     /**
@@ -58,4 +59,5 @@ public class ExpressionPattern extends AbstractPattern {
             throw e;
         }
     }
+
 }
