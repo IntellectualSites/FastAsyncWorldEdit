@@ -12,7 +12,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 import org.intellij.lang.annotations.Language;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,7 +127,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         });
     }
 
-    public Future<RollbackOptimizedHistory> getEdit(@NotNull UUID uuid, int id) {
+    public Future<RollbackOptimizedHistory> getEdit(@Nonnull UUID uuid, int id) {
         return call(() -> {
             try (PreparedStatement stmt = connection.prepareStatement(getEditUser)) {
                 stmt.setBytes(1, toBytes(uuid));

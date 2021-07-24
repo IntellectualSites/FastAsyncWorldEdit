@@ -31,7 +31,7 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.NBTConversions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
     private NBTInputStream inputStream;
     private NBTOutputStream out;
 
-    public MinecraftStructure(@NotNull NBTInputStream inputStream) {
+    public MinecraftStructure(@Nonnull NBTInputStream inputStream) {
         this.inputStream = inputStream;
     }
 

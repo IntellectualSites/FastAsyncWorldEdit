@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.internal.io;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.io.DataOutput;
 import java.io.FilterOutputStream;
@@ -48,7 +48,7 @@ public class LittleEndianOutputStream extends FilterOutputStream implements Data
      * @exception  IOException  if the underlying stream throws an IOException.
      */
     @Override
-    public synchronized void write(@NotNull byte[] data, int offset, int length)
+    public synchronized void write(@Nonnull byte[] data, int offset, int length)
             throws IOException {
         out.write(data, offset, length);
         written += length;

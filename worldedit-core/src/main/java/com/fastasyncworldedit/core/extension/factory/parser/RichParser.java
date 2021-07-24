@@ -7,7 +7,7 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +37,7 @@ public abstract class RichParser<E> extends InputParser<E> {
         this.prefixes = aliases;
     }
 
-    @NotNull
+    @Nonnull
     private static Predicate<String> validPrefix(String other) {
         return prefix -> {
             if (prefix.length() > other.length()) {
@@ -47,7 +47,7 @@ public abstract class RichParser<E> extends InputParser<E> {
         };
     }
 
-    @NotNull
+    @Nonnull
     private Function<String, Stream<? extends String>> extractArguments(String input) {
         return prefix -> {
             if (input.length() > prefix.length()) {
@@ -111,7 +111,7 @@ public abstract class RichParser<E> extends InputParser<E> {
      * @return the resulting parsed type.
      * @throws InputParseException if the input couldn't be parsed correctly.
      */
-    protected abstract E parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException;
+    protected abstract E parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException;
 
     /**
      * Extracts arguments enclosed by {@code []} into an array.

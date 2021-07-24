@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.jnbt.CompoundTag;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 /**
  * Describes the material for a block.

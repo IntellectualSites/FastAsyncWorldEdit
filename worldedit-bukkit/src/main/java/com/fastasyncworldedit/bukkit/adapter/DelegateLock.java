@@ -5,14 +5,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public class DelegateLock extends ReentrantLockWithGetOwner {
     private final ReentrantLock parent;
     private volatile boolean modified;
     private final AtomicInteger count;
 
-    public DelegateLock(@NotNull ReentrantLock parent) {
+    public DelegateLock(@Nonnull ReentrantLock parent) {
         this.parent = parent;
         this.count = null;
     }

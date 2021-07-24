@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.util;
 
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
@@ -86,7 +86,7 @@ public class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getField(@NotNull Field field, Object instance) {
+    public static <T> T getField(@Nonnull Field field, Object instance) {
         field.setAccessible(true);
         try {
             return (T) field.get(instance);

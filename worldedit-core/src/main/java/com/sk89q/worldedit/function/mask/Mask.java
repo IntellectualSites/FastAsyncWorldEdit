@@ -24,7 +24,7 @@ import com.fastasyncworldedit.core.extent.filter.MaskFilter;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.function.mask.InverseMask;
 import com.sk89q.worldedit.math.BlockVector3;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nullable;
 
 import java.util.function.Consumer;
 

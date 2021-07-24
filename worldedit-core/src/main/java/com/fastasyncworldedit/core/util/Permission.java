@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 import com.sk89q.worldedit.util.auth.Subject;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 public enum Permission {
     /*
@@ -18,7 +18,7 @@ public enum Permission {
     }
 
 
-    public static boolean hasPermission(@NotNull Subject player, String permission) {
+    public static boolean hasPermission(@Nonnull Subject player, String permission) {
         if (player.hasPermission(ADMIN.permission) || player.hasPermission(permission)) {
             return true;
         }

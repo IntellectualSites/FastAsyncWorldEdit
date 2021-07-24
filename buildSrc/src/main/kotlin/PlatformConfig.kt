@@ -55,7 +55,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
     }
 
     dependencies {
-        "compileOnly"("org.jetbrains:annotations:20.1.0")
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
         "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")

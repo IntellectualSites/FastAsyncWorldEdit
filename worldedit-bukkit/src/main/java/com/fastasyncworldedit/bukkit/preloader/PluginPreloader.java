@@ -13,8 +13,8 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginBase;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginLoader;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import java.io.File;
 import java.io.InputStream;
@@ -95,26 +95,26 @@ public class PluginPreloader extends PluginBase {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public File getDataFolder() {
         return null;
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public PluginDescriptionFile getDescription() {
         return null;
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public FileConfiguration getConfig() {
         return null;
     }
 
     @Override
     @Nullable
-    public InputStream getResource(@NotNull String filename) {
+    public InputStream getResource(@Nonnull String filename) {
         return null;
     }
 
@@ -129,7 +129,7 @@ public class PluginPreloader extends PluginBase {
     }
 
     @Override
-    public void saveResource(@NotNull String resourcePath, boolean replace) {
+    public void saveResource(@Nonnull String resourcePath, boolean replace) {
 
     }
 
@@ -139,13 +139,13 @@ public class PluginPreloader extends PluginBase {
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public PluginLoader getPluginLoader() {
         return null;
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public Server getServer() {
         return null;
     }
@@ -182,24 +182,24 @@ public class PluginPreloader extends PluginBase {
 
     @Override
     @Nullable
-    public ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, @Nullable String id) {
+    public ChunkGenerator getDefaultWorldGenerator(@Nonnull String worldName, @Nullable String id) {
         return null;
     }
 
     @Override
-    @NotNull
+    @Nonnull
     public Logger getLogger() {
         return null;
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String label, String[] args) {
         return false;
     }
 
     @Override
     @Nullable
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+    public List<String> onTabComplete(@Nonnull CommandSender sender, @Nonnull Command command, @Nonnull String alias, String[] args) {
         return null;
     }
 }

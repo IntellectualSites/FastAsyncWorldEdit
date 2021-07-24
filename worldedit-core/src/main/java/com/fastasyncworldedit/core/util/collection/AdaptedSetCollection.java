@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.util.collection;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -44,21 +44,21 @@ public class AdaptedSetCollection<T, V> implements Set<V> {
         return adapted.contains(o);
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Iterator<V> iterator() {
         return adapted.iterator();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public Object[] toArray() {
         return adapted.toArray();
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public <V> V[] toArray(@NotNull V[] a) {
+    public <V> V[] toArray(@Nonnull V[] a) {
         return adapted.toArray(a);
     }
 
@@ -73,17 +73,17 @@ public class AdaptedSetCollection<T, V> implements Set<V> {
     }
 
     @Override
-    public boolean containsAll(@NotNull Collection<?> c) {
+    public boolean containsAll(@Nonnull Collection<?> c) {
         return adapted.containsAll(c);
     }
 
     @Override
-    public boolean addAll(@NotNull Collection<? extends V> c) {
+    public boolean addAll(@Nonnull Collection<? extends V> c) {
         return adapted.addAll(c);
     }
 
     @Override
-    public boolean removeAll(@NotNull Collection<?> c) {
+    public boolean removeAll(@Nonnull Collection<?> c) {
         return adapted.removeAll(c);
     }
 
@@ -93,7 +93,7 @@ public class AdaptedSetCollection<T, V> implements Set<V> {
     }
 
     @Override
-    public boolean retainAll(@NotNull Collection<?> c) {
+    public boolean retainAll(@Nonnull Collection<?> c) {
         return adapted.retainAll(c);
     }
 

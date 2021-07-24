@@ -3,7 +3,7 @@ package com.fastasyncworldedit.core.world.block;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 /**
  * BaseBlock that when parsed to masks represents all BlockStates of a BlockType, whilst allowing for NBT storage
@@ -14,7 +14,7 @@ public final class BlanketBaseBlock extends BaseBlock {
         super(blockState);
     }
 
-    public BlanketBaseBlock(BlockState blockState, @NotNull CompoundTag tile) {
+    public BlanketBaseBlock(BlockState blockState, @Nonnull CompoundTag tile) {
         super(blockState, tile);
     }
 

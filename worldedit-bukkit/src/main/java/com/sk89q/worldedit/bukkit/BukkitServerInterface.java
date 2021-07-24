@@ -45,7 +45,7 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.enginehub.piston.CommandManager;
-import org.jetbrains.annotations.NotNull;
+import javax.annotation.Nonnull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -264,7 +264,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     //FAWE start
     @Override
-    public @NotNull RelighterFactory getRelighterFactory() {
+    public @Nonnull RelighterFactory getRelighterFactory() {
         if (this.relighterFactory == null) {
             this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
             LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");
