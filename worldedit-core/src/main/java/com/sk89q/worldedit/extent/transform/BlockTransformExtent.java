@@ -475,7 +475,7 @@ public class BlockTransformExtent extends ResettableExtent {
             BLOCK_TRANSFORM_INVERSE[i] = ALL;
             BlockType type = BlockTypes.get(i);
             int bitMask = 0;
-            for (AbstractProperty property : (Collection<AbstractProperty>) type.getProperties()) {
+            for (AbstractProperty property : (Collection<AbstractProperty>) (Collection) type.getProperties()) {
                 if (isDirectional(property)) {
                     BLOCK_TRANSFORM[i] = null;
                     BLOCK_TRANSFORM_INVERSE[i] = null;

@@ -23,7 +23,6 @@ import com.fastasyncworldedit.core.queue.implementation.preloader.AsyncPreloader
 import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.ThirdPartyManager;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.image.ImageViewer;
 import com.plotsquared.core.PlotSquared;
@@ -43,7 +42,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -112,24 +110,12 @@ public class FaweBukkit implements IFawe, Listener {
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
-                File output = new File(
-                        plugin.getDataFolder().getParentFile(),
-                        "PacketListenerAPI_v3.7.6-SNAPSHOT.jar"
-                );
-                byte[] jarData = ThirdPartyManager.PacketListenerAPI.download();
-                try (FileOutputStream fos = new FileOutputStream(output)) {
-                    fos.write(jarData);
-                }
+                LOGGER.error("PacketListener not found! Please install PacketListenerAPI v3.7.6 or above before attempting to " +
+                        "complete image-related edits");
             }
             if (manager.getPlugin("MapManager") == null) {
-                File output = new File(
-                        plugin.getDataFolder().getParentFile(),
-                        "MapManager_v1.7.8-SNAPSHOT.jar"
-                );
-                byte[] jarData = ThirdPartyManager.MapManager.download();
-                try (FileOutputStream fos = new FileOutputStream(output)) {
-                    fos.write(jarData);
-                }
+                LOGGER.error("MapManager not found! Please install PacketListenerAPI v1.7.8 or above before attempting to " +
+                        "complete image-related edits");
             }
             return new BukkitImageViewer(BukkitAdapter.adapt(player));
         } catch (Throwable ignored) {
