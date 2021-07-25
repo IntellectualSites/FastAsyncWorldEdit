@@ -286,7 +286,7 @@ public class SelectionCommands {
             }
 
             min = minChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS);
-            max = min.add(15,255, 15);
+            max = min.add(15, 255, 15);
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected",

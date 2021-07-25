@@ -43,7 +43,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
 
     public boolean contains(int x, int y, int z) {
         // take 128 to fit -256<y<255
-        return set.get(MathMan.tripleSearchCoordsExtendedY(x - offsetX, y - 128, z - offsetZ));
+        return set.get(MathMan.tripleSearchCoords(x - offsetX, y - 128, z - offsetZ));
     }
 
     @Override
@@ -240,7 +240,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
 
     private int getIndex(BlockVector3 vector) {
         // take 128 to fit -256<y<255
-        return MathMan.tripleSearchCoordsExtendedY(
+        return MathMan.tripleSearchCoords(
                 vector.getBlockX() - offsetX,
                 vector.getBlockY() - 128,
                 vector.getBlockZ() - offsetZ
@@ -249,7 +249,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
 
     private int getIndex(int x, int y, int z) {
         // take 128 to fit -256<y<255
-        return MathMan.tripleSearchCoordsExtendedY(x - offsetX, y - 128, z - offsetZ);
+        return MathMan.tripleSearchCoords(x - offsetX, y - 128, z - offsetZ);
     }
 
     public boolean remove(int x, int y, int z) {
@@ -259,7 +259,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             return false;
         }
         // take 128 to fit -256<y<255
-        int index = MathMan.tripleSearchCoordsExtendedY(relX, y - 128, relZ);
+        int index = MathMan.tripleSearchCoords(relX, y - 128, relZ);
         boolean value = set.get(index);
         set.clear(index);
         return value;

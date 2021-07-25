@@ -45,23 +45,23 @@ public class AdjacentMaskParser extends RichParser<Mask> {
             max = min;
         }
         if (max >= 8 && min == 1) {
-            int miny;
-            int maxy;
+            int minY;
+            int maxY;
             if (context.getActor() instanceof Player) {
                 World world = ((Player) context.getActor()).getWorld();
-                miny = world.getMinY();
-                maxy = world.getMaxY();
+                minY = world.getMinY();
+                maxY = world.getMaxY();
             } else if (context.getWorld() != null) {
-                miny = context.getWorld().getMinY();
-                maxy = context.getWorld().getMaxY();
-            } else if(context.getExtent() != null) {
-                miny = context.getExtent().getMinY();
-                maxy = context.getExtent().getMaxY();
+                minY = context.getWorld().getMinY();
+                maxY = context.getWorld().getMaxY();
+            } else if (context.getExtent() != null) {
+                minY = context.getExtent().getMinY();
+                maxY = context.getExtent().getMaxY();
             } else {
-                miny = 0;
-                maxy = 255;
+                minY = 0;
+                maxY = 255;
             }
-            return new AdjacentAnyMask(subMask, miny, maxy);
+            return new AdjacentAnyMask(subMask, minY, maxY);
         }
         return new AdjacentMask(subMask, min, max);
     }

@@ -190,23 +190,6 @@ public class MathMan {
     }
 
     /**
-    * @deprecated does not support 0>y>255
-     */
-    @Deprecated
-    public static int tripleSearchCoords(int x, int y, int z) {
-        byte b1 = (byte) y;
-        byte b3 = (byte) (x);
-        byte b4 = (byte) (z);
-        int x16 = (x >> 8) & 0x7;
-        int z16 = (z >> 8) & 0x7;
-        byte b2 = MathMan.pair8(x16, z16);
-        return ((b1 & 0xFF)
-                + ((b2 & 0x7F) << 8)
-                + ((b3 & 0xFF) << 15)
-                + ((b4 & 0xFF) << 23));
-    }
-
-    /**
      * Obtain an integer representation of 3 ints, x, y and z. y is represented by the right-most 9 bits and can
      * be within the range -256 to 255. x and z are represented by 11 bits each and can be within the range
      * -1024 to 1024
@@ -216,7 +199,7 @@ public class MathMan {
      * @param z z value
      * @return integer representation of x y z
      */
-    public static int tripleSearchCoordsExtendedY(int x, int y, int z) {
+    public static int tripleSearchCoords(int x, int y, int z) {
         if (x > 1023 || x < -1024 || y > 255 || y < -256 || z > 1023 || z < -1024) {
             throw new IndexOutOfBoundsException(String.format("Check range on x=%s, y=%s and z=%s!", x, y, z));
         }
