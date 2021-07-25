@@ -8,6 +8,8 @@ import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extension.platform.Locatable;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.world.World;
 
@@ -45,18 +47,24 @@ public class AdjacentMaskParser extends RichParser<Mask> {
             max = min;
         }
         if (max >= 8 && min == 1) {
+
             int minY;
             int maxY;
+            Extent extent = null;
+
             if (context.getActor() instanceof Player) {
-                World world = ((Player) context.getActor()).getWorld();
-                minY = world.getMinY();
-                maxY = world.getMaxY();
+                extent = ((Player) context.getActor()).getWorld();
             } else if (context.getWorld() != null) {
-                minY = context.getWorld().getMinY();
-                maxY = context.getWorld().getMaxY();
+                extent = context.getWorld();
+            } else if (context.getActor() instanceof Locatable) {
+                extent = ((Locatable) context.getActor()).getExtent();
             } else if (context.getExtent() != null) {
-                minY = context.getExtent().getMinY();
-                maxY = context.getExtent().getMaxY();
+                extent = context.getExtent();
+            }
+
+            if (extent != null) {
+                minY = extent.getMinY();
+                maxY = extent.getMaxY();
             } else {
                 minY = 0;
                 maxY = 255;

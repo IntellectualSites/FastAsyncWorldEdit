@@ -63,17 +63,17 @@ public abstract class CharBlocks implements IBlocks {
     };
     public char[][] blocks;
     public Section[] sections;
-    protected int minLayer;
-    protected int maxLayer;
-    protected int layers;
+    protected int minSectionIndex;
+    protected int maxSectionIndex;
+    protected int sectionCount;
 
-    public CharBlocks(int minLayer, int maxLayer) {
-        this.minLayer = minLayer;
-        this.maxLayer = maxLayer;
-        this.layers = maxLayer - minLayer + 1;
-        blocks = new char[layers][];
-        sections = new Section[layers];
-        for (int i = 0; i < layers; i++) {
+    public CharBlocks(int minSectionIndex, int maxSectionIndex) {
+        this.minSectionIndex = minSectionIndex;
+        this.maxSectionIndex = maxSectionIndex;
+        this.sectionCount = maxSectionIndex - minSectionIndex + 1;
+        blocks = new char[sectionCount][];
+        sections = new Section[sectionCount];
+        for (int i = 0; i < sectionCount; i++) {
             sections[i] = empty;
         }
     }
@@ -81,7 +81,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public synchronized boolean trim(boolean aggressive) {
         boolean result = true;
-        for (int i = 0; i < layers; i++) {
+        for (int i = 0; i < sectionCount; i++) {
             if (!sections[i].isFull() && blocks[i] != null) {
                 blocks[i] = null;
             } else {
@@ -104,14 +104,14 @@ public abstract class CharBlocks implements IBlocks {
 
     @Override
     public synchronized IChunkSet reset() {
-        for (int i = 0; i < layers; i++) {
+        for (int i = 0; i < sectionCount; i++) {
             sections[i] = empty;
         }
         return null;
     }
 
     public synchronized void reset(int layer) {
-        layer -= minLayer;
+        layer -= minSectionIndex;
         sections[layer] = empty;
     }
 
@@ -128,13 +128,13 @@ public abstract class CharBlocks implements IBlocks {
     // Not synchronized as any subsequent methods called from this class will be, or the section shouldn't appear as loaded anyway.
     @Override
     public boolean hasSection(int layer) {
-        layer -= minLayer;
+        layer -= minSectionIndex;
         return layer >= 0 && layer < sections.length && sections[layer].isFull();
     }
 
     @Override
     public char[] load(int layer) {
-        layer -= minLayer;
+        layer -= minSectionIndex;
         synchronized (sections[layer]) {
             return sections[layer].get(this, layer);
         }
@@ -148,7 +148,7 @@ public abstract class CharBlocks implements IBlocks {
     public char get(int x, int y, int z) {
         final int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
-        if (layer > maxLayer || layer < minLayer) {
+        if (layer > maxSectionIndex || layer < minSectionIndex) {
             return 0;
         }
         return sections[layer].get(this, layer, index);
@@ -172,13 +172,13 @@ public abstract class CharBlocks implements IBlocks {
      */
 
     public final char get(int layer, int index) {
-        layer -= minLayer;
+        layer -= minSectionIndex;
         return sections[layer].get(this, layer, index);
     }
 
     public synchronized final void set(int layer, int index, char value) throws
             ArrayIndexOutOfBoundsException {
-        layer -= minLayer;
+        layer -= minSectionIndex;
         sections[layer].set(this, layer, index, value);
     }
 

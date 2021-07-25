@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.queue;
 
-import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
@@ -57,7 +56,7 @@ public interface IBatchProcessor {
             }
         }
         int maxLayer = (maxY + 1) >> 4;
-        for (int layer = maxLayer; layer < set.getLayerCount(); layer++) {
+        for (int layer = maxLayer; layer < set.getSectionCount(); layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);

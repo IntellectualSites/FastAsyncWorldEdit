@@ -184,13 +184,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public int getMaxLayer() {
-        return getOrCreateGet().getMaxLayer();
+    public int getMaxSectionIndex() {
+        return getOrCreateGet().getMaxSectionIndex();
     }
 
     @Override
-    public int getMinLayer() {
-        return getOrCreateGet().getMinLayer();
+    public int getMinSectionIndex() {
+        return getOrCreateGet().getMinSectionIndex();
     }
 
     public void flushLightToGet(boolean heightmaps) {
@@ -909,8 +909,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public int getLayerCount() {
-        return getOrCreateGet().getLayerCount();
+    public int getSectionCount() {
+        return getOrCreateGet().getSectionCount();
     }
 
     @Override

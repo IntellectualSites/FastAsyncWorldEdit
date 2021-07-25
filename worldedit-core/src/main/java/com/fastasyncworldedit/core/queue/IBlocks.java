@@ -37,7 +37,7 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        return IntStream.range(0, getLayerCount()).filter(this::hasSection)
+        return IntStream.range(0, getSectionCount()).filter(this::hasSection)
                 .map(layer -> (1 << layer)).sum();
     }
 
@@ -47,7 +47,7 @@ public interface IBlocks extends Trimable {
 
     IBlocks reset();
 
-    int getLayerCount();
+    int getSectionCount();
 
     default byte[] toByteArray(boolean full, boolean stretched) {
         return toByteArray(null, getBitMask(), full, stretched);
@@ -62,7 +62,7 @@ public interface IBlocks extends Trimable {
                 .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
         FastByteArrayOutputStream sectionByteArray = new FastByteArrayOutputStream(buffer);
         try (FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray)) {
-            for (int layer = 0; layer < this.getLayerCount(); layer++) {
+            for (int layer = 0; layer < this.getSectionCount(); layer++) {
                 if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) {
                     continue;
                 }

@@ -191,7 +191,7 @@ public class NMSRelighter implements Relighter {
             if (!iChunk.isInit()) {
                 iChunk.init(queue, chunk.x, chunk.z);
             }
-            for (int i = iChunk.getMinLayer(); i < iChunk.getMaxLayer(); i++) {
+            for (int i = iChunk.getMinSectionIndex(); i <= iChunk.getMaxSectionIndex(); i++) {
                 iChunk.removeSectionLighting(i, true);
             }
             iter.remove();

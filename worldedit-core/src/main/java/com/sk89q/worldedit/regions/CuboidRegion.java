@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.math.BlockVectorSet;
@@ -766,7 +765,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimX = lowerX != 0 || upperX != 15;
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
-            for (int layer = 0; layer < set.getLayerCount(); layer++) {
+            for (int layer = 0; layer < set.getSectionCount(); layer++) {
                 if (set.hasSection(layer)) {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {

@@ -200,7 +200,7 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public int getLayerCount() {
+    public int getSectionCount() {
         return layers;
     }
 

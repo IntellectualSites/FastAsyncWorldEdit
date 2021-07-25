@@ -28,12 +28,12 @@ public class RelightProcessor implements IBatchProcessor {
         if (Settings.IMP.LIGHTING.MODE == 2) {
             relighter.addChunk(chunk.getX(), chunk.getZ(), null, chunk.getBitMask());
         } else if (Settings.IMP.LIGHTING.MODE == 1) {
-            byte[] fix = new byte[get.getMaxLayer() - get.getMinLayer()];
+            byte[] fix = new byte[get.getSectionCount()];
             boolean relight = false;
-            for (int i = get.getMaxLayer(); i >= get.getMinLayer(); i--) {
+            for (int i = get.getMaxSectionIndex(); i >= get.getMinSectionIndex(); i--) {
                 if (!set.hasSection(i)) {
-                    // Array index cannot be < 0 so "add" the min layer
-                    fix[get.getMaxLayer() - get.getMinLayer()] = Relighter.SkipReason.AIR;
+                    // Array index cannot be < 0 so "add" the min
+                    fix[i - get.getMinSectionIndex()] = Relighter.SkipReason.AIR;
                     continue;
                 }
                 relight = true;

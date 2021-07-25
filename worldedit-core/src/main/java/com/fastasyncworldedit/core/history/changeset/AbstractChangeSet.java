@@ -157,7 +157,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 addEntityCreate(tag);
             }
         }
-        for (int layer = get.getMinLayer(); layer < get.getMaxLayer(); layer++) {
+        for (int layer = get.getMinSectionIndex(); layer <= get.getMaxSectionIndex(); layer++) {
             if (!set.hasSection(layer)) {
                 continue;
             }
@@ -173,7 +173,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             System.arraycopy(set.load(layer), 0, (blocksSet = new char[4096]), 0, 4096);
 
             // Account for negative layers
-            int by = (layer - get.getMinLayer()) << 4;
+            int by = (layer - get.getMinSectionIndex()) << 4;
             for (int y = 0, index = 0; y < 16; y++) {
                 int yy = y + by;
                 for (int z = 0; z < 16; z++) {
@@ -196,7 +196,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
         BiomeType[] biomes = set.getBiomes();
         if (biomes != null) {
-            for (int y = get.getMinLayer() << 2, index = 0; y < get.getMaxLayer() << 2; y++) {
+            for (int y = get.getMinSectionIndex() << 2, index = 0; y <= get.getMaxSectionIndex() << 2; y++) {
                 for (int z = 0; z < 4; z++) {
                     for (int x = 0; x < 4; x++, index++) {
                         BiomeType newBiome = biomes[index];

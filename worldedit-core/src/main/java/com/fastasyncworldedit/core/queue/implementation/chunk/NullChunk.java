@@ -204,12 +204,12 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Override
-    public int getMaxLayer() {
+    public int getMaxSectionIndex() {
         return 0;
     }
 
     @Override
-    public int getMinLayer() {
+    public int getMinSectionIndex() {
         return 0;
     }
 
@@ -227,7 +227,7 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Override
-    public int getLayerCount() {
+    public int getSectionCount() {
         return 0;
     }
 
