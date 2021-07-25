@@ -89,6 +89,26 @@ public final class NullChunkGet implements IChunkGet {
     public void setHeightmapToGet(HeightMapType type, int[] data) {
     }
 
+    @Override
+    public int getMaxY() {
+        return 0;
+    }
+
+    @Override
+    public int getMinY() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxLayer() {
+        return 0;
+    }
+
+    @Override
+    public int getMinLayer() {
+        return 0;
+    }
+
     public boolean trim(boolean aggressive) {
         return true;
     }
@@ -127,6 +147,11 @@ public final class NullChunkGet implements IChunkGet {
     @Nullable
     public IBlocks reset() {
         return null;
+    }
+
+    @Override
+    public int getLayerCount() {
+        return 0;
     }
 
     private NullChunkGet() {

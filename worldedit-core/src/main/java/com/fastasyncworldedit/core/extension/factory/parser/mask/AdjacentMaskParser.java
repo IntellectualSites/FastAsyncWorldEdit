@@ -5,9 +5,11 @@ import com.fastasyncworldedit.core.function.mask.AdjacentAnyMask;
 import com.fastasyncworldedit.core.function.mask.AdjacentMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nonnull;
 import java.util.stream.Stream;
@@ -43,7 +45,23 @@ public class AdjacentMaskParser extends RichParser<Mask> {
             max = min;
         }
         if (max >= 8 && min == 1) {
-            return new AdjacentAnyMask(subMask);
+            int miny;
+            int maxy;
+            if (context.getActor() instanceof Player) {
+                World world = ((Player) context.getActor()).getWorld();
+                miny = world.getMinY();
+                maxy = world.getMaxY();
+            } else if (context.getWorld() != null) {
+                miny = context.getWorld().getMinY();
+                maxy = context.getWorld().getMaxY();
+            } else if(context.getExtent() != null) {
+                miny = context.getExtent().getMinY();
+                maxy = context.getExtent().getMaxY();
+            } else {
+                miny = 0;
+                maxy = 255;
+            }
+            return new AdjacentAnyMask(subMask, miny, maxy);
         }
         return new AdjacentMask(subMask, min, max);
     }

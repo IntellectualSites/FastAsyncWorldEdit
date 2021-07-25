@@ -66,7 +66,7 @@ dependencies {
         because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
     })
     implementation("org.apache.logging.log4j:log4j-api")
-    compileOnly("org.spigotmc:spigot:1.17-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT")
     implementation("io.papermc:paperlib:1.0.6")
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")

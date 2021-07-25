@@ -189,11 +189,11 @@ public class CavesGen extends GenBase {
                 n = 16;
             }
 
-            if (i1 < 1) {
-                i1 = 1;
+            if (i1 < chunk.getMinY() + 1) {
+                i1 = chunk.getMinY();
             }
-            if (i2 > 256 - 8) {
-                i2 = 256 - 8;
+            if (i2 > chunk.getMaxY() - 8) {
+                i2 = chunk.getMaxY() - 8;
             }
             if (i3 < 0) {
                 i3 = 0;
@@ -207,7 +207,7 @@ public class CavesGen extends GenBase {
             for (int local_x = m; !waterFound && local_x < n; local_x++) {
                 for (int local_z = i3; !waterFound && local_z < i4; local_z++) {
                     for (int local_y = i2 + 1; !waterFound && local_y >= i1 - 1; local_y--) {
-                        if (local_y < 255) {
+                        if (local_y < chunk.getMaxY()) {
                             BlockState material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
                             if (material.getBlockType() == BlockTypes.WATER) {
                                 waterFound = true;

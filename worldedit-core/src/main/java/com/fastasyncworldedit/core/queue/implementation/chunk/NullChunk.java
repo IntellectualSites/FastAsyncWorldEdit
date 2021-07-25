@@ -193,6 +193,26 @@ public final class NullChunk implements IQueueChunk {
     public void setHeightmapToGet(HeightMapType type, int[] data) {
     }
 
+    @Override
+    public int getMaxY() {
+        return 0;
+    }
+
+    @Override
+    public int getMinY() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxLayer() {
+        return 0;
+    }
+
+    @Override
+    public int getMinLayer() {
+        return 0;
+    }
+
     @Nullable
     public <T extends Future<T>> T call(@Nullable IChunkSet set, @Nullable Runnable finalize) {
         return null;
@@ -204,6 +224,11 @@ public final class NullChunk implements IQueueChunk {
 
     public boolean trim(boolean aggressive, int layer) {
         return true;
+    }
+
+    @Override
+    public int getLayerCount() {
+        return 0;
     }
 
     private NullChunk() {

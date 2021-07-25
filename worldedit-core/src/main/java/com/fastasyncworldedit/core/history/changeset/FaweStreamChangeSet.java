@@ -28,11 +28,16 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+/**
+ * FAWE stream ChangeSet offering support for extended-height worlds
+ */
 public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public static final int HEADER_SIZE = 9;
+    private static final int version = 1;
     private int mode;
     private final int compression;
+    private final int minY;
 
     protected FaweStreamIdDelegate idDel;
     protected FaweStreamPositionDelegate posDel;
@@ -44,6 +49,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public FaweStreamChangeSet(World world, int compression, boolean storeRedo, boolean smallLoc) {
         super(world);
         this.compression = compression;
+        this.minY = world.getMinY();
         init(storeRedo, smallLoc);
     }
 
@@ -139,6 +145,10 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
                 @Override
                 public void write(OutputStream out, int x, int y, int z) throws IOException {
+                    if (y < 0 || y > 255) {
+                        throw new UnsupportedOperationException("y cannot be outside range 0-255 for " +
+                                "small-edits=true");
+                    }
                     int rx = -lx + (lx = x);
                     int ry = -ly + (ly = y);
                     int rz = -lz + (lz = z);
@@ -188,7 +198,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     stream.write(((rx) >> 8) & 0xff);
                     stream.write((rz) & 0xff);
                     stream.write(((rz) >> 8) & 0xff);
-                    stream.write((byte) ry);
+                    stream.write((ry) & 0xff);
+                    stream.write(((ry) >> 8) & 0xff);
                 }
 
                 @Override
@@ -199,7 +210,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
                 @Override
                 public int readY(FaweInputStream is) throws IOException {
-                    return (ly = (ly + (buffer[4]))) & 0xFF;
+                    is.readFully(buffer);
+                    return lx = (lx + (buffer[4] & 0xFF) + (buffer[5] << 8));
                 }
 
                 @Override
@@ -212,6 +224,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
     public void writeHeader(OutputStream os, int x, int y, int z) throws IOException {
         os.write(mode);
+        // Allows for version detection of history in case of changes to format.
+        os.write(version);
         setOrigin(x, z);
         os.write((byte) (x >> 24));
         os.write((byte) (x >> 16));
@@ -227,6 +241,10 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public void readHeader(InputStream is) throws IOException {
         // skip mode
         int mode = is.read();
+        int version = is.read();
+        if (version != FaweStreamChangeSet.version) {
+            throw new UnsupportedOperationException(String.format("Version %s history not supported!", version));
+        }
         // origin
         int x = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
         int z = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
@@ -290,10 +308,6 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     public abstract NBTInputStream getTileRemoveIS() throws IOException;
 
     protected int blockSize;
-    public int entityCreateSize;
-    public int entityRemoveSize;
-    public int tileCreateSize;
-    public int tileRemoveSize;
 
     private int originX;
     private int originZ;
@@ -325,9 +339,12 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public void addBiomeChange(int x, int y, int z, BiomeType from, BiomeType to) {
+    public void addBiomeChange(int bx, int by, int bz, BiomeType from, BiomeType to) {
         blockSize++;
         try {
+            int x = bx >> 2;
+            int y = by >> 2;
+            int z = bz >> 2;
             FaweOutputStream os = getBiomeOS();
             os.write((byte) (x >> 24));
             os.write((byte) (x >> 16));
@@ -337,6 +354,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             os.write((byte) (z >> 16));
             os.write((byte) (z >> 8));
             os.write((byte) (z));
+            // only need to store biomes in the 4x4x4 chunks so only need one byte for y still (signed byte -128 -> 127)
+            //  means -512 -> 508
             os.write((byte) (y));
             os.writeVarInt(from.getInternalId());
             os.writeVarInt(to.getInternalId());
@@ -465,9 +484,9 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 try {
                     int int1 = is.read();
                     if (int1 != -1) {
-                        int x = ((int1 << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
-                        int z = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read());
-                        int y = is.read();
+                        int x = ((int1 << 24) + (is.read() << 16) + (is.read() << 8) + is.read()) << 2;
+                        int z = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read()) << 2;
+                        int y = is.read() << 2;
                         int from = is.readVarInt();
                         int to = is.readVarInt();
                         change.setBiome(x, y, z, from, to);

@@ -597,12 +597,18 @@ public class GenerationCommands {
             @Arg(desc = "Ore vein size") @Range(from = 0, to = Integer.MAX_VALUE) int size,
             @Arg(desc = "Ore vein frequency (number of times to attempt to place ore)", def = "10") @Range(from = 0, to = Integer.MAX_VALUE) int freq,
             @Arg(desc = "Ore vein rarity (% chance each attempt is placed)", def = "100") @Range(from = 0, to = 100) int rarity,
-            @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
-            @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY
+            @Arg(desc = "Ore vein min y", def = "0") int minY,
+            @Arg(desc = "Ore vein max y", def = "63") int maxY
     ) throws WorldEditException {
         if (mask instanceof AbstractExtentMask) {
             ((AbstractExtentMask) mask).setExtent(editSession);
         }
+        checkCommandArgument(minY >= editSession.getMinY(), Caption.of("fawe.error.outside-range-lower", "miny",
+                editSession.getMinY()));
+        checkCommandArgument(maxY <= editSession.getMaxY(), Caption.of("fawe.error.outside-range-upper", "maxy",
+                editSession.getMaxY()));
+        checkCommandArgument(minY < maxY, Caption.of("fawe.error.argument-size-mismatch", "miny",
+                "maxy"));
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }

@@ -418,12 +418,13 @@ public interface Extent extends InputExtent, OutputExtent {
         spawnResource(region, new OreGen(this, mask, material, size, minY, maxY), rarity, frequency);
     }
 
+    //TODO: probably update these for 1.18 etc.
     default void addOres(Region region, Mask mask) throws WorldEditException {
-        addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, 0, 255);
-        addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, 0, 255);
-        addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, 0, 79);
-        addOre(region, mask, BlockTypes.DIORITE.getDefaultState(), 33, 10, 100, 0, 79);
-        addOre(region, mask, BlockTypes.GRANITE.getDefaultState(), 33, 10, 100, 0, 79);
+        addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, getMinY(), getMaxY());
+        addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, getMinY(), getMaxY());
+        addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
+        addOre(region, mask, BlockTypes.DIORITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
+        addOre(region, mask, BlockTypes.GRANITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
         addOre(region, mask, BlockTypes.COAL_ORE.getDefaultState(), 17, 20, 100, 0, 127);
         addOre(region, mask, BlockTypes.IRON_ORE.getDefaultState(), 9, 20, 100, 0, 63);
         addOre(region, mask, BlockTypes.GOLD_ORE.getDefaultState(), 9, 2, 100, 0, 31);
@@ -530,11 +531,11 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default int getMinY() {
-        return 0;
+        return getMinimumPoint().getY();
     }
 
     default int getMaxY() {
-        return 255;
+        return getMaximumPoint().getY();
     }
 
     /**

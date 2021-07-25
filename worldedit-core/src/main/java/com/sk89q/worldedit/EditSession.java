@@ -1182,6 +1182,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return getBlockChangeCount();
     }
 
+    @Override
+    public BlockVector3 getMinimumPoint() {
+        return getWorld().getMinimumPoint();
+    }
+
+    @Override
+    public BlockVector3 getMaximumPoint() {
+        return getWorld().getMaximumPoint();
+    }
+
     //FAWE start
     public void setSize(int size) {
         this.changes = size;

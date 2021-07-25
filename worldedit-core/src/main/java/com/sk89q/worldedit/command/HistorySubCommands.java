@@ -192,9 +192,9 @@ public class HistorySubCommands {
                                             .summarize(RegionWrapper.GLOBAL(), false);
                                     if (summary != null) {
                                         rollback.setDimensions(
-                                                BlockVector3.at(summary.minX, 0, summary.minZ),
+                                                BlockVector3.at(summary.minX, world.getMinY(), summary.minZ),
                                                 BlockVector3
-                                                        .at(summary.maxX, 255, summary.maxZ)
+                                                        .at(summary.maxX, world.getMaxY(), summary.maxZ)
                                         );
                                         rollback.setTime(historyFile.lastModified());
                                         RollbackDatabase db = DBHandler.IMP

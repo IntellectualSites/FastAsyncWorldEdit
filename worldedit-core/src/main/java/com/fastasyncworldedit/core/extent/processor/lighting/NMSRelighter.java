@@ -60,6 +60,7 @@ public class NMSRelighter implements Relighter {
     private final ConcurrentHashMap<Long, long[][][]> concurrentLightQueue;
     private final RelightMode relightMode;
     private final int maxY;
+    private final int minY;
     private final ReentrantLock lightingLock;
     private final AtomicBoolean finished = new AtomicBoolean(false);
     private boolean removeFirst;
@@ -75,6 +76,7 @@ public class NMSRelighter implements Relighter {
         this.chunksToSend = new Long2ObjectOpenHashMap<>(12);
         this.concurrentLightQueue = new ConcurrentHashMap<>(12);
         this.maxY = queue.getMaxY();
+        this.minY = queue.getMinY();
         this.relightMode = relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE);
         this.lightingLock = new ReentrantLock();
     }
@@ -118,7 +120,8 @@ public class NMSRelighter implements Relighter {
         if (m2 == null) {
             m2 = m1[x] = new long[4];
         }
-        m2[y >> 6] |= 1L << y;
+        // Account for negative y values by "adding" minY
+        m2[(y - minY) >> 6] |= 1L << (y - minY);
     }
 
     public void addLightUpdate(int x, int y, int z) {
@@ -188,7 +191,7 @@ public class NMSRelighter implements Relighter {
             if (!iChunk.isInit()) {
                 iChunk.init(queue, chunk.x, chunk.z);
             }
-            for (int i = 0; i < 16; i++) {
+            for (int i = iChunk.getMinLayer(); i < iChunk.getMaxLayer(); i++) {
                 iChunk.removeSectionLighting(i, true);
             }
             iter.remove();
@@ -287,7 +290,7 @@ public class NMSRelighter implements Relighter {
                     removalVisited,
                     visited
             );
-            if (node.getY() > 0) {
+            if (node.getY() > minY) {
                 this.computeRemoveBlockLight(
                         node.getX(),
                         node.getY() - 1,
@@ -299,7 +302,7 @@ public class NMSRelighter implements Relighter {
                         visited
                 );
             }
-            if (node.getY() < 255) {
+            if (node.getY() < maxY) {
                 this.computeRemoveBlockLight(
                         node.getX(),
                         node.getY() + 1,
@@ -650,7 +653,7 @@ public class NMSRelighter implements Relighter {
             this.computeSpreadBlockLight(x, y - 1, z, currentLight, queue, visited);
         }
         state = this.queue.getBlock(x, y + 1, z);
-        if (y < 255 && !top && isSlabOrTrueValue(state, "top") && isStairOrTrueTop(state, true)) {
+        if (y < maxY && !top && isSlabOrTrueValue(state, "top") && isStairOrTrueTop(state, true)) {
             this.computeSpreadBlockLight(x, y + 1, z, currentLight, queue, visited);
         }
     }
@@ -696,7 +699,7 @@ public class NMSRelighter implements Relighter {
             this.computeSpreadBlockLight(x, y - 1, z, currentLight, queue, visited);
         }
         state = this.queue.getBlock(x, y + 1, z);
-        if (y < 255 && isSlabOrTrueValue(state, "top") && isStairOrTrueTop(state, false)) {
+        if (y < maxY && isSlabOrTrueValue(state, "top") && isStairOrTrueTop(state, false)) {
             this.computeSpreadBlockLight(x, y + 1, z, currentLight, queue, visited);
         }
     }
@@ -1025,9 +1028,9 @@ public class NMSRelighter implements Relighter {
                 }
             }
         }
-        for (int y = 255; y > 0; y--) {
+        for (int y = maxY; y > minY; y--) {
             for (RelightSkyEntry chunk : chunks) { // Propagate skylight
-                int layer = y >> 4;
+                int layer = (y - minY) >> 4;
                 byte[] mask = chunk.mask;
                 if (chunk.fix[layer] != SkipReason.NONE) {
                     if ((y & 15) == 0 && layer != 0 && chunk.fix[layer - 1] == SkipReason.NONE) {

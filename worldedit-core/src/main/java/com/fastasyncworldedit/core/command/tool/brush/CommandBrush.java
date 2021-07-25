@@ -41,7 +41,8 @@ public class CommandBrush implements Brush {
                 .replace("{size}", Integer.toString(radius));
 
         Player player = editSession.getPlayer();
-        Location face = player.getBlockTraceFace(256, true);
+        //Use max world height to allow full coverage of the world height
+        Location face = player.getBlockTraceFace(editSession.getWorld().getMaxY(), true);
         if (face == null) {
             position = position.add(0, 1, 1);
         } else {

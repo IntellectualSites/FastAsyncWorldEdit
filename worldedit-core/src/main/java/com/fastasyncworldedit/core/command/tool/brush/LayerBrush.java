@@ -36,7 +36,7 @@ public class LayerBrush implements Brush {
                 BlockTypes.AIR,
                 BlockTypes.CAVE_AIR,
                 BlockTypes.VOID_AIR
-        ));
+        ), editSession.getMinY(), editSession.getMaxY());
         final SolidBlockMask solid = new SolidBlockMask(editSession);
         final RadiusMask radius = new RadiusMask(0, (int) size);
         visitor = new RecursiveVisitor(new MaskIntersection(adjacent, solid, radius), function -> true);

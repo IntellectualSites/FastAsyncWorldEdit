@@ -63,4 +63,12 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     void setHeightmapToGet(HeightMapType type, int[] data);
 
+    int getMaxY();
+
+    int getMinY();
+
+    int getMaxLayer();
+
+    int getMinLayer();
+
 }

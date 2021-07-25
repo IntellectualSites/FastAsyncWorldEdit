@@ -258,7 +258,7 @@ public class SelectionCommands {
                     .clampY(minChunkY, maxChunkY);
 
             min = minChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS);
-            max = maxChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS).add(15, world.getMaxY(), 15);
+            max = maxChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS).add(15, 255, 15);
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected-multiple",
@@ -286,7 +286,7 @@ public class SelectionCommands {
             }
 
             min = minChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS);
-            max = min.add(15, world.getMaxY(), 15);
+            max = min.add(15,255, 15);
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected",

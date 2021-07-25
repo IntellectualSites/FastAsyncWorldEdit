@@ -10,6 +10,10 @@ import java.util.Arrays;
 
 public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
+    public CharGetBlocks(final int minLayer, final int maxLayer) {
+        super(minLayer, maxLayer);
+    }
+
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
         BlockState state = BlockTypesCache.states[get(x, y, z)];
@@ -18,7 +22,7 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
     @Override
     public boolean trim(boolean aggressive) {
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < layers; i++) {
             sections[i] = empty;
             blocks[i] = null;
         }
@@ -36,6 +40,7 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
     @Override
     public synchronized boolean trim(boolean aggressive, int layer) {
+        layer -= minLayer;
         sections[layer] = empty;
         blocks[layer] = null;
         return true;
@@ -45,6 +50,11 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     public IChunkSet reset() {
         super.reset();
         return null;
+    }
+
+    @Override
+    public int getLayerCount() {
+        return layers;
     }
 
 }

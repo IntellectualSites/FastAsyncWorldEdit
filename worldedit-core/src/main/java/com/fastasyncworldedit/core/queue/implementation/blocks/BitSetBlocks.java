@@ -20,14 +20,21 @@ public class BitSetBlocks implements IChunkSet {
 
     private final MemBlockSet.RowZ row;
     private final BlockState blockState;
+    private final int minLayer;
+    private final int maxLayer;
+    private final int layers;
 
-    public BitSetBlocks(BlockState blockState) {
-        this.row = new MemBlockSet.RowZ();
+    public BitSetBlocks(BlockState blockState, int minLayer, int maxLayer) {
+        this.row = new MemBlockSet.RowZ(minLayer, maxLayer);
         this.blockState = blockState;
+        this.minLayer = minLayer;
+        this.maxLayer = maxLayer;
+        this.layers = maxLayer - minLayer + 1;
     }
 
     @Override
     public boolean hasSection(int layer) {
+        layer -= minLayer;
         return row.rows[layer] != MemBlockSet.NULL_ROW_Y;
     }
 
@@ -39,19 +46,21 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
-        row.set(null, x, y, z);
+        y -= minLayer << 4;
+        row.set(null, x, y, z, minLayer, maxLayer);
         return true;
     }
 
     @Override
     public void setBlocks(int layer, char[] data) {
+        layer -= minLayer;
         row.reset(layer);
         int by = layer << 4;
         for (int y = 0, index = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++, index++) {
                     if (data[index] != 0) {
-                        row.set(null, x, by + y, z);
+                        row.set(null, x, by + y, z, minLayer, maxLayer);
                     }
                 }
             }
@@ -114,6 +123,7 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public char[] load(int layer) {
+        layer -= minLayer;
         char[] arr = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         MemBlockSet.IRow nullRowY = row.getRow(layer);
         if (nullRowY instanceof MemBlockSet.RowY) {
@@ -187,6 +197,11 @@ public class BitSetBlocks implements IChunkSet {
     public IChunkSet reset() {
         row.reset();
         return this;
+    }
+
+    @Override
+    public int getLayerCount() {
+        return layers;
     }
 
     @Override

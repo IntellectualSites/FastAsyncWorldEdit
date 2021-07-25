@@ -57,7 +57,7 @@ public interface IBatchProcessor {
             }
         }
         int maxLayer = (maxY + 1) >> 4;
-        for (int layer = maxLayer; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+        for (int layer = maxLayer; layer < set.getLayerCount(); layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);
@@ -74,10 +74,8 @@ public interface IBatchProcessor {
         try {
             int layer = (minY - 15) >> 4;
             while (layer < (maxY + 15) >> 4) {
-                if (layer > -1) {
-                    if (set.hasSection(layer)) {
-                        return true;
-                    }
+                if (set.hasSection(layer)) {
+                    return true;
                 }
                 layer++;
             }

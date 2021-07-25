@@ -11,7 +11,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
-import org.jetbrains.annotations.Range;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,7 +22,7 @@ import java.util.stream.IntStream;
  */
 public interface IBlocks extends Trimable {
 
-    boolean hasSection(@Range(from = 0, to = 15) int layer);
+    boolean hasSection(int layer);
 
     char[] load(int layer);
 
@@ -38,7 +37,7 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        return IntStream.range(0, FaweCache.IMP.CHUNK_LAYERS).filter(this::hasSection)
+        return IntStream.range(0, getLayerCount()).filter(this::hasSection)
                 .map(layer -> (1 << layer)).sum();
     }
 
@@ -47,6 +46,8 @@ public interface IBlocks extends Trimable {
     boolean trim(boolean aggressive, int layer);
 
     IBlocks reset();
+
+    int getLayerCount();
 
     default byte[] toByteArray(boolean full, boolean stretched) {
         return toByteArray(null, getBitMask(), full, stretched);
@@ -61,7 +62,7 @@ public interface IBlocks extends Trimable {
                 .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry();
         FastByteArrayOutputStream sectionByteArray = new FastByteArrayOutputStream(buffer);
         try (FaweOutputStream sectionWriter = new FaweOutputStream(sectionByteArray)) {
-            for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+            for (int layer = 0; layer < this.getLayerCount(); layer++) {
                 if (!this.hasSection(layer) || (bitMask & (1 << layer)) == 0) {
                     continue;
                 }

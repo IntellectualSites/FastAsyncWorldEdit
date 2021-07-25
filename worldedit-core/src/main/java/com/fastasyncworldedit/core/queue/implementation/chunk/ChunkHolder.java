@@ -19,7 +19,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import org.jetbrains.annotations.Range;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -172,6 +171,26 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public void setHeightmapToGet(HeightMapType type, int[] data) {
         delegate.setHeightmapToGet(this, type, data);
+    }
+
+    @Override
+    public int getMaxY() {
+        return getOrCreateGet().getMaxY();
+    }
+
+    @Override
+    public int getMinY() {
+        return getOrCreateGet().getMinY();
+    }
+
+    @Override
+    public int getMaxLayer() {
+        return getOrCreateGet().getMaxLayer();
+    }
+
+    @Override
+    public int getMinLayer() {
+        return getOrCreateGet().getMinLayer();
     }
 
     public void flushLightToGet(boolean heightmaps) {
@@ -493,7 +512,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         public <B extends BlockStateHolder<B>> boolean setBlock(
                 ChunkHolder chunk,
                 int x,
-                @Range(from = 0, to = 255) int y,
+                int y,
                 int z,
                 B block
         ) {
@@ -887,6 +906,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public synchronized boolean trim(boolean aggressive, int layer) {
         return this.trim(aggressive);
+    }
+
+    @Override
+    public int getLayerCount() {
+        return getOrCreateGet().getLayerCount();
     }
 
     @Override
