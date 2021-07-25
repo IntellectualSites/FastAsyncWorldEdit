@@ -307,6 +307,12 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
+    public char[] load(final int layer) {
+        checkLayer(layer);
+        return super.load(layer);
+    }
+
+    @Override
     public int getLayerCount() {
         return layers;
     }
@@ -315,27 +321,33 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (layer >= minLayer && layer <= maxLayer) {
             return;
         }
-        char[][] tmpBlocks = new char[layers][];
-        Section[] tmpSections = new Section[layers];
         if (layer < minLayer) {
             int diff = minLayer - layer;
             layers += diff;
-            System.arraycopy(blocks, 0, tmpBlocks, diff, layers);
-            System.arraycopy(sections, 0, tmpSections, diff, layers);
+            char[][] tmpBlocks = new char[layers][];
+            Section[] tmpSections = new Section[layers];
+            System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
+            System.arraycopy(sections, 0, tmpSections, diff, sections.length);
             for (int i = 0; i < diff; i++) {
                 tmpSections[i] = empty;
             }
+            blocks = tmpBlocks;
+            sections = tmpSections;
+            minLayer = layer;
         } else {
             int diff = layer - maxLayer;
             layers += diff;
-            System.arraycopy(blocks, 0, tmpBlocks, 0, layers);
-            System.arraycopy(sections, 0, tmpSections, 0, layers);
+            char[][] tmpBlocks = new char[layers][];
+            Section[] tmpSections = new Section[layers];
+            System.arraycopy(blocks, 0, tmpBlocks, 0, blocks.length);
+            System.arraycopy(sections, 0, tmpSections, 0, sections.length);
             for (int i = layers - diff; i < layers; i++) {
                 tmpSections[i] = empty;
             }
+            blocks = tmpBlocks;
+            sections = tmpSections;
+            maxLayer = layer;
         }
-        blocks = tmpBlocks;
-        sections = tmpSections;
     }
 
 }

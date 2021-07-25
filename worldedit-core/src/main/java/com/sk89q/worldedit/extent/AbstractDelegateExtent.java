@@ -203,6 +203,11 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public int getMinY() {
+        return extent.getMinY();
+    }
+
+    @Override
     public boolean relight(int x, int y, int z) {
         return extent.relight(x, y, z);
     }

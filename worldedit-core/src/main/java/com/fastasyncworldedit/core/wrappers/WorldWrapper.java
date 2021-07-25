@@ -96,6 +96,11 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
+    public int getMinY() {
+        return parent.getMinY();
+    }
+
+    @Override
     public Mask createLiquidMask() {
         return parent.createLiquidMask();
     }

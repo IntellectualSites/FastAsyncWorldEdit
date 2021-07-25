@@ -129,7 +129,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public boolean hasSection(int layer) {
         layer -= minLayer;
-        return sections[layer].isFull();
+        return layer >= 0 && layer < sections.length && sections[layer].isFull();
     }
 
     @Override

@@ -218,6 +218,11 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
+    public int getMinY() {
+        throw reason;
+    }
+
+    @Override
     public BlockArrayClipboard lazyCopy(Region region) {
         throw reason;
     }
