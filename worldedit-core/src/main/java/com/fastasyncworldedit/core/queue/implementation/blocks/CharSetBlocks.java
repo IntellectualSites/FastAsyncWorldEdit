@@ -94,7 +94,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        checkLayer(y >> 4);
+        updateSectionIndexRange(y >> 4);
         y -= minSectionIndex << 4;
         if (biomes == null) {
             biomes = new BiomeType[1024];
@@ -105,7 +105,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
-        checkLayer(y >> 4);
+        updateSectionIndexRange(y >> 4);
         set(x, y, z, holder.getOrdinalChar());
         holder.applyTileEntity(this, x, y, z);
         return true;
@@ -113,7 +113,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void setBlocks(int layer, char[] data) {
-        checkLayer(layer);
+        updateSectionIndexRange(layer);
         layer -= minSectionIndex;
         this.blocks[layer] = data;
         this.sections[layer] = data == null ? empty : FULL;
@@ -130,14 +130,14 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (tiles == null) {
             tiles = new BlockVector3ChunkMap<>();
         }
-        checkLayer(y >> 4);
+        updateSectionIndexRange(y >> 4);
         tiles.put(x, y, z, tile);
         return true;
     }
 
     @Override
     public void setBlockLight(int x, int y, int z, int value) {
-        checkLayer(y >> 4);
+        updateSectionIndexRange(y >> 4);
         if (light == null) {
             light = new char[sectionCount][];
         }
@@ -153,7 +153,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void setSkyLight(int x, int y, int z, int value) {
-        checkLayer(y >> 4);
+        updateSectionIndexRange(y >> 4);
         if (skyLight == null) {
             skyLight = new char[sectionCount][];
         }
@@ -177,7 +177,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void setLightLayer(int layer, char[] toSet) {
-        checkLayer(layer);
+        updateSectionIndexRange(layer);
         if (light == null) {
             light = new char[sectionCount][];
         }
@@ -187,7 +187,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void setSkyLightLayer(int layer, char[] toSet) {
-        checkLayer(layer);
+        updateSectionIndexRange(layer);
         if (skyLight == null) {
             skyLight = new char[sectionCount][];
         }
@@ -207,7 +207,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void removeSectionLighting(int layer, boolean sky) {
-        checkLayer(layer);
+        updateSectionIndexRange(layer);
         layer -= minSectionIndex;
         if (light == null) {
             light = new char[sectionCount][];
@@ -229,7 +229,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void setFullBright(int layer) {
-        checkLayer(layer);
+        updateSectionIndexRange(layer);
         layer -= minSectionIndex;
         if (light == null) {
             light = new char[sectionCount][];
@@ -308,7 +308,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public char[] load(final int layer) {
-        checkLayer(layer);
+        updateSectionIndexRange(layer);
         return super.load(layer);
     }
 
@@ -317,7 +317,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         return sectionCount;
     }
 
-    private void checkLayer(int layer) {
+    private void updateSectionIndexRange(int layer) {
         if (layer >= minSectionIndex && layer <= maxSectionIndex) {
             return;
         }

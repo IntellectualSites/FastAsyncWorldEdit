@@ -192,7 +192,7 @@ public class CavesGen extends GenBase {
             if (i1 < chunk.getMinY() + 1) {
                 i1 = chunk.getMinY();
             }
-            if (i2 > chunk.getMaxY() - 8) {
+            if (i2 >= chunk.getMaxY() - 8) {
                 i2 = chunk.getMaxY() - 8;
             }
             if (i3 < 0) {

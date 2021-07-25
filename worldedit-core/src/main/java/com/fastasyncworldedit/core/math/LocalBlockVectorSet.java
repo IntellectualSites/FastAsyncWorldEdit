@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  * The LocalBlockVectorSet is a Memory and CPU optimized Set for storing BlockVectors which are all in a local region
- * - All vectors must be in a 2048 * 2048 * 512 area centered around the first entry
+ * - All vectors must be in a 2048 * 512 * 2048 area centered around the first entry
  * - This will use 8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
  */
 public class LocalBlockVectorSet implements Set<BlockVector3> {
