@@ -618,7 +618,8 @@ public class BrushCommands {
             name = "layer",
             desc = "Replaces terrain with a layer.",
             descFooter = "Replaces terrain with a layer.\n"
-                    + "Example: /br layer oak_planks orange_stained_glass magenta_stained_glass black_wool - Places several layers on a surface\n"
+                    + "Example: /br layer 5 oak_planks,orange_stained_glass,magenta_stained_glass,black_wool - Places several " +
+                    "layers on a surface\n"
                     + "Pic: https://i.imgur.com/XV0vYoX.png"
     )
     @CommandPermissions("worldedit.brush.layer")
