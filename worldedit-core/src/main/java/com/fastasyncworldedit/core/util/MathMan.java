@@ -192,7 +192,7 @@ public class MathMan {
     /**
      * Obtain an integer representation of 3 ints, x, y and z. y is represented by the right-most 9 bits and can
      * be within the range -256 to 255. x and z are represented by 11 bits each and can be within the range
-     * -1024 to 1024
+     * -1024 to 1023
      *
      * @param x x value
      * @param y y value
