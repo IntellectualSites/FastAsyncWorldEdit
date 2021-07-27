@@ -68,14 +68,14 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         if (size() < length * length * length) {
             int index = -1;
             while ((index = set.nextSetBit(index + 1)) != -1) {
-                int b1 = (byte) (index >> 0) & 0xFF;
-                int b2 = (byte) (index >> 8) & 0x7F;
-                int b3 = (byte) (index >> 15) & 0xFF;
-                int b4 = (byte) (index >> 23) & 0xFF;
-                int ix = (offsetX + (b3 + (((b2 & 0x7)) << 8)));
+                int b1 = (index & 0xFF);
+                int b2 = (index >> 8) & 0xff;
+                int b3 = (index >> 15) & 0xFF;
+                int b4 = (index >> 23) & 0xFF;
+                int ix = (offsetX + (b3 + (((b2 & 0x7)) << 8)) << 21) >> 21;
                 // Add 128 as we shift y by 128 to fit -256<y<255
                 int iy = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
-                int iz = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)));
+                int iz = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21;
                 if (Math.abs(ix - x) <= radius && Math.abs(iz - z) <= radius && Math.abs(iy - y) <= radius) {
                     return true;
                 }
@@ -114,14 +114,14 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             index = set.nextSetBit(index + 1);
         }
         if (index != -1) {
-            int b1 = (byte) (index >> 0) & 0xFF;
-            int b2 = (byte) (index >> 8) & 0x7F;
-            int b3 = (byte) (index >> 15) & 0xFF;
-            int b4 = (byte) (index >> 23) & 0xFF;
-            int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)));
+            int b1 = (index & 0xFF);
+            int b2 = (index >> 8) & 0xff;
+            int b3 = (index >> 15) & 0xFF;
+            int b4 = (index >> 23) & 0xFF;
+            int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)) << 21) >> 21;
             // Add 128 as we shift y by 128 to fit -256<y<255
             int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
-            int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)));
+            int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21;
             return MutableBlockVector3.get(x, y, z);
         }
         return null;
@@ -149,13 +149,13 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
             public BlockVector3 next() {
                 if (index != -1) {
                     int b1 = (index & 0xFF);
-                    int b2 = ((byte) (index >> 8)) & 0x7F;
-                    int b3 = ((byte) (index >> 15)) & 0xFF;
-                    int b4 = ((byte) (index >> 23)) & 0xFF;
-                    int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)));
+                    int b2 = (index >> 8) & 0xff;
+                    int b3 = (index >> 15) & 0xFF;
+                    int b4 = (index >> 23) & 0xFF;
+                    int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)) << 21) >> 21;
                     // Add 128 as we shift y by 128 to fit -256<y<255
                     int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
-                    int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)));
+                    int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21;
                     mutable.mutX(x);
                     mutable.mutY(y);
                     mutable.mutZ(z);
@@ -185,13 +185,13 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index);
             int b1 = (index & 0xFF);
-            int b2 = ((byte) (index >> 8)) & 0x7F;
-            int b3 = ((byte) (index >> 15)) & 0xFF;
-            int b4 = ((byte) (index >> 23)) & 0xFF;
-            int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)));
+            int b2 = (index >> 8) & 0xff;
+            int b3 = (index >> 15) & 0xFF;
+            int b4 = (index >> 23) & 0xFF;
+            int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)) << 21) >> 21;
             // Add 128 as we shift y by 128 to fit -256<y<255
             int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
-            int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)));
+            int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21;
             array[i] = (T) BlockVector3.at(x, y, z);
             index++;
         }
@@ -302,13 +302,13 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index + 1);
             int b1 = (index & 0xFF);
-            int b2 = ((byte) (index >> 8)) & 0x7F;
-            int b3 = ((byte) (index >> 15)) & 0xFF;
-            int b4 = ((byte) (index >> 23)) & 0xFF;
-            int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)));
+            int b2 = (index >> 8) & 0xff;
+            int b3 = (index >> 15) & 0xFF;
+            int b4 = (index >> 23) & 0xFF;
+            int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)) << 21) >> 21;
             // Add 128 as we shift y by 128 to fit -256<y<255
             int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
-            int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)));
+            int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21;
             mVec.mutX(x);
             mVec.mutY(y);
             mVec.mutZ(z);
@@ -332,17 +332,16 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     public void forEach(BlockVectorSetVisitor visitor) {
         int size = size();
         int index = -1;
-        BlockVector3 mVec = MutableBlockVector3.get(0, 0, 0);
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index + 1);
             int b1 = (index & 0xFF);
-            int b2 = ((byte) (index >> 8)) & 0x7F;
-            int b3 = ((byte) (index >> 15)) & 0xFF;
-            int b4 = ((byte) (index >> 23)) & 0xFF;
-            int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)));
+            int b2 = (index >> 8) & 0xff;
+            int b3 = (index >> 15) & 0xFF;
+            int b4 = (index >> 23) & 0xFF;
+            int x = (offsetX + (b3 + (((b2 & 0x7)) << 8)) << 21) >> 21;
             // Add 128 as we shift y by 128 to fit -256<y<255
             int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
-            int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)));
+            int z = (offsetZ + (b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21;
             visitor.run(x, y, z, index);
         }
     }

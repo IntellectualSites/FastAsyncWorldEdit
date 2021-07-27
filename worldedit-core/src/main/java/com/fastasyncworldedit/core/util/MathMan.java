@@ -203,17 +203,14 @@ public class MathMan {
         if (x > 1023 || x < -1024 || y > 255 || y < -256 || z > 1023 || z < -1024) {
             throw new IndexOutOfBoundsException(String.format("Check range on x=%s, y=%s and z=%s!", x, y, z));
         }
-        byte b1 = (byte) (y & 0xff);
-        byte b3 = (byte) (x & 0xff);
-        byte b4 = (byte) (z & 0xff);
-        int x16 = (x >> 8) & 0x3 | (x < 0 ? 0x4 : 0x00);
-        int z16 = (z >> 8) & 0x3 | (z < 0 ? 0x4 : 0x00);
-        int y16 = y < 0 ? 0x1 : 0x00;
-        byte b2 = (byte) (((x16 | z16 << 3) | y16 << 6) & 0xFF);
-        return ((b1)
-                | ((b2) << 8)
-                | ((b3) << 15)
-                | ((b4) << 23));
+        int b1 = Math.abs(y) & 0xff;
+        int b3 = x & 0xff;
+        int b4 = z & 0xff;
+        int x16 = (((x >> 8) & 0x3) | (x < 0 ? 0x4 : 0x00));
+        int z16 = (((z >> 8) & 0x3) | (z < 0 ? 0x4 : 0x00));
+        int y16 = (y < 0 ? 0x1 : 0x00);
+        int b2 = ((x16 + (z16 << 3) + (y16 << 6)));
+        return (((b1) | (b2 << 8)) | (b3 << 15)) | (b4 << 23);
     }
 
     public static int pairSearchCoords(int x, int y) {
