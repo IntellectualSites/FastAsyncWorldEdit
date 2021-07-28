@@ -30,6 +30,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.datapack.Datapack;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -147,7 +148,7 @@ public class FaweBukkit implements IFawe, Listener {
         StringBuilder msg = new StringBuilder();
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         msg.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
-        msg.append("Plugins (").append(plugins.length).append("): \n");
+        msg.append("Plugins (").append(plugins.length).append("):\n");
         for (Plugin p : plugins) {
             msg.append(" - ").append(p.getName()).append(":").append("\n")
                     .append("  • Version: ").append(p.getDescription().getVersion()).append("\n")
@@ -158,6 +159,13 @@ public class FaweBukkit implements IFawe, Listener {
                     .append("  • Dependencies: ").append(p.getDescription().getDepend()).append("\n")
                     .append("  • Soft Dependencies: ").append(p.getDescription().getSoftDepend()).append("\n")
                     .append("  • Provides: ").append(p.getDescription().getProvides()).append("\n");
+        }
+        if (PaperLib.isPaper()) {
+            Collection<Datapack> datapacks = Bukkit.getServer().getDatapackManager().getEnabledPacks();
+            msg.append("Enabled Datapacks (").append(datapacks.size()).append("):\n");
+            for (Datapack dp : datapacks) {
+                msg.append(" - ").append(dp.getName()).append("\n");
+            }
         }
         return msg.toString();
     }

@@ -6,8 +6,6 @@ import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.MaskIntersection;
-import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.mask.OffsetMask;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -45,8 +43,7 @@ public class RichOffsetMaskParser extends RichParser<Mask> {
         int y = Integer.parseInt(arguments[1]);
         int z = Integer.parseInt(arguments[2]);
         Mask submask = worldEdit.getMaskFactory().parseFromInput(arguments[3], context);
-        OffsetMask offsetMask = new OffsetMask(submask, BlockVector3.at(x, y, z));
-        return new MaskIntersection(offsetMask, Masks.negate(submask));
+        return new OffsetMask(submask, BlockVector3.at(x, y, z));
     }
 
 }
