@@ -52,12 +52,10 @@ public class AdjacentMaskParser extends RichParser<Mask> {
             int maxY;
             Extent extent = null;
 
-            if (context.getActor() instanceof Player) {
-                extent = ((Player) context.getActor()).getWorld();
+            if (context.getActor() instanceof Locatable) {
+                extent = ((Locatable) context.getActor()).getExtent();
             } else if (context.getWorld() != null) {
                 extent = context.getWorld();
-            } else if (context.getActor() instanceof Locatable) {
-                extent = ((Locatable) context.getActor()).getExtent();
             } else if (context.getExtent() != null) {
                 extent = context.getExtent();
             }

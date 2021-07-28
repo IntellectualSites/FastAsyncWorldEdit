@@ -102,8 +102,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         entfFile = new File(folder, index + ".entf");
         enttFile = new File(folder, index + ".entt");
         //Switch file ending due to new (sort-of) format. (Added e for Extended height)
-        bdFile = new File(folder, index + ".bde");
-        bioFile = new File(folder, index + ".bioe");
+        bdFile = new File(folder, index + ".bd");
+        bioFile = new File(folder, index + ".bio");
     }
 
     private void init(UUID uuid, int i) {

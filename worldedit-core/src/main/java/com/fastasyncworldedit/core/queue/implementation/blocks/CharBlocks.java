@@ -73,7 +73,7 @@ public abstract class CharBlocks implements IBlocks {
         this.sectionCount = maxSectionIndex - minSectionIndex + 1;
         blocks = new char[sectionCount][];
         sections = new Section[sectionCount];
-        for (int i = 0; i < sectionCount; i++) {
+        for (int i = 0; i <= sectionCount; i++) {
             sections[i] = empty;
         }
     }
@@ -81,7 +81,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public synchronized boolean trim(boolean aggressive) {
         boolean result = true;
-        for (int i = 0; i < sectionCount; i++) {
+        for (int i = 0; i <= sectionCount; i++) {
             if (!sections[i].isFull() && blocks[i] != null) {
                 blocks[i] = null;
             } else {
@@ -104,7 +104,7 @@ public abstract class CharBlocks implements IBlocks {
 
     @Override
     public synchronized IChunkSet reset() {
-        for (int i = 0; i < sectionCount; i++) {
+        for (int i = 0; i <= sectionCount; i++) {
             sections[i] = empty;
         }
         return null;
@@ -146,12 +146,12 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     public char get(int x, int y, int z) {
-        final int layer = y >> 4;
+        int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         if (layer > maxSectionIndex || layer < minSectionIndex) {
             return 0;
         }
-        return sections[layer].get(this, layer, index);
+        return get(layer, index);
     }
 
     // Not synchronized as it refers to a synchronized method and includes nothing that requires synchronization

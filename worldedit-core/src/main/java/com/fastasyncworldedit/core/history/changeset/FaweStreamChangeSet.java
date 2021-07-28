@@ -184,7 +184,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             };
         } else {
             posDel = new FaweStreamPositionDelegate() {
-                final byte[] buffer = new byte[5];
+                final byte[] buffer = new byte[6];
                 int lx;
                 int ly;
                 int lz;
@@ -210,8 +210,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
                 @Override
                 public int readY(FaweInputStream is) throws IOException {
-                    is.readFully(buffer);
-                    return lx = (lx + (buffer[4] & 0xFF) + (buffer[5] << 8));
+                    return ly = (ly + (buffer[4] & 0xFF) + (buffer[5] << 8));
                 }
 
                 @Override

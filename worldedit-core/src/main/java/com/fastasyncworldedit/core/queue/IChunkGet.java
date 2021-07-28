@@ -64,22 +64,22 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
     void setHeightmapToGet(HeightMapType type, int[] data);
 
     /**
-     * Max world y (inclusive)
+     * Max y value for the chunk's world (inclusive)
      */
     int getMaxY();
 
     /**
-     * Min world y (inclusive)
+     * Min y value for the chunk's world (inclusive)
      */
     int getMinY();
 
     /**
-     * Max ChunkSection index (inclusive)
+     * Max ChunkSection array index
      */
     int getMaxSectionIndex();
 
     /**
-     * Min ChunkSection index (inclusive)
+     * Min ChunkSection array index
      */
     int getMinSectionIndex();
 

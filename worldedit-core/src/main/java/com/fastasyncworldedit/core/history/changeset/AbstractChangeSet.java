@@ -347,6 +347,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         Runnable wrappedTask = () -> {
             try {
                 writeTask.run();
+            } catch (Throwable t) {
+                t.printStackTrace();
             } finally {
                 if (AbstractChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
                     synchronized (AbstractChangeSet.this.waitingAsync) {
