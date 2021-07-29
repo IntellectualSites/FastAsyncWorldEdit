@@ -49,6 +49,7 @@ import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
@@ -59,6 +60,7 @@ import org.apache.logging.log4j.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Biome;
 import org.bukkit.command.BlockCommandSender;
@@ -234,16 +236,18 @@ public class WorldEditPlugin extends JavaPlugin {
         // datapacks aren't loaded until just before the world is, and bukkit has no event for this
         // so the earliest we can do this is in WorldInit
         setupTags();
+        setupBiomes(); // FAWE - load biomes later
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
     @SuppressWarnings({"deprecation", "unchecked"})
     private void initializeRegistries() {
-        // Biome
+        /* Biome FAWE start - move to own method
         for (Biome biome : Biome.values()) {
             String lowerCaseBiomeName = biome.name().toLowerCase(Locale.ROOT);
             BiomeType.REGISTRY.register("minecraft:" + lowerCaseBiomeName, new BiomeType("minecraft:" + lowerCaseBiomeName));
         }
+        /* FAWE end
         /*
 
         // Block & Item
@@ -302,6 +306,28 @@ public class WorldEditPlugin extends JavaPlugin {
         } catch (NoSuchMethodError ignored) {
             LOGGER.warn(
                     "The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
+        }
+    }
+
+    private void setupBiomes() {
+        if (this.adapter.value().isPresent()) {
+            // We don't know which world is the one with the data packs
+            // so we just loop over them. Doesn't hurt
+            for (org.bukkit.World world : Bukkit.getWorlds()) {
+                // cast is needed, thanks to raw types <3
+                for (final NamespacedKey biome : ((BukkitImplAdapter<?>) adapter.value().get()).getRegisteredBiomes(world)) {
+                    if (BiomeTypes.get(biome.toString()) == null) { // only register once
+                        BiomeType.REGISTRY.register(biome.toString(), new BiomeType(biome.toString()));
+                    }
+                }
+            }
+        } else {
+            LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
+            for (Biome biome : Biome.values()) {
+                if (BiomeTypes.get(biome.toString()) == null) { // only register once
+                    BiomeType.REGISTRY.register(biome.getKey().toString(), new BiomeType(biome.getKey().toString()));
+                }
+            }
         }
     }
 
