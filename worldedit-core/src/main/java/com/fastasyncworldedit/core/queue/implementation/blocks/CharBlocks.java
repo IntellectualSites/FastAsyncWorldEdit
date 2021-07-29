@@ -14,7 +14,7 @@ public abstract class CharBlocks implements IBlocks {
 
     protected static final Section FULL = new Section() {
         @Override
-        public final char[] get(CharBlocks blocks, int layer) {
+        public char[] get(CharBlocks blocks, int layer) {
             return blocks.blocks[layer];
         }
 
@@ -25,13 +25,13 @@ public abstract class CharBlocks implements IBlocks {
         }
 
         @Override
-        public final boolean isFull() {
+        public boolean isFull() {
             return true;
         }
     };
     protected final Section empty = new Section() {
         @Override
-        public final synchronized char[] get(CharBlocks blocks, int layer) {
+        public synchronized char[] get(CharBlocks blocks, int layer) {
             // Defaults to aggressive as it should only be avoided where we know we've reset a chunk during an edit
             return get(blocks, layer, true);
         }
@@ -57,7 +57,7 @@ public abstract class CharBlocks implements IBlocks {
         }
 
         @Override
-        public final boolean isFull() {
+        public boolean isFull() {
             return false;
         }
     };
@@ -73,7 +73,7 @@ public abstract class CharBlocks implements IBlocks {
         this.sectionCount = maxSectionIndex - minSectionIndex + 1;
         blocks = new char[sectionCount][];
         sections = new Section[sectionCount];
-        for (int i = 0; i <= sectionCount; i++) {
+        for (int i = 0; i < sectionCount; i++) {
             sections[i] = empty;
         }
     }
@@ -81,7 +81,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public synchronized boolean trim(boolean aggressive) {
         boolean result = true;
-        for (int i = 0; i <= sectionCount; i++) {
+        for (int i = 0; i < sectionCount; i++) {
             if (!sections[i].isFull() && blocks[i] != null) {
                 blocks[i] = null;
             } else {
@@ -104,7 +104,7 @@ public abstract class CharBlocks implements IBlocks {
 
     @Override
     public synchronized IChunkSet reset() {
-        for (int i = 0; i <= sectionCount; i++) {
+        for (int i = 0; i < sectionCount; i++) {
             sections[i] = empty;
         }
         return null;
