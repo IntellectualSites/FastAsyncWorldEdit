@@ -196,14 +196,21 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
         BiomeType[] biomes = set.getBiomes();
         if (biomes != null) {
-            for (int y = get.getMinSectionIndex() << 2, index = 0; y <= get.getMaxSectionIndex() << 2; y++) {
-                for (int z = 0; z < 4; z++) {
-                    for (int x = 0; x < 4; x++, index++) {
-                        BiomeType newBiome = biomes[index];
-                        if (newBiome != null) {
-                            BiomeType oldBiome = get.getBiomeType(x, y, z);
-                            if (oldBiome != newBiome) {
-                                addBiomeChange(bx + (x << 2), y << 2, bz + (z << 2), oldBiome, newBiome);
+            int index = 0;
+            for (int layer = get.getMinSectionIndex(); layer <= get.getMaxSectionIndex(); layer++) {
+                if (!set.hasBiomes(layer)) {
+                    continue;
+                }
+                int yy = layer << 4;
+                for (int y = 0; y < 4; y++) {
+                    for (int z = 0; z < 4; z++) {
+                        for (int x = 0; x < 4; x++, index++) {
+                            BiomeType newBiome = biomes[index];
+                            if (newBiome != null) {
+                                BiomeType oldBiome = get.getBiomeType(x, y, z);
+                                if (oldBiome != newBiome) {
+                                    addBiomeChange(bx + (x << 2), yy + (y << 2), bz + (z << 2), oldBiome, newBiome);
+                                }
                             }
                         }
                     }

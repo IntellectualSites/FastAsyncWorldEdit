@@ -139,6 +139,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return bitMask;
     }
 
+    @Override
+    public boolean hasBiomes(final int layer) {
+        // No need to go through delegate. hasBiomes is SET only.
+        return getOrCreateSet().hasBiomes(layer);
+    }
+
     public boolean isInit() {
         return isInit;
     }

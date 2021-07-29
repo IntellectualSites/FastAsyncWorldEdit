@@ -82,6 +82,11 @@ public final class NullChunk implements IQueueChunk {
         return new char[0][];
     }
 
+    @Override
+    public boolean hasBiomes(final int layer) {
+        return false;
+    }
+
     @Nonnull
     public int[] getHeightMap(@Nullable HeightMapType type) {
         return new int[256];

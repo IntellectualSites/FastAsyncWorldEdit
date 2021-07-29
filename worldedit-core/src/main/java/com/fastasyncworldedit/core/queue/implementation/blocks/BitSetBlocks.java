@@ -200,6 +200,11 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
+    public boolean hasBiomes(final int layer) {
+        return false;
+    }
+
+    @Override
     public int getSectionCount() {
         return layers;
     }

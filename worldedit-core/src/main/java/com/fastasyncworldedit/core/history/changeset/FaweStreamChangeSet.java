@@ -354,8 +354,8 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             os.write((byte) (z >> 8));
             os.write((byte) (z));
             // only need to store biomes in the 4x4x4 chunks so only need one byte for y still (signed byte -128 -> 127)
-            //  means -512 -> 508
-            os.write((byte) (y));
+            //  means -512 -> 508. Add 128 to avoid negative value casting.
+            os.write((byte) (y + 128));
             os.writeVarInt(from.getInternalId());
             os.writeVarInt(to.getInternalId());
         } catch (Throwable e) {
@@ -485,7 +485,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                     if (int1 != -1) {
                         int x = ((int1 << 24) + (is.read() << 16) + (is.read() << 8) + is.read()) << 2;
                         int z = ((is.read() << 24) + (is.read() << 16) + (is.read() << 8) + is.read()) << 2;
-                        int y = is.read() << 2;
+                        int y = (is.read() - 128) << 2;
                         int from = is.readVarInt();
                         int to = is.readVarInt();
                         change.setBiome(x, y, z, from, to);

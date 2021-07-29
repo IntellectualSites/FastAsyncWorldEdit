@@ -22,6 +22,13 @@ import java.util.stream.IntStream;
  */
 public interface IBlocks extends Trimable {
 
+    /**
+     * Returns if the chunk has a BLOCKS section at the given layer. May not be indicative of presence
+     * of entities, tile entites, biomes, etc.
+     *
+     * @param layer chunk section layer
+     * @return if blocks/a block section is present
+     */
     boolean hasSection(int layer);
 
     char[] load(int layer);

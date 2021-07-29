@@ -107,4 +107,6 @@ public interface IChunkSet extends IBlocks, OutputExtent {
         return null;
     }
 
+    boolean hasBiomes(int layer);
+
 }
