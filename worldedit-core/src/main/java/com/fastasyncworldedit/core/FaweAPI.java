@@ -11,7 +11,6 @@ import com.fastasyncworldedit.core.object.changeset.DiskStorageHistory;
 import com.fastasyncworldedit.core.object.changeset.SimpleChangeSetSummary;
 import com.fastasyncworldedit.core.object.exception.FaweException;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -59,17 +58,6 @@ import javax.annotation.Nullable;
 public class FaweAPI {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-
-    /**
-     * Offers a lot of options for building an EditSession.
-     *
-     * @return A new EditSessionBuilder
-     * @see EditSessionBuilder
-     */
-    @Deprecated(forRemoval = true)
-    public static EditSessionBuilder getEditSessionBuilder(World world) {
-        return WorldEdit.getInstance().newEditSessionBuilder().world(world);
-    }
 
     /**
      * The TaskManager has some useful methods for doing things asynchronously.

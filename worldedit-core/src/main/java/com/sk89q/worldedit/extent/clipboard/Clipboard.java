@@ -25,9 +25,9 @@ import com.fastasyncworldedit.core.object.clipboard.CPUOptimizedClipboard;
 import com.fastasyncworldedit.core.object.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.object.clipboard.MemoryOptimizedClipboard;
 import com.fastasyncworldedit.core.object.clipboard.ReadOnlyClipboard;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Entity;
@@ -231,7 +231,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             editSession = (EditSession) world;
         } else {
             EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world).autoQueue(true)
-                .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
+                                                  .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
             if (allowUndo) {
                 editSession = builder.build();
             } else {

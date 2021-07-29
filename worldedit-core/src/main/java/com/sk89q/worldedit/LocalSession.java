@@ -29,7 +29,6 @@ import com.fastasyncworldedit.core.object.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.object.collection.SparseBitSet;
 import com.fastasyncworldedit.core.object.extent.ResettableExtent;
 import com.fastasyncworldedit.core.util.BrushCache;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.util.TextureHolder;

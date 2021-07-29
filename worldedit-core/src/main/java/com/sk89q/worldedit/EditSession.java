@@ -39,7 +39,6 @@ import com.fastasyncworldedit.core.object.extent.SourceMaskExtent;
 import com.fastasyncworldedit.core.object.function.SurfaceRegionFunction;
 import com.fastasyncworldedit.core.object.mask.ResettableMask;
 import com.fastasyncworldedit.core.object.pattern.ExistingPattern;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -252,7 +251,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue,
         @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages,
         @Nullable BlockBag blockBag, @Nullable EditSessionEvent event) {
-        this(new EditSessionBuilder(world).actor(actor).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).eventBus(bus).event(event));
+        this(new EditSessionBuilder(bus).world(world).actor(actor).limit(limit).changeSet(changeSet).allowedRegions(allowedRegions).autoQueue(autoQueue).fastmode(fastmode).checkMemory(checkMemory).combineStages(combineStages).blockBag(blockBag).event(event));
     }
 
     /**
