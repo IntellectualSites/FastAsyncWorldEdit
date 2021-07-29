@@ -173,7 +173,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             System.arraycopy(set.load(layer), 0, (blocksSet = new char[4096]), 0, 4096);
 
             // Account for negative layers
-            int by = (layer - get.getMinSectionIndex()) << 4;
+            int by = layer << 4;
             for (int y = 0, index = 0; y < 16; y++) {
                 int yy = y + by;
                 for (int z = 0; z < 16; z++) {
