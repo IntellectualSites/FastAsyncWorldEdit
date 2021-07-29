@@ -209,8 +209,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             try {
                 byteBuffer.put(HEADER_SIZE + (getVolume() << 1) + index, (byte) biome.getInternalId());
             } catch (IndexOutOfBoundsException e) {
-                System.out.println((long) (getHeight() >> 2) * (getLength() >> 2) * (getWidth() >> 2));
-                System.out.println(index);
+                LOGGER.info((long) (getHeight() >> 2) * (getLength() >> 2) * (getWidth() >> 2));
+                LOGGER.info(index);
                 e.printStackTrace();
             }
         }
