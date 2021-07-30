@@ -10,6 +10,7 @@ import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
 import com.fastasyncworldedit.bukkit.regions.ResidenceFeature;
 import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
+import com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
@@ -299,11 +300,8 @@ public class FaweBukkit implements IFawe, Listener {
         if (plotSquared == null) {
             return;
         }
-        if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
-            WEManager.IMP.managers.add(new com.fastasyncworldedit.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
-            LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
-        } else if (PlotSquared.get().getVersion().version[0] == 6) {
-            WEManager.IMP.managers.add(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
+        if (PlotSquared.get().getVersion().version[0] == 6) {
+            WEManager.IMP.managers.add(new PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
         } else {
             LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");

@@ -4,7 +4,6 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.regions.filter.RegionFilter;
-import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.command.MainCommand;
 import com.plotsquared.core.configuration.Settings;
@@ -14,6 +13,7 @@ import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.flag.implementations.DoneFlag;
 import com.plotsquared.core.plot.flag.implementations.NoWorldeditFlag;
+import com.plotsquared.core.util.PlayerManager;
 import com.plotsquared.core.util.WEManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.Player;
@@ -60,7 +60,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     }
 
     public static String getName(UUID uuid) {
-        return UUIDHandler.getName(uuid);
+        return PlayerManager.getName(uuid);
     }
 
     public boolean isAllowed(Player player, Plot plot, MaskType type) {
