@@ -36,21 +36,26 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Request {
 
     private static final ThreadLocal<Request> threadLocal = ThreadLocal.withInitial(Request::new);
+    //FAWE start
     // TODO any better way to deal with this?
     private static final Map<Thread, Request> requests = new ConcurrentHashMap<>();
+    //FAWE end
 
     @Nullable
     private World world;
     @Nullable
-    private Actor actor;
-    @Nullable
     private LocalSession session;
     @Nullable
     private EditSession editSession;
+    private boolean valid;
+    //FAWE start
+    @Nullable
+    private Actor actor;
     @Nullable
     private Extent extent;
-    private boolean valid;
+    //FAWE end
 
+    //FAWE start
     private Request() {
         requests.put(Thread.currentThread(), this);
     }
@@ -58,6 +63,7 @@ public final class Request {
     public static Collection<Request> getAll() {
         return requests.values();
     }
+    //FAWE end
 
     /**
      * Get the request world.
@@ -78,6 +84,7 @@ public final class Request {
         this.world = world;
     }
 
+    //FAWE start
     public void setExtent(@Nullable Extent extent) {
         this.extent = extent;
     }
@@ -104,6 +111,7 @@ public final class Request {
     public void setActor(@Nullable Actor actor) {
         this.actor = actor;
     }
+    //FAWE end
 
     /**
      * Get the request session.
@@ -115,6 +123,8 @@ public final class Request {
         return session;
     }
 
+    //FAWE start
+
     /**
      * Get the request session.
      *
@@ -123,6 +133,7 @@ public final class Request {
     public void setSession(@Nullable LocalSession session) {
         this.session = session;
     }
+    //FAWE end
 
     /**
      * Get the {@link EditSession}.
@@ -158,7 +169,9 @@ public final class Request {
     public static void reset() {
         request().invalidate();
         threadLocal.remove();
+        //FAWE start
         requests.remove(Thread.currentThread());
+        //FAWE end
     }
 
     /**
@@ -173,4 +186,5 @@ public final class Request {
     private void invalidate() {
         valid = false;
     }
+
 }

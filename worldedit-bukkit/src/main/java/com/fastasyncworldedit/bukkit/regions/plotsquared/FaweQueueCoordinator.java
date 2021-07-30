@@ -2,8 +2,9 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.beta.IQueueChunk;
-import com.fastasyncworldedit.core.beta.IQueueExtent;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.queue.IQueueChunk;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.plotsquared.core.queue.LightingMode;
 import com.plotsquared.core.queue.QueueCoordinator;
 import com.plotsquared.core.queue.subscriber.ProgressSubscriber;
@@ -12,15 +13,14 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -29,7 +29,7 @@ public class FaweQueueCoordinator extends QueueCoordinator {
 
     public final IQueueExtent<IQueueChunk> instance;
     private final World world;
-    private BlockVector3 mutable = new MutableBlockVector3();
+    private final BlockVector3 mutable = new MutableBlockVector3();
     private boolean setbiome = false;
 
     public FaweQueueCoordinator(World world) {
@@ -76,7 +76,7 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     }
 
     @Override
-    public boolean setBiome(int x, int y, int z, @NotNull BiomeType biome) {
+    public boolean setBiome(int x, int y, int z, @Nonnull BiomeType biome) {
         return false;
     }
 
@@ -86,23 +86,23 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     }
 
     @Override
-    public boolean setEntity(@NotNull Entity entity) {
+    public boolean setEntity(@Nonnull Entity entity) {
         return false;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public List<BlockVector2> getReadChunks() {
         return null;
     }
 
     @Override
-    public void addReadChunks(@NotNull Set<BlockVector2> readChunks) {
+    public void addReadChunks(@Nonnull Set<BlockVector2> readChunks) {
 
     }
 
     @Override
-    public void addReadChunk(@NotNull BlockVector2 chunk) {
+    public void addReadChunk(@Nonnull BlockVector2 chunk) {
 
     }
 
@@ -123,7 +123,7 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     }
 
     @Override
-    public void setRegenRegion(@NotNull CuboidRegion regenRegion) {
+    public void setRegenRegion(@Nonnull CuboidRegion regenRegion) {
 
     }
 
@@ -161,16 +161,16 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     }
 
     @Override
-    public void setChunkConsumer(@NotNull Consumer<BlockVector2> consumer) {
+    public void setChunkConsumer(@Nonnull Consumer<BlockVector2> consumer) {
 
     }
 
     @Override
-    public void addProgressSubscriber(@NotNull ProgressSubscriber progressSubscriber) {
+    public void addProgressSubscriber(@Nonnull ProgressSubscriber progressSubscriber) {
 
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public LightingMode getLightingMode() {
         return null;
@@ -202,4 +202,5 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     public boolean isSettingTiles() {
         return false;
     }
+
 }

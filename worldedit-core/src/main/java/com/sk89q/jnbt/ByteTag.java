@@ -56,11 +56,11 @@ public final class ByteTag extends Tag {
         return innerTag;
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_BYTE;
     }
-    // FAWE End
+    //FAWE end
 
 }

@@ -170,4 +170,5 @@ class BukkitEntityProperties implements EntityProperties {
     public boolean isWaterCreature() {
         return entity instanceof WaterMob;
     }
+
 }

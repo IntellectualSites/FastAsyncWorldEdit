@@ -45,7 +45,7 @@ public class BiomeChange3D implements Change {
      *
      * @param position the position
      * @param previous the previous biome
-     * @param current the current biome
+     * @param current  the current biome
      */
     public BiomeChange3D(BlockVector3 position, BiomeType previous, BiomeType current) {
         checkNotNull(position);

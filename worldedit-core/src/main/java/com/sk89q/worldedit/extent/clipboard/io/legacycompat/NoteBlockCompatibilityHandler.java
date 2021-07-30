@@ -29,6 +29,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import java.util.Map;
 
 public class NoteBlockCompatibilityHandler implements NBTCompatibilityHandler {
+
     private static final IntegerProperty NoteProperty;
 
     static {
@@ -60,4 +61,5 @@ public class NoteBlockCompatibilityHandler implements NBTCompatibilityHandler {
         }
         return block;
     }
+
 }

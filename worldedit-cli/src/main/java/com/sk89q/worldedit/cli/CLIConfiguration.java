@@ -37,4 +37,5 @@ public class CLIConfiguration extends PropertiesConfiguration {
     public Path getWorkingDirectoryPath() {
         return CLIWorldEdit.inst.getWorkingDir();
     }
+
 }

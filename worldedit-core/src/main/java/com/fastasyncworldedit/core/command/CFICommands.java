@@ -82,7 +82,7 @@
 //import org.enginehub.piston.annotation.param.Switch;
 //import org.enginehub.piston.exception.StopExecutionException;
 //import org.enginehub.piston.inject.InjectedValueAccess;
-//import org.jetbrains.annotations.NotNull;
+//import javax.annotation.Nonnull;
 //
 //@CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 //public class CFICommands {
@@ -160,7 +160,7 @@
 //    public void brush(Player player) {
 //        CFISettings settings = assertSettings(player);
 //        settings.popMessages(player);
-//        @NotNull Builder msg;
+//        @Nonnull Builder msg;
 //        if (settings.getGenerator().getImageViewer() != null) {
 //            msg = TextComponent.builder("CFI supports using brushes during creation").append(newline())
 //                    .append(" - Place the map on a wall of item frames").append(newline())
@@ -817,7 +817,7 @@
 //        TextComponent.empty().clickEvent(ClickEvent.runCommand(
 //            "/cfi randomization " + !rand)).hoverEvent(HoverEvent.showText(
 //            TextComponent.of("/cfi randomization " + !rand)));
-//        @NotNull Builder builder = TextComponent.builder(">> Current Settings <<");
+//        @Nonnull Builder builder = TextComponent.builder(">> Current Settings <<");
 //        builder.append(newline());
 //        builder.append(TextComponent.of("Randomization [" + Boolean.toString(rand).toUpperCase(Locale.ROOT) + "]")
 //            .clickEvent(ClickEvent.runCommand(
@@ -1040,7 +1040,7 @@
 //        String snow = "/cfi snow";
 //
 //        //TODO
-//        @NotNull Builder msg = TextComponent.builder(">> Current Settings <<").append(newline())
+//        @Nonnull Builder msg = TextComponent.builder(">> Current Settings <<").append(newline())
 //                .append("Mask ").append(TextComponent.of("[" + mask + "]")
 //                        .hoverEvent(HoverEvent.showText(TextComponent.of("/cfi mask")))
 //                        .clickEvent(ClickEvent.runCommand("/cfi mask")))

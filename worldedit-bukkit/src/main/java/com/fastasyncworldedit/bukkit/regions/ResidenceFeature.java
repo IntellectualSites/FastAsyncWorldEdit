@@ -19,8 +19,8 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private FaweBukkit plugin;
-    private Plugin residence;
+    private final FaweBukkit plugin;
+    private final Plugin residence;
 
     public ResidenceFeature(final Plugin residencePlugin, final FaweBukkit p3) {
         super(residencePlugin.getName());
@@ -31,9 +31,11 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
 
     public boolean isAllowed(Player player, ClaimedResidence residence, MaskType type) {
         return residence != null &&
-            (residence.getOwner().equals(player.getName()) ||
-                residence.getOwner().equals(player.getUniqueId().toString()) ||
-                type == MaskType.MEMBER && TaskManager.IMP.sync(() -> residence.getPermissions().playerHas(player, "build", false)));
+                (residence.getOwner().equals(player.getName()) ||
+                        residence.getOwner().equals(player.getUniqueId().toString()) ||
+                        type == MaskType.MEMBER && TaskManager.IMP.sync(() -> residence
+                                .getPermissions()
+                                .playerHas(player, "build", false)));
     }
 
     @Override
@@ -61,4 +63,5 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
         }
         return null;
     }
+
 }

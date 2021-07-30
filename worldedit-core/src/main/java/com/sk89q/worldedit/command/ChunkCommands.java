@@ -27,6 +27,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
+import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
@@ -38,6 +39,7 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
@@ -74,9 +76,9 @@ public class ChunkCommands {
     }
 
     @Command(
-        name = "chunkinfo",
-        aliases = { "/chunkinfo" },
-        desc = "Get information about the chunk you're inside"
+            name = "chunkinfo",
+            aliases = {"/chunkinfo"},
+            desc = "Get information about the chunk you're inside"
     )
     @CommandPermissions("worldedit.chunkinfo")
     public void chunkInfo(Player player) {
@@ -87,33 +89,48 @@ public class ChunkCommands {
         final BlockVector2 chunkPos = BlockVector2.at(chunkX, chunkZ);
         player.print(Caption.of("worldedit.chunkinfo.chunk", TextComponent.of(chunkX), TextComponent.of(chunkZ)));
         player.print(Caption.of("worldedit.chunkinfo.old-filename", TextComponent.of(LegacyChunkStore.getFilename(chunkPos))));
-        player.print(Caption.of("worldedit.chunkinfo.mcregion-filename", TextComponent.of(McRegionChunkStore.getFilename(chunkPos))));
+        player.print(Caption.of(
+                "worldedit.chunkinfo.mcregion-filename",
+                TextComponent.of(McRegionChunkStore.getFilename(chunkPos))
+        ));
     }
 
     @Command(
-        name = "listchunks",
-        aliases = { "/listchunks" },
-        desc = "List chunks that your selection includes"
+            name = "listchunks",
+            aliases = {"/listchunks"},
+            desc = "List chunks that your selection includes"
     )
     @CommandPermissions("worldedit.listchunks")
-    public void listChunks(Actor actor, World world, LocalSession session,
-                            @ArgFlag(name = 'p', desc = "Page number.", def = "1") int page) throws WorldEditException {
+    public void listChunks(
+            Actor actor, World world, LocalSession session,
+            @ArgFlag(name = 'p', desc = "Page number.", def = "1") int page
+    ) throws WorldEditException {
         final Region region = session.getSelection(world);
 
+        WorldEditAsyncCommandBuilder.createAndSendMessage(
+                actor,
+                () -> new ChunkListPaginationBox(region).create(page),
+                TranslatableComponent.of(
+                        "worldedit.listchunks.listfor",
+                        TextComponent.of(actor.getName())
+                )
+        );
         actor.print(new ChunkListPaginationBox(region).create(page));
         actor.print(Caption.of("worldedit.listchunks.listfor", TextComponent.of(actor.getName())));
     }
 
     @Command(
-        name = "delchunks",
-        aliases = { "/delchunks" },
-        desc = "Delete chunks that your selection includes"
+            name = "delchunks",
+            aliases = {"/delchunks"},
+            desc = "Delete chunks that your selection includes"
     )
     @CommandPermissions("worldedit.delchunks")
     @Logging(REGION)
-    public void deleteChunks(Actor actor, World world, LocalSession session,
-                                @ArgFlag(name = 'o', desc = "Only delete chunks older than the specified time.")
-                                    ZonedDateTime beforeTime) throws WorldEditException {
+    public void deleteChunks(
+            Actor actor, World world, LocalSession session,
+            @ArgFlag(name = 'o', desc = "Only delete chunks older than the specified time.")
+                    ZonedDateTime beforeTime
+    ) throws WorldEditException {
         Path worldDir = world.getStoragePath();
         if (worldDir == null) {
             throw new StopExecutionException(TextComponent.of("Couldn't find world folder for this world."));
@@ -161,11 +178,15 @@ public class ChunkCommands {
             throw new StopExecutionException(TextComponent.of("Failed to write chunk list: " + e.getMessage()));
         }
 
-        actor.print(TextComponent.of(String.format("%d chunk(s) have been marked for deletion the next time the server starts.",
-                newBatch.getChunkCount())));
+        actor.print(TextComponent.of(String.format(
+                "%d chunk(s) have been marked for deletion the next time the server starts.",
+                newBatch.getChunkCount()
+        )));
         if (currentInfo.batches.size() > 1) {
-            actor.printDebug(TextComponent.of(String.format("%d chunks total marked for deletion. (May have overlaps).",
-                    currentInfo.batches.stream().mapToInt(ChunkDeletionInfo.ChunkBatch::getChunkCount).sum())));
+            actor.printDebug(TextComponent.of(String.format(
+                    "%d chunks total marked for deletion. (May have overlaps).",
+                    currentInfo.batches.stream().mapToInt(ChunkDeletionInfo.ChunkBatch::getChunkCount).sum()
+            )));
         }
         actor.print(TextComponent.of("You can mark more chunks for deletion, or to stop now, run: ", TextColor.LIGHT_PURPLE)
                 .append(TextComponent.of("/stop", TextColor.AQUA)
@@ -173,11 +194,16 @@ public class ChunkCommands {
     }
 
     private static class ChunkListPaginationBox extends PaginationBox {
+
         //private final Region region;
         private final List<BlockVector2> chunks;
 
         ChunkListPaginationBox(Region region) {
             super("Selected Chunks", "/listchunks -p %page%");
+            // TODO make efficient/streamable/calculable implementations of this
+            // for most region types, so we can just store the region and random-access get one page of chunks
+            // (this is non-trivial for some types of selections...)
+            //this.region = region.clone();
             this.chunks = new ArrayList<>(region.getChunks());
         }
 
@@ -190,5 +216,7 @@ public class ChunkCommands {
         public int getComponentsSize() {
             return chunks.size();
         }
+
     }
+
 }

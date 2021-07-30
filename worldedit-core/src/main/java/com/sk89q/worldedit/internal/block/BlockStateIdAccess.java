@@ -25,10 +25,12 @@ import javax.annotation.Nullable;
 
 public final class BlockStateIdAccess {
 
+    //FAWE start - Register via ordinal ID
     private static final int INVALID_ID = -1;
 
     /**
      * An invalid internal ID, for verification purposes.
+     *
      * @return an internal ID which is never valid
      */
     public static int invalidId() {
@@ -50,5 +52,6 @@ public final class BlockStateIdAccess {
 
     private BlockStateIdAccess() {
     }
+    //FAWE end
 
 }

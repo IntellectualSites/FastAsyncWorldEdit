@@ -37,4 +37,5 @@ public class ActorAuthorizer implements Authorizer {
             return sender.hasPermission(permission);
         }
     }
+
 }

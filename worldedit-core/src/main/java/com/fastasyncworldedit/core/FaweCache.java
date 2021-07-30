@@ -1,18 +1,20 @@
 package com.fastasyncworldedit.core;
 
-import com.fastasyncworldedit.core.beta.IChunkSet;
-import com.fastasyncworldedit.core.beta.Trimable;
-import com.fastasyncworldedit.core.beta.implementation.queue.Pool;
-import com.fastasyncworldedit.core.beta.implementation.queue.QueuePool;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.collection.BitArray;
-import com.fastasyncworldedit.core.object.collection.BitArrayUnstretched;
-import com.fastasyncworldedit.core.object.collection.CleanableThreadLocal;
-import com.fastasyncworldedit.core.object.exception.FaweBlockBagException;
-import com.fastasyncworldedit.core.object.exception.FaweChunkLoadException;
-import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.internal.exception.FaweBlockBagException;
+import com.fastasyncworldedit.core.internal.exception.FaweChunkLoadException;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.math.BitArray;
+import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableVector3;
+import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.Pool;
+import com.fastasyncworldedit.core.queue.Trimable;
+import com.fastasyncworldedit.core.queue.implementation.QueuePool;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -31,12 +33,10 @@ import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
-import com.sk89q.worldedit.math.MutableBlockVector3;
-import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,8 +59,7 @@ import java.util.function.Supplier;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public enum FaweCache implements Trimable {
-    IMP
-    ; // singleton
+    IMP; // singleton
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -118,7 +117,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Supplier<V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(@NotNull T key) {
+            public V load(@Nonnull T key) {
                 return withInitial.get();
             }
         });
@@ -127,7 +126,7 @@ public enum FaweCache implements Trimable {
     public <T, V> LoadingCache<T, V> createCache(Function<T, V> withInitial) {
         return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
             @Override
-            public V load(@NotNull T key) {
+            public V load(@Nonnull T key) {
                 return withInitial.apply(key);
             }
         });
@@ -140,13 +139,16 @@ public enum FaweCache implements Trimable {
     public static final FaweBlockBagException BLOCK_BAG = new FaweBlockBagException();
     public static final FaweException MANUAL = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.manual"));
     public static final FaweException NO_REGION = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.no.region"));
-    public static final FaweException OUTSIDE_REGION = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
+    public static final FaweException OUTSIDE_REGION = new FaweException(Caption.of(
+            "fawe.cancel.worldedit.cancel.reason.outside.region"));
     public static final FaweException MAX_CHECKS = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.checks"));
     public static final FaweException MAX_CHANGES = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.changes"));
     public static final FaweException LOW_MEMORY = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.low.memory"));
-    public static final FaweException MAX_ENTITIES = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.entities"));
+    public static final FaweException MAX_ENTITIES = new FaweException(Caption.of(
+            "fawe.cancel.worldedit.cancel.reason.max.entities"));
     public static final FaweException MAX_TILES = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.tiles"));
-    public static final FaweException MAX_ITERATIONS = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.iterations"));
+    public static final FaweException MAX_ITERATIONS = new FaweException(Caption.of(
+            "fawe.cancel.worldedit.cancel.reason.max.iterations"));
 
     /*
     thread cache
@@ -167,9 +169,9 @@ public enum FaweCache implements Trimable {
     public final CleanableThreadLocal<int[]> PALETTE_TO_BLOCK = new CleanableThreadLocal<>(() -> new int[Character.MAX_VALUE + 1]);
 
     public final CleanableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new CleanableThreadLocal<>(
-        () -> new char[Character.MAX_VALUE + 1], a -> {
-            Arrays.fill(a, Character.MAX_VALUE);
-        }
+            () -> new char[Character.MAX_VALUE + 1], a -> {
+        Arrays.fill(a, Character.MAX_VALUE);
+    }
     );
 
     public final CleanableThreadLocal<long[]> BLOCK_STATES = new CleanableThreadLocal<>(() -> new long[2048]);
@@ -182,6 +184,7 @@ public enum FaweCache implements Trimable {
      * Holds data for a palette used in a chunk section
      */
     public static final class Palette {
+
         public int bitsPerEntry;
 
         public int paletteToBlockLength;
@@ -195,12 +198,14 @@ public enum FaweCache implements Trimable {
          * Reusable buffer array, MUST check blockStatesLength for actual length
          */
         public long[] blockStates;
+
     }
 
     private final CleanableThreadLocal<Palette> PALETTE_CACHE = new CleanableThreadLocal<>(Palette::new);
 
     /**
      * Convert raw char array to palette
+     *
      * @param layerOffset
      * @param blocks
      * @return palette
@@ -211,6 +216,7 @@ public enum FaweCache implements Trimable {
 
     /**
      * Convert raw int array to palette
+     *
      * @param layerOffset
      * @param blocks
      * @return palette
@@ -296,6 +302,7 @@ public enum FaweCache implements Trimable {
 
     /**
      * Convert raw int array to unstretched palette (1.16)
+     *
      * @param layerOffset
      * @param blocks
      * @return palette
@@ -531,9 +538,10 @@ public enum FaweCache implements Trimable {
         int nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
         ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads);
         return new ThreadPoolExecutor(nThreads, nThreads,
-                                      0L, TimeUnit.MILLISECONDS, queue,
-                                      Executors.defaultThreadFactory(),
-                                      new ThreadPoolExecutor.CallerRunsPolicy()) {
+                0L, TimeUnit.MILLISECONDS, queue,
+                Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.CallerRunsPolicy()
+        ) {
             protected void afterExecute(Runnable r, Throwable t) {
                 try {
                     super.afterExecute(r, t);

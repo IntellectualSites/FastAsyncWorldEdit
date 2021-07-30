@@ -24,4 +24,5 @@ public interface CUIEvent {
     String getTypeId();
 
     String[] getParameters();
+
 }

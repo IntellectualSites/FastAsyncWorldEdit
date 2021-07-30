@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 
 public class CleanTextureUtil extends TextureUtil {
+
     private final int min;
     private final int max;
 
@@ -16,10 +17,8 @@ public class CleanTextureUtil extends TextureUtil {
         long min = parent.distances[minIndex];
         long max = parent.distances[maxIndex];
         for (; minIndex > 0 && parent.distances[minIndex - 1] == min; minIndex--) {
-            ;
         }
         for (; maxIndex < parent.distances.length - 1 && parent.distances[maxIndex + 1] == max; maxIndex++) {
-            ;
         }
         int num = maxIndex - minIndex + 1;
         this.validMixBiomeColors = parent.validMixBiomeColors;
@@ -49,4 +48,5 @@ public class CleanTextureUtil extends TextureUtil {
     public int getMax() {
         return max;
     }
+
 }

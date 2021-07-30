@@ -23,10 +23,6 @@ repositories {
         url = uri("https://maven.enginehub.org/repo/")
     }
     maven {
-        name = "Athion"
-        url = uri("https://ci.athion.net/plugin/repository/tools/")
-    }
-    maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
     }
@@ -60,7 +56,6 @@ dependencies {
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:bukkit"))
     implementation(":worldedit-adapters:")
-    // Paper-patched NMS jars
     implementation("it.unimi.dsi:fastutil")
     api("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT") {
         exclude("junit", "junit")
@@ -72,7 +67,6 @@ dependencies {
     })
     implementation("org.apache.logging.log4j:log4j-api")
     compileOnly("org.spigotmc:spigot:1.17-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains:annotations:21.0.0")
     implementation("io.papermc:paperlib:1.0.6")
     compileOnly("com.sk89q:dummypermscompat:1.10") {
         exclude("com.github.MilkBowl", "VaultAPI")
@@ -91,6 +85,8 @@ dependencies {
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     api("org.lz4:lz4-java:1.8.0")
     api("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
+    api("com.zaxxer:SparseBitSet:1.2") { isTransitive = false }
+    api("org.anarres:parallelgzip:1.0.5") { isTransitive = false }
     // Third party
     implementation("org.bstats:bstats-bukkit:2.2.1")
     implementation("org.bstats:bstats-base:2.2.1")
@@ -104,10 +100,9 @@ dependencies {
     implementation("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     implementation("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
     implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
-    implementation("com.thevoxelbox.voxelsniper:voxelsniper:5.171.0") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
     implementation("org.incendo.serverlib:ServerLib:2.2.1")
-    api("com.plotsquared:PlotSquared-Bukkit:6.0.6-SNAPSHOT")
+    api("com.plotsquared:PlotSquared-Bukkit:6.0.6-SNAPSHOT") { isTransitive = false }
 }
 
 tasks.named<Copy>("processResources") {
@@ -160,7 +155,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
         }
         relocate("com.github.luben", "com.fastasyncworldedit.core.zstd") {
-            include(dependency("com.github.luben:zstd-jni:1.5.0-2"))
+            include(dependency("com.github.luben:zstd-jni:1.5.0-4"))
         }
         relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz") {
             include(dependency("net.jpountz:lz4-java-stream:1.0.0"))
@@ -170,6 +165,12 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
             include(dependency("net.kyori:adventure-nbt:4.8.1"))
+        }
+        relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
+            include(dependency("com.zaxxer:SparseBitSet:1.2"))
+        }
+        relocate("org.anarres", "com.fastasyncworldedit.core.internal.io") {
+            include(dependency("org.anarres:parallelgzip:1.0.5"))
         }
     }
 }

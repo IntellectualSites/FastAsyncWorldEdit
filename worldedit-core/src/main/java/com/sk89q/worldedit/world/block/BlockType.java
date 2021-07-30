@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
-import com.sk89q.worldedit.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -32,7 +33,6 @@ import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.world.item.ItemType;
@@ -41,6 +41,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -48,11 +49,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+//FAWE start - Pattern
 public class BlockType implements Keyed, Pattern {
+//FAWE end
 
     public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -60,8 +62,9 @@ public class BlockType implements Keyed, Pattern {
     private final String id;
     private final BlockTypesCache.Settings settings;
     private final LazyReference<FuzzyBlockState> emptyFuzzy
-        = LazyReference.from(() -> new FuzzyBlockState(this));
+            = LazyReference.from(() -> new FuzzyBlockState(this));
 
+    //FAWE start
     private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
     private final LazyReference<Integer> legacyData = LazyReference.from(() -> computeLegacy(1));
 
@@ -89,6 +92,7 @@ public class BlockType implements Keyed, Pattern {
     public int getMaxStateId() {
         return settings.permutations;
     }
+    //FAWE end
 
     /**
      * Gets the ID of this block.
@@ -102,9 +106,10 @@ public class BlockType implements Keyed, Pattern {
 
     public Component getRichName() {
         return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
-            .getRegistries().getBlockRegistry().getRichName(this);
+                .getRegistries().getBlockRegistry().getRichName(this);
     }
 
+    //FAWE start
     public String getNamespace() {
         String id = getId();
         int i = id.indexOf(':');
@@ -137,17 +142,26 @@ public class BlockType implements Keyed, Pattern {
         return defaultState;
     }
     */
+
     @Deprecated
     public BlockState withPropertyId(int propertyId) {
         if (settings.stateOrdinals == null) {
             return settings.defaultState;
         } else if (propertyId >= settings.stateOrdinals.length || propertyId < 0) {
-            LOGGER.error("Attempted to load blockstate with id {} of type {} outside of state ordinals length. Using default state.", propertyId, getId());
+            LOGGER.error(
+                    "Attempted to load blockstate with id {} of type {} outside of state ordinals length. Using default state.",
+                    propertyId,
+                    getId()
+            );
             return settings.defaultState;
         }
         int ordinal = settings.stateOrdinals[propertyId];
         if (ordinal >= BlockTypesCache.states.length || ordinal < 0) {
-            LOGGER.error("Attempted to load blockstate with ordinal {} of type {} outside of states length. Using default state. Using default state.", ordinal, getId());
+            LOGGER.error(
+                    "Attempted to load blockstate with ordinal {} of type {} outside of states length. Using default state. Using default state.",
+                    ordinal,
+                    getId()
+            );
             return settings.defaultState;
         }
         return BlockTypesCache.states[ordinal];
@@ -157,6 +171,7 @@ public class BlockType implements Keyed, Pattern {
     public BlockState withStateId(int internalStateId) { //
         return this.withPropertyId(internalStateId >> BlockTypesCache.BIT_OFFSET);
     }
+    //FAWE end
 
     /**
      * Gets the properties of this BlockType in a {@code key->property} mapping.
@@ -173,13 +188,17 @@ public class BlockType implements Keyed, Pattern {
      * @return the properties
      */
     public List<? extends Property<?>> getProperties() {
-        return this.settings.propertiesList; // stop changing this
+        //FAWE start - Don't use an ImmutableList here
+        return this.settings.propertiesList;
+        //FAWE end
     }
 
+    //FAWE start
     @Deprecated
     public Set<? extends Property<?>> getPropertiesSet() {
         return this.settings.propertiesSet;
     }
+    //FAWE end
 
     /**
      * Gets a property by name.
@@ -188,9 +207,12 @@ public class BlockType implements Keyed, Pattern {
      * @return The property
      */
     public <V> Property<V> getProperty(String name) {
-        return (Property<V>) this.settings.propertiesMap.get(name);  // stop changing this (performance)
+        //FAWE start - use properties map
+        return (Property<V>) this.settings.propertiesMap.get(name);
+        //FAWE end
     }
 
+    //FAWE start
     public boolean hasProperty(PropertyKey key) {
         int ordinal = key.getId();
         return this.settings.propertiesMapArr.length > ordinal && this.settings.propertiesMapArr[ordinal] != null;
@@ -203,6 +225,7 @@ public class BlockType implements Keyed, Pattern {
             return null;
         }
     }
+    //FAWE end
 
     /**
      * Gets the default state of this block type.
@@ -210,7 +233,9 @@ public class BlockType implements Keyed, Pattern {
      * @return The default state
      */
     public BlockState getDefaultState() {
+        //FAWE start - use settings
         return this.settings.defaultState;
+        //FAWE end
     }
 
     public FuzzyBlockState getFuzzyMatcher() {
@@ -223,10 +248,13 @@ public class BlockType implements Keyed, Pattern {
      * @return All possible states
      */
     public List<BlockState> getAllStates() {
+        //FAWE start - use ordinals
         if (settings.stateOrdinals == null) {
             return Collections.singletonList(getDefaultState());
         }
-        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(Collectors.toList());
+        return IntStream.of(settings.stateOrdinals).filter(i -> i != -1).mapToObj(i -> BlockTypesCache.states[i]).collect(
+                Collectors.toList());
+        //FAWE end
     }
 
     /**
@@ -234,7 +262,8 @@ public class BlockType implements Keyed, Pattern {
      *
      * @return The state, if it exists
      */
-    public BlockState getState(Map<Property<?>, Object> key) { //
+    public BlockState getState(Map<Property<?>, Object> key) {
+        //FAWE start - use ids & btp (block type property)
         int id = getInternalId();
         for (Map.Entry<Property<?>, Object> iter : key.entrySet()) {
             Property<?> prop = iter.getKey();
@@ -250,6 +279,7 @@ public class BlockType implements Keyed, Pattern {
             id = btp.modify(id, btp.getValueFor((String) value));
         }
         return withStateId(id);
+        //FAWE end
     }
 
     /**
@@ -268,11 +298,13 @@ public class BlockType implements Keyed, Pattern {
      */
     @Nullable
     public ItemType getItemType() {
+        //FAWE start - init this
         if (!initItemType) {
             initItemType = true;
             itemType = ItemTypes.get(this.id);
         }
         return itemType;
+        //FAWE end
     }
 
     /**
@@ -281,32 +313,38 @@ public class BlockType implements Keyed, Pattern {
      * @return The material
      */
     public BlockMaterial getMaterial() {
+        //FAWE start - use settings
         return this.settings.blockMaterial;
+        //FAWE end
     }
 
     /**
      * Gets the legacy ID. Needed for legacy reasons.
-     *
+     * <p>
      * DO NOT USE THIS.
      *
      * @return legacy id or 0, if unknown
      */
     @Deprecated
     public int getLegacyCombinedId() {
+        //FAWE start - use LegacyMapper
         Integer combinedId = LegacyMapper.getInstance().getLegacyCombined(this);
         return combinedId == null ? 0 : combinedId;
+        //FAWE end
     }
 
     /**
      * Gets the legacy data. Needed for legacy reasons.
-     *
+     * <p>
      * DO NOT USE THIS.
      *
      * @return legacy data or 0, if unknown
      */
     @Deprecated
     public int getLegacyId() {
+        //FAWE start
         return computeLegacy(0);
+        //FAWE end
     }
 
     /**
@@ -320,15 +358,21 @@ public class BlockType implements Keyed, Pattern {
      */
     @Deprecated
     public int getLegacyData() {
+        //FAWE start
         return computeLegacy(1);
+        //FAWE end
     }
 
     private int computeLegacy(int index) {
+        //FAWE start
         if (this.legacyCombinedId == null) {
             this.legacyCombinedId = LegacyMapper.getInstance().getLegacyCombined(this.getDefaultState());
         }
         return index == 0 ? legacyCombinedId >> 4 : legacyCombinedId & 15;
+        //FAWE end
     }
+
+    //FAWE start
 
     /**
      * The internal index of this type.
@@ -375,4 +419,5 @@ public class BlockType implements Keyed, Pattern {
     public SingleBlockTypeMask toMask(Extent extent) {
         return new SingleBlockTypeMask(extent, this);
     }
+    //FAWE end
 }

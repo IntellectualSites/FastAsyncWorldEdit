@@ -47,12 +47,14 @@ public class BaseEntity implements NbtValued {
 
     private final EntityType type;
     @Nullable
+    //FAWE start - use LZ<CBT> over CompoundTag
     private LazyReference<CompoundBinaryTag> nbtData;
+    //FAWE end
 
     /**
      * Create a new base entity.
      *
-     * @param type the entity type
+     * @param type    the entity type
      * @param nbtData NBT data
      * @deprecated Use {@link BaseEntity#BaseEntity(EntityType, LazyReference)}
      */
@@ -65,7 +67,7 @@ public class BaseEntity implements NbtValued {
     /**
      * Create a new base entity.
      *
-     * @param type the entity type
+     * @param type    the entity type
      * @param nbtData NBT data
      */
     public BaseEntity(EntityType type, LazyReference<CompoundBinaryTag> nbtData) {
@@ -93,12 +95,6 @@ public class BaseEntity implements NbtValued {
         setNbtReference(other.getNbtReference());
     }
 
-    @Nullable
-    @Override
-    public LazyReference<CompoundBinaryTag> getNbtReference() {
-        return nbtData;
-    }
-
     @Override
     public void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
         this.nbtData = nbtData;
@@ -113,11 +109,16 @@ public class BaseEntity implements NbtValued {
         return this.type;
     }
 
-    // FAWE start
+    //FAWE start
     public BaseEntity(CompoundTag tag) {
         this(EntityTypes.parse(tag.getString("Id")), tag);
     }
 
-    // FAWE end
+    @Nullable
+    @Override
+    public LazyReference<CompoundBinaryTag> getNbtReference() {
+        return nbtData;
+    }
+    //FAWE end
 
 }

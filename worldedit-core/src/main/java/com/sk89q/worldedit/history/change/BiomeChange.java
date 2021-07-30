@@ -33,6 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>This biome change does not have an {@link Extent} assigned to it because
  * one will be taken from the passed {@link UndoContext}. If the context
  * does not have an extent (it is null), cryptic errors may occur.</p>
+ *
  * @deprecated use {@link BiomeChange3D}
  */
 @Deprecated
@@ -47,7 +48,7 @@ public class BiomeChange implements Change {
      *
      * @param position the position
      * @param previous the previous biome
-     * @param current the current biome
+     * @param current  the current biome
      */
     public BiomeChange(BlockVector2 position, BiomeType previous, BiomeType current) {
         checkNotNull(position);

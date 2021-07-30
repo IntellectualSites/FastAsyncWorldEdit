@@ -27,8 +27,8 @@ import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.NbtValued;
 import com.sk89q.worldedit.world.item.ItemType;
 
-import java.io.IOException;
 import javax.annotation.Nullable;
+import java.io.IOException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,7 +42,9 @@ public class BaseItem implements NbtValued {
 
     private ItemType itemType;
     @Nullable
+    //FAWE start - Use LR & CBT over CompoundTag
     private LazyReference<CompoundBinaryTag> nbtData;
+    //FAWE end
 
     /**
      * Construct the object.
@@ -52,35 +54,6 @@ public class BaseItem implements NbtValued {
     public BaseItem(ItemType itemType) {
         checkNotNull(itemType);
         this.itemType = itemType;
-    }
-
-    /**
-     * Construct the object.
-     *
-     * @param itemType Type of the item
-     * @param nbtData NBT Compound tag
-     */
-    @Deprecated
-    public BaseItem(ItemType itemType, @Nullable CompoundTag nbtData) {
-        this(itemType, nbtData == null ? null : LazyReference.from(nbtData::asBinaryTag));
-    }
-
-    /**
-     * Construct the object.
-     *
-     * @param itemType Type of the item
-     * @param tag NBT Compound tag
-     */
-    public BaseItem(ItemType itemType, @Nullable LazyReference<CompoundBinaryTag> tag) {
-        checkNotNull(itemType);
-        this.itemType = itemType;
-        this.nbtData = tag;
-    }
-
-    @Deprecated
-    @Nullable
-    public Object getNativeItem() {
-        return null;
     }
 
     /**
@@ -99,6 +72,37 @@ public class BaseItem implements NbtValued {
      */
     public void setType(ItemType itemType) {
         this.itemType = itemType;
+    }
+
+    //FAWE start
+
+    /**
+     * Construct the object.
+     *
+     * @param itemType Type of the item
+     * @param nbtData  NBT Compound tag
+     */
+    @Deprecated
+    public BaseItem(ItemType itemType, @Nullable CompoundTag nbtData) {
+        this(itemType, nbtData == null ? null : LazyReference.from(nbtData::asBinaryTag));
+    }
+
+    /**
+     * Construct the object.
+     *
+     * @param itemType Type of the item
+     * @param tag      NBT Compound tag
+     */
+    public BaseItem(ItemType itemType, @Nullable LazyReference<CompoundBinaryTag> tag) {
+        checkNotNull(itemType);
+        this.itemType = itemType;
+        this.nbtData = tag;
+    }
+
+    @Deprecated
+    @Nullable
+    public Object getNativeItem() {
+        return null;
     }
 
     @Nullable
@@ -126,4 +130,5 @@ public class BaseItem implements NbtValued {
 
         return getType().getId() + nbtString;
     }
+    //FAWE end
 }

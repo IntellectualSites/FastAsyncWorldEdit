@@ -59,15 +59,17 @@ public class SnapshotUtilCommands {
     }
 
     @Command(
-        name = "restore",
-        aliases = { "/restore" },
-        desc = "Restore the selection from a snapshot"
+            name = "restore",
+            aliases = {"/restore"},
+            desc = "Restore the selection from a snapshot"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.snapshots.restore")
-    public void restore(Actor actor, World world, LocalSession session, EditSession editSession,
-                        @Arg(name = "snapshot", desc = "The snapshot to restore", def = "")
-                            String snapshotName) throws WorldEditException, IOException {
+    public void restore(
+            Actor actor, World world, LocalSession session, EditSession editSession,
+            @Arg(name = "snapshot", desc = "The snapshot to restore", def = "")
+                    String snapshotName
+    ) throws WorldEditException, IOException {
         LocalConfiguration config = we.getConfiguration();
         checkSnapshotsConfigured(config);
 
@@ -94,22 +96,22 @@ public class SnapshotUtilCommands {
         // No snapshot set?
         if (snapshot == null) {
             try (Stream<Snapshot> snapshotStream =
-                     config.snapshotDatabase.getSnapshotsNewestFirst(world.getName())) {
+                         config.snapshotDatabase.getSnapshotsNewestFirst(world.getName())) {
                 snapshot = snapshotStream
-                    .findFirst().orElse(null);
+                        .findFirst().orElse(null);
             }
 
             if (snapshot == null) {
                 actor.print(Caption.of(
-                    "worldedit.restore.none-for-specific-world",
-                    TextComponent.of(world.getName())
+                        "worldedit.restore.none-for-specific-world",
+                        TextComponent.of(world.getName())
                 ));
                 return;
             }
         }
         actor.print(Caption.of(
-            "worldedit.restore.loaded",
-            TextComponent.of(snapshot.getInfo().getDisplayName())
+                "worldedit.restore.loaded",
+                TextComponent.of(snapshot.getInfo().getDisplayName())
         ));
 
         try {
@@ -130,9 +132,11 @@ public class SnapshotUtilCommands {
                     actor.print(Caption.of("worldedit.restore.chunk-load-failed"));
                 }
             } else {
-                actor.print(Caption.of("worldedit.restore.restored",
-                    TextComponent.of(restore.getMissingChunks().size()),
-                    TextComponent.of(restore.getErrorChunks().size())));
+                actor.print(Caption.of(
+                        "worldedit.restore.restored",
+                        TextComponent.of(restore.getMissingChunks().size()),
+                        TextComponent.of(restore.getErrorChunks().size())
+                ));
             }
         } finally {
             try {
@@ -141,4 +145,5 @@ public class SnapshotUtilCommands {
             }
         }
     }
+
 }

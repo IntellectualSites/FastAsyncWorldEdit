@@ -842,7 +842,10 @@ public class MemorySection implements ConfigurationSection {
     @Override
     public String toString() {
         Configuration root = getRoot();
-        return getClass().getSimpleName() + "[path='" + getCurrentPath() + "', root='" + (root == null ? null : root.getClass().getSimpleName()) +
+        return getClass().getSimpleName() + "[path='" + getCurrentPath() + "', root='" + (root == null
+                ? null
+                : root.getClass().getSimpleName()) +
                 "']";
     }
+
 }

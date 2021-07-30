@@ -44,11 +44,11 @@ public class ExtentBiomeCopy implements FlatRegionFunction, RegionFunction {
     /**
      * Make a new biome copy.
      *
-     * @param source the source extent
-     * @param from the source offset
+     * @param source      the source extent
+     * @param from        the source offset
      * @param destination the destination extent
-     * @param to the destination offset
-     * @param transform a transform to apply to positions (after source offset, before destination offset)
+     * @param to          the destination offset
+     * @param transform   a transform to apply to positions (after source offset, before destination offset)
      * @deprecated use {@link ExtentBiomeCopy#ExtentBiomeCopy(Extent, BlockVector3, Extent, BlockVector3, Transform)}
      */
     @Deprecated
@@ -68,11 +68,11 @@ public class ExtentBiomeCopy implements FlatRegionFunction, RegionFunction {
     /**
      * Make a new biome copy.
      *
-     * @param source the source extent
-     * @param from the source offset
+     * @param source      the source extent
+     * @param from        the source offset
      * @param destination the destination extent
-     * @param to the destination offset
-     * @param transform a transform to apply to positions (after source offset, before destination offset)
+     * @param to          the destination offset
+     * @param transform   a transform to apply to positions (after source offset, before destination offset)
      */
     public ExtentBiomeCopy(Extent source, BlockVector3 from, Extent destination, BlockVector3 to, Transform transform) {
         checkNotNull(source);
@@ -92,8 +92,8 @@ public class ExtentBiomeCopy implements FlatRegionFunction, RegionFunction {
         BiomeType biome = source.getBiome(position);
         BlockVector3 orig = position.subtract(from);
         BlockVector3 transformed = transform.apply(orig.toVector3())
-            .toBlockPoint()
-            .add(to);
+                .toBlockPoint()
+                .add(to);
 
         return destination.setBiome(transformed, biome);
     }
@@ -107,4 +107,5 @@ public class ExtentBiomeCopy implements FlatRegionFunction, RegionFunction {
         }
         return success;
     }
+
 }

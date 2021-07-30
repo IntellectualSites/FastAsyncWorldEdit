@@ -45,7 +45,9 @@ public class Deform implements Contextual<Operation> {
 
     private Extent destination;
     private Region region;
+    //FAWE Start - String
     private String expression;
+    //FAWE end
     private Mode mode;
     private Vector3 offset = Vector3.ZERO;
 
@@ -119,7 +121,9 @@ public class Deform implements Contextual<Operation> {
 
     @Override
     public String toString() {
+        //FAWE start - We string-ify elsewhere
         return "deformation of " + expression;
+        //FAWE end
     }
 
     @Override
@@ -159,10 +163,12 @@ public class Deform implements Contextual<Operation> {
 
         LocalSession session = context.getSession();
         return new DeformOperation(context.getDestination(), region, zero, unit, expression,
-                session == null ? WorldEdit.getInstance().getConfiguration().calculationTimeout : session.getTimeout());
+                session == null ? WorldEdit.getInstance().getConfiguration().calculationTimeout : session.getTimeout()
+        );
     }
 
     private static final class DeformOperation implements Operation {
+
         private final Extent destination;
         private final Region region;
         private final Vector3 zero;
@@ -197,8 +203,10 @@ public class Deform implements Contextual<Operation> {
 
         @Override
         public Iterable<Component> getStatusMessages() {
-            return ImmutableList.of(Caption.of("worldedit.operation.deform.expression",
-                    TextComponent.of(expression)));
+            return ImmutableList.of(Caption.of(
+                    "worldedit.operation.deform.expression",
+                    TextComponent.of(expression)
+            ));
         }
 
     }

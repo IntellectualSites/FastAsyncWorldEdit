@@ -85,8 +85,8 @@ public final class Substring {
         }
         Substring substring1 = (Substring) o;
         return start == substring1.start
-            && end == substring1.end
-            && substring.equals(substring1.substring);
+                && end == substring1.end
+                && substring.equals(substring1.substring);
     }
 
     @Override
@@ -97,9 +97,10 @@ public final class Substring {
     @Override
     public String toString() {
         return "Substring{"
-            + "substring='" + substring + "'"
-            + ",start=" + start
-            + ",end=" + end
-            + "}";
+                + "substring='" + substring + "'"
+                + ",start=" + start
+                + ",end=" + end
+                + "}";
     }
+
 }

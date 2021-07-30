@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
+import com.fastasyncworldedit.bukkit.adapter.SimpleBukkitAdapter;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
-import com.fastasyncworldedit.bukkit.adapter.SimpleBukkitAdapter;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -49,9 +49,9 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +62,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Adapts between Bukkit and WorldEdit equivalent objects.
  */
-// FAWE start - enum-ized
+//FAWE start - enum-ized
 public enum BukkitAdapter {
     INSTANCE;
 
@@ -77,7 +77,7 @@ public enum BukkitAdapter {
         return INSTANCE.adapter;
     }
 
-    // FAWE end
+    //FAWE end
 
     private static final ParserContext TO_BLOCK_CONTEXT = new ParserContext();
 
@@ -89,13 +89,13 @@ public enum BukkitAdapter {
      * Checks equality between a WorldEdit BlockType and a Bukkit Material.
      *
      * @param blockType The WorldEdit BlockType
-     * @param type The Bukkit Material
+     * @param type      The Bukkit Material
      * @return If they are equal
      */
     public static boolean equals(BlockType blockType, Material type) {
-        // FAWE start - swapped reference to getAdapter
+        //FAWE start - swapped reference to getAdapter
         return getAdapter().equals(blockType, type);
-        // FAWE end
+        //FAWE end
     }
 
     /**
@@ -108,9 +108,9 @@ public enum BukkitAdapter {
      * @return a wrapped Bukkit world
      */
     public static BukkitWorld asBukkitWorld(World world) {
-        // FAWE start - logic moved to IBukkitAdapter
+        //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().asBukkitWorld(world);
-        // FAWE end
+        //FAWE end
     }
 
     /**
@@ -120,9 +120,9 @@ public enum BukkitAdapter {
      * @return a WorldEdit world
      */
     public static World adapt(org.bukkit.World world) {
-        // FAWE start - logic moved to IBukkitAdapter
+        //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().adapt(world);
-        // FAWE end
+        //FAWE end
     }
 
     /**
@@ -184,11 +184,16 @@ public enum BukkitAdapter {
             return null;
         }
         switch (face) {
-            case NORTH: return Direction.NORTH;
-            case SOUTH: return Direction.SOUTH;
-            case WEST: return Direction.WEST;
-            case EAST: return Direction.EAST;
-            case DOWN: return Direction.DOWN;
+            case NORTH:
+                return Direction.NORTH;
+            case SOUTH:
+                return Direction.SOUTH;
+            case WEST:
+                return Direction.WEST;
+            case EAST:
+                return Direction.EAST;
+            case DOWN:
+                return Direction.DOWN;
             case UP:
             default:
                 return Direction.UP;
@@ -220,7 +225,8 @@ public enum BukkitAdapter {
                 adapt(location.getWorld()),
                 position,
                 location.getYaw(),
-                location.getPitch());
+                location.getPitch()
+        );
     }
 
     /**
@@ -236,13 +242,14 @@ public enum BukkitAdapter {
                 adapt((World) location.getExtent()),
                 position.getX(), position.getY(), position.getZ(),
                 location.getYaw(),
-                location.getPitch());
+                location.getPitch()
+        );
     }
 
     /**
      * Create a Bukkit location from a WorldEdit position with a Bukkit world.
      *
-     * @param world the Bukkit world
+     * @param world    the Bukkit world
      * @param position the WorldEdit position
      * @return a Bukkit location
      */
@@ -251,13 +258,14 @@ public enum BukkitAdapter {
         checkNotNull(position);
         return new org.bukkit.Location(
                 world,
-                position.getX(), position.getY(), position.getZ());
+                position.getX(), position.getY(), position.getZ()
+        );
     }
 
     /**
      * Create a Bukkit location from a WorldEdit position with a Bukkit world.
      *
-     * @param world the Bukkit world
+     * @param world    the Bukkit world
      * @param position the WorldEdit position
      * @return a Bukkit location
      */
@@ -266,13 +274,14 @@ public enum BukkitAdapter {
         checkNotNull(position);
         return new org.bukkit.Location(
                 world,
-                position.getX(), position.getY(), position.getZ());
+                position.getX(), position.getY(), position.getZ()
+        );
     }
 
     /**
      * Create a Bukkit location from a WorldEdit location with a Bukkit world.
      *
-     * @param world the Bukkit world
+     * @param world    the Bukkit world
      * @param location the WorldEdit location
      * @return a Bukkit location
      */
@@ -283,7 +292,8 @@ public enum BukkitAdapter {
                 world,
                 location.getX(), location.getY(), location.getZ(),
                 location.getYaw(),
-                location.getPitch());
+                location.getPitch()
+        );
     }
 
     /**
@@ -392,8 +402,8 @@ public enum BukkitAdapter {
         //FAWE end
     }
 
-    private static EnumMap<Material, BlockType> materialBlockTypeCache = new EnumMap<>(Material.class);
-    private static EnumMap<Material, ItemType> materialItemTypeCache = new EnumMap<>(Material.class);
+    private static final EnumMap<Material, BlockType> materialBlockTypeCache = new EnumMap<>(Material.class);
+    private static final EnumMap<Material, ItemType> materialItemTypeCache = new EnumMap<>(Material.class);
 
     /**
      * Converts a Material to a BlockType.
@@ -421,8 +431,8 @@ public enum BukkitAdapter {
         //FAWE end
     }
 
-    private static Int2ObjectMap<BlockState> blockStateCache = new Int2ObjectOpenHashMap<>();
-    private static Map<String, BlockState> blockStateStringCache = new HashMap<>();
+    private static final Int2ObjectMap<BlockState> blockStateCache = new Int2ObjectOpenHashMap<>();
+    private static final Map<String, BlockState> blockStateStringCache = new HashMap<>();
 
     /**
      * Create a WorldEdit BlockState from a Bukkit BlockData.
@@ -430,13 +440,13 @@ public enum BukkitAdapter {
      * @param blockData The Bukkit BlockData
      * @return The WorldEdit BlockState
      */
-    public static BlockState adapt(@NotNull BlockData blockData) {
+    public static BlockState adapt(@Nonnull BlockData blockData) {
         //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().adapt(blockData);
         //FAWE end
     }
 
-    private static Int2ObjectMap<BlockData> blockDataCache = new Int2ObjectOpenHashMap<>();
+    private static final Int2ObjectMap<BlockData> blockDataCache = new Int2ObjectOpenHashMap<>();
 
     /**
      * Create a Bukkit BlockData from a WorldEdit BlockStateHolder.
@@ -444,7 +454,7 @@ public enum BukkitAdapter {
      * @param block The WorldEdit BlockStateHolder
      * @return The Bukkit BlockData
      */
-    public static BlockData adapt(@NotNull BlockStateHolder block) {
+    public static BlockData adapt(@Nonnull BlockStateHolder block) {
         //FAWE start - logic moved to IBukkitAdapter
         return getAdapter().adapt(block);
         //FAWE end

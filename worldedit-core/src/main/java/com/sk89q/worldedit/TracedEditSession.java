@@ -49,4 +49,5 @@ class TracedEditSession extends EditSession {
             WorldEdit.logger.warn("Here is a stacktrace from the creation of this EditSession:", stacktrace);
         }
     }
+
 }

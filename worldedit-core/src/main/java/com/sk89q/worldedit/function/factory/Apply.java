@@ -30,6 +30,13 @@ import com.sk89q.worldedit.regions.Region;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
 
+/**
+ * Creates an operation from a region context.
+ *
+ * @deprecated Use {@link ApplyRegion} or {@link ApplyLayer}
+ *         depending on function type.
+ */
+@Deprecated
 public class Apply implements Contextual<Operation> {
 
     private final Region region;
@@ -48,7 +55,9 @@ public class Apply implements Contextual<Operation> {
 
     @Override
     public Operation createFromContext(EditContext context) {
-        return new RegionVisitor(firstNonNull(context.getRegion(), region), function.createFromContext(context));
+        //FAWE start > add extent to RegionVisitor to allow chunk preloading
+        return new RegionVisitor(firstNonNull(context.getRegion(), region), function.createFromContext(context), context.getDestination());
+        //FAWE end
     }
 
     @Override

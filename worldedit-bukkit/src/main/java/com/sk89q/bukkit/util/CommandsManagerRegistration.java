@@ -69,7 +69,13 @@ public class CommandsManagerRegistration extends CommandRegistration {
                 }
             }
 
-            toRegister.add(new CommandInfo(command.usage(), command.desc(), command.aliases(), commands, permissions == null ? null : permissions.toArray(new String[permissions.size()])));
+            toRegister.add(new CommandInfo(
+                    command.usage(),
+                    command.desc(),
+                    command.aliases(),
+                    commands,
+                    permissions == null ? null : permissions.toArray(new String[permissions.size()])
+            ));
         }
 
         return register(toRegister);

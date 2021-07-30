@@ -3,14 +3,14 @@ package com.fastasyncworldedit.core.util;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.FaweInputStream;
-import com.fastasyncworldedit.core.object.FaweOutputStream;
-import com.fastasyncworldedit.core.object.RegionWrapper;
-import com.fastasyncworldedit.core.object.RunnableVal;
-import com.fastasyncworldedit.core.object.RunnableVal2;
-import com.fastasyncworldedit.core.object.changeset.FaweStreamChangeSet;
-import com.fastasyncworldedit.core.object.io.AbstractDelegateOutputStream;
-import com.fastasyncworldedit.core.object.io.zstd.ZstdInputStream;
+import com.fastasyncworldedit.core.history.changeset.FaweStreamChangeSet;
+import com.fastasyncworldedit.core.internal.io.AbstractDelegateOutputStream;
+import com.fastasyncworldedit.core.internal.io.FaweInputStream;
+import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
+import com.fastasyncworldedit.core.regions.RegionWrapper;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
+import com.fastasyncworldedit.core.util.task.RunnableVal2;
+import com.github.luben.zstd.ZstdInputStream;
 import com.github.luben.zstd.ZstdOutputStream;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
@@ -33,7 +33,6 @@ import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
 import net.jpountz.lz4.LZ4InputStream;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -90,6 +89,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import static java.lang.System.arraycopy;
+
 public class MainUtil {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -389,11 +389,18 @@ public class MainUtil {
         return new FaweInputStream(new FastBufferedInputStream(is));
     }
 
-    public static URL upload(UUID uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
+    public static URL upload(UUID uuid, String file, String extension, @Nonnull final RunnableVal<OutputStream> writeTask) {
         return upload(Settings.IMP.WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
-    public static URL upload(String urlStr, boolean save, String uuid, String file, String extension, @NotNull final RunnableVal<OutputStream> writeTask) {
+    public static URL upload(
+            String urlStr,
+            boolean save,
+            String uuid,
+            String file,
+            String extension,
+            @Nonnull final RunnableVal<OutputStream> writeTask
+    ) {
         String filename = (file == null ? "plot" : file) + (extension != null ? "." + extension : "");
         uuid = uuid == null ? UUID.randomUUID().toString() : uuid;
         final String website;
@@ -410,7 +417,10 @@ public class MainUtil {
             URLConnection con = new URL(website).openConnection();
             con.setDoOutput(true);
             con.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-            try (OutputStream output = con.getOutputStream(); PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8), true)) {
+            try (OutputStream output = con.getOutputStream(); PrintWriter writer = new PrintWriter(new OutputStreamWriter(
+                    output,
+                    StandardCharsets.UTF_8
+            ), true)) {
                 String crlf = "\r\n";
                 writer.append("--" + boundary).append(crlf);
                 writer.append("Content-Disposition: form-data; name=\"param\"").append(crlf);
@@ -418,7 +428,9 @@ public class MainUtil {
                 String param = "value";
                 writer.append(crlf).append(param).append(crlf).flush();
                 writer.append("--" + boundary).append(crlf);
-                writer.append("Content-Disposition: form-data; name=\"schematicFile\"; filename=\"" + filename + '"').append(crlf);
+                writer
+                        .append("Content-Disposition: form-data; name=\"schematicFile\"; filename=\"" + filename + '"')
+                        .append(crlf);
                 writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(filename)).append(crlf);
                 writer.append("Content-Transfer-Encoding: binary").append(crlf);
                 writer.append(crlf).flush();
@@ -460,7 +472,7 @@ public class MainUtil {
      * @param z   New Z coordinate
      * @return New tag
      */
-    public static @NotNull CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
+    @Nonnull public static CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
         Map<String, Tag> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
@@ -475,7 +487,7 @@ public class MainUtil {
      * @param entity Entity
      * @return New tag
      */
-    public static @NotNull CompoundTag setEntityInfo(@NotNull CompoundTag tag, @NotNull Entity entity) {
+    @Nonnull public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
         Map<String, Tag> map = new HashMap<>(tag.getValue());
         map.put("Id", new StringTag(entity.getState().getType().getId()));
         ListTag pos = (ListTag) map.get("Pos");
@@ -492,7 +504,7 @@ public class MainUtil {
     }
 
     public static String getText(String url) throws IOException {
-        try (Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8")) {
+        try (Scanner scanner = new Scanner(new URL(url).openStream(), StandardCharsets.UTF_8)) {
             return scanner.useDelimiter("\\A").next();
         }
     }
@@ -529,12 +541,12 @@ public class MainUtil {
     }
 
     public static Thread[] getThreads() {
-        ThreadGroup rootGroup = Thread.currentThread( ).getThreadGroup( );
+        ThreadGroup rootGroup = Thread.currentThread().getThreadGroup();
         ThreadGroup parentGroup;
-        while ( ( parentGroup = rootGroup.getParent() ) != null ) {
+        while ((parentGroup = rootGroup.getParent()) != null) {
             rootGroup = parentGroup;
         }
-        Thread[] threads = new Thread[ rootGroup.activeCount() ];
+        Thread[] threads = new Thread[rootGroup.activeCount()];
         if (threads.length != 0) {
             while (rootGroup.enumerate(threads, true) == threads.length) {
                 threads = new Thread[threads.length * 2];
@@ -892,4 +904,5 @@ public class MainUtil {
             e.printStackTrace();
         }
     }
+
 }

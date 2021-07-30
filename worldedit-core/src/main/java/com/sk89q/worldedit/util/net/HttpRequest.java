@@ -45,8 +45,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.google.common.base.Preconditions.checkState;
-
 public class HttpRequest implements Closeable {
 
     private static final int CONNECT_TIMEOUT = 1000 * 5;
@@ -170,8 +168,8 @@ public class HttpRequest implements Closeable {
             }
 
             inputStream = conn.getResponseCode() == HttpURLConnection.HTTP_OK
-                ? conn.getInputStream()
-                : conn.getErrorStream();
+                    ? conn.getInputStream()
+                    : conn.getErrorStream();
 
             successful = true;
         } finally {
@@ -215,13 +213,6 @@ public class HttpRequest implements Closeable {
         }
 
         return conn.getResponseCode();
-    }
-
-    public String getSingleHeaderValue(String header) {
-        checkState(conn != null, "No connection has been made");
-
-        // maybe we should check for multi-header?
-        return conn.getHeaderField(header);
     }
 
     /**
@@ -383,7 +374,8 @@ public class HttpRequest implements Closeable {
             URL url = new URL(existing.toString());
             URI uri = new URI(
                     url.getProtocol(), url.getUserInfo(), url.getHost(), url.getPort(),
-                    url.getPath(), url.getQuery(), url.getRef());
+                    url.getPath(), url.getQuery(), url.getRef()
+            );
             url = uri.toURL();
             return url;
         } catch (MalformedURLException | URISyntaxException e) {
@@ -397,13 +389,13 @@ public class HttpRequest implements Closeable {
     public static final class Form {
 
         private static final Joiner.MapJoiner URL_ENCODER = Joiner.on('&')
-            .withKeyValueSeparator('=');
+                .withKeyValueSeparator('=');
         private static final Joiner CRLF_JOINER = Joiner.on("\r\n");
 
         public final Map<String, String> elements = new LinkedHashMap<>();
 
         private final String formDataSeparator = "EngineHubFormData"
-            + ThreadLocalRandom.current().nextInt(10000, 99999);
+                + ThreadLocalRandom.current().nextInt(10000, 99999);
 
         private Form() {
         }
@@ -430,12 +422,12 @@ public class HttpRequest implements Closeable {
 
             for (Map.Entry<String, String> element : elements.entrySet()) {
                 CRLF_JOINER.appendTo(
-                    builder,
-                    separatorWithDashes,
-                    "Content-Disposition: form-data; name=\"" + element.getKey() + "\"",
-                    "",
-                    element.getValue(),
-                    ""
+                        builder,
+                        separatorWithDashes,
+                        "Content-Disposition: form-data; name=\"" + element.getKey() + "\"",
+                        "",
+                        element.getValue(),
+                        ""
                 );
             }
 
@@ -446,12 +438,12 @@ public class HttpRequest implements Closeable {
 
         public String toUrlEncodedString() {
             return URL_ENCODER.join(
-                elements.entrySet().stream()
-                    .map(e -> Maps.immutableEntry(
-                        UrlEscapers.urlFormParameterEscaper().escape(e.getKey()),
-                        UrlEscapers.urlFormParameterEscaper().escape(e.getValue())
-                    ))
-                    .iterator()
+                    elements.entrySet().stream()
+                            .map(e -> Maps.immutableEntry(
+                                    UrlEscapers.urlFormParameterEscaper().escape(e.getKey()),
+                                    UrlEscapers.urlFormParameterEscaper().escape(e.getValue())
+                            ))
+                            .iterator()
             );
         }
 
@@ -463,12 +455,14 @@ public class HttpRequest implements Closeable {
         public static Form create() {
             return new Form();
         }
+
     }
 
     /**
      * Used to buffer the response in memory.
      */
     public class BufferedResponse {
+
         private final byte[] data;
 
         private BufferedResponse(byte[] data) {
@@ -532,6 +526,7 @@ public class HttpRequest implements Closeable {
 
             return this;
         }
+
     }
 
 }

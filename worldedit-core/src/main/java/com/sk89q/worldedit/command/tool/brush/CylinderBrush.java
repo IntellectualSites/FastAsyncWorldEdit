@@ -27,14 +27,15 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class CylinderBrush implements Brush {
 
-    private int height;
+    private final int height;
 
     public CylinderBrush(int height) {
         this.height = height;
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         if (pattern == null) {
             pattern = BlockTypes.COBBLESTONE.getDefaultState();
         }

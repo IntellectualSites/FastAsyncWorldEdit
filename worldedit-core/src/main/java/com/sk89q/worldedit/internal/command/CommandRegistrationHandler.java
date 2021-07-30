@@ -39,13 +39,14 @@ public class CommandRegistrationHandler {
 
     public <CI> void register(CommandManager manager, CommandRegistration<CI> registration, CI instance) {
         registration.containerInstance(instance)
-            .commandManager(manager)
-            .listeners(callListeners);
+                .commandManager(manager)
+                .listeners(callListeners);
         if (registration instanceof CommandPermissionsConditionGenerator.Registration) {
             ((CommandPermissionsConditionGenerator.Registration) registration).commandPermissionsConditionGenerator(
-                PERM_GEN
+                    PERM_GEN
             );
         }
         registration.build();
     }
+
 }

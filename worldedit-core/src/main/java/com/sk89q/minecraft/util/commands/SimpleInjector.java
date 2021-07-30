@@ -28,8 +28,8 @@ import java.lang.reflect.InvocationTargetException;
 public class SimpleInjector implements Injector {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private Object[] args;
-    private Class<?>[] argClasses;
+    private final Object[] args;
+    private final Class<?>[] argClasses;
 
     public SimpleInjector(Object... args) {
         this.args = args;
@@ -50,4 +50,5 @@ public class SimpleInjector implements Injector {
             return null;
         }
     }
+
 }

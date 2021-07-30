@@ -29,26 +29,29 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Applies a {@link BlockBag} to operations.
  */
 public class BlockBagExtent extends AbstractDelegateExtent {
 
+    //FAWE start
     private final boolean mine;
-    private int[] missingBlocks = new int[BlockTypes.size()];
+    private final int[] missingBlocks = new int[BlockTypes.size()];
+    //FAWE end
     private BlockBag blockBag;
 
     /**
      * Create a new instance.
      *
-     * @param extent the extent
+     * @param extent   the extent
      * @param blockBag the block bag
      */
+    //FAWE start
     public BlockBagExtent(Extent extent, @Nullable BlockBag blockBag) {
         this(extent, blockBag, false);
     }
@@ -58,6 +61,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
         this.blockBag = blockBag;
         this.mine = mine;
     }
+    //FAWe end
 
     /**
      * Get the block bag.
@@ -85,6 +89,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
      * @return a map of missing blocks
      */
     public Map<BlockType, Integer> popMissing() {
+        //FAWE start - Use an Array
         HashMap<BlockType, Integer> map = new HashMap<>();
         for (int i = 0; i < missingBlocks.length; i++) {
             int count = missingBlocks[i];
@@ -94,6 +99,7 @@ public class BlockBagExtent extends AbstractDelegateExtent {
         }
         Arrays.fill(missingBlocks, 0);
         return map;
+        //FAWE end
     }
 
     @Override
@@ -111,10 +117,13 @@ public class BlockBagExtent extends AbstractDelegateExtent {
                 } catch (UnplaceableBlockException e) {
                     throw FaweCache.BLOCK_BAG;
                 } catch (BlockBagException e) {
+                    //FAWE start - listen for internal ids
                     missingBlocks[block.getBlockType().getInternalId()]++;
                     throw FaweCache.BLOCK_BAG;
+                    //FAWE end
                 }
             }
+            //FAWE start
             if (mine) {
                 if (!existing.getBlockType().getMaterial().isAir()) {
                     try {
@@ -123,8 +132,10 @@ public class BlockBagExtent extends AbstractDelegateExtent {
                     }
                 }
             }
+            //FAWE end
         }
 
         return super.setBlock(x, y, z, block);
     }
+
 }

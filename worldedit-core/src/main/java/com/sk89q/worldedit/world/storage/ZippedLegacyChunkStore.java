@@ -44,7 +44,9 @@ public class ZippedLegacyChunkStore extends LegacyChunkStore {
      * the folder to not look into a subdirectory.
      *
      * @param zipFile the zip file
-     * @param folder the folder
+     * @param folder  the folder
+     * @throws IOException  if there is an error opening the zip
+     * @throws ZipException if there is an error opening the zip
      */
     public ZippedLegacyChunkStore(File zipFile, String folder) throws IOException, ZipException {
         this.folder = folder;
@@ -57,6 +59,8 @@ public class ZippedLegacyChunkStore extends LegacyChunkStore {
      * be detected.
      *
      * @param zipFile the zip file
+     * @throws IOException  if there is an error opening the zip
+     * @throws ZipException if there is an error opening the zip
      */
     public ZippedLegacyChunkStore(File zipFile) throws IOException, ZipException {
         zip = new ZipFile(zipFile);
@@ -65,10 +69,12 @@ public class ZippedLegacyChunkStore extends LegacyChunkStore {
     /**
      * Get the input stream for a chunk file.
      *
-     * @param f1 the first part of the path
-     * @param f2 the second part of the path
+     * @param f1   the first part of the path
+     * @param f2   the second part of the path
      * @param name the name of the file
      * @return an input stream
+     * @throws IOException   if there is an error getting the chunk data
+     * @throws DataException if there is an error getting the chunk data
      */
     @Override
     protected InputStream getInputStream(String f1, String f2, String name) throws IOException, DataException {

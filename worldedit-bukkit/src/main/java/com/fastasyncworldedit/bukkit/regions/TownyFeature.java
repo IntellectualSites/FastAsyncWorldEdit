@@ -83,10 +83,10 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
             if (isMember) {
                 final Chunk chunk = location.getChunk();
                 final BlockVector3 pos1 = BlockVector3
-                    .at(chunk.getX() * 16, 0, chunk.getZ() * 16);
+                        .at(chunk.getX() * 16, 0, chunk.getZ() * 16);
                 final BlockVector3 pos2 = BlockVector3.at(
-                    chunk.getX() * 16 + 15, 156, chunk.getZ() * 16
-                        + 15);
+                        chunk.getX() * 16 + 15, 156, chunk.getZ() * 16
+                                + 15);
                 return new FaweMask(new CuboidRegion(pos1, pos2)) {
                     @Override
                     public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
@@ -98,4 +98,5 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
         }
         return null;
     }
+
 }

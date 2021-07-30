@@ -1,11 +1,11 @@
 package com.fastasyncworldedit.bukkit.filter;
 
-import com.fastasyncworldedit.core.regions.general.CuboidRegionFilter;
+import com.fastasyncworldedit.core.regions.filter.CuboidRegionFilter;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.sk89q.worldedit.math.BlockVector2;
-import com.griefdefender.api.claim.Claim;
-import com.griefdefender.api.GriefDefender;
 import com.flowpowered.math.vector.Vector3i;
+import com.griefdefender.api.GriefDefender;
+import com.griefdefender.api.claim.Claim;
+import com.sk89q.worldedit.math.BlockVector2;
 import org.bukkit.World;
 
 import java.util.ArrayDeque;
@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GriefDefenderFilter extends CuboidRegionFilter {
+
     private final Collection<Claim> claims;
     private final World world;
 
@@ -37,4 +38,5 @@ public class GriefDefenderFilter extends CuboidRegionFilter {
             }
         }
     }
+
 }

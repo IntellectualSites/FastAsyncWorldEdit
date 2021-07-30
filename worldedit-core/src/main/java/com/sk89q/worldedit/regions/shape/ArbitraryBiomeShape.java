@@ -42,12 +42,14 @@ public abstract class ArbitraryBiomeShape {
     private final int cacheSizeY;
     private final int cacheSizeZ;
 
+    //FAWE start
     /**
      * Cache entries.
      * null = unknown
      * OUTSIDE = outside
      * else = inside
      */
+    //FAWE end
     private final BiomeType[] cache;
     private final BitSet isCached;
 
@@ -76,8 +78,8 @@ public abstract class ArbitraryBiomeShape {
     /**
      * Override this function to specify the shape to generate.
      *
-     * @param x X coordinate to be queried
-     * @param z Z coordinate to be queried
+     * @param x                X coordinate to be queried
+     * @param z                Z coordinate to be queried
      * @param defaultBaseBiome The default biome for the current column.
      * @return material to place or null to not place anything.
      */
@@ -96,6 +98,7 @@ public abstract class ArbitraryBiomeShape {
         return cache[index];
     }
 
+    //FAWE start
     private boolean isInsideCached(int x, int y, int z, BiomeType baseBiome) {
         final int index = (y - cacheOffsetY) + (z - cacheOffsetZ) * cacheSizeY + (x - cacheOffsetX) * cacheSizeY * cacheSizeZ;
 
@@ -107,6 +110,7 @@ public abstract class ArbitraryBiomeShape {
 
         return cacheEntry != BiomeTypes.THE_VOID;
     }
+    //FAWE end
 
     private boolean isOutside(int x, int y, int z, BiomeType baseBiome) {
         return getBiomeCached(x, y, z, baseBiome) == null;
@@ -116,8 +120,8 @@ public abstract class ArbitraryBiomeShape {
      * Generates the shape.
      *
      * @param editSession The EditSession to use.
-     * @param baseBiome The default biome type.
-     * @param hollow Specifies whether to generate a hollow shape.
+     * @param baseBiome   The default biome type.
+     * @param hollow      Specifies whether to generate a hollow shape.
      * @return number of affected blocks.
      */
     public int generate(EditSession editSession, BiomeType baseBiome, boolean hollow) {

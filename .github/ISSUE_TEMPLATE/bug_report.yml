@@ -29,7 +29,7 @@ body:
       description: Which server version version you using? If your server version is not listed, it is not supported. Update to a supported version first.
       multiple: false
       options:
-        - '1.17.+'
+        - '1.17.1'
         - '1.16.5'
         - '1.15.2'
     validations:
@@ -82,7 +82,7 @@ body:
     attributes:
       label: Fawe Version
       description: What version of Fawe are you running? (`/version FastAsyncWorldEdit`)
-      placeholder: "For example: FastAsyncWorldEdit version 1.16-606;4a6af71"
+      placeholder: "For example: FastAsyncWorldEdit version 1.17-89;8c01959"
     validations:
       required: true
       

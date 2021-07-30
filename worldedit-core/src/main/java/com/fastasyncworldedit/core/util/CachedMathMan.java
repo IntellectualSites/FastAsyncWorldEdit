@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 public class CachedMathMan {
+
     private static final int ATAN2_BITS = 7;
     private static final int ATAN2_BITS2 = ATAN2_BITS << 1;
     private static final int ATAN2_MASK = ~(-1 << ATAN2_BITS2);
@@ -20,7 +21,7 @@ public class CachedMathMan {
         }
     }
 
-    private static float[] ANGLES = new float[65536];
+    private static final float[] ANGLES = new float[65536];
 
     static {
         for (int i = 0; i < 65536; ++i) {
@@ -28,7 +29,7 @@ public class CachedMathMan {
         }
     }
 
-    private static char[] SQRT = new char[65536];
+    private static final char[] SQRT = new char[65536];
 
     static {
         for (int i = 0; i < SQRT.length; i++) {
@@ -87,4 +88,5 @@ public class CachedMathMan {
 
         return (atan2[(yi * ATAN2_DIM) + xi] + add) * mul;
     }
+
 }

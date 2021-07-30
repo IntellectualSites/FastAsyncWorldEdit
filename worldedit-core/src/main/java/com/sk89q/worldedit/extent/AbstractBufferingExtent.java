@@ -27,8 +27,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.Optional;
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 /**
  * Base extent class for buffering changes between {@link #setBlock(BlockVector3, BlockStateHolder)}
@@ -36,6 +36,7 @@ import javax.annotation.Nullable;
  * handled, by returning buffered blocks.
  */
 public abstract class AbstractBufferingExtent extends AbstractDelegateExtent {
+
     /**
      * Create a new instance.
      *
@@ -48,7 +49,8 @@ public abstract class AbstractBufferingExtent extends AbstractDelegateExtent {
     @Override
     public abstract <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException;
 
-    protected final <T extends BlockStateHolder<T>> boolean setDelegateBlock(BlockVector3 location, T block) throws WorldEditException {
+    protected final <T extends BlockStateHolder<T>> boolean setDelegateBlock(BlockVector3 location, T block) throws
+            WorldEditException {
         return super.setBlock(location, block);
     }
 
@@ -74,7 +76,7 @@ public abstract class AbstractBufferingExtent extends AbstractDelegateExtent {
      * Gets a block from the buffer.
      *
      * @deprecated New subclasses should override {@link #getBufferedFullBlock(BlockVector3)}
-     *     instead
+     *         instead
      */
     @Deprecated
     protected Optional<BaseBlock> getBufferedBlock(BlockVector3 position) {
@@ -86,12 +88,10 @@ public abstract class AbstractBufferingExtent extends AbstractDelegateExtent {
      *
      * @param position The position
      * @return The buffered block, or null
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "getBufferedBlock",
-        delegateParams = { BlockVector3.class }
+            delegateName = "getBufferedBlock",
+            delegateParams = {BlockVector3.class}
     )
     @Nullable
     protected BaseBlock getBufferedFullBlock(BlockVector3 position) {

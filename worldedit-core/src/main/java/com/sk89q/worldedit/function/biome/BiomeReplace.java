@@ -42,7 +42,7 @@ public class BiomeReplace implements FlatRegionFunction, RegionFunction {
      * Create a new instance.
      *
      * @param extent an extent
-     * @param biome a biome
+     * @param biome  a biome
      */
     public BiomeReplace(Extent extent, BiomeType biome) {
         this(extent, (BiomePattern) biome);
@@ -51,7 +51,7 @@ public class BiomeReplace implements FlatRegionFunction, RegionFunction {
     /**
      * Create a new instance.
      *
-     * @param extent the extent to apply this function to
+     * @param extent  the extent to apply this function to
      * @param pattern the biome pattern to set
      */
     public BiomeReplace(Extent extent, BiomePattern pattern) {
@@ -75,4 +75,5 @@ public class BiomeReplace implements FlatRegionFunction, RegionFunction {
         }
         return success;
     }
+
 }

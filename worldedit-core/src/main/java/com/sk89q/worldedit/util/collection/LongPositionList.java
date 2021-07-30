@@ -55,16 +55,20 @@ class LongPositionList implements PositionList {
 
     @Override
     public Iterator<BlockVector3> iterator() {
-        return new PositionIterator(delegate.iterator(),
-            LongListIterator::hasNext,
-            LongListIterator::nextLong);
+        return new PositionIterator(
+                delegate.iterator(),
+                LongListIterator::hasNext,
+                LongListIterator::nextLong
+        );
     }
 
     @Override
     public Iterator<BlockVector3> reverseIterator() {
-        return new PositionIterator(delegate.listIterator(size()),
-            LongListIterator::hasPrevious,
-            LongListIterator::previousLong);
+        return new PositionIterator(
+                delegate.listIterator(size()),
+                LongListIterator::hasPrevious,
+                LongListIterator::previousLong
+        );
     }
 
     private static final class PositionIterator extends AbstractIterator<BlockVector3> {
@@ -73,9 +77,11 @@ class LongPositionList implements PositionList {
         private final Predicate<LongListIterator> hasNext;
         private final ToLongFunction<LongListIterator> next;
 
-        private PositionIterator(LongListIterator iterator,
-                                 Predicate<LongListIterator> hasNext,
-                                 ToLongFunction<LongListIterator> next) {
+        private PositionIterator(
+                LongListIterator iterator,
+                Predicate<LongListIterator> hasNext,
+                ToLongFunction<LongListIterator> next
+        ) {
             this.iterator = iterator;
             this.hasNext = hasNext;
             this.next = next;
@@ -84,8 +90,10 @@ class LongPositionList implements PositionList {
         @Override
         protected BlockVector3 computeNext() {
             return hasNext.test(iterator)
-                ? BlockVector3.fromLongPackedForm(next.applyAsLong(iterator))
-                : endOfData();
+                    ? BlockVector3.fromLongPackedForm(next.applyAsLong(iterator))
+                    : endOfData();
         }
+
     }
+
 }

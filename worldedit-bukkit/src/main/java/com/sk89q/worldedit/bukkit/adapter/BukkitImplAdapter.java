@@ -23,9 +23,9 @@ import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
-import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
@@ -59,17 +59,17 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * An interface for adapters of various Bukkit implementations.
  */
-// FAWE start - Generic & extends IBukkitAdapter
+//FAWE start - Generic & extends IBukkitAdapter
 public interface BukkitImplAdapter<T> extends IBukkitAdapter {
-// FAWE end
+//FAWE end
 
     /**
      * Get a data fixer, or null if not supported.
@@ -123,7 +123,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * Create the given entity.
      *
      * @param location the location
-     * @param state the state
+     * @param state    the state
      * @return the created entity or null
      */
     @Nullable
@@ -164,8 +164,8 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     /**
      * Send the given NBT data to the player.
      *
-     * @param player The player
-     * @param pos The position
+     * @param player  The player
+     * @param pos     The position
      * @param nbtData The NBT Data
      */
     void sendFakeNBT(Player player, BlockVector3 pos, CompoundBinaryTag nbtData);
@@ -181,10 +181,10 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     /**
      * Simulates a player using an item.
      *
-     * @param world the world
+     * @param world    the world
      * @param position the location
-     * @param item the item to be used
-     * @param face the direction in which to "face" when using the item
+     * @param item     the item to be used
+     * @param face     the direction in which to "face" when using the item
      * @return whether the usage was successful
      */
     default boolean simulateItemUse(World world, BlockVector3 position, BaseItem item, Direction face) {
@@ -194,8 +194,8 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     /**
      * Gets whether the given {@link BlockState} can be placed here.
      *
-     * @param world The world
-     * @param position The position
+     * @param world      The world
+     * @param position   The position
      * @param blockState The blockstate
      * @return If it can be placed
      */
@@ -225,10 +225,10 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     Set<SideEffect> getSupportedSideEffects();
 
     default OptionalInt getInternalBlockStateId(BlockData data) {
-        // FAWE start
+        //FAWE start
         // return OptionalInt.empty();
         return getInternalBlockStateId(BukkitAdapter.adapt(data));
-        // FAWE end
+        //FAWE end
     }
 
     /**
@@ -243,9 +243,10 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     /**
      * Regenerate a region in the given world, so it appears "as new".
-     * @param world the world to regen in
-     * @param region the region to regen
-     * @param extent the extent to use for setting blocks
+     *
+     * @param world   the world to regen in
+     * @param region  the region to regen
+     * @param extent  the extent to use for setting blocks
      * @param options the regeneration options
      * @return true on success, false on failure
      */
@@ -253,7 +254,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         throw new UnsupportedOperationException("This adapter does not support regeneration.");
     }
 
-    // FAWE start
+    //FAWE start
     default BlockMaterial getMaterial(BlockType blockType) {
         return getMaterial(blockType.getDefaultState());
     }
@@ -306,5 +307,5 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     default RelighterFactory getRelighterFactory() {
         return new NMSRelighterFactory(); // TODO implement in adapters instead
     }
-    // FAWE end
+    //FAWE end
 }

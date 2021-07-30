@@ -5,10 +5,12 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 
 
 //TODO: Add proper documenation for this class describing what it is. Is it just a wrapper for a player so no messages are printed anywhere? 
+
 /**
  * Avoids printing any messages
  */
 public class SilentPlayerWrapper extends AsyncPlayer {
+
     public SilentPlayerWrapper(Player parent) {
         super(parent);
     }
@@ -33,4 +35,5 @@ public class SilentPlayerWrapper extends AsyncPlayer {
     @Override
     public void printRaw(String msg) {
     }
+
 }

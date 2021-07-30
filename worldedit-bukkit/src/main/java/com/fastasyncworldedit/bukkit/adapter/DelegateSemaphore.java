@@ -3,6 +3,7 @@ package com.fastasyncworldedit.bukkit.adapter;
 import java.util.concurrent.Semaphore;
 
 public class DelegateSemaphore extends Semaphore {
+
     private final Semaphore delegate;
 
     public DelegateSemaphore(int permits, Semaphore delegate) {
@@ -30,4 +31,5 @@ public class DelegateSemaphore extends Semaphore {
     public synchronized void release() {
         this.delegate.release();
     }
+
 }

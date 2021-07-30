@@ -53,9 +53,9 @@ class AnnotatedSubscriberFinder implements SubscriberFindingStrategy {
                     Class<?>[] parameterTypes = method.getParameterTypes();
                     if (parameterTypes.length != 1) {
                         throw new IllegalArgumentException(
-                            "Method " + method + " has @Subscribe annotation, but requires "
-                                + parameterTypes.length + " arguments. Event handler methods "
-                                + "must require a single argument."
+                                "Method " + method + " has @Subscribe annotation, but requires "
+                                        + parameterTypes.length + " arguments. Event handler methods "
+                                        + "must require a single argument."
                         );
                     }
                     Class<?> eventType = parameterTypes[0];

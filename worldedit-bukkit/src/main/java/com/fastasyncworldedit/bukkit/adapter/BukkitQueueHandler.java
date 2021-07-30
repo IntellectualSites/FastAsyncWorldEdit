@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import co.aikar.timings.Timings;
-import com.fastasyncworldedit.core.beta.implementation.queue.QueueHandler;
 import com.fastasyncworldedit.bukkit.listener.ChunkListener;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.spigotmc.AsyncCatcher;
@@ -17,6 +17,7 @@ public class BukkitQueueHandler extends QueueHandler {
     private static boolean alertTimingsChange = true;
 
     private static Method methodCheck;
+
     static {
         try {
             methodCheck = Class.forName("co.aikar.timings.TimingsManager").getDeclaredMethod("recheckEnabled");
@@ -61,4 +62,5 @@ public class BukkitQueueHandler extends QueueHandler {
             }
         }
     }
+
 }

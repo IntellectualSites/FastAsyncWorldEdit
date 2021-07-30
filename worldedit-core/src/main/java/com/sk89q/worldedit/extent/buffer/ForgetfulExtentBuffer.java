@@ -68,17 +68,19 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
         this(delegate, Masks.alwaysTrue());
     }
 
+    //FAWE start
     @Override
     public boolean isQueueEnabled() {
         return true;
     }
+    //FAWE end
 
     /**
      * Create a new extent buffer that will buffer changes that meet the criteria
      * of the given mask.
      *
      * @param delegate the delegate extent for {@link Extent#getBlock(BlockVector3)}, etc. calls
-     * @param mask the mask
+     * @param mask     the mask
      */
     public ForgetfulExtentBuffer(Extent delegate, Mask mask) {
         super(delegate);
@@ -102,16 +104,19 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
             max = max.getMaximum(location);
         }
 
+        //FAWE start
         if (mask.test(location)) {
             buffer.put(location, block.toBaseBlock());
             return true;
         } else {
             return getExtent().setBlock(location, block);
         }
+        //FAWE end
     }
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        //FAWE start
         // Update minimum
         if (min == null) {
             min = position;
@@ -132,10 +137,12 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
         } else {
             return getExtent().setBiome(position, biome);
         }
+        //FAWE end
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        //FAWE start
         // Update minimum
         if (min == null) {
             min = BlockVector3.at(x, y, z);
@@ -156,6 +163,7 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
         } else {
             return getExtent().setBiome(x, y, z, biome);
         }
+        //FAWE end
     }
 
 
@@ -225,4 +233,5 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
             }
         };
     }
+
 }

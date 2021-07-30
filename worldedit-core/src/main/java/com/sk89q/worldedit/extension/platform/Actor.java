@@ -21,10 +21,11 @@ package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.entity.MapMetadatable;
 import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.util.task.InterruptableCondition;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.entity.MapMetadatable;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.session.SessionOwner;
 import com.sk89q.worldedit.session.request.Request;
@@ -165,10 +166,25 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
      */
     void dispatchCUIEvent(CUIEvent event);
 
+    /**
+     * Get the locale of this actor.
+     *
+     * @return The locale
+     */
+    Locale getLocale();
+
+    /**
+     * Sends any relevant notices to the user when they first use WorldEdit in a session.
+     */
+    default void sendAnnouncements() {
+    }
+
+    //FAWE start
     boolean runAction(Runnable ifFree, boolean checkFree, boolean async);
 
     /**
      * Decline any pending actions.
+     *
      * @return true if an action was pending
      */
     default boolean decline() {
@@ -182,6 +198,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
 
     /**
      * Confirm any pending actions.
+     *
      * @return true if an action was pending
      */
     default boolean confirm() {
@@ -223,6 +240,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
 
     /**
      * Attempt to cancel all pending and running actions.
+     *
      * @param close if Extents are closed
      * @return number of cancelled actions
      */
@@ -241,17 +259,5 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
         }
         return cancelled;
     }
-
-    /**
-     * Get the locale of this actor.
-     *
-     * @return The locale
-     */
-    Locale getLocale();
-
-    /**
-     * Sends any relevant notices to the user when they first use WorldEdit in a session.
-     */
-    default void sendAnnouncements() {
-    }
+    //FAWE end
 }

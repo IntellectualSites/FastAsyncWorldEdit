@@ -17,5 +17,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * The following classes are FAWE additions:
+ *
+ * @see com.sk89q.worldedit.command.argument.ExpressionConverter
+ * @see com.sk89q.worldedit.command.argument.LocationConverter
+ */
 @org.enginehub.piston.util.NonnullByDefault
 package com.sk89q.worldedit.command.argument;

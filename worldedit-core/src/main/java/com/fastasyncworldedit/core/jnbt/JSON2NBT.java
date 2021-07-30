@@ -22,6 +22,7 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 public class JSON2NBT {
+
     private static final Pattern INT_ARRAY_MATCHER = Pattern.compile("\\[[-+\\d|,\\s]+\\]");
 
     private JSON2NBT() {
@@ -30,7 +31,7 @@ public class JSON2NBT {
     public static CompoundTag getTagFromJson(String jsonString) throws NBTException {
         jsonString = jsonString.trim();
         if (!jsonString.startsWith("{")) {
-            throw new NBTException("Invalid tag encountered, expected \'{\' as first char.");
+            throw new NBTException("Invalid tag encountered, expected '{' as first char.");
         } else if (topTagsCount(jsonString) != 1) {
             throw new NBTException("Encountered multiple top tags, only one expected");
         } else {
@@ -111,7 +112,7 @@ public class JSON2NBT {
 
                 c01 = value.charAt(s.length());
                 if (c01 != 44 && c01 != 123 && c01 != 125 && c01 != 91 && c01 != 93) {
-                    throw new NBTException("Unexpected token \'" + c01 + "\' at: " + value.substring(s.length()));
+                    throw new NBTException("Unexpected token '" + c01 + "' at: " + value.substring(s.length()));
                 }
             }
 
@@ -133,7 +134,7 @@ public class JSON2NBT {
 
                 c01 = value.charAt(s.length());
                 if (c01 != 44 && c01 != 123 && c01 != 125 && c01 != 91 && c01 != 93) {
-                    throw new NBTException("Unexpected token \'" + c01 + "\' at: " + value.substring(s.length()));
+                    throw new NBTException("Unexpected token '" + c01 + "' at: " + value.substring(s.length()));
                 }
             }
 
@@ -289,6 +290,7 @@ public class JSON2NBT {
     }
 
     private static class Primitive extends JSON2NBT.Any {
+
         private static final Pattern DOUBLE = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+[d|D]");
         private static final Pattern FLOAT = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+[f|F]");
         private static final Pattern BYTE = Pattern.compile("[-+]?[0-9]+[b|B]");
@@ -344,7 +346,7 @@ public class JSON2NBT {
 
             if (this.jsonValue.startsWith("[") && this.jsonValue.endsWith("]")) {
                 String var7 = this.jsonValue.substring(1, this.jsonValue.length() - 1);
-                String[] var8 = (String[]) ((String[]) Iterables.toArray(SPLITTER.split(var7), String.class));
+                String[] var8 = Iterables.toArray(SPLITTER.split(var7), String.class);
 
                 try {
                     int[] var5 = new int[var8.length];
@@ -377,9 +379,11 @@ public class JSON2NBT {
                 return new StringTag(stringbuilder.toString());
             }
         }
+
     }
 
     private static class List extends JSON2NBT.Any {
+
         protected java.util.List<JSON2NBT.Any> tagList = Lists.newArrayList();
 
         public List(String json) {
@@ -397,9 +401,11 @@ public class JSON2NBT {
             Class<? extends Tag> tagType = list.isEmpty() ? CompoundTag.class : list.get(0).getClass();
             return new ListTag(tagType, list);
         }
+
     }
 
     private static class Compound extends JSON2NBT.Any {
+
         protected java.util.List<JSON2NBT.Any> tagList = Lists.newArrayList();
 
         public Compound(String jsonIn) {
@@ -417,14 +423,18 @@ public class JSON2NBT {
 
             return new CompoundTag(map);
         }
+
     }
 
     private abstract static class Any {
+
         protected String json;
 
         Any() {
         }
 
         public abstract Tag parse() throws NBTException;
+
     }
+
 }

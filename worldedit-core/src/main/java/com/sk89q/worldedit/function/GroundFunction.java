@@ -37,7 +37,7 @@ public class GroundFunction implements LayerFunction {
     /**
      * Create a new ground function.
      *
-     * @param mask a mask
+     * @param mask     a mask
      * @param function the function to apply
      */
     public GroundFunction(Mask mask, RegionFunction function) {

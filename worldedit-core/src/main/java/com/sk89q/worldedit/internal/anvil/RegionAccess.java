@@ -30,7 +30,7 @@ import java.nio.file.Path;
  */
 class RegionAccess implements AutoCloseable {
 
-    private RandomAccessFile raf;
+    private final RandomAccessFile raf;
     private int[] offsets;
     private int[] timestamps;
 
@@ -98,4 +98,5 @@ class RegionAccess implements AutoCloseable {
     public void close() throws IOException {
         raf.close();
     }
+
 }

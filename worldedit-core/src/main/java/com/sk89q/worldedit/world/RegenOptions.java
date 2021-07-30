@@ -24,8 +24,8 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
 
-import java.util.OptionalLong;
 import javax.annotation.Nullable;
+import java.util.OptionalLong;
 
 /**
  * Regeneration options for {@link World#regenerate(Region, Extent, RegenOptions)}.
@@ -39,7 +39,9 @@ public abstract class RegenOptions {
      * @return the builder
      */
     public static Builder builder() {
+        //FAWE start - biomeType
         return new AutoValue_RegenOptions.Builder().seed(OptionalLong.empty()).regenBiomes(false).biomeType(null);
+        //FAWE end
     }
 
     @AutoValue.Builder
@@ -70,12 +72,16 @@ public abstract class RegenOptions {
          */
         public abstract Builder regenBiomes(boolean regenBiomes);
 
+        //FAWE start
+
         /**
          * Defines the {@code BiomeType} the regenerator should use for regeneration. Defaults to {@code null}.
+         *
          * @param biomeType the {@code BiomeType} to be used for regeneration
          * @return this builder
          */
         public abstract Builder biomeType(@Nullable BiomeType biomeType);
+        //FAWE end
 
         /**
          * Build the options object.
@@ -107,10 +113,13 @@ public abstract class RegenOptions {
         return isRegenBiomes();
     }
 
-    @Nullable public abstract BiomeType getBiomeType();
+    //FAWE start
+    @Nullable
+    public abstract BiomeType getBiomeType();
 
     public boolean hasBiomeType() {
         return getBiomeType() != null;
     }
+    //FAWE end
 
 }

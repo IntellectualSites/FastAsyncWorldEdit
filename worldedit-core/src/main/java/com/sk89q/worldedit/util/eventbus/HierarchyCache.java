@@ -35,8 +35,8 @@ import java.util.Set;
 class HierarchyCache {
 
     private final LoadingCache<Class<?>, Set<Class<?>>> cache = CacheBuilder.newBuilder()
-        .weakKeys()
-        .build(CacheLoader.from(this::build));
+            .weakKeys()
+            .build(CacheLoader.from(this::build));
 
     public Set<Class<?>> get(Class<?> concreteClass) {
         return cache.getUnchecked(concreteClass);

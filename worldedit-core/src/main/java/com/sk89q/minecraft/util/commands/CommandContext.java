@@ -69,13 +69,14 @@ public class CommandContext {
      *
      * <p>Empty arguments are removed from the list of arguments.</p>
      *
-     * @param args an array with arguments
-     * @param valueFlags a set containing all value flags (pass null to disable value flag parsing)
+     * @param args             an array with arguments
+     * @param valueFlags       a set containing all value flags (pass null to disable value flag parsing)
      * @param allowHangingFlag true if hanging flags are allowed
-     * @param locals the locals, null to create empty one
+     * @param locals           the locals, null to create empty one
      * @throws CommandException thrown on a parsing error
      */
-    public CommandContext(String[] args, Set<Character> valueFlags, boolean allowHangingFlag, CommandLocals locals) throws CommandException {
+    public CommandContext(String[] args, Set<Character> valueFlags, boolean allowHangingFlag, CommandLocals locals) throws
+            CommandException {
         this(args, valueFlags, allowHangingFlag, locals, true);
     }
 
@@ -84,14 +85,20 @@ public class CommandContext {
      *
      * <p>Empty arguments are removed from the list of arguments.</p>
      *
-     * @param args an array with arguments
-     * @param valueFlags a set containing all value flags (pass null to disable value flag parsing)
+     * @param args             an array with arguments
+     * @param valueFlags       a set containing all value flags (pass null to disable value flag parsing)
      * @param allowHangingFlag true if hanging flags are allowed
-     * @param locals the locals, null to create empty one
-     * @param parseFlags where to parse flags
+     * @param locals           the locals, null to create empty one
+     * @param parseFlags       where to parse flags
      * @throws CommandException thrown on a parsing error
      */
-    public CommandContext(String[] args, Set<Character> valueFlags, boolean allowHangingFlag, CommandLocals locals, boolean parseFlags) throws CommandException {
+    public CommandContext(
+            String[] args,
+            Set<Character> valueFlags,
+            boolean allowHangingFlag,
+            CommandLocals locals,
+            boolean parseFlags
+    ) throws CommandException {
         if (valueFlags == null) {
             valueFlags = Collections.emptySet();
         }
@@ -117,37 +124,37 @@ public class CommandContext {
             argIndexList.add(i);
 
             switch (arg.charAt(0)) {
-            case '\'':
-            case '"':
-                final StringBuilder build = new StringBuilder();
-                final char quotedChar = arg.charAt(0);
+                case '\'':
+                case '"':
+                    final StringBuilder build = new StringBuilder();
+                    final char quotedChar = arg.charAt(0);
 
-                int endIndex;
-                for (endIndex = i; endIndex < args.length; ++endIndex) {
-                    final String arg2 = args[endIndex];
-                    if (arg2.charAt(arg2.length() - 1) == quotedChar && arg2.length() > 1) {
-                        if (endIndex != i) {
-                            build.append(' ');
+                    int endIndex;
+                    for (endIndex = i; endIndex < args.length; ++endIndex) {
+                        final String arg2 = args[endIndex];
+                        if (arg2.charAt(arg2.length() - 1) == quotedChar && arg2.length() > 1) {
+                            if (endIndex != i) {
+                                build.append(' ');
+                            }
+                            build.append(arg2, endIndex == i ? 1 : 0, arg2.length() - 1);
+                            break;
+                        } else if (endIndex == i) {
+                            build.append(arg2.substring(1));
+                        } else {
+                            build.append(' ').append(arg2);
                         }
-                        build.append(arg2.substring(endIndex == i ? 1 : 0, arg2.length() - 1));
-                        break;
-                    } else if (endIndex == i) {
-                        build.append(arg2.substring(1));
-                    } else {
-                        build.append(' ').append(arg2);
                     }
-                }
 
-                if (endIndex < args.length) {
-                    arg = build.toString();
-                    i = endIndex;
-                }
+                    if (endIndex < args.length) {
+                        arg = build.toString();
+                        i = endIndex;
+                    }
 
-                // In case there is an empty quoted string
-                if (arg.isEmpty()) {
-                    continue;
-                }
-                // else raise exception about hanging quotes?
+                    // In case there is an empty quoted string
+                    if (arg.isEmpty()) {
+                        continue;
+                    }
+                    // else raise exception about hanging quotes?
             }
             argList.add(arg);
         }
@@ -361,4 +368,5 @@ public class CommandContext {
     public CommandLocals getLocals() {
         return locals;
     }
+
 }

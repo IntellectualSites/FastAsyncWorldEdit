@@ -76,7 +76,10 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
         final Matcher matcher = numberFormat.matcher(e.getMessage());
 
         if (matcher.matches()) {
-            throw newCommandException(Caption.of("worldedit.error.invalid-number.matches", TextComponent.of(matcher.group(1))), e);
+            throw newCommandException(
+                    Caption.of("worldedit.error.invalid-number.matches", TextComponent.of(matcher.group(1))),
+                    e
+            );
         } else {
             throw newCommandException(Caption.of("worldedit.error.invalid-number"), e);
         }
@@ -97,6 +100,7 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
         throw newCommandException(Caption.of("worldedit.error.unknown-block", TextComponent.of(e.getID())), e);
     }
 
+    @Deprecated
     @ExceptionMatch
     public void convert(InvalidItemException e) throws CommandException {
         throw newCommandException(e.getMessage(), e);

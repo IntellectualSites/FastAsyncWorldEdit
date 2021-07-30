@@ -52,7 +52,7 @@ public class Snapshot implements Comparable<Snapshot> {
     /**
      * Construct a snapshot restoration operation.
      *
-     * @param repo a repository
+     * @param repo     a repository
      * @param snapshot a snapshot name
      */
     public Snapshot(SnapshotRepository repo, String snapshot) {
@@ -64,8 +64,8 @@ public class Snapshot implements Comparable<Snapshot> {
      * Get a chunk store.
      *
      * @return a chunk store
-     * @throws IOException if there is an error loading the chunk store
-     * @throws DataException  if there is an error loading the chunk store
+     * @throws IOException   if there is an error loading the chunk store
+     * @throws DataException if there is an error loading the chunk store
      */
     public ChunkStore getChunkStore() throws IOException, DataException {
         ChunkStore chunkStore = internalGetChunkStore();
@@ -80,7 +80,7 @@ public class Snapshot implements Comparable<Snapshot> {
      * Get a chunk store.
      *
      * @return a chunk store
-     * @throws IOException if there is an error loading the chunk store
+     * @throws IOException   if there is an error loading the chunk store
      * @throws DataException if there is an error loading the chunk store
      */
     private ChunkStore internalGetChunkStore() throws IOException, DataException {
@@ -208,7 +208,7 @@ public class Snapshot implements Comparable<Snapshot> {
             int ourIndex = name.indexOf('/');
             int theirIndex = o.name.indexOf('/');
             return name.substring(Math.min(ourIndex, 0))
-                .compareTo(o.name.substring(Math.min(theirIndex, 0)));
+                    .compareTo(o.name.substring(Math.min(theirIndex, 0)));
         } else {
             return date.compareTo(o.date);
         }
@@ -223,4 +223,5 @@ public class Snapshot implements Comparable<Snapshot> {
     public int hashCode() {
         return file.hashCode();
     }
+
 }

@@ -77,11 +77,12 @@ class BukkitCommandInspector implements CommandInspector {
         if (mapping.isPresent()) {
             InjectedValueStore store = MapBackedValueStore.create();
             store.injectValue(Key.of(Actor.class), context ->
-                Optional.of(plugin.wrapCommandSender(sender)));
+                    Optional.of(plugin.wrapCommandSender(sender)));
             return mapping.get().getCondition().satisfied(store);
         } else {
             LOGGER.warn("BukkitCommandInspector doesn't know how about the command '" + command + "'");
             return false;
         }
     }
+
 }

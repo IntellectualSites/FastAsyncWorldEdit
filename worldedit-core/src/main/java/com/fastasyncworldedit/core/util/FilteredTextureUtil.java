@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.Set;
 
 public class FilteredTextureUtil extends TextureUtil {
+
     private final Set<BlockType> blocks;
 
     public FilteredTextureUtil(TextureUtil parent, Set<BlockType> blocks) throws FileNotFoundException {
@@ -39,4 +40,5 @@ public class FilteredTextureUtil extends TextureUtil {
         }
         this.calculateLayerArrays();
     }
+
 }

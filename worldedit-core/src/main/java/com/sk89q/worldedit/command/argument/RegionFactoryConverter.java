@@ -31,19 +31,21 @@ import org.enginehub.piston.inject.Key;
 public class RegionFactoryConverter {
 
     public static void register(CommandManager commandManager) {
-        commandManager.registerConverter(Key.of(RegionFactory.class),
-            MultiKeyConverter.builder(
-                ImmutableSetMultimap.<RegionFactory, String>builder()
-                    .put(new CuboidRegionFactory(), "cuboid")
-                    .put(new SphereRegionFactory(), "sphere")
-                    .putAll(new CylinderRegionFactory(1), "cyl", "cylinder")
-                    .build()
-            )
-                .errorMessage(arg -> "Not a known region type: " + arg)
-                .build()
+        commandManager.registerConverter(
+                Key.of(RegionFactory.class),
+                MultiKeyConverter.builder(
+                        ImmutableSetMultimap.<RegionFactory, String>builder()
+                                .put(new CuboidRegionFactory(), "cuboid")
+                                .put(new SphereRegionFactory(), "sphere")
+                                .putAll(new CylinderRegionFactory(1), "cyl", "cylinder")
+                                .build()
+                )
+                        .errorMessage(arg -> "Not a known region type: " + arg)
+                        .build()
         );
     }
 
     private RegionFactoryConverter() {
     }
+
 }

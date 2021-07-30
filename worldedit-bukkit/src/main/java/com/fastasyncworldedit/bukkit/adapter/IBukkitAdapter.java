@@ -1,11 +1,9 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import com.fastasyncworldedit.bukkit.util.BukkitItemStack;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitEntity;
-import com.fastasyncworldedit.bukkit.util.BukkitItemStack;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
@@ -25,8 +23,6 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.gamemode.GameModes;
 import com.sk89q.worldedit.world.item.ItemType;
-import java.util.Locale;
-
 import com.sk89q.worldedit.world.item.ItemTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -34,6 +30,10 @@ import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Locale;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public interface IBukkitAdapter {
 
@@ -81,7 +81,7 @@ public interface IBukkitAdapter {
     /**
      * Create a Bukkit location from a WorldEdit position with a Bukkit world.
      *
-     * @param world the Bukkit world
+     * @param world    the Bukkit world
      * @param position the WorldEdit position
      * @return a Bukkit location
      */
@@ -90,7 +90,8 @@ public interface IBukkitAdapter {
         checkNotNull(position);
         return new org.bukkit.Location(
                 world,
-                position.getX(), position.getY(), position.getZ());
+                position.getX(), position.getY(), position.getZ()
+        );
     }
 
     default org.bukkit.Location adapt(org.bukkit.World world, BlockVector3 position) {
@@ -100,7 +101,7 @@ public interface IBukkitAdapter {
     /**
      * Create a Bukkit location from a WorldEdit location with a Bukkit world.
      *
-     * @param world the Bukkit world
+     * @param world    the Bukkit world
      * @param location the WorldEdit location
      * @return a Bukkit location
      */
@@ -111,7 +112,8 @@ public interface IBukkitAdapter {
                 world,
                 location.getX(), location.getY(), location.getZ(),
                 location.getYaw(),
-                location.getPitch());
+                location.getPitch()
+        );
     }
 
     /**
@@ -192,7 +194,7 @@ public interface IBukkitAdapter {
     default BlockType asBlockType(Material material) {
         checkNotNull(material);
         if (!material.isBlock()) {
-            throw new IllegalArgumentException(material.getKey().toString() + " is not a block!") {
+            throw new IllegalArgumentException(material.getKey() + " is not a block!") {
                 @Override
                 public synchronized Throwable fillInStackTrace() {
                     return this;
@@ -201,7 +203,6 @@ public interface IBukkitAdapter {
         }
         return BlockTypes.get(material.getKey().toString());
     }
-
 
 
     /**
@@ -269,6 +270,7 @@ public interface IBukkitAdapter {
     default BukkitPlayer adapt(Player player) {
         return WorldEditPlugin.getInstance().wrapPlayer(player);
     }
+
     /**
      * Create a Bukkit Player from a WorldEdit Player.
      *
@@ -298,7 +300,7 @@ public interface IBukkitAdapter {
      * Checks equality between a WorldEdit BlockType and a Bukkit Material
      *
      * @param blockType The WorldEdit BlockType
-     * @param type The Bukkit Material
+     * @param type      The Bukkit Material
      * @return If they are equal
      */
     default boolean equals(BlockType blockType, Material type) {
@@ -351,4 +353,5 @@ public interface IBukkitAdapter {
             throw new NotABlockException();
         }
     }
+
 }

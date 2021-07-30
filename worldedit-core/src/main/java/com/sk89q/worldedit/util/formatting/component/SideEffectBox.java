@@ -38,15 +38,17 @@ public class SideEffectBox extends PaginationBox {
 
     private static List<SideEffect> sideEffects;
 
-    private SideEffectSet sideEffectSet;
+    private final SideEffectSet sideEffectSet;
 
     private static List<SideEffect> getSideEffects() {
+        //FAWE start
         if (sideEffects == null) {
             sideEffects = WorldEdit.getInstance().getPlatformManager().getSupportedSideEffects()
                     .stream()
                     .sorted(Comparator.comparing(Enum::name))
                     .collect(Collectors.toList());
         }
+        //FAWE end
 
         return sideEffects;
     }
@@ -70,7 +72,9 @@ public class SideEffectBox extends PaginationBox {
         for (SideEffect.State uiState : SHOWN_VALUES) {
             builder = builder.append(TextComponent.space());
             builder = builder.append(Caption.of(uiState.getDisplayName(), uiState == state ? TextColor.WHITE : TextColor.GRAY)
-                    .clickEvent(ClickEvent.runCommand("//perf -h " + effect.name().toLowerCase(Locale.US) + " " + uiState.name().toLowerCase(Locale.US)))
+                    .clickEvent(ClickEvent.runCommand("//perf -h " + effect.name().toLowerCase(Locale.US) + " " + uiState
+                            .name()
+                            .toLowerCase(Locale.US)))
                     .hoverEvent(HoverEvent.showText(uiState == state
                             ? Caption.of("worldedit.sideeffect.box.current")
                             : Caption.of("worldedit.sideeffect.box.change-to", Caption.of(uiState.getDisplayName()))
@@ -85,4 +89,5 @@ public class SideEffectBox extends PaginationBox {
     public int getComponentsSize() {
         return getSideEffects().size();
     }
+
 }

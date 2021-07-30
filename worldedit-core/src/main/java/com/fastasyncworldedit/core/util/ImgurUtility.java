@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.util;
 
-import com.fastasyncworldedit.core.object.io.FastByteArrayOutputStream;
+import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -15,10 +15,12 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.stream.Collectors;
 
 public class ImgurUtility {
+
     public static final String CLIENT_ID = "50e34b65351eb07";
 
     public static URL uploadImage(File file) throws IOException {
@@ -52,7 +54,10 @@ public class ImgurUtility {
         String imageString = Base64.getEncoder().encodeToString(image);
         URL url = new URL("https://api.imgur.com/3/image");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        String data = URLEncoder.encode("image", "UTF-8") + "=" + URLEncoder.encode(imageString, "UTF-8");
+        String data = URLEncoder.encode("image", StandardCharsets.UTF_8) + "=" + URLEncoder.encode(
+                imageString,
+                StandardCharsets.UTF_8
+        );
         conn.setDoOutput(true);
         conn.setDoInput(true);
         conn.setRequestMethod("POST");
@@ -70,4 +75,5 @@ public class ImgurUtility {
         }
         return stb;
     }
+
 }

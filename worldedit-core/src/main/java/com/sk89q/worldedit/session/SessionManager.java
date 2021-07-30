@@ -44,6 +44,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -53,7 +54,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -71,7 +71,6 @@ public class SessionManager {
     private static final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(
             EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 5, "WorldEdit Session Saver - %s"));
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    private static boolean warnedInvalidTool;
 
     private final Timer timer = new Timer("WorldEdit Session Manager");
     private final WorldEdit worldEdit;
@@ -169,6 +168,7 @@ public class SessionManager {
             session.setConfiguration(config);
             session.setBlockChangeLimit(config.defaultChangeLimit);
             session.setTimeout(config.calculationTimeout);
+            //FAWE start
             /*
             try {
                 if (owner.hasPermission("worldedit.selection.pos")) {
@@ -184,6 +184,7 @@ public class SessionManager {
                 }
             }
             */
+            //FAWE end
 
             // Remember the session regardless of if it's currently active or not.
             // And have the SessionTracker FLUSH inactive sessions.
@@ -220,7 +221,8 @@ public class SessionManager {
         return false;
     }
 
-    private void setDefaultWand(String sessionItem, String configItem, LocalSession session, Tool wand) throws InvalidToolBindException {
+    private void setDefaultWand(String sessionItem, String configItem, LocalSession session, Tool wand) throws
+            InvalidToolBindException {
         ItemType wandItem = null;
         if (sessionItem != null) {
             wandItem = ItemTypes.get(sessionItem);
@@ -328,8 +330,10 @@ public class SessionManager {
                 stored.lastActive = now;
 
                 if (stored.session.compareAndResetDirty()) {
+                    //FAWE start
                     // Don't save unless player disconnects
                     // saveQueue.put(stored.key, stored.session);
+                    //FAWE end
                 }
             } else {
                 if (now - stored.lastActive > EXPIRATION_GRACE) {
@@ -350,7 +354,7 @@ public class SessionManager {
     @Subscribe
     public void onConfigurationLoad(ConfigurationLoadEvent event) {
         LocalConfiguration config = event.getConfiguration();
-        File dir = new File(config.getWorkingDirectory(), "sessions");
+        File dir = new File(config.getWorkingDirectoryPath().toFile(), "sessions");
         store = new JsonFileSessionStore(dir);
     }
 
@@ -370,6 +374,7 @@ public class SessionManager {
      * Stores the owner of a session, the session, and the last active time.
      */
     private static final class SessionHolder {
+
         private final SessionKey key;
         private final LocalSession session;
         private long lastActive = System.currentTimeMillis();
@@ -379,6 +384,7 @@ public class SessionManager {
             this.key = key;
             this.session = session;
         }
+
     }
 
     /**
@@ -386,12 +392,14 @@ public class SessionManager {
      * of time. Commits them as well.
      */
     private class SessionTracker extends TimerTask {
+
         @Override
         public void run() {
             synchronized (SessionManager.this) {
                 saveChangedSessions();
             }
         }
+
     }
 
 }

@@ -99,4 +99,5 @@ public class ForwardSeekableInputStream extends InputStream {
             throw new IOException("Failed to seek " + diff + " bytes");
         }
     }
+
 }

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.fastasyncworldedit.core.object.collection.BlockVectorSet;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -27,6 +27,7 @@ import com.sk89q.worldedit.regions.iterator.RegionIterator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
+import javax.annotation.Nullable;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,18 +36,23 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+//FAWE start - extends AbstractSet<BlockVector3>
 public abstract class AbstractRegion extends AbstractSet<BlockVector3> implements Region {
+//FAWE end
 
+    @Nullable
     protected World world;
 
-    public AbstractRegion(World world) {
+    public AbstractRegion(@Nullable World world) {
         this.world = world;
     }
 
+    //FAWE start
     @Override
     public int size() {
         return com.google.common.primitives.Ints.saturatedCast(getVolume());
     }
+    //FAWE end
 
     @Override
     public Vector3 getCenter() {
@@ -64,7 +70,8 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     }
 
     @Override
-    public World getWorld() {
+    public @Nullable
+    World getWorld() {
         return world;
     }
 
@@ -91,7 +98,8 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     @Override
     public List<BlockVector2> polygonize(int maxPoints) {
         if (maxPoints >= 0 && maxPoints < 4) {
-            throw new IllegalArgumentException("Cannot polygonize an AbstractRegion with no overridden polygonize method into less than 4 points.");
+            throw new IllegalArgumentException(
+                    "Cannot polygonize an AbstractRegion with no overridden polygonize method into less than 4 points.");
         }
 
         final BlockVector3 min = getMinimumPoint();
@@ -113,8 +121,8 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         BlockVector3 max = getMaximumPoint();
 
         return (max.getX() - min.getX() + 1L)
-            * (max.getY() - min.getY() + 1L)
-            * (max.getZ() - min.getZ() + 1L);
+                * (max.getY() - min.getY() + 1L)
+                * (max.getZ() - min.getZ() + 1L);
     }
 
     /**
@@ -168,8 +176,10 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         final BlockVector3 minBlock = getMinimumPoint();
         final BlockVector3 maxBlock = getMaximumPoint();
 
+        //FAWE start
         final BlockVector2 min = BlockVector2.at(minBlock.getX() >> 4, minBlock.getZ() >> 4);
         final BlockVector2 max = BlockVector2.at(maxBlock.getX() >> 4, maxBlock.getZ() >> 4);
+        //FAWE end
 
         for (int X = min.getBlockX(); X <= max.getBlockX(); ++X) {
             for (int Z = min.getBlockZ(); Z <= max.getBlockZ(); ++Z) {
@@ -197,9 +207,9 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
                     }
 
                     chunks.add(BlockVector3.at(
-                        x >> ChunkStore.CHUNK_SHIFTS,
-                        y >> ChunkStore.CHUNK_SHIFTS,
-                        z >> ChunkStore.CHUNK_SHIFTS
+                            x >> ChunkStore.CHUNK_SHIFTS,
+                            y >> ChunkStore.CHUNK_SHIFTS,
+                            z >> ChunkStore.CHUNK_SHIFTS
                     ));
                 }
             }
@@ -211,13 +221,18 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     // Sub-class utilities
 
     protected final int getWorldMinY() {
-        return world == null ? Integer.MIN_VALUE : world.getMinY();
+        //FAWE start > Integer.MIN_VALUE -> 0 (to avoid crazy for loops...) TODO: See if there's a way to find a "server default"
+        return world == null ? 0 : world.getMinY();
+        //FAWE end
     }
 
     protected final int getWorldMaxY() {
-        return world == null ? Integer.MAX_VALUE : world.getMaxY();
+        //FAWE start > Integer.MAX_VALUE -> 255 (to avoid crazy for loops...) TODO: See if there's a way to find a "server default"
+        return world == null ? 255 : world.getMaxY();
+        //FAWE end
     }
 
+    //FAWE start
     @Override
     public int hashCode() {
         int worldHash = this.world == null ? 7 : this.world.hashCode();
@@ -238,13 +253,11 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
         }
         Region region = ((Region) o);
 
-        if (Objects.equals(this.getWorld(), region.getWorld())
-            && this.getMinimumPoint().equals(region.getMinimumPoint())
-            && this.getMaximumPoint().equals(region.getMaximumPoint())
-            && this.getVolume() == region.getVolume()) {
-            return true;
-        }
-        return false;
+        return Objects.equals(this.getWorld(), region.getWorld())
+                && this.getMinimumPoint().equals(region.getMinimumPoint())
+                && this.getMaximumPoint().equals(region.getMaximumPoint())
+                && this.getVolume() == region.getVolume();
     }
+    //FAWE end
 
 }

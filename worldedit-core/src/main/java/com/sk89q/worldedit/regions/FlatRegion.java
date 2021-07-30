@@ -43,4 +43,5 @@ public interface FlatRegion extends Region {
      * @return a flat region iterable
      */
     Iterable<BlockVector2> asFlatRegion();
+
 }

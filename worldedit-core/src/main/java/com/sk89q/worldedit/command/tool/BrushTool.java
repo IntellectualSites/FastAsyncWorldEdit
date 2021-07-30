@@ -19,16 +19,16 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.fastasyncworldedit.core.command.tool.MovableTool;
+import com.fastasyncworldedit.core.command.tool.ResettableTool;
+import com.fastasyncworldedit.core.command.tool.TargetMode;
+import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
+import com.fastasyncworldedit.core.command.tool.scroll.Scroll;
+import com.fastasyncworldedit.core.command.tool.scroll.ScrollTool;
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.brush.BrushSettings;
-import com.fastasyncworldedit.core.object.brush.MovableTool;
-import com.fastasyncworldedit.core.object.brush.ResettableTool;
-import com.fastasyncworldedit.core.object.brush.TargetMode;
-import com.fastasyncworldedit.core.object.brush.scroll.Scroll;
-import com.fastasyncworldedit.core.object.brush.scroll.ScrollTool;
-import com.fastasyncworldedit.core.object.extent.ResettableExtent;
-import com.fastasyncworldedit.core.object.mask.MaskedTargetBlock;
-import com.fastasyncworldedit.core.object.pattern.PatternTraverser;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.function.mask.MaskedTargetBlock;
+import com.fastasyncworldedit.core.function.pattern.PatternTraverser;
 import com.fastasyncworldedit.core.util.BrushCache;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.StringMan;
@@ -54,10 +54,10 @@ import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockType;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -65,23 +65,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Builds a shape at the place being looked at.
  */
 public class BrushTool
-    implements DoubleActionTraceTool, ScrollTool, MovableTool, ResettableTool, Serializable {
+        //FAWE start - All implements but TraceTool
+        implements DoubleActionTraceTool, ScrollTool, MovableTool, ResettableTool, Serializable, TraceTool {
     //    TODO:
     // Serialize methods
     // serialize BrushSettings (primary and secondary only if different)
     // set transient values e.g., context
 
 
-    public enum BrushAction {
-        PRIMARY, SECONDARY
+    enum BrushAction {
+        PRIMARY,
+        SECONDARY
     }
-
+    //FAWE end
 
     protected static int MAX_RANGE = 500;
-    protected static int DEFAULT_RANGE = 240; // 500 is laggy as the default
     protected int range = -1;
-    private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
     private Mask traceMask = null;
+    //FAWE start
+    protected static int DEFAULT_RANGE = 240; // 500 is laggy as the default
+    private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
     private int targetOffset;
 
     private transient BrushSettings primary = new BrushSettings();
@@ -89,6 +92,7 @@ public class BrushTool
     private transient BrushSettings context = primary;
 
     private transient BaseItem holder;
+    //FAWE end
 
     /**
      * Construct the tool.
@@ -100,6 +104,7 @@ public class BrushTool
         getContext().addPermission(permission);
     }
 
+    //FAWE start
     public BrushTool() {
     }
 
@@ -197,15 +202,6 @@ public class BrushTool
      *
      * @return the filter
      */
-    public Mask getMask() {
-        return getContext().getMask();
-    }
-
-    /**
-     * Get the filter.
-     *
-     * @return the filter
-     */
     //TODO A better description is needed here to explain what makes a source-mask different from a regular mask.
     public Mask getSourceMask() {
         return getContext().getSourceMask();
@@ -229,6 +225,16 @@ public class BrushTool
         this.getContext().setMask(filter);
         update();
     }
+    //FAWE end
+
+    /**
+     * Get the filter.
+     *
+     * @return the filter
+     */
+    public Mask getMask() {
+        return getContext().getMask();
+    }
 
     /**
      * Get the mask used for identifying where to stop traces.
@@ -250,6 +256,8 @@ public class BrushTool
         update();
     }
 
+    //FAWE start
+
     /**
      * Set the block filter used for identifying blocks to replace.
      *
@@ -259,19 +267,22 @@ public class BrushTool
         this.getContext().setSourceMask(filter);
         update();
     }
+    //FAWE end
 
     /**
      * Set the brush.
      *
-     * @param brush the brush
+     * @param brush      the brush
      * @param permission the permission
      */
     public void setBrush(Brush brush, String permission) {
+        //FAWE start - We use our own logic
         BrushSettings current = getContext();
         current.clearPerms();
         current.setBrush(brush);
         current.addPermission(permission);
         update();
+        //FAWE end
     }
 
     /**
@@ -348,11 +359,16 @@ public class BrushTool
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player,
-        LocalSession session) {
+    public boolean actPrimary(
+            Platform server, LocalConfiguration config, Player player,
+            LocalSession session
+    ) {
+        //FAWE start - Use logic previously declared as FAWE-like
         return act(BrushAction.PRIMARY, player, session);
+        //FAWE end
     }
 
+    //FAWE start
     public BlockVector3 getPosition(EditSession editSession, Player player) {
         Location loc = player.getLocation();
         switch (targetMode) {
@@ -364,7 +380,7 @@ public class BrushTool
                 pitch = 23 - (pitch / 4);
                 d += (int) (Math.sin(Math.toRadians(pitch)) * 50);
                 final Vector3 vector = loc.getDirection().withY(0).normalize().multiply(d)
-                    .add(loc.getX(), loc.getY(), loc.getZ());
+                        .add(loc.getX(), loc.getY(), loc.getZ());
                 return offset(vector, loc).toBlockPoint();
             }
             case TARGET_POINT_HEIGHT: {
@@ -421,7 +437,7 @@ public class BrushTool
 
         if (!current.canUse(player)) {
             player.print(
-                Caption.of("fawe.error.no-perm", StringMan.join(current.getPermissions(), ",")));
+                    Caption.of("fawe.error.no-perm", StringMan.join(current.getPermissions(), ",")));
             return false;
         }
         try (EditSession editSession = session.createEditSession(player, current.toString())) {
@@ -479,11 +495,12 @@ public class BrushTool
     }
 
     @Override
-    public boolean actSecondary(Platform server, LocalConfiguration config, Player player,
-        LocalSession session) {
+    public boolean actSecondary(
+            Platform server, LocalConfiguration config, Player player,
+            LocalSession session
+    ) {
         return act(BrushAction.SECONDARY, player, session);
     }
-
 
 
     public void setScrollAction(Scroll scrollAction) {
@@ -524,4 +541,5 @@ public class BrushTool
     public boolean move(Player player) {
         return false;
     }
+    //FAWE end
 }

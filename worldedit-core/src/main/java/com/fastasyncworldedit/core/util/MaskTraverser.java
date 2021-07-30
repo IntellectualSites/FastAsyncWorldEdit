@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.util;
 
-import com.fastasyncworldedit.core.object.mask.ResettableMask;
+import com.fastasyncworldedit.core.function.mask.ResettableMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 
 public class MaskTraverser {
+
     private final Mask mask;
 
     public MaskTraverser(Mask start) {
@@ -71,4 +72,5 @@ public class MaskTraverser {
             current = current.getSuperclass();
         }
     }
+
 }

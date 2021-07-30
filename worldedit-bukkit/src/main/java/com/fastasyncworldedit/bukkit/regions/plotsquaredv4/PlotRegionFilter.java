@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
-import com.fastasyncworldedit.core.regions.general.CuboidRegionFilter;
+import com.fastasyncworldedit.core.regions.filter.CuboidRegionFilter;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
 import com.github.intellectualsites.plotsquared.plot.object.PlotArea;
@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class PlotRegionFilter extends CuboidRegionFilter {
+
     private final PlotArea area;
 
     public PlotRegionFilter(PlotArea area) {
@@ -27,4 +28,5 @@ public class PlotRegionFilter extends CuboidRegionFilter {
             add(BlockVector2.at(bottom.getX(), bottom.getZ()), BlockVector2.at(top.getX(), top.getZ()));
         }
     }
+
 }

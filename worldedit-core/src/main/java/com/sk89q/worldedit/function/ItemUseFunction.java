@@ -26,6 +26,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.World;
 
 public final class ItemUseFunction implements RegionFunction {
+
     private final World world;
     private final BaseItem item;
     private final Direction dir;
@@ -44,4 +45,5 @@ public final class ItemUseFunction implements RegionFunction {
     public boolean apply(BlockVector3 position) throws WorldEditException {
         return world.useItem(position, item, dir);
     }
+
 }

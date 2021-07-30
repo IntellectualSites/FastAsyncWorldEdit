@@ -1,16 +1,16 @@
 package com.fastasyncworldedit.core;
 
-import com.fastasyncworldedit.core.beta.IQueueChunk;
-import com.fastasyncworldedit.core.beta.IQueueExtent;
-import com.fastasyncworldedit.core.beta.implementation.lighting.Relighter;
-import com.fastasyncworldedit.core.beta.implementation.queue.ParallelQueueExtent;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.RegionWrapper;
-import com.fastasyncworldedit.core.object.RelightMode;
-import com.fastasyncworldedit.core.object.changeset.DiskStorageHistory;
-import com.fastasyncworldedit.core.object.changeset.SimpleChangeSetSummary;
-import com.fastasyncworldedit.core.object.exception.FaweException;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
+import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
+import com.fastasyncworldedit.core.history.DiskStorageHistory;
+import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.queue.IQueueChunk;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -76,7 +76,7 @@ public class FaweAPI {
      * EditSession} can do a lot more. Remember to commit when you are done!
      * </p>
      *
-     * @param world The name of the world
+     * @param world     The name of the world
      * @param autoQueue If it should start dispatching before you enqueue it.
      * @return the queue extent
      */
@@ -103,7 +103,7 @@ public class FaweAPI {
      * Upload the clipboard to the configured web interface.
      *
      * @param clipboard The clipboard (may not be null)
-     * @param format The format to use (some formats may not be supported)
+     * @param format    The format to use (some formats may not be supported)
      * @return The download URL or null
      */
     public static URL upload(final Clipboard clipboard, final ClipboardFormat format) {
@@ -180,7 +180,7 @@ public class FaweAPI {
         if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".bd")) {
             throw new IllegalArgumentException("Not a BD file!");
         }
-        String[] path = file.getPath().split(File.separatorChar=='\\' ? "\\\\" : File.separator);
+        String[] path = file.getPath().split(File.separatorChar == '\\' ? "\\\\" : File.separator);
         if (path.length < 3) {
             throw new IllegalArgumentException("Not in history directory!");
         }
@@ -202,16 +202,13 @@ public class FaweAPI {
     /**
      * Used in the rollback to generate a list of {@link DiskStorageHistory} objects.
      *
-     * @param origin - The origin location
-     * @param user - The uuid (may be null)
-     * @param radius - The radius from the origin of the edit
+     * @param origin   - The origin location
+     * @param user     - The uuid (may be null)
+     * @param radius   - The radius from the origin of the edit
      * @param timediff - The max age of the file in milliseconds
-     * @param shallow - If shallow is true, FAWE will only read the first {@link
-     *     Settings.HISTORY#BUFFER_SIZE} bytes to obtain history info
+     * @param shallow  - If shallow is true, FAWE will only read the first {@link
+     *                 Settings.HISTORY#BUFFER_SIZE} bytes to obtain history info
      * @return a list of DiskStorageHistory Objects
-     * @apiNote An edit outside the radius may be included if it overlaps with an edit inside
-     *     that depends on it. Reading only part of the file will result in unreliable bounds info
-     *     for large edits.
      */
     public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
         Extent extent = origin.getExtent();
@@ -258,7 +255,12 @@ public class FaweAPI {
             long value = aI - bI;
             return value == 0 ? 0 : value < 0 ? -1 : 1;
         });
-        RegionWrapper bounds = new RegionWrapper(origin.getBlockX() - radius, origin.getBlockX() + radius, origin.getBlockZ() - radius, origin.getBlockZ() + radius);
+        RegionWrapper bounds = new RegionWrapper(
+                origin.getBlockX() - radius,
+                origin.getBlockX() + radius,
+                origin.getBlockZ() - radius,
+                origin.getBlockZ() + radius
+        );
         RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
         HashSet<RegionWrapper> regionSet = Sets.<RegionWrapper>newHashSet(bounds);
         ArrayList<DiskStorageHistory> result = new ArrayList<>();
@@ -290,7 +292,6 @@ public class FaweAPI {
 
     /**
      * The DiskStorageHistory class is what FAWE uses to represent the undo on disk.
-     *
      */
     public static DiskStorageHistory getChangeSetFromDisk(World world, UUID uuid, int index) {
         return new DiskStorageHistory(world, uuid, index);
@@ -305,13 +306,18 @@ public class FaweAPI {
      *     <li>Resends the chunks to the client.</li>
      * </ol>
      *
-     * @param world World to relight in
+     * @param world     World to relight in
      * @param selection Region to relight
-     * @param queue Queue to relight in/from
-     * @param mode The mode to relight with
+     * @param queue     Queue to relight in/from
+     * @param mode      The mode to relight with
      * @return Chunks changed
      */
-    public static int fixLighting(World world, Region selection, @Nullable IQueueExtent<IQueueChunk> queue, final RelightMode mode) {
+    public static int fixLighting(
+            World world,
+            Region selection,
+            @Nullable IQueueExtent<IQueueChunk> queue,
+            final RelightMode mode
+    ) {
         final BlockVector3 bot = selection.getMinimumPoint();
         final BlockVector3 top = selection.getMaximumPoint();
 
@@ -329,7 +335,7 @@ public class FaweAPI {
                 queue = (IQueueExtent) unwrapped;
             } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1) {
                 ParallelQueueExtent parallel =
-                    new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, true);
+                        new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, true);
                 queue = parallel.getExtent();
             } else {
                 queue = Fawe.get().getQueueHandler().getQueue(world);

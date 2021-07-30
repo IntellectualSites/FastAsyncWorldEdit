@@ -34,7 +34,7 @@ public class RandomTextureUtil extends CachedTextureUtil {
         if (i < 0) {
             int i1 = -i;
             return -ThreadLocalRandom.current().nextInt(i1);
-        } else if( i == 0) {
+        } else if (i == 0) {
             return 0;
         } else {
             return ThreadLocalRandom.current().nextInt(i);
@@ -60,10 +60,7 @@ public class RandomTextureUtil extends CachedTextureUtil {
         int blockColor = getColor(block);
         blockAndBiomeIdOutput[0] = block.getDefaultState().getOrdinalChar();
         blockAndBiomeIdOutput[1] = (char) biomeId;
-        if (colorDistance(biomeAvColor, color) - biomePriority > colorDistance(blockColor, color)) {
-            return true;
-        }
-        return false;
+        return colorDistance(biomeAvColor, color) - biomePriority > colorDistance(blockColor, color);
     }
 
 
@@ -86,7 +83,7 @@ public class RandomTextureUtil extends CachedTextureUtil {
 
     @Override
     public BlockType getNearestBlock(int color) {
-        int offsetColor = offsets.getOrDefault((Object)color, 0);
+        int offsetColor = offsets.getOrDefault((Object) color, 0);
         if (offsetColor != 0) {
             offsetColor = addRandomColor(color, offsetColor);
         } else {
@@ -103,4 +100,5 @@ public class RandomTextureUtil extends CachedTextureUtil {
         offsets.put(color, (Integer) ((dr << 16) + (dg << 8) + (db << 0)));
         return res;
     }
+
 }

@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public abstract class MapChunkUtil<T> {
+
     protected Field fieldX;
     protected Field fieldZ;
     protected Field fieldHeightMap;
@@ -50,4 +51,5 @@ public abstract class MapChunkUtil<T> {
             return null;
         }
     }
+
 }

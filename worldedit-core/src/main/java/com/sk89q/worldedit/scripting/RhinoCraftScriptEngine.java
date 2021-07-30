@@ -28,10 +28,11 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrappedException;
 
-import java.util.Map;
 import javax.script.ScriptException;
+import java.util.Map;
 
 public class RhinoCraftScriptEngine implements CraftScriptEngine {
+
     private int timeLimit;
 
     @Override
@@ -46,7 +47,7 @@ public class RhinoCraftScriptEngine implements CraftScriptEngine {
 
     @Override
     public Object evaluate(String script, String filename, Map<String, Object> args)
-            throws ScriptException, Throwable {
+            throws Throwable {
         RhinoContextFactory factory = new RhinoContextFactory(timeLimit);
         Context cx = factory.enterContext();
         cx.setClassShutter(new MinecraftHidingClassShutter());
@@ -55,7 +56,8 @@ public class RhinoCraftScriptEngine implements CraftScriptEngine {
 
         for (Map.Entry<String, Object> entry : args.entrySet()) {
             ScriptableObject.putProperty(scope, entry.getKey(),
-                    Context.javaToJS(entry.getValue(), scope));
+                    Context.javaToJS(entry.getValue(), scope)
+            );
         }
         try {
             return cx.evaluateString(scope, script, filename, 1, null);

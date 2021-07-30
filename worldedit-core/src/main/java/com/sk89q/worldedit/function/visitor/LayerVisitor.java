@@ -45,16 +45,16 @@ public class LayerVisitor implements Operation {
     private final FlatRegion flatRegion;
     private final LayerFunction function;
     private Mask2D mask = Masks.alwaysTrue2D();
-    private int minY;
-    private int maxY;
+    private final int minY;
+    private final int maxY;
 
     /**
      * Create a new visitor.
      *
      * @param flatRegion the flat region to visit
-     * @param minY the minimum Y to stop the search at
-     * @param maxY the maximum Y to begin the search at
-     * @param function the layer function to apply t blocks
+     * @param minY       the minimum Y to stop the search at
+     * @param maxY       the maximum Y to begin the search at
+     * @param function   the layer function to apply t blocks
      */
     public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function) {
         checkNotNull(flatRegion);

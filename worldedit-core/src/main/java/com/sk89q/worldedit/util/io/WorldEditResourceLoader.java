@@ -35,4 +35,5 @@ public class WorldEditResourceLoader implements ResourceLoader {
     public Path getLocalResource(String pathName) {
         return this.worldEdit.getWorkingDirectoryPath(pathName);
     }
+
 }

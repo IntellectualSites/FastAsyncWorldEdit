@@ -29,11 +29,11 @@ import static com.sk89q.worldedit.math.BlockVector2.COMPARING_GRID_ARRANGEMENT;
 public class RegionOptimizedChunkComparator {
 
     private static final Comparator<BlockVector2> CHUNK_COMPARATOR =
-        Comparator.comparing((BlockVector2 chunkPos) -> chunkPos.shr(5), COMPARING_GRID_ARRANGEMENT)
-            .thenComparing(COMPARING_GRID_ARRANGEMENT);
+            Comparator.comparing((BlockVector2 chunkPos) -> chunkPos.shr(5), COMPARING_GRID_ARRANGEMENT)
+                    .thenComparing(COMPARING_GRID_ARRANGEMENT);
 
     public static final Comparator<BlockVector3> INSTANCE
-        = Comparator.comparing(blockPos -> blockPos.toBlockVector2().shr(4), CHUNK_COMPARATOR);
+            = Comparator.comparing(blockPos -> blockPos.toBlockVector2().shr(4), CHUNK_COMPARATOR);
 
     private RegionOptimizedChunkComparator() {
     }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.registry;
 
+import com.fastasyncworldedit.core.registry.RegistryItem;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 
 import javax.annotation.Nullable;
@@ -33,11 +34,14 @@ import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
+
     private static final String MINECRAFT_NAMESPACE = "minecraft";
     private final Set<String> knownNamespaces = new HashSet<>();
     private final String defaultNamespace;
+    //FAWE start
     private final List<V> values = new ArrayList<>();
     private int lastInternalId = 0;
+    //FAWE end
 
     public NamespacedRegistry(final String name) {
         this(name, MINECRAFT_NAMESPACE);
@@ -59,15 +63,18 @@ public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
         requireNonNull(key, "key");
         final int i = key.indexOf(':');
         checkState(i > 0, "key is not namespaced");
+        //FAWE start
         if (value instanceof RegistryItem) {
             ((RegistryItem) value).setInternalId(lastInternalId++);
         }
         values.add(value);
+        //FAWE end
         final V registered = super.register(key, value);
         knownNamespaces.add(key.substring(0, i));
         return registered;
     }
 
+    //FAWE start
     public V getByInternalId(int index) {
         try {
             return values.get(index);
@@ -79,6 +86,7 @@ public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
     public int size() {
         return values.size();
     }
+    //FAWE end
 
     /**
      * Get a set of the namespaces of all registered keys.
@@ -105,7 +113,9 @@ public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
         return key;
     }
 
+    //FAWE start
     public <V1 extends Keyed> Stream<String> getSuggestions(String input) {
         return SuggestionHelper.getNamespacedRegistrySuggestions(this, input);
     }
+    //FAWE end
 }

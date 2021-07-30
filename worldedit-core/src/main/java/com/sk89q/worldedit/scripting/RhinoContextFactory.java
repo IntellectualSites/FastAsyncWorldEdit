@@ -58,8 +58,10 @@ public class RhinoContextFactory extends ContextFactory {
     }
 
     @Override
-    protected Object doTopCall(Callable callable, Context cx, Scriptable scope,
-            Scriptable thisObj, Object[] args) {
+    protected Object doTopCall(
+            Callable callable, Context cx, Scriptable scope,
+            Scriptable thisObj, Object[] args
+    ) {
         RhinoContext mcx = (RhinoContext) cx;
         mcx.startTime = System.currentTimeMillis();
 
@@ -67,11 +69,13 @@ public class RhinoContextFactory extends ContextFactory {
     }
 
     private static class RhinoContext extends Context {
+
         long startTime;
 
         private RhinoContext(ContextFactory factory) {
             super(factory);
         }
+
     }
 
 }

@@ -26,7 +26,8 @@ public class FaweTrim extends SubCommand {
             return false;
         }
         if (strings.length != 2) {
-            plotPlayer.sendMessage("First make a backup of your world called <world-copy> then stand in the middle of an empty plot");
+            plotPlayer.sendMessage(
+                    "First make a backup of your world called <world-copy> then stand in the middle of an empty plot");
             plotPlayer.sendMessage("use /plot trimall <world> <boolean-delete-unowned>");
             return false;
         }
@@ -53,4 +54,5 @@ public class FaweTrim extends SubCommand {
         });
         return true;
     }
+
 }

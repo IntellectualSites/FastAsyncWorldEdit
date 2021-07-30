@@ -28,10 +28,12 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 public class HollowSphereBrush implements Brush {
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         if (pattern == null) {
             pattern = BlockTypes.COBBLESTONE.getDefaultState();
         }
         editSession.makeSphere(position, pattern, size, size, size, false);
     }
+
 }

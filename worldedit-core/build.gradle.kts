@@ -42,15 +42,17 @@ dependencies {
     compileOnly("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
     annotationProcessor("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
     testRuntimeOnly("org.apache.logging.log4j:log4j-core:2.8.1")
-    implementation("com.github.luben:zstd-jni:1.5.0-2")
+    implementation("com.github.luben:zstd-jni:1.5.0-4")
     compileOnly("net.fabiozumbi12:redprotect:1.9.6")
     api("com.github.intellectualsites.plotsquared:PlotSquared-API:4.514") { isTransitive = false }
-    api("com.plotsquared:PlotSquared-Core:6.0.6-SNAPSHOT")
+    api("com.plotsquared:PlotSquared-Core:6.0.6-SNAPSHOT") { isTransitive = false }
     compileOnlyApi("net.kyori:adventure-api:4.8.0")
     compileOnlyApi("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
     api("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT")
     compileOnly("net.jpountz:lz4-java-stream:1.0.0") { isTransitive = false }
     compileOnly("org.lz4:lz4-java:1.8.0")
+    compileOnly("com.zaxxer:SparseBitSet:1.2")
+    compileOnly("org.anarres:parallelgzip:1.0.5")
 }
 
 tasks.named<Test>("test") {

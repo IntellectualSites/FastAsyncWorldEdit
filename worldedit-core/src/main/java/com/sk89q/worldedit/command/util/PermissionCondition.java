@@ -31,7 +31,9 @@ public class PermissionCondition implements Command.Condition {
     private static final Key<Actor> ACTOR_KEY = Key.of(Actor.class);
 
     private final Set<String> permissions;
+    //FAWE start
     private final boolean queued;
+    //FAWE end
 
     public PermissionCondition(Set<String> permissions) {
         this(permissions, true);
@@ -49,12 +51,14 @@ public class PermissionCondition implements Command.Condition {
     @Override
     public boolean satisfied(InjectedValueAccess context) {
         return permissions.isEmpty()
-            || context.injectedValue(ACTOR_KEY)
-            .map(actor -> permissions.stream().anyMatch(actor::hasPermission))
-            .orElse(false);
+                || context.injectedValue(ACTOR_KEY)
+                .map(actor -> permissions.stream().anyMatch(actor::hasPermission))
+                .orElse(false);
     }
 
+    //FAWE start
     public boolean isQueued() {
         return queued;
     }
+    //FAWE end
 }

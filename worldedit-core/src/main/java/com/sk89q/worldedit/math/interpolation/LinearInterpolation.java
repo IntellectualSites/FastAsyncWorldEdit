@@ -130,11 +130,11 @@ public class LinearInterpolation implements Interpolation {
             case 1:
                 // This case is merely a speed-up for a very common case
                 return arcLengthRecursive(indexA, remainderA, 1.0)
-                    + arcLengthRecursive(indexB, 0.0, remainderB);
+                        + arcLengthRecursive(indexB, 0.0, remainderB);
 
             default:
                 return arcLengthRecursive(indexA, remainderA, indexB - 1, 1.0)
-                    + arcLengthRecursive(indexB, 0.0, remainderB);
+                        + arcLengthRecursive(indexB, 0.0, remainderB);
         }
     }
 

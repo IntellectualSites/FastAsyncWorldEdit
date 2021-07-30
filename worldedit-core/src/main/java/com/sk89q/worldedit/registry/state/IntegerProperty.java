@@ -21,18 +21,21 @@ package com.sk89q.worldedit.registry.state;
 
 import com.fastasyncworldedit.core.util.StringMan;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 
 public class IntegerProperty extends AbstractProperty<Integer> {
 
+    //FAWE start
     private final int[] map;
+    //FAWE end
 
     public IntegerProperty(final String name, final List<Integer> values) {
         this(name, values, 0);
     }
 
+    //FAWE start
     private IntegerProperty(final String name, final List<Integer> values, int bitOffset) {
         super(name, values, bitOffset);
         int max = Collections.max(values);
@@ -73,6 +76,7 @@ public class IntegerProperty extends AbstractProperty<Integer> {
             }
             */
             // An exception will get thrown anyway if the property doesn't exist, so it's not really that important. Anyway, we can check the array instead of the string list
+            //FAWE end
             if (val > 0 && val >= map.length) {
                 throw new IllegalArgumentException("Invalid int value: " + string + ". Must be in " + getValues().toString());
             }
@@ -81,4 +85,5 @@ public class IntegerProperty extends AbstractProperty<Integer> {
             throw new IllegalArgumentException("Invalid int value: " + string + ". Not an int.");
         }
     }
+
 }

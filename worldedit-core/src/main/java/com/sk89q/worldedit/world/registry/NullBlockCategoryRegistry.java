@@ -30,4 +30,5 @@ public class NullBlockCategoryRegistry implements BlockCategoryRegistry {
     public Set<BlockType> getCategorisedByName(String category) {
         return Collections.emptySet();
     }
+
 }

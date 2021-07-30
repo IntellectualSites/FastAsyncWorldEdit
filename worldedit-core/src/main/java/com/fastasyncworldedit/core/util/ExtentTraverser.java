@@ -2,19 +2,20 @@ package com.fastasyncworldedit.core.util;
 
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 
 public class ExtentTraverser<T extends Extent> {
+
     private final T root;
     private final ExtentTraverser<T> parent;
 
-    public ExtentTraverser(@NotNull T root) {
+    public ExtentTraverser(@Nonnull T root) {
         this(root, null);
     }
 
-    public ExtentTraverser(@NotNull T root, ExtentTraverser<T> parent) {
+    public ExtentTraverser(@Nonnull T root, ExtentTraverser<T> parent) {
         this.root = root;
         this.parent = parent;
     }
@@ -105,4 +106,5 @@ public class ExtentTraverser<T extends Extent> {
             return null;
         }
     }
+
 }

@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.bukkit.filter.WorldGuardFilter;
-import com.fastasyncworldedit.core.object.RegionWrapper;
 import com.fastasyncworldedit.core.regions.FaweMask;
-import com.fastasyncworldedit.core.regions.general.RegionFilter;
+import com.fastasyncworldedit.core.regions.RegionWrapper;
+import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -28,9 +28,11 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
+
 import java.util.Locale;
 
 public class WorldGuardFeature extends BukkitMaskManager implements Listener {
+
     private final WorldGuardPlugin worldguard;
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -67,9 +69,18 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
         if (global != null && isAllowed(player, global)) {
             return global;
         }
-        final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(location.getX(), location.getY(), location.getZ()));
+        final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(
+                location.getX(),
+                location.getY(),
+                location.getZ()
+        ));
         //Merge WorldGuardFlag
-        if (player.hasPermission("fawe.worldguardflag") && !regions.testState(player, Flags.BUILD, Flags.BLOCK_PLACE, Flags.BLOCK_BREAK)) {
+        if (player.hasPermission("fawe.worldguardflag") && !regions.testState(
+                player,
+                Flags.BUILD,
+                Flags.BLOCK_PLACE,
+                Flags.BLOCK_BREAK
+        )) {
             return null;
         }
         for (ProtectedRegion region : regions) {
@@ -117,8 +128,16 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
                 pos2 = BlockVector3.at(Integer.MAX_VALUE, 255, Integer.MAX_VALUE);
             } else {
                 if (myregion instanceof ProtectedCuboidRegion) {
-                    pos1 = BlockVector3.at(myregion.getMinimumPoint().getBlockX(), myregion.getMinimumPoint().getBlockY(), myregion.getMinimumPoint().getBlockZ());
-                    pos2 = BlockVector3.at(myregion.getMaximumPoint().getBlockX(), myregion.getMaximumPoint().getBlockY(), myregion.getMaximumPoint().getBlockZ());
+                    pos1 = BlockVector3.at(
+                            myregion.getMinimumPoint().getBlockX(),
+                            myregion.getMinimumPoint().getBlockY(),
+                            myregion.getMinimumPoint().getBlockZ()
+                    );
+                    pos2 = BlockVector3.at(
+                            myregion.getMaximumPoint().getBlockX(),
+                            myregion.getMaximumPoint().getBlockY(),
+                            myregion.getMaximumPoint().getBlockZ()
+                    );
                 } else {
                     return new FaweMask(adapt(myregion)) {
                         @Override
@@ -144,6 +163,7 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
     }
 
     private static class AdaptedRegion extends AbstractRegion {
+
         private final ProtectedRegion region;
 
         public AdaptedRegion(ProtectedRegion region) {
@@ -175,6 +195,7 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
         public boolean contains(BlockVector3 position) {
             return region.contains(position);
         }
+
     }
 
     private static Region adapt(ProtectedRegion region) {
@@ -192,4 +213,5 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
         }
         return new AdaptedRegion(region);
     }
+
 }

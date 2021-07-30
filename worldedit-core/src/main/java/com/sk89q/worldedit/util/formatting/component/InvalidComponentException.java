@@ -32,4 +32,5 @@ public class InvalidComponentException extends WorldEditException {
     public InvalidComponentException(Component message) {
         super(message);
     }
+
 }

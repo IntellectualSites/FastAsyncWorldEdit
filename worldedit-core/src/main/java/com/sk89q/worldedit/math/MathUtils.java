@@ -123,4 +123,5 @@ public final class MathUtils {
     public static double roundHalfUp(double value) {
         return Math.signum(value) * Math.round(Math.abs(value));
     }
+
 }

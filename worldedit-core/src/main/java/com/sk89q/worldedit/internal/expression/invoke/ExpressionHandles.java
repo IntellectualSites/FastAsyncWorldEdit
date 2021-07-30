@@ -30,6 +30,7 @@ import it.unimi.dsi.fastutil.doubles.Double2ObjectMaps;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 
+import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -37,7 +38,6 @@ import java.util.Objects;
 import java.util.function.DoubleBinaryOperator;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.internal.expression.ExpressionHelper.check;
 import static com.sk89q.worldedit.internal.expression.ExpressionHelper.checkIterations;
@@ -80,38 +80,56 @@ class ExpressionHandles {
         MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             EVAL_EXCEPTION_CONSTR = lookup.findConstructor(
-                EvaluationException.class, methodType(void.class, int.class, String.class));
+                    EvaluationException.class, methodType(void.class, int.class, String.class));
             CALL_EXPRESSION = lookup.findVirtual(
-                CompiledExpression.class, "execute",
-                methodType(Double.class, ExecutionData.class));
+                    CompiledExpression.class, "execute",
+                    methodType(Double.class, ExecutionData.class)
+            );
             GET_VARIABLE = lookup.findStatic(ExpressionHandles.class, "getVariable",
-                methodType(LocalSlot.Variable.class, ExecutionData.class, Token.class));
-            WHILE_FOR_LOOP_IMPL = lookup.findStatic(ExpressionHandles.class,
-                "whileForLoopImpl",
-                methodType(Double.class, ExecutionData.class, MethodHandle.class,
-                    MethodHandle.class, ExecNode.class, MethodHandle.class));
+                    methodType(LocalSlot.Variable.class, ExecutionData.class, Token.class)
+            );
+            WHILE_FOR_LOOP_IMPL = lookup.findStatic(
+                    ExpressionHandles.class,
+                    "whileForLoopImpl",
+                    methodType(Double.class, ExecutionData.class, MethodHandle.class,
+                            MethodHandle.class, ExecNode.class, MethodHandle.class
+                    )
+            );
             DO_WHILE_LOOP_IMPL = lookup.findStatic(ExpressionHandles.class, "doWhileLoopImpl",
-                methodType(Double.class, ExecutionData.class, MethodHandle.class, ExecNode.class));
+                    methodType(Double.class, ExecutionData.class, MethodHandle.class, ExecNode.class)
+            );
             SIMPLE_FOR_LOOP_IMPL = lookup.findStatic(ExpressionHandles.class, "simpleForLoopImpl",
-                methodType(Double.class, ExecutionData.class, MethodHandle.class,
-                    MethodHandle.class, Token.class, ExecNode.class));
+                    methodType(Double.class, ExecutionData.class, MethodHandle.class,
+                            MethodHandle.class, Token.class, ExecNode.class
+                    )
+            );
             SWITCH_IMPL = lookup.findStatic(ExpressionHandles.class, "switchImpl",
-                methodType(Double.class, ExecutionData.class, Double2ObjectMap.class,
-                    MethodHandle.class, ExecNode.class));
+                    methodType(Double.class, ExecutionData.class, Double2ObjectMap.class,
+                            MethodHandle.class, ExecNode.class
+                    )
+            );
 
             IS_NULL = lookup.findStatic(Objects.class, "isNull",
-                methodType(boolean.class, Object.class));
+                    methodType(boolean.class, Object.class)
+            );
             DOUBLE_TO_BOOL = boxDoubles(lookup.findStatic(ExpressionHandles.class, "doubleToBool",
-                methodType(boolean.class, double.class)));
+                    methodType(boolean.class, double.class)
+            ));
             CALL_BINARY_OP = lookup.findVirtual(DoubleBinaryOperator.class, "applyAsDouble",
-                methodType(double.class, double.class, double.class))
-                .asType(methodType(Double.class, DoubleBinaryOperator.class, double.class, double.class));
-            NEW_LS_CONSTANT = lookup.findConstructor(LocalSlot.Constant.class,
-                methodType(void.class, double.class));
-            NEW_RETURN_EXCEPTION = lookup.findConstructor(ReturnException.class,
-                methodType(void.class, Double.class));
+                    methodType(double.class, double.class, double.class)
+            )
+                    .asType(methodType(Double.class, DoubleBinaryOperator.class, double.class, double.class));
+            NEW_LS_CONSTANT = lookup.findConstructor(
+                    LocalSlot.Constant.class,
+                    methodType(void.class, double.class)
+            );
+            NEW_RETURN_EXCEPTION = lookup.findConstructor(
+                    ReturnException.class,
+                    methodType(void.class, Double.class)
+            );
             RETURN_EXCEPTION_GET_RESULT = lookup.findVirtual(ReturnException.class,
-                "getResult", methodType(Double.class));
+                    "getResult", methodType(Double.class)
+            );
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new IllegalStateException(e);
         }
@@ -120,9 +138,9 @@ class ExpressionHandles {
     static MethodHandle boxDoubles(MethodHandle handle) {
         MethodType type = handle.type();
         type = methodType(
-            boxIfPrimitiveDouble(type.returnType()),
-            type.parameterList().stream().map(ExpressionHandles::boxIfPrimitiveDouble)
-                .collect(Collectors.toList())
+                boxIfPrimitiveDouble(type.returnType()),
+                type.parameterList().stream().map(ExpressionHandles::boxIfPrimitiveDouble)
+                        .collect(Collectors.toList())
         );
         return handle.asType(type);
     }
@@ -134,9 +152,9 @@ class ExpressionHandles {
     static MethodHandle unboxDoubles(MethodHandle handle) {
         MethodType type = handle.type();
         type = methodType(
-            unboxIfDouble(type.returnType()),
-            type.parameterList().stream().map(ExpressionHandles::unboxIfDouble)
-                .collect(Collectors.toList())
+                unboxIfDouble(type.returnType()),
+                type.parameterList().stream().map(ExpressionHandles::unboxIfDouble)
+                        .collect(Collectors.toList())
         );
         return handle.asType(type);
     }
@@ -147,7 +165,9 @@ class ExpressionHandles {
 
     @FunctionalInterface
     interface Invokable {
+
         Object invoke(MethodHandle handle) throws Throwable;
+
     }
 
     static Object safeInvoke(MethodHandle handle, Invokable invokable) {
@@ -173,22 +193,22 @@ class ExpressionHandles {
 
     static MethodHandle dedupData(MethodHandle doubleData) {
         return permuteArguments(
-            doubleData, COMPILED_EXPRESSION_SIG,
-            0, 0
+                doubleData, COMPILED_EXPRESSION_SIG,
+                0, 0
         );
     }
 
     static LocalSlot.Variable initVariable(ExecutionData data, Token nameToken) {
         String name = nameToken.getText();
         return data.getSlots().initVariable(name)
-            .orElseThrow(() -> ExpressionHelper.evalException(
-                nameToken, "Cannot overwrite non-variable '" + name + "'"
-            ));
+                .orElseThrow(() -> ExpressionHelper.evalException(
+                        nameToken, "Cannot overwrite non-variable '" + name + "'"
+                ));
     }
 
     private static Supplier<EvaluationException> varNotInitException(Token nameToken) {
         return () -> ExpressionHelper.evalException(
-            nameToken, "'" + nameToken.getText() + "' is not initialized yet"
+                nameToken, "'" + nameToken.getText() + "' is not initialized yet"
         );
     }
 
@@ -199,10 +219,10 @@ class ExpressionHandles {
     static LocalSlot.Variable getVariable(ExecutionData data, Token nameToken) {
         String name = nameToken.getText();
         LocalSlot slot = data.getSlots().getSlot(name)
-            .orElseThrow(varNotInitException(nameToken));
+                .orElseThrow(varNotInitException(nameToken));
         if (!(slot instanceof LocalSlot.Variable)) {
             throw ExpressionHelper.evalException(
-                nameToken, "'" + name + "' is not a variable"
+                    nameToken, "'" + name + "' is not a variable"
             );
         }
         return (LocalSlot.Variable) slot;
@@ -211,7 +231,7 @@ class ExpressionHandles {
     static double getSlotValue(ExecutionData data, Token nameToken) {
         String name = nameToken.getText();
         return data.getSlots().getSlotValue(name)
-            .orElseThrow(varNotInitException(nameToken));
+                .orElseThrow(varNotInitException(nameToken));
     }
 
     /**
@@ -220,7 +240,8 @@ class ExpressionHandles {
      */
     private static MethodHandle evalException(ParserRuleContext ctx, String message) {
         return insertArguments(EVAL_EXCEPTION_CONSTR, 0,
-            getErrorPosition(ctx.start), message);
+                getErrorPosition(ctx.start), message
+        );
     }
 
     /**
@@ -230,9 +251,9 @@ class ExpressionHandles {
     static MethodHandle throwEvalException(ParserRuleContext ctx, String message) {
         // replace arg0 of `throw` with `evalException`
         return collectArguments(
-            throwException(Double.class, EvaluationException.class),
-            0,
-            evalException(ctx, message)
+                throwException(Double.class, EvaluationException.class),
+                0,
+                evalException(ctx, message)
         );
     }
 
@@ -253,22 +274,28 @@ class ExpressionHandles {
 
     static MethodHandle whileLoop(MethodHandle condition, ExecNode body) {
         return insertArguments(WHILE_FOR_LOOP_IMPL, 1,
-            null, condition, body, null);
+                null, condition, body, null
+        );
     }
 
-    static MethodHandle forLoop(MethodHandle init,
-                                MethodHandle condition,
-                                ExecNode body,
-                                MethodHandle update) {
+    static MethodHandle forLoop(
+            MethodHandle init,
+            MethodHandle condition,
+            ExecNode body,
+            MethodHandle update
+    ) {
         return insertArguments(WHILE_FOR_LOOP_IMPL, 1,
-            init, condition, body, update);
+                init, condition, body, update
+        );
     }
 
-    private static Double whileForLoopImpl(ExecutionData data,
-                                           @Nullable MethodHandle init,
-                                           MethodHandle condition,
-                                           ExecNode body,
-                                           @Nullable MethodHandle update) {
+    private static Double whileForLoopImpl(
+            ExecutionData data,
+            @Nullable MethodHandle init,
+            MethodHandle condition,
+            ExecNode body,
+            @Nullable MethodHandle update
+    ) {
         Double result = null;
         int iterations = 0;
         if (init != null) {
@@ -296,9 +323,11 @@ class ExpressionHandles {
         return insertArguments(DO_WHILE_LOOP_IMPL, 1, condition, body);
     }
 
-    private static Double doWhileLoopImpl(ExecutionData data,
-                                          MethodHandle condition,
-                                          ExecNode body) {
+    private static Double doWhileLoopImpl(
+            ExecutionData data,
+            MethodHandle condition,
+            ExecNode body
+    ) {
         Double result = null;
         int iterations = 0;
         do {
@@ -316,19 +345,24 @@ class ExpressionHandles {
         return result;
     }
 
-    static MethodHandle simpleForLoop(MethodHandle first,
-                                      MethodHandle last,
-                                      Token counter,
-                                      ExecNode body) {
+    static MethodHandle simpleForLoop(
+            MethodHandle first,
+            MethodHandle last,
+            Token counter,
+            ExecNode body
+    ) {
         return insertArguments(SIMPLE_FOR_LOOP_IMPL, 1,
-            first, last, counter, body);
+                first, last, counter, body
+        );
     }
 
-    private static Double simpleForLoopImpl(ExecutionData data,
-                                            MethodHandle getFirst,
-                                            MethodHandle getLast,
-                                            Token counterToken,
-                                            ExecNode body) {
+    private static Double simpleForLoopImpl(
+            ExecutionData data,
+            MethodHandle getFirst,
+            MethodHandle getLast,
+            Token counterToken,
+            ExecNode body
+    ) {
         Double result = null;
         int iterations = 0;
         double first = (double) standardInvoke(getFirst, data);
@@ -350,16 +384,20 @@ class ExpressionHandles {
         return result;
     }
 
-    static MethodHandle switchStatement(Double2ObjectMap<ExecNode> cases,
-                                        MethodHandle getValue,
-                                        @Nullable ExecNode defaultCase) {
+    static MethodHandle switchStatement(
+            Double2ObjectMap<ExecNode> cases,
+            MethodHandle getValue,
+            @Nullable ExecNode defaultCase
+    ) {
         return insertArguments(SWITCH_IMPL, 1, cases, getValue, defaultCase);
     }
 
-    private static Double switchImpl(ExecutionData data,
-                                     Double2ObjectMap<ExecNode> cases,
-                                     MethodHandle getValue,
-                                     @Nullable ExecNode defaultCase) {
+    private static Double switchImpl(
+            ExecutionData data,
+            Double2ObjectMap<ExecNode> cases,
+            MethodHandle getValue,
+            @Nullable ExecNode defaultCase
+    ) {
         double value = (double) standardInvoke(getValue, data);
         boolean matched = false;
         Double evaluated = null;

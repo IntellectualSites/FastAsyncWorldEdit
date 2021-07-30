@@ -28,7 +28,7 @@ import java.util.NoSuchElementException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class FlatRegionIterator implements Iterator<BlockVector2>  {
+public class FlatRegionIterator implements Iterator<BlockVector2> {
 
     private final Region region;
     private final int y;

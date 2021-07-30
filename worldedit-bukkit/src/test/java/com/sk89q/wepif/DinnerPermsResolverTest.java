@@ -30,6 +30,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DinnerPermsResolverTest {
+
     private DinnerPermsResolver resolver;
 
     @BeforeEach
@@ -86,4 +87,5 @@ public class DinnerPermsResolverTest {
         assertTrue(resolver.inGroup(permissible, "b"));
         assertFalse(resolver.inGroup(permissible, "c"));
     }
+
 }

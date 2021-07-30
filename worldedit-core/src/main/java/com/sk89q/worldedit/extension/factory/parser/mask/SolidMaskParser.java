@@ -46,4 +46,5 @@ public class SolidMaskParser extends SimpleInputParser<Mask> {
     public Mask parseFromSimpleInput(String input, ParserContext context) throws InputParseException {
         return new SolidBlockMask(context.requireExtent());
     }
+
 }

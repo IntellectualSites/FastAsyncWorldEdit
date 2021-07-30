@@ -40,7 +40,7 @@ import java.util.Map;
  * @deprecated WorldEdit does not handle interpreting NBT,
  *     deprecated for removal without replacement
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public class MobSpawnerBlock extends BaseBlock {
 
     private String mobType;

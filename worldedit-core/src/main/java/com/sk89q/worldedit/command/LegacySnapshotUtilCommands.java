@@ -47,8 +47,10 @@ class LegacySnapshotUtilCommands {
         this.we = we;
     }
 
-    void restore(Actor actor, World world, LocalSession session, EditSession editSession,
-                 String snapshotName) throws WorldEditException {
+    void restore(
+            Actor actor, World world, LocalSession session, EditSession editSession,
+            String snapshotName
+    ) throws WorldEditException {
         LocalConfiguration config = we.getConfiguration();
 
         Region region = session.getSelection(world);
@@ -78,11 +80,11 @@ class LegacySnapshotUtilCommands {
 
                     try {
                         WorldEdit.logger.info("WorldEdit found no snapshots: looked in: "
-                            + dir.getCanonicalPath());
+                                + dir.getCanonicalPath());
                     } catch (IOException e) {
                         WorldEdit.logger.info("WorldEdit found no snapshots: looked in "
-                            + "(NON-RESOLVABLE PATH - does it exist?): "
-                            + dir.getPath());
+                                + "(NON-RESOLVABLE PATH - does it exist?): "
+                                + dir.getPath());
                     }
 
                     return;
@@ -122,9 +124,11 @@ class LegacySnapshotUtilCommands {
                     actor.print(Caption.of("worldedit.restore.chunk-load-failed"));
                 }
             } else {
-                actor.print(Caption.of("worldedit.restore.restored",
-                    TextComponent.of(restore.getMissingChunks().size()),
-                    TextComponent.of(restore.getErrorChunks().size())));
+                actor.print(Caption.of(
+                        "worldedit.restore.restored",
+                        TextComponent.of(restore.getMissingChunks().size()),
+                        TextComponent.of(restore.getErrorChunks().size())
+                ));
             }
         } finally {
             try {
@@ -133,4 +137,5 @@ class LegacySnapshotUtilCommands {
             }
         }
     }
+
 }

@@ -21,7 +21,7 @@ package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.util.CachedTextureUtil;
 import com.fastasyncworldedit.core.util.CleanTextureUtil;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -48,6 +48,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.CommandUtil;
+import com.sk89q.worldedit.internal.cui.ServerCUIHandler;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
@@ -85,24 +86,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class GeneralCommands {
 
-    public static void register(CommandRegistrationHandler registration,
-                                CommandManager commandManager,
-                                CommandManagerService commandManagerService,
-                                WorldEdit worldEdit) {
+    public static void register(
+            CommandRegistrationHandler registration,
+            CommandManager commandManager,
+            CommandManagerService commandManagerService,
+            WorldEdit worldEdit
+    ) {
         // Collect the tool commands
         CommandManager collect = commandManagerService.newCommandManager();
 
         registration.register(
-            collect,
-            GeneralCommandsRegistration.builder(),
-            new GeneralCommands(worldEdit)
+                collect,
+                GeneralCommandsRegistration.builder(),
+                new GeneralCommands(worldEdit)
         );
 
 
         Set<org.enginehub.piston.Command> commands = collect.getAllCommands()
-            .collect(Collectors.toSet());
+                .collect(Collectors.toSet());
         for (org.enginehub.piston.Command command : commands) {
-            /*if in FAWE, //fast will remain for now
+            /*FAWE start - if in FAWE, //fast will remain for now
              (command.getName().equals("/fast")) {
 
                 // deprecate to `//perf`
@@ -119,15 +122,17 @@ public class GeneralCommands {
         }
     }
 
-    private static Component replaceFastForPerf(org.enginehub.piston.Command oldCmd,
-                                                CommandParameters oldParams) {
+    private static Component replaceFastForPerf(
+            org.enginehub.piston.Command oldCmd,
+            CommandParameters oldParams
+    ) {
         if (oldParams.getMetadata() == null) {
             return CommandUtil.createNewCommandReplacementText("//perf");
         }
         ImmutableList<String> args = oldParams.getMetadata().getArguments();
         if (args.isEmpty()) {
             return TextComponent.of("There is not yet a replacement for //fast" +
-                " with no arguments");
+                    " with no arguments");
         }
         String arg0 = args.get(0).toLowerCase(Locale.ENGLISH);
         String flipped;
@@ -157,13 +162,15 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/limit",
-        desc = "Modify block change limit"
+            name = "/limit",
+            desc = "Modify block change limit"
     )
     @CommandPermissions("worldedit.limit")
-    public void limit(Actor actor, LocalSession session,
-                      @Arg(desc = "The limit to set", def = "")
-                          Integer limit) {
+    public void limit(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The limit to set", def = "")
+                    Integer limit
+    ) {
 
         LocalConfiguration config = worldEdit.getConfiguration();
         boolean mayDisable = actor.hasPermission("worldedit.limit.unrestricted");
@@ -185,13 +192,15 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/timeout",
-        desc = "Modify evaluation timeout time."
+            name = "/timeout",
+            desc = "Modify evaluation timeout time."
     )
     @CommandPermissions("worldedit.timeout")
-    public void timeout(Actor actor, LocalSession session,
-                        @Arg(desc = "The timeout time to set", def = "")
-                            Integer limit) {
+    public void timeout(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The timeout time to set", def = "")
+                    Integer limit
+    ) {
         LocalConfiguration config = worldEdit.getConfiguration();
         boolean mayDisable = actor.hasPermission("worldedit.timeout.unrestricted");
 
@@ -212,43 +221,21 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/fast",
-        desc = "Toggle fast mode"
-    )
-    @CommandPermissions("worldedit.fast")
-    @Deprecated
-    void fast(Actor actor, LocalSession session,
-              @Arg(desc = "The new fast mode state", def = "")
-                  Boolean fastMode) {
-        boolean hasFastMode = session.hasFastMode();
-        if (fastMode != null && fastMode == hasFastMode) {
-            actor.print(Caption.of(fastMode ? "worldedit.fast.enabled.already" : "worldedit.fast.disabled.already"));
-            return;
-        }
-
-        if (hasFastMode) {
-            session.setFastMode(false);
-            actor.print(Caption.of("worldedit.fast.disabled"));
-        } else {
-            session.setFastMode(true);
-            actor.print(Caption.of("worldedit.fast.enabled"));
-        }
-    }
-
-    @Command(
-        name = "/perf",
-        desc = "Toggle side effects for performance",
-        descFooter = "Note that this command is GOING to change in the future." +
-            " Do not depend on the exact format of this command yet."
+            name = "/perf",
+            desc = "Toggle side effects for performance",
+            descFooter = "Note that this command is GOING to change in the future." +
+                    " Do not depend on the exact format of this command yet."
     )
     @CommandPermissions("worldedit.perf")
-    void perf(Actor actor, LocalSession session,
-              @Arg(desc = "The side effect", def = "")
-                  SideEffect sideEffect,
-              @Arg(desc = "The new side effect state", def = "")
-                  SideEffect.State newState,
-              @Switch(name = 'h', desc = "Show the info box")
-                  boolean showInfoBox) throws WorldEditException {
+    void perf(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The side effect", def = "")
+                    SideEffect sideEffect,
+            @Arg(desc = "The new side effect state", def = "")
+                    SideEffect.State newState,
+            @Switch(name = 'h', desc = "Show the info box")
+                    boolean showInfoBox
+    ) throws WorldEditException {
         if (sideEffect != null) {
             SideEffect.State currentState = session.getSideEffectSet().getState(sideEffect);
             if (newState != null && newState == currentState) {
@@ -299,13 +286,15 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/reorder",
-        desc = "Sets the reorder mode of WorldEdit"
+            name = "/reorder",
+            desc = "Sets the reorder mode of WorldEdit"
     )
     @CommandPermissions("worldedit.reorder")
-    public void reorderMode(Actor actor, LocalSession session,
-                            @Arg(desc = "The reorder mode", def = "")
-                                EditSession.ReorderMode reorderMode) {
+    public void reorderMode(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The reorder mode", def = "")
+                    EditSession.ReorderMode reorderMode
+    ) {
         if (reorderMode == null) {
             actor.print(Caption.of("worldedit.reorder.current", TextComponent.of(session.getReorderMode().getDisplayName())));
         } else {
@@ -315,13 +304,15 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/drawsel",
-        desc = "Toggle drawing the current selection"
+            name = "/drawsel",
+            desc = "Toggle drawing the current selection"
     )
     @CommandPermissions("worldedit.drawsel")
-    public void drawSelection(Player player, LocalSession session,
-                              @Arg(desc = "The new draw selection state", def = "")
-                                  Boolean drawSelection) throws WorldEditException {
+    public void drawSelection(
+            Player player, LocalSession session,
+            @Arg(desc = "The new draw selection state", def = "")
+                    Boolean drawSelection
+    ) throws WorldEditException {
         if (!WorldEdit.getInstance().getConfiguration().serverSideCUI) {
             throw new AuthorizationException(Caption.of("worldedit.error.disabled"));
         }
@@ -338,17 +329,25 @@ public class GeneralCommands {
         } else {
             session.setUseServerCUI(true);
             session.updateServerCUI(player);
-            player.print(Caption.of("worldedit.drawsel.enabled"));
+            int maxSize = ServerCUIHandler.getMaxServerCuiSize();
+            player.print(Caption.of(
+                    "worldedit.drawsel.enabled",
+                    TextComponent.of(maxSize),
+                    TextComponent.of(maxSize),
+                    TextComponent.of(maxSize)
+            ));
         }
     }
 
     @Command(
-        name = "/world",
-        desc = "Sets the world override"
+            name = "/world",
+            desc = "Sets the world override"
     )
     @CommandPermissions("worldedit.world")
-    public void world(Actor actor, LocalSession session,
-            @Arg(desc = "The world override", def = "") World world) {
+    public void world(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The world override", def = "") World world
+    ) {
         session.setWorldOverride(world);
         if (world == null) {
             actor.print(Caption.of("worldedit.world.remove"));
@@ -358,15 +357,17 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/watchdog",
-        desc = "Changes watchdog hook state.",
-        descFooter = "This is dependent on platform implementation. " +
-            "Not all platforms support watchdog hooks, or contain a watchdog."
+            name = "/watchdog",
+            desc = "Changes watchdog hook state.",
+            descFooter = "This is dependent on platform implementation. " +
+                    "Not all platforms support watchdog hooks, or contain a watchdog."
     )
     @CommandPermissions("worldedit.watchdog")
-    public void watchdog(Actor actor, LocalSession session,
-                         @Arg(desc = "The mode to set the watchdog hook to", def = "")
-                             HookMode hookMode) {
+    public void watchdog(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The mode to set the watchdog hook to", def = "")
+                    HookMode hookMode
+    ) {
         if (WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getWatchdog() == null) {
             actor.print(Caption.of("worldedit.watchdog.no-hook"));
             return;
@@ -381,14 +382,16 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "gmask",
-        aliases = {"/gmask"},
-        desc = "Set the global mask"
+            name = "gmask",
+            aliases = {"/gmask"},
+            desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-mask")
-    public void gmask(Actor actor, LocalSession session,
-                      @Arg(desc = "The mask to set", def = "")
-                          Mask mask) {
+    public void gmask(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The mask to set", def = "")
+                    Mask mask
+    ) {
         if (mask == null) {
             session.setMask(null);
             actor.print(Caption.of("worldedit.gmask.disabled"));
@@ -399,9 +402,9 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "toggleplace",
-        aliases = {"/toggleplace"},
-        desc = "Switch between your position and pos1 for placement"
+            name = "toggleplace",
+            aliases = {"/toggleplace"},
+            desc = "Switch between your position and pos1 for placement"
     )
     @CommandPermissions("worldedit.toggleplace")
     public void togglePlace(Actor actor, LocalSession session) {
@@ -417,20 +420,22 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "searchitem",
-        aliases = {"/searchitem", "/l", "/search"},
-        desc = "Search for an item"
+            name = "searchitem",
+            aliases = {"/searchitem", "/l", "/search"},
+            desc = "Search for an item"
     )
     @CommandPermissions("worldedit.searchitem")
-    public void searchItem(Actor actor,
-                           @Switch(name = 'b', desc = "Only search for blocks")
-                               boolean blocksOnly,
-                           @Switch(name = 'i', desc = "Only search for items")
-                               boolean itemsOnly,
-                           @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
-                               int page,
-                           @Arg(desc = "Search query", variable = true)
-                               List<String> query) {
+    public void searchItem(
+            Actor actor,
+            @Switch(name = 'b', desc = "Only search for blocks")
+                    boolean blocksOnly,
+            @Switch(name = 'i', desc = "Only search for items")
+                    boolean itemsOnly,
+            @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
+                    int page,
+            @Arg(desc = "Search query", variable = true)
+                    List<String> query
+    ) {
         String search = String.join(" ", query);
         if (search.length() <= 2) {
             actor.print(Caption.of("worldedit.searchitem.too-short"));
@@ -442,10 +447,12 @@ public class GeneralCommands {
         }
 
         WorldEditAsyncCommandBuilder.createAndSendMessage(actor, new ItemSearcher(search, blocksOnly, itemsOnly, page),
-                Caption.of("worldedit.searchitem.searching"));
+                Caption.of("worldedit.searchitem.searching")
+        );
     }
 
     private static class ItemSearcher implements Callable<Component> {
+
         private final boolean blocksOnly;
         private final boolean itemsOnly;
         private final String search;
@@ -476,17 +483,19 @@ public class GeneralCommands {
                 if (id.contains(idMatch)) {
                     Component name = searchType.getRichName();
                     results.put(id, TextComponent.builder()
-                        .append(name)
-                        .append(" (" + id + ")")
-                        .build());
+                            .append(name)
+                            .append(" (" + id + ")")
+                            .build());
                 }
             }
             List<Component> list = new ArrayList<>(results.values());
             return PaginationBox.fromComponents("Search results for '" + search + "'", command, list)
-                .create(page);
+                    .create(page);
         }
+
     }
 
+    //FAWE start
     @Command(
             name = "/gtexture",
             aliases = {"gtexture"},
@@ -494,7 +503,13 @@ public class GeneralCommands {
             desc = "Set the global mask"
     )
     @CommandPermissions("worldedit.global-texture")
-    public void gtexture(Player player, World worldArg, LocalSession session, EditSession editSession, @Arg(name = "context", desc = "InjectedValueAccess", def = "") List<String> arguments) throws WorldEditException, FileNotFoundException {
+    public void gtexture(
+            Player player,
+            World worldArg,
+            LocalSession session,
+            EditSession editSession,
+            @Arg(name = "context", desc = "InjectedValueAccess", def = "") List<String> arguments
+    ) throws WorldEditException, FileNotFoundException {
         // gtexture <randomize> <min=0> <max=100>
         // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
         if (arguments.isEmpty()) {
@@ -557,13 +572,18 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/gsmask",
-        aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
-        desc = "Set the global source mask",
-        descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g., the blocks in your clipboard)"
+            name = "/gsmask",
+            aliases = {"gsmask", "globalsourcemask", "/globalsourcemask"},
+            desc = "Set the global source mask",
+            descFooter = "The global source mask applies to all edits you do and masks based on the source blocks (e.g., the blocks in your clipboard)"
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
-    public void gsmask(Player player, LocalSession session, EditSession editSession, @Arg(desc = "The mask to set", def = "") Mask maskOpt) throws WorldEditException {
+    public void gsmask(
+            Player player,
+            LocalSession session,
+            EditSession editSession,
+            @Arg(desc = "The mask to set", def = "") Mask maskOpt
+    ) throws WorldEditException {
         session.setSourceMask(maskOpt);
         if (maskOpt == null) {
             player.print(Caption.of("fawe.worldedit.general.source.mask.disabled"));
@@ -574,12 +594,13 @@ public class GeneralCommands {
 
 
     @Command(
-        name = "/gtransform",
-        aliases = {"gtransform"},
-        desc = "Set the global transform"
+            name = "/gtransform",
+            aliases = {"gtransform"},
+            desc = "Set the global transform"
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
-    public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws WorldEditException {
+    public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws
+            WorldEditException {
         session.setTransform(transform);
         if (transform == null) {
             player.print(Caption.of("fawe.worldedit.general.transform.disabled"));
@@ -589,9 +610,9 @@ public class GeneralCommands {
     }
 
     @Command(
-        name = "/tips",
-        aliases = {"tips"},
-        desc = "Toggle FAWE tips"
+            name = "/tips",
+            aliases = {"tips"},
+            desc = "Toggle FAWE tips"
     )
     @CommandPermissions("fawe.tips")
     public void tips(Player player, LocalSession session) throws WorldEditException {
@@ -601,4 +622,31 @@ public class GeneralCommands {
             player.print(Caption.of("fawe.info.worldedit.toggle.tips.off"));
         }
     }
+
+    @Command(
+            name = "/fast",
+            desc = "Toggle fast mode"
+    )
+    @CommandPermissions("worldedit.fast")
+    @Deprecated
+    void fast(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The new fast mode state", def = "")
+                    Boolean fastMode
+    ) {
+        boolean hasFastMode = session.hasFastMode();
+        if (fastMode != null && fastMode == hasFastMode) {
+            actor.print(Caption.of(fastMode ? "worldedit.fast.enabled.already" : "worldedit.fast.disabled.already"));
+            return;
+        }
+
+        if (hasFastMode) {
+            session.setFastMode(false);
+            actor.print(Caption.of("worldedit.fast.disabled"));
+        } else {
+            session.setFastMode(true);
+            actor.print(Caption.of("worldedit.fast.enabled"));
+        }
+    }
+    //FAWE end
 }

@@ -1,8 +1,9 @@
 package com.fastasyncworldedit.core.wrappers;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.object.RunnableVal;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -97,7 +98,7 @@ public class AsyncPlayer extends PlayerProxy {
         while (y <= world.getMaximumPoint().getY()) {
             // Found a ceiling!
             if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
-                .isMovementBlocker()) {
+                    .isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
                 floatAt(x, platformY + 1, z, alwaysGlass);
                 return true;
@@ -126,7 +127,7 @@ public class AsyncPlayer extends PlayerProxy {
 
         while (y <= world.getMaximumPoint().getY() + 2) {
             if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
-                .isMovementBlocker()) {
+                    .isMovementBlocker()) {
                 break; // Hit something
             } else if (y > maxY + 1) {
                 break;
@@ -213,8 +214,8 @@ public class AsyncPlayer extends PlayerProxy {
 
             while ((block = hitBlox.getNextBlock()) != null) {
                 boolean free = !world.getBlock(
-                    BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ()))
-                    .getBlockType().getMaterial().isMovementBlocker();
+                        BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ()))
+                        .getBlockType().getMaterial().isMovementBlocker();
 
                 if (firstBlock) {
                     firstBlock = false;
@@ -247,4 +248,5 @@ public class AsyncPlayer extends PlayerProxy {
             return false;
         });
     }
+
 }

@@ -20,7 +20,8 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.object.collection.BlockVectorSet;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.WorldEditException;
@@ -28,7 +29,6 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableBlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -54,6 +54,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public abstract class BreadthFirstSearch implements Operation {
 
+    //FAWE start
     public static final BlockVector3[] DEFAULT_DIRECTIONS = new BlockVector3[6];
     public static final BlockVector3[] DIAGONAL_DIRECTIONS;
 
@@ -80,12 +81,16 @@ public abstract class BreadthFirstSearch implements Operation {
         list.sort((o1, o2) -> (int) Math.signum(o1.lengthSq() - o2.lengthSq()));
         DIAGONAL_DIRECTIONS = list.toArray(new BlockVector3[0]);
     }
+    //FAWE end
 
     private final RegionFunction function;
+    //FAWE Start - BVS > Queue<BV3>, Set<BV3>, List<BV3>
     private BlockVectorSet queue = new BlockVectorSet();
     private BlockVectorSet visited = new BlockVectorSet();
     private BlockVector3[] directions;
+    //FAWE end
     private int affected = 0;
+    //FAWE start
     private int currentDepth = 0;
     private final int maxDepth;
     private int maxBranch = Integer.MAX_VALUE;
@@ -96,10 +101,13 @@ public abstract class BreadthFirstSearch implements Operation {
      * @param function the function to apply to visited blocks
      */
     public BreadthFirstSearch(RegionFunction function) {
+        //FAWE start
         this(function, Integer.MAX_VALUE);
+        //FAWE end
         checkNotNull(function);
     }
 
+    //FAWE start
     public BreadthFirstSearch(RegionFunction function, int maxDepth) {
         checkNotNull(function);
         this.function = function;
@@ -114,6 +122,7 @@ public abstract class BreadthFirstSearch implements Operation {
     public void setDirections(Collection<BlockVector3> directions) {
         setDirections(directions.toArray(new BlockVector3[0]));
     }
+    //FAWE end
 
     /**
      * Get the list of directions will be visited.
@@ -135,6 +144,7 @@ public abstract class BreadthFirstSearch implements Operation {
      * Add the directions along the axes as directions to visit.
      */
     public void addAxes() {
+        //FAWE start - HS<BV3>
         HashSet<BlockVector3> set = Sets.newHashSet(directions);
         set.add(BlockVector3.UNIT_MINUS_Y);
         set.add(BlockVector3.UNIT_Y);
@@ -143,18 +153,21 @@ public abstract class BreadthFirstSearch implements Operation {
         set.add(BlockVector3.UNIT_MINUS_Z);
         set.add(BlockVector3.UNIT_Z);
         setDirections(set);
+        //FAWE end
     }
 
     /**
      * Add the diagonal directions as directions to visit.
      */
     public void addDiagonal() {
+        //FAWE start - HS<BV3>
         HashSet<BlockVector3> set = Sets.newHashSet(directions);
         set.add(Direction.NORTHEAST.toBlockVector());
         set.add(Direction.SOUTHEAST.toBlockVector());
         set.add(Direction.SOUTHWEST.toBlockVector());
         set.add(Direction.NORTHWEST.toBlockVector());
         setDirections(set);
+        //FAWE end
     }
 
     /**
@@ -182,7 +195,7 @@ public abstract class BreadthFirstSearch implements Operation {
      * Try to visit the given 'to' location.
      *
      * @param from the origin block
-     * @param to the block under question
+     * @param to   the block under question
      */
     private void visit(BlockVector3 from, BlockVector3 to) {
         if (!visited.contains(to)) {
@@ -193,6 +206,7 @@ public abstract class BreadthFirstSearch implements Operation {
         }
     }
 
+    //FAWE start
     public void setVisited(BlockVectorSet set) {
         this.visited = set;
     }
@@ -208,13 +222,14 @@ public abstract class BreadthFirstSearch implements Operation {
     public void setMaxBranch(int maxBranch) {
         this.maxBranch = maxBranch;
     }
+    //FAWE end
 
     /**
      * Return whether the given 'to' block should be visited, starting from the
      * 'from' block.
      *
      * @param from the origin block
-     * @param to the block under question
+     * @param to   the block under question
      * @return true if the 'to' block should be visited
      */
     protected abstract boolean isVisitable(BlockVector3 from, BlockVector3 to);
@@ -230,6 +245,7 @@ public abstract class BreadthFirstSearch implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
+        //FAWE start - directions & visited
         MutableBlockVector3 mutable = new MutableBlockVector3();
         BlockVector3[] dirs = directions;
         BlockVectorSet tempQueue = new BlockVectorSet();
@@ -263,19 +279,24 @@ public abstract class BreadthFirstSearch implements Operation {
             tmp.clear();
             tempQueue = tmp;
         }
+        //FAWE end
 
         return null;
     }
 
+    //FAWE start
     public int getDepth() {
         return currentDepth;
     }
+    //FAWE end
 
     @Override
     public void cancel() {
+        //FAWE start
         queue.clear();
         visited.clear();
         affected = 0;
+        //FAWE emd
     }
 
     @Override

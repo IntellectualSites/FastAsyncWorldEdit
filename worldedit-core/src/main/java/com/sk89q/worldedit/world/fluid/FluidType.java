@@ -19,19 +19,21 @@
 
 package com.sk89q.worldedit.world.fluid;
 
+import com.fastasyncworldedit.core.registry.RegistryItem;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
-import com.sk89q.worldedit.registry.RegistryItem;
 
 /**
  * Minecraft now has a 'fluid' system. This is a
  * stub class to represent what it may be in the future.
  */
+//FAWE start - implements RegistryItem
 public class FluidType implements RegistryItem, Keyed {
+//FAWE end
 
     public static final NamespacedRegistry<FluidType> REGISTRY = new NamespacedRegistry<>("fluid type");
 
-    private String id;
+    private final String id;
 
     public FluidType(String id) {
         this.id = id;
@@ -47,6 +49,7 @@ public class FluidType implements RegistryItem, Keyed {
         return this.id;
     }
 
+    //FAWE start
     private int internalId;
 
     //UNUSED
@@ -60,6 +63,7 @@ public class FluidType implements RegistryItem, Keyed {
     public int getInternalId() {
         return internalId;
     }
+    //FAWE end
 
     @Override
     public String toString() {
@@ -75,4 +79,5 @@ public class FluidType implements RegistryItem, Keyed {
     public boolean equals(Object obj) {
         return obj instanceof FluidType && this.id.equals(((FluidType) obj).id);
     }
+
 }

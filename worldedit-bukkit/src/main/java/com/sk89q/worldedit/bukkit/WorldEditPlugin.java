@@ -112,17 +112,18 @@ public class WorldEditPlugin extends JavaPlugin {
     @Override
     public void onLoad() {
 
-        // FAWE start
+        //FAWE start
         // This is already covered by Spigot, however, a more pesky warning with a proper explanation over "Ambiguous plugin name..." can't hurt.
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         for (Plugin p : plugins) {
             if (p.getName().equals("WorldEdit")) {
-                LOGGER.warn("You installed WorldEdit alongside FastAsyncWorldEdit. That is unneeded and will cause unforeseen issues, " +
-                        "because FastAsyncWorldEdit already provides WorldEdit. " +
-                        "Stop your server and delete the 'worldedit-bukkit' jar from your plugins folder.");
+                LOGGER.warn(
+                        "You installed WorldEdit alongside FastAsyncWorldEdit. That is unneeded and will cause unforeseen issues, " +
+                                "because FastAsyncWorldEdit already provides WorldEdit. " +
+                                "Stop your server and delete the 'worldedit-bukkit' jar from your plugins folder.");
             }
         }
-        // FAWE end
+        //FAWE end
 
         INSTANCE = this;
 
@@ -142,7 +143,7 @@ public class WorldEditPlugin extends JavaPlugin {
         //FAWE start - Modify WorldEdit config name
         config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "config-legacy.yml"), true), this);
         //FAWE end
-        
+
         //FAWE start - Setup permission attachments
         permissionAttachmentManager = new BukkitPermissionAttachmentManager(this);
         //FAWE end
@@ -202,7 +203,8 @@ public class WorldEditPlugin extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new WorldInitListener(), this);
         } else {
             //FAWE start
-            LOGGER.warn("Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins. Reloading the server is not advised.");
+            LOGGER.warn(
+                    "Server reload detected. This may cause various issues with FastAsyncWorldEdit and dependent plugins. Reloading the server is not advised.");
             LOGGER.warn("For more information why reloading is bad, see https://madelinemiller.dev/blog/problem-with-reload/");
             //FAWE end
             try {
@@ -235,7 +237,7 @@ public class WorldEditPlugin extends JavaPlugin {
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
-    @SuppressWarnings({ "deprecation", "unchecked" })
+    @SuppressWarnings({"deprecation", "unchecked"})
     private void initializeRegistries() {
         // Biome
         for (Biome biome : Biome.values()) {
@@ -298,7 +300,8 @@ public class WorldEditPlugin extends JavaPlugin {
                 ItemCategory.REGISTRY.register(itemTag.getKey().toString(), new ItemCategory(itemTag.getKey().toString()));
             }
         } catch (NoSuchMethodError ignored) {
-            LOGGER.warn("The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
+            LOGGER.warn(
+                    "The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
         }
     }
 
@@ -329,8 +332,8 @@ public class WorldEditPlugin extends JavaPlugin {
             } else {
                 //FAWE start - Identify as FAWE
                 LOGGER.info("FastAsyncWorldEdit could not find a Bukkit adapter for this MC version, "
-                             + "but it seems that you have another implementation of FastAsyncWorldEdit installed (" + platform.getPlatformName() + ") "
-                             + "that handles the world editing.");
+                        + "but it seems that you have another implementation of FastAsyncWorldEdit installed (" + platform.getPlatformName() + ") "
+                        + "that handles the world editing.");
                 //FAWE end
             }
             this.adapter.invalidate();
@@ -446,7 +449,7 @@ public class WorldEditPlugin extends JavaPlugin {
     /**
      * Remember an edit session.
      *
-     * @param player a player
+     * @param player      a player
      * @param editSession an edit session
      */
     public void remember(Player player, EditSession editSession) {
@@ -476,8 +479,9 @@ public class WorldEditPlugin extends JavaPlugin {
     public PermissionsResolverManager getPermissionsResolver() {
         return PermissionsResolverManager.getInstance();
     }
-    
+
     //FAWE start
+
     /**
      * Get the permissions attachment manager in use
      *
@@ -568,6 +572,7 @@ public class WorldEditPlugin extends JavaPlugin {
     }
 
     private class WorldInitListener implements Listener {
+
         private boolean loaded = false;
 
         @EventHandler(priority = EventPriority.LOWEST)
@@ -578,9 +583,11 @@ public class WorldEditPlugin extends JavaPlugin {
             loaded = true;
             setupWorldData();
         }
+
     }
 
     private class AsyncTabCompleteListener implements Listener {
+
         AsyncTabCompleteListener() {
         }
 
@@ -600,7 +607,8 @@ public class WorldEditPlugin extends JavaPlugin {
             // Strip leading slash, if present.
             label = label.startsWith("/") ? label.substring(1) : label;
             final Optional<org.enginehub.piston.Command> command
-                    = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(label);
+                    = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(
+                    label);
             if (!command.isPresent()) {
                 return;
             }
@@ -611,5 +619,7 @@ public class WorldEditPlugin extends JavaPlugin {
             event.setCompletions(CommandUtil.fixSuggestions(buffer, suggestEvent.getSuggestions()));
             event.setHandled(true);
         }
+
     }
+
 }

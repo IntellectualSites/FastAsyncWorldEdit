@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MemUtil {
 
-    private static AtomicBoolean memory = new AtomicBoolean(false);
+    private static final AtomicBoolean memory = new AtomicBoolean(false);
 
     public static boolean isMemoryFree() {
         return !memory.get();
@@ -51,8 +51,8 @@ public class MemUtil {
         return size;
     }
 
-    private static Queue<Runnable> memoryLimitedTasks = new ConcurrentLinkedQueue<>();
-    private static Queue<Runnable> memoryPlentifulTasks = new ConcurrentLinkedQueue<>();
+    private static final Queue<Runnable> memoryLimitedTasks = new ConcurrentLinkedQueue<>();
+    private static final Queue<Runnable> memoryPlentifulTasks = new ConcurrentLinkedQueue<>();
 
     public static void addMemoryLimitedTask(Runnable run) {
         if (run != null) {
@@ -81,4 +81,5 @@ public class MemUtil {
         }
         memory.set(false);
     }
+
 }

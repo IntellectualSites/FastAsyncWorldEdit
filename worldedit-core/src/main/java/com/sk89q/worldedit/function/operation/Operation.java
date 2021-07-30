@@ -87,10 +87,12 @@ public interface Operation {
         if (oldMessages.size() > 0) {
             String className = getClass().getName();
             if (!warnedDeprecatedClasses.contains(className)) {
-                WorldEdit.logger.warn("An operation is using the old status message API. This will be removed in WorldEdit 8. Class: " + className);
+                WorldEdit.logger.warn(
+                        "An operation is using the old status message API. This will be removed in WorldEdit 8. Class: " + className);
                 warnedDeprecatedClasses.add(className);
             }
         }
         return oldMessages.stream().map(TextComponent::of).collect(Collectors.toList());
     }
+
 }

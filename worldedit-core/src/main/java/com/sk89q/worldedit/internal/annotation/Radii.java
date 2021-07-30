@@ -33,8 +33,10 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @InjectAnnotation
 public @interface Radii {
+
     /**
      * Number of radii values to inject at maximum. May inject less.
      */
     int value();
+
 }

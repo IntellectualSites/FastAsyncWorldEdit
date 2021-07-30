@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.bukkit.filter;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.regions.general.CuboidRegionFilter;
+import com.fastasyncworldedit.core.regions.filter.CuboidRegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -32,7 +32,7 @@ public class WorldGuardFilter extends CuboidRegionFilter {
     public void calculateRegions() {
         Fawe.get().getQueueHandler().sync(() -> {
             WorldGuardFilter.this.manager = WorldGuard.getInstance().getPlatform().getRegionContainer().get(
-                BukkitAdapter.adapt(world));
+                    BukkitAdapter.adapt(world));
             for (ProtectedRegion region : manager.getRegions().values()) {
                 BlockVector3 min = region.getMinimumPoint();
                 BlockVector3 max = region.getMaximumPoint();
@@ -69,4 +69,5 @@ public class WorldGuardFilter extends CuboidRegionFilter {
         ApplicableRegionSet set = manager.getApplicableRegions(regionRegion);
         return set.size() > 0 && !set.getRegions().iterator().next().getId().equals("__global__");
     }
+
 }

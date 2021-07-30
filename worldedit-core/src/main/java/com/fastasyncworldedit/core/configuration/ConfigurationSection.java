@@ -90,7 +90,7 @@ public interface ConfigurationSection {
      * <p>
      * To retrieve the single name of this section, that is, the final part of the path returned by
      * this method, you may use {@link #getName()}.
-     *</p>
+     * </p>
      *
      * @return Path of this section relative to its root
      */
@@ -163,7 +163,7 @@ public interface ConfigurationSection {
      * </p>
      *
      * @param path Path of the Object to get.
-     * @param def The default value to return if the path is not found.
+     * @param def  The default value to return if the path is not found.
      * @return Requested Object.
      */
     Object get(String path, Object def);
@@ -182,7 +182,7 @@ public interface ConfigurationSection {
      * ConfigurationSection}s, please use {@link #createSection(String)} for that.
      * </p>
      *
-     * @param path Path of the object to set.
+     * @param path  Path of the object to set.
      * @param value New value to set the path to.
      */
     void set(String path, Object value);
@@ -209,7 +209,7 @@ public interface ConfigurationSection {
      * </p>
      *
      * @param path Path to create the section at.
-     * @param map The values to used.
+     * @param map  The values to used.
      * @return Newly created section
      */
     ConfigurationSection createSection(String path, Map<?, ?> map);
@@ -265,7 +265,7 @@ public interface ConfigurationSection {
      * Gets the requested int by a path.
      *
      * <p>
-     *     If the int does not exist, but a default value has been specified, this
+     * If the int does not exist, but a default value has been specified, this
      * will return the default value. If the int does not exist and no default
      * value was specified, this will return 0.
      * </p>
@@ -284,7 +284,7 @@ public interface ConfigurationSection {
      * </p>
      *
      * @param path Path of the int to get.
-     * @param def The default value to return if the path is not found or is not an int.
+     * @param def  The default value to return if the path is not found or is not an int.
      * @return Requested int.
      */
     int getInt(String path, int def);
@@ -326,7 +326,7 @@ public interface ConfigurationSection {
      * </p>
      *
      * @param path Path of the boolean to get.
-     * @param def The default value to return if the path is not found or is not a boolean.
+     * @param def  The default value to return if the path is not found or is not a boolean.
      * @return Requested boolean.
      */
     boolean getBoolean(String path, boolean def);
@@ -368,7 +368,7 @@ public interface ConfigurationSection {
      * </p>
      *
      * @param path Path of the double to get.
-     * @param def The default value to return if the path is not found or is not a double.
+     * @param def  The default value to return if the path is not found or is not a double.
      * @return Requested double.
      */
     double getDouble(String path, double def);
@@ -410,7 +410,7 @@ public interface ConfigurationSection {
      * </p>
      *
      * @param path Path of the long to get.
-     * @param def The default value to return if the path is not found or is not a long.
+     * @param def  The default value to return if the path is not found or is not a long.
      * @return Requested long.
      */
     long getLong(String path, long def);
@@ -454,7 +454,7 @@ public interface ConfigurationSection {
      * </p>
      *
      * @param path Path of the List to get.
-     * @param def The default value to return if the path is not found or is not a List.
+     * @param def  The default value to return if the path is not found or is not a List.
      * @return Requested List.
      */
     List<?> getList(String path, List<?> def);
@@ -724,9 +724,10 @@ public interface ConfigurationSection {
      * section at the path, replacing anything that may have existed there previously.
      * </p>
      *
-     * @param path Path of the value to set.
+     * @param path  Path of the value to set.
      * @param value Value to set the default to.
      * @throws IllegalArgumentException Thrown if path is null.
      */
     void addDefault(String path, Object value);
+
 }

@@ -39,10 +39,13 @@ public final class Blocks {
      * Checks whether a given block is in a list of base blocks.
      *
      * @param collection the collection
-     * @param o the block
+     * @param o          the block
      * @return true if the collection contains the given block
      */
-    public static <B extends BlockStateHolder<B>> boolean containsFuzzy(Collection<? extends BlockStateHolder<?>> collection, B o) {
+    public static <B extends BlockStateHolder<B>> boolean containsFuzzy(
+            Collection<? extends BlockStateHolder<?>> collection,
+            B o
+    ) {
         // Allow masked data in the searchBlocks to match various types
         for (BlockStateHolder<?> b : collection) {
             if (b.equalsFuzzy(o)) {
@@ -56,7 +59,7 @@ public final class Blocks {
      * Parses a string->string map to find the matching Property and values for the given BlockType.
      *
      * @param states the desired states and values
-     * @param type the block type to get properties and values for
+     * @param type   the block type to get properties and values for
      * @return a property->value map
      */
     public static Map<Property<Object>, Object> resolveProperties(Map<String, String> states, BlockType type) {
@@ -80,4 +83,5 @@ public final class Blocks {
         });
         return newMap;
     }
+
 }

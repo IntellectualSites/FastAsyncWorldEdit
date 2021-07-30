@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import com.fastasyncworldedit.core.object.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.UndoContext;
@@ -35,6 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ChangeSetExecutor implements Operation {
 
+    //FAWE start - Override
     public enum Type {
         UNDO {
             @Override
@@ -52,6 +53,7 @@ public class ChangeSetExecutor implements Operation {
         public void perform(Change change, UndoContext context) {
         }
     }
+    //FAWE end
 
     private final Iterator<Change> iterator;
     private final Type type;
@@ -61,9 +63,10 @@ public class ChangeSetExecutor implements Operation {
      * Create a new instance.
      *
      * @param changeSet the change set
-     * @param type type of change
-     * @param context the undo context
+     * @param type      type of change
+     * @param context   the undo context
      */
+    //FAWE start - BlockBag & inventory
     private ChangeSetExecutor(ChangeSet changeSet, Type type, UndoContext context, BlockBag blockBag, int inventory) {
         checkNotNull(changeSet);
         checkNotNull(type);
@@ -79,12 +82,15 @@ public class ChangeSetExecutor implements Operation {
             iterator = changeSet.forwardIterator();
         }
     }
+    //FAWE end
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         while (iterator.hasNext()) {
             Change change = iterator.next();
+            //FAWE start - types > individual history step
             type.perform(change, context);
+            //FAWE end
         }
         return null;
     }
@@ -93,15 +99,23 @@ public class ChangeSetExecutor implements Operation {
     public void cancel() {
     }
 
-    public static ChangeSetExecutor create(ChangeSet changeSet, UndoContext context, Type type, BlockBag blockBag, int inventory) {
+    //FAWE start
+    public static ChangeSetExecutor create(
+            ChangeSet changeSet,
+            UndoContext context,
+            Type type,
+            BlockBag blockBag,
+            int inventory
+    ) {
         return new ChangeSetExecutor(changeSet, type, context, blockBag, inventory);
     }
+    //FAWE end
 
     /**
      * Create a new undo operation.
      *
      * @param changeSet the change set
-     * @param context an undo context
+     * @param context   an undo context
      * @return an operation
      */
     public static ChangeSetExecutor createUndo(ChangeSet changeSet, UndoContext context) {
@@ -112,7 +126,7 @@ public class ChangeSetExecutor implements Operation {
      * Create a new redo operation.
      *
      * @param changeSet the change set
-     * @param context an undo context
+     * @param context   an undo context
      * @return an operation
      */
     public static ChangeSetExecutor createRedo(ChangeSet changeSet, UndoContext context) {

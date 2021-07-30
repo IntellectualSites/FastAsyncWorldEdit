@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class Settings extends Config {
+
     @Ignore
     public static final Settings IMP = new Settings();
 
@@ -72,20 +73,23 @@ public class Settings extends Config {
 
     @Comment("Enable or disable core components")
     public static final class ENABLED_COMPONENTS {
+
         public boolean COMMANDS = true;
         @Comment({
-            "Disable the FAWE-PlotSquared hook to take over most intense P2 queueing",
-            "Specific aspects can be turned on and off further below",
-            "Only disables/enables the hook with v4. For v6, see PlotSquared settings.yml"
+                "Disable the FAWE-PlotSquared hook to take over most intense P2 queueing",
+                "Specific aspects can be turned on and off further below",
+                "Only disables/enables the hook with v4. For v6, see PlotSquared settings.yml"
         })
         public boolean PLOTSQUARED_v4_HOOK = true;
         @Comment({"Show additional information in console. It helps us at IntellectualSites to find out more about an issue.",
                 "Leave it off if you don't need it, it can spam your console."})
         public boolean DEBUG = false;
+
     }
 
     @Comment("Paths for various directories")
     public static final class PATHS {
+
         @Comment({
                 "Put any minecraft or mod jars for FAWE to be aware of block textures",
         })
@@ -99,16 +103,19 @@ public class Settings extends Config {
         public String CLIPBOARD = "clipboard";
         @Comment("Each player has his or her own sub directory for schematics")
         public boolean PER_PLAYER_SCHEMATICS = true;
+
     }
 
     @Comment("Region restriction settings")
     public static final class REGION_RESTRICTIONS_OPTIONS {
+
         @Comment({
                 "What type of users are allowed to WorldEdit in a region",
                 " - MEMBER = Players added to a region",
                 " - OWNER = Players who own the region"
         })
         public String MODE = "MEMBER";
+
     }
 
     @Comment({
@@ -119,6 +126,7 @@ public class Settings extends Config {
     })
     @BlockName("default") // The name for the default block
     public static class LIMITS extends ConfigBlock {
+
         @Comment("Max actions that can be run concurrently (i.e. commands)")
         public int MAX_ACTIONS = 1;
         @Comment("Max number of block changes (e.g. by `//set stone`).")
@@ -168,17 +176,19 @@ public class Settings extends Config {
         })
         public boolean CONFIRM_LARGE = true;
         @Comment({
-            "If undo and redo commands should be restricted to allowed regions",
-            " - Prevents scenarios where players can delete/reset a region, and then continue to undo/redo on it"
+                "If undo and redo commands should be restricted to allowed regions",
+                " - Prevents scenarios where players can delete/reset a region, and then continue to undo/redo on it"
         })
         public boolean RESTRICT_HISTORY_TO_REGIONS = true;
         @Comment({
                 "List of blocks to strip nbt from",
         })
         public List<String> STRIP_NBT = new ArrayList<>();
+
     }
 
     public static class HISTORY {
+
         @Comment({
                 "Should history be saved on disk:",
                 " - Frees up a lot of memory",
@@ -200,9 +210,9 @@ public class Settings extends Config {
         })
         public boolean COMBINE_STAGES = true;
         @Comment({
-            "Do not wait for a chunk's history to save before sending it",
-            " - Undo/redo commands will wait until the history has been written to disk before executing",
-            " - Requires combine-stages = true"
+                "Do not wait for a chunk's history to save before sending it",
+                " - Undo/redo commands will wait until the history has been written to disk before executing",
+                " - Requires combine-stages = true"
         })
         public boolean SEND_BEFORE_HISTORY = true;
         @Comment({
@@ -266,10 +276,12 @@ public class Settings extends Config {
                 " - Reduces history size by ~10%",
         })
         public boolean SMALL_EDITS = false;
+
     }
 
     @Comment("This relates to how FAWE places chunks")
     public static class QUEUE {
+
         @Comment({
                 "This should equal the number of processors you have",
         })
@@ -325,11 +337,12 @@ public class Settings extends Config {
         public int DISCARD_AFTER_MS = 60000;
 
         @Comment({
-            "When using fastmode also do not bother to fix existing ticking blocks"
+                "When using fastmode also do not bother to fix existing ticking blocks"
         })
         public boolean NO_TICK_FASTMODE = true;
 
         public static class PROGRESS {
+
             @Comment({"Display constant titles about the progress of a user's edit",
                     " - false = disabled",
                     " - title = Display progress titles",
@@ -340,7 +353,9 @@ public class Settings extends Config {
             public int INTERVAL = 1;
             @Comment("Delay sending progress in milliseconds (so quick edits don't spam)")
             public int DELAY = 5000;
+
         }
+
     }
 
     @Comment({
@@ -349,6 +364,7 @@ public class Settings extends Config {
             " - SAFE = Can be buggy but unlikely to cause any damage"
     })
     public static class EXPERIMENTAL {
+
         @Comment({
                 "[UNSAFE] Directly modify the region files. (OBSOLETE - USE ANVIL COMMANDS)",
                 " - IMPROPER USE CAN CAUSE WORLD CORRUPTION!",
@@ -384,14 +400,14 @@ public class Settings extends Config {
         public boolean OTHER = false;
 
         @Comment({
-            "Allow blocks placed by WorldEdit to tick. This could cause the big lags.",
-            "This has no effect on existing blocks one way or the other."
+                "Allow blocks placed by WorldEdit to tick. This could cause the big lags.",
+                "This has no effect on existing blocks one way or the other."
         })
         public boolean ALLOW_TICK_PLACED = false;
 
         @Comment({
-            "Force re-ticking of existing blocks not edited by FAWE.",
-            "This will increase time taken slightly."
+                "Force re-ticking of existing blocks not edited by FAWE.",
+                "This will increase time taken slightly."
         })
         public boolean ALLOW_TICK_EXISTING = true;
 
@@ -406,18 +422,22 @@ public class Settings extends Config {
                 "Set to -1 to disable"
         })
         public int PER_PLAYER_FILE_NUM_LIMIT = -1;
+
     }
 
     public static class PLOTSQUARED_INTEGRATION {
+
         @Comment({
-            "Only disables/enables the components with PlotSquared v4.",
-            "For v6, see PlotSquared settings.yml"
+                "Only disables/enables the components with PlotSquared v4.",
+                "For v6, see PlotSquared settings.yml"
         })
         public boolean CLEAR = true;
         public boolean COPY_AND_SWAP = true;
+
     }
 
     public static class WEB {
+
         @Comment({
                 "The web interface for clipboards",
                 " - All schematics are anonymous and private",
@@ -425,9 +445,11 @@ public class Settings extends Config {
                 " - Supports clipboard uploads, downloads and saves",
         })
         public String URL = "https://schem.intellectualsites.com/fawe/";
+
     }
 
     public static class EXTENT {
+
         @Comment({
                 "Don't bug console when these plugins slow down WorldEdit operations",
                 " - You'll see a message in console if you need to change this option"
@@ -435,10 +457,12 @@ public class Settings extends Config {
         public List<String> ALLOWED_PLUGINS = new ArrayList<>();
         @Comment("Should debug messages be sent when third party extents are used?")
         public boolean DEBUG = true;
+
     }
 
     @Comment("Generic tick limiter (not necessarily WorldEdit related, but useful to stop abuse)")
     public static class TICK_LIMITER {
+
         @Comment("Enable the limiter")
         public boolean ENABLED = true;
         @Comment("The interval in ticks")
@@ -455,9 +479,11 @@ public class Settings extends Config {
                 " - Horizontal fireworks can be hacked in to crash a server"
         })
         public boolean FIREWORKS_LOAD_CHUNKS = false;
+
     }
 
     public static class CLIPBOARD {
+
         @Comment({
                 "Store the clipboard on disk instead of memory",
                 " - Will be slightly slower",
@@ -474,9 +500,11 @@ public class Settings extends Config {
         public int COMPRESSION_LEVEL = 1;
         @Comment("Number of days to keep history on disk before deleting it")
         public int DELETE_AFTER_DAYS = 1;
+
     }
 
     public static class LIGHTING {
+
         @Comment({
                 "If packet sending should be delayed until relight is finished",
         })
@@ -491,6 +519,7 @@ public class Settings extends Config {
         public int MODE = 1;
         @Comment({"If existing lighting should be removed before relighting"})
         public boolean REMOVE_FIRST = true;
+
     }
 
     public void reload(File file) {
@@ -515,15 +544,39 @@ public class Settings extends Config {
             if (actor.hasPermission("fawe.limit." + key) || !limitFound && key.equals("default")) {
                 limitFound = true;
                 LIMITS newLimit = LIMITS.get(key);
-                limit.MAX_ACTIONS = Math.max(limit.MAX_ACTIONS, newLimit.MAX_ACTIONS != -1 ? newLimit.MAX_ACTIONS : Integer.MAX_VALUE);
-                limit.MAX_CHANGES = Math.max(limit.MAX_CHANGES, newLimit.MAX_CHANGES != -1 ? newLimit.MAX_CHANGES : Integer.MAX_VALUE);
-                limit.MAX_BLOCKSTATES = Math.max(limit.MAX_BLOCKSTATES, newLimit.MAX_BLOCKSTATES != -1 ? newLimit.MAX_BLOCKSTATES : Integer.MAX_VALUE);
-                limit.MAX_CHECKS = Math.max(limit.MAX_CHECKS, newLimit.MAX_CHECKS != -1 ? newLimit.MAX_CHECKS : Integer.MAX_VALUE);
-                limit.MAX_ENTITIES = Math.max(limit.MAX_ENTITIES, newLimit.MAX_ENTITIES != -1 ? newLimit.MAX_ENTITIES : Integer.MAX_VALUE);
+                limit.MAX_ACTIONS = Math.max(
+                        limit.MAX_ACTIONS,
+                        newLimit.MAX_ACTIONS != -1 ? newLimit.MAX_ACTIONS : Integer.MAX_VALUE
+                );
+                limit.MAX_CHANGES = Math.max(
+                        limit.MAX_CHANGES,
+                        newLimit.MAX_CHANGES != -1 ? newLimit.MAX_CHANGES : Integer.MAX_VALUE
+                );
+                limit.MAX_BLOCKSTATES = Math.max(
+                        limit.MAX_BLOCKSTATES,
+                        newLimit.MAX_BLOCKSTATES != -1 ? newLimit.MAX_BLOCKSTATES : Integer.MAX_VALUE
+                );
+                limit.MAX_CHECKS = Math.max(
+                        limit.MAX_CHECKS,
+                        newLimit.MAX_CHECKS != -1 ? newLimit.MAX_CHECKS : Integer.MAX_VALUE
+                );
+                limit.MAX_ENTITIES = Math.max(
+                        limit.MAX_ENTITIES,
+                        newLimit.MAX_ENTITIES != -1 ? newLimit.MAX_ENTITIES : Integer.MAX_VALUE
+                );
                 limit.MAX_FAILS = Math.max(limit.MAX_FAILS, newLimit.MAX_FAILS != -1 ? newLimit.MAX_FAILS : Integer.MAX_VALUE);
-                limit.MAX_ITERATIONS = Math.max(limit.MAX_ITERATIONS, newLimit.MAX_ITERATIONS != -1 ? newLimit.MAX_ITERATIONS : Integer.MAX_VALUE);
-                limit.MAX_HISTORY = Math.max(limit.MAX_HISTORY, newLimit.MAX_HISTORY_MB != -1 ? newLimit.MAX_HISTORY_MB : Integer.MAX_VALUE);
-                limit.MAX_EXPRESSION_MS = Math.max(limit.MAX_EXPRESSION_MS, newLimit.MAX_EXPRESSION_MS != -1 ? newLimit.MAX_EXPRESSION_MS : Integer.MAX_VALUE);
+                limit.MAX_ITERATIONS = Math.max(
+                        limit.MAX_ITERATIONS,
+                        newLimit.MAX_ITERATIONS != -1 ? newLimit.MAX_ITERATIONS : Integer.MAX_VALUE
+                );
+                limit.MAX_HISTORY = Math.max(
+                        limit.MAX_HISTORY,
+                        newLimit.MAX_HISTORY_MB != -1 ? newLimit.MAX_HISTORY_MB : Integer.MAX_VALUE
+                );
+                limit.MAX_EXPRESSION_MS = Math.max(
+                        limit.MAX_EXPRESSION_MS,
+                        newLimit.MAX_EXPRESSION_MS != -1 ? newLimit.MAX_EXPRESSION_MS : Integer.MAX_VALUE
+                );
                 limit.INVENTORY_MODE = Math.min(limit.INVENTORY_MODE, newLimit.INVENTORY_MODE);
                 limit.SPEED_REDUCTION = Math.min(limit.SPEED_REDUCTION, newLimit.SPEED_REDUCTION);
                 limit.FAST_PLACEMENT |= newLimit.FAST_PLACEMENT;
@@ -544,4 +597,5 @@ public class Settings extends Config {
         }
         return limit;
     }
+
 }

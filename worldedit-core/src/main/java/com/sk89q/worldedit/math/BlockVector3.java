@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.math;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -52,7 +53,7 @@ public abstract class BlockVector3 {
     }
 
     public static BlockVector3 at(int x, int y, int z) {
-        /* unnecessary
+        /*FAWE start unnecessary
         // switch for efficiency on typical cases
         // in MC y is rarely 0/1 on selections
         switch (y) {
@@ -70,11 +71,13 @@ public abstract class BlockVector3 {
                 break;
         }
         */
+        //FAWE end
         return new BlockVector3Imp(x, y, z);
     }
 
     private static final int WORLD_XZ_MINMAX = 30_000_000;
-    private static final int WORLD_Y_MAX = 4095;
+    private static final int WORLD_Y_MIN = -2048;
+    private static final int WORLD_Y_MAX = 2047;
 
     private static boolean isHorizontallyInBounds(int h) {
         return -WORLD_XZ_MINMAX <= h && h <= WORLD_XZ_MINMAX;
@@ -82,13 +85,14 @@ public abstract class BlockVector3 {
 
     public static boolean isLongPackable(BlockVector3 location) {
         return isHorizontallyInBounds(location.getX())
-            && isHorizontallyInBounds(location.getZ())
-            && 0 <= location.getY() && location.getY() <= WORLD_Y_MAX;
+                && isHorizontallyInBounds(location.getZ())
+                && WORLD_Y_MIN <= location.getY() && location.getY() <= WORLD_Y_MAX;
     }
 
     public static void checkLongPackable(BlockVector3 location) {
         checkArgument(isLongPackable(location),
-            "Location exceeds long packing limits: %s", location);
+                "Location exceeds long packing limits: %s", location
+        );
     }
 
     private static final long BITS_26 = mask(26);
@@ -100,10 +104,12 @@ public abstract class BlockVector3 {
 
     // thread-safe initialization idiom
     private static final class YzxOrderComparator {
+
         private static final Comparator<BlockVector3> YZX_ORDER =
-            Comparator.comparingInt(BlockVector3::getY)
-                .thenComparingInt(BlockVector3::getZ)
-                .thenComparingInt(BlockVector3::getX);
+                Comparator.comparingInt(BlockVector3::getY)
+                        .thenComparingInt(BlockVector3::getZ)
+                        .thenComparingInt(BlockVector3::getX);
+
     }
 
     /**
@@ -117,6 +123,7 @@ public abstract class BlockVector3 {
         return YzxOrderComparator.YZX_ORDER;
     }
 
+    //FAWE start
     public MutableBlockVector3 setComponents(double x, double y, double z) {
         return new MutableBlockVector3((int) x, (int) y, (int) z);
     }
@@ -157,22 +164,27 @@ public abstract class BlockVector3 {
     public BlockVector3 toImmutable() {
         return BlockVector3.at(getX(), getY(), getZ());
     }
+    //FAWE end
 
     /**
      * Get the X coordinate.
      *
      * @return the x coordinate
      */
+    //FAWE start - Made abstract
     public abstract int getX();
+    //FAWE end
 
     /**
      * Get the X coordinate.
      *
      * @return the x coordinate
      */
+    //FAWE start - getter
     public int getBlockX() {
         return getX();
     }
+    //FAWE end
 
     /**
      * Set the X coordinate.
@@ -180,25 +192,31 @@ public abstract class BlockVector3 {
      * @param x the new X
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 withX(int x) {
         return BlockVector3.at(x, getY(), getZ());
     }
+    //FAWE end
 
     /**
      * Get the Y coordinate.
      *
      * @return the y coordinate
      */
+    //FAWE start - Made abstract
     public abstract int getY();
+    //FAWE end
 
     /**
      * Get the Y coordinate.
      *
      * @return the y coordinate
      */
+    //FAWE start - getter
     public int getBlockY() {
         return getY();
     }
+    //FAWE end
 
     /**
      * Set the Y coordinate.
@@ -206,25 +224,31 @@ public abstract class BlockVector3 {
      * @param y the new Y
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 withY(int y) {
         return BlockVector3.at(getX(), y, getZ());
     }
+    //FAWE end
 
     /**
      * Get the Z coordinate.
      *
      * @return the z coordinate
      */
+    //FAWE start - Made abstract
     public abstract int getZ();
+    //FAWE end
 
     /**
      * Get the Z coordinate.
      *
      * @return the z coordinate
      */
+    //FAWE start - getter
     public int getBlockZ() {
         return getZ();
     }
+    //FAWE end
 
     /**
      * Set the Z coordinate.
@@ -232,9 +256,11 @@ public abstract class BlockVector3 {
      * @param z the new Z
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 withZ(int z) {
         return BlockVector3.at(getX(), getY(), z);
     }
+    //FAWE end
 
     /**
      * Add another vector to this vector and return the result as a new vector.
@@ -242,9 +268,11 @@ public abstract class BlockVector3 {
      * @param other the other vector
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 add(BlockVector3 other) {
         return add(other.getX(), other.getY(), other.getZ());
     }
+    //FAWE end
 
     /**
      * Add another vector to this vector and return the result as a new vector.
@@ -254,9 +282,11 @@ public abstract class BlockVector3 {
      * @param z the value to add
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 add(int x, int y, int z) {
         return BlockVector3.at(this.getX() + x, this.getY() + y, this.getZ() + z);
     }
+    //FAWE end
 
     /**
      * Add a list of vectors to this vector and return the
@@ -265,6 +295,7 @@ public abstract class BlockVector3 {
      * @param others an array of vectors
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 add(BlockVector3... others) {
         int newX = getX();
         int newY = getY();
@@ -278,6 +309,7 @@ public abstract class BlockVector3 {
 
         return BlockVector3.at(newX, newY, newZ);
     }
+    //FAWE end
 
     /**
      * Subtract another vector from this vector and return the result
@@ -286,9 +318,11 @@ public abstract class BlockVector3 {
      * @param other the other vector
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 subtract(BlockVector3 other) {
         return subtract(other.getX(), other.getY(), other.getZ());
     }
+    //FAWE end
 
     /**
      * Subtract another vector from this vector and return the result
@@ -299,9 +333,11 @@ public abstract class BlockVector3 {
      * @param z the value to subtract
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 subtract(int x, int y, int z) {
         return BlockVector3.at(this.getX() - x, this.getY() - y, this.getZ() - z);
     }
+    //FAWE end
 
     /**
      * Subtract a list of vectors from this vector and return the result
@@ -310,6 +346,7 @@ public abstract class BlockVector3 {
      * @param others an array of vectors
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 subtract(BlockVector3... others) {
         int newX = getX();
         int newY = getY();
@@ -323,6 +360,7 @@ public abstract class BlockVector3 {
 
         return BlockVector3.at(newX, newY, newZ);
     }
+    //FAWE end
 
     /**
      * Multiply this vector by another vector on each component.
@@ -330,9 +368,11 @@ public abstract class BlockVector3 {
      * @param other the other vector
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 multiply(BlockVector3 other) {
         return multiply(other.getX(), other.getY(), other.getZ());
     }
+    //FAWE end
 
     /**
      * Multiply this vector by another vector on each component.
@@ -342,9 +382,11 @@ public abstract class BlockVector3 {
      * @param z the value to multiply
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 multiply(int x, int y, int z) {
         return BlockVector3.at(this.getX() * x, this.getY() * y, this.getZ() * z);
     }
+    //FAWE end
 
     /**
      * Multiply this vector by zero or more vectors on each component.
@@ -352,6 +394,7 @@ public abstract class BlockVector3 {
      * @param others an array of vectors
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 multiply(BlockVector3... others) {
         int newX = getX();
         int newY = getY();
@@ -365,6 +408,7 @@ public abstract class BlockVector3 {
 
         return BlockVector3.at(newX, newY, newZ);
     }
+    //FAWE end
 
     /**
      * Perform scalar multiplication and return a new vector.
@@ -382,9 +426,11 @@ public abstract class BlockVector3 {
      * @param other the other vector
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 divide(BlockVector3 other) {
         return divide(other.getX(), other.getY(), other.getZ());
     }
+    //FAWE end
 
     /**
      * Divide this vector by another vector on each component.
@@ -394,9 +440,11 @@ public abstract class BlockVector3 {
      * @param z the value to divide by
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 divide(int x, int y, int z) {
         return BlockVector3.at(this.getX() / x, this.getY() / y, this.getZ() / z);
     }
+    //FAWE end
 
     /**
      * Perform scalar division and return a new vector.
@@ -416,9 +464,11 @@ public abstract class BlockVector3 {
      * @param z the value to shift z by
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 shr(int x, int y, int z) {
         return at(this.getX() >> x, this.getY() >> y, this.getZ() >> z);
     }
+    //FAWE end
 
     /**
      * Shift all components right by {@code n}.
@@ -438,9 +488,11 @@ public abstract class BlockVector3 {
      * @param z the value to shift z by
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 shl(int x, int y, int z) {
         return at(this.getX() << x, this.getY() << y, this.getZ() << z);
     }
+    //FAWE end
 
     /**
      * Shift all components left by {@code n}.
@@ -466,9 +518,11 @@ public abstract class BlockVector3 {
      *
      * @return length, squared
      */
+    //FAWE start - getter
     public int lengthSq() {
         return getX() * getX() + getY() * getY() + getZ() * getZ();
     }
+    //FAWE end
 
     /**
      * Get the distance between this vector and another vector.
@@ -486,12 +540,14 @@ public abstract class BlockVector3 {
      * @param other the other vector
      * @return distance
      */
+    //FAWE start - getter
     public int distanceSq(BlockVector3 other) {
         int dx = other.getX() - getX();
         int dy = other.getY() - getY();
         int dz = other.getZ() - getZ();
         return dx * dx + dy * dy + dz * dz;
     }
+    //FAWE end
 
     /**
      * Get the normalized vector, which is the vector divided by its
@@ -499,6 +555,7 @@ public abstract class BlockVector3 {
      *
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 normalize() {
         double len = length();
         double x = this.getX() / len;
@@ -506,6 +563,7 @@ public abstract class BlockVector3 {
         double z = this.getZ() / len;
         return BlockVector3.at(x, y, z);
     }
+    //FAWE end
 
     /**
      * Gets the dot product of this and another vector.
@@ -513,9 +571,11 @@ public abstract class BlockVector3 {
      * @param other the other vector
      * @return the dot product of this and the other vector
      */
+    //FAWE start - getter
     public double dot(BlockVector3 other) {
         return getX() * other.getX() + getY() * other.getY() + getZ() * other.getZ();
     }
+    //FAWE end
 
     /**
      * Gets the cross product of this and another vector.
@@ -523,13 +583,15 @@ public abstract class BlockVector3 {
      * @param other the other vector
      * @return the cross product of this and the other vector
      */
+    //FAWE start - getter
     public BlockVector3 cross(BlockVector3 other) {
         return new BlockVector3Imp(
-            getY() * other.getZ() - getZ() * other.getY(),
-            getZ() * other.getX() - getX() * other.getZ(),
-            getX() * other.getY() - getY() * other.getX()
+                getY() * other.getZ() - getZ() * other.getY(),
+                getZ() * other.getX() - getX() * other.getZ(),
+                getX() * other.getY() - getY() * other.getX()
         );
     }
+    //FAWE end
 
     /**
      * Checks to see if a vector is contained with another.
@@ -538,10 +600,12 @@ public abstract class BlockVector3 {
      * @param max the maximum point (X, Y, and Z are the lowest)
      * @return true if the vector is contained
      */
+    //FAWE start - getter
     public boolean containedWithin(BlockVector3 min, BlockVector3 max) {
         return getX() >= min.getX() && getX() <= max.getX() && getY() >= min.getY() && getY() <= max
-            .getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
+                .getY() && getZ() >= min.getZ() && getZ() <= max.getZ();
     }
+    //FAWE end
 
     /**
      * Clamp the Y component.
@@ -550,6 +614,7 @@ public abstract class BlockVector3 {
      * @param max the maximum value
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 clampY(int min, int max) {
         checkArgument(min <= max, "minimum cannot be greater than maximum");
         if (getY() < min) {
@@ -560,6 +625,7 @@ public abstract class BlockVector3 {
         }
         return this;
     }
+    //FAWE end
 
     /**
      * Floors the values of all components.
@@ -599,21 +665,24 @@ public abstract class BlockVector3 {
      *
      * @return a new vector
      */
+    //FAWE start - getter
     public BlockVector3 abs() {
         return BlockVector3.at(Math.abs(getX()), Math.abs(getY()), Math.abs(getZ()));
     }
+    //FAWE end
 
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle in degrees
-     * @param aboutX about which x coordinate to rotate
-     * @param aboutZ about which z coordinate to rotate
+     * @param angle      in degrees
+     * @param aboutX     about which x coordinate to rotate
+     * @param aboutZ     about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
      * @see AffineTransform another method to transform vectors
      */
+    //FAWE start - getter
     public BlockVector3 transform2D(double angle, double aboutX, double aboutZ, double translateX, double translateZ) {
         angle = Math.toRadians(angle);
         double x = this.getX() - aboutX;
@@ -624,11 +693,12 @@ public abstract class BlockVector3 {
         double z2 = x * sin + z * cos;
 
         return BlockVector3.at(
-            x2 + aboutX + translateX,
-            getY(),
-            z2 + aboutZ + translateZ
+                x2 + aboutX + translateX,
+                getY(),
+                z2 + aboutZ + translateZ
         );
     }
+    //FAWE end
 
     /**
      * Get this vector's pitch as used within the game.
@@ -670,6 +740,7 @@ public abstract class BlockVector3 {
      * @param v2 the second vector
      * @return minimum
      */
+    //FAWE start - getter
     public BlockVector3 getMinimum(BlockVector3 v2) {
         return new BlockVector3Imp(
                 Math.min(getX(), v2.getX()),
@@ -677,6 +748,7 @@ public abstract class BlockVector3 {
                 Math.min(getZ(), v2.getZ())
         );
     }
+    //FAWE end
 
     /**
      * Gets the maximum components of two vectors.
@@ -684,6 +756,7 @@ public abstract class BlockVector3 {
      * @param v2 the second vector
      * @return maximum
      */
+    //FAWE start - getter
     public BlockVector3 getMaximum(BlockVector3 v2) {
         return new BlockVector3Imp(
                 Math.max(getX(), v2.getX()),
@@ -691,7 +764,9 @@ public abstract class BlockVector3 {
                 Math.max(getZ(), v2.getZ())
         );
     }
+    //FAWE end
 
+    //FAWE start
     /*
     Methods for getting/setting blocks
 
@@ -789,6 +864,7 @@ public abstract class BlockVector3 {
 
     /**
      * Returns a string representation that is supported by the parser.
+     *
      * @return string
      */
     public String toParserString() {
@@ -799,5 +875,6 @@ public abstract class BlockVector3 {
     public BlockVector3 plus(BlockVector3 other) {
         return add(other);
     }
+    //FAWE end
 
 }

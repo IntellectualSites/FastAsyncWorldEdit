@@ -12,10 +12,10 @@ import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.player.PlotPlayer;
 
 @CommandDeclaration(command = "trimchunks",
-    permission = "plots.admin",
-    description = "Delete unmodified portions of your plotworld",
-    requiredType = RequiredType.PLAYER,
-    category = CommandCategory.ADMINISTRATION)
+        permission = "plots.admin",
+        description = "Delete unmodified portions of your plotworld",
+        requiredType = RequiredType.PLAYER,
+        category = CommandCategory.ADMINISTRATION)
 public class FaweTrim extends SubCommand {
 
     private boolean ran = false;
@@ -28,7 +28,7 @@ public class FaweTrim extends SubCommand {
         }
         if (strings.length != 2) {
             plotPlayer.sendMessage(StaticCaption
-                .of("First make a backup of your world called <world-copy> then stand in the middle of an empty plot"));
+                    .of("First make a backup of your world called <world-copy> then stand in the middle of an empty plot"));
             plotPlayer.sendMessage(StaticCaption.of("use /plot trimall <world> <boolean-delete-unowned>"));
             return false;
         }
@@ -52,4 +52,5 @@ public class FaweTrim extends SubCommand {
         });
         return true;
     }
+
 }

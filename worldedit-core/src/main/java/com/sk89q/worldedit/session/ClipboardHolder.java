@@ -55,16 +55,19 @@ public class ClipboardHolder {
      * not contain its effect.
      * </p>
      *
-     * @deprecated FAWE supports multiple loaded schematics {@link #getClipboards()}
      * @return the clipboard
+     * @deprecated FAWE supports multiple loaded schematics {@link #getClipboards()}
      */
     @Deprecated
     public Clipboard getClipboard() {
         return clipboard;
     }
 
+    //FAWE start
+
     /**
      * Gets all currently held clipboards.
+     *
      * @return all clipboards being held.
      */
     public List<Clipboard> getClipboards() {
@@ -77,13 +80,15 @@ public class ClipboardHolder {
 
     /**
      * Gets all end ClipboardHolders<br/>
-     *  - Usually this will return itself.<br/>
-     *  - If this is a multi clipboard, it will return the children
+     * - Usually this will return itself.<br/>
+     * - If this is a multi clipboard, it will return the children
+     *
      * @return a List of end ClipboardHolders
      */
     public List<ClipboardHolder> getHolders() {
         return Collections.singletonList(this);
     }
+    //FAWE end
 
     /**
      * Set the transform.
@@ -119,7 +124,6 @@ public class ClipboardHolder {
         }
         clipboard = null;
     }
-
 
 
 }

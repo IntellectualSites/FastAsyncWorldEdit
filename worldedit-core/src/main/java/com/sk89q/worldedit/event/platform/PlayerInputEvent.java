@@ -37,7 +37,7 @@ public class PlayerInputEvent extends Event implements Cancellable {
     /**
      * Create a new event.
      *
-     * @param player the player
+     * @param player    the player
      * @param inputType the input type
      */
     public PlayerInputEvent(Player player, InputType inputType) {

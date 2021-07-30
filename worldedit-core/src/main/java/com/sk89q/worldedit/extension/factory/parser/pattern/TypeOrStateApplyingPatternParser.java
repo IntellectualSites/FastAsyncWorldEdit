@@ -80,8 +80,10 @@ public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> {
         String type = parts[0];
 
         if (parts.length == 1) {
-            return new TypeApplyingPattern(extent,
-                    worldEdit.getBlockFactory().parseFromInput(type, context).getBlockType().getDefaultState());
+            return new TypeApplyingPattern(
+                    extent,
+                    worldEdit.getBlockFactory().parseFromInput(type, context).getBlockType().getDefaultState()
+            );
         } else {
             // states given
             if (!parts[1].endsWith("]")) {
@@ -106,15 +108,20 @@ public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> {
                     throw new InputParseException(Caption.of("worldedit.error.parser.empty-value"));
                 }
                 if (statesToSet.put(prop, value) != null) {
-                    throw new InputParseException(Caption.of("worldedit.error.parser.duplicate-property", TextComponent.of(prop)));
+                    throw new InputParseException(Caption.of(
+                            "worldedit.error.parser.duplicate-property",
+                            TextComponent.of(prop)
+                    ));
                 }
             }
             if (type.isEmpty()) {
                 return new StateApplyingPattern(extent, statesToSet);
             } else {
                 Extent buffer = new ExtentBuffer(extent);
-                Pattern typeApplier = new TypeApplyingPattern(buffer,
-                        worldEdit.getBlockFactory().parseFromInput(type, context).getBlockType().getDefaultState());
+                Pattern typeApplier = new TypeApplyingPattern(
+                        buffer,
+                        worldEdit.getBlockFactory().parseFromInput(type, context).getBlockType().getDefaultState()
+                );
                 Pattern stateApplier = new StateApplyingPattern(buffer, statesToSet);
                 return new ExtentBufferedCompositePattern(buffer, typeApplier, stateApplier);
             }

@@ -31,6 +31,7 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 import java.util.Map;
 
 public class FlowerPotCompatibilityHandler implements NBTCompatibilityHandler {
+
     @Override
     public <B extends BlockStateHolder<B>> boolean isAffectedBlock(B block) {
         return block.getBlockType() == BlockTypes.FLOWER_POT;
@@ -94,4 +95,5 @@ public class FlowerPotCompatibilityHandler implements NBTCompatibilityHandler {
         }
         return null;
     }
+
 }

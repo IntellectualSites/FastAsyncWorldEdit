@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.jnbt.streamer;
 import java.io.IOException;
 
 public interface ValueReader<T> extends StreamReader<T> {
+
     void apply(int index, T value) throws IOException;
 
     default void applyInt(int index, int value) throws IOException {
@@ -20,4 +21,5 @@ public interface ValueReader<T> extends StreamReader<T> {
     default void applyDouble(int index, double value) throws IOException {
         apply(index, (T) (Double) value);
     }
+
 }

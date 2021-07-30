@@ -5,6 +5,7 @@ package com.fastasyncworldedit.core.configuration;
  * MemoryConfiguration}
  */
 public class MemoryConfigurationOptions extends ConfigurationOptions {
+
     protected MemoryConfigurationOptions(final MemoryConfiguration configuration) {
         super(configuration);
     }
@@ -25,4 +26,5 @@ public class MemoryConfigurationOptions extends ConfigurationOptions {
         super.pathSeparator(value);
         return this;
     }
+
 }

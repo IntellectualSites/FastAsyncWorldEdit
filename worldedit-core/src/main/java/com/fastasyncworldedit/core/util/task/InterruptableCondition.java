@@ -6,6 +6,7 @@ import java.util.concurrent.locks.Lock;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class InterruptableCondition {
+
     private final Condition condition;
     private final Thread thread;
     private final Lock lock;
@@ -31,4 +32,5 @@ public class InterruptableCondition {
     public void interrupt() {
         this.thread.interrupt();
     }
+
 }

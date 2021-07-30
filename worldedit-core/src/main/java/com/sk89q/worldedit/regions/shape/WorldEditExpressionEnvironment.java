@@ -19,18 +19,20 @@
 
 package com.sk89q.worldedit.regions.shape;
 
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.expression.ExpressionEnvironment;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.Vector3;
 
 public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
 
     private final Vector3 unit;
     private final Vector3 zero2;
+    //FAWE start - MutableVector3
     private Vector3 current = new MutableVector3(Vector3.ZERO);
+    //FAWE end
     private final Extent extent;
 
     public WorldEditExpressionEnvironment(EditSession editSession, Vector3 unit, Vector3 zero) {
@@ -46,10 +48,6 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
     public BlockVector3 toWorld(double x, double y, double z) {
         // unscale, unoffset, round-nearest
         return Vector3.at(x, y, z).multiply(unit).add(zero2).toBlockPoint();
-    }
-
-    public Vector3 toWorldRel(double x, double y, double z) {
-        return current.add(x, y, z);
     }
 
     @SuppressWarnings("deprecation")
@@ -88,9 +86,15 @@ public class WorldEditExpressionEnvironment implements ExpressionEnvironment {
         return extent.getBlock(toWorld(x, y, z)).getBlockType().getLegacyCombinedId() & 0xF;
     }
 
+    //FAWE start
     public void setCurrentBlock(int x, int y, int z) {
         current.setComponents(x, y, z);
     }
+
+    public Vector3 toWorldRel(double x, double y, double z) {
+        return current.add(x, y, z);
+    }
+    //FAWe end
 
     public void setCurrentBlock(Vector3 current) {
         this.current = current;

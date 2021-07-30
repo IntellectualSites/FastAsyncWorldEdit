@@ -31,7 +31,8 @@ import java.lang.reflect.Type;
 public class BlockVectorAdapter implements JsonDeserializer<BlockVector3> {
 
     @Override
-    public BlockVector3 deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public BlockVector3 deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws
+            JsonParseException {
         JsonArray jsonArray = json.getAsJsonArray();
         if (jsonArray.size() != 3) {
             throw new JsonParseException("Expected array of 3 length for BlockVector3");
@@ -43,4 +44,5 @@ public class BlockVectorAdapter implements JsonDeserializer<BlockVector3> {
 
         return BlockVector3.at(x, y, z);
     }
+
 }

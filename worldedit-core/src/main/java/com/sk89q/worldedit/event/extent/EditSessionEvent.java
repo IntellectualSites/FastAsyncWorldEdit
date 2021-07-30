@@ -32,6 +32,8 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.EditSession.Stage;
@@ -72,15 +74,17 @@ public class EditSessionEvent extends Event implements Cancellable {
     private final List<TracingExtent> tracingExtents = new ArrayList<>();
     private Extent extent;
     private boolean tracing;
+    //FAWE start
     private boolean cancelled;
+    //FAWE end
 
     /**
      * Create a new event.
      *
-     * @param world the world
-     * @param actor the actor, or null if there is no actor specified
+     * @param world     the world
+     * @param actor     the actor, or null if there is no actor specified
      * @param maxBlocks the maximum number of block changes
-     * @param stage the stage
+     * @param stage     the stage
      */
     public EditSessionEvent(@Nullable World world, Actor actor, int maxBlocks, Stage stage) {
         this.world = world;
@@ -156,6 +160,7 @@ public class EditSessionEvent extends Event implements Cancellable {
      * Set tracing enabled, with the current extent as the "base".
      *
      * <em>Internal use only.</em>
+     *
      * @param tracing if tracing is enabled
      */
     public void setTracing(boolean tracing) {
@@ -171,16 +176,6 @@ public class EditSessionEvent extends Event implements Cancellable {
         return tracingExtents;
     }
 
-    @Override
-    public boolean isCancelled() {
-        return cancelled;
-    }
-
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
-
     /**
      * Create a clone of this event with the given stage.
      *
@@ -190,5 +185,17 @@ public class EditSessionEvent extends Event implements Cancellable {
     public EditSessionEvent clone(Stage stage) {
         return new EditSessionEvent(world, actor, maxBlocks, stage);
     }
+
+    //FAWE start
+    @Override
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+    //FAWE end
 
 }

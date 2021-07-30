@@ -19,16 +19,18 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.fastasyncworldedit.core.object.io.PGZIPOutputStream;
-import com.fastasyncworldedit.core.object.io.ResettableFileInputStream;
-import com.fastasyncworldedit.core.object.schematic.MinecraftStructure;
-import com.fastasyncworldedit.core.object.schematic.PNGWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
+import com.fastasyncworldedit.core.extent.clipboard.io.schematic.PNGWriter;
+import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.NamedTag;
 import com.sk89q.jnbt.Tag;
+import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -48,8 +50,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public enum BuiltInClipboardFormat implements ClipboardFormat {
 
+    //FAWE start - register fast clipboard io
     FAST("fast", "fawe") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
@@ -68,11 +70,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             OutputStream gzip;
-            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+            if (outputStream instanceof ParallelGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
                 gzip = outputStream;
             } else {
                 outputStream = new BufferedOutputStream(outputStream);
-                gzip = new PGZIPOutputStream(outputStream);
+                gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new FastSchematicWriter(nbtStream);
@@ -85,12 +87,12 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         }
 
     },
+    //FAWE end
 
     /**
      * The Schematic format used by MCEdit.
      */
     MCEDIT_SCHEMATIC("mcedit", "mce", "schematic") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schematic";
@@ -104,7 +106,10 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            throw new IOException("The formats `.schematic`, `.mcedit` and `.mce` are discontinued on versions newer than 1.12 and superseded by the sponge schematic implementation known for `.schem` files.");
+            //FAWE start - be a more helpful exception
+            throw new IOException("The formats `.schematic`, `.mcedit` and `.mce` are discontinued on versions newer than" +
+                    "1.12 and superseded by the sponge schematic implementation known for `.schem` files.");
+            //FAWE end
         }
 
         @Override
@@ -115,11 +120,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
     },
 
     SPONGE_SCHEMATIC("sponge", "schem") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
         }
+
         @Override
         public ClipboardReader getReader(InputStream inputStream) throws IOException {
             NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(inputStream));
@@ -154,8 +159,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         }
     },
 
+    //FAWE start - recover schematics with bad entity data & register other clipboard formats
     BROKENENTITY("brokenentity", "legacyentity", "le", "be", "brokenentities", "legacyentities") {
-
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
@@ -176,11 +181,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             OutputStream gzip;
-            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+            if (outputStream instanceof ParallelGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
                 gzip = outputStream;
             } else {
                 outputStream = new BufferedOutputStream(outputStream);
-                gzip = new PGZIPOutputStream(outputStream);
+                gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             FastSchematicWriter writer = new FastSchematicWriter(nbtStream);
@@ -215,7 +220,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             outputStream = new BufferedOutputStream(outputStream);
-            OutputStream gzip = new PGZIPOutputStream(outputStream);
+            OutputStream gzip = new ParallelGZIPOutputStream(outputStream);
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new MinecraftStructure(nbtStream);
         }
@@ -231,7 +236,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
      * Isometric PNG writer.
      */
     PNG("png", "image") {
-
         @Override
         public ClipboardReader getReader(InputStream inputStream) {
             return null;
@@ -252,6 +256,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return "png";
         }
     };
+    //FAWE end
 
     private final ImmutableSet<String> aliases;
 
