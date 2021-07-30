@@ -2,12 +2,12 @@ package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.palmergames.bukkit.towny.Towny;
+import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.PlayerCache;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
-import com.palmergames.bukkit.towny.object.TownyUniverse;
 import com.palmergames.bukkit.towny.object.WorldCoord;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -38,7 +38,7 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
         }
         Resident resident;
         try {
-            resident = TownyUniverse.getDataSource().getResident(player.getName());
+            resident = TownyUniverse.getInstance().getResident(player.getName());
             try {
                 if (block.getResident().equals(resident)) {
                     return true;

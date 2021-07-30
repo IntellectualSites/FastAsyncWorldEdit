@@ -99,7 +99,7 @@ dependencies {
     }
     implementation("com.massivecraft:mcore:7.0.1") { isTransitive = false }
     implementation("com.bekvon.bukkit.residence:Residence:4.5._13.1") { isTransitive = false }
-    implementation("com.palmergames.bukkit:towny:0.84.0.9") { isTransitive = false }
+    compileOnly("com.github.TownyAdvanced:Towny:0.97.0.17") { isTransitive = false }
     implementation("com.comphenix.protocol:ProtocolLib:4.7.0") { isTransitive = false }
     implementation("org.incendo.serverlib:ServerLib:2.2.1")
     api("com.plotsquared:PlotSquared-Bukkit:6.0.6-SNAPSHOT") { isTransitive = false }

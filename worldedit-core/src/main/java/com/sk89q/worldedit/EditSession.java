@@ -1150,6 +1150,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
+        return this.changes = super.setBlocks(region, block);
+    }
+
+    @Override
+    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
+        return this.changes = super.setBlocks(region, pattern);
+    }
     //FAWE end
 
     //FAWE start
@@ -1570,32 +1580,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 position.add(adjustment)
         );
         return replaceBlocks(region, mask, BlockTypes.AIR.getDefaultState());
-    }
-
-    /**
-     * Sets all the blocks inside a region to a given block type.
-     *
-     * @param region the region
-     * @param block the block
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    @Override
-    public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        return this.changes = super.setBlocks(region, block);
-    }
-
-    /**
-     * Sets all the blocks inside a region to a given pattern.
-     *
-     * @param region the region
-     * @param pattern the pattern that provides the replacement block
-     * @return number of blocks affected
-     * @throws MaxChangedBlocksException thrown if too many blocks are changed
-     */
-    @Override
-    public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
-        return this.changes = super.setBlocks(region, pattern);
     }
 
     /**
