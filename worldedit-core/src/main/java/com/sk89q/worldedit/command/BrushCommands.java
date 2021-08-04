@@ -997,11 +997,14 @@ public class BrushCommands {
         // TODO NOT IMPLEMENTED
         //        UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
     }
+    //FAWE end
 
     static void setOperationBasedBrush(
             Player player,
             LocalSession session,
+            //FAWE start - Expression > double
             Expression radius,
+            //FAWE end
             Contextual<? extends Operation> factory,
             RegionFactory shape,
             String permission
@@ -1013,9 +1016,9 @@ public class BrushCommands {
         tool.setFill(null);
         tool.setBrush(new OperationFactoryBrush(factory, shape, session), permission);
 
-        player.print(TextComponent.of("Set brush to " + factory));
+        player.print(Caption.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
+        ToolCommands.sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
-    //FAWE end
 
     @Command(
             name = "deform",
@@ -1418,6 +1421,7 @@ public class BrushCommands {
         bs.setBrush(brush);
         return process(player, arguments, bs);
     }
+    //FAWE end
 
     static void setOperationBasedBrush(
             Player player, LocalSession session, double radius,
@@ -1434,5 +1438,4 @@ public class BrushCommands {
         player.print(Caption.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
         ToolCommands.sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
-    //FAWE end
 }
