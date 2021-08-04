@@ -63,6 +63,9 @@ public class BlockType implements Keyed, Pattern {
     private final BlockTypesCache.Settings settings;
     private final LazyReference<FuzzyBlockState> emptyFuzzy
             = LazyReference.from(() -> new FuzzyBlockState(this));
+    @Deprecated
+    private final LazyReference<String> name = LazyReference.from(() -> WorldEdit.getInstance().getPlatformManager()
+            .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getName(this));
 
     //FAWE start
     private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
@@ -120,6 +123,7 @@ public class BlockType implements Keyed, Pattern {
         String id = getId();
         return id.substring(id.indexOf(':') + 1);
     }
+    //FAWE end
 
     /**
      * Gets the name of this block, or the ID if the name cannot be found.
@@ -129,7 +133,11 @@ public class BlockType implements Keyed, Pattern {
      */
     @Deprecated
     public String getName() {
-        return getRichName().toString();
+        String name = this.name.getValue();
+        if (name == null || name.isEmpty()) {
+            return getId();
+        }
+        return name;
     }
 
     /*
