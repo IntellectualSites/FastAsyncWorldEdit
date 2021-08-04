@@ -91,8 +91,10 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.factory.Apply;
+import com.sk89q.worldedit.function.factory.ApplyLayer;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Paint;
+import com.sk89q.worldedit.function.factory.Snow;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -101,6 +103,7 @@ import com.sk89q.worldedit.internal.annotation.ClipboardMask;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.factory.CylinderRegionFactory;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.HandSide;
@@ -1012,6 +1015,7 @@ public class BrushCommands {
 
         player.print(TextComponent.of("Set brush to " + factory));
     }
+    //FAWE end
 
     @Command(
             name = "deform",
@@ -1116,7 +1120,30 @@ public class BrushCommands {
                 new Deform("y+=1"), shape, "worldedit.brush.lower"
         );
     }
-    //FAWE end
+
+    @Command(
+            name = "snow",
+            desc = "Snow brush, sets snow in the area"
+    )
+    @CommandPermissions("worldedit.brush.snow")
+    public void snow(
+            Player player, LocalSession localSession,
+            @Arg(desc = "The shape of the region")
+                    RegionFactory shape,
+            @Arg(desc = "The size of the brush", def = "5")
+                    double radius,
+            @Switch(name = 's', desc = "Whether to stack snow")
+                    boolean stack
+    ) throws WorldEditException {
+
+        if (shape instanceof CylinderRegionFactory) {
+            shape = new CylinderRegionFactory(radius);
+        }
+
+        setOperationBasedBrush(player, localSession, radius,
+                new ApplyLayer(new Snow(stack)), shape, "worldedit.brush.snow"
+        );
+    }
 
     @Command(
             name = "sphere",
