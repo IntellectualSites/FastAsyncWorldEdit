@@ -67,12 +67,14 @@ import org.bukkit.inventory.InventoryHolder;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -466,8 +468,9 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public void simulateBlockMine(BlockVector3 pt) {
-        getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
+    public Collection<BaseItemStack> simulateBlockMine(BlockVector3 pt) {
+        return getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).getDrops().stream()
+                .map(BukkitAdapter::adapt).collect(Collectors.toList());
     }
 
     @Override

@@ -4,7 +4,6 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
@@ -39,6 +38,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -231,13 +231,8 @@ public class WorldWrapper extends AbstractWorld {
     }
 
     @Override
-    public void simulateBlockMine(BlockVector3 pt) {
-        TaskManager.IMP.sync(new RunnableVal<Object>() {
-            @Override
-            public void run(Object value) {
-                parent.simulateBlockMine(pt);
-            }
-        });
+    public Collection<BaseItemStack> simulateBlockMine(BlockVector3 pt) {
+        return TaskManager.IMP.sync(() -> parent.simulateBlockMine(pt));
     }
 
     @Override

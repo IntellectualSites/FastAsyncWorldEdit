@@ -19,13 +19,18 @@
 
 package com.sk89q.worldedit.extent.world;
 
+import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+
+import java.util.Collection;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -91,8 +96,21 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (toolUse && block.getBlockType().getMaterial().isAir()) {
-            world.simulateBlockMine(location);
-            return true;
+            Collection<BaseItemStack> drops = world.simulateBlockMine(location);
+            boolean canSet = super.setBlock(location, block);
+            if (canSet) {
+                for (BaseItemStack stack : drops) {
+                    TaskManager.IMP.sync(new RunnableVal<>() {
+                        @Override
+                        public void run(Object value) {
+                            world.dropItem(location.toVector3(), stack);
+                        }
+                    });
+                }
+                return true;
+            } else {
+                return false;
+            }
         } else {
             // Can't be an inlined check due to inconsistent generic return type
             if (stripNbt) {

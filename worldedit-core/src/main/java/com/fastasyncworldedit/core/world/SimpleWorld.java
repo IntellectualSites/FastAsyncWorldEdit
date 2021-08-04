@@ -24,6 +24,8 @@ import com.sk89q.worldedit.world.weather.WeatherTypes;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.function.Supplier;
 
 /**
@@ -118,12 +120,13 @@ public interface SimpleWorld extends World {
     }
 
     @Override
-    default void simulateBlockMine(BlockVector3 position) {
+    default Collection<BaseItemStack> simulateBlockMine(BlockVector3 position) {
         try {
             setBlock(position, BlockTypes.AIR.getDefaultState());
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
+        return Collections.emptyList();
     }
 
     @Override

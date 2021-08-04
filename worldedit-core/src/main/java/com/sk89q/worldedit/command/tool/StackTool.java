@@ -63,7 +63,6 @@ public class StackTool implements BlockTool {
             BlockStateHolder<?> block = editSession.getFullBlock(clicked.toVector().toBlockPoint());
 
             try {
-                editSession.disableBuffering();
                 BlockVector3 position = clicked.toVector().toBlockPoint();
                 for (int i = 0; i < range; i++) {
                     position = position.add(face.toBlockVector());
