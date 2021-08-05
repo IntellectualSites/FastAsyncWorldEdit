@@ -24,8 +24,6 @@ import com.sk89q.worldedit.world.weather.WeatherTypes;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.function.Supplier;
 
 /**
