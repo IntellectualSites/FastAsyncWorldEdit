@@ -1,4 +1,4 @@
-package com.sk89q.util;
+package com.fastasyncworldedit.util;
 
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import org.junit.jupiter.api.Test;

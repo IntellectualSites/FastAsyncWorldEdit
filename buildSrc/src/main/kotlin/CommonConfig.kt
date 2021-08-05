@@ -1,9 +1,7 @@
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.jvm.toolchain.JavaLanguageVersion
-import org.gradle.jvm.toolchain.JvmVendorSpec
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.repositories
 import org.gradle.kotlin.dsl.the
 
@@ -56,15 +54,15 @@ fun Project.applyCommonConfiguration() {
                     continue
                 }
                 add(conf.name, "com.google.guava:guava") {
-                    version { require(Versions.GUAVA) }
+                    version { require("21.0") }
                     because("Mojang provides Guava")
                 }
                 add(conf.name, "com.google.code.gson:gson") {
-                    version { require(Versions.GSON) }
+                    version { require("2.8.0") }
                     because("Mojang provides Gson")
                 }
                 add(conf.name, "it.unimi.dsi:fastutil") {
-                    version { require(Versions.FAST_UTIL) }
+                    version { require("8.2.1") }
                     because("Mojang provides FastUtil")
                 }
             }

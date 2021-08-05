@@ -64,7 +64,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      * Construct a block with the given type and default data.
      *
      * @param blockType The block type
-     * @deprecated Just use the BlockType.getDefaultState()
+     * @deprecated FAWE deprecation - Just use the {@link BlockType#getDefaultState()}
      */
     @Deprecated
     public BaseBlock(BlockType blockType) {

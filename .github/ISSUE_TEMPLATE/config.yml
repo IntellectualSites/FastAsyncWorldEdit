@@ -1,8 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Reporting Security Vulnerabilities
-    url: https://forms.gle/btgdRn9yhGtzEiGW8
-    about: Use this form to report security vulnerabilities. Do not use the public issue tracker.
   - name: IntellectualSites Discord
     url: https://discord.gg/intellectualsites
     about: Our support Discord, please ask questions and seek support here.

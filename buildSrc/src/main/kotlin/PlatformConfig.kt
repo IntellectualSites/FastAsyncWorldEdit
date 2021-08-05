@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
@@ -44,18 +45,22 @@ fun Project.applyPlatformAndCoreConfiguration() {
             options.compilerArgs.add("-parameters")
         }
 
+    configurations.all {
+        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 16)
+    }
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
     }
 
     dependencies {
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
-        "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
-        "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
-        "testImplementation"("net.bytebuddy:byte-buddy:1.11.0")
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
+        "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.7.2")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.7.2")
+        "testImplementation"("org.mockito:mockito-core:3.11.2")
+        "testImplementation"("org.mockito:mockito-junit-jupiter:3.11.2")
+        "testImplementation"("net.bytebuddy:byte-buddy:1.11.9")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:3.11.2")
     }
 
     // Java 8 turns on doclint which we fail

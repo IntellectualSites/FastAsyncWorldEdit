@@ -37,7 +37,7 @@ import java.util.function.Function;
  *
  * @deprecated JNBT is being removed in WE8.
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public class AdventureNBTConverter {
 
     private static final BiMap<Class<? extends Tag>, BinaryTagType<?>> TAG_TYPES =

@@ -91,8 +91,10 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.Contextual;
 import com.sk89q.worldedit.function.factory.Apply;
+import com.sk89q.worldedit.function.factory.ApplyLayer;
 import com.sk89q.worldedit.function.factory.Deform;
 import com.sk89q.worldedit.function.factory.Paint;
+import com.sk89q.worldedit.function.factory.Snow;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -101,6 +103,7 @@ import com.sk89q.worldedit.internal.annotation.ClipboardMask;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.factory.CylinderRegionFactory;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.HandSide;
@@ -994,11 +997,14 @@ public class BrushCommands {
         // TODO NOT IMPLEMENTED
         //        UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
     }
+    //FAWE end
 
     static void setOperationBasedBrush(
             Player player,
             LocalSession session,
+            //FAWE start - Expression > double
             Expression radius,
+            //FAWE end
             Contextual<? extends Operation> factory,
             RegionFactory shape,
             String permission
@@ -1010,7 +1016,8 @@ public class BrushCommands {
         tool.setFill(null);
         tool.setBrush(new OperationFactoryBrush(factory, shape, session), permission);
 
-        player.print(TextComponent.of("Set brush to " + factory));
+        player.print(Caption.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
+        ToolCommands.sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
 
     @Command(
@@ -1116,7 +1123,30 @@ public class BrushCommands {
                 new Deform("y+=1"), shape, "worldedit.brush.lower"
         );
     }
-    //FAWE end
+
+    @Command(
+            name = "snow",
+            desc = "Snow brush, sets snow in the area"
+    )
+    @CommandPermissions("worldedit.brush.snow")
+    public void snow(
+            Player player, LocalSession localSession,
+            @Arg(desc = "The shape of the region")
+                    RegionFactory shape,
+            @Arg(desc = "The size of the brush", def = "5")
+                    double radius,
+            @Switch(name = 's', desc = "Whether to stack snow")
+                    boolean stack
+    ) throws WorldEditException {
+
+        if (shape instanceof CylinderRegionFactory) {
+            shape = new CylinderRegionFactory(radius);
+        }
+
+        setOperationBasedBrush(player, localSession, radius,
+                new ApplyLayer(new Snow(stack)), shape, "worldedit.brush.snow"
+        );
+    }
 
     @Command(
             name = "sphere",
@@ -1391,6 +1421,7 @@ public class BrushCommands {
         bs.setBrush(brush);
         return process(player, arguments, bs);
     }
+    //FAWE end
 
     static void setOperationBasedBrush(
             Player player, LocalSession session, double radius,
@@ -1407,5 +1438,4 @@ public class BrushCommands {
         player.print(Caption.of("worldedit.brush.operation.equip", TextComponent.of(factory.toString())));
         ToolCommands.sendUnbindInstruction(player, UNBIND_COMMAND_COMPONENT);
     }
-    //FAWE end
 }

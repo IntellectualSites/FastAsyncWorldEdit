@@ -13,18 +13,24 @@ applyShadowConfiguration()
 addJarManifest(WorldEditKind.Standalone("com.sk89q.worldedit.cli.CLIWorldEdit"))
 
 dependencies {
-    compileOnly(project(":worldedit-libs:core:ap"))
-    annotationProcessor(project(":worldedit-libs:core:ap"))
-    annotationProcessor("com.google.guava:guava:${Versions.GUAVA}")
-    api(project(":worldedit-core"))
-    implementation(platform("org.apache.logging.log4j:log4j-bom:2.14.1") {
+    // Modules
+    api(projects.worldeditCore)
+    compileOnly(projects.worldeditLibs.core.ap)
+    annotationProcessor(projects.worldeditLibs.core.ap)
+
+    // Minecraft expectations
+    annotationProcessor(libs.guava)
+    implementation(libs.guava)
+    implementation(libs.gson)
+
+    // Logging
+    implementation(libs.log4jBom) {
         because("We control Log4J on this platform")
-    })
-    implementation("org.apache.logging.log4j:log4j-api")
-    implementation("org.apache.logging.log4j:log4j-core")
+    }
+    implementation(libs.log4j)
+    implementation(libs.log4jCore
+    )
     implementation("commons-cli:commons-cli:1.4")
-    implementation("com.google.guava:guava")
-    implementation("com.google.code.gson:gson")
 }
 
 tasks.named<ShadowJar>("shadowJar") {

@@ -19,6 +19,9 @@
 
 package com.sk89q.worldedit.session.request;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -27,19 +30,15 @@ import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Describes the current request using a {@link ThreadLocal}.
+ * Describes the current request
  */
 public final class Request {
 
-    private static final ThreadLocal<Request> threadLocal = ThreadLocal.withInitial(Request::new);
-    //FAWE start
-    // TODO any better way to deal with this?
-    private static final Map<Thread, Request> requests = new ConcurrentHashMap<>();
-    //FAWE end
+    private static final LoadingCache<Thread, Request> THREAD_TO_REQUEST = CacheBuilder.newBuilder()
+            .weakKeys()
+            .build(CacheLoader.from(Request::new));
 
     @Nullable
     private World world;
@@ -55,13 +54,12 @@ public final class Request {
     private Extent extent;
     //FAWE end
 
-    //FAWE start
     private Request() {
-        requests.put(Thread.currentThread(), this);
     }
 
+    //FAWE start
     public static Collection<Request> getAll() {
-        return requests.values();
+        return THREAD_TO_REQUEST.asMap().values();
     }
     //FAWE end
 
@@ -160,7 +158,7 @@ public final class Request {
      * @return the current request
      */
     public static Request request() {
-        return threadLocal.get();
+        return THREAD_TO_REQUEST.getUnchecked(Thread.currentThread());
     }
 
     /**
@@ -168,10 +166,7 @@ public final class Request {
      */
     public static void reset() {
         request().invalidate();
-        threadLocal.remove();
-        //FAWE start
-        requests.remove(Thread.currentThread());
-        //FAWE end
+        THREAD_TO_REQUEST.invalidate(Thread.currentThread());
     }
 
     /**
