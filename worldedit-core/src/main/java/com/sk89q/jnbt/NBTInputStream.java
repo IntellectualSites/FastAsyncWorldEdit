@@ -45,7 +45,7 @@ import java.util.Map;
  *
  * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public final class NBTInputStream implements Closeable {
 
     private final DataInputStream is;
