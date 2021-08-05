@@ -90,10 +90,6 @@ public class BlockDataCyler implements DoubleActionBlockTool {
                 BlockState newBlock = block.with(objProp, currentProperty.getValues().get(index));
 
                 try (EditSession editSession = session.createEditSession(player)) {
-                    // FAWE start
-                    // editSession.disableBuffering();
-                    // FAWE end
-
                     try {
                         editSession.setBlock(blockPoint, newBlock);
                         player.print(Caption.of(
