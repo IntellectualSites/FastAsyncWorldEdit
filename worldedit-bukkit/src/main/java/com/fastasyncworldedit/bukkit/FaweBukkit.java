@@ -305,6 +305,7 @@ public class FaweBukkit implements IFawe, Listener {
             LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
         } else {
             LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");
+            LOGGER.info("https://www.spigotmc.org/resources/77506/.");
         }
     }
 
