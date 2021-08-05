@@ -64,7 +64,6 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 #Platform expectations
 paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
-spigot = { group = "org.spigotmc", name = "spigot", version.ref = "paper" }
 
 # Plugins
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
