@@ -62,9 +62,6 @@ dependencies {
         isTransitive = false
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    compileOnly(libs.spigot) {
-        because("Remove if #1208 has been addressed")
-    }
 
     // Logging
     implementation(libs.log4j)
