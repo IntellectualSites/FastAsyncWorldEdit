@@ -49,7 +49,6 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -127,8 +126,7 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public Collection<BaseItemStack> simulateBlockMine(BlockVector3 position) {
-        return Collections.emptyList();
+    public void simulateBlockMine(BlockVector3 position) {
     }
 
     @Override

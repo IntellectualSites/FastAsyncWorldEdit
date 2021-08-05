@@ -51,6 +51,7 @@ import com.sk89q.worldedit.world.weather.WeatherType;
 import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
@@ -216,9 +217,20 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * Simulate a block being mined at the given position.
      *
      * @param position the position
-     * @return Block default drops
      */
-    Collection<BaseItemStack> simulateBlockMine(BlockVector3 position);
+    void simulateBlockMine(BlockVector3 position);
+
+    //FAWE start
+    /**
+     * Return block drops, as if it were mined.
+     *
+     * @param position the position
+     * @return Block drops
+     */
+    default Collection<BaseItemStack> getBlockDrops(BlockVector3 position) {
+        return Collections.emptyList();
+    }
+    //FAWE end
 
     /**
      * Gets whether the given {@link BlockState} can be placed here.

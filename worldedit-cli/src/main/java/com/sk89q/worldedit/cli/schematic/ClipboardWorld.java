@@ -126,8 +126,7 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
     }
 
     @Override
-    public Collection<BaseItemStack> simulateBlockMine(BlockVector3 position) {
-        return Collections.emptyList();
+    public void simulateBlockMine(BlockVector3 position) {
     }
 
     @Override

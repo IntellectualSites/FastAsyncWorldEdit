@@ -120,13 +120,12 @@ public interface SimpleWorld extends World {
     }
 
     @Override
-    default Collection<BaseItemStack> simulateBlockMine(BlockVector3 position) {
+    default void simulateBlockMine(BlockVector3 position) {
         try {
             setBlock(position, BlockTypes.AIR.getDefaultState());
         } catch (WorldEditException e) {
             throw new RuntimeException(e);
         }
-        return Collections.emptyList();
     }
 
     @Override

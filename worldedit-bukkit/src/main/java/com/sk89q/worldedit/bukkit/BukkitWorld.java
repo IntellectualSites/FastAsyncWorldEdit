@@ -468,10 +468,17 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public Collection<BaseItemStack> simulateBlockMine(BlockVector3 pt) {
-        return getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).getDrops().stream()
+    public void simulateBlockMine(BlockVector3 pt) {
+        getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
+    }
+
+    //FAWE start
+    @Override
+    public Collection<BaseItemStack> getBlockDrops(BlockVector3 position) {
+        return getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ()).getDrops().stream()
                 .map(BukkitAdapter::adapt).collect(Collectors.toList());
     }
+    //FAWE end
 
     @Override
     public boolean canPlaceAt(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState blockState) {

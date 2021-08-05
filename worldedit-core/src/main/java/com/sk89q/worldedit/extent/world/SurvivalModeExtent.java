@@ -96,17 +96,18 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         if (toolUse && block.getBlockType().getMaterial().isAir()) {
-            Collection<BaseItemStack> drops = world.simulateBlockMine(location);
+            Collection<BaseItemStack> drops = world.getBlockDrops(location);
             boolean canSet = super.setBlock(location, block);
             if (canSet) {
-                for (BaseItemStack stack : drops) {
-                    TaskManager.IMP.sync(new RunnableVal<>() {
-                        @Override
-                        public void run(Object value) {
+                TaskManager.IMP.sync(new RunnableVal<>() {
+                    @Override
+                    public void run(Object value) {
+                        for (BaseItemStack stack : drops) {
                             world.dropItem(location.toVector3(), stack);
                         }
-                    });
-                }
+                    }
+                });
+
                 return true;
             } else {
                 return false;

@@ -65,6 +65,9 @@ public class BlockReplacer implements DoubleActionBlockTool {
 
         try (EditSession editSession = session.createEditSession(player)) {
             try {
+                // FAWE start
+                // editSession.disableBuffering();
+                // FAWE end
                 BlockVector3 position = clicked.toVector().toBlockPoint();
                 editSession.setBlock(position, pattern);
             } catch (MaxChangedBlocksException ignored) {
