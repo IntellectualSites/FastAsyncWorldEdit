@@ -253,6 +253,9 @@
     "worldedit.error.file-aborted": "File selection aborted.",
     "worldedit.error.world-unloaded": "The world was unloaded already.",
     "worldedit.error.blocks-cant-be-used": "Blocks can't be used",
+    "worldedit.error.unknown-tag": "Tag name '{0}' was not recognized.",
+    "worldedit.error.empty-tag": "Tag name '{0}' has no contents.",
+    "worldedit.error.unknown-biome": "Biome name '{0}' was not recognized.",
 
     "worldedit.brush.radius-too-large": "Maximum allowed brush radius: {0}",
     "worldedit.brush.apply.description": "Apply brush, apply a function to every block",
