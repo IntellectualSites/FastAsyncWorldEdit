@@ -56,6 +56,16 @@ public interface IBlocks extends Trimable {
 
     int getSectionCount();
 
+    /**
+     * Max ChunkSection array index
+     */
+    int getMaxSectionIndex();
+
+    /**
+     * Min ChunkSection array index
+     */
+    int getMinSectionIndex();
+
     default byte[] toByteArray(boolean full, boolean stretched) {
         return toByteArray(null, getBitMask(), full, stretched);
     }

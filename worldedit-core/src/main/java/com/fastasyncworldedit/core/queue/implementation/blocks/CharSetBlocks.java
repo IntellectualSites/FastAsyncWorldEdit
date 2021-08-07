@@ -148,7 +148,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             light[layer] = c;
         }
         final int index = (y & 15) << 8 | (z & 15) << 4 | (x & 15);
-        light[y >> 4][index] = (char) value;
+        light[layer][index] = (char) value;
     }
 
     @Override
@@ -164,7 +164,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             skyLight[layer] = c;
         }
         final int index = (y & 15) << 8 | (z & 15) << 4 | (x & 15);
-        skyLight[y >> 4][index] = (char) value;
+        skyLight[layer][index] = (char) value;
     }
 
     @Override
@@ -326,6 +326,16 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         return sectionCount;
     }
 
+    @Override
+    public int getMaxSectionIndex() {
+        return maxSectionIndex;
+    }
+
+    @Override
+    public int getMinSectionIndex() {
+        return minSectionIndex;
+    }
+
     private void updateSectionIndexRange(int layer) {
         if (layer >= minSectionIndex && layer <= maxSectionIndex) {
             return;
@@ -348,6 +358,16 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 System.arraycopy(biomes, 0, tmpBiomes, 64*diff, biomes.length);
                 biomes = tmpBiomes;
             }
+            if (light != null) {
+                char[][] tmplight = new char[sectionCount][];
+                System.arraycopy(light, 0, tmplight, diff, light.length);
+                light = tmplight;
+            }
+            if (skyLight != null) {
+                char[][] tmplight = new char[sectionCount][];
+                System.arraycopy(skyLight, 0, tmplight, diff, skyLight.length);
+                skyLight = tmplight;
+            }
         } else {
             int diff = layer - maxSectionIndex;
             sectionCount += diff;
@@ -365,6 +385,16 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
                 System.arraycopy(biomes, 0, tmpBiomes, 0, biomes.length);
                 biomes = tmpBiomes;
+            }
+            if (light != null) {
+                char[][] tmplight = new char[sectionCount][];
+                System.arraycopy(light, 0, tmplight, 0, light.length);
+                light = tmplight;
+            }
+            if (skyLight != null) {
+                char[][] tmplight = new char[sectionCount][];
+                System.arraycopy(skyLight, 0, tmplight, 0, skyLight.length);
+                skyLight = tmplight;
             }
         }
     }

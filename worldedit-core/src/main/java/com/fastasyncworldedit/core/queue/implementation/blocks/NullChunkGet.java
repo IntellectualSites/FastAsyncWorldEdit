@@ -78,11 +78,11 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public void setLightingToGet(char[][] lighting) {
+    public void setLightingToGet(char[][] lighting, int startSectionIndex, int endSectionIndex) {
     }
 
     @Override
-    public void setSkyLightingToGet(char[][] lighting) {
+    public void setSkyLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
     }
 
     @Override

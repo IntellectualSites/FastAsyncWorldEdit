@@ -57,9 +57,9 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
         return null;
     }
 
-    void setLightingToGet(char[][] lighting);
+    void setLightingToGet(char[][] lighting, int startSectionIndex, int endSectionIndex);
 
-    void setSkyLightingToGet(char[][] lighting);
+    void setSkyLightingToGet(char[][] lighting, int startSectionIndex, int endSectionIndex);
 
     void setHeightmapToGet(HeightMapType type, int[] data);
 
@@ -72,15 +72,5 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
      * Min y value for the chunk's world (inclusive)
      */
     int getMinY();
-
-    /**
-     * Max ChunkSection array index
-     */
-    int getMaxSectionIndex();
-
-    /**
-     * Min ChunkSection array index
-     */
-    int getMinSectionIndex();
 
 }
