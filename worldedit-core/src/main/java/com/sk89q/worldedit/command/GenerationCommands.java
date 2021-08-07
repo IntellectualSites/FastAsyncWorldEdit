@@ -241,9 +241,6 @@ public class GenerationCommands {
             @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                     double density
     ) throws WorldEditException {
-        //FAWE start
-        actor.print(TextComponent.of("Warning: This brush is currently not undo-able due to a Spigot bug!").color(TextColor.RED));
-        //FAWE end
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
         density /= 100;
