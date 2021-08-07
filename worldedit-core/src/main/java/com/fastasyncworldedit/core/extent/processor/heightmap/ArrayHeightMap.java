@@ -11,7 +11,8 @@ public class ArrayHeightMap extends ScalableHeightMap {
     private double rx;
     private double rz;
 
-    public ArrayHeightMap(byte[][] height) {
+    public ArrayHeightMap(byte[][] height, int minY, int maxY) {
+        super(minY, maxY);
         setSize(5);
         this.height = height;
         this.width = height.length;

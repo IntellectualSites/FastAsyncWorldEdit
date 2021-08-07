@@ -78,7 +78,8 @@ public class CopyPastaBrush implements Brush, ResettableTool {
             };
             // Add origin
             mask.test(position);
-            RecursiveVisitor visitor = new RecursiveVisitor(mask, new NullRegionFunction(), (int) size);
+            RecursiveVisitor visitor = new RecursiveVisitor(mask, new NullRegionFunction(), (int) size, editSession.getMinY(),
+                    editSession.getMaxY());
             visitor.visit(position);
             Operations.completeBlindly(visitor);
             // Build the clipboard

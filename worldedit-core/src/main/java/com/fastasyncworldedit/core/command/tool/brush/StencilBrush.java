@@ -21,8 +21,9 @@ public class StencilBrush extends HeightBrush {
 
     private final boolean onlyWhite;
 
-    public StencilBrush(InputStream stream, int rotation, double yscale, boolean onlyWhite, Clipboard clipboard) {
-        super(stream, rotation, yscale, false, true, clipboard);
+    public StencilBrush(InputStream stream, int rotation, double yscale, boolean onlyWhite, Clipboard clipboard, int minY,
+                        int maxY) {
+        super(stream, rotation, yscale, false, true, clipboard, minY, maxY);
         this.onlyWhite = onlyWhite;
     }
 
@@ -32,15 +33,16 @@ public class StencilBrush extends HeightBrush {
         int size = (int) sizeDouble;
         int size2 = (int) (sizeDouble * sizeDouble);
         int maxY = editSession.getMaxY();
+        int minY = editSession.getMinY();
         int add;
         if (yscale < 0) {
-            add = maxY;
+            add = maxY - minY;
         } else {
             add = 0;
         }
         final HeightMap map = getHeightMap();
         map.setSize(size);
-        int cutoff = onlyWhite ? maxY : 0;
+        int cutoff = onlyWhite ? maxY - minY : 0;
         final SolidBlockMask solid = new SolidBlockMask(editSession);
 
         Location loc = editSession.getPlayer().getLocation();
@@ -48,7 +50,7 @@ public class StencilBrush extends HeightBrush {
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();
 
-        double scale = (yscale / sizeDouble) * (maxY + 1);
+        double scale = (yscale / sizeDouble) * (maxY - minY + 1);
         RecursiveVisitor visitor =
                 new RecursiveVisitor(new StencilBrushMask(
                         editSession,
@@ -63,7 +65,7 @@ public class StencilBrush extends HeightBrush {
                         maxY,
                         pattern
                 ),
-                        vector -> true, Integer.MAX_VALUE
+                        vector -> true, Integer.MAX_VALUE, editSession.getMinY(), editSession.getMaxY()
                 );
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(center);

@@ -41,7 +41,7 @@ public interface IBatchProcessor {
      */
     default boolean trimY(IChunkSet set, int minY, int maxY) {
         int minLayer = (minY - 1) >> 4;
-        for (int layer = 0; layer <= minLayer; layer++) {
+        for (int layer = set.getMinSectionIndex(); layer <= minLayer; layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);
@@ -56,7 +56,7 @@ public interface IBatchProcessor {
             }
         }
         int maxLayer = (maxY + 1) >> 4;
-        for (int layer = maxLayer; layer < set.getSectionCount(); layer++) {
+        for (int layer = maxLayer; layer < set.getMaxSectionIndex(); layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
                     char[] arr = set.load(layer);

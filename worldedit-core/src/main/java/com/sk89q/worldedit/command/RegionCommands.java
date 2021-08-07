@@ -358,17 +358,17 @@ public class RegionCommands {
             @Selection Region region,
             @Arg(name = "pattern", desc = "The pattern of blocks to lay") Pattern patternArg
     ) throws WorldEditException {
-        BlockVector3 max = region.getMaximumPoint();
-        int maxY = max.getBlockY();
+        int maxY = region.getMaximumY();
+        int minY = region.getMinimumY();
         Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
         Iterator<BlockVector2> iter = flat.iterator();
-        int y = 0;
+        int y = minY;
         int affected = 0;
         while (iter.hasNext()) {
             BlockVector2 pos = iter.next();
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
-            y = editSession.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
+            y = editSession.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
             editSession.setBlock(x, y, z, patternArg);
             affected++;
         }

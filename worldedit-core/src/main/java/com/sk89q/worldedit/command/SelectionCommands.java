@@ -124,9 +124,9 @@ public class SelectionCommands {
         Location pos;
         //FAWE start - clamp
         if (coordinates != null) {
-            pos = new Location(world, coordinates.toVector3().clampY(0, world.getMaxY()));
+            pos = new Location(world, coordinates.toVector3().clampY(world.getMinY(), world.getMaxY()));
         } else if (actor instanceof Locatable) {
-            pos = ((Locatable) actor).getBlockLocation().clampY(0, world.getMaxY());
+            pos = ((Locatable) actor).getBlockLocation().clampY(world.getMinY(), world.getMaxY());
             //FAWE end
         } else {
             actor.print(Caption.of("worldedit.pos.console-require-coords"));
@@ -157,9 +157,9 @@ public class SelectionCommands {
         Location pos;
         if (coordinates != null) {
             //FAWE start - clamp
-            pos = new Location(world, coordinates.toVector3().clampY(0, world.getMaxY()));
+            pos = new Location(world, coordinates.toVector3().clampY(world.getMinY(), world.getMaxY()));
         } else if (actor instanceof Locatable) {
-            pos = ((Locatable) actor).getBlockLocation().clampY(0, world.getMaxY());
+            pos = ((Locatable) actor).getBlockLocation().clampY(world.getMinY(), world.getMaxY());
             //Fawe end
         } else {
             actor.print(Caption.of("worldedit.pos.console-require-coords"));

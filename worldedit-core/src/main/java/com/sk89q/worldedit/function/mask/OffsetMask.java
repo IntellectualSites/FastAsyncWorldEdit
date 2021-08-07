@@ -31,6 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class OffsetMask extends AbstractMask {
 
+    private final int minY;
+    private final int maxY;
     private Mask mask;
     private BlockVector3 offset;
 
@@ -40,11 +42,13 @@ public class OffsetMask extends AbstractMask {
      * @param mask   the mask
      * @param offset the offset
      */
-    public OffsetMask(Mask mask, BlockVector3 offset) {
+    public OffsetMask(Mask mask, BlockVector3 offset, int minY, int maxY) {
         checkNotNull(mask);
         checkNotNull(offset);
         this.mask = mask;
         this.offset = offset;
+        this.minY = minY;
+        this.maxY = maxY;
     }
 
     /**
@@ -88,7 +92,7 @@ public class OffsetMask extends AbstractMask {
     @Override
     public boolean test(BlockVector3 vector) {
         BlockVector3 testPos = vector.add(offset);
-        if (testPos.getBlockY() < 0 || testPos.getBlockY() > 255) {
+        if (testPos.getBlockY() < minY || testPos.getBlockY() > maxY) {
             return false;
         }
         return getMask().test(vector.add(offset));
@@ -108,7 +112,7 @@ public class OffsetMask extends AbstractMask {
     //FAWE start
     @Override
     public Mask copy() {
-        return new OffsetMask(mask.copy(), offset.toImmutable());
+        return new OffsetMask(mask.copy(), offset.toImmutable(), minY, maxY);
     }
     //FAWE end
 

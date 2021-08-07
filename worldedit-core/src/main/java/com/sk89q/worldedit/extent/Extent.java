@@ -201,8 +201,6 @@ public interface Extent extends InputExtent, OutputExtent {
      */
 
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
-        maxY = Math.min(maxY, Math.max(0, maxY));
-        minY = Math.max(0, minY);
         for (int y = maxY; y >= minY; --y) {
             BlockState block = getBlock(x, y, z);
             if (block.getBlockType().getMaterial().isMovementBlocker()) {
@@ -213,8 +211,6 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY, Mask filter) {
-        maxY = Math.min(maxY, Math.max(0, maxY));
-        minY = Math.max(0, minY);
         for (int y = maxY; y >= minY; --y) {
             if (filter.test(MutableBlockVector3.get(x, y, z))) {
                 return y;
@@ -363,7 +359,7 @@ public interface Extent extends InputExtent, OutputExtent {
             }
         }
         int result = state ? failedMin : failedMax;
-        if (result > 0 && !ignoreAir) {
+        if (result > minY && !ignoreAir) {
             block = getBlock(x, result, z);
             return block.getBlockType().getMaterial().isAir() ? -1 : result;
         }

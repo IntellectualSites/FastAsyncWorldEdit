@@ -744,7 +744,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
         if (bx >= minX && tx <= maxX && bz >= minZ && tz <= maxZ) {
             // contains all X/Z
-            if (minY <= 0 && maxY >= 255) {
+            if (minY <= set.getMinSectionIndex() << 4 && maxY >= (set.getMaxSectionIndex() << 4) + 15) {
                 return set;
             }
             trimY(set, minY, maxY);
@@ -765,7 +765,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimX = lowerX != 0 || upperX != 15;
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
-            for (int layer = 0; layer < set.getSectionCount(); layer++) {
+            for (int layer = get.getMinSectionIndex(); layer < get.getMaxSectionIndex(); layer++) {
                 if (set.hasSection(layer)) {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {

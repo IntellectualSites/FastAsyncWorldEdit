@@ -28,22 +28,19 @@ import com.sk89q.worldedit.math.BlockVector3;
  */
 public class NonRisingVisitor extends RecursiveVisitor {
 
-    //FAWE start - max int
+    //FAWE start - int depth
 
     /**
      * Create a new recursive visitor.
      *
      * @param mask     the mask
      * @param function the function
+     * @param depth    max number of recursions
+     * @param minY     min applicable y
+     * @param maxY     max applicable y
      */
-    public NonRisingVisitor(Mask mask, RegionFunction function) {
-        this(mask, function, Integer.MAX_VALUE);
-    }
-    //FAWE end
-
-    //FAWE start - int depth
-    public NonRisingVisitor(Mask mask, RegionFunction function, int depth) {
-        super(mask, function, depth);
+    public NonRisingVisitor(Mask mask, RegionFunction function, int depth, int minY, int maxY) {
+        super(mask, function, depth, minY, maxY);
         setDirections(
                 BlockVector3.UNIT_X,
                 BlockVector3.UNIT_MINUS_X,

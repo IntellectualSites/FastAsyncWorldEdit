@@ -84,8 +84,8 @@ public class AsyncPlayer extends PlayerProxy {
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
         Location pos = getBlockLocation();
         int x = pos.getBlockX();
-        int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 2);
+        int initialY = Math.max(getWorld().getMinY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() + 2);
         int z = pos.getBlockZ();
         Extent world = getLocation().getExtent();
 

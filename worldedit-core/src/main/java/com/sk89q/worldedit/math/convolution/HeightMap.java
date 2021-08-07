@@ -97,18 +97,18 @@ public class HeightMap {
             int bx = min.getBlockX();
             int bz = min.getBlockZ();
             Iterator<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion().iterator();
-            int layer = 0;
+            int layer = session.getMinY();
             while (flat.hasNext()) {
                 BlockVector2 pos = flat.next();
                 int x = pos.getBlockX();
                 int z = pos.getBlockZ();
-                layer = session.getNearestSurfaceLayer(x, z, (layer + 7) >> 3, 0, maxY);
+                layer = session.getNearestSurfaceLayer(x, z, (layer + 7) >> 3, session.getMinY(), maxY);
                 data[(z - bz) * width + (x - bx)] = layer;
             }
         } else {
             // Store current heightmap data
             int index = 0;
-            int yTmp = 255;
+            int yTmp = session.getMaxY();
             for (int z = 0; z < height; ++z) {
                 for (int x = 0; x < width; ++x, index++) {
                     if (mask != null) {
@@ -324,7 +324,7 @@ public class HeightMap {
                         int y0 = newHeight - 1;
                         for (int setY = y0, getY = curHeight - 1; setY >= curHeight; setY--, getY--) {
                             BlockState get;
-                            if (getY >= 0 && getY < 256) {
+                            if (getY >= session.getMinY() && getY <= session.getMaxY()) {
                                 get = session.getBlock(xr, getY, zr);
                             } else {
                                 get = BlockTypes.AIR.getDefaultState();

@@ -37,21 +37,9 @@ public class DownwardVisitor extends RecursiveVisitor {
     private final int baseY;
 
     //FAWE start
-
-    /**
-     * Create a new visitor.
-     *
-     * @param mask     the mask
-     * @param function the function
-     * @param baseY    the base Y
-     */
-    public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
-        this(mask, function, baseY, Integer.MAX_VALUE);
-    }
-    //FAWE end
-
-    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth) {
-        super(mask, function, depth);
+    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, int minY, int maxY) {
+        super(mask, function, depth, minY, maxY);
+        //FAWE end
         checkNotNull(mask);
 
         this.baseY = baseY;

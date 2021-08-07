@@ -18,13 +18,17 @@ public class ScalableHeightMap implements HeightMap {
 
     public int size2;
     public int size;
+    protected int minY;
+    protected int maxY;
 
     public enum Shape {
         CONE,
         CYLINDER,
     }
 
-    public ScalableHeightMap() {
+    public ScalableHeightMap(final int minY, final int maxY) {
+        this.minY = minY;
+        this.maxY = maxY;
         setSize(5);
     }
 
@@ -44,29 +48,29 @@ public class ScalableHeightMap implements HeightMap {
         int dz = Math.abs(z);
         int d2 = dx * dx + dz * dz;
         if (d2 > size2) {
-            return 0;
+            return minY;
         }
-        return Math.max(0, size - MathMan.sqrtApprox(d2));
+        return Math.max(minY, size - MathMan.sqrtApprox(d2));
     }
 
-    public static ScalableHeightMap fromShape(Shape shape) {
+    public static ScalableHeightMap fromShape(Shape shape, int minY, int maxY) {
         switch (shape) {
             default:
             case CONE:
-                return new ScalableHeightMap();
+                return new ScalableHeightMap(minY, maxY);
             case CYLINDER:
-                return new FlatScalableHeightMap();
+                return new FlatScalableHeightMap(minY, maxY);
         }
     }
 
-    public static ScalableHeightMap fromClipboard(Clipboard clipboard) {
+    public static ScalableHeightMap fromClipboard(Clipboard clipboard, int minY, int maxY) {
         BlockVector3 dim = clipboard.getDimensions();
         byte[][] heightArray = new byte[dim.getBlockX()][dim.getBlockZ()];
-        int minX = clipboard.getMinimumPoint().getBlockX();
-        int minZ = clipboard.getMinimumPoint().getBlockZ();
-        int minY = clipboard.getMinimumPoint().getBlockY();
-        int maxY = clipboard.getMaximumPoint().getBlockY();
-        int clipHeight = maxY - minY + 1;
+        int clipMinX = clipboard.getMinimumPoint().getBlockX();
+        int clipMinZ = clipboard.getMinimumPoint().getBlockZ();
+        int clipMinY = clipboard.getMinimumPoint().getBlockY();
+        int clipMaxY = clipboard.getMaximumPoint().getBlockY();
+        int clipHeight = clipMaxY - clipMinY + 1;
         HashSet<IntPair> visited = new HashSet<>();
         for (BlockVector3 pos : clipboard.getRegion()) {
             IntPair pair = new IntPair(pos.getBlockX(), pos.getBlockZ());
@@ -76,24 +80,24 @@ public class ScalableHeightMap implements HeightMap {
             visited.add(pair);
             int xx = pos.getBlockX();
             int zz = pos.getBlockZ();
-            int highestY = minY;
+            int highestY = clipMinY;
             MutableBlockVector3 bv = new MutableBlockVector3(pos);
-            for (int y = minY; y <= maxY; y++) {
+            for (int y = clipMinY; y <= clipMaxY; y++) {
                 bv.mutY(y);
                 BlockState block = clipboard.getBlock(bv);
                 if (!block.getBlockType().getMaterial().isAir()) {
                     highestY = y + 1;
                 }
             }
-            int pointHeight = Math.min(255, (256 * (highestY - minY)) / clipHeight);
-            int x = xx - minX;
-            int z = zz - minZ;
+            int pointHeight = Math.min(clipMaxY, ((maxY - minY + 1 ) * (highestY - clipMinY)) / clipHeight);
+            int x = xx - clipMinX;
+            int z = zz - clipMinZ;
             heightArray[x][z] = (byte) pointHeight;
         }
-        return new ArrayHeightMap(heightArray);
+        return new ArrayHeightMap(heightArray, minY, maxY);
     }
 
-    public static ScalableHeightMap fromPNG(InputStream stream) throws IOException {
+    public static ScalableHeightMap fromPNG(InputStream stream, int minY, int maxY) throws IOException {
         BufferedImage heightFile = MainUtil.readImage(stream);
         int width = heightFile.getWidth();
         int length = heightFile.getHeight();
@@ -112,7 +116,7 @@ public class ScalableHeightMap implements HeightMap {
                 array[x][z] = (byte) intensity;
             }
         }
-        return new ArrayHeightMap(array);
+        return new ArrayHeightMap(array, minY, maxY);
     }
 
 }

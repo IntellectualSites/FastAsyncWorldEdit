@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.inject.InjectedValueAccess;
@@ -50,6 +51,8 @@ public class ParserContext {
     private boolean preferringWildcard;
     //Fawe start
     private InjectedValueAccess injected;
+    private int minY = Integer.MIN_VALUE;
+    private int maxY = Integer.MAX_VALUE;
     //FAWE end
 
     /**
@@ -269,6 +272,58 @@ public class ParserContext {
 
     public InjectedValueAccess getInjected() {
         return injected;
+    }
+
+    public int getMinY() {
+        if (minY != Integer.MIN_VALUE) {
+            return minY;
+        }
+
+        Extent extent = null;
+
+        if (actor instanceof Locatable) {
+            extent = ((Locatable) actor).getExtent();
+        } else if (world != null) {
+            extent = world;
+        } else if (this.extent != null) {
+            extent = this.extent;
+        }
+
+        if (extent != null) {
+            minY = extent.getMinY();
+            maxY = extent.getMaxY();
+        } else {
+            minY = 0;
+            maxY = 255;
+        }
+
+        return minY;
+    }
+
+    public int getMaxY() {
+        if (maxY != Integer.MAX_VALUE) {
+            return maxY;
+        }
+
+        Extent extent = null;
+
+        if (actor instanceof Locatable) {
+            extent = ((Locatable) actor).getExtent();
+        } else if (world != null) {
+            extent = world;
+        } else if (this.extent != null) {
+            extent = this.extent;
+        }
+
+        if (extent != null) {
+            minY = extent.getMinY();
+            maxY = extent.getMaxY();
+        } else {
+            minY = 0;
+            maxY = 255;
+        }
+
+        return maxY;
     }
     //FAWE end
 }

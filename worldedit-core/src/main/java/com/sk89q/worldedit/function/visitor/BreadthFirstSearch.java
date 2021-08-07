@@ -83,12 +83,14 @@ public abstract class BreadthFirstSearch implements Operation {
     }
     //FAWE end
 
-    private final RegionFunction function;
+    protected final RegionFunction function;
     //FAWE Start - BVS > Queue<BV3>, Set<BV3>, List<BV3>
     private BlockVectorSet queue = new BlockVectorSet();
     private BlockVectorSet visited = new BlockVectorSet();
     private BlockVector3[] directions;
     //FAWE end
+    protected final int minY;
+    protected final int maxY;
     private int affected = 0;
     //FAWE start
     private int currentDepth = 0;
@@ -102,17 +104,19 @@ public abstract class BreadthFirstSearch implements Operation {
      */
     public BreadthFirstSearch(RegionFunction function) {
         //FAWE start
-        this(function, Integer.MAX_VALUE);
+        this(function, Integer.MAX_VALUE, 0, 255);
         //FAWE end
         checkNotNull(function);
     }
 
     //FAWE start
-    public BreadthFirstSearch(RegionFunction function, int maxDepth) {
+    public BreadthFirstSearch(RegionFunction function, int maxDepth, int minY, int maxY) {
         checkNotNull(function);
         this.function = function;
         this.directions = DEFAULT_DIRECTIONS;
         this.maxDepth = maxDepth;
+        this.minY = minY;
+        this.maxY = maxY;
     }
 
     public void setDirections(BlockVector3... directions) {
@@ -257,7 +261,7 @@ public abstract class BreadthFirstSearch implements Operation {
                 for (int i = 0, j = 0; i < dirs.length && j < maxBranch; i++) {
                     BlockVector3 direction = dirs[i];
                     int y = from.getBlockY() + direction.getY();
-                    if (y < 0 || y >= 256) {
+                    if (y < minY || y > maxY) {
                         continue;
                     }
                     int x = from.getBlockX() + direction.getX();

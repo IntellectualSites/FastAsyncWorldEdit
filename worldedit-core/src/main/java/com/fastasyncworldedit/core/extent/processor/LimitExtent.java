@@ -126,7 +126,7 @@ public class LimitExtent extends AbstractDelegateExtent {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
@@ -139,7 +139,7 @@ public class LimitExtent extends AbstractDelegateExtent {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
@@ -152,7 +152,7 @@ public class LimitExtent extends AbstractDelegateExtent {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
@@ -165,7 +165,7 @@ public class LimitExtent extends AbstractDelegateExtent {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
@@ -178,7 +178,7 @@ public class LimitExtent extends AbstractDelegateExtent {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
@@ -191,7 +191,7 @@ public class LimitExtent extends AbstractDelegateExtent {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
@@ -204,7 +204,7 @@ public class LimitExtent extends AbstractDelegateExtent {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
@@ -226,7 +226,7 @@ public class LimitExtent extends AbstractDelegateExtent {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
