@@ -118,13 +118,13 @@ public class AsyncPlayer extends PlayerProxy {
     public boolean ascendUpwards(int distance, boolean alwaysGlass) {
         final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
-        final int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 1);
+        final int initialY = Math.max(getWorld().getMinY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() + 1);
         final int z = pos.getBlockZ();
         final int maxY = Math.min(getWorld().getMaxY() + 1, initialY + distance);
         final Extent world = getLocation().getExtent();
 
-        while (y <= world.getMaximumPoint().getY() + 2) {
+        while (y <= world.getMaxY() + 2) {
             if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
                     .isMovementBlocker()) {
                 break; // Hit something
