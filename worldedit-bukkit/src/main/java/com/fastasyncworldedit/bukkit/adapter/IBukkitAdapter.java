@@ -359,6 +359,15 @@ public interface IBukkitAdapter {
         }
     }
 
+    /**
+     * Generate a given tree type to the given editsession.
+     *
+     * @param type Type of tree to generate
+     * @param editSession Editsession to set blocks to
+     * @param pt Point to generate tree at
+     * @param world World to "generate" tree from (seed-wise)
+     * @return If successsful
+     */
     default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt, org.bukkit.World world) {
         TreeType bukkitType = BukkitWorld.toBukkitTreeType(type);
         if (bukkitType == TreeType.CHORUS_PLANT) {
