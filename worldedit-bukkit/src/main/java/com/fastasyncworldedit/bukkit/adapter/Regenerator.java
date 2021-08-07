@@ -267,7 +267,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         }
 
         source = new SingleThreadQueueExtent(originalBukkitWorld.getMinHeight(), originalBukkitWorld.getMaxHeight());
-        source.init(null, initSourceQueueCache(), null);
+        source.init(target, initSourceQueueCache(), null);
         return true;
     }
 
