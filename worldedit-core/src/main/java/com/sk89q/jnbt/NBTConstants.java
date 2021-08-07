@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public final class NBTConstants {
 
     public static final Charset CHARSET = StandardCharsets.UTF_8;

@@ -887,6 +887,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized boolean trim(boolean aggressive) {
+        // always trim GET. It could be cached elsewhere.
+        chunkExisting.trim(aggressive);
         if (chunkSet != null) {
             final boolean result = chunkSet.trim(aggressive);
             if (result) {
@@ -903,8 +905,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             } else if (delegate == GET) {
                 delegate = NULL;
             }
-        } else {
-            chunkExisting.trim(false);
         }
         return false;
     }
