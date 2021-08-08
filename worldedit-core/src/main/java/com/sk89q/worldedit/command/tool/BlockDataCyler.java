@@ -34,7 +34,7 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BaseBlock;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -62,7 +62,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
         World world = (World) clicked.getExtent();
 
         BlockVector3 blockPoint = clicked.toVector().toBlockPoint();
-        BlockState block = world.getBlock(blockPoint);
+        BaseBlock block = world.getFullBlock(blockPoint);
 
         if (!config.allowedDataCycleBlocks.isEmpty()
                 && !player.hasPermission("worldedit.override.data-cycler")
@@ -87,7 +87,7 @@ public class BlockDataCyler implements DoubleActionBlockTool {
                 index = (index + 1) % currentProperty.getValues().size();
                 @SuppressWarnings("unchecked")
                 Property<Object> objProp = (Property<Object>) currentProperty;
-                BlockState newBlock = block.with(objProp, currentProperty.getValues().get(index));
+                BaseBlock newBlock = block.with(objProp, currentProperty.getValues().get(index));
 
                 try (EditSession editSession = session.createEditSession(player)) {
                     try {
