@@ -44,7 +44,7 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        return IntStream.range(0, getSectionCount()).filter(this::hasSection)
+        return IntStream.range(getMinSectionIndex(), getMaxSectionIndex() + 1).filter(this::hasSection)
                 .map(layer -> (1 << layer)).sum();
     }
 
