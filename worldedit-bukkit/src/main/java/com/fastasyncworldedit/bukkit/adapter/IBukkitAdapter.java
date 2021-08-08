@@ -1,16 +1,20 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.bukkit.util.BukkitItemStack;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitEntity;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
+import com.sk89q.worldedit.bukkit.EditSessionBlockChangeDelegate;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -26,6 +30,7 @@ import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.TreeType;
 import org.bukkit.block.Biome;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -352,6 +357,26 @@ public interface IBukkitAdapter {
         } else {
             throw new NotABlockException();
         }
+    }
+
+    /**
+     * Generate a given tree type to the given editsession.
+     *
+     * @param type Type of tree to generate
+     * @param editSession Editsession to set blocks to
+     * @param pt Point to generate tree at
+     * @param world World to "generate" tree from (seed-wise)
+     * @return If successsful
+     */
+    default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt, org.bukkit.World world) {
+        TreeType bukkitType = BukkitWorld.toBukkitTreeType(type);
+        if (bukkitType == TreeType.CHORUS_PLANT) {
+            pt = pt.add(0, 1, 0); // bukkit skips the feature gen which does this offset normally, so we have to add it back
+        }
+        return type != null && world.generateTree(
+                BukkitAdapter.adapt(world, pt), bukkitType,
+                new EditSessionBlockChangeDelegate(editSession)
+        );
     }
 
 }

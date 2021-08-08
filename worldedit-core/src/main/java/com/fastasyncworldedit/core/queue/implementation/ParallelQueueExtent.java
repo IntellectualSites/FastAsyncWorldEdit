@@ -147,9 +147,9 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
 
     @Override
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        return this.changes = apply(region, new BlockMaskBuilder().add(block).build(this).toFilter(new CountFilter()))
-                .getParent()
-                .getTotal();
+        Mask mask = new BlockMaskBuilder().add(block).build(this).inverse();
+        return this.changes = apply(region, mask.toFilter(block), mask.replacesAir())
+                .getBlocksApplied();
     }
 
     @Override

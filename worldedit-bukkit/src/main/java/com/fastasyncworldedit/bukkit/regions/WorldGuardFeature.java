@@ -47,8 +47,8 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
         return (WorldGuardPlugin) plugin;
     }
 
-    public WorldGuardFeature(Plugin p2) {
-        super(p2.getName());
+    public WorldGuardFeature(Plugin plugin) {
+        super(plugin.getName());
         this.worldguard = this.getWorldGuard();
         LOGGER.info("Plugin 'WorldGuard' found. Using it now.");
 
