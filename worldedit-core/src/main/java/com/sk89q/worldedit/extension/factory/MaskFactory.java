@@ -28,6 +28,7 @@ import com.fastasyncworldedit.core.extension.factory.parser.mask.LiquidMaskParse
 import com.fastasyncworldedit.core.extension.factory.parser.mask.ROCAngleMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.RichOffsetMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.SimplexMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.SurfaceAngleMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.SurfaceMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.TrueMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.WallMaskParser;
@@ -108,6 +109,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new XAxisMaskParser(worldEdit));
         register(new YAxisMaskParser(worldEdit));
         register(new ZAxisMaskParser(worldEdit));
+        register(new SurfaceAngleMaskParser(worldEdit));
         //FAWE end
 
     }
