@@ -274,6 +274,12 @@ public class ParserContext {
         return injected;
     }
 
+    /**
+     * Attempts to resolve the minimum Y value associated with this context or returns 0.
+     * Caches both min and max y values.
+     *
+     * @return Minimum y value (inclusive) or 0
+     */
     public int getMinY() {
         if (minY != Integer.MIN_VALUE) {
             return minY;
@@ -300,6 +306,12 @@ public class ParserContext {
         return minY;
     }
 
+    /**
+     * Attempts to resolve the maximum Y value associated with this context or returns 255.
+     * Caches both min and max y values.
+     *
+     * @return Maximum y value (inclusive) or 255
+     */
     public int getMaxY() {
         if (maxY != Integer.MAX_VALUE) {
             return maxY;

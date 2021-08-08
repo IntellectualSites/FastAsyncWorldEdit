@@ -31,8 +31,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class OffsetMask extends AbstractMask {
 
+    //FAWE start - ignore resultant position outside world height range
     private final int minY;
     private final int maxY;
+    //FAWE end
     private Mask mask;
     private BlockVector3 offset;
 
@@ -42,6 +44,7 @@ public class OffsetMask extends AbstractMask {
      * @param mask   the mask
      * @param offset the offset
      */
+    //FAWE start - ignore resultant position outside world height range
     public OffsetMask(Mask mask, BlockVector3 offset, int minY, int maxY) {
         checkNotNull(mask);
         checkNotNull(offset);
@@ -49,6 +52,7 @@ public class OffsetMask extends AbstractMask {
         this.offset = offset;
         this.minY = minY;
         this.maxY = maxY;
+        //FAWE end
     }
 
     /**
@@ -91,11 +95,13 @@ public class OffsetMask extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
+        //FAWE start - ignore resultant position outside world height range
         BlockVector3 testPos = vector.add(offset);
         if (testPos.getBlockY() < minY || testPos.getBlockY() > maxY) {
             return false;
         }
-        return getMask().test(vector.add(offset));
+        return getMask().test(testPos);
+        //FAWE end
     }
 
     @Nullable

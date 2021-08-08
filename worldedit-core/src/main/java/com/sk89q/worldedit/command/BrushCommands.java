@@ -457,9 +457,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.stencil")
     public void stencilBrush(
-            //FAWE start
             Player player,
-            //FAWE end
             LocalSession session, InjectedValueAccess context,
             @Arg(desc = "Pattern")
                     Pattern fill,
@@ -715,9 +713,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.height")
     public void heightBrush(
-            //FAWE start
             Player player,
-            //FAWE end
             LocalSession session,
             @Arg(desc = "Expression", def = "5")
                     Expression radius,
@@ -749,9 +745,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.height")
     public void cliffBrush(
-            //FAWE start
             Player player,
-            //FAWE end
             LocalSession session,
             @Arg(desc = "Expression", def = "5")
                     Expression radius,
@@ -786,9 +780,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.height")
     public void flattenBrush(
-            //FAWE start
             Player player,
-            //FAWE end
             LocalSession session,
             @Arg(desc = "Expression", def = "5")
                     Expression radius,

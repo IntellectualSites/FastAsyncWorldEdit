@@ -83,7 +83,7 @@ public abstract class BreadthFirstSearch implements Operation {
     }
     //FAWE end
 
-    protected final RegionFunction function;
+    private final RegionFunction function;
     //FAWE Start - BVS > Queue<BV3>, Set<BV3>, List<BV3>
     private BlockVectorSet queue = new BlockVectorSet();
     private BlockVectorSet visited = new BlockVectorSet();

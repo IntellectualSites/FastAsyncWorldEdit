@@ -37,6 +37,16 @@ public class DownwardVisitor extends RecursiveVisitor {
     private final int baseY;
 
     //FAWE start
+    /**
+     * Create a new visitor.
+     *
+     * @param mask     the mask
+     * @param function the function
+     * @param baseY    the base Y
+     * @param depth    maximum number of iterations
+     * @param minY     minimum allowable y to visit
+     * @param maxY     maximum allowable y to visit
+     */
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, int minY, int maxY) {
         super(mask, function, depth, minY, maxY);
         //FAWE end
