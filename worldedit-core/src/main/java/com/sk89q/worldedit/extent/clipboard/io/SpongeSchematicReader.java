@@ -253,7 +253,13 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 values.put("x", new IntTag(pt.getBlockX()));
                 values.put("y", new IntTag(pt.getBlockY()));
                 values.put("z", new IntTag(pt.getBlockZ()));
-                values.put("id", values.get("Id"));
+                //FAWE start
+                if (!values.containsKey("id")) {
+                    values.put("id", requireTag(values, "Id", StringTag.class));
+                } else {
+                    requireTag(values, "id", StringTag.class);
+                }
+                //FAWE end
                 values.remove("Id");
                 values.remove("Pos");
                 if (fixer != null) {
