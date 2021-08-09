@@ -28,6 +28,8 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
+import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -162,6 +164,8 @@ public class BiomeCommands {
             descFooter = "By default, uses all the blocks in your selection"
     )
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
+    @Confirm(Confirm.Processor.REGION)
     @CommandPermissions("worldedit.biome.set")
     public void setBiome(
             Player player, LocalSession session, EditSession editSession,
@@ -184,9 +188,9 @@ public class BiomeCommands {
         if (mask != null) {
             replace = new RegionMaskingFilter(editSession, mask, replace);
         }
-        //FAWE start > add extent to RegionVisitor to allow chunk preloading
-        RegionVisitor visitor = new RegionVisitor(region, replace, editSession);
-        //FAWE end
+
+        RegionVisitor visitor = new RegionVisitor(region, replace);
+
         Operations.completeLegacy(visitor);
 
         player.print(Caption.of(

@@ -19,16 +19,12 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
-import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
-import com.fastasyncworldedit.core.util.MemUtil;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
@@ -49,10 +45,12 @@ import java.util.Iterator;
 @Deprecated public class RegionVisitor implements Operation {
 
     public final Iterable<? extends BlockVector3> iterable;
+    //FAWE start - allow chunk preloading
+    private final SingleThreadQueueExtent singleQueue;
+    //FAWE end
     private final Region region;
     private final RegionFunction function;
     private int affected = 0;
-    private SingleThreadQueueExtent singleQueue;
 
     /**
      * @deprecated Use other constructors which will preload chunks during iteration
@@ -91,7 +89,7 @@ import java.util.Iterator;
 
     @Override public Operation resume(RunContext run) throws WorldEditException {
         //FAWE start > allow chunk preloading
-        if (singleQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNKS > 1) {
+        if (singleQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
             /*
              * The following is done to reduce iteration cost
              *  - Preload chunks just in time
@@ -105,7 +103,7 @@ import java.util.Iterator;
             int lastTrailChunkZ = Integer.MIN_VALUE;
             int lastLeadChunkX = Integer.MIN_VALUE;
             int lastLeadChunkZ = Integer.MIN_VALUE;
-            int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNKS;
+            int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT;
             try {
                 for (; ; ) {
                     BlockVector3 pt = trailIter.next();
@@ -130,7 +128,7 @@ import java.util.Iterator;
                             if (vcx != lastLeadChunkX || vcz != lastLeadChunkZ) {
                                 lastLeadChunkX = vcx;
                                 lastLeadChunkZ = vcz;
-                                queueChunkLoad(vcx, vcz);
+                                singleQueue.addChunkLoad(vcx, vcz);
                                 count++;
                             }
                             // Skip the next 15 blocks
@@ -195,18 +193,6 @@ import java.util.Iterator;
         if (function.apply(pt)) {
             affected++;
         }
-    }
-
-    private void queueChunkLoad(int cx, int cz) {
-        TaskManager.IMP.sync(() -> {
-            boolean lowMem = MemUtil.isMemoryLimited();
-            if (!singleQueue.isQueueEnabled() || (!(lowMem && singleQueue.size() > Settings.IMP.QUEUE.PARALLEL_THREADS + 8)
-                && singleQueue.size() < Settings.IMP.QUEUE.TARGET_SIZE && Fawe.get().getQueueHandler().isUnderutilized())) {
-                //The GET chunk is what will take longest.
-                ((ChunkHolder)singleQueue.getOrCreateChunk(cx, cz)).getOrCreateGet();
-            }
-            return null;
-        });
     }
     //FAWE end
 

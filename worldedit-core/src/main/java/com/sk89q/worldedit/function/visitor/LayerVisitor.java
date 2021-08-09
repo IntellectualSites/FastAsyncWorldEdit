@@ -19,7 +19,13 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
+import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.LayerFunction;
 import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.mask.Masks;
@@ -28,6 +34,8 @@ import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.FlatRegion;
+
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -44,9 +52,18 @@ public class LayerVisitor implements Operation {
 
     private final FlatRegion flatRegion;
     private final LayerFunction function;
+    //FAWE start - chunk preloading
+    private final SingleThreadQueueExtent singleQueue;
+    //FAWE end
     private Mask2D mask = Masks.alwaysTrue2D();
     private final int minY;
     private final int maxY;
+
+
+    //FAWE start - chunk preloading
+    public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function) {
+        this(flatRegion, minY, maxY, function, null);
+    }
 
     /**
      * Create a new visitor.
@@ -54,9 +71,11 @@ public class LayerVisitor implements Operation {
      * @param flatRegion the flat region to visit
      * @param minY       the minimum Y to stop the search at
      * @param maxY       the maximum Y to begin the search at
-     * @param function   the layer function to apply t blocks
+     * @param function   the layer function to apply to blocks
+     * @param extent     the extent for preloading
      */
-    public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function) {
+    public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function, Extent extent) {
+        //FAWE end
         checkNotNull(flatRegion);
         checkArgument(minY <= maxY, "minY <= maxY required");
         checkNotNull(function);
@@ -65,6 +84,14 @@ public class LayerVisitor implements Operation {
         this.minY = minY;
         this.maxY = maxY;
         this.function = function;
+        //FAWE start - chunk preloading
+        if (extent != null) {
+            ExtentTraverser<ParallelQueueExtent> queueTraverser = new ExtentTraverser<>(extent).find(ParallelQueueExtent.class);
+            this.singleQueue = queueTraverser != null ? (SingleThreadQueueExtent) queueTraverser.get().getExtent() : null;
+        } else {
+            this.singleQueue = null;
+        }
+        //FAWE end
     }
 
     /**
@@ -90,6 +117,11 @@ public class LayerVisitor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
+        //FAWE start - chunk preloading
+        if (singleQueue != null) {
+            singleQueue.preload(flatRegion);
+        }
+        //FAWE end
         for (BlockVector2 column : flatRegion.asFlatRegion()) {
             if (!mask.test(column)) {
                 continue;
