@@ -188,9 +188,7 @@ public class BiomeCommands {
         if (mask != null) {
             replace = new RegionMaskingFilter(editSession, mask, replace);
         }
-
         RegionVisitor visitor = new RegionVisitor(region, replace);
-
         Operations.completeLegacy(visitor);
 
         player.print(Caption.of(

@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
 public class AsyncPreloader implements Preloader, Runnable {
 
     private final ConcurrentHashMap<UUID, MutablePair<World, Set<BlockVector2>>> update;
