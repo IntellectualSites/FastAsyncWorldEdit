@@ -1408,11 +1408,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         // Pick how we're going to visit blocks
         RecursiveVisitor visitor;
+        //FAWE start - provide extent for preloading
         if (recursive) {
             visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
         } else {
             visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1), this);
         }
+        //FAWE end
 
         // Start at the origin
         visitor.visit(origin);
@@ -1686,7 +1688,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         Naturalizer naturalizer = new Naturalizer(this);
         FlatRegion flatRegion = Regions.asFlatRegion(region);
+        //FAWE start - provide extent for preloading
         LayerVisitor visitor = new LayerVisitor(flatRegion, minimumBlockY(region), maximumBlockY(region), naturalizer, this);
+        //FAWE end
         Operations.completeBlindly(visitor);
         return this.changes = naturalizer.getAffected();
     }
@@ -1937,7 +1941,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             replace = new BlockReplace(this, BlockTypes.AIR.getDefaultState());
         }
+        //FAWE start - provide extent for preloading
         RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
+        //FAWE end
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
@@ -1980,7 +1986,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         );
 
         BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
+        //FAWE start - provide extent for preloading
         NonRisingVisitor visitor = new NonRisingVisitor(mask, replace, Integer.MAX_VALUE, this);
+        //FAWE end
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
@@ -2580,7 +2588,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(region);
 
         SnowSimulator snowSimulator = new SnowSimulator(this, stack);
+        //FAWE start - provide extent for preloading
         LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), snowSimulator, this);
+        //FAWE end
         Operations.completeLegacy(layerVisitor);
         return snowSimulator.getAffected();
     }
@@ -2717,7 +2727,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int makeForest(Region region, double density, TreeGenerator.TreeType treeType) throws MaxChangedBlocksException {
         ForestGenerator generator = new ForestGenerator(this, treeType);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
+        //FAWE start - provide extent for preloading
         LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground, this);
+        //FAWE end
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
         return ground.getAffected();

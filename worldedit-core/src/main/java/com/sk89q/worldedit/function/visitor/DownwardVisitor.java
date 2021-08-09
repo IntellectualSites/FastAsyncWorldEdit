@@ -50,10 +50,27 @@ public class DownwardVisitor extends RecursiveVisitor {
         this(mask, function, baseY, Integer.MAX_VALUE);
     }
 
+    /**
+     * Create a new visitor.
+     *
+     * @param mask     the mask
+     * @param function the function
+     * @param baseY    the base Y
+     * @param depth    maximum number of iterations
+     */
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth) {
         this (mask, function, baseY, depth, null);
     }
 
+    /**
+     * Create a new visitor.
+     *
+     * @param mask     the mask
+     * @param function the function
+     * @param baseY    the base Y
+     * @param depth    maximum number of iterations
+     * @param extent   extent for preloading
+     */
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, Extent extent) {
         super(mask, function, depth, extent);
         checkNotNull(mask);

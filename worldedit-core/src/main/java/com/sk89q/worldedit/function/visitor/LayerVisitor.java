@@ -61,6 +61,14 @@ public class LayerVisitor implements Operation {
 
 
     //FAWE start - chunk preloading
+    /**
+     * Create a new visitor.
+     *
+     * @param flatRegion the flat region to visit
+     * @param minY       the minimum Y to stop the search at
+     * @param maxY       the maximum Y to begin the search at
+     * @param function   the layer function to apply to blocks
+     */
     public LayerVisitor(FlatRegion flatRegion, int minY, int maxY, LayerFunction function) {
         this(flatRegion, minY, maxY, function, null);
     }

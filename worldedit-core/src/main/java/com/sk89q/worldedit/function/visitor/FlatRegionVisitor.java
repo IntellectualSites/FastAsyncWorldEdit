@@ -49,6 +49,12 @@ public class FlatRegionVisitor implements Operation {
     private int affected = 0;
 
     //FAWE start - chunk preloading
+    /**
+     * Create a new visitor.
+     *
+     * @param flatRegion a flat region
+     * @param function   a function to apply to columns
+     */
     public FlatRegionVisitor(FlatRegion flatRegion, FlatRegionFunction function) {
         this(flatRegion, function, null);
     }

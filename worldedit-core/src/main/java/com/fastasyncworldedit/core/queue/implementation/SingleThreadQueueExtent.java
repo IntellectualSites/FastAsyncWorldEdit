@@ -308,6 +308,12 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         }
     }
 
+    /**
+     * Load a chunk in the world associated with this {@link SingleThreadQueueExtent} instance
+     *
+     * @param cx chunk X coordinate
+     * @param cz chunk Z coordinate
+     */
     public void addChunkLoad(int cx, int cz) {
         if (world == null) {
             return;
@@ -315,6 +321,11 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         world.checkLoadedChunk(BlockVector3.at(cx << 4, 0, cz << 4));
     }
 
+    /**
+     * Define a region to be "preloaded" to the number of chunks provided by the queue.preload-chunk-count setting
+     *
+     * @param region region of chunks
+     */
     public void preload(Region region) {
         if (Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
             int loadCount = 0;

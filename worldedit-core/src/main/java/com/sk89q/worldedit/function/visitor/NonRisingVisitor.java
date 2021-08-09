@@ -42,11 +42,26 @@ public class NonRisingVisitor extends RecursiveVisitor {
     }
     //FAWE end
 
-    //FAWE start - int depth
+    //FAWE start - int depth, preloading
+    /**
+     * Create a new recursive visitor.
+     *
+     * @param mask     the mask
+     * @param function the function
+     * @param depth    the maximum number of iterations
+     */
     public NonRisingVisitor(Mask mask, RegionFunction function, int depth) {
         this(mask, function, depth, null);
     }
 
+    /**
+     * Create a new recursive visitor.
+     *
+     * @param mask     the mask
+     * @param function the function
+     * @param depth    the maximum number of iterations
+     * @param extent   the extent for preloading
+     */
     public NonRisingVisitor(Mask mask, RegionFunction function, int depth, Extent extent) {
         super(mask, function, depth, extent);
         setDirections(

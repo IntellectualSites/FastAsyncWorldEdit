@@ -114,10 +114,23 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     //FAWE start
+    /**
+     * Create a new instance.
+     *
+     * @param function the function to apply to visited blocks
+     * @param maxDepth the maximum number of iterations
+     */
     public BreadthFirstSearch(RegionFunction function, int maxDepth) {
         this(function, maxDepth, null);
     }
 
+    /**
+     * Create a new instance.
+     *
+     * @param function the function to apply to visited blocks
+     * @param maxDepth the maximum number of iterations
+     * @param extent   extent to use for preloading
+     */
     public BreadthFirstSearch(RegionFunction function, int maxDepth, Extent extent) {
         checkNotNull(function);
         this.function = function;
@@ -261,7 +274,7 @@ public abstract class BreadthFirstSearch implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        //FAWE start - directions & visited
+        //FAWE start - directions, visited and preloading
         MutableBlockVector3 mutable = new MutableBlockVector3();
         BlockVector3[] dirs = directions;
         BlockVectorSet tempQueue = new BlockVectorSet();

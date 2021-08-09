@@ -35,10 +35,23 @@ public class RecursiveVisitor extends BreadthFirstSearch {
     private final Mask mask;
 
     //FAWE start
+    /**
+     * Create a new recursive visitor.
+     *
+     * @param mask     the mask
+     * @param function the function
+     */
     public RecursiveVisitor(Mask mask, RegionFunction function) {
         this(mask, function, Integer.MAX_VALUE);
     }
 
+    /**
+     * Create a new recursive visitor.
+     *
+     * @param mask     the mask
+     * @param function the function
+     * @param maxDepth the maximum number of iterations
+     */
     public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth) {
         this(mask, function, maxDepth, null);
     }
@@ -48,6 +61,8 @@ public class RecursiveVisitor extends BreadthFirstSearch {
      *
      * @param mask     the mask
      * @param function the function
+     * @param maxDepth the maximum number of iterations
+     * @param extent   the extent for preloading
      */
     public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth, Extent extent) {
         super(function, maxDepth, extent);
