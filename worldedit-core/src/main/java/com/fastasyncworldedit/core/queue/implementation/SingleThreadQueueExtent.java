@@ -318,16 +318,12 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     public void preload(Region region) {
         if (Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
             int loadCount = 0;
-            BlockVectorSet chunkLoadSet = new BlockVectorSet();
             for (BlockVector2 from : region.getChunks()) {
                 if (loadCount >= Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT) {
                     break;
                 }
                 loadCount++;
-                chunkLoadSet.add(from.getX(), 0, from.getZ());
-            }
-            for (BlockVector3 chunk : chunkLoadSet) {
-                addChunkLoad(chunk.getBlockX(), chunk.getBlockZ());
+                addChunkLoad(from.getBlockX(), from.getBlockZ());
             }
         }
     }
