@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.sk89q.util.StubServer;
+import com.fastasyncworldedit.util.StubServer;
 import com.sk89q.worldedit.util.TreeGenerator;
 import org.bukkit.Bukkit;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,9 @@ public class BukkitWorldTest {
 
     @Test
     public void testTreeTypeMapping() {
+        // FAWE start - server implementation required because of LOGGER#warn in BukkitWorld.java
         Bukkit.setServer(new StubServer());
+        // FAWE end
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             assertNotNull(BukkitWorld.toBukkitTreeType(type), "No mapping for: " + type);
         }

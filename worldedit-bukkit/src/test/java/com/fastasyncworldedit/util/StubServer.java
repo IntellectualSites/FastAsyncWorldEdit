@@ -1,21 +1,47 @@
-package com.sk89q.util;
+package com.fastasyncworldedit.util;
 
 import com.destroystokyo.paper.entity.ai.MobGoals;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import io.papermc.paper.datapack.DatapackManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import org.bukkit.*;
+import org.bukkit.BanList;
+import org.bukkit.GameMode;
+import org.bukkit.Keyed;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
+import org.bukkit.StructureType;
+import org.bukkit.Tag;
+import org.bukkit.UnsafeValues;
+import org.bukkit.Warning;
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.advancement.Advancement;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.boss.*;
-import org.bukkit.command.*;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.boss.KeyedBossBar;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.help.HelpMap;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemFactory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.loot.LootTable;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
@@ -30,7 +56,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -280,12 +311,22 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull ItemStack createExplorerMap(@NotNull World world, @NotNull Location location, @NotNull StructureType structureType) {
+    public @NotNull ItemStack createExplorerMap(
+            @NotNull World world,
+            @NotNull Location location,
+            @NotNull StructureType structureType
+    ) {
         return null;
     }
 
     @Override
-    public @NotNull ItemStack createExplorerMap(@NotNull World world, @NotNull Location location, @NotNull StructureType structureType, int i, boolean b) {
+    public @NotNull ItemStack createExplorerMap(
+            @NotNull World world,
+            @NotNull Location location,
+            @NotNull StructureType structureType,
+            int i,
+            boolean b
+    ) {
         return null;
     }
 
@@ -513,7 +554,11 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Inventory createInventory(@Nullable InventoryHolder inventoryHolder, @NotNull InventoryType inventoryType, @NotNull Component component) {
+    public @NotNull Inventory createInventory(
+            @Nullable InventoryHolder inventoryHolder,
+            @NotNull InventoryType inventoryType,
+            @NotNull Component component
+    ) {
         return null;
     }
 
@@ -524,7 +569,11 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @NotNull Inventory createInventory(@Nullable InventoryHolder inventoryHolder, @NotNull InventoryType inventoryType, @NotNull String s) {
+    public @NotNull Inventory createInventory(
+            @Nullable InventoryHolder inventoryHolder,
+            @NotNull InventoryType inventoryType,
+            @NotNull String s
+    ) {
         return null;
     }
 
@@ -534,7 +583,11 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Inventory createInventory(@Nullable InventoryHolder inventoryHolder, int i, @NotNull Component component) throws IllegalArgumentException {
+    public @NotNull Inventory createInventory(
+            @Nullable InventoryHolder inventoryHolder,
+            int i,
+            @NotNull Component component
+    ) throws IllegalArgumentException {
         return null;
     }
 
@@ -545,7 +598,8 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @NotNull Inventory createInventory(@Nullable InventoryHolder inventoryHolder, int i, @NotNull String s) throws IllegalArgumentException {
+    public @NotNull Inventory createInventory(@Nullable InventoryHolder inventoryHolder, int i, @NotNull String s) throws
+            IllegalArgumentException {
         return null;
     }
 
@@ -645,7 +699,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull CachedServerIcon loadServerIcon(@NotNull BufferedImage bufferedImage) throws IllegalArgumentException, Exception {
+    public @NotNull CachedServerIcon loadServerIcon(@NotNull BufferedImage bufferedImage) throws IllegalArgumentException,
+            Exception {
         return null;
     }
 
@@ -670,12 +725,23 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull BossBar createBossBar(@Nullable String s, @NotNull BarColor barColor, @NotNull BarStyle barStyle, @NotNull BarFlag... barFlags) {
+    public @NotNull BossBar createBossBar(
+            @Nullable String s,
+            @NotNull BarColor barColor,
+            @NotNull BarStyle barStyle,
+            @NotNull BarFlag... barFlags
+    ) {
         return null;
     }
 
     @Override
-    public @NotNull KeyedBossBar createBossBar(@NotNull NamespacedKey namespacedKey, @Nullable String s, @NotNull BarColor barColor, @NotNull BarStyle barStyle, @NotNull BarFlag... barFlags) {
+    public @NotNull KeyedBossBar createBossBar(
+            @NotNull NamespacedKey namespacedKey,
+            @Nullable String s,
+            @NotNull BarColor barColor,
+            @NotNull BarStyle barStyle,
+            @NotNull BarFlag... barFlags
+    ) {
         return null;
     }
 
@@ -765,7 +831,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull List<Entity> selectEntities(@NotNull CommandSender commandSender, @NotNull String s) throws IllegalArgumentException {
+    public @NotNull List<Entity> selectEntities(@NotNull CommandSender commandSender, @NotNull String s) throws
+            IllegalArgumentException {
         return null;
     }
 
@@ -851,4 +918,5 @@ public class StubServer implements Server {
     public @NotNull Set<String> getListeningPluginChannels() {
         return null;
     }
+
 }
