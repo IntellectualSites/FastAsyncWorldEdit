@@ -22,8 +22,6 @@ jobs:
         with:
           distribution: "temurin"
           java-version: "16"
-      - name: "make gradlew executable"
-        run: "chmod +x gradlew"
       - name: "Clean Build"
         run: "./gradlew clean build"
       - name: Archive Artifacts
