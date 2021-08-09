@@ -9,7 +9,6 @@ import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
-import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
@@ -322,7 +321,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     /**
-     * Define a region to be "preloaded" to the number of chunks provided by the queue.preload-chunk-count setting
+     * Define a region to be "preloaded" to the number of chunks provided by {@link Settings.QUEUE#PRELOAD_CHUNK_COUNT}
      *
      * @param region region of chunks
      */
