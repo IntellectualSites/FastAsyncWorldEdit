@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extension.factory;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.AdjacentMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.AngleMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.DefaultMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.ExtremaMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.FalseMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.LiquidMaskParser;
@@ -71,6 +72,10 @@ import java.util.stream.Collectors;
  */
 public final class MaskFactory extends AbstractFactory<Mask> {
 
+    //FAWE start - rich mask parsing
+    private final DefaultMaskParser defaultMaskParser;
+    //FAWE end
+
     /**
      * Create a new mask registry.
      *
@@ -78,6 +83,10 @@ public final class MaskFactory extends AbstractFactory<Mask> {
      */
     public MaskFactory(WorldEdit worldEdit) {
         super(worldEdit, new BlocksMaskParser(worldEdit));
+
+        //FAWE start - rich mask parsing
+        defaultMaskParser = new DefaultMaskParser(worldEdit);
+        //FAWE end
 
         register(new ExistingMaskParser(worldEdit));
         register(new AirMaskParser(worldEdit));
@@ -133,18 +142,14 @@ public final class MaskFactory extends AbstractFactory<Mask> {
                 continue;
             }
 
-            Mask match = null;
-            for (InputParser<Mask> parser : getParsers()) {
-                match = parser.parseFromInput(component, context);
-
-                if (match != null) {
-                    break;
-                }
+            //FAWE start - rich mask parsing
+            Mask match = defaultMaskParser.parseFromInput(component, context);
+            if (match != null) {
+                masks.add(match);
+                continue;
             }
-            if (match == null) {
-                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
-            }
-            masks.add(match);
+            parseFromParsers(context, masks, component, match);
+            //FAWE end
         }
 
         switch (masks.size()) {
@@ -156,5 +161,49 @@ public final class MaskFactory extends AbstractFactory<Mask> {
                 return new MaskIntersection(masks).optimize();
         }
     }
+
+    //FAWE start - rich mask parsing
+    private void parseFromParsers(
+            final ParserContext context,
+            final List<Mask> masks,
+            final String component,
+            Mask match
+    ) {
+        for (InputParser<Mask> parser : getParsers()) {
+            match = parser.parseFromInput(component, context);
+
+            if (match != null) {
+                break;
+            }
+        }
+        if (match == null) {
+            throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
+        }
+        masks.add(match);
+    }
+
+    public Mask parseWithoutDefault(String input, ParserContext context) throws InputParseException {
+        List<Mask> masks = new ArrayList<>();
+
+        for (String component : input.split(" ")) {
+            if (component.isEmpty()) {
+                continue;
+            }
+
+            Mask match = null;
+
+            parseFromParsers(context, masks, component, match);
+        }
+
+        switch (masks.size()) {
+            case 0:
+                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
+            case 1:
+                return masks.get(0).optimize();
+            default:
+                return new MaskIntersection(masks).optimize();
+        }
+    }
+    //FAWE end
 
 }

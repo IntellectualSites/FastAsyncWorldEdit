@@ -840,7 +840,7 @@ public final class PlatformCommandManager {
     //FAWE end
 
     //FAWE start - Event & suggestions
-    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event, boolean isSuggestions) {
+    public MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event, boolean isSuggestions) {
         //FAWE end
         InjectedValueStore store = MapBackedValueStore.create();
         store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
