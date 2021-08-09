@@ -2,6 +2,7 @@ package com.sk89q.util;
 
 import com.destroystokyo.paper.entity.ai.MobGoals;
 import com.destroystokyo.paper.profile.PlayerProfile;
+import io.papermc.paper.datapack.DatapackManager;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -117,6 +118,16 @@ public class StubServer implements Server {
 
     @Override
     public void setWhitelist(boolean b) {
+
+    }
+
+    @Override
+    public boolean isWhitelistEnforced() {
+        return false;
+    }
+
+    @Override
+    public void setWhitelistEnforced(final boolean b) {
 
     }
 
@@ -324,6 +335,20 @@ public class StubServer implements Server {
     }
 
     @Override
+    public @Nullable Recipe getCraftingRecipe(final @NotNull ItemStack[] itemStacks, @NotNull final World world) {
+        return null;
+    }
+
+    @Override
+    public @NotNull ItemStack craftItem(
+            final @NotNull ItemStack[] itemStacks,
+            @NotNull final World world,
+            @NotNull final Player player
+    ) {
+        return null;
+    }
+
+    @Override
     public @NotNull Iterator<Recipe> recipeIterator() {
         return null;
     }
@@ -385,6 +410,11 @@ public class StubServer implements Server {
      */
     @Override
     public int broadcast(@NotNull String s, @NotNull String s1) {
+        return 0;
+    }
+
+    @Override
+    public int broadcast(@NotNull final Component component) {
         return 0;
     }
 
@@ -799,6 +829,11 @@ public class StubServer implements Server {
 
     @Override
     public @NotNull MobGoals getMobGoals() {
+        return null;
+    }
+
+    @Override
+    public @NotNull DatapackManager getDatapackManager() {
         return null;
     }
 

@@ -62,6 +62,9 @@ allprojects {
                 showStackTraces = true
             }
         }
+        tasks.withType(Javadoc::class) {
+            options.encoding = "UTF-8"
+        }
     }
 }
 
