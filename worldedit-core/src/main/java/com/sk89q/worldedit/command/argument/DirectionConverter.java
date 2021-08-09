@@ -26,8 +26,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import org.enginehub.piston.CommandManager;
 
-import java.util.Optional;
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public final class DirectionConverter extends AbstractDirectionConverter<Direction> {
 
@@ -36,14 +36,15 @@ public final class DirectionConverter extends AbstractDirectionConverter<Directi
     }
 
     public static void register(WorldEdit worldEdit, CommandManager commandManager) {
-        for (boolean includeDiagonals : new boolean[] { false, true }) {
+        for (boolean includeDiagonals : new boolean[]{false, true}) {
             DirectionConverter directionConverter = new DirectionConverter(worldEdit, includeDiagonals);
             register(commandManager, directionConverter, Direction.class, includeDiagonals);
         }
     }
 
     @Override
-    protected Direction convertDirection(String argument, @Nullable Player player, boolean includeDiagonals) throws UnknownDirectionException {
+    protected Direction convertDirection(String argument, @Nullable Player player, boolean includeDiagonals) throws
+            UnknownDirectionException {
         final BlockVector3 vec = includeDiagonals
                 ? getWorldEdit().getDiagonalDirection(player, argument)
                 : getWorldEdit().getDirection(player, argument);

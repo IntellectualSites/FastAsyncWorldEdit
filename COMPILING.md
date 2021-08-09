@@ -38,7 +38,7 @@ You will find:
 * FastAsyncWorldEdit for Bukkit in **worldedit-bukkit/build/libs**
 * the CLI version in **worldedit-cli/build/libs**
 
-If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-1.16-<commitHash>` version obtained in **worldedit-bukkit/build/libs**.
+If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-1.17-<commitHash>` version obtained in **worldedit-bukkit/build/libs**.
 
 (The `-#` version includes FastAsyncWorldEdit + necessary libraries.)
 

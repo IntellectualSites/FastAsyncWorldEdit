@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
-import com.sk89q.jnbt.CompoundTag;
+import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -13,6 +12,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -22,7 +22,6 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -39,6 +38,7 @@ import java.util.Map;
 import java.util.OptionalInt;
 
 public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
+
     BukkitImplAdapter<T> getParent();
 
     @Override
@@ -263,4 +263,5 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     default BlockState asBlockState(ItemStack itemStack) {
         return getParent().asBlockState(itemStack);
     }
+
 }

@@ -38,4 +38,5 @@ public @interface Direction {
     String AIM = "me";
 
     boolean includeDiagonals() default false;
+
 }

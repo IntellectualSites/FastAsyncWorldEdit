@@ -23,8 +23,8 @@ public class ColorUtil {
             throw new IllegalArgumentException("Invalid color specification");
         }
         float c = type == PARSE_COMPONENT
-            ? Integer.parseInt(color)
-            : Float.parseFloat(color);
+                ? Integer.parseInt(color)
+                : Float.parseFloat(color);
         switch (type) {
             case PARSE_ALPHA:
                 return c < 0f ? 0f : Math.min(c, 1f);
@@ -34,10 +34,10 @@ public class ColorUtil {
                 return c <= 0f ? 0f : c >= 255f ? 1f : c / 255f;
             case PARSE_ANGLE:
                 return c < 0f
-                    ? c % 360f + 360f
-                    : c > 360f
-                        ? c % 360f
-                        : c;
+                        ? c % 360f + 360f
+                        : c > 360f
+                                ? c % 360f
+                                : c;
         }
 
         throw new IllegalArgumentException("Invalid color specification");
@@ -76,7 +76,7 @@ public class ColorUtil {
     public static Color parseColor(String colorString) {
         if (colorString == null) {
             throw new NullPointerException(
-                "The color components or name must be specified");
+                    "The color components or name must be specified");
         }
         if (colorString.isEmpty()) {
             throw new IllegalArgumentException("Invalid color specification");
@@ -145,4 +145,5 @@ public class ColorUtil {
 
         throw new IllegalArgumentException("Invalid color specification");
     }
+
 }

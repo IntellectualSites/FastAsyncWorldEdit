@@ -37,10 +37,6 @@ public final class Masks {
     private Masks() {
     }
 
-    public static boolean isNull(Mask mask) {
-        return mask == null || mask == ALWAYS_TRUE;
-    }
-
     /**
      * Return a 3D mask that always returns true.
      *
@@ -50,9 +46,11 @@ public final class Masks {
         return ALWAYS_TRUE;
     }
 
+    //FAWE start
     public static Mask alwaysFalse() {
         return ALWAYS_FALSE;
     }
+    //FAWE end
 
     /**
      * Return a 2D mask that always returns true.
@@ -126,7 +124,10 @@ public final class Masks {
         };
     }
 
+    //FAWE start - protected > private
     protected static class AlwaysTrue implements Mask, Mask2D {
+
+        //FAWE end
         @Override
         public boolean test(BlockVector3 vector) {
             return true;
@@ -143,6 +144,7 @@ public final class Masks {
             return this;
         }
 
+        //FAWE start
         @Override
         public Mask tryCombine(Mask other) {
             return other;
@@ -164,10 +166,14 @@ public final class Masks {
         public Mask2D copy2D() {
             return new AlwaysTrue();
         }
+        //FAWE end
 
     }
 
+    //FAWE start - protected > private
     protected static class AlwaysFalse implements Mask, Mask2D {
+
+        //FAWE end
         @Override
         public boolean test(BlockVector3 vector) {
             return false;
@@ -184,6 +190,7 @@ public final class Masks {
             return this;
         }
 
+        //FAWE start
         @Override
         public Mask tryCombine(Mask other) {
             return this;
@@ -205,6 +212,7 @@ public final class Masks {
         public Mask2D copy2D() {
             return new AlwaysFalse();
         }
+        //FAWE end
 
     }
 

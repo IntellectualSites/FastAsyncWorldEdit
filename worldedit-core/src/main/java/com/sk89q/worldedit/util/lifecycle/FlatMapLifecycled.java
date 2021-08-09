@@ -19,11 +19,12 @@
 
 package com.sk89q.worldedit.util.lifecycle;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 class FlatMapLifecycled<T, U> implements Lifecycled<U> {
+
     private final LifecycledCallbackHandler<U> events = new LifecycledCallbackHandler<>(this);
     private Lifecycled<U> mapped;
     private Token<FlatMapLifecycled<T, U>> mappedToken;
@@ -77,4 +78,5 @@ class FlatMapLifecycled<T, U> implements Lifecycled<U> {
     public Events<U> events() {
         return events;
     }
+
 }

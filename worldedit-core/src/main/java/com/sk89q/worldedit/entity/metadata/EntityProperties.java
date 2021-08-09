@@ -168,4 +168,5 @@ public interface EntityProperties {
      * @return true if water creature
      */
     boolean isWaterCreature();
+
 }

@@ -1,12 +1,12 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import co.aikar.timings.Timings;
-import com.fastasyncworldedit.core.beta.implementation.queue.QueueHandler;
 import com.fastasyncworldedit.bukkit.listener.ChunkListener;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
-import org.spigotmc.AsyncCatcher;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class BukkitQueueHandler extends QueueHandler {
@@ -16,11 +16,18 @@ public class BukkitQueueHandler extends QueueHandler {
     private volatile boolean timingsEnabled;
     private static boolean alertTimingsChange = true;
 
-    private static Method methodCheck;
+    private static Method timingsCheck;
+    private static Field asyncCatcher;
+
     static {
         try {
-            methodCheck = Class.forName("co.aikar.timings.TimingsManager").getDeclaredMethod("recheckEnabled");
-            methodCheck.setAccessible(true);
+            timingsCheck = Class.forName("co.aikar.timings.TimingsManager").getDeclaredMethod("recheckEnabled");
+            timingsCheck.setAccessible(true);
+        } catch (Throwable ignored) {
+        }
+        try {
+            asyncCatcher = Class.forName("org.spigotmc.AsyncCatcher").getDeclaredField("enabled");
+            asyncCatcher.setAccessible(true);
         } catch (Throwable ignored) {
         }
     }
@@ -30,7 +37,7 @@ public class BukkitQueueHandler extends QueueHandler {
         ChunkListener.physicsFreeze = true;
         if (parallel) {
             try {
-                AsyncCatcher.enabled = false;
+                asyncCatcher.setBoolean(asyncCatcher, false);
                 timingsEnabled = Timings.isTimingsEnabled();
                 if (timingsEnabled) {
                     if (alertTimingsChange) {
@@ -38,7 +45,7 @@ public class BukkitQueueHandler extends QueueHandler {
                         LOGGER.debug("Having `parallel-threads` > 1 interferes with the timings.");
                     }
                     Timings.setTimingsEnabled(false);
-                    methodCheck.invoke(null);
+                    timingsCheck.invoke(null);
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -51,14 +58,15 @@ public class BukkitQueueHandler extends QueueHandler {
         ChunkListener.physicsFreeze = false;
         if (parallel) {
             try {
-                AsyncCatcher.enabled = true;
+                asyncCatcher.setBoolean(asyncCatcher, true);
                 if (timingsEnabled) {
                     Timings.setTimingsEnabled(true);
-                    methodCheck.invoke(null);
+                    timingsCheck.invoke(null);
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
     }
+
 }

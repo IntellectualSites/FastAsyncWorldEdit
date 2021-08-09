@@ -25,7 +25,9 @@ import com.sk89q.worldedit.extension.platform.Platform;
  * Raised when a platform needs to retract all registered data, e.g. due to a reload.
  */
 public class PlatformUnreadyEvent extends PlatformEvent {
+
     public PlatformUnreadyEvent(Platform platform) {
         super(platform);
     }
+
 }

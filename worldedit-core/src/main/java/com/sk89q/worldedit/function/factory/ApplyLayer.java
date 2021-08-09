@@ -51,10 +51,12 @@ public class ApplyLayer implements Contextual<Operation> {
     public Operation createFromContext(EditContext context) {
         FlatRegion localRegion = Regions.asFlatRegion(firstNonNull(context.getRegion(), region));
 
-        return new LayerVisitor(localRegion,
-            localRegion.getMinimumPoint().getY(),
-            localRegion.getMaximumPoint().getY(),
-            function.createFromContext(context));
+        return new LayerVisitor(
+                localRegion,
+                localRegion.getMinimumPoint().getY(),
+                localRegion.getMaximumPoint().getY(),
+                function.createFromContext(context)
+        );
     }
 
     @Override

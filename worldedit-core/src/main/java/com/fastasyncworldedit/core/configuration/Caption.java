@@ -8,8 +8,9 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.format.Style;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +19,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import javax.annotation.Nonnull;
 
 public class Caption {
 
@@ -104,7 +104,11 @@ public class Caption {
         return parent;
     }
 
-    public static TranslatableComponent of(@Nonnull final String key, @Nullable final TextColor color, @Nonnull final List<? extends Component> args) {
+    public static TranslatableComponent of(
+            @Nonnull final String key,
+            @Nullable final TextColor color,
+            @Nonnull final List<? extends Component> args
+    ) {
         return TranslatableComponent.of(key, color, Collections.emptySet(), args);
     }
 
@@ -115,4 +119,5 @@ public class Caption {
                 .collect(Collectors.toList());
         return TranslatableComponent.of(key, components);
     }
+
 }

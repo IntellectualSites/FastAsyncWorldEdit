@@ -39,25 +39,29 @@ import java.util.List;
 import java.util.function.Function;
 
 public class Chunk3dVectorConverter<C, T> implements ArgumentConverter<T> {
+
     public static void register(CommandManager commandManager) {
-        CommaSeparatedValuesConverter<Integer> intConverter = CommaSeparatedValuesConverter.wrap(ArgumentConverters.get(TypeToken.of(int.class)));
-        commandManager.registerConverter(Key.of(BlockVector3.class, Chunk3d.class),
-            new Chunk3dVectorConverter<>(
-                intConverter,
-                Range.closed(2, 3),
-                cmps -> {
-                    switch (cmps.size()) {
-                        case 2:
-                            return BlockVector3.at(cmps.get(0), 0, cmps.get(1));
-                        case 3:
-                            return BlockVector3.at(cmps.get(0), cmps.get(1), cmps.get(2));
-                        default:
-                            break;
-                    }
-                    throw new AssertionError("Expected 2 or 3 components");
-                },
-                "block vector with x,z or x,y,z"
-            ));
+        CommaSeparatedValuesConverter<Integer> intConverter = CommaSeparatedValuesConverter.wrap(ArgumentConverters.get(TypeToken.of(
+                int.class)));
+        commandManager.registerConverter(
+                Key.of(BlockVector3.class, Chunk3d.class),
+                new Chunk3dVectorConverter<>(
+                        intConverter,
+                        Range.closed(2, 3),
+                        cmps -> {
+                            switch (cmps.size()) {
+                                case 2:
+                                    return BlockVector3.at(cmps.get(0), 0, cmps.get(1));
+                                case 3:
+                                    return BlockVector3.at(cmps.get(0), cmps.get(1), cmps.get(2));
+                                default:
+                                    break;
+                            }
+                            throw new AssertionError("Expected 2 or 3 components");
+                        },
+                        "block vector with x,z or x,y,z"
+                )
+        );
     }
 
     private final ArgumentConverter<C> componentConverter;
@@ -65,10 +69,12 @@ public class Chunk3dVectorConverter<C, T> implements ArgumentConverter<T> {
     private final Function<List<C>, T> vectorConstructor;
     private final String acceptableArguments;
 
-    private Chunk3dVectorConverter(ArgumentConverter<C> componentConverter,
-                                   Range<Integer> componentCount,
-                                   Function<List<C>, T> vectorConstructor,
-                                   String acceptableArguments) {
+    private Chunk3dVectorConverter(
+            ArgumentConverter<C> componentConverter,
+            Range<Integer> componentCount,
+            Function<List<C>, T> vectorConstructor,
+            String acceptableArguments
+    ) {
         this.componentConverter = componentConverter;
         this.componentCount = componentCount;
         this.vectorConstructor = vectorConstructor;
@@ -88,9 +94,10 @@ public class Chunk3dVectorConverter<C, T> implements ArgumentConverter<T> {
         }
         if (!componentCount.contains(components.get().size())) {
             return FailedConversion.from(new IllegalArgumentException(
-                "Must have " + componentCount + " vector components"));
+                    "Must have " + componentCount + " vector components"));
         }
         T vector = vectorConstructor.apply(ImmutableList.copyOf(components.get()));
         return SuccessfulConversion.fromSingle(vector);
     }
+
 }

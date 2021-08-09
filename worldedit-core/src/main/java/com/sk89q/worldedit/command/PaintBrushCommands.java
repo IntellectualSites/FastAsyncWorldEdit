@@ -60,88 +60,110 @@ import static org.enginehub.piston.part.CommandParts.arg;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class PaintBrushCommands {
 
-    private static final CommandArgument REGION_FACTORY = arg(TranslatableComponent.of("shape") , Caption.of("worldedit.brush.paint.shape"))
-        .defaultsTo(ImmutableList.of())
-        .ofTypes(ImmutableList.of(Key.of(RegionFactory.class)))
-        .build();
+    private static final CommandArgument REGION_FACTORY = arg(
+            TranslatableComponent.of("shape"),
+            Caption.of("worldedit.brush.paint.shape")
+    )
+            .defaultsTo(ImmutableList.of())
+            .ofTypes(ImmutableList.of(Key.of(RegionFactory.class)))
+            .build();
 
-    private static final CommandArgument RADIUS = arg(TranslatableComponent.of("radius") , Caption.of("worldedit.brush.paint.size"))
-        .defaultsTo(ImmutableList.of("5"))
-        .ofTypes(ImmutableList.of(Key.of(double.class)))
-        .build();
+    private static final CommandArgument RADIUS = arg(
+            TranslatableComponent.of("radius"),
+            Caption.of("worldedit.brush.paint.size")
+    )
+            .defaultsTo(ImmutableList.of("5"))
+            .ofTypes(ImmutableList.of(Key.of(double.class)))
+            .build();
 
-    private static final CommandArgument DENSITY = arg(TranslatableComponent.of("density") , Caption.of("worldedit.brush.paint.density"))
-        .defaultsTo(ImmutableList.of("20"))
-        .ofTypes(ImmutableList.of(Key.of(double.class)))
-        .build();
+    private static final CommandArgument DENSITY = arg(
+            TranslatableComponent.of("density"),
+            Caption.of("worldedit.brush.paint.density")
+    )
+            .defaultsTo(ImmutableList.of("20"))
+            .ofTypes(ImmutableList.of(Key.of(double.class)))
+            .build();
 
-    public static void register(CommandManagerService service, CommandManager commandManager, CommandRegistrationHandler registration) {
+    public static void register(
+            CommandManagerService service,
+            CommandManager commandManager,
+            CommandRegistrationHandler registration
+    ) {
         commandManager.register("paint", builder -> {
             builder.description(Caption.of("worldedit.brush.paint.description"));
             builder.action(org.enginehub.piston.Command.Action.NULL_ACTION);
 
             CommandManager manager = service.newCommandManager();
             registration.register(
-                manager,
-                PaintBrushCommandsRegistration.builder(),
-                new PaintBrushCommands()
+                    manager,
+                    PaintBrushCommandsRegistration.builder(),
+                    new PaintBrushCommands()
             );
 
             builder.condition(new PermissionCondition(ImmutableSet.of("worldedit.brush.paint")));
 
             builder.addParts(REGION_FACTORY, RADIUS, DENSITY);
-            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type") , Caption.of("worldedit.brush.paint.type"))
-                .withCommands(manager.getAllCommands().collect(Collectors.toList()))
-                .required()
-                .build());
+            builder.addPart(SubCommandPart.builder(TranslatableComponent.of("type"), Caption.of("worldedit.brush.paint.type"))
+                    .withCommands(manager.getAllCommands().collect(Collectors.toList()))
+                    .required()
+                    .build());
         });
     }
 
-    private void setPaintBrush(CommandParameters parameters, Player player, LocalSession localSession,
-        Contextual<? extends RegionFunction> generatorFactory) throws WorldEditException {
+    private void setPaintBrush(
+            CommandParameters parameters, Player player, LocalSession localSession,
+            Contextual<? extends RegionFunction> generatorFactory
+    ) throws WorldEditException {
         double radius = requireNonNull(RADIUS.value(parameters).asSingle(double.class));
         double density = requireNonNull(DENSITY.value(parameters).asSingle(double.class)) / 100;
         RegionFactory regionFactory = REGION_FACTORY.value(parameters).asSingle(RegionFactory.class);
         BrushCommands.setOperationBasedBrush(player, localSession, radius,
-            new Paint(generatorFactory, density), regionFactory, "worldedit.brush.paint");
+                new Paint(generatorFactory, density), regionFactory, "worldedit.brush.paint"
+        );
     }
 
     @Command(
-        name = "forest",
-        desc = "Plant trees"
+            name = "forest",
+            desc = "Plant trees"
     )
-    public void forest(CommandParameters parameters,
-        Player player, LocalSession localSession,
-        @Arg(desc = "The type of tree to plant")
-            TreeGenerator.TreeType type) throws WorldEditException {
+    public void forest(
+            CommandParameters parameters,
+            Player player, LocalSession localSession,
+            @Arg(desc = "The type of tree to plant")
+                    TreeGenerator.TreeType type
+    ) throws WorldEditException {
         setPaintBrush(parameters, player, localSession, new TreeGeneratorFactory(type));
     }
 
     @Command(
-        name = "item",
-        desc = "Use an item"
+            name = "item",
+            desc = "Use an item"
     )
     @CommandPermissions("worldedit.brush.item")
-    public void item(CommandParameters parameters,
-                     Player player, LocalSession localSession,
-                     @Arg(desc = "The type of item to use")
-                         BaseItem item,
-                     @Arg(desc = "The direction in which the item will be applied", def = "up")
-                     @Direction(includeDiagonals = true)
-                         com.sk89q.worldedit.util.Direction direction) throws WorldEditException {
+    public void item(
+            CommandParameters parameters,
+            Player player, LocalSession localSession,
+            @Arg(desc = "The type of item to use")
+                    BaseItem item,
+            @Arg(desc = "The direction in which the item will be applied", def = "up")
+            @Direction(includeDiagonals = true)
+                    com.sk89q.worldedit.util.Direction direction
+    ) throws WorldEditException {
         player.print(TextComponent.builder().append("WARNING: ")
                 .append(Caption.of("worldedit.brush.paint.item.warning")).build());
         setPaintBrush(parameters, player, localSession, new ItemUseFactory(item, direction));
     }
 
     @Command(
-        name = "set",
-        desc = "Place a block"
+            name = "set",
+            desc = "Place a block"
     )
-    public void set(CommandParameters parameters,
-        Player player, LocalSession localSession,
-        @Arg(desc = "The pattern of blocks to use")
-            Pattern pattern) throws WorldEditException {
+    public void set(
+            CommandParameters parameters,
+            Player player, LocalSession localSession,
+            @Arg(desc = "The pattern of blocks to use")
+                    Pattern pattern
+    ) throws WorldEditException {
         setPaintBrush(parameters, player, localSession, new ReplaceFactory(pattern));
     }
 

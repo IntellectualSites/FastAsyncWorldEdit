@@ -1,29 +1,27 @@
 package com.fastasyncworldedit.bukkit;
 
-import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
-import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
-import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.IFawe;
-import com.fastasyncworldedit.core.beta.implementation.preloader.AsyncPreloader;
-import com.fastasyncworldedit.core.beta.implementation.preloader.Preloader;
-import com.fastasyncworldedit.core.beta.implementation.queue.QueueHandler;
 import com.fastasyncworldedit.bukkit.adapter.BukkitQueueHandler;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
 import com.fastasyncworldedit.bukkit.listener.BrushListener;
 import com.fastasyncworldedit.bukkit.listener.ChunkListener9;
 import com.fastasyncworldedit.bukkit.listener.RenderListener;
-import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
 import com.fastasyncworldedit.bukkit.regions.GriefDefenderFeature;
+import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
 import com.fastasyncworldedit.bukkit.regions.ResidenceFeature;
 import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
-//import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
+import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
+import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.IFawe;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
+import com.fastasyncworldedit.core.queue.implementation.preloader.AsyncPreloader;
+import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
-import com.fastasyncworldedit.core.util.ThirdPartyManager;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.image.ImageViewer;
@@ -32,6 +30,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.datapack.Datapack;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -44,7 +43,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.UUID;
@@ -91,7 +89,7 @@ public class FaweBukkit implements IFawe, Listener {
         TaskManager.IMP.task(() -> {
             // Fix for ProtocolSupport
             Settings.IMP.PROTOCOL_SUPPORT_FIX =
-                Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
+                    Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
 
             // This class
             Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
@@ -101,7 +99,8 @@ public class FaweBukkit implements IFawe, Listener {
         });
     }
 
-    @Override public QueueHandler getQueueHandler() {
+    @Override
+    public QueueHandler getQueueHandler() {
         return new BukkitQueueHandler();
     }
 
@@ -112,20 +111,12 @@ public class FaweBukkit implements IFawe, Listener {
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
-                File output = new File(plugin.getDataFolder().getParentFile(),
-                    "PacketListenerAPI_v3.7.6-SNAPSHOT.jar");
-                byte[] jarData = ThirdPartyManager.PacketListenerAPI.download();
-                try (FileOutputStream fos = new FileOutputStream(output)) {
-                    fos.write(jarData);
-                }
+                LOGGER.error("PacketListener not found! Please install PacketListenerAPI v3.7.6 or above before attempting to " +
+                        "complete image-related edits");
             }
             if (manager.getPlugin("MapManager") == null) {
-                File output = new File(plugin.getDataFolder().getParentFile(),
-                    "MapManager_v1.7.8-SNAPSHOT.jar");
-                byte[] jarData = ThirdPartyManager.MapManager.download();
-                try (FileOutputStream fos = new FileOutputStream(output)) {
-                    fos.write(jarData);
-                }
+                LOGGER.error("MapManager not found! Please install PacketListenerAPI v1.7.8 or above before attempting to " +
+                        "complete image-related edits");
             }
             return new BukkitImageViewer(BukkitAdapter.adapt(player));
         } catch (Throwable ignored) {
@@ -133,7 +124,8 @@ public class FaweBukkit implements IFawe, Listener {
         return null;
     }
 
-    @Override public File getDirectory() {
+    @Override
+    public File getDirectory() {
         return plugin.getDataFolder();
     }
 
@@ -151,21 +143,29 @@ public class FaweBukkit implements IFawe, Listener {
         return tmp;
     }
 
-    @Override public String getDebugInfo() {
+    @Override
+    public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         msg.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
-        msg.append("Plugins (").append(plugins.length).append("): \n");
+        msg.append("Plugins (").append(plugins.length).append("):\n");
         for (Plugin p : plugins) {
             msg.append(" - ").append(p.getName()).append(":").append("\n")
-                .append("  • Version: ").append(p.getDescription().getVersion()).append("\n")
-                .append("  • Enabled: ").append(p.isEnabled()).append("\n")
-                .append("  • Main: ").append(p.getDescription().getMain()).append("\n")
-                .append("  • Authors: ").append(p.getDescription().getAuthors()).append("\n")
-                .append("  • Load Before: ").append(p.getDescription().getLoadBefore()).append("\n")
-                .append("  • Dependencies: ").append(p.getDescription().getDepend()).append("\n")
-                .append("  • Soft Dependencies: ").append(p.getDescription().getSoftDepend()).append("\n")
-                .append("  • Provides: ").append(p.getDescription().getProvides()).append("\n");
+                    .append("  • Version: ").append(p.getDescription().getVersion()).append("\n")
+                    .append("  • Enabled: ").append(p.isEnabled()).append("\n")
+                    .append("  • Main: ").append(p.getDescription().getMain()).append("\n")
+                    .append("  • Authors: ").append(p.getDescription().getAuthors()).append("\n")
+                    .append("  • Load Before: ").append(p.getDescription().getLoadBefore()).append("\n")
+                    .append("  • Dependencies: ").append(p.getDescription().getDepend()).append("\n")
+                    .append("  • Soft Dependencies: ").append(p.getDescription().getSoftDepend()).append("\n")
+                    .append("  • Provides: ").append(p.getDescription().getProvides()).append("\n");
+        }
+        if (PaperLib.isPaper()) {
+            Collection<Datapack> datapacks = Bukkit.getServer().getDatapackManager().getEnabledPacks();
+            msg.append("Enabled Datapacks (").append(datapacks.size()).append("):\n");
+            for (Datapack dp : datapacks) {
+                msg.append(" - ").append(dp.getName()).append("\n");
+            }
         }
         return msg.toString();
     }
@@ -173,7 +173,8 @@ public class FaweBukkit implements IFawe, Listener {
     /**
      * The task manager handles sync/async tasks.
      */
-    @Override public TaskManager getTaskManager() {
+    @Override
+    public TaskManager getTaskManager() {
         return new BukkitTaskManager(plugin);
     }
 
@@ -184,9 +185,10 @@ public class FaweBukkit implements IFawe, Listener {
     /**
      * A mask manager handles region restrictions e.g., PlotSquared plots / WorldGuard regions
      */
-    @Override public Collection<FaweMaskManager> getMaskManagers() {
+    @Override
+    public Collection<FaweMaskManager> getMaskManagers() {
         final Plugin worldguardPlugin =
-            Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
+                Bukkit.getServer().getPluginManager().getPlugin("WorldGuard");
         final ArrayList<FaweMaskManager> managers = new ArrayList<>();
         if (worldguardPlugin != null && worldguardPlugin.isEnabled()) {
             try {
@@ -212,7 +214,7 @@ public class FaweBukkit implements IFawe, Listener {
             }
         }
         final Plugin griefpreventionPlugin =
-            Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention");
+                Bukkit.getServer().getPluginManager().getPlugin("GriefPrevention");
         if (griefpreventionPlugin != null && griefpreventionPlugin.isEnabled()) {
             try {
                 managers.add(new GriefPreventionFeature(griefpreventionPlugin));
@@ -259,26 +261,31 @@ public class FaweBukkit implements IFawe, Listener {
         wePlayer.unregister();
     }
 
-    @Override public String getPlatform() {
+    @Override
+    public String getPlatform() {
         return "Bukkit";
     }
 
-    @Override public UUID getUUID(String name) {
+    @Override
+    public UUID getUUID(String name) {
         return Bukkit.getOfflinePlayer(name).getUniqueId();
     }
 
-    @Override public String getName(UUID uuid) {
+    @Override
+    public String getName(UUID uuid) {
         return Bukkit.getOfflinePlayer(uuid).getName();
     }
 
-    @Override public Preloader getPreloader() {
+    @Override
+    public Preloader getPreloader() {
         if (PaperLib.isPaper()) {
             return new AsyncPreloader();
         }
         return null;
     }
 
-    @Override public boolean isChunksStretched() {
+    @Override
+    public boolean isChunksStretched() {
         return chunksStretched;
     }
 
@@ -295,11 +302,12 @@ public class FaweBukkit implements IFawe, Listener {
         if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
             WEManager.IMP.managers.add(new com.fastasyncworldedit.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
-        } else if (PlotSquared.get().getVersion().version[0] == 6){
+        } else if (PlotSquared.get().getVersion().version[0] == 6) {
             WEManager.IMP.managers.add(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
         } else {
             LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");
         }
     }
+
 }

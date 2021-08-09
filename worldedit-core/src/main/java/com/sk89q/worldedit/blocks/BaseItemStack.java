@@ -49,7 +49,7 @@ public class BaseItemStack extends BaseItem {
      * Construct the object.
      *
      * @param itemType The item type
-     * @param amount amount in the stack
+     * @param amount   amount in the stack
      */
     public BaseItemStack(ItemType itemType, int amount) {
         super(itemType);
@@ -59,25 +59,13 @@ public class BaseItemStack extends BaseItem {
     /**
      * Construct the object.
      *
-     * @param id The item type
-     * @param tag Tag value
+     * @param id     The item type
+     * @param tag    Tag value
      * @param amount amount in the stack
      * @deprecated Use {@link #BaseItemStack(ItemType, LazyReference, int)}
      */
     @Deprecated
     public BaseItemStack(ItemType id, CompoundTag tag, int amount) {
-        super(id, tag);
-        this.amount = amount;
-    }
-
-    /**
-     * Construct the object.
-     *
-     * @param id The item type
-     * @param tag Tag value
-     * @param amount amount in the stack
-     */
-    public BaseItemStack(ItemType id, LazyReference<CompoundBinaryTag> tag, int amount) {
         super(id, tag);
         this.amount = amount;
     }
@@ -102,6 +90,21 @@ public class BaseItemStack extends BaseItem {
 
     public Component getRichName() {
         return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
-            .getRegistries().getItemRegistry().getRichName(this);
+                .getRegistries().getItemRegistry().getRichName(this);
     }
+
+    //FAWE start
+
+    /**
+     * Construct the object.
+     *
+     * @param id     The item type
+     * @param tag    Tag value
+     * @param amount amount in the stack
+     */
+    public BaseItemStack(ItemType id, LazyReference<CompoundBinaryTag> tag, int amount) {
+        super(id, tag);
+        this.amount = amount;
+    }
+    //FAWE end
 }

@@ -28,7 +28,6 @@ public interface CUIRegion {
      * Sends CUI events describing the region for
      * versions of CUI equal to or greater than the
      * value supplied by getProtocolVersion().
-     *
      */
     void describeCUI(LocalSession session, Actor player);
 
@@ -36,7 +35,6 @@ public interface CUIRegion {
      * Sends CUI events describing the region for
      * versions of CUI smaller than the value
      * supplied by getProtocolVersion().
-     *
      */
     void describeLegacyCUI(LocalSession session, Actor player);
 
@@ -63,4 +61,5 @@ public interface CUIRegion {
      * @return the legacy type ID
      */
     String getLegacyTypeID();
+
 }

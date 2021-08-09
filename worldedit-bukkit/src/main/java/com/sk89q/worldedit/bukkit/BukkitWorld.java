@@ -21,8 +21,9 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.util.WorldUnloadedException;
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.sk89q.jnbt.CompoundTag;
@@ -67,12 +68,14 @@ import org.bukkit.inventory.InventoryHolder;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -177,6 +180,7 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     //FAWE start
+
     /**
      * Get the world handle.
      *
@@ -311,11 +315,11 @@ public class BukkitWorld extends AbstractWorld {
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             if (treeTypeMapping.get(type) == null) {
                 LOGGER.error("No TreeType mapping for TreeGenerator.TreeType." + type);
-                // FAWE start
+                //FAWE start
                 LOGGER.warn("Your FAWE version is newer than " + Bukkit.getVersion() +
                         " and contains features of future minecraft versions which do not exist in "
                         + Bukkit.getVersion() + ", hence the tree type " + type + " is not available.");
-                // FAWE end
+                //FAWE end
             }
         }
     }
@@ -326,13 +330,10 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
-        World world = getWorld();
-        TreeType bukkitType = toBukkitTreeType(type);
-        if (bukkitType == TreeType.CHORUS_PLANT) {
-            pt = pt.add(0, 1, 0); // bukkit skips the feature gen which does this offset normally, so we have to add it back
-        }
-        return type != null && world.generateTree(BukkitAdapter.adapt(world, pt), bukkitType,
-                new EditSessionBlockChangeDelegate(editSession));
+        //FAWE start - allow tree commands to be undone and obey region restrictions
+        return TaskManager.IMP.sync(() -> WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt,
+                getWorld()));
+        //FAWE end
     }
 
     @Override
@@ -468,6 +469,14 @@ public class BukkitWorld extends AbstractWorld {
         getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
     }
 
+    //FAWE start
+    @Override
+    public Collection<BaseItemStack> getBlockDrops(BlockVector3 position) {
+        return getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ()).getDrops().stream()
+                .map(BukkitAdapter::adapt).collect(Collectors.toList());
+    }
+    //FAWE end
+
     @Override
     public boolean canPlaceAt(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState blockState) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
@@ -505,7 +514,7 @@ public class BukkitWorld extends AbstractWorld {
             } catch (Exception e) {
                 if (block instanceof BaseBlock && ((BaseBlock) block).getNbt() != null) {
                     LOGGER.warn("Tried to set a corrupt tile entity at " + position.toString()
-                        + ": " + ((BaseBlock) block).getNbt(), e);
+                            + ": " + ((BaseBlock) block).getNbt(), e);
                 } else {
                     LOGGER.warn("Failed to set block via adapter, falling back to generic", e);
                 }
@@ -527,8 +536,10 @@ public class BukkitWorld extends AbstractWorld {
     }
 
     @Override
-    public Set<SideEffect> applySideEffects(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType,
-            SideEffectSet sideEffectSet) {
+    public Set<SideEffect> applySideEffects(
+            BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType,
+            SideEffectSet sideEffectSet
+    ) {
         if (worldNativeAccess != null) {
             worldNativeAccess.applySideEffects(position, previousType, sideEffectSet);
             return Sets.intersection(

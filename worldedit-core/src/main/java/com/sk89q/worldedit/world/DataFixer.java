@@ -29,11 +29,14 @@ import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 public interface DataFixer {
 
     final class FixType<T> {
+
         private FixType() {
         }
+
     }
 
     final class FixTypes {
+
         private FixTypes() {
         }
 
@@ -43,6 +46,7 @@ public interface DataFixer {
         public static FixType<String> BLOCK_STATE = new FixType<>();
         public static FixType<String> BIOME = new FixType<>();
         public static FixType<String> ITEM_TYPE = new FixType<>();
+
     }
 
     default <T> T fixUp(FixType<T> type, T original) {
@@ -50,4 +54,5 @@ public interface DataFixer {
     }
 
     <T> T fixUp(FixType<T> type, T original, int srcVer);
+
 }

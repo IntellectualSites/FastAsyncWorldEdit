@@ -50,8 +50,8 @@ public class ExpressionHelper {
 
     public static EvaluationException evalException(Token token, String message) {
         return new EvaluationException(
-            getErrorPosition(token),
-            message
+                getErrorPosition(token),
+                message
         );
     }
 
@@ -59,8 +59,10 @@ public class ExpressionHelper {
         check(iterations <= 256, ctx, "Loop exceeded 256 iterations");
     }
 
-    public static MethodHandle resolveFunction(Functions functions,
-                                               ExpressionParser.FunctionCallContext ctx) {
+    public static MethodHandle resolveFunction(
+            Functions functions,
+            ExpressionParser.FunctionCallContext ctx
+    ) {
         String fnName = ctx.name.getText();
         Set<MethodHandle> matchingFns = functions.getMap().get(fnName);
         check(!matchingFns.isEmpty(), ctx, "Unknown function '" + fnName + "'");
@@ -93,12 +95,12 @@ public class ExpressionHelper {
         }
         // We matched no function, fail with appropriate message.
         String possibleCounts = matchingFns.stream()
-            .map(mh -> mh.isVarargsCollector()
-                ? (mh.type().parameterCount() - 1) + "+"
-                : String.valueOf(mh.type().parameterCount()))
-            .collect(Collectors.joining("/"));
+                .map(mh -> mh.isVarargsCollector()
+                        ? (mh.type().parameterCount() - 1) + "+"
+                        : String.valueOf(mh.type().parameterCount()))
+                .collect(Collectors.joining("/"));
         throw evalException(ctx, "Incorrect number of arguments for function '" + fnName + "', "
-            + "expected " + possibleCounts + ", " + "got " + ctx.args.size());
+                + "expected " + possibleCounts + ", " + "got " + ctx.args.size());
     }
 
     // Special argument handle names
@@ -111,15 +113,18 @@ public class ExpressionHelper {
      * If this argument needs a handle, returns the name of the handle needed. Otherwise, returns
      * {@code null}. If {@code arg} isn't a valid handle reference, throws.
      */
-    public static String getArgumentHandleName(String fnName, MethodType type, int i,
-                                               ParserRuleContext arg) {
+    public static String getArgumentHandleName(
+            String fnName, MethodType type, int i,
+            ParserRuleContext arg
+    ) {
         // Pass variable handle in for modification?
         Class<?> pType = type.parameterType(i);
         Optional<String> id = tryResolveId(arg);
         if (pType == LocalSlot.Variable.class) {
             // MUST be an id
             check(id.isPresent(), arg,
-                "Function '" + fnName + "' requires a variable in parameter " + i);
+                    "Function '" + fnName + "' requires a variable in parameter " + i
+            );
             return id.get();
         } else if (pType == LocalSlot.class) {
             return id.orElse(WRAPPED_CONSTANT);
@@ -129,7 +134,7 @@ public class ExpressionHelper {
 
     private static Optional<String> tryResolveId(ParserRuleContext arg) {
         Optional<ExpressionParser.WrappedExprContext> wrappedExprContext =
-            tryAs(arg, ExpressionParser.WrappedExprContext.class);
+                tryAs(arg, ExpressionParser.WrappedExprContext.class);
         if (wrappedExprContext.isPresent()) {
             return tryResolveId(wrappedExprContext.get().expression());
         }
@@ -140,8 +145,8 @@ public class ExpressionHelper {
     }
 
     private static <T extends ParserRuleContext> Optional<T> tryAs(
-        ParserRuleContext ctx,
-        Class<T> rule
+            ParserRuleContext ctx,
+            Class<T> rule
     ) {
         if (rule.isInstance(ctx)) {
             return Optional.of(rule.cast(ctx));

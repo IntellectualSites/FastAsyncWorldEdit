@@ -27,30 +27,35 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.util.Location;
 
+//FAWE start - enum-ized
 public enum NavigationWand implements DoubleActionTraceTool {
-  INSTANCE;
+    INSTANCE;
+//FAWE end
 
-  @Override
-  public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-      if (!player.hasPermission("worldedit.navigation.jumpto.tool")) {
-          return false;
-      }
-      final int maxDist = config.navigationWandMaxDistance;
-      if (maxDist <= 0) {
-          return false;
-      }
-      Location pos = player.getSolidBlockTrace(maxDist);
-      if (pos != null) {
-          player.findFreePosition(pos);
-      } else {
-          player.print(Caption.of("worldedit.jumpto.none"));
-      }
-      return true;
-  }
+    private static final String PRIMARY_PERMISSION = "worldedit.navigation.thru.tool";
+    private static final String SECONDARY_PERMISSION = "worldedit.navigation.jumpto.tool";
+
+    @Override
+    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
+        if (!player.hasPermission(SECONDARY_PERMISSION)) {
+            return false;
+        }
+        final int maxDist = config.navigationWandMaxDistance;
+        if (maxDist <= 0) {
+            return false;
+        }
+        Location pos = player.getSolidBlockTrace(maxDist);
+        if (pos != null) {
+            player.findFreePosition(pos);
+        } else {
+            player.print(Caption.of("worldedit.jumpto.none"));
+        }
+        return true;
+    }
 
     @Override
     public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session) {
-        if (!player.hasPermission("worldedit.navigation.thru.tool")) {
+        if (!player.hasPermission(PRIMARY_PERMISSION)) {
             return false;
         }
         final int maxDist = config.navigationWandMaxDistance;
@@ -66,6 +71,6 @@ public enum NavigationWand implements DoubleActionTraceTool {
 
     @Override
     public boolean canUse(Actor actor) {
-        return actor.hasPermission("worldedit.navigation.jumpto.tool"); // check should be here
+        return actor.hasPermission(PRIMARY_PERMISSION) || actor.hasPermission(SECONDARY_PERMISSION);
     }
 }

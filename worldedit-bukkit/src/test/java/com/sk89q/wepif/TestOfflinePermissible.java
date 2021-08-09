@@ -31,15 +31,16 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 
+import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 public class TestOfflinePermissible implements OfflinePlayer, Permissible {
+
     private boolean op;
     private UUID randomUuid = UUID.randomUUID();
 
@@ -190,118 +191,129 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-	@Override
-	public long getLastLogin() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
-
-	@Override
-	public long getLastSeen() {
-		throw new UnsupportedOperationException("Not supported yet.");
-	}
+    @Override
+    public long getLastLogin() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
+    public long getLastSeen() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void incrementStatistic(@Nonnull Statistic statistic) throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
+    public void decrementStatistic(@Nonnull Statistic statistic) throws IllegalArgumentException {
 
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic, int amount)
-        throws IllegalArgumentException {
+    public void incrementStatistic(@Nonnull Statistic statistic, int amount)
+            throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic, int amount)
-        throws IllegalArgumentException {
+    public void decrementStatistic(@Nonnull Statistic statistic, int amount)
+            throws IllegalArgumentException {
 
     }
 
     @Override
-    public void setStatistic(@NotNull Statistic statistic, int newValue)
-        throws IllegalArgumentException {
+    public void setStatistic(@Nonnull Statistic statistic, int newValue)
+            throws IllegalArgumentException {
 
     }
 
     @Override
-    public int getStatistic(@NotNull Statistic statistic) throws IllegalArgumentException {
+    public int getStatistic(@Nonnull Statistic statistic) throws IllegalArgumentException {
         return 0;
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic, @NotNull Material material)
-        throws IllegalArgumentException {
+    public void incrementStatistic(@Nonnull Statistic statistic, @Nonnull Material material)
+            throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic, @NotNull Material material)
-        throws IllegalArgumentException {
+    public void decrementStatistic(@Nonnull Statistic statistic, @Nonnull Material material)
+            throws IllegalArgumentException {
 
     }
 
     @Override
-    public int getStatistic(@NotNull Statistic statistic, @NotNull Material material)
-        throws IllegalArgumentException {
+    public int getStatistic(@Nonnull Statistic statistic, @Nonnull Material material)
+            throws IllegalArgumentException {
         return 0;
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic, @NotNull Material material,
-        int amount) throws IllegalArgumentException {
+    public void incrementStatistic(
+            @Nonnull Statistic statistic, @Nonnull Material material,
+            int amount
+    ) throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic, @NotNull Material material,
-        int amount) throws IllegalArgumentException {
+    public void decrementStatistic(
+            @Nonnull Statistic statistic, @Nonnull Material material,
+            int amount
+    ) throws IllegalArgumentException {
 
     }
 
     @Override
-    public void setStatistic(@NotNull Statistic statistic, @NotNull Material material, int newValue)
-        throws IllegalArgumentException {
+    public void setStatistic(@Nonnull Statistic statistic, @Nonnull Material material, int newValue)
+            throws IllegalArgumentException {
 
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType)
-        throws IllegalArgumentException {
+    public void incrementStatistic(@Nonnull Statistic statistic, @Nonnull EntityType entityType)
+            throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType)
-        throws IllegalArgumentException {
+    public void decrementStatistic(@Nonnull Statistic statistic, @Nonnull EntityType entityType)
+            throws IllegalArgumentException {
 
     }
 
     @Override
-    public int getStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType)
-        throws IllegalArgumentException {
+    public int getStatistic(@Nonnull Statistic statistic, @Nonnull EntityType entityType)
+            throws IllegalArgumentException {
         return 0;
     }
 
     @Override
-    public void incrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType,
-        int amount) throws IllegalArgumentException {
+    public void incrementStatistic(
+            @Nonnull Statistic statistic, @Nonnull EntityType entityType,
+            int amount
+    ) throws IllegalArgumentException {
 
     }
 
     @Override
-    public void decrementStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType,
-        int amount) {
+    public void decrementStatistic(
+            @Nonnull Statistic statistic, @Nonnull EntityType entityType,
+            int amount
+    ) {
 
     }
 
     @Override
-    public void setStatistic(@NotNull Statistic statistic, @NotNull EntityType entityType,
-        int newValue) {
+    public void setStatistic(
+            @Nonnull Statistic statistic, @Nonnull EntityType entityType,
+            int newValue
+    ) {
 
     }
+
 }

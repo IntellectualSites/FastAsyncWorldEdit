@@ -1,14 +1,15 @@
 package com.fastasyncworldedit.core.configuration.file;
 
+import com.fastasyncworldedit.core.configuration.Configuration;
 import com.fastasyncworldedit.core.configuration.MemoryConfiguration;
 import com.fastasyncworldedit.core.configuration.MemoryConfigurationOptions;
-import com.fastasyncworldedit.core.configuration.Configuration;
 
 /**
  * Various settings for controlling the input and output of a {@link
  * FileConfiguration}
  */
 public class FileConfigurationOptions extends MemoryConfigurationOptions {
+
     private String header = null;
     private boolean copyHeader = true;
 
@@ -117,4 +118,5 @@ public class FileConfigurationOptions extends MemoryConfigurationOptions {
 
         return this;
     }
+
 }

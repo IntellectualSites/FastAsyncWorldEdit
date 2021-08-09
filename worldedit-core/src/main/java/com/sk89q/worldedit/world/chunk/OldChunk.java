@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.chunk;
 
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -27,7 +28,6 @@ import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.util.nbt.IntBinaryTag;
 import com.sk89q.worldedit.util.nbt.ListBinaryTag;
-import com.sk89q.worldedit.util.nbt.NbtUtils;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -43,7 +43,9 @@ import java.util.Map;
  */
 public class OldChunk implements Chunk {
 
+    //FAWE start
     private final CompoundBinaryTag rootTag;
+    //FAWE end
     private final byte[] blocks;
     private final byte[] data;
     private final int rootX;
@@ -51,6 +53,7 @@ public class OldChunk implements Chunk {
 
     private Map<BlockVector3, CompoundBinaryTag> tileEntities;
 
+    //FAWE start
 
     /**
      * Construct the chunk with a compound tag.
@@ -63,6 +66,7 @@ public class OldChunk implements Chunk {
     public OldChunk(CompoundTag tag) throws DataException {
         this(tag.asBinaryTag());
     }
+    //FAWE end
 
     /**
      * Construct the chunk with a compound tag.
@@ -70,6 +74,7 @@ public class OldChunk implements Chunk {
      * @param tag the tag
      * @throws DataException if there is an error getting the chunk data
      */
+    //FAWE start - use *BinaryTag > *Tag
     public OldChunk(CompoundBinaryTag tag) throws DataException {
         rootTag = tag;
 
@@ -158,9 +163,6 @@ public class OldChunk implements Chunk {
         }
 
         CompoundBinaryTag values = tileEntities.get(position);
-        if (values == null) {
-            return null;
-        }
         return values;
     }
 
@@ -209,5 +211,6 @@ public class OldChunk implements Chunk {
 
         return state.toBaseBlock();
     }
+    //FAWE end
 
 }

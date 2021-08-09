@@ -1,10 +1,13 @@
 package com.sk89q.worldedit.function.mask;
 
+import com.fastasyncworldedit.core.function.mask.ABlockMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 
 public class InverseSingleBlockStateMask extends ABlockMask {
+
     private final char ordinal;
     private final boolean isAir;
 
@@ -51,4 +54,5 @@ public class InverseSingleBlockStateMask extends ABlockMask {
     public Mask copy() {
         return new InverseSingleBlockStateMask(getExtent(), ordinal, isAir);
     }
+
 }

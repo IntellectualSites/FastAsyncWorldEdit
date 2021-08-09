@@ -42,4 +42,5 @@ public class RandomStatePattern implements Pattern {
     public BaseBlock applyBlock(BlockVector3 position) {
         return blocks.get(rand.nextInt(blocks.size()));
     }
+
 }

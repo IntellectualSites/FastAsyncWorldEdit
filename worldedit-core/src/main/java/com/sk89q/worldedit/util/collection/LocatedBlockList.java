@@ -26,9 +26,9 @@ import com.sk89q.worldedit.util.LocatedBlock;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -39,7 +39,7 @@ public class LocatedBlockList implements Iterable<LocatedBlock> {
 
     private final BlockMap<BaseBlock> blocks = BlockMap.createForBaseBlock();
     private final PositionList order = PositionList.create(
-        WorldEdit.getInstance().getConfiguration().extendedYLimit
+            WorldEdit.getInstance().getConfiguration().extendedYLimit
     );
 
     public LocatedBlockList() {
@@ -82,12 +82,12 @@ public class LocatedBlockList implements Iterable<LocatedBlock> {
     @Override
     public Iterator<LocatedBlock> iterator() {
         return Iterators.transform(order.iterator(), position ->
-            new LocatedBlock(position, blocks.get(position)));
+                new LocatedBlock(position, blocks.get(position)));
     }
 
     public Iterator<LocatedBlock> reverseIterator() {
         return Iterators.transform(order.reverseIterator(), position ->
-            new LocatedBlock(position, blocks.get(position)));
+                new LocatedBlock(position, blocks.get(position)));
     }
 
 }

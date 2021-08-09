@@ -28,7 +28,9 @@ import java.util.Locale;
 /**
  * Parent for all WorldEdit exceptions.
  */
+//FAWE start - RuntimeException > Exception
 public abstract class WorldEditException extends RuntimeException {
+//FAWE end
 
     private final Component message;
 
@@ -67,7 +69,7 @@ public abstract class WorldEditException extends RuntimeException {
      * Create a new exception with a message and a cause.
      *
      * @param message the message
-     * @param cause the cause
+     * @param cause   the cause
      * @deprecated Use component version
      */
     @Deprecated
@@ -81,7 +83,7 @@ public abstract class WorldEditException extends RuntimeException {
      * Create a new exception with a message and a cause.
      *
      * @param message the message
-     * @param cause the cause
+     * @param cause   the cause
      */
     protected WorldEditException(Component message, Throwable cause) {
         super(WorldEditText.reduceToText(message, Locale.getDefault()), cause);
@@ -108,4 +110,5 @@ public abstract class WorldEditException extends RuntimeException {
     public Component getRichMessage() {
         return this.message;
     }
+
 }

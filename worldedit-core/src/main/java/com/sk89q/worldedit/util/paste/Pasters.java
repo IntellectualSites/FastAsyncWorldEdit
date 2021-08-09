@@ -32,7 +32,8 @@ final class Pasters {
             MoreExecutors.listeningDecorator(
                     new ThreadPoolExecutor(0, Integer.MAX_VALUE,
                             2L, TimeUnit.SECONDS,
-                            new SynchronousQueue<>()));
+                            new SynchronousQueue<>()
+                    ));
 
     private Pasters() {
     }

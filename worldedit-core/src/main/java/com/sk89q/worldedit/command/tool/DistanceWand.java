@@ -85,4 +85,5 @@ public class DistanceWand extends BrushTool implements DoubleActionTraceTool {
 
         return target;
     }
+
 }

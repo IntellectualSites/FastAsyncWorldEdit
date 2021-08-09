@@ -39,8 +39,9 @@ public class BukkitItemCategoryRegistry implements ItemCategoryRegistry {
     public Set<ItemType> getCategorisedByName(String category) {
         String[] split = category.split(":");
         String namespace = split.length > 1 ? split[0] : "minecraft";
-        String key =  split.length > 1 ? split[1] : category;
+        String key = split.length > 1 ? split[1] : category;
         Tag<Material> tag = Bukkit.getTag(Tag.REGISTRY_ITEMS, new NamespacedKey(namespace, key), Material.class);
         return getFromBukkitTag(tag);
     }
+
 }

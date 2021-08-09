@@ -69,10 +69,13 @@ public interface ItemRegistry {
     @Nullable
     ItemMaterial getMaterial(ItemType itemType);
 
+    //FAWE start
+
     /**
      * Register all items.
      */
     default Collection<String> values() {
         return Collections.emptyList();
     }
+    //FAWE end
 }

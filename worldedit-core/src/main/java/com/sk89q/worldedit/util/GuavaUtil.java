@@ -31,4 +31,5 @@ public final class GuavaUtil {
     public static <T> T firstNonNull(@Nullable T first, @Nullable T second) {
         return first != null ? first : checkNotNull(second);
     }
+
 }

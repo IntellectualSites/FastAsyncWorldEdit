@@ -36,7 +36,7 @@ public class CommandEvent extends AbstractCancellable {
     /**
      * Create a new instance.
      *
-     * @param actor the player
+     * @param actor     the player
      * @param arguments the arguments
      */
     public CommandEvent(Actor actor, String arguments) {
@@ -65,9 +65,11 @@ public class CommandEvent extends AbstractCancellable {
         return arguments;
     }
 
+    //FAWE start
     @Override
     public boolean call() {
         PlatformCommandManager.getInstance().handleCommandOnCurrentThread(this);
         return true;
     }
+    //FAWE end
 }

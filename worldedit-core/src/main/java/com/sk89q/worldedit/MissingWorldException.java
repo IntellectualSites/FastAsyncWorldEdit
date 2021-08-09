@@ -29,4 +29,5 @@ public class MissingWorldException extends WorldEditException {
     public MissingWorldException() {
         super(Caption.of("worldedit.error.missing-world"));
     }
+
 }

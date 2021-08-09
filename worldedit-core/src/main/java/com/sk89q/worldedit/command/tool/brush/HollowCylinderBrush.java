@@ -27,18 +27,27 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class HollowCylinderBrush implements Brush {
 
-    private int height;
+    private final int height;
+    //FAWE start - hcyl thickness
+    private final double thickness;
+    //FAWE end
 
-    public HollowCylinderBrush(int height) {
+    public HollowCylinderBrush(int height, double thickness) {
         this.height = height;
+        //FAWE start - hcyl thickness
+        this.thickness = thickness;
+        //FAWE end
     }
 
     @Override
-    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws MaxChangedBlocksException {
+    public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
+            MaxChangedBlocksException {
         if (pattern == null) {
             pattern = BlockTypes.COBBLESTONE.getDefaultState();
         }
-        editSession.makeCylinder(position, pattern, size, size, height, false);
+        //FAWE start - hcyl thickness
+        editSession.makeCylinder(position, pattern, size, size, height, thickness, false);
+        //FAWE end
     }
 
 }

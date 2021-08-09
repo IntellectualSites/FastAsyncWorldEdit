@@ -65,10 +65,10 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     /**
      * Construct the region.
      *
-     * @param world the world
+     * @param world  the world
      * @param points list of points
-     * @param minY minimum Y
-     * @param maxY maximum Y
+     * @param minY   minimum Y
+     * @param maxY   maximum Y
      */
     public Polygonal2DRegion(World world, List<BlockVector2> points, int minY, int maxY) {
         super(world);
@@ -291,6 +291,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         recalculate();
     }
 
+    //FAWE start
     @Override
     public boolean contains(int targetX, int targetZ) {
         boolean inside = false;
@@ -344,6 +345,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
 
         return inside;
     }
+    //FAWE end
 
     @Override
     public boolean contains(BlockVector3 position) {
@@ -354,9 +356,9 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
      * Checks to see if a point is inside a region.
      *
      * @param points a list of points
-     * @param minY the min Y
-     * @param maxY the max Y
-     * @param pt the position to check
+     * @param minY   the min Y
+     * @param maxY   the max Y
+     * @param pt     the position to check
      * @return true if the given polygon contains the given point
      */
     public static boolean contains(List<BlockVector2> points, int minY, int maxY, BlockVector3 pt) {
@@ -501,6 +503,7 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         return points;
     }
 
+    //FAWE start
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         for (int x = bx; x <= tx; x++) {
@@ -525,4 +528,5 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
         }
         return true;
     }
+    //FAWE end
 }

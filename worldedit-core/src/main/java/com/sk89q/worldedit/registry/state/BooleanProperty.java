@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.registry.state;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class BooleanProperty extends AbstractProperty<Boolean> {
 
-    private int defaultIndex;
+    //FAWE start
+    private final int defaultIndex;
 
     public BooleanProperty(final String name, final List<Boolean> values) {
         this(name, values, 0);
@@ -56,6 +57,7 @@ public class BooleanProperty extends AbstractProperty<Boolean> {
                 return -1;
         }
     }
+    //FAWE end
 
     @Nullable
     @Override
@@ -66,4 +68,5 @@ public class BooleanProperty extends AbstractProperty<Boolean> {
         }
         return val;
     }
+
 }

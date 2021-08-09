@@ -1,8 +1,7 @@
 package com.fastasyncworldedit.bukkit.util;
 
-import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
-import com.fastasyncworldedit.bukkit.util.ItemUtil;
+import com.fastasyncworldedit.core.Fawe;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -12,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import javax.annotation.Nullable;
 
 public class BukkitItemStack extends BaseItemStack {
+
     private ItemStack stack;
     private Object nativeItem;
     private boolean loadedNBT;
@@ -75,4 +75,5 @@ public class BukkitItemStack extends BaseItemStack {
         }
         super.setNbtData(nbtData);
     }
+
 }

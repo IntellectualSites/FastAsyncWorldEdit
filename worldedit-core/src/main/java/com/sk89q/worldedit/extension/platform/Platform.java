@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.fastasyncworldedit.core.beta.implementation.lighting.Relighter;
-import com.fastasyncworldedit.core.beta.implementation.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -31,13 +31,13 @@ import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * Represents a platform that WorldEdit has been implemented for.
@@ -92,9 +92,9 @@ public interface Platform extends Keyed {
      * Schedules the given {@code task} to be invoked once every
      * {@code period} ticks after an initial delay of {@code delay} ticks.
      *
-     * @param delay Delay in server ticks before executing first repeat
+     * @param delay  Delay in server ticks before executing first repeat
      * @param period Period in server ticks of the task
-     * @param task Task to be executed
+     * @param task   Task to be executed
      * @return Task id number (-1 if scheduling failed)
      */
     int schedule(long delay, long period, Runnable task);
@@ -124,7 +124,8 @@ public interface Platform extends Keyed {
      * @param player the player to match
      * @return a matched player, otherwise null
      */
-    @Nullable Player matchPlayer(Player player);
+    @Nullable
+    Player matchPlayer(Player player);
 
     /**
      * Create a duplicate of the given world.
@@ -134,13 +135,14 @@ public interface Platform extends Keyed {
      * @param world the world to match
      * @return a matched world, otherwise null
      */
-    @Nullable World matchWorld(World world);
+    @Nullable
+    World matchWorld(World world);
 
     /**
      * Register the commands contained within the given command manager.
      *
      * <p>
-     *     This method should be ignored if the platform offers a command registration event.
+     * This method should be ignored if the platform offers a command registration event.
      * </p>
      *
      * @param commandManager the command manager
@@ -197,18 +199,6 @@ public interface Platform extends Keyed {
     String getPlatformVersion();
 
     /**
-     * {@inheritDoc}
-     * @return an id
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
-     */
-    @NonAbstractForCompatibility(delegateName = "getPlatformName", delegateParams = {})
-    @Override
-    default String getId() {
-        return "legacy:" + getPlatformName().toLowerCase(Locale.ROOT).replaceAll("[^a-z_.-]", "_");
-    }
-
-    /**
      * Get a map of advertised capabilities of this platform, where each key
      * in the given map is a supported capability and the respective value
      * indicates the preference for this platform for that given capability.
@@ -224,12 +214,26 @@ public interface Platform extends Keyed {
      */
     Set<SideEffect> getSupportedSideEffects();
 
+    //FAWE start
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return an id
+     */
+    @NonAbstractForCompatibility(delegateName = "getPlatformName", delegateParams = {})
+    @Override
+    default String getId() {
+        return "legacy:" + getPlatformName().toLowerCase(Locale.ROOT).replaceAll("[^a-z_.-]", "_");
+    }
+
     /**
      * Get the {@link RelighterFactory} that can be used to obtain
      * {@link Relighter}s.
      *
      * @return the relighter factory to be used.
      */
-    @NotNull
+    @Nonnull
     RelighterFactory getRelighterFactory();
+    //FAWE end
 }

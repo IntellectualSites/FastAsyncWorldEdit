@@ -29,4 +29,5 @@ public class HierarchyObjectReport extends ShallowObjectReport {
             scanClass(object, type);
         }
     }
+
 }

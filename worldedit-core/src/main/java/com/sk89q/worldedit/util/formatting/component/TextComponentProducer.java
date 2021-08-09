@@ -80,4 +80,5 @@ public class TextComponentProducer {
         builder = TextComponent.builder().content("");
         return this;
     }
+
 }

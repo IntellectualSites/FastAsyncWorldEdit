@@ -106,8 +106,8 @@ public class CommandArgParser {
         if (part.getSubstring().endsWith("\"")) {
             state = State.NORMAL;
             currentArg.add(Substring.wrap(
-                part.getSubstring().substring(0, part.getSubstring().length() - 1),
-                part.getStart(), part.getEnd() - 1
+                    part.getSubstring().substring(0, part.getSubstring().length() - 1),
+                    part.getStart(), part.getEnd() - 1
             ));
             finishArg();
         } else {
@@ -121,9 +121,9 @@ public class CommandArgParser {
         int start = currentArg.get(0).getStart();
         int end = Iterables.getLast(currentArg).getEnd();
         args.add(Substring.wrap(currentArg.stream()
-                .map(Substring::getSubstring)
-                .collect(Collectors.joining(" ")),
-            start, end
+                        .map(Substring::getSubstring)
+                        .collect(Collectors.joining(" ")),
+                start, end
         ));
         currentArg.clear();
     }

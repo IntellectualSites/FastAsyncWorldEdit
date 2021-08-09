@@ -3,12 +3,13 @@ package com.fastasyncworldedit.core.util.image;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extension.platform.binding.ProvideBindings;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.platform.binding.ProvideBindings;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
+import javax.annotation.Nullable;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
@@ -21,17 +22,18 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import javax.annotation.Nullable;
 
 public class ImageUtil {
 
-    public static BufferedImage getScaledInstance(BufferedImage image, int targetWidth,
-        int targetHeight, Object hint, boolean higherQuality) {
+    public static BufferedImage getScaledInstance(
+            BufferedImage image, int targetWidth,
+            int targetHeight, Object hint, boolean higherQuality
+    ) {
         if (image.getHeight() == targetHeight && image.getWidth() == targetWidth) {
             return image;
         }
         int type = image.getTransparency() == Transparency.OPAQUE ?
-            BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
+                BufferedImage.TYPE_INT_RGB : BufferedImage.TYPE_INT_ARGB;
         BufferedImage scaledImage = image;
         int width;
         int height;
@@ -67,10 +69,14 @@ public class ImageUtil {
             Graphics2D g2 = tmp.createGraphics();
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, hint);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_SPEED);
-            g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,
-                RenderingHints.VALUE_COLOR_RENDER_SPEED);
-            g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,
-                RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED);
+            g2.setRenderingHint(
+                    RenderingHints.KEY_COLOR_RENDERING,
+                    RenderingHints.VALUE_COLOR_RENDER_SPEED
+            );
+            g2.setRenderingHint(
+                    RenderingHints.KEY_ALPHA_INTERPOLATION,
+                    RenderingHints.VALUE_ALPHA_INTERPOLATION_SPEED
+            );
             g2.drawImage(scaledImage, 0, 0, width, height, null);
             g2.dispose();
 
@@ -136,7 +142,6 @@ public class ImageUtil {
                 default:
                     alpha = MathMan.clamp((int) (alpha * alphaScale), 0, 255);
                     raw[i] = (color & 0x00FFFFFF) + (alpha << 24);
-                    continue;
             }
         }
     }
@@ -166,7 +171,7 @@ public class ImageUtil {
     }
 
     public static BufferedImage load(@Nullable ProvideBindings.ImageUri uri)
-        throws InputParseException {
+            throws InputParseException {
         return uri == null ? null : uri.load();
     }
 
@@ -206,8 +211,10 @@ public class ImageUtil {
             }
             if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
-                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(),
-                    Settings.IMP.PATHS.HEIGHTMAP), arg);
+                File file = MainUtil.getFile(MainUtil.getFile(
+                        Fawe.imp().getDirectory(),
+                        Settings.IMP.PATHS.HEIGHTMAP
+                ), arg);
                 return MainUtil.readImage(file);
             }
             throw new InputParseException(Caption.of("fawe.error.invalid-image", TextComponent.of(arg)));
@@ -226,13 +233,21 @@ public class ImageUtil {
             }
             if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
-                File file = MainUtil.getFile(MainUtil.getFile(Fawe.imp().getDirectory(),
-                    Settings.IMP.PATHS.HEIGHTMAP), arg);
+                File file = MainUtil.getFile(MainUtil.getFile(
+                        Fawe.imp().getDirectory(),
+                        Settings.IMP.PATHS.HEIGHTMAP
+                ), arg);
                 if (!file.exists()) {
-                    throw new InputParseException(Caption.of("fawe.error.file-not-found", TextComponent.of(String.valueOf(file))));
+                    throw new InputParseException(Caption.of(
+                            "fawe.error.file-not-found",
+                            TextComponent.of(String.valueOf(file))
+                    ));
                 }
                 if (file.isDirectory()) {
-                    throw new InputParseException(Caption.of("fawe.error.file-is-invalid-directory", TextComponent.of(String.valueOf(file))));
+                    throw new InputParseException(Caption.of(
+                            "fawe.error.file-is-invalid-directory",
+                            TextComponent.of(String.valueOf(file))
+                    ));
                 }
                 return file.toURI();
             }
@@ -241,4 +256,5 @@ public class ImageUtil {
             throw new InputParseException(Caption.of(e.getMessage()));
         }
     }
+
 }

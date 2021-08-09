@@ -41,8 +41,10 @@ public class WorldConverter implements ArgumentConverter<World> {
     public static void register(CommandManager commandManager) {
         commandManager.registerConverter(Key.of(World.class), WORLD_CONVERTER);
     }
-    
+
+    //FAWE start - Accessed by LocationConverter
     public static final WorldConverter WORLD_CONVERTER = new WorldConverter();
+    //FAWE end
 
     private final TextComponent choices;
 
@@ -78,4 +80,5 @@ public class WorldConverter implements ArgumentConverter<World> {
                 "Not a valid world: " + s))
                 : SuccessfulConversion.fromSingle(result);
     }
+
 }

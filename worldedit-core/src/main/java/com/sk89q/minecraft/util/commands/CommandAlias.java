@@ -37,4 +37,5 @@ public @interface CommandAlias {
      * @return the command
      */
     String[] value();
+
 }

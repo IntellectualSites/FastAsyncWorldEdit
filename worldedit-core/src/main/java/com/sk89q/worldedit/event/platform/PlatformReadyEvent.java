@@ -25,7 +25,9 @@ import com.sk89q.worldedit.extension.platform.Platform;
  * Raised when a platform has finished loading its data.
  */
 public class PlatformReadyEvent extends PlatformEvent {
+
     public PlatformReadyEvent(Platform platform) {
         super(platform);
     }
+
 }

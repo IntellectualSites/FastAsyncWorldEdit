@@ -32,7 +32,9 @@ import java.io.Serializable;
  * <a href="http://geom-java.sourceforge.net/index.html">JavaGeom project</a>,
  * which is licensed under LGPL v2.1.</p>
  */
+//FAWE start - made Serializable
 public class AffineTransform implements Transform, Serializable {
+//FAWE end
 
     /**
      * coefficients for x coordinate.
@@ -103,9 +105,11 @@ public class AffineTransform implements Transform, Serializable {
         }
     }
 
-    public AffineTransform(double xx, double yx, double zx, double tx,
-                           double xy, double yy, double zy, double ty, double xz, double yz,
-                           double zz, double tz) {
+    public AffineTransform(
+            double xx, double yx, double zx, double tx,
+            double xy, double yy, double zy, double ty, double xz, double yz,
+            double zz, double tz
+    ) {
         m00 = xx;
         m01 = yx;
         m02 = zx;
@@ -126,9 +130,9 @@ public class AffineTransform implements Transform, Serializable {
     @Override
     public boolean isIdentity() {
         return m00 == m11 && m11 == m22 && m22 == 1
-            && m01 == m02 && m02 == m03 && m03 == 0
-            && m10 == m12 && m12 == m13 && m13 == 0
-            && m20 == m21 && m21 == m23 && m23 == 0;
+                && m01 == m02 && m02 == m03 && m03 == 0
+                && m10 == m12 && m12 == m13 && m13 == 0
+                && m20 == m21 && m21 == m23 && m23 == 0;
     }
 
     /**
@@ -139,6 +143,7 @@ public class AffineTransform implements Transform, Serializable {
         return new double[]{m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23};
     }
 
+    //FAWE start
     public boolean isOffAxis() {
         double[] c = coefficients();
         for (int i = 0; i < c.length; i++) {
@@ -150,6 +155,7 @@ public class AffineTransform implements Transform, Serializable {
         }
         return false;
     }
+    //FAWE end
 
     /**
      * Computes the determinant of this transform. Can be zero.
@@ -182,7 +188,8 @@ public class AffineTransform implements Transform, Serializable {
                 (m20 * m01 - m00 * m21) / det,
                 (m00 * m11 - m10 * m01) / det,
                 (m00 * (m21 * m13 - m11 * m23) + m01 * (m10 * m23 - m20 * m13)
-                        - m03 * (m10 * m21 - m20 * m11)) / det);
+                        - m03 * (m10 * m21 - m20 * m11)) / det
+        );
     }
 
     // ===================================================================
@@ -211,7 +218,8 @@ public class AffineTransform implements Transform, Serializable {
         return new AffineTransform(
                 n00, n01, n02, n03,
                 n10, n11, n12, n13,
-                n20, n21, n22, n23);
+                n20, n21, n22, n23
+        );
     }
 
     /**
@@ -237,7 +245,8 @@ public class AffineTransform implements Transform, Serializable {
         return new AffineTransform(
                 n00, n01, n02, n03,
                 n10, n11, n12, n13,
-                n20, n21, n22, n23);
+                n20, n21, n22, n23
+        );
     }
 
     public AffineTransform translate(Vector3 vec) {
@@ -259,7 +268,8 @@ public class AffineTransform implements Transform, Serializable {
                 new AffineTransform(
                         1, 0, 0, 0,
                         0, cot, -sit, 0,
-                        0, sit, cot, 0));
+                        0, sit, cot, 0
+                ));
     }
 
     public AffineTransform rotateY(double theta) {
@@ -269,7 +279,8 @@ public class AffineTransform implements Transform, Serializable {
                 new AffineTransform(
                         cot, 0, sit, 0,
                         0, 1, 0, 0,
-                        -sit, 0, cot, 0));
+                        -sit, 0, cot, 0
+                ));
     }
 
     public AffineTransform rotateZ(double theta) {
@@ -279,7 +290,8 @@ public class AffineTransform implements Transform, Serializable {
                 new AffineTransform(
                         cot, -sit, 0, 0,
                         sit, cot, 0, 0,
-                        0, 0, 1, 0));
+                        0, 0, 1, 0
+                ));
     }
 
     public AffineTransform scale(double s) {
@@ -294,6 +306,7 @@ public class AffineTransform implements Transform, Serializable {
         return scale(vec.getX(), vec.getY(), vec.getZ());
     }
 
+    //FAWE start
     public boolean isScaled(Vector3 vector) {
         boolean flip = vector.getX() != 0 && m00 < 0;
         if (vector.getY() != 0 && m11 < 0) {
@@ -317,6 +330,7 @@ public class AffineTransform implements Transform, Serializable {
         }
         return flip;
     }
+    //FAWE end
 
     @Override
     public Vector3 apply(Vector3 vector) {
@@ -335,9 +349,11 @@ public class AffineTransform implements Transform, Serializable {
 
     @Override
     public Transform combine(Transform other) {
+        //FAWE start - check other identity
         if (other instanceof Identity || other.isIdentity()) {
             return this;
         } else if (other instanceof AffineTransform) {
+            //FAWE end
             return concatenate((AffineTransform) other);
         } else {
             return new CombinedTransform(this, other);
@@ -361,7 +377,21 @@ public class AffineTransform implements Transform, Serializable {
 
     @Override
     public String toString() {
-        return String.format("Affine[%g %g %g %g, %g %g %g %g, %g %g %g %g]}", m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23);
+        return String.format(
+                "Affine[%g %g %g %g, %g %g %g %g, %g %g %g %g]}",
+                m00,
+                m01,
+                m02,
+                m03,
+                m10,
+                m11,
+                m12,
+                m13,
+                m20,
+                m21,
+                m22,
+                m23
+        );
     }
 
 

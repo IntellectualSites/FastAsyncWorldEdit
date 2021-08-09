@@ -34,4 +34,5 @@ class MinecraftHidingClassShutter implements ClassShutter {
         }
         return !fullClassName.startsWith("net.minecraft");
     }
+
 }

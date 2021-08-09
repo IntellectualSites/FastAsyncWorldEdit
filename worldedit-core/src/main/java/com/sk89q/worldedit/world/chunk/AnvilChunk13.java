@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.chunk;
 
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
@@ -27,7 +28,6 @@ import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.util.nbt.IntBinaryTag;
 import com.sk89q.worldedit.util.nbt.ListBinaryTag;
-import com.sk89q.worldedit.util.nbt.NbtUtils;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -35,22 +35,26 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * The chunk format for Minecraft 1.13 to 1.15
  */
 public class AnvilChunk13 implements Chunk {
 
+    //FAWE start - CBT > CT
     private final CompoundBinaryTag rootTag;
-    private BlockState[][] blocks;
-    private int rootX;
-    private int rootZ;
+    //FAWE end
+    private final BlockState[][] blocks;
+    private final int rootX;
+    private final int rootZ;
 
     private Map<BlockVector3, CompoundBinaryTag> tileEntities;
 
+
+    //FAWE start
 
     /**
      * Construct the chunk with a compound tag.
@@ -63,6 +67,7 @@ public class AnvilChunk13 implements Chunk {
     public AnvilChunk13(CompoundTag tag) throws DataException {
         this(tag.asBinaryTag());
     }
+    //FAWE end
 
     /**
      * Construct the chunk with a compound tag.
@@ -78,6 +83,7 @@ public class AnvilChunk13 implements Chunk {
 
         blocks = new BlockState[16][];
 
+        //FAWE start - use *BinaryTag > *Tag
         ListBinaryTag sections = NbtUtils.getChildTag(rootTag, "Sections", BinaryTagTypes.LIST);
 
         for (BinaryTag rawSectionTag : sections) {
@@ -117,13 +123,16 @@ public class AnvilChunk13 implements Chunk {
                             try {
                                 blockState = getBlockStateWith(blockState, property, value);
                             } catch (IllegalArgumentException e) {
-                                throw new InvalidFormatException("Invalid block state for " + blockState.getBlockType().getId() + ", " + property.getName() + ": " + value);
+                                throw new InvalidFormatException("Invalid block state for " + blockState
+                                        .getBlockType()
+                                        .getId() + ", " + property.getName() + ": " + value);
                             }
                         }
                     }
                 }
                 palette[paletteEntryId] = blockState;
             }
+            //FAWE end
 
             // parse block states
             long[] blockStatesSerialized = NbtUtils.getChildTag(sectionTag, "BlockStates", BinaryTagTypes.LONG_ARRAY).value();
@@ -135,7 +144,8 @@ public class AnvilChunk13 implements Chunk {
         }
     }
 
-    protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws InvalidFormatException {
+    protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws
+            InvalidFormatException {
         int paletteBits = 4;
         while ((1 << paletteBits) < palette.length) {
             ++paletteBits;
@@ -181,6 +191,7 @@ public class AnvilChunk13 implements Chunk {
         if (rootTag.get("TileEntities") == null) {
             return;
         }
+        //FAWE start - use *BinaryTag > *Tag
         ListBinaryTag tags = NbtUtils.getChildTag(rootTag, "TileEntities", BinaryTagTypes.LIST);
 
         for (BinaryTag tag : tags) {
@@ -197,6 +208,7 @@ public class AnvilChunk13 implements Chunk {
             BlockVector3 vec = BlockVector3.at(x, y, z);
             tileEntities.put(vec, t);
         }
+        //FAWE end
     }
 
     /**
@@ -209,15 +221,13 @@ public class AnvilChunk13 implements Chunk {
      * @throws DataException thrown if there is a data error
      */
     @Nullable
+    //FAWE start - use *BinaryTag > *Tag
     private CompoundBinaryTag getBlockTileEntity(BlockVector3 position) throws DataException {
         if (tileEntities == null) {
             populateTileEntities();
         }
 
         CompoundBinaryTag values = tileEntities.get(position);
-        if (values == null) {
-            return null;
-        }
 
         return values;
     }
@@ -246,5 +256,6 @@ public class AnvilChunk13 implements Chunk {
 
         return state.toBaseBlock();
     }
+    //FAWE end
 
 }

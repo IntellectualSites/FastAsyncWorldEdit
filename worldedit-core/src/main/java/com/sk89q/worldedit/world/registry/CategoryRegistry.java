@@ -40,4 +40,5 @@ public interface CategoryRegistry<T extends Keyed> {
     default Set<T> getAll(final Category<T> category) {
         return getCategorisedByName(category.getId());
     }
+
 }

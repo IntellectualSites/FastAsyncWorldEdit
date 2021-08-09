@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import com.fastasyncworldedit.core.beta.IChunkCache;
-import com.fastasyncworldedit.core.beta.IChunkGet;
-import com.fastasyncworldedit.core.beta.implementation.queue.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.queue.IChunkCache;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -16,6 +16,9 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.generator.BlockPopulator;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -30,20 +33,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.Logger;
-import org.bukkit.generator.BlockPopulator;
-
 /**
  * Represents an abstract regeneration handler.
+ *
  * @param <IChunkAccess> the type of the {@Code IChunkAccess} of the current Minecraft implementation
- * @param <ProtoChunk> the type of the {@Code ProtoChunk} of the current Minecraft implementation
- * @param <Chunk> the type of the {@Code Chunk} of the current Minecraft implementation
- * @param <ChunkStatus> the type of the {@Code ChunkStatusWrapper} wrapping the {@Code ChunkStatus} enum
+ * @param <ProtoChunk>   the type of the {@Code ProtoChunk} of the current Minecraft implementation
+ * @param <Chunk>        the type of the {@Code Chunk} of the current Minecraft implementation
+ * @param <ChunkStatus>  the type of the {@Code ChunkStatusWrapper} wrapping the {@Code ChunkStatus} enum
  */
 public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess, Chunk extends IChunkAccess, ChunkStatus extends Regenerator.ChunkStatusWrapper<IChunkAccess>> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-    
+
     protected final org.bukkit.World originalBukkitWorld;
     protected final Region region;
     protected final Extent target;
@@ -53,7 +54,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     protected final Map<ChunkStatus, Concurrency> chunkStati = new LinkedHashMap<>();
     protected boolean generateConcurrent = true;
     protected long seed;
-    
+
     private final Long2ObjectLinkedOpenHashMap<ProtoChunk> protoChunks = new Long2ObjectLinkedOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap<>();
     private ExecutorService executor;
@@ -61,10 +62,11 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     /**
      * Initializes an abstract regeneration handler.
+     *
      * @param originalBukkitWorld the Bukkit world containing all the information on how to regenerate the {code Region}
-     * @param region the selection to regenerate
-     * @param target the target {@code Extent} to paste the regenerated blocks into
-     * @param options the options to used while regenerating and pasting into the target {@code Extent}
+     * @param region              the selection to regenerate
+     * @param target              the target {@code Extent} to paste the regenerated blocks into
+     * @param options             the options to used while regenerating and pasting into the target {@code Extent}
      */
     public Regenerator(org.bukkit.World originalBukkitWorld, Region region, Extent target, RegenOptions options) {
         this.originalBukkitWorld = originalBukkitWorld;
@@ -75,6 +77,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     /**
      * Regenerates the selected {@code Region}.
+     *
      * @return whether or not the regeneration process was successful
      * @throws Exception when something goes terribly wrong
      */
@@ -116,6 +119,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     /**
      * Returns the {@code ProtoChunk} at the given chunk coordinates.
+     *
      * @param x the chunk x coordinate
      * @param z the chunk z coordinate
      * @return the {@code ProtoChunk} at the given chunk coordinates or null if it is not part of the regeneration process or has not been initialized yet.
@@ -126,6 +130,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     /**
      * Returns the {@code Chunk} at the given chunk coordinates.
+     *
      * @param x the chunk x coordinate
      * @param z the chunk z coordinate
      * @return the {@code Chunk} at the given chunk coordinates or null if it is not part of the regeneration process or has not been converted yet.
@@ -142,12 +147,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)? 
         //for now it is working well and fast, if we are bored in the future we could do the research (a lot of it) to reduce the border radius
-        
+
         //generate chunk coords lists with a certain radius
         Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
         chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
-            if (radius == -1) //ignore ChunkStatus.EMPTY
+            if (radius == -1) { //ignore ChunkStatus.EMPTY
                 return;
+            }
             int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
             chunkCoordsForRadius.put(radius, getChunkCoordsRegen(region, border));
         });
@@ -161,8 +167,9 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
         Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap<>();
         chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
-            if (radius == -1) //ignore ChunkStatus.EMPTY
+            if (radius == -1) { //ignore ChunkStatus.EMPTY
                 return;
+            }
             Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap<>();
             for (Long xz : chunkCoordsForRadius.get(radius)) {
                 int x = MathMan.unpairIntX(xz);
@@ -281,19 +288,19 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 //                    realExtent.setBlockLight(vec, extent.getBrightness(vec));
         }
     }
-    
+
+    //functions to be implemented by sub class
     private void cleanup0() {
         if (executor != null) {
             executor.shutdownNow();
         }
         cleanup();
     }
-    
-    //functions to be implemented by sub class
+
     /**
      * <p>Implement the preparation process in here. DO NOT instanciate any variable here that require the cleanup function. This function is for gathering further information before initializing a new
      * world.</p>
-     * 
+     *
      * <p>Fields required to be initialized: chunkStati, seed</p>
      * <p>For chunkStati also see {code ChunkStatusWrapper}.</p>
      *
@@ -303,20 +310,21 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     /**
      * Implement the creation of the seperate world in here.
-     * 
+     * <p>
      * Fields required to be initialized: generateConcurrent
      *
      * @return true if everything went fine, otherwise false. When false is returned the Regenerator halts the regeneration process and calls the cleanup function.
      * @throws java.lang.Exception When the implementation of this method throws and exception the Regenerator halts the regeneration process and calls the cleanup function.
      */
     protected abstract boolean initNewWorld() throws Exception;
-    
+
     /**
      * Implement the cleanup of all the mess that is created during the regeneration process (initNewWorld() and generate()).This function must not throw any exceptions.
      */
     protected abstract void cleanup();
-    
+
     //functions to implement by sub class - regenate related
+
     /**
      * Implement the initialization of a {@code ProtoChunk} here.
      *
@@ -352,28 +360,39 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     /**
      * Implement the population of the {@code Chunk} with the given chunk random and {@code BlockPopulator} here.
      *
-     * @param chunk the {@code Chunk} to populate
+     * @param chunk  the {@code Chunk} to populate
      * @param random the chunk random to use for population
-     * @param pop the {@code BlockPopulator} to use
+     * @param pop    the {@code BlockPopulator} to use
      */
     protected abstract void populate(Chunk chunk, Random random, BlockPopulator pop);
-    
+
     /**
      * Implement the initialization an {@code IChunkCache<IChunkGet>} here. Use will need the {@code getChunkAt} function
+     *
      * @return an initialized {@code IChunkCache<IChunkGet>}
      */
     protected abstract IChunkCache<IChunkGet> initSourceQueueCache();
-    
+
     //algorithms
     private List<Long> getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
         BlockVector3 oldMin = region.getMinimumPoint();
-        BlockVector3 newMin = BlockVector3.at((oldMin.getX() >> 4 << 4) - border * 16, oldMin.getY(), (oldMin.getZ() >> 4 << 4) - border * 16);
+        BlockVector3 newMin = BlockVector3.at(
+                (oldMin.getX() >> 4 << 4) - border * 16,
+                oldMin.getY(),
+                (oldMin.getZ() >> 4 << 4) - border * 16
+        );
         BlockVector3 oldMax = region.getMaximumPoint();
-        BlockVector3 newMax = BlockVector3.at((oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1, oldMax.getY(), (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 - 1);
+        BlockVector3 newMax = BlockVector3.at(
+                (oldMax.getX() >> 4 << 4) + (border + 1) * 16 - 1,
+                oldMax.getY(),
+                (oldMax.getZ() >> 4 << 4) + (border + 1) * 16 - 1
+        );
         Region adjustedRegion = new CuboidRegion(newMin, newMax);
         return adjustedRegion.getChunks().stream()
                 .map(c -> BlockVector2.at(c.getX(), c.getZ()))
-                .sorted(Comparator.<BlockVector2>comparingInt(c -> c.getZ()).thenComparingInt(c -> c.getX())) //needed for RegionLimitedWorldAccess
+                .sorted(Comparator
+                        .<BlockVector2>comparingInt(c -> c.getZ())
+                        .thenComparingInt(c -> c.getX())) //needed for RegionLimitedWorldAccess
                 .map(c -> MathMan.pairInt(c.getX(), c.getZ()))
                 .collect(Collectors.toList());
     }
@@ -381,11 +400,14 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     /**
      * Creates a list of chunkcoord rows that may be executed concurrently
      *
-     * @param allcoords the coords that should be sorted into rows, must be sorted by z and x
+     * @param allcoords                   the coords that should be sorted into rows, must be sorted by z and x
      * @param requiredNeighborChunkRadius the radius of neighbor chunks that may not be written to conccurently (ChunkStatus.requiredNeighborRadius)
      * @return a list of chunkcoords rows that may be executed concurrently
      */
-    private SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> getChunkStatusTaskRows(List<Long> allcoords, int requiredNeighborChunkRadius) {
+    private SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> getChunkStatusTaskRows(
+            List<Long> allcoords,
+            int requiredNeighborChunkRadius
+    ) {
         int requiredneighbors = Math.max(0, requiredNeighborChunkRadius);
 
         int minx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(0));
@@ -413,8 +435,9 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             tasks = new SequentialTasks(numlists);
             for (int offset = 0; offset < numlists; offset++) {
                 ConcurrentTasks<SequentialTasks<Long>> para = new ConcurrentTasks((maxz - minz + 1) / numlists + 1);
-                for (int i = 0; minx + i * numlists + offset <= maxx; i++)
+                for (int i = 0; minx + i * numlists + offset <= maxx; i++) {
                     para.add(byx.get(minx + i * numlists + offset));
+                }
                 tasks.add(para);
             }
         } else {
@@ -437,8 +460,9 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             tasks = new SequentialTasks(numlists);
             for (int offset = 0; offset < numlists; offset++) {
                 ConcurrentTasks<SequentialTasks<Long>> para = new ConcurrentTasks((maxx - minx + 1) / numlists + 1);
-                for (int i = 0; minz + i * numlists + offset <= maxz; i++)
+                for (int i = 0; minz + i * numlists + offset <= maxz; i++) {
                     para.add(byz.get(minz + i * numlists + offset));
+                }
                 tasks.add(para);
             }
         }
@@ -456,8 +480,10 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     }
 
     //classes
+
     /**
      * This class is used to wrap the ChunkStatus of the current Minecraft implementation and as the implementation to execute a chunk generation step.
+     *
      * @param <IChunkAccess> the IChunkAccess class of the current Minecraft implementation
      */
     public static abstract class ChunkStatusWrapper<IChunkAccess> {
@@ -483,9 +509,9 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         /**
          * Return the name of the wrapped {@code ChunkStatus}.
          *
-         * @param xz represents the chunk coordinates of the chunk to process as denoted by {@code MathMan}
-         * @param accessibleChunks a list of chunks that will be used during the execution of the wrapped {@code ChunkStatus}. 
-         * This list is order in the correct order required by the {@code ChunkStatus}, unless Mojang suddenly decides to do things differently.
+         * @param xz               represents the chunk coordinates of the chunk to process as denoted by {@code MathMan}
+         * @param accessibleChunks a list of chunks that will be used during the execution of the wrapped {@code ChunkStatus}.
+         *                         This list is order in the correct order required by the {@code ChunkStatus}, unless Mojang suddenly decides to do things differently.
          */
         public abstract void processChunk(Long xz, List<IChunkAccess> accessibleChunks);
 
@@ -493,9 +519,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             try {
                 processChunk(xz, accessibleChunks);
             } catch (Exception e) {
-                LOGGER.error("Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz), e);
+                LOGGER.error(
+                        "Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz),
+                        e
+                );
             }
         }
+
     }
 
     public enum Concurrency {
@@ -509,6 +539,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         public SequentialTasks(int expectedsize) {
             super(expectedsize);
         }
+
     }
 
     public static class ConcurrentTasks<T> extends Tasks<T> {
@@ -516,6 +547,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         public ConcurrentTasks(int expectedsize) {
             super(expectedsize);
         }
+
     }
 
     public static class Tasks<T> implements Iterable<T> {
@@ -537,7 +569,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         public int size() {
             return tasks.size();
         }
-        
+
         @Override
         public Iterator<T> iterator() {
             return tasks.iterator();
@@ -547,5 +579,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         public String toString() {
             return tasks.toString();
         }
+
     }
+
 }

@@ -80,16 +80,16 @@ public class MCEditSchematicReader extends NBTSchematicReader {
     private final DataFixer fixer;
     private static final ImmutableList<NBTCompatibilityHandler> COMPATIBILITY_HANDLERS
             = ImmutableList.of(
-                new SignCompatibilityHandler(),
-                new FlowerPotCompatibilityHandler(),
-                new NoteBlockCompatibilityHandler(),
-                new SkullBlockCompatibilityHandler(),
-                new BannerBlockCompatibilityHandler(),
-                new BedBlockCompatibilityHandler()
+            new SignCompatibilityHandler(),
+            new FlowerPotCompatibilityHandler(),
+            new NoteBlockCompatibilityHandler(),
+            new SkullBlockCompatibilityHandler(),
+            new BannerBlockCompatibilityHandler(),
+            new BedBlockCompatibilityHandler()
     );
     private static final ImmutableList<EntityNBTCompatibilityHandler> ENTITY_COMPATIBILITY_HANDLERS
             = ImmutableList.of(
-                    new Pre13HangingCompatibilityHandler()
+            new Pre13HangingCompatibilityHandler()
     );
 
     /**
@@ -222,7 +222,13 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             }
 
             if (fixer != null && t != null) {
-                t = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, t.asBinaryTag(), -1));
+                //FAWE start
+                t = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                        DataFixer.FixTypes.BLOCK_ENTITY,
+                        t.asBinaryTag(),
+                        -1
+                ));
+                //FAWE end
             }
 
             BlockVector3 vec = BlockVector3.at(x, y, z);
@@ -283,10 +289,18 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                 if (tag instanceof CompoundTag) {
                     CompoundTag compound = (CompoundTag) tag;
                     if (fixer != null) {
-                        compound = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(DataFixer.FixTypes.ENTITY, compound.asBinaryTag(), -1));
+                        compound = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                                DataFixer.FixTypes.ENTITY,
+                                compound.asBinaryTag(),
+                                -1
+                        ));
                     }
                     String id = convertEntityId(compound.getString("id"));
-                    Location location = NBTConversions.toLocation(clipboard, compound.getListTag("Pos"), compound.getListTag("Rotation"));
+                    Location location = NBTConversions.toLocation(
+                            clipboard,
+                            compound.getListTag("Pos"),
+                            compound.getListTag("Rotation")
+                    );
                     if (!id.isEmpty()) {
                         EntityType entityType = EntityTypes.get(id.toLowerCase(Locale.ROOT));
                         if (entityType != null) {
@@ -310,38 +324,70 @@ public class MCEditSchematicReader extends NBTSchematicReader {
 
     private String convertEntityId(String id) {
         switch (id) {
-            case "AreaEffectCloud": return "area_effect_cloud";
-            case "ArmorStand": return "armor_stand";
-            case "CaveSpider": return "cave_spider";
-            case "MinecartChest": return "chest_minecart";
-            case "DragonFireball": return "dragon_fireball";
-            case "ThrownEgg": return "egg";
-            case "EnderDragon": return "ender_dragon";
-            case "ThrownEnderpearl": return "ender_pearl";
-            case "FallingSand": return "falling_block";
-            case "FireworksRocketEntity": return "fireworks_rocket";
-            case "MinecartFurnace": return "furnace_minecart";
-            case "MinecartHopper": return "hopper_minecart";
-            case "EntityHorse": return "horse";
-            case "ItemFrame": return "item_frame";
-            case "LeashKnot": return "leash_knot";
-            case "LightningBolt": return "lightning_bolt";
-            case "LavaSlime": return "magma_cube";
-            case "MinecartRideable": return "minecart";
-            case "MushroomCow": return "mooshroom";
-            case "Ozelot": return "ocelot";
-            case "PolarBear": return "polar_bear";
-            case "ThrownPotion": return "potion";
-            case "ShulkerBullet": return "shulker_bullet";
-            case "SmallFireball": return "small_fireball";
-            case "MinecartSpawner": return "spawner_minecart";
-            case "SpectralArrow": return "spectral_arrow";
-            case "PrimedTnt": return "tnt";
-            case "MinecartTNT": return "tnt_minecart";
-            case "VillagerGolem": return "villager_golem";
-            case "WitherBoss": return "wither";
-            case "WitherSkull": return "wither_skull";
-            case "PigZombie": return "zombie_pigman";
+            case "AreaEffectCloud":
+                return "area_effect_cloud";
+            case "ArmorStand":
+                return "armor_stand";
+            case "CaveSpider":
+                return "cave_spider";
+            case "MinecartChest":
+                return "chest_minecart";
+            case "DragonFireball":
+                return "dragon_fireball";
+            case "ThrownEgg":
+                return "egg";
+            case "EnderDragon":
+                return "ender_dragon";
+            case "ThrownEnderpearl":
+                return "ender_pearl";
+            case "FallingSand":
+                return "falling_block";
+            case "FireworksRocketEntity":
+                return "fireworks_rocket";
+            case "MinecartFurnace":
+                return "furnace_minecart";
+            case "MinecartHopper":
+                return "hopper_minecart";
+            case "EntityHorse":
+                return "horse";
+            case "ItemFrame":
+                return "item_frame";
+            case "LeashKnot":
+                return "leash_knot";
+            case "LightningBolt":
+                return "lightning_bolt";
+            case "LavaSlime":
+                return "magma_cube";
+            case "MinecartRideable":
+                return "minecart";
+            case "MushroomCow":
+                return "mooshroom";
+            case "Ozelot":
+                return "ocelot";
+            case "PolarBear":
+                return "polar_bear";
+            case "ThrownPotion":
+                return "potion";
+            case "ShulkerBullet":
+                return "shulker_bullet";
+            case "SmallFireball":
+                return "small_fireball";
+            case "MinecartSpawner":
+                return "spawner_minecart";
+            case "SpectralArrow":
+                return "spectral_arrow";
+            case "PrimedTnt":
+                return "tnt";
+            case "MinecartTNT":
+                return "tnt_minecart";
+            case "VillagerGolem":
+                return "villager_golem";
+            case "WitherBoss":
+                return "wither";
+            case "WitherSkull":
+                return "wither_skull";
+            case "PigZombie":
+                return "zombie_pigman";
             case "XPOrb":
             case "xp_orb":
                 return "experience_orb";
@@ -354,17 +400,25 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             case "EnderCrystal":
             case "ender_crystal":
                 return "end_crystal";
-            case "fireworks_rocket": return "firework_rocket";
+            case "fireworks_rocket":
+                return "firework_rocket";
             case "MinecartCommandBlock":
             case "commandblock_minecart":
                 return "command_block_minecart";
-            case "snowman": return "snow_golem";
-            case "villager_golem": return "iron_golem";
-            case "evocation_fangs": return "evoker_fangs";
-            case "evocation_illager": return "evoker";
-            case "vindication_illager": return "vindicator";
-            case "illusion_illager": return "illusioner";
-            default: return id;
+            case "snowman":
+                return "snow_golem";
+            case "villager_golem":
+                return "iron_golem";
+            case "evocation_fangs":
+                return "evoker_fangs";
+            case "evocation_illager":
+                return "evoker";
+            case "vindication_illager":
+                return "vindicator";
+            case "illusion_illager":
+                return "illusioner";
+            default:
+                return id;
         }
     }
 
@@ -428,4 +482,5 @@ public class MCEditSchematicReader extends NBTSchematicReader {
     public void close() throws IOException {
         inputStream.close();
     }
+
 }

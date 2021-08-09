@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 public class FileMcRegionChunkStore extends McRegionChunkStore {
 
-    private File path;
+    private final File path;
 
     /**
      * Create an instance. The passed path is the folder to read the
@@ -74,7 +74,7 @@ public class FileMcRegionChunkStore extends McRegionChunkStore {
     @Override
     public boolean isValid() {
         return new File(path, "region").isDirectory()
-            || new File(path, "DIM-1" + File.separator + "region").isDirectory();
+                || new File(path, "DIM-1" + File.separator + "region").isDirectory();
     }
 
 }

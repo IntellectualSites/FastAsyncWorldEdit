@@ -37,13 +37,13 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -71,10 +71,12 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         region = new ConvexPolyhedralRegion(world);
     }
 
+    //FAWE start
     public ConvexPolyhedralRegionSelector(ConvexPolyhedralRegion region) {
         checkNotNull(region);
         this.region = region;
     }
+    //FAWE end
 
     /**
      * Create a new selector.
@@ -277,8 +279,10 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         }
     }
 
+    //FAWE start
     @Override
     public List<BlockVector3> getVertices() {
         return new ArrayList<>(region.getVertices());
     }
+    //FAWE end
 }

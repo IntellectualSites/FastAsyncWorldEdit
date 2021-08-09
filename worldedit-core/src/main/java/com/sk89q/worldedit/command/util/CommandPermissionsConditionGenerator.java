@@ -33,7 +33,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public final class CommandPermissionsConditionGenerator implements CommandConditionGenerator {
 
     public interface Registration {
+
         Registration commandPermissionsConditionGenerator(CommandPermissionsConditionGenerator generator);
+
     }
 
     @Override
@@ -43,4 +45,5 @@ public final class CommandPermissionsConditionGenerator implements CommandCondit
         Set<String> permissions = ImmutableSet.copyOf(annotation.value());
         return new PermissionCondition(permissions, annotation.queued());
     }
+
 }

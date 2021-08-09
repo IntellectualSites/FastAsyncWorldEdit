@@ -69,7 +69,7 @@ public class SphereRegionSelector extends EllipsoidRegionSelector {
     /**
      * Create a new selector.
      *
-     * @param world the world
+     * @param world  the world
      * @param center the center position
      * @param radius the radius
      */

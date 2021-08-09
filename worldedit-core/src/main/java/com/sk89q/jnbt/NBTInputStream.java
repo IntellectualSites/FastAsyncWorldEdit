@@ -45,7 +45,7 @@ import java.util.Map;
  *
  * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public final class NBTInputStream implements Closeable {
 
     private final DataInputStream is;
@@ -170,7 +170,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_COMPOUND: {
                 // readDataPayload
                 depth++;
-                while(true) {
+                while (true) {
                     int childType = is.readByte();
                     if (childType == NBTConstants.TYPE_END) {
                         return;
@@ -334,7 +334,7 @@ public final class NBTInputStream implements Closeable {
                         valueReader.apply(i, entry);
                     }
                 }
-                while(true) {
+                while (true) {
                     int childType = is.readByte();
                     if (childType == NBTConstants.TYPE_END) {
                         return;
@@ -472,7 +472,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
                     throw new IOException(
-                        "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+                            "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
                     return null;
                 }
@@ -565,7 +565,7 @@ public final class NBTInputStream implements Closeable {
     /**
      * Reads the payload of a tag given the type.
      *
-     * @param type the type
+     * @param type  the type
      * @param depth the depth
      * @return the tag
      * @throws IOException if an I/O error occurs.
@@ -575,7 +575,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
                     throw new IOException(
-                        "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+                            "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
                     return new EndTag();
                 }

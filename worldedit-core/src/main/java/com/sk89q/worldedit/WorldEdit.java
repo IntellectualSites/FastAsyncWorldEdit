@@ -59,7 +59,6 @@ import com.sk89q.worldedit.util.concurrency.EvenMoreExecutors;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.util.io.file.FileSelectionAbortedException;
 import com.sk89q.worldedit.util.io.file.FilenameException;
 import com.sk89q.worldedit.util.io.file.FilenameResolutionException;
@@ -74,6 +73,8 @@ import com.sk89q.worldedit.world.registry.BundledItemData;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
+import javax.script.ScriptException;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,8 +88,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.annotation.Nullable;
-import javax.script.ScriptException;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.sk89q.worldedit.event.platform.Interaction.HIT;
@@ -121,12 +120,19 @@ public final class WorldEdit {
     private final PlatformManager platformManager = new PlatformManager(this);
     private final EditSessionFactory editSessionFactory = new EditSessionFactory.EditSessionFactoryImpl(eventBus);
     private final SessionManager sessions = new SessionManager(this);
-    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(0, 1, 20, "WorldEdit Task Executor - %s"));
+    private final ListeningExecutorService executorService = MoreExecutors.listeningDecorator(EvenMoreExecutors.newBoundedCachedThreadPool(
+            0,
+            1,
+            20,
+            "WorldEdit Task Executor - %s"
+    ));
     private final Supervisor supervisor = new SimpleSupervisor();
+    //FAWE start
     private final LazyReference<TranslationManager> translationManager =
             LazyReference.from(() -> new TranslationManager(
                     WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader()
             ));
+    //FAWE end
 
     private final BlockFactory blockFactory = new BlockFactory(this);
     private final ItemFactory itemFactory = new ItemFactory(this);
@@ -258,15 +264,16 @@ public final class WorldEdit {
      * traversal exploits by checking the root directory and the file directory.
      * On success, a {@code java.io.File} object will be returned.
      *
-     * @param actor the actor
-     * @param dir sub-directory to look in
-     * @param filename filename (user-submitted)
+     * @param actor      the actor
+     * @param dir        sub-directory to look in
+     * @param filename   filename (user-submitted)
      * @param defaultExt append an extension if missing one, null to not use
      * @param extensions list of extensions, null for any
      * @return a file
      * @throws FilenameException thrown if the filename is invalid
      */
-    public File getSafeSaveFile(Actor actor, File dir, String filename, String defaultExt, String... extensions) throws FilenameException {
+    public File getSafeSaveFile(Actor actor, File dir, String filename, String defaultExt, String... extensions) throws
+            FilenameException {
         return getSafeFile(actor, dir, filename, defaultExt, extensions, true);
     }
 
@@ -276,31 +283,39 @@ public final class WorldEdit {
      * traversal exploits by checking the root directory and the file directory.
      * On success, a {@code java.io.File} object will be returned.
      *
-     * @param actor the actor
-     * @param dir sub-directory to look in
-     * @param filename filename (user-submitted)
+     * @param actor      the actor
+     * @param dir        sub-directory to look in
+     * @param filename   filename (user-submitted)
      * @param defaultExt append an extension if missing one, null to not use
      * @param extensions list of extensions, null for any
      * @return a file
      * @throws FilenameException thrown if the filename is invalid
      */
-    public File getSafeOpenFile(Actor actor, File dir, String filename, String defaultExt, String... extensions) throws FilenameException {
+    public File getSafeOpenFile(Actor actor, File dir, String filename, String defaultExt, String... extensions) throws
+            FilenameException {
         return getSafeFile(actor, dir, filename, defaultExt, extensions, false);
     }
 
     /**
      * Get a safe path to a file.
      *
-     * @param actor the actor
-     * @param dir sub-directory to look in
-     * @param filename filename (user-submitted)
+     * @param actor      the actor
+     * @param dir        sub-directory to look in
+     * @param filename   filename (user-submitted)
      * @param defaultExt append an extension if missing one, null to not use
      * @param extensions list of extensions, null for any
-     * @param isSave true if the purpose is for saving
+     * @param isSave     true if the purpose is for saving
      * @return a file
      * @throws FilenameException thrown if the filename is invalid
      */
-    private File getSafeFile(@Nullable Actor actor, File dir, String filename, String defaultExt, String[] extensions, boolean isSave) throws FilenameException {
+    private File getSafeFile(
+            @Nullable Actor actor,
+            File dir,
+            String filename,
+            String defaultExt,
+            String[] extensions,
+            boolean isSave
+    ) throws FilenameException {
         if (extensions != null && (extensions.length == 1 && extensions[0] == null)) {
             extensions = null;
         }
@@ -343,7 +358,8 @@ public final class WorldEdit {
         }
     }
 
-    private File getSafeFileWithExtensions(File dir, String filename, List<String> exts, boolean isSave) throws InvalidFilenameException {
+    private File getSafeFileWithExtensions(File dir, String filename, List<String> exts, boolean isSave) throws
+            InvalidFilenameException {
         if (isSave) {
             // First is default, only use that.
             if (exts.size() != 1) {
@@ -362,7 +378,7 @@ public final class WorldEdit {
             }
         }
         File result = null;
-        for (Iterator<String> iter = exts.iterator(); iter.hasNext() && (result == null || (!isSave && !result.exists()));) {
+        for (Iterator<String> iter = exts.iterator(); iter.hasNext() && (result == null || (!isSave && !result.exists())); ) {
             result = getSafeFileWithExtension(dir, filename, iter.next());
         }
         if (result == null) {
@@ -423,6 +439,7 @@ public final class WorldEdit {
         }
     }
 
+    //FAWE start
     public void checkMaxBrushRadius(Expression radius) throws MaxBrushRadiusException {
         double val = radius.evaluate();
         checkArgument(val >= 0, "Radius must be a positive number.");
@@ -432,6 +449,7 @@ public final class WorldEdit {
             }
         }
     }
+    //FAWE end
 
     /**
      * Get a file relative to the defined working directory. If the specified
@@ -462,7 +480,8 @@ public final class WorldEdit {
         return getConfiguration().getWorkingDirectoryPath().resolve(path);
     }
 
-    //FAWE
+    //FAWE start
+
     /**
      * Gets the path to the folder in which schematics are saved by default
      *
@@ -471,6 +490,7 @@ public final class WorldEdit {
     public Path getSchematicsFolderPath() {
         return getWorkingDirectoryPath(getConfiguration().saveDir);
     }
+    //FAWE end
 
     /**
      * Get the direction vector for a player's direction.
@@ -517,7 +537,7 @@ public final class WorldEdit {
     static {
         SetMultimap<Direction, String> directionNames = HashMultimap.create();
         for (Direction direction : Direction.valuesOf(
-            Direction.Flag.CARDINAL | Direction.Flag.UPRIGHT
+                Direction.Flag.CARDINAL | Direction.Flag.UPRIGHT
         )) {
             String name = direction.name().toLowerCase(Locale.ROOT);
             for (int i = 1; i <= name.length(); i++) {
@@ -527,7 +547,7 @@ public final class WorldEdit {
         ImmutableMap.Builder<String, Direction> nameToDirectionMap = ImmutableMap.builder();
         for (Direction direction : directionNames.keySet()) {
             directionNames.get(direction).forEach(name ->
-                nameToDirectionMap.put(name, direction)
+                    nameToDirectionMap.put(name, direction)
             );
         }
         for (Direction direction : ImmutableList.of(Direction.NORTH, Direction.SOUTH)) {
@@ -535,7 +555,7 @@ public final class WorldEdit {
                 for (String dirName : directionNames.get(direction)) {
                     for (String diagName : directionNames.get(diagonal)) {
                         nameToDirectionMap.put(dirName + diagName, Direction.valueOf(
-                            direction.name() + diagonal.name()
+                                direction.name() + diagonal.name()
                         ));
                     }
                 }
@@ -591,7 +611,7 @@ public final class WorldEdit {
     /**
      * Flush a block bag's changes to a player.
      *
-     * @param actor the actor
+     * @param actor       the actor
      * @param editSession the edit session
      */
     public void flushBlockBag(Actor actor, EditSession editSession) {
@@ -613,8 +633,8 @@ public final class WorldEdit {
                 str.append((blockTypeIntegerEntry.getKey()).getRichName());
 
                 str.append(" [Amt: ")
-                    .append(String.valueOf(blockTypeIntegerEntry.getValue()))
-                    .append("]");
+                        .append(String.valueOf(blockTypeIntegerEntry.getValue()))
+                        .append("]");
 
                 ++i;
 
@@ -654,7 +674,7 @@ public final class WorldEdit {
     /**
      * Called on right click.
      *
-     * @param player the player
+     * @param player  the player
      * @param clicked the clicked block
      * @return false if you want the action to go through
      */
@@ -666,9 +686,9 @@ public final class WorldEdit {
     /**
      * Called on right click.
      *
-     * @param player the player
+     * @param player  the player
      * @param clicked the clicked block
-     * @param face The clicked face
+     * @param face    The clicked face
      * @return false if you want the action to go through
      */
     public boolean handleBlockRightClick(Player player, Location clicked, @Nullable Direction face) {
@@ -680,7 +700,7 @@ public final class WorldEdit {
     /**
      * Called on left click.
      *
-     * @param player the player
+     * @param player  the player
      * @param clicked the clicked block
      * @return false if you want the action to go through
      */
@@ -692,9 +712,9 @@ public final class WorldEdit {
     /**
      * Called on left click.
      *
-     * @param player the player
+     * @param player  the player
      * @param clicked the clicked block
-     * @param face The clicked face
+     * @param face    The clicked face
      * @return false if you want the action to go through
      */
     public boolean handleBlockLeftClick(Player player, Location clicked, @Nullable Direction face) {
@@ -707,8 +727,8 @@ public final class WorldEdit {
      * Executes a WorldEdit script.
      *
      * @param player the player
-     * @param f the script file to execute
-     * @param args arguments for the script
+     * @param f      the script file to execute
+     * @param args   arguments for the script
      * @throws WorldEditException if something goes wrong
      */
     public void runScript(Player player, File f, String[] args) throws WorldEditException {
@@ -748,8 +768,14 @@ public final class WorldEdit {
         }
 
         LocalSession session = getSessionManager().get(player);
-        CraftScriptContext scriptContext = new CraftScriptContext(this, getPlatformManager().queryCapability(Capability.USER_COMMANDS),
-                getConfiguration(), session, player, args);
+        CraftScriptContext scriptContext = new CraftScriptContext(
+                this,
+                getPlatformManager().queryCapability(Capability.USER_COMMANDS),
+                getConfiguration(),
+                session,
+                player,
+                args
+        );
 
         CraftScriptEngine engine;
 
@@ -782,7 +808,7 @@ public final class WorldEdit {
             logger.warn("Failed to execute script", e);
         } finally {
             for (EditSession editSession : scriptContext.getEditSessions()) {
-                editSession.flushSession();
+                editSession.close();
                 session.remember(editSession);
             }
         }

@@ -25,12 +25,12 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.plugin.Plugin;
 
+import javax.annotation.Nullable;
 import java.security.CodeSource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -109,7 +109,8 @@ public class ClassSourceValidator {
         builder.append("** the version of ").append(plugin.getName()).append(" that you downloaded, you\n");
         builder.append("** will be using a broken mix of old ").append(plugin.getName()).append(" (that came\n");
         builder.append("** with the plugin) and your downloaded version. THIS MAY\n");
-        builder.append("** SEVERELY BREAK ").append(plugin.getName().toUpperCase(Locale.ROOT)).append(" AND ALL OF ITS FEATURES.\n");
+        builder.append("** SEVERELY BREAK ").append(plugin.getName().toUpperCase(Locale.ROOT)).append(
+                " AND ALL OF ITS FEATURES.\n");
         builder.append("**\n");
         builder.append("** This may have happened because the developer is using\n");
         builder.append("** the ").append(plugin.getName()).append(" API and thinks that including\n");
@@ -128,4 +129,5 @@ public class ClassSourceValidator {
 
         LOGGER.error(builder.toString());
     }
+
 }

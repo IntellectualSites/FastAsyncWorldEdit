@@ -49,8 +49,18 @@ public class BundledBlockRegistry implements BlockRegistry {
             return TextComponent.of(blockEntry.localizedName);
         }
         return Caption.of(
-            TranslationManager.makeTranslationKey("block", blockType.getId())
+                TranslationManager.makeTranslationKey("block", blockType.getId())
         );
+    }
+
+    @Nullable
+    @Override
+    @Deprecated
+    // dumb_intellij.jpg - Ok??
+    @SuppressWarnings("deprecation")
+    public String getName(BlockType blockType) {
+        BundledBlockData.BlockEntry blockEntry = BundledBlockData.getInstance().findById(blockType.getId());
+        return blockEntry != null ? blockEntry.localizedName : null;
     }
 
     @Nullable

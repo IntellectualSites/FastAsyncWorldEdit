@@ -24,11 +24,12 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.biome.Biomes;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
+import org.bukkit.Bukkit;
+
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
-import org.bukkit.Bukkit;
 
 @CommandDeclaration(
         command = "generatebiome",
@@ -40,29 +41,40 @@ import org.bukkit.Bukkit;
         usage = "/plots generatebiome <biome>"
 )
 public class PlotSetBiome extends Command {
+
     public PlotSetBiome() {
         super(MainCommand.getInstance(), true);
     }
 
     @Override
-    public CompletableFuture<Boolean> execute(final PlotPlayer player, String[] args, RunnableVal3<Command, Runnable, Runnable> confirm, RunnableVal2<Command, CommandResult> whenDone) throws CommandException {
+    public CompletableFuture<Boolean> execute(
+            final PlotPlayer player,
+            String[] args,
+            RunnableVal3<Command, Runnable, Runnable> confirm,
+            RunnableVal2<Command, CommandResult> whenDone
+    ) throws CommandException {
         final Plot plot = check(player.getCurrentPlot(), Captions.NOT_IN_PLOT);
         checkTrue(plot.isOwner(player.getUUID()) || Permissions
-            .hasPermission(player, "plots.admin.command.generatebiome"), Captions.NO_PLOT_PERMS);
+                .hasPermission(player, "plots.admin.command.generatebiome"), Captions.NO_PLOT_PERMS);
         if (plot.getRunning() != 0) {
             Captions.WAIT_FOR_TIMER.send(player);
             return null;
         }
         checkTrue(args.length == 1, Captions.COMMAND_SYNTAX, getUsage());
         final Set<CuboidRegion> regions = plot.getRegions();
-        BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
+        BiomeRegistry biomeRegistry = WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.GAME_HOOKS)
+                .getRegistries()
+                .getBiomeRegistry();
         Collection<BiomeType> knownBiomes = BiomeTypes.values();
         final BiomeType biome = Biomes.findBiomeByName(knownBiomes, args[0], biomeRegistry);
         if (biome == null) {
             String biomes = StringMan
                     .join(BiomeType.REGISTRY.values(), Captions.BLOCK_LIST_SEPARATOR.getTranslated());
             Captions.NEED_BIOME.send(player);
-            MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER.toString() + biomes);
+            MainUtil.sendMessage(player, Captions.SUBCOMMAND_SET_OPTIONS_HEADER + biomes);
             return CompletableFuture.completedFuture(false);
         }
         confirm.run(this, () -> {
@@ -90,4 +102,5 @@ public class PlotSetBiome extends Command {
 
         return CompletableFuture.completedFuture(true);
     }
+
 }

@@ -48,16 +48,16 @@ public class DeprecationUtil {
         // find the matching caller method
         Method callingMethod = getCallingMethod(caller);
         NonAbstractForCompatibility annotation =
-            callingMethod.getAnnotation(NonAbstractForCompatibility.class);
+                callingMethod.getAnnotation(NonAbstractForCompatibility.class);
         // get the deprecated method
         Method deprecatedMethod;
         try {
             deprecatedMethod = implementingClass.getMethod(
-                annotation.delegateName(), annotation.delegateParams()
+                    annotation.delegateName(), annotation.delegateParams()
             );
         } catch (NoSuchMethodException e) {
             throw new AssertionError(
-                "Missing method referenced by " + NonAbstractForCompatibility.class, e
+                    "Missing method referenced by " + NonAbstractForCompatibility.class, e
             );
         }
         // Check if the deprecated method was overridden. If the declaring class is the caller's
@@ -67,7 +67,7 @@ public class DeprecationUtil {
         // way this could be reached is if someone calls `super.xyz`, which they have no reason to.
         if (deprecatedMethod.getDeclaringClass().getName().equals(caller.getClassName())) {
             throw new IllegalStateException("Class " + implementingClass.getName()
-                + " must override " + methodToString(callingMethod));
+                    + " must override " + methodToString(callingMethod));
         }
     }
 
@@ -80,22 +80,22 @@ public class DeprecationUtil {
         }
         for (Method declaredMethod : declaredMethods) {
             if (declaredMethod.isAnnotationPresent(NonAbstractForCompatibility.class)
-                && declaredMethod.getName().equals(callerInfo.getMethodName())) {
+                    && declaredMethod.getName().equals(callerInfo.getMethodName())) {
                 return declaredMethod;
             }
         }
         throw new IllegalStateException("Failed to find caller method "
-            + callerInfo.getMethodName() + " annotated with " + NonAbstractForCompatibility.class);
+                + callerInfo.getMethodName() + " annotated with " + NonAbstractForCompatibility.class);
     }
 
     private static String methodToString(Method method) {
         StringBuilder builder = new StringBuilder(method.getDeclaringClass().getCanonicalName())
-            .append('.')
-            .append(method.getName())
-            .append('(');
+                .append('.')
+                .append(method.getName())
+                .append('(');
         Joiner.on(", ").appendTo(builder, Stream.of(method.getParameterTypes())
-            .map(Class::getSimpleName)
-            .iterator());
+                .map(Class::getSimpleName)
+                .iterator());
         builder.append(')');
         return builder.toString();
     }
@@ -106,12 +106,12 @@ public class DeprecationUtil {
         @SuppressWarnings("deprecation")
         BlockType wallSign = BlockTypes.WALL_SIGN;
         return blockType == sign || blockType == wallSign
-            || BlockCategories.SIGNS.contains(blockType);
+                || BlockCategories.SIGNS.contains(blockType);
     }
 
     public static String getHeadOwnerKey() {
         int dataVersion = WorldEdit.getInstance().getPlatformManager()
-            .queryCapability(Capability.GAME_HOOKS).getDataVersion();
+                .queryCapability(Capability.GAME_HOOKS).getDataVersion();
         return dataVersion >= Constants.DATA_VERSION_MC_1_16 ? "SkullOwner" : "Owner";
     }
 

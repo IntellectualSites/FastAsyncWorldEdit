@@ -52,9 +52,11 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     private final List<EditSession> editSessions = new ArrayList<>();
     private final String[] args;
 
-    public CraftScriptContext(WorldEdit controller,
+    public CraftScriptContext(
+            WorldEdit controller,
             Platform server, LocalConfiguration config,
-            LocalSession session, Player player, String[] args) {
+            LocalSession session, Player player, String[] args
+    ) {
         super(controller, server, config, session, player);
         this.args = args;
     }
@@ -68,7 +70,8 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     public EditSession remember() {
         EditSession editSession = controller.getEditSessionFactory()
                 .getEditSession(player.getWorld(),
-                        session.getBlockChangeLimit(), session.getBlockBag(player), player);
+                        session.getBlockChangeLimit(), session.getBlockBag(player), player
+                );
         Request.request().setEditSession(editSession);
         editSession.enableStandardMode();
         editSessions.add(editSession);
@@ -141,8 +144,8 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     /**
      * Checks to make sure that there are enough but not too many arguments.
      *
-     * @param min a number of arguments
-     * @param max -1 for no maximum
+     * @param min   a number of arguments
+     * @param max   -1 for no maximum
      * @param usage usage string
      * @throws InsufficientArgumentsException if the arguments are not "sufficiently" good
      */
@@ -166,10 +169,10 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     /**
      * Get an item from an item name or an item ID number.
      *
-     * @param input input to parse
+     * @param input      input to parse
      * @param allAllowed true to ignore blacklists
      * @return a block
-     * @throws NoMatchException if no block was found
+     * @throws NoMatchException         if no block was found
      * @throws DisallowedUsageException if the block is disallowed
      */
     public BaseBlock getBlock(String input, boolean allAllowed) throws WorldEditException {
@@ -188,7 +191,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      *
      * @param id the type Id
      * @return a block
-     * @throws NoMatchException if no block was found
+     * @throws NoMatchException         if no block was found
      * @throws DisallowedUsageException if the block is disallowed
      */
     public BaseBlock getBlock(String id) throws WorldEditException {
@@ -200,7 +203,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      *
      * @param list the input
      * @return pattern
-     * @throws NoMatchException if the pattern was invalid
+     * @throws NoMatchException         if the pattern was invalid
      * @throws DisallowedUsageException if the block is disallowed
      */
     public Pattern getBlockPattern(String list) throws WorldEditException {
@@ -214,10 +217,10 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     /**
      * Get a list of blocks as a set.
      *
-     * @param list a list
+     * @param list             a list
      * @param allBlocksAllowed true if all blocks are allowed
      * @return set
-     * @throws NoMatchException if the blocks couldn't be found
+     * @throws NoMatchException         if the blocks couldn't be found
      * @throws DisallowedUsageException if the block is disallowed
      */
     public Set<BaseBlock> getBlocks(String list, boolean allBlocksAllowed) throws WorldEditException {
@@ -238,10 +241,10 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      *
      * <p>Use this method if you need to read a file from a directory.</p>
      *
-     * @param folder sub-directory to look in
-     * @param filename filename (user-submitted)
+     * @param folder     sub-directory to look in
+     * @param filename   filename (user-submitted)
      * @param defaultExt default extension to append if there is none
-     * @param exts list of extensions for file open dialog, null for no filter
+     * @param exts       list of extensions for file open dialog, null for no filter
      * @return a file
      * @throws FilenameException if there is a problem with the name of the file
      */
@@ -259,10 +262,10 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      *
      * <p>Use this method if you need to read a file from a directory.</p>
      *
-     * @param folder sub-directory to look in
-     * @param filename filename (user-submitted)
+     * @param folder     sub-directory to look in
+     * @param filename   filename (user-submitted)
      * @param defaultExt default extension to append if there is none
-     * @param exts list of extensions for file save dialog, null for no filter
+     * @param exts       list of extensions for file save dialog, null for no filter
      * @return a file
      * @throws FilenameException if there is a problem with the name of the file
      */

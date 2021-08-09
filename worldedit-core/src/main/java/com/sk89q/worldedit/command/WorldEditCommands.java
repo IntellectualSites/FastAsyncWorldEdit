@@ -62,6 +62,7 @@ import java.util.Map;
 
 @CommandContainer(superTypes = {CommandPermissionsConditionGenerator.Registration.class})
 public class WorldEditCommands {
+
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
 
     private final WorldEdit we;
@@ -71,12 +72,13 @@ public class WorldEditCommands {
     }
 
     @Command(
-        name = "version",
-        aliases = { "ver" },
-        desc = "Get the FAWE version"
+            name = "version",
+            aliases = {"ver"},
+            desc = "Get the FAWE version"
     )
     @CommandPermissions(queued = false)
     public void version(Actor actor) {
+        //FAWE start - get own version format
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
         actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
@@ -84,7 +86,7 @@ public class WorldEditCommands {
         if (fVer != null) {
             FaweVersion version = Fawe.get().getVersion();
             Date date = new GregorianCalendar(2000 + version.year, version.month - 1, version.day)
-                .getTime();
+                    .getTime();
 
             TextComponent dateArg = TextComponent.of(date.toLocaleString());
             TextComponent commitArg = TextComponent.of(Integer.toHexString(version.hash));
@@ -95,6 +97,7 @@ public class WorldEditCommands {
         }
 
         actor.printInfo(TextComponent.of("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki"));
+        //FAWE end
 
         PlatformManager pm = we.getPlatformManager();
 
@@ -104,7 +107,7 @@ public class WorldEditCommands {
                     TextComponent.of("* ", TextColor.GRAY)
                             .append(TextComponent.of(platform.getPlatformName())
                                     .hoverEvent(HoverEvent.showText(TextComponent.of(platform.getId()))))
-                    .append(TextComponent.of("(" + platform.getPlatformVersion() + ")"))
+                            .append(TextComponent.of("(" + platform.getPlatformVersion() + ")"))
             ).newline();
         }
         actor.print(new MessageBox("Platforms", producer, TextColor.GRAY).create());
@@ -113,9 +116,9 @@ public class WorldEditCommands {
         for (Capability capability : Capability.values()) {
             Platform platform = pm.queryCapability(capability);
             producer.append(
-                TextComponent.of(capability.name(), TextColor.GRAY)
-                    .append(TextComponent.of(": ")
-                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "none")))
+                    TextComponent.of(capability.name(), TextColor.GRAY)
+                            .append(TextComponent.of(": ")
+                                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "none")))
             ).newline();
         }
         actor.print(new MessageBox("Capabilities", producer, TextColor.GRAY).create());
@@ -123,20 +126,26 @@ public class WorldEditCommands {
     }
 
     @Command(
-        name = "reload",
-        desc = "Reload configuration and translations"
+            name = "reload",
+            desc = "Reload configuration and translations"
     )
     @CommandPermissions("worldedit.reload")
     public void reload(Actor actor) {
         we.getPlatformManager().queryCapability(Capability.CONFIGURATION).reload();
-        we.getEventBus().post(new ConfigurationLoadEvent(we.getPlatformManager().queryCapability(Capability.CONFIGURATION).getConfiguration()));
+        we.getEventBus().post(new ConfigurationLoadEvent(we
+                .getPlatformManager()
+                .queryCapability(Capability.CONFIGURATION)
+                .getConfiguration()));
+        //FAWE start
         Fawe.get().setupConfigs();
+        //FAWE end
         actor.print(Caption.of("worldedit.reload.config"));
     }
 
+    //FAWE start
     @Command(
-        name = "debugpaste",
-        desc = "Writes a report of latest.log, config.yml, config-legacy.yml, strings.json to https://athion.net/ISPaster/paste"
+            name = "debugpaste",
+            desc = "Writes a report of latest.log, config.yml, config-legacy.yml, strings.json to https://athion.net/ISPaster/paste"
     )
     @CommandPermissions(value = {"worldedit.report", "worldedit.debugpaste"}, queued = false)
     public void report(Actor actor) throws WorldEditException {
@@ -151,12 +160,12 @@ public class WorldEditCommands {
             return;
         }
         actor.print(Caption.of("worldedit.report.written", TextComponent.of(dest).clickEvent(
-            ClickEvent.openUrl(dest))));
+                ClickEvent.openUrl(dest))));
     }
 
     @Command(
-        name = "threads",
-        desc = "Print all thread stacks"
+            name = "threads",
+            desc = "Print all thread stacks"
     )
     @CommandPermissions(value = "worldedit.threads", queued = false)
     public void threads(Actor actor) throws WorldEditException {
@@ -164,17 +173,18 @@ public class WorldEditCommands {
         for (Map.Entry<Thread, StackTraceElement[]> entry : stacks.entrySet()) {
             Thread thread = entry.getKey();
             actor.printDebug(TextComponent.of(
-                "--------------------------------------------------------------------------------------------"));
+                    "--------------------------------------------------------------------------------------------"));
             actor.printDebug("Thread: " + thread.getName() + " | Id: " + thread.getId() + " | Alive: " + thread.isAlive());
             for (StackTraceElement elem : entry.getValue()) {
                 actor.printDebug(TextComponent.of(elem.toString()));
             }
         }
     }
+    //FAWE end
 
     @Command(
-        name = "cui",
-        desc = "Complete CUI handshake (internal usage)"
+            name = "cui",
+            desc = "Complete CUI handshake (internal usage)"
     )
     @CommandPermissions(value = "worldedit.cui", queued = false)
     public void cui(Player player, LocalSession session) {
@@ -183,39 +193,47 @@ public class WorldEditCommands {
     }
 
     @Command(
-        name = "tz",
-        desc = "Set your timezone for snapshots"
+            name = "tz",
+            desc = "Set your timezone for snapshots"
     )
     @CommandPermissions(value = "worldedit.timezone", queued = false)
-    public void tz(Actor actor, LocalSession session,
-                   @Arg(desc = "The timezone to set")
-                       String timezone) {
+    public void tz(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The timezone to set")
+                    String timezone
+    ) {
         try {
             ZoneId tz = ZoneId.of(timezone);
             session.setTimezone(tz);
             actor.print(Caption.of("worldedit.timezone.set", TextComponent.of(tz.getDisplayName(
                     TextStyle.FULL, actor.getLocale()
             ))));
-            actor.print(Caption.of("worldedit.timezone.current",
-                    TextComponent.of(dateFormat.withLocale(actor.getLocale()).format(ZonedDateTime.now(tz)))));
+            actor.print(Caption.of(
+                    "worldedit.timezone.current",
+                    TextComponent.of(dateFormat.withLocale(actor.getLocale()).format(ZonedDateTime.now(tz)))
+            ));
         } catch (ZoneRulesException e) {
             actor.print(Caption.of("worldedit.timezone.invalid"));
         }
     }
 
     @Command(
-        name = "help",
-        desc = "Displays help for WorldEdit commands"
+            name = "help",
+            desc = "Displays help for WorldEdit commands"
     )
     @CommandPermissions(value = "worldedit.help", queued = false)
-    public void help(Actor actor,
-                     @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
-                         boolean listSubCommands,
-                     @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
-                         int page,
-                     @Arg(desc = "The command to retrieve help for", def = "", variable = true)
-                         List<String> command) throws WorldEditException {
+    public void help(
+            Actor actor,
+            @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
+                    boolean listSubCommands,
+            @ArgFlag(name = 'p', desc = "The page to retrieve", def = "1")
+                    int page,
+            @Arg(desc = "The command to retrieve help for", def = "", variable = true)
+                    List<String> command
+    ) throws WorldEditException {
         PrintCommandHelp.help(command, page, listSubCommands,
-                we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "/worldedit help");
+                we.getPlatformManager().getPlatformCommandManager().getCommandManager(), actor, "/worldedit help"
+        );
     }
+
 }

@@ -19,12 +19,12 @@
 
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.fawe.NumberTag;
+import com.fastasyncworldedit.core.jnbt.NumberTag;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.Location;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.sk89q.worldedit.util.nbt.BinaryTag;
 import com.sk89q.worldedit.util.nbt.BinaryTagLike;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
@@ -53,8 +53,8 @@ public class CompoundTag extends Tag {
      */
     public CompoundTag(Map<String, Tag> value) {
         this(CompoundBinaryTag.builder()
-            .put(Maps.transformValues(value, BinaryTagLike::asBinaryTag))
-            .build());
+                .put(Maps.transformValues(value, BinaryTagLike::asBinaryTag))
+                .build());
     }
 
     public CompoundTag(CompoundBinaryTag adventureTag) {
@@ -247,10 +247,10 @@ public class CompoundTag extends Tag {
      * a list but the list of of a different type, then an empty
      * list will also be returned.</p>
      *
-     * @param key the key
+     * @param key      the key
      * @param listType the class of the contained type
+     * @param <T>      the type of list
      * @return a list of tags
-     * @param <T> the type of list
      */
     @SuppressWarnings("unchecked")
     public <T extends Tag> List<T> getList(String key, Class<T> listType) {
@@ -338,7 +338,7 @@ public class CompoundTag extends Tag {
     }
 
 
-    // FAWE Start
+    //FAWE start
     public UUID getUUID() {
         long most = getLong("UUIDMost");
         long least = getLong("UUIDLeast");
@@ -376,6 +376,6 @@ public class CompoundTag extends Tag {
         }
         return raw;
     }
-    // FAWE End
+    //FAWE end
 
 }

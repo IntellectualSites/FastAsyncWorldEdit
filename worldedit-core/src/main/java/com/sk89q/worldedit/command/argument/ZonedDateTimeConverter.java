@@ -51,11 +51,12 @@ public class ZonedDateTimeConverter implements ArgumentConverter<ZonedDateTime> 
     @Override
     public ConversionResult<ZonedDateTime> convert(String argument, InjectedValueAccess context) {
         LocalSession session = context.injectedValue(Key.of(LocalSession.class))
-            .orElseThrow(() -> new IllegalStateException("Need a local session"));
+                .orElseThrow(() -> new IllegalStateException("Need a local session"));
         Calendar date = session.detectDate(argument);
         if (date == null) {
             return FailedConversion.from(new IllegalArgumentException("Not a date: " + argument));
         }
         return SuccessfulConversion.fromSingle(date.toInstant().atZone(ZoneOffset.UTC));
     }
+
 }

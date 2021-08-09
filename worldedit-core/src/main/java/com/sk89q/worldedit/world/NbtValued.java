@@ -43,8 +43,12 @@ public interface NbtValued {
      */
     @Deprecated
     default boolean hasNbtData() {
+        //FAWE start - return & deprecation
         return getNbt() != null;
+        //FAWE end
     }
+
+    //FAWE start
 
     /**
      * Get the object's NBT data (tile entity data). The returned tag, if
@@ -86,12 +90,10 @@ public interface NbtValued {
      * </p>
      *
      * @return compound tag, or null
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "getNbtData",
-        delegateParams = { }
+            delegateName = "getNbtData",
+            delegateParams = {}
     )
     @Nullable
     default LazyReference<CompoundBinaryTag> getNbtReference() {
@@ -105,8 +107,6 @@ public interface NbtValued {
      * Get the object's NBT data (tile entity data).
      *
      * @return compound tag, or null
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @Nullable
     default CompoundBinaryTag getNbt() {
@@ -118,12 +118,10 @@ public interface NbtValued {
      * Set the object's NBT data (tile entity data).
      *
      * @param nbtData NBT data, or null if no data
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "setNbtData",
-        delegateParams = { CompoundTag.class }
+            delegateName = "setNbtData",
+            delegateParams = {CompoundTag.class}
     )
     default void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
         DeprecationUtil.checkDelegatingOverride(getClass());
@@ -139,5 +137,6 @@ public interface NbtValued {
     default void setNbt(@Nullable CompoundBinaryTag nbtData) {
         setNbtReference(nbtData == null ? null : LazyReference.computed(nbtData));
     }
+    //FAWE end
 
 }

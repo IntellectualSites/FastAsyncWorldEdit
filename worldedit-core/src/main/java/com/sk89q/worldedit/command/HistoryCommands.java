@@ -56,22 +56,26 @@ public class HistoryCommands {
     }
 
     @Command(
-        name = "undo",
-        aliases = { "/undo" },
-        desc = "Undoes the last action (from history)"
+            name = "undo",
+            aliases = {"/undo"},
+            desc = "Undoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
-    public void undo(Actor actor, LocalSession session,
-                     @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of undoes to perform", def = "1")
-                         int times,
-                     @Arg(name = "player", desc = "Undo this player's operations", def = "")
-                         String playerName) throws WorldEditException {
+    public void undo(
+            Actor actor, LocalSession session,
+            @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of undoes to perform", def = "1")
+                    int times,
+            @Arg(name = "player", desc = "Undo this player's operations", def = "")
+                    String playerName
+    ) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession undoSession = session;
+        //FAWE start - Add fastmode check
         if (session.hasFastMode()) {
             actor.print(Caption.of("fawe.worldedit.history.command.undo.disabled"));
             return;
         }
+        //FAWE end
         if (playerName != null) {
             actor.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);
@@ -99,16 +103,18 @@ public class HistoryCommands {
     }
 
     @Command(
-        name = "redo",
-        aliases = { "/redo" },
-        desc = "Redoes the last action (from history)"
+            name = "redo",
+            aliases = {"/redo"},
+            desc = "Redoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})
-    public void redo(Actor actor, LocalSession session,
-                     @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of redoes to perform", def = "1")
-                         int times,
-                     @Arg(name = "player", desc = "Redo this player's operations", def = "")
-                         String playerName) throws WorldEditException {
+    public void redo(
+            Actor actor, LocalSession session,
+            @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of redoes to perform", def = "1")
+                    int times,
+            @Arg(name = "player", desc = "Redo this player's operations", def = "")
+                    String playerName
+    ) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession redoSession = session;
         if (playerName != null) {
@@ -138,9 +144,9 @@ public class HistoryCommands {
     }
 
     @Command(
-        name = "clearhistory",
-        aliases = { "/clearhistory" },
-        desc = "Clear your history"
+            name = "clearhistory",
+            aliases = {"/clearhistory"},
+            desc = "Clear your history"
     )
     @CommandPermissions("worldedit.history.clear")
     public void clearHistory(Actor actor, LocalSession session) {

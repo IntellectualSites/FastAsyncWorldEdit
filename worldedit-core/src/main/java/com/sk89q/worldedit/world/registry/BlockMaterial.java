@@ -20,7 +20,8 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.jnbt.CompoundTag;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.Nullable;
 
 /**
  * Describes the material for a block.
@@ -98,12 +99,6 @@ public interface BlockMaterial {
     int getLightValue();
 
     /**
-     * Get the opacity of the block.
-     * @return opacity
-     */
-    int getLightOpacity();
-
-    /**
      * Get whether this block breaks when it is pushed by a piston.
      *
      * @return true if the block breaks
@@ -168,6 +163,15 @@ public interface BlockMaterial {
      */
     boolean hasContainer();
 
+    //FAWE start
+
+    /**
+     * Get the opacity of the block.
+     *
+     * @return opacity
+     */
+    int getLightOpacity();
+
     /**
      * Gets whether the block is a tile entity.
      *
@@ -185,7 +189,9 @@ public interface BlockMaterial {
 
     /**
      * Get the map color.
+     *
      * @return or 0
      */
     int getMapColor();
+    //FAWE end
 }

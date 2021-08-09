@@ -2,7 +2,7 @@ package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.bukkit.filter.GriefPreventionFilter;
 import com.fastasyncworldedit.core.regions.FaweMask;
-import com.fastasyncworldedit.core.regions.general.RegionFilter;
+import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -26,8 +26,10 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
     }
 
     public boolean isAllowed(Player player, Claim claim, MaskType type) {
-        return claim != null && (claim.getOwnerName().equalsIgnoreCase(player.getName()) || claim.getOwnerName().equals(player.getUniqueId()) ||
-            type == MaskType.MEMBER && claim.allowBuild(player, Material.AIR) == null);
+        return claim != null && (claim.getOwnerName().equalsIgnoreCase(player.getName()) || claim
+                .getOwnerName()
+                .equals(player.getUniqueId()) ||
+                type == MaskType.MEMBER && claim.allowBuild(player, Material.AIR) == null);
     }
 
     @Override
@@ -37,8 +39,16 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
         if (claim != null) {
             if (isAllowed(player, claim, type)) {
                 claim.getGreaterBoundaryCorner().getBlockX();
-                final BlockVector3 pos1 = BlockVector3.at(claim.getLesserBoundaryCorner().getBlockX(), 0, claim.getLesserBoundaryCorner().getBlockZ());
-                final BlockVector3 pos2 = BlockVector3.at(claim.getGreaterBoundaryCorner().getBlockX(), 256, claim.getGreaterBoundaryCorner().getBlockZ());
+                final BlockVector3 pos1 = BlockVector3.at(
+                        claim.getLesserBoundaryCorner().getBlockX(),
+                        0,
+                        claim.getLesserBoundaryCorner().getBlockZ()
+                );
+                final BlockVector3 pos2 = BlockVector3.at(
+                        claim.getGreaterBoundaryCorner().getBlockX(),
+                        256,
+                        claim.getGreaterBoundaryCorner().getBlockZ()
+                );
                 return new FaweMask(new CuboidRegion(pos1, pos2)) {
 
                     @Override
@@ -55,4 +65,5 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
     public RegionFilter getFilter(String world) {
         return new GriefPreventionFilter(Bukkit.getWorld(world));
     }
+
 }

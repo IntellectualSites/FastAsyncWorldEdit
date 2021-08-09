@@ -42,7 +42,7 @@ public class Triangle {
         checkNotNull(v1);
         checkNotNull(v2);
 
-        vertices = new Vector3[] { v0, v1, v2 };
+        vertices = new Vector3[]{v0, v1, v2};
 
         this.normal = v1.subtract(v0).cross(v2.subtract(v0)).normalize();
         this.maxDotProduct = Math.max(Math.max(normal.dot(v0), normal.dot(v1)), normal.dot(v2));

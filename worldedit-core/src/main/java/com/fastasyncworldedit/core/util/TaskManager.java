@@ -1,13 +1,14 @@
 package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.beta.implementation.queue.QueueHandler;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.object.RunnableVal;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
@@ -15,7 +16,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 public abstract class TaskManager {
 
@@ -31,7 +31,7 @@ public abstract class TaskManager {
      * @param runnable the task to run
      * @param interval in ticks
      */
-    public abstract int repeat(@NotNull final Runnable runnable, final int interval);
+    public abstract int repeat(@Nonnull final Runnable runnable, final int interval);
 
     /**
      * Run a repeating task asynchronously.
@@ -40,27 +40,26 @@ public abstract class TaskManager {
      * @param interval in ticks
      * @return the task id number
      */
-    public abstract int repeatAsync(@NotNull final Runnable runnable, final int interval);
+    public abstract int repeatAsync(@Nonnull final Runnable runnable, final int interval);
 
     /**
      * Run a task asynchronously.
      *
      * @param runnable the task to run
      */
-    public abstract void async(@NotNull final Runnable runnable);
+    public abstract void async(@Nonnull final Runnable runnable);
 
     /**
      * Run a task on the main thread.
      *
      * @param runnable the task to run
      */
-    public abstract void task(@NotNull final Runnable runnable);
+    public abstract void task(@Nonnull final Runnable runnable);
 
     /**
      * Get the public ForkJoinPool.
      * - ONLY SUBMIT SHORT LIVED TASKS<br>
      * - DO NOT USE SLEEP/WAIT/LOCKS IN ANY SUBMITTED TASKS<br>
-     *
      */
     public ForkJoinPool getPublicForkJoinPool() {
         return pool;
@@ -151,9 +150,9 @@ public abstract class TaskManager {
      * - If it's already the main thread, it will just call run()
      *
      * @param runnable the task to run
-     * @param async whether the task should run on the main thread
+     * @param async    whether the task should run on the main thread
      */
-    public void taskNow(@NotNull final Runnable runnable, boolean async) {
+    public void taskNow(@Nonnull final Runnable runnable, boolean async) {
         if (async) {
             async(runnable);
         } else {
@@ -167,7 +166,7 @@ public abstract class TaskManager {
      *
      * @param runnable the task to run
      */
-    public void taskNowMain(@NotNull final Runnable runnable) {
+    public void taskNowMain(@Nonnull final Runnable runnable) {
         if (Fawe.isMainThread()) {
             runnable.run();
         } else {
@@ -181,7 +180,7 @@ public abstract class TaskManager {
      * @param runnable the task to run
      * @see Fawe#isMainThread()
      */
-    public void taskNowAsync(@NotNull final Runnable runnable) {
+    public void taskNowAsync(@Nonnull final Runnable runnable) {
         taskNow(runnable, Fawe.isMainThread());
     }
 
@@ -189,9 +188,9 @@ public abstract class TaskManager {
      * Run a task on the main thread at the next tick or now async.
      *
      * @param runnable the task to run.
-     * @param async whether the task should run on the main thread
+     * @param async    whether the task should run on the main thread
      */
-    public void taskSoonMain(@NotNull final Runnable runnable, boolean async) {
+    public void taskSoonMain(@Nonnull final Runnable runnable, boolean async) {
         if (async) {
             async(runnable);
         } else {
@@ -204,17 +203,17 @@ public abstract class TaskManager {
      * Run a task later on the main thread.
      *
      * @param runnable the task to run
-     * @param delay in ticks
+     * @param delay    in ticks
      */
-    public abstract void later(@NotNull final Runnable runnable, final int delay);
+    public abstract void later(@Nonnull final Runnable runnable, final int delay);
 
     /**
      * Run a task later asynchronously.
      *
      * @param runnable the task to run
-     * @param delay in ticks
+     * @param delay    in ticks
      */
-    public abstract void laterAsync(@NotNull final Runnable runnable, final int delay);
+    public abstract void laterAsync(@Nonnull final Runnable runnable, final int delay);
 
     /**
      * Cancel a task.
@@ -275,7 +274,7 @@ public abstract class TaskManager {
         }
     }
 
-    public void taskWhenFree(@NotNull Runnable run) {
+    public void taskWhenFree(@Nonnull Runnable run) {
         if (Fawe.isMainThread()) {
             run.run();
         } else {
@@ -288,7 +287,7 @@ public abstract class TaskManager {
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
      */
-    public <T> T syncWhenFree(@NotNull final RunnableVal<T> function) {
+    public <T> T syncWhenFree(@Nonnull final RunnableVal<T> function) {
         if (Fawe.isMainThread()) {
             function.run();
             return function.value;
@@ -305,7 +304,7 @@ public abstract class TaskManager {
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
      */
-    public <T> T syncWhenFree(@NotNull final Supplier<T> supplier) {
+    public <T> T syncWhenFree(@Nonnull final Supplier<T> supplier) {
         if (Fawe.isMainThread()) {
             return supplier.get();
         }
@@ -321,7 +320,7 @@ public abstract class TaskManager {
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms
      */
-    public <T> T sync(@NotNull final RunnableVal<T> function) {
+    public <T> T sync(@Nonnull final RunnableVal<T> function) {
         return sync((Supplier<T>) function);
     }
 
@@ -340,4 +339,5 @@ public abstract class TaskManager {
             throw new RuntimeException(e);
         }
     }
+
 }

@@ -138,4 +138,5 @@ public class BedBlockCompatibilityHandler implements NBTCompatibilityHandler {
         }
         return color + "_bed";
     }
+
 }

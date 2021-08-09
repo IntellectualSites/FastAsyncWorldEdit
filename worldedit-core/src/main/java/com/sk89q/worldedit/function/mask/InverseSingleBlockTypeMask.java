@@ -1,5 +1,7 @@
 package com.sk89q.worldedit.function.mask;
 
+import com.fastasyncworldedit.core.function.mask.ABlockMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -7,6 +9,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class InverseSingleBlockTypeMask extends ABlockMask {
+
     private final int internalId;
     private final boolean replacesAir;
 
@@ -40,4 +43,5 @@ public class InverseSingleBlockTypeMask extends ABlockMask {
     public boolean replacesAir() {
         return replacesAir;
     }
+
 }

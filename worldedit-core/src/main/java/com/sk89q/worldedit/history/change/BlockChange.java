@@ -46,9 +46,13 @@ public class BlockChange implements Change {
      *
      * @param position the position
      * @param previous the previous block
-     * @param current the current block
+     * @param current  the current block
      */
-    public <BP extends BlockStateHolder<BP>, BC extends BlockStateHolder<BC>> BlockChange(BlockVector3 position, BP previous, BC current) {
+    public <BP extends BlockStateHolder<BP>, BC extends BlockStateHolder<BC>> BlockChange(
+            BlockVector3 position,
+            BP previous,
+            BC current
+    ) {
         checkNotNull(position);
         checkNotNull(previous);
         checkNotNull(current);

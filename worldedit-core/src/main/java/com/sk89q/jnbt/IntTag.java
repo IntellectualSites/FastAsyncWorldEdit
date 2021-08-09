@@ -56,11 +56,11 @@ public final class IntTag extends Tag {
         return innerTag.value();
     }
 
-    // FAWE Start
+    //FAWE start
     @Override
     public int getTypeCode() {
         return NBTConstants.TYPE_INT;
     }
-    // FAWE End
+    //FAWE end
 
 }

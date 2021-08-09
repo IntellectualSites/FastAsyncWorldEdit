@@ -36,4 +36,5 @@ public abstract class AbstractExtentPattern extends AbstractPattern implements E
     public Extent getExtent() {
         return extent;
     }
+
 }

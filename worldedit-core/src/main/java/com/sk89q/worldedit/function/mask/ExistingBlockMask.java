@@ -55,10 +55,12 @@ public class ExistingBlockMask extends AbstractExtentMask {
         return null;
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         // The mask is not mutable. There is no need to clone it.
         return this;
     }
+    //FAWE end
 
 }

@@ -29,4 +29,5 @@ public interface CommandInspector {
     String getFullText(Command command);
 
     boolean testPermission(CommandSender sender, Command command);
+
 }

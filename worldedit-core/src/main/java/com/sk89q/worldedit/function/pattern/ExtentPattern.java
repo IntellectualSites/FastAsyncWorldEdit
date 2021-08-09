@@ -29,4 +29,5 @@ public interface ExtentPattern extends Pattern {
      * @return the extent for this pattern
      */
     Extent getExtent();
+
 }

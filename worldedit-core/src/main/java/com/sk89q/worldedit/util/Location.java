@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.util;
 
+import com.fastasyncworldedit.core.math.Vector3Impl;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.math.Vector3Impl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -36,7 +36,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * {@link #equals(Object)} are subject to minor differences caused by
  * floating point errors.</p>
  */
+//FAWE start - extends Vector3Impl
 public class Location extends Vector3Impl {
+//FAWE end
 
     private final Extent extent;
     private final float pitch;
@@ -57,9 +59,9 @@ public class Location extends Vector3Impl {
      * with a direction vector of 0, 0, 0.
      *
      * @param extent the extent
-     * @param x the X coordinate
-     * @param y the Y coordinate
-     * @param z the Z coordinate
+     * @param x      the X coordinate
+     * @param y      the Y coordinate
+     * @param z      the Z coordinate
      */
     public Location(Extent extent, double x, double y, double z) {
         this(extent, Vector3.at(x, y, z), 0f, 90f);
@@ -69,7 +71,7 @@ public class Location extends Vector3Impl {
      * Create a new instance in the given extent with the given position
      * vector and a direction vector of 0, 0, 0.
      *
-     * @param extent the extent
+     * @param extent   the extent
      * @param position the position vector
      */
     public Location(Extent extent, Vector3 position) {
@@ -80,10 +82,10 @@ public class Location extends Vector3Impl {
      * Create a new instance in the given extent with the given coordinates
      * and the given direction vector.
      *
-     * @param extent the extent
-     * @param x the X coordinate
-     * @param y the Y coordinate
-     * @param z the Z coordinate
+     * @param extent    the extent
+     * @param x         the X coordinate
+     * @param y         the Y coordinate
+     * @param z         the Z coordinate
      * @param direction the direction vector
      */
     public Location(Extent extent, double x, double y, double z, Vector3 direction) {
@@ -95,11 +97,11 @@ public class Location extends Vector3Impl {
      * and the given direction vector.
      *
      * @param extent the extent
-     * @param x the X coordinate
-     * @param y the Y coordinate
-     * @param z the Z coordinate
-     * @param yaw the yaw, in degrees
-     * @param pitch the pitch, in degrees
+     * @param x      the X coordinate
+     * @param y      the Y coordinate
+     * @param z      the Z coordinate
+     * @param yaw    the yaw, in degrees
+     * @param pitch  the pitch, in degrees
      */
     public Location(Extent extent, double x, double y, double z, float yaw, float pitch) {
         this(extent, Vector3.at(x, y, z), yaw, pitch);
@@ -109,8 +111,8 @@ public class Location extends Vector3Impl {
      * Create a new instance in the given extent with the given position vector
      * and the given direction vector.
      *
-     * @param extent the extent
-     * @param position the position vector
+     * @param extent    the extent
+     * @param position  the position vector
      * @param direction the direction vector
      */
     public Location(Extent extent, Vector3 position, Vector3 direction) {
@@ -121,13 +123,15 @@ public class Location extends Vector3Impl {
      * Create a new instance in the given extent with the given position vector
      * and the given direction vector.
      *
-     * @param extent the extent
+     * @param extent   the extent
      * @param position the position vector
-     * @param yaw the yaw, in degrees
-     * @param pitch the pitch, in degrees
+     * @param yaw      the yaw, in degrees
+     * @param pitch    the pitch, in degrees
      */
     public Location(Extent extent, Vector3 position, float yaw, float pitch) {
+        //FAWE start
         super(position);
+        //FAWE end
         checkNotNull(extent);
         checkNotNull(position);
         this.extent = extent;
@@ -195,7 +199,7 @@ public class Location extends Vector3Impl {
     /**
      * Create a clone of this object with the given yaw and pitch.
      *
-     * @param yaw the new yaw
+     * @param yaw   the new yaw
      * @param pitch the new pitch
      * @return the new instance
      */
@@ -218,7 +222,8 @@ public class Location extends Vector3Impl {
         return Vector3.at(
                 -xz * Math.sin(yaw),
                 -Math.sin(pitch),
-                xz * Math.cos(yaw));
+                xz * Math.cos(yaw)
+        );
     }
 
     /**
@@ -293,7 +298,9 @@ public class Location extends Vector3Impl {
         return new Location(extent, position, yaw, pitch);
     }
 
-    @Override public Location clampY(int min, int max) {
+    //FAWE start
+    @Override
+    public Location clampY(int min, int max) {
         checkArgument(min <= max, "minimum cannot be greater than maximum");
         if (getY() < min) {
             return new Location(extent, getX(), min, getZ());
@@ -304,6 +311,7 @@ public class Location extends Vector3Impl {
         return this;
 
     }
+    //FAWE end
 
     @Override
     public boolean equals(Object o) {
@@ -322,6 +330,7 @@ public class Location extends Vector3Impl {
         if (Double.doubleToLongBits(yaw) != Double.doubleToLongBits(location.yaw)) {
             return false;
         }
+        //FAWE start
         if (this.getX() != location.getX()) {
             return false;
         }
@@ -331,11 +340,8 @@ public class Location extends Vector3Impl {
         if (this.getY() != location.getY()) {
             return false;
         }
-        if (!extent.equals(location.extent)) {
-            return false;
-        }
-
-        return true;
+        return extent.equals(location.extent);
+        //FAWE end
     }
 
 }

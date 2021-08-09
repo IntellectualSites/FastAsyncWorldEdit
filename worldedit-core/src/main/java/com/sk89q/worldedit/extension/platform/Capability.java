@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.sk89q.worldedit.WorldEdit;
-
 /**
  * A collection of capabilities that a {@link Platform} may support.
  */
@@ -45,7 +43,9 @@ public enum Capability {
     /**
      * The capability of providing configuration.
      */
+    //FAWE start
     CONFIGURATION,
+    //FAWE end
 
     /**
      * The capability of handling user commands entered in chat or console.
@@ -62,6 +62,7 @@ public enum Capability {
         }
     },
 
+    //FAWE start
     /**
      * The capability of a platform to assess whether a given
      * {@link Actor} has sufficient authorization to perform a task.
@@ -94,6 +95,7 @@ public enum Capability {
         }
         */
     };
+    //FAWE end
 
     /**
      * Initialize platform-wide state.

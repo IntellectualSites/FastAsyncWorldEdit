@@ -29,7 +29,7 @@ public interface Authorizer {
     /**
      * Tests whether permission is granted for the given context.
      *
-     * @param locals locals
+     * @param locals     locals
      * @param permission the permission string
      * @return true if permitted
      */

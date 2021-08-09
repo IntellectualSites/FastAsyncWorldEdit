@@ -33,15 +33,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class EntityCreate implements Change {
 
     private final Location location;
+    //FAWE start - made public
     public final BaseEntity state;
+    //FAWE end
     private Entity entity;
 
     /**
      * Create a new instance.
      *
      * @param location the location
-     * @param state the state of the created entity
-     * @param entity the entity that was created
+     * @param state    the state of the created entity
+     * @param entity   the entity that was created
      */
     public EntityCreate(Location location, BaseEntity state, Entity entity) {
         checkNotNull(location);
@@ -60,9 +62,11 @@ public class EntityCreate implements Change {
         }
     }
 
+    //FAWE start
     public Entity getEntity() {
         return entity;
     }
+    //FAWE end
 
     @Override
     public void redo(UndoContext context) throws WorldEditException {

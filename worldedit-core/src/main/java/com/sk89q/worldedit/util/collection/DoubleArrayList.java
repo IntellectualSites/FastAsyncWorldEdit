@@ -33,8 +33,8 @@ import java.util.NoSuchElementException;
  */
 public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
 
-    private List<A> listA = new ArrayList<>();
-    private List<B> listB = new ArrayList<>();
+    private final List<A> listA = new ArrayList<>();
+    private final List<B> listB = new ArrayList<>();
     private boolean isReversed = false;
 
     /**
@@ -83,11 +83,13 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
         if (reversed) {
             return new ReverseEntryIterator<>(
                     listA.listIterator(listA.size()),
-                    listB.listIterator(listB.size()));
+                    listB.listIterator(listB.size())
+            );
         } else {
             return new ForwardEntryIterator<>(
                     listA.iterator(),
-                    listB.iterator());
+                    listB.iterator()
+            );
         }
     }
 
@@ -102,8 +104,8 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
     public class ForwardEntryIterator<T extends Map.Entry<A, B>>
             implements Iterator<Map.Entry<A, B>> {
 
-        private Iterator<A> keyIterator;
-        private Iterator<B> valueIterator;
+        private final Iterator<A> keyIterator;
+        private final Iterator<B> valueIterator;
 
         public ForwardEntryIterator(Iterator<A> keyIterator, Iterator<B> valueIterator) {
             this.keyIterator = keyIterator;
@@ -124,6 +126,7 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+
     }
 
     /**
@@ -132,8 +135,8 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
     public class ReverseEntryIterator<T extends Map.Entry<A, B>>
             implements Iterator<Map.Entry<A, B>> {
 
-        private ListIterator<A> keyIterator;
-        private ListIterator<B> valueIterator;
+        private final ListIterator<A> keyIterator;
+        private final ListIterator<B> valueIterator;
 
         public ReverseEntryIterator(ListIterator<A> keyIterator, ListIterator<B> valueIterator) {
             this.keyIterator = keyIterator;
@@ -154,14 +157,16 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
+
     }
 
     /**
      * Class to masquerade as Map.Entry.
      */
     public class Entry<C, D> implements Map.Entry<A, B> {
-        private A key;
-        private B value;
+
+        private final A key;
+        private final B value;
 
         private Entry(A key, B value) {
             this.key = key;
@@ -182,6 +187,7 @@ public class DoubleArrayList<A, B> implements Iterable<Map.Entry<A, B>> {
         public B setValue(B value) {
             throw new UnsupportedOperationException();
         }
+
     }
 
 }

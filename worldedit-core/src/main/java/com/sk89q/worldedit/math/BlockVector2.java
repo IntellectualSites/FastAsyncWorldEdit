@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.math;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 
 import java.util.Comparator;
@@ -26,7 +27,9 @@ import java.util.Comparator;
 /**
  * An immutable 2-dimensional vector.
  */
+//FAWE start - un-finalize
 public class BlockVector2 {
+//FAWE end
 
     public static final BlockVector2 ZERO = new BlockVector2(0, 0);
     public static final BlockVector2 UNIT_X = new BlockVector2(1, 0);
@@ -50,13 +53,14 @@ public class BlockVector2 {
      * </pre>
      */
     public static final Comparator<BlockVector2> COMPARING_GRID_ARRANGEMENT =
-        Comparator.comparingInt(BlockVector2::getZ).thenComparingInt(BlockVector2::getX);
+            Comparator.comparingInt(BlockVector2::getZ).thenComparingInt(BlockVector2::getX);
 
     public static BlockVector2 at(double x, double z) {
         return at((int) Math.floor(x), (int) Math.floor(z));
     }
 
     public static BlockVector2 at(int x, int z) {
+        //FAWE start
         /* unnecessary
         switch (x) {
             case 0:
@@ -112,6 +116,7 @@ public class BlockVector2 {
     public MutableBlockVector2 mutZ(int z) {
         return new MutableBlockVector2(x, z);
     }
+    //FAWE end
 
     /**
      * Get the X coordinate.
@@ -169,6 +174,7 @@ public class BlockVector2 {
         return BlockVector2.at(x, z);
     }
 
+    //FAWE start
     public MutableBlockVector2 nextPosition() {
         int absX = Math.abs(x);
         int absY = Math.abs(z);
@@ -197,6 +203,7 @@ public class BlockVector2 {
             return setComponents(x + 1, z);
         }
     }
+    //FAWE end
 
     /**
      * Add another vector to this vector and return the result as a new vector.
@@ -501,9 +508,9 @@ public class BlockVector2 {
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle in degrees
-     * @param aboutX about which x coordinate to rotate
-     * @param aboutZ about which z coordinate to rotate
+     * @param angle      in degrees
+     * @param aboutX     about which x coordinate to rotate
+     * @param aboutZ     about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
@@ -519,7 +526,8 @@ public class BlockVector2 {
         double z2 = x * sin + z * cos;
         return BlockVector2.at(
                 x2 + aboutX + translateX,
-                z2 + aboutZ + translateZ);
+                z2 + aboutZ + translateZ
+        );
     }
 
     /**
@@ -530,8 +538,8 @@ public class BlockVector2 {
      */
     public BlockVector2 getMinimum(BlockVector2 v2) {
         return new BlockVector2(
-            Math.min(x, v2.x),
-            Math.min(z, v2.z)
+                Math.min(x, v2.x),
+                Math.min(z, v2.z)
         );
     }
 
@@ -543,8 +551,8 @@ public class BlockVector2 {
      */
     public BlockVector2 getMaximum(BlockVector2 v2) {
         return new BlockVector2(
-            Math.max(x, v2.x),
-            Math.max(z, v2.z)
+                Math.max(x, v2.x),
+                Math.max(z, v2.z)
         );
     }
 
@@ -613,9 +621,11 @@ public class BlockVector2 {
 
     /**
      * Returns a string representation that is supported by the parser.
+     *
      * @return string
      */
     public String toParserString() {
         return x + "," + z;
     }
+
 }

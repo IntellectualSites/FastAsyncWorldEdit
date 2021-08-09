@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.util.lifecycle;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import javax.annotation.Nullable;
 
 class MapLifecycled<T, U> implements Lifecycled<U> {
+
     private final LifecycledCallbackHandler<U> events = new LifecycledCallbackHandler<>(this);
     private final Lifecycled<T> upstream;
     private final Function<T, U> mapper;
@@ -43,7 +44,7 @@ class MapLifecycled<T, U> implements Lifecycled<U> {
                 this$.events.fireInvalidated();
             }
         });
-        upstream.events().onNewValue(this,  (this$, __) -> {
+        upstream.events().onNewValue(this, (this$, __) -> {
             boolean fire = !this$.computable;
             this$.computable = true;
             if (fire) {
@@ -79,4 +80,5 @@ class MapLifecycled<T, U> implements Lifecycled<U> {
     public Events<U> events() {
         return events;
     }
+
 }

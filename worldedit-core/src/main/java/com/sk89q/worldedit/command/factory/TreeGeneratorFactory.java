@@ -26,6 +26,7 @@ import com.sk89q.worldedit.function.generator.ForestGenerator;
 import com.sk89q.worldedit.util.TreeGenerator;
 
 public final class TreeGeneratorFactory implements Contextual<ForestGenerator> {
+
     private final TreeGenerator.TreeType type;
 
     public TreeGeneratorFactory(TreeGenerator.TreeType type) {
@@ -41,4 +42,5 @@ public final class TreeGeneratorFactory implements Contextual<ForestGenerator> {
     public String toString() {
         return "tree of type " + type;
     }
+
 }

@@ -49,11 +49,11 @@ public class ExtentBlockCopy implements RegionFunction {
     /**
      * Make a new copy.
      *
-     * @param source the source extent
-     * @param from the source offset
+     * @param source      the source extent
+     * @param from        the source offset
      * @param destination the destination extent
-     * @param to the destination offset
-     * @param transform a transform to apply to positions (after source offset, before destination offset)
+     * @param to          the destination offset
+     * @param transform   a transform to apply to positions (after source offset, before destination offset)
      */
     public ExtentBlockCopy(Extent source, BlockVector3 from, Extent destination, BlockVector3 to, Transform transform) {
         checkNotNull(source);
@@ -88,6 +88,7 @@ public class ExtentBlockCopy implements RegionFunction {
      * @return a new state or the existing one
      */
     private BaseBlock transformNbtData(BaseBlock state) {
+        //FAWE start - Replace CompoundTag with CompoundBinaryTag
         CompoundBinaryTag tag = state.getNbt();
 
         if (tag != null) {
@@ -104,7 +105,8 @@ public class ExtentBlockCopy implements RegionFunction {
 
                     if (newDirection != null) {
                         return state.toBaseBlock(
-                            tag.putByte("Rot", (byte) MCDirections.toRotation(newDirection))
+                                tag.putByte("Rot", (byte) MCDirections.toRotation(newDirection))
+                                //FAWE end
                         );
                     }
                 }

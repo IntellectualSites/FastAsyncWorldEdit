@@ -68,7 +68,11 @@ public class ExpressionMaskParser extends InputParser<Mask> {
             }
             return new ExpressionMask(exp);
         } catch (ExpressionException e) {
-            throw new InputParseException(Caption.of("worldedit.error.parser.invalid-expression", TextComponent.of(e.getMessage())));
+            throw new InputParseException(Caption.of(
+                    "worldedit.error.parser.invalid-expression",
+                    TextComponent.of(e.getMessage())
+            ));
         }
     }
+
 }

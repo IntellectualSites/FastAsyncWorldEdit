@@ -1,233 +1,233 @@
-name: FastAsyncWorldEdit
-main: com.sk89q.worldedit.bukkit.WorldEditPlugin
-version: "${internalVersion}"
-load: STARTUP
-api-version: 1.15
-softdepend: [Vault]
-provides: [WorldEdit]
-website: https://www.spigotmc.org/resources/13932/
-description: Blazingly fast world manipulation for builders, large networks and developers.
-authors: [Empire92, MattBDev, IronApollo, dordsor21, NotMyFault]
-loadbefore: [WorldGuard, PlotSquared]
-database: false
-permissions:
-  fawe.plotsquared:
-    default: true
-    children:
-      fawe.plotsquared.trusted: true
-  fawe.bypass.regions:
-    default: false
-  fawe.bypass:
-    default: false
-    children:
-      fawe.bypass.regions: true
-      fawe.limit.*: true
-  fawe.tips:
-    default: false
-  fawe.admin:
-    default: op
-  fawe.reload:
-    default: false
-  fawe.permpack.basic:
-    default: op
-    children:
-      fawe.worldeditregion: true
-      fawe.cancel: true
-      worldedit.biome.info: true
-      worldedit.biome.set: true
-      worldedit.biome.list: true
-      worldedit.chunkinfo: true
-      worldedit.listchunks: true
-      worldedit.clipboard.cut: true
-      worldedit.clipboard.paste: true
-      worldedit.schematic.formats: true
-      worldedit.schematic.load: true
-      worldedit.schematic.list: true
-      worldedit.schematic.save: true
-      worldedit.clipboard.clear: true
-      worldedit.clipboard.copy: true
-      worldedit.clipboard.lazycopy: true
-      worldedit.clipboard.place: true
-      worldedit.clipboard.download: true
-      worldedit.clipboard.flip: true
-      worldedit.clipboard.rotate: true
-      worldedit.help: true
-      worldedit.global-mask: true
-      worldedit.global-transform: true
-      worldedit.generation.cylinder: true
-      worldedit.generation.sphere: true
-      worldedit.generation.forest: true
-      worldedit.generation.pumpkins: true
-      worldedit.generation.pyramid: true
-      worldedit.generation.shape: true
-      worldedit.history.undo: true
-      worldedit.history.redo: true
-      worldedit.history.rollback: true
-      worldedit.navigation.unstuck: true
-      worldedit.navigation.ascend: true
-      worldedit.navigation.descend: true
-      worldedit.navigation.ceiling: true
-      worldedit.navigation.thru.command: true
-      worldedit.navigation.jumpto.command: true
-      worldedit.navigation.up: true
-      worldedit.region.hollow: true
-      worldedit.region.line: true
-      worldedit.region.curve: true
-      worldedit.region.overlay: true
-      worldedit.region.center: true
-      worldedit.region.naturalize: true
-      worldedit.region.walls: true
-      worldedit.region.faces: true
-      worldedit.region.smooth: true
-      worldedit.region.move: true
-      worldedit.region.forest: true
-      worldedit.region.replace: true
-      worldedit.region.stack: true
-      worldedit.region.set: true
-      worldedit.selection.pos: true
-      worldedit.selection.chunk: true
-      worldedit.selection.hpos: true
-      worldedit.wand: true
-      worldedit.wand.toggle: true
-      worldedit.selection.contract: true
-      worldedit.selection.outset: true
-      worldedit.selection.inset: true
-      worldedit.analysis.distr: true
-      worldedit.analysis.count: true
-      worldedit.analysis.sel: true
-      worldedit.selection.size: true
-      worldedit.selection.expand: true
-      worldedit.selection.shift: true
-      worldedit.snapshots.list: true
-      worldedit.superpickaxe: true
-      worldedit.superpickaxe.area: true
-      worldedit.superpickaxe.recursive: true
-      worldedit.brush.blendball: true
-      worldedit.brush.erode: true
-      worldedit.brush.pull: true
-      worldedit.brush.circle: true
-      worldedit.brush.recursive: true
-      worldedit.brush.line: true
-      worldedit.brush.spline: true
-      worldedit.brush.surfacespline: true
-      worldedit.brush.shatter: true
-      worldedit.brush.stencil: true
-      worldedit.brush.height: true
-      worldedit.brush.layer: true
-      worldedit.brush.populateschematic: true
-      worldedit.brush.scatter: true
-      worldedit.brush.splatter: true
-      worldedit.brush.scattercommand: true
-      worldedit.brush.copy: true
-      worldedit.brush.command: true
-      worldedit.brush.apply: true
-      worldedit.brush.sphere: true
-      worldedit.brush.cylinder: true
-      worldedit.brush.clipboard: true
-      worldedit.brush.smooth: true
-      worldedit.brush.ex: true
-      worldedit.brush.gravity: true
-      worldedit.brush.options.range: true
-      worldedit.brush.options.material: true
-      worldedit.brush.options.size: true
-      worldedit.brush.options.mask: true
-      worldedit.brush.options.smask: true
-      worldedit.brush.options.transform: true
-      worldedit.brush.options.scroll: true
-      worldedit.brush.options.visualize: true
-      worldedit.tool.deltree: true
-      worldedit.tool.farwand: true
-      worldedit.tool.lrbuild: true
-      worldedit.tool.info: true
-      worldedit.tool.tree: true
-      worldedit.tool.replacer: true
-      worldedit.tool.data-cycler: true
-      worldedit.tool.flood-fill: true
-      worldedit.tool.inspect: true
-      worldedit.fill.recursive: true
-      worldedit.drain: true
-      worldedit.fixlava: true
-      worldedit.fixwater: true
-      worldedit.removeabove: true
-      worldedit.removebelow: true
-      worldedit.removenear: true
-      worldedit.replacenear: true
-      worldedit.snow: true
-      worldedit.thaw: true
-      worldedit.green: true
-      worldedit.extinguish: true
-      worldedit.calc: true
-      worldedit.fill: true
-  fawe.voxelbrush:
-    default: op
-    children:
-      voxelsniper.brush.ball: true
-      voxelsniper.brush.biome: true
-      voxelsniper.brush.blendball: true
-      voxelsniper.brush.blenddisc: true
-      voxelsniper.brush.blendvoxel: true
-      voxelsniper.brush.blendvoxeldisc: true
-      voxelsniper.brush.blob: true
-      voxelsniper.brush.blockreset: true
-      voxelsniper.brush.blockresetsurface: true
-      voxelsniper.brush.canyon: true
-      voxelsniper.brush.canyonselection: true
-      voxelsniper.brush.checkervoxeldisc: true
-      voxelsniper.brush.cleansnow: true
-      voxelsniper.brush.clonestamp: true
-      voxelsniper.brush.copypasta: true
-      voxelsniper.brush.cylinder: true
-      voxelsniper.brush.disc: true
-      voxelsniper.brush.discface: true
-      voxelsniper.brush.dome: true
-      voxelsniper.brush.drain: true
-      voxelsniper.brush.ellipse: true
-      voxelsniper.brush.ellipsoid: true
-      voxelsniper.brush.eraser: true
-      voxelsniper.brush.erode: true
-      voxelsniper.brush.extrude: true
-      voxelsniper.brush.filldown: true
-      voxelsniper.brush.flatocean: true
-      voxelsniper.brush.heatray: true
-      voxelsniper.brush.jaggedline: true
-      voxelsniper.brush.line: true
-      voxelsniper.brush.move: true
-      voxelsniper.brush.ocean: true
-      voxelsniper.brush.overlay: true
-      voxelsniper.brush.pull: true
-      voxelsniper.brush.randomerode: true
-      voxelsniper.brush.ring: true
-      voxelsniper.brush.rot2d: true
-      voxelsniper.brush.rot2dvert: true
-      voxelsniper.brush.rot3d: true
-      voxelsniper.brush.ruler: true
-      voxelsniper.brush.scanner: true
-      voxelsniper.brush.set: true
-      voxelsniper.brush.setredstoneflip: true
-      voxelsniper.brush.setredstonerotate: true
-      voxelsniper.brush.shellball: true
-      voxelsniper.brush.shellset: true
-      voxelsniper.brush.shellvoxel: true
-      voxelsniper.brush.signoverwrite: true
-      voxelsniper.brush.snipe: true
-      voxelsniper.brush.snowcone: true
-      voxelsniper.brush.spiralstaircase: true
-      voxelsniper.brush.splatterball: true
-      voxelsniper.brush.splatterdisc: true
-      voxelsniper.brush.splatteroverlay: true
-      voxelsniper.brush.splattervoxel: true
-      voxelsniper.brush.splattervoxeldisc: true
-      voxelsniper.brush.spline: true
-      voxelsniper.brush.stamp: true
-      voxelsniper.brush.stencil: true
-      voxelsniper.brush.stencillist: true
-      voxelsniper.brush.threepointcircle: true
-      voxelsniper.brush.triangle: true
-      voxelsniper.brush.underlay: true
-      voxelsniper.brush.voltmeter: true
-      voxelsniper.brush.voxel: true
-      voxelsniper.brush.voxeldisc: true
-      voxelsniper.brush.voxeldiscface: true
-      voxelsniper.brush.warp: true
-      voxelsniper.goto: true
-      voxelsniper.sniper: true
+name : FastAsyncWorldEdit
+main : com.sk89q.worldedit.bukkit.WorldEditPlugin
+version : "${internalVersion}"
+load : STARTUP
+api-version : 1.15
+softdepend : [ Vault ]
+provides : [ WorldEdit ]
+website : https://www.spigotmc.org/resources/13932/
+description : Blazingly fast world manipulation for builders, large networks and developers.
+authors : [ Empire92, MattBDev, IronApollo, dordsor21, NotMyFault ]
+loadbefore : [ WorldGuard, PlotSquared ]
+database : false
+permissions :
+  fawe.plotsquared :
+    default : true
+    children :
+      fawe.plotsquared.trusted : true
+  fawe.bypass.regions :
+    default : false
+  fawe.bypass :
+    default : false
+    children :
+      fawe.bypass.regions : true
+      fawe.limit.* : true
+  fawe.tips :
+    default : false
+  fawe.admin :
+    default : op
+  fawe.reload :
+    default : false
+  fawe.permpack.basic :
+    default : op
+    children :
+      fawe.worldeditregion : true
+      fawe.cancel : true
+      worldedit.biome.info : true
+      worldedit.biome.set : true
+      worldedit.biome.list : true
+      worldedit.chunkinfo : true
+      worldedit.listchunks : true
+      worldedit.clipboard.cut : true
+      worldedit.clipboard.paste : true
+      worldedit.schematic.formats : true
+      worldedit.schematic.load : true
+      worldedit.schematic.list : true
+      worldedit.schematic.save : true
+      worldedit.clipboard.clear : true
+      worldedit.clipboard.copy : true
+      worldedit.clipboard.lazycopy : true
+      worldedit.clipboard.place : true
+      worldedit.clipboard.download : true
+      worldedit.clipboard.flip : true
+      worldedit.clipboard.rotate : true
+      worldedit.help : true
+      worldedit.global-mask : true
+      worldedit.global-transform : true
+      worldedit.generation.cylinder : true
+      worldedit.generation.sphere : true
+      worldedit.generation.forest : true
+      worldedit.generation.pumpkins : true
+      worldedit.generation.pyramid : true
+      worldedit.generation.shape : true
+      worldedit.history.undo : true
+      worldedit.history.redo : true
+      worldedit.history.rollback : true
+      worldedit.navigation.unstuck : true
+      worldedit.navigation.ascend : true
+      worldedit.navigation.descend : true
+      worldedit.navigation.ceiling : true
+      worldedit.navigation.thru.command : true
+      worldedit.navigation.jumpto.command : true
+      worldedit.navigation.up : true
+      worldedit.region.hollow : true
+      worldedit.region.line : true
+      worldedit.region.curve : true
+      worldedit.region.overlay : true
+      worldedit.region.center : true
+      worldedit.region.naturalize : true
+      worldedit.region.walls : true
+      worldedit.region.faces : true
+      worldedit.region.smooth : true
+      worldedit.region.move : true
+      worldedit.region.forest : true
+      worldedit.region.replace : true
+      worldedit.region.stack : true
+      worldedit.region.set : true
+      worldedit.selection.pos : true
+      worldedit.selection.chunk : true
+      worldedit.selection.hpos : true
+      worldedit.wand : true
+      worldedit.wand.toggle : true
+      worldedit.selection.contract : true
+      worldedit.selection.outset : true
+      worldedit.selection.inset : true
+      worldedit.analysis.distr : true
+      worldedit.analysis.count : true
+      worldedit.analysis.sel : true
+      worldedit.selection.size : true
+      worldedit.selection.expand : true
+      worldedit.selection.shift : true
+      worldedit.snapshots.list : true
+      worldedit.superpickaxe : true
+      worldedit.superpickaxe.area : true
+      worldedit.superpickaxe.recursive : true
+      worldedit.brush.blendball : true
+      worldedit.brush.erode : true
+      worldedit.brush.pull : true
+      worldedit.brush.circle : true
+      worldedit.brush.recursive : true
+      worldedit.brush.line : true
+      worldedit.brush.spline : true
+      worldedit.brush.surfacespline : true
+      worldedit.brush.shatter : true
+      worldedit.brush.stencil : true
+      worldedit.brush.height : true
+      worldedit.brush.layer : true
+      worldedit.brush.populateschematic : true
+      worldedit.brush.scatter : true
+      worldedit.brush.splatter : true
+      worldedit.brush.scattercommand : true
+      worldedit.brush.copy : true
+      worldedit.brush.command : true
+      worldedit.brush.apply : true
+      worldedit.brush.sphere : true
+      worldedit.brush.cylinder : true
+      worldedit.brush.clipboard : true
+      worldedit.brush.smooth : true
+      worldedit.brush.ex : true
+      worldedit.brush.gravity : true
+      worldedit.brush.options.range : true
+      worldedit.brush.options.material : true
+      worldedit.brush.options.size : true
+      worldedit.brush.options.mask : true
+      worldedit.brush.options.smask : true
+      worldedit.brush.options.transform : true
+      worldedit.brush.options.scroll : true
+      worldedit.brush.options.visualize : true
+      worldedit.tool.deltree : true
+      worldedit.tool.farwand : true
+      worldedit.tool.lrbuild : true
+      worldedit.tool.info : true
+      worldedit.tool.tree : true
+      worldedit.tool.replacer : true
+      worldedit.tool.data-cycler : true
+      worldedit.tool.flood-fill : true
+      worldedit.tool.inspect : true
+      worldedit.fill.recursive : true
+      worldedit.drain : true
+      worldedit.fixlava : true
+      worldedit.fixwater : true
+      worldedit.removeabove : true
+      worldedit.removebelow : true
+      worldedit.removenear : true
+      worldedit.replacenear : true
+      worldedit.snow : true
+      worldedit.thaw : true
+      worldedit.green : true
+      worldedit.extinguish : true
+      worldedit.calc : true
+      worldedit.fill : true
+  fawe.voxelbrush :
+    default : op
+    children :
+      voxelsniper.brush.ball : true
+      voxelsniper.brush.biome : true
+      voxelsniper.brush.blendball : true
+      voxelsniper.brush.blenddisc : true
+      voxelsniper.brush.blendvoxel : true
+      voxelsniper.brush.blendvoxeldisc : true
+      voxelsniper.brush.blob : true
+      voxelsniper.brush.blockreset : true
+      voxelsniper.brush.blockresetsurface : true
+      voxelsniper.brush.canyon : true
+      voxelsniper.brush.canyonselection : true
+      voxelsniper.brush.checkervoxeldisc : true
+      voxelsniper.brush.cleansnow : true
+      voxelsniper.brush.clonestamp : true
+      voxelsniper.brush.copypasta : true
+      voxelsniper.brush.cylinder : true
+      voxelsniper.brush.disc : true
+      voxelsniper.brush.discface : true
+      voxelsniper.brush.dome : true
+      voxelsniper.brush.drain : true
+      voxelsniper.brush.ellipse : true
+      voxelsniper.brush.ellipsoid : true
+      voxelsniper.brush.eraser : true
+      voxelsniper.brush.erode : true
+      voxelsniper.brush.extrude : true
+      voxelsniper.brush.filldown : true
+      voxelsniper.brush.flatocean : true
+      voxelsniper.brush.heatray : true
+      voxelsniper.brush.jaggedline : true
+      voxelsniper.brush.line : true
+      voxelsniper.brush.move : true
+      voxelsniper.brush.ocean : true
+      voxelsniper.brush.overlay : true
+      voxelsniper.brush.pull : true
+      voxelsniper.brush.randomerode : true
+      voxelsniper.brush.ring : true
+      voxelsniper.brush.rot2d : true
+      voxelsniper.brush.rot2dvert : true
+      voxelsniper.brush.rot3d : true
+      voxelsniper.brush.ruler : true
+      voxelsniper.brush.scanner : true
+      voxelsniper.brush.set : true
+      voxelsniper.brush.setredstoneflip : true
+      voxelsniper.brush.setredstonerotate : true
+      voxelsniper.brush.shellball : true
+      voxelsniper.brush.shellset : true
+      voxelsniper.brush.shellvoxel : true
+      voxelsniper.brush.signoverwrite : true
+      voxelsniper.brush.snipe : true
+      voxelsniper.brush.snowcone : true
+      voxelsniper.brush.spiralstaircase : true
+      voxelsniper.brush.splatterball : true
+      voxelsniper.brush.splatterdisc : true
+      voxelsniper.brush.splatteroverlay : true
+      voxelsniper.brush.splattervoxel : true
+      voxelsniper.brush.splattervoxeldisc : true
+      voxelsniper.brush.spline : true
+      voxelsniper.brush.stamp : true
+      voxelsniper.brush.stencil : true
+      voxelsniper.brush.stencillist : true
+      voxelsniper.brush.threepointcircle : true
+      voxelsniper.brush.triangle : true
+      voxelsniper.brush.underlay : true
+      voxelsniper.brush.voltmeter : true
+      voxelsniper.brush.voxel : true
+      voxelsniper.brush.voxeldisc : true
+      voxelsniper.brush.voxeldiscface : true
+      voxelsniper.brush.warp : true
+      voxelsniper.goto : true
+      voxelsniper.sniper : true

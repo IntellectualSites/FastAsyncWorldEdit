@@ -26,7 +26,7 @@ import com.sk89q.worldedit.world.block.BlockType;
  */
 public class OutOfSpaceException extends BlockBagException {
 
-    private BlockType type;
+    private final BlockType type;
 
     /**
      * Construct the object.
@@ -45,4 +45,5 @@ public class OutOfSpaceException extends BlockBagException {
     public BlockType getType() {
         return this.type;
     }
+
 }

@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.util;
 
-import org.jetbrains.annotations.NotNull;
-
+import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -17,7 +16,8 @@ public class ReflectionUtils {
         return t.isInstance(o) ? t.cast(o) : null;
     }
 
-    public static void setAccessibleNonFinal(Field field) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public static void setAccessibleNonFinal(Field field) throws IllegalAccessException, NoSuchMethodException,
+            InvocationTargetException {
         // let's make the field accessible
         field.setAccessible(true);
 
@@ -31,15 +31,16 @@ public class ReflectionUtils {
 
                 // blank out the final bit in the modifiers int
                 ((MethodHandles.Lookup) lookupField.get(null))
-                    .findSetter(Field.class, "modifiers", int.class)
-                    .invokeExact(field, field.getModifiers() & ~Modifier.FINAL);
+                        .findSetter(Field.class, "modifiers", int.class)
+                        .invokeExact(field, field.getModifiers() & ~Modifier.FINAL);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public static void setFailsafeFieldValue(Field field, Object target, Object value) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+    public static void setFailsafeFieldValue(Field field, Object target, Object value) throws IllegalAccessException,
+            NoSuchMethodException, InvocationTargetException {
         setAccessibleNonFinal(field);
         field.set(target, value);
     }
@@ -86,7 +87,7 @@ public class ReflectionUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T getField(@NotNull Field field, Object instance) {
+    public static <T> T getField(@Nonnull Field field, Object instance) {
         field.setAccessible(true);
         try {
             return (T) field.get(instance);
@@ -110,4 +111,5 @@ public class ReflectionUtils {
             return null;
         }
     }
+
 }

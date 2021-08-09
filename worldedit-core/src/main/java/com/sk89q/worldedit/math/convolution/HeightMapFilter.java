@@ -43,9 +43,9 @@ public class HeightMapFilter {
     /**
      * Construct the HeightMapFilter object.
      *
-     * @param kernelWidth the width
+     * @param kernelWidth  the width
      * @param kernelHeight the height
-     * @param kernelData the data
+     * @param kernelData   the data
      */
     public HeightMapFilter(int kernelWidth, int kernelHeight, float[] kernelData) {
         checkNotNull(kernelData);
@@ -74,9 +74,8 @@ public class HeightMapFilter {
      * Filter with a 2D kernel.
      *
      * @param inData the data
-     * @param width the width
+     * @param width  the width
      * @param height the height
-     *
      * @return the modified height map
      */
     public int[] filter(int[] inData, int width, int height) {

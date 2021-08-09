@@ -34,4 +34,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @InjectAnnotation
 public @interface ClipboardMask {
+
 }

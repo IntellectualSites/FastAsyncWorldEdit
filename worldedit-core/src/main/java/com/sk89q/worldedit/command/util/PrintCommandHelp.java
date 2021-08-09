@@ -68,8 +68,10 @@ public class PrintCommandHelp {
         return mapping.orElse(null);
     }
 
-    public static void help(List<String> commandPath, int page, boolean listSubCommands,
-                            CommandManager manager, Actor actor, String helpRootCommand) throws InvalidComponentException {
+    public static void help(
+            List<String> commandPath, int page, boolean listSubCommands,
+            CommandManager manager, Actor actor, String helpRootCommand
+    ) throws InvalidComponentException {
 
         if (commandPath.isEmpty()) {
             printCommands(page, manager.getAllCommands(), actor, ImmutableList.of(), helpRootCommand);
@@ -91,7 +93,8 @@ public class PrintCommandHelp {
 
             if (subCommands.isEmpty()) {
                 actor.print(Caption.of("worldedit.help.no-subcommands",
-                    TextComponent.of(toCommandString(visited)), TextComponent.of(subCommand)));
+                        TextComponent.of(toCommandString(visited)), TextComponent.of(subCommand)
+                ));
                 // full help for single command
                 CommandUsageBox box = new CommandUsageBox(visited, visited.stream()
                         .map(Command::getName).collect(Collectors.joining(" ")), helpRootCommand);
@@ -104,9 +107,16 @@ public class PrintCommandHelp {
                 visited.add(currentCommand);
             } else {
                 actor.print(Caption.of("worldedit.help.subcommand-not-found",
-                    TextComponent.of(subCommand), TextComponent.of(toCommandString(visited))));
+                        TextComponent.of(subCommand), TextComponent.of(toCommandString(visited))
+                ));
                 // list subcommands for currentCommand
-                printCommands(page, getSubCommands(Iterables.getLast(visited)).values().stream(), actor, visited, helpRootCommand);
+                printCommands(
+                        page,
+                        getSubCommands(Iterables.getLast(visited)).values().stream(),
+                        actor,
+                        visited,
+                        helpRootCommand
+                );
                 return;
             }
         }
@@ -126,18 +136,21 @@ public class PrintCommandHelp {
         return "/" + Joiner.on(" ").join(visited.stream().map(Command::getName).iterator());
     }
 
-    private static void printCommands(int page, Stream<Command> commandStream, Actor actor,
-                                      List<Command> commandList, String helpRootCommand) throws InvalidComponentException {
+    private static void printCommands(
+            int page, Stream<Command> commandStream, Actor actor,
+            List<Command> commandList, String helpRootCommand
+    ) throws InvalidComponentException {
         // Get a list of aliases
         List<Command> commands = commandStream
-            .sorted(byCleanName())
-            .collect(toList());
+                .sorted(byCleanName())
+                .collect(toList());
 
         String used = commandList.isEmpty() ? null : toCommandString(commandList);
         CommandListBox box = new CommandListBox(
                 (used == null ? "Help" : "Subcommands: " + used),
                 helpRootCommand + " -s -p %page%" + (used == null ? "" : " " + used),
-                helpRootCommand);
+                helpRootCommand
+        );
         if (!actor.isPlayer()) {
             box.formatForConsole();
         }
@@ -145,8 +158,8 @@ public class PrintCommandHelp {
         for (Command mapping : commands) {
             String alias = (commandList.isEmpty() ? "/" : "") + mapping.getName();
             String command = Stream.concat(commandList.stream(), Stream.of(mapping))
-                .map(Command::getName)
-                .collect(Collectors.joining(" ", "/", ""));
+                    .map(Command::getName)
+                    .collect(Collectors.joining(" ", "/", ""));
             box.appendCommand(alias, mapping.getDescription(), command);
         }
 
@@ -155,4 +168,5 @@ public class PrintCommandHelp {
 
     private PrintCommandHelp() {
     }
+
 }

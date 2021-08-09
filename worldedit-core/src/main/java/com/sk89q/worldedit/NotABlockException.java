@@ -63,4 +63,5 @@ public class NotABlockException extends WorldEditException {
     public NotABlockException(ItemType input) {
         super(Caption.of("worldedit.error.not-a-block.item", input.getRichName()));
     }
+
 }

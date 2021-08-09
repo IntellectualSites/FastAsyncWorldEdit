@@ -37,11 +37,12 @@ import java.util.stream.Stream;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({
-            ElementType.PARAMETER,
-            ElementType.METHOD
-        })
+        ElementType.PARAMETER,
+        ElementType.METHOD
+})
 @InjectAnnotation
 public @interface Confirm {
+
     Processor value() default Processor.ALWAYS;
 
     enum Processor {
@@ -51,15 +52,18 @@ public @interface Confirm {
                 if (checkExisting(context)) {
                     return true;
                 }
-                Region region = context.injectedValue(Key.of(Region.class, Selection.class)).orElseThrow(IncompleteRegionException::new);
+                Region region = context
+                        .injectedValue(Key.of(Region.class, Selection.class))
+                        .orElseThrow(IncompleteRegionException::new);
                 BlockVector3 pos1 = region.getMinimumPoint();
                 BlockVector3 pos2 = region.getMaximumPoint();
                 long area = (pos2.getX() - pos1.getX()) * (pos2.getZ() - pos1.getZ() + 1)
-                    * (long) value;
+                        * (long) value;
                 long max = 2 << 18;
                 if (max != -1 && area > max) {
                     actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm.region",
-                            pos1, pos2, getArgs(context), region.getHeight() * area));
+                            pos1, pos2, getArgs(context), region.getHeight() * area
+                    ));
                     return confirm(actor, context);
                 }
                 return true;
@@ -74,7 +78,8 @@ public @interface Confirm {
                 int max = WorldEdit.getInstance().getConfiguration().maxRadius;
                 if (max != -1 && value > max) {
                     actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm.radius",
-                            value, max, getArgs(context)));
+                            value, max, getArgs(context)
+                    ));
                     return confirm(actor, context);
                 }
                 return true;
@@ -89,7 +94,8 @@ public @interface Confirm {
                 int max = 50; //TODO configurable, get Key.of(Method.class) @Limit
                 if (max != -1 && value > max) {
                     actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm.limit",
-                            value, max, getArgs(context)));
+                            value, max, getArgs(context)
+                    ));
                     return confirm(actor, context);
                 }
                 return true;
@@ -190,8 +196,10 @@ public @interface Confirm {
     }
 
     class Reflect {
+
         static final Field memory;
         static final Field injectedValues;
+
         static {
             Field memoryField;
             try {
@@ -215,4 +223,5 @@ public @interface Confirm {
             injectedValues = injectedValuesField;
         }
     }
+
 }

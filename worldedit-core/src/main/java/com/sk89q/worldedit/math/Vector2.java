@@ -378,9 +378,9 @@ public final class Vector2 {
     /**
      * Perform a 2D transformation on this vector and return a new one.
      *
-     * @param angle in degrees
-     * @param aboutX about which x coordinate to rotate
-     * @param aboutZ about which z coordinate to rotate
+     * @param angle      in degrees
+     * @param aboutX     about which x coordinate to rotate
+     * @param aboutZ     about which z coordinate to rotate
      * @param translateX what to add after rotation
      * @param translateZ what to add after rotation
      * @return a new vector
@@ -396,7 +396,8 @@ public final class Vector2 {
         double z2 = x * sin + z * cos;
         return new Vector2(
                 x2 + aboutX + translateX,
-                z2 + aboutZ + translateZ);
+                z2 + aboutZ + translateZ
+        );
     }
 
     /**
@@ -407,8 +408,8 @@ public final class Vector2 {
      */
     public Vector2 getMinimum(Vector2 v2) {
         return new Vector2(
-            Math.min(x, v2.x),
-            Math.min(z, v2.z)
+                Math.min(x, v2.x),
+                Math.min(z, v2.z)
         );
     }
 
@@ -420,8 +421,8 @@ public final class Vector2 {
      */
     public Vector2 getMaximum(Vector2 v2) {
         return new Vector2(
-            Math.max(x, v2.x),
-            Math.max(z, v2.z)
+                Math.max(x, v2.x),
+                Math.max(z, v2.z)
         );
     }
 
@@ -470,7 +471,9 @@ public final class Vector2 {
 
     @Override
     public int hashCode() {
+        //FAWE start - XOR over x z calc
         return (int) x << 16 ^ (int) z;
+        //FAWE end
     }
 
     @Override
@@ -480,6 +483,7 @@ public final class Vector2 {
 
     /**
      * Returns a string representation that is supported by the parser.
+     *
      * @return string
      */
     public String toParserString() {

@@ -36,8 +36,8 @@ public final class Enums {
      * given values, searching in an ascending manner.
      *
      * @param enumType the enum type
-     * @param values the list of values
-     * @param <T> the type of enum
+     * @param values   the list of values
+     * @param <T>      the type of enum
      * @return the found value or null
      */
     @Nullable
@@ -52,4 +52,5 @@ public final class Enums {
         }
         return null;
     }
+
 }

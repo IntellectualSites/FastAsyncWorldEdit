@@ -33,14 +33,16 @@ public class RecursiveVisitor extends BreadthFirstSearch {
 
     private final Mask mask;
 
+    //FAWE start
     public RecursiveVisitor(Mask mask, RegionFunction function) {
         this(mask, function, Integer.MAX_VALUE);
     }
+    //FAWE end
 
     /**
      * Create a new recursive visitor.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the function
      */
     public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth) {
@@ -53,4 +55,5 @@ public class RecursiveVisitor extends BreadthFirstSearch {
     protected boolean isVisitable(BlockVector3 from, BlockVector3 to) {
         return mask.test(to);
     }
+
 }

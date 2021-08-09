@@ -34,8 +34,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class RequestExtent implements Extent {
 
@@ -90,14 +90,16 @@ public class RequestExtent implements Extent {
         return getExtent().getBiome(position);
     }
 
+    //FAWE start
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 position, T block) throws WorldEditException {
         return getExtent().setBlock(position, block);
     }
+    //FAWE end
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
+            throws WorldEditException {
         return getExtent().setBlock(x, y, z, block);
     }
 
@@ -106,6 +108,7 @@ public class RequestExtent implements Extent {
         return getExtent().fullySupports3DBiomes();
     }
 
+    //FAWE start
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return getExtent().setTile(x, y, z, tile);
@@ -115,6 +118,7 @@ public class RequestExtent implements Extent {
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         return getExtent().setBiome(position, biome);
     }
+    //FAWE end
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
@@ -128,4 +132,5 @@ public class RequestExtent implements Extent {
         request = null;
         return commit;
     }
+
 }

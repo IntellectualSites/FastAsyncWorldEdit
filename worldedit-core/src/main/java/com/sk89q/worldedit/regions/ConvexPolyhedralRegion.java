@@ -25,13 +25,13 @@ import com.sk89q.worldedit.regions.polyhedron.Edge;
 import com.sk89q.worldedit.regions.polyhedron.Triangle;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -329,8 +329,10 @@ public class ConvexPolyhedralRegion extends AbstractRegion {
         return new ConvexPolyhedralRegion(this);
     }
 
+    //FAWE start
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         return false;
     }
+    //FAWE end
 }

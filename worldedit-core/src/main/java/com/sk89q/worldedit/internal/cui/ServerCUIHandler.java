@@ -40,14 +40,23 @@ import javax.annotation.Nullable;
  */
 public class ServerCUIHandler {
 
+    private static final int MAX_DISTANCE = 32;
+
     private ServerCUIHandler() {
+    }
+
+    public static int getMaxServerCuiSize() {
+        int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion();
+
+        // 1.16 increased maxSize to 48.
+        return dataVersion >= 2566 ? 48 : 32;
     }
 
     /**
      * Creates a structure block that shows the region.
      *
      * <p>
-     *     Null symbolises removal of the CUI.
+     * Null symbolises removal of the CUI.
      * </p>
      *
      * @param player The player to create the structure block for.
@@ -57,8 +66,6 @@ public class ServerCUIHandler {
     public static BaseBlock createStructureBlock(Player player) {
         LocalSession session = WorldEdit.getInstance().getSessionManager().get(player);
         RegionSelector regionSelector = session.getRegionSelector(player.getWorld());
-
-        int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
 
         int posX;
         int posY;
@@ -109,16 +116,11 @@ public class ServerCUIHandler {
             return null;
         }
 
-        if (dataVersion >= 2526) {
-            if (width > 48 || length > 48 || height > 48) {
-                // 20w16a+ allows structure blocks up to 48 per axis
-                return null;
-            } else {
-                if (width > 32 || length > 32 || height > 32) {
-                    // Structure blocks on versions <= 20w16a have a limit of 32x32x32
-                    return null;
-                }
-            }
+        int maxSize = getMaxServerCuiSize();
+
+        if (width > maxSize || length > maxSize || height > maxSize) {
+            // Structure blocks have a limit of maxSize^3
+            return null;
         }
 
         // Borrowed this math from FAWE
@@ -128,26 +130,24 @@ public class ServerCUIHandler {
         double xz = Math.cos(Math.toRadians(rotY));
         int x = (int) (location.getX() - (-xz * Math.sin(Math.toRadians(rotX))) * 12);
         int z = (int) (location.getZ() - (xz * Math.cos(Math.toRadians(rotX))) * 12);
-        int y = Math.max(0, Math.min(Math.min(255, posY + 32), posY + 3));
+        int y = Math.max(
+                player.getWorld().getMinY(),
+                Math.min(Math.min(player.getWorld().getMaxY(), posY + MAX_DISTANCE), posY + 3)
+        );
 
+        //FAWE start - CBT > Map<String, Tag>
         CompoundBinaryTag.Builder structureTag = CompoundBinaryTag.builder();
 
         posX -= x;
         posY -= y;
         posZ -= z;
 
-        if (dataVersion >= 2526) {
-            if (Math.abs(posX) > 48 || Math.abs(posY) > 48 || Math.abs(posZ) > 48) {
-                // 20w16a+ allows structure blocks up to 48 per axis
-                return null;
-            } else {
-                if (Math.abs(posX) > 32 || Math.abs(posY) > 32 || Math.abs(posZ) > 32) {
-                    // Structure blocks on versions <= 20w16a have a limit of 32x32x32
-                    return null;
-                }
-            }
+        if (Math.abs(posX) > MAX_DISTANCE || Math.abs(posY) > MAX_DISTANCE || Math.abs(posZ) > MAX_DISTANCE) {
+            // Structure blocks have a limit
+            return null;
         }
 
+        //FAWE start - see comment of CBT
         structureTag.putString("name", "worldedit:" + player.getName());
         structureTag.putString("author", player.getName());
         structureTag.putString("metadata", "");
@@ -168,5 +168,7 @@ public class ServerCUIHandler {
         structureTag.putString("id", BlockTypes.STRUCTURE_BLOCK.getId());
 
         return BlockTypes.STRUCTURE_BLOCK.getDefaultState().toBaseBlock(structureTag.build());
+        //FAWE end
     }
+
 }

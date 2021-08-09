@@ -46,7 +46,14 @@ public class StackTool implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
+    public boolean actPrimary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         if (face == null) {
             return false;
         }
@@ -56,7 +63,6 @@ public class StackTool implements BlockTool {
             BlockStateHolder<?> block = editSession.getFullBlock(clicked.toVector().toBlockPoint());
 
             try {
-                editSession.disableBuffering();
                 BlockVector3 position = clicked.toVector().toBlockPoint();
                 for (int i = 0; i < range; i++) {
                     position = position.add(face.toBlockVector());
@@ -82,4 +88,5 @@ public class StackTool implements BlockTool {
     public boolean canUse(Actor actor) {
         return actor.hasPermission("worldedit.tool.stack");
     }
+
 }
