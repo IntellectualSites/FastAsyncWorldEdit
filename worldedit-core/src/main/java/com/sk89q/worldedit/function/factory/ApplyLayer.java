@@ -55,7 +55,8 @@ public class ApplyLayer implements Contextual<Operation> {
                 localRegion,
                 localRegion.getMinimumPoint().getY(),
                 localRegion.getMaximumPoint().getY(),
-                function.createFromContext(context)
+                function.createFromContext(context),
+                context.getDestination()
         );
     }
 

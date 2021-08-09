@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -43,7 +44,11 @@ public class NonRisingVisitor extends RecursiveVisitor {
 
     //FAWE start - int depth
     public NonRisingVisitor(Mask mask, RegionFunction function, int depth) {
-        super(mask, function, depth);
+        this(mask, function, depth, null);
+    }
+
+    public NonRisingVisitor(Mask mask, RegionFunction function, int depth, Extent extent) {
+        super(mask, function, depth, extent);
         setDirections(
                 BlockVector3.UNIT_X,
                 BlockVector3.UNIT_MINUS_X,

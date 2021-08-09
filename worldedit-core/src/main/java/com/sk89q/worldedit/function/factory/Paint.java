@@ -70,7 +70,7 @@ public class Paint implements Contextual<Operation> {
         Extent destination = firstNonNull(context.getDestination(), this.destination);
         Region region = firstNonNull(context.getRegion(), this.region);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(destination), function.createFromContext(context));
-        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
+        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground, destination);
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         return visitor;
     }

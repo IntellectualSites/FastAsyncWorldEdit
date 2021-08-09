@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -48,10 +49,13 @@ public class DownwardVisitor extends RecursiveVisitor {
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
         this(mask, function, baseY, Integer.MAX_VALUE);
     }
-    //FAWE end
 
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth) {
-        super(mask, function, depth);
+        this (mask, function, baseY, depth, null);
+    }
+
+    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, Extent extent) {
+        super(mask, function, depth, extent);
         checkNotNull(mask);
 
         this.baseY = baseY;
@@ -64,6 +68,7 @@ public class DownwardVisitor extends RecursiveVisitor {
                 BlockVector3.UNIT_MINUS_Y
         );
     }
+    //FAWE end
 
     @Override
     protected boolean isVisitable(BlockVector3 from, BlockVector3 to) {

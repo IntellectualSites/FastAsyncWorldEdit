@@ -1409,9 +1409,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         // Pick how we're going to visit blocks
         RecursiveVisitor visitor;
         if (recursive) {
-            visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1));
+            visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
         } else {
-            visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1));
+            visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1), this);
         }
 
         // Start at the origin
@@ -1667,7 +1667,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int minY = region.getMinimumPoint().getBlockY();
         int maxY = Math.min(getMaximumPoint().getBlockY(), region.getMaximumPoint().getBlockY() + 1);
         SurfaceRegionFunction surface = new SurfaceRegionFunction(this, offset, minY, maxY);
-        FlatRegionVisitor visitor = new FlatRegionVisitor(asFlatRegion(region), surface);
+        FlatRegionVisitor visitor = new FlatRegionVisitor(asFlatRegion(region), surface, this);
         //FAWE end
         Operations.completeBlindly(visitor);
         return this.changes = visitor.getAffected();
@@ -1686,7 +1686,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         Naturalizer naturalizer = new Naturalizer(this);
         FlatRegion flatRegion = Regions.asFlatRegion(region);
-        LayerVisitor visitor = new LayerVisitor(flatRegion, minimumBlockY(region), maximumBlockY(region), naturalizer);
+        LayerVisitor visitor = new LayerVisitor(flatRegion, minimumBlockY(region), maximumBlockY(region), naturalizer, this);
         Operations.completeBlindly(visitor);
         return this.changes = naturalizer.getAffected();
     }
@@ -1937,7 +1937,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             replace = new BlockReplace(this, BlockTypes.AIR.getDefaultState());
         }
-        RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1));
+        RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), this);
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
@@ -1980,7 +1980,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         );
 
         BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
-        NonRisingVisitor visitor = new NonRisingVisitor(mask, replace);
+        NonRisingVisitor visitor = new NonRisingVisitor(mask, replace, Integer.MAX_VALUE, this);
 
         // Around the origin in a 3x3 block
         for (BlockVector3 position : CuboidRegion.fromCenter(origin, 1)) {
@@ -2580,7 +2580,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(region);
 
         SnowSimulator snowSimulator = new SnowSimulator(this, stack);
-        LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), snowSimulator);
+        LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), snowSimulator, this);
         Operations.completeLegacy(layerVisitor);
         return snowSimulator.getAffected();
     }
@@ -2683,7 +2683,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         );
 
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
-        LayerVisitor visitor = new LayerVisitor(region, minimumBlockY(region), maximumBlockY(region), ground);
+        LayerVisitor visitor = new LayerVisitor(region, minimumBlockY(region), maximumBlockY(region), ground, this);
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
         return this.changes = ground.getAffected();
@@ -2717,7 +2717,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int makeForest(Region region, double density, TreeGenerator.TreeType treeType) throws MaxChangedBlocksException {
         ForestGenerator generator = new ForestGenerator(this, treeType);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
-        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
+        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground, this);
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
         return ground.getAffected();

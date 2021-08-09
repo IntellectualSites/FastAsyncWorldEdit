@@ -866,7 +866,7 @@ public class RegionCommands {
         density = density / 100;
         FloraGenerator generator = new FloraGenerator(editSession);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(editSession), generator);
-        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
+        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground, editSession);
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
 

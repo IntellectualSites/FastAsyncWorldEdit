@@ -107,7 +107,8 @@ public class ConsumeBindings extends Bindings {
 
     @Binding
     @Preload(Preload.PreloadCheck.NEVER)
-    public void neverPreload(Actor actor, InjectedValueAccess context) {}
+    public void neverPreload(Actor actor, InjectedValueAccess context) {
+    }
 
     @Binding
     public UUID playerUUID(Actor actor, String argument) {
