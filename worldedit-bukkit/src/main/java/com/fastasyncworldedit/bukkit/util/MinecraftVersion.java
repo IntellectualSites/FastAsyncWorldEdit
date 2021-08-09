@@ -140,9 +140,8 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
     }
 
     /**
-     * Determines the server version based on the package path, e.g. {@code org.bukkit.craftbukkit.v1_16_R3},
-     * where v1_16_R3 is the resolved version. Note: as of Minecraft 1.17, NMS is no longer versioned thus this
-     * method may have poor results.
+     * Determines the server version based on the CraftBukkit package path, e.g. {@code org.bukkit.craftbukkit.v1_16_R3},
+     * where v1_16_R3 is the resolved version.
      *
      * @return The package version.
      */

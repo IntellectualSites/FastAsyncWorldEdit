@@ -148,7 +148,11 @@ public class HistorySubCommands {
         for (Supplier<RollbackOptimizedHistory> supplier : database.getEdits(other, minTime, bot, top, !restore, restore)) {
             count++;
             RollbackOptimizedHistory edit = supplier.get();
-            edit.undo(player, allowedRegions);
+            if (restore) {
+                edit.redo(player, allowedRegions);
+            } else {
+                edit.undo(player, allowedRegions);
+            }
             String path = edit.getWorld().getName() + "/" + finalOther + "-" + edit.getIndex();
             player.print(Caption.of("fawe.worldedit.rollback.rollback.element", path));
         }
