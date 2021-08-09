@@ -35,7 +35,7 @@ public interface IFawe {
 
     QueueHandler getQueueHandler();
 
-    Preloader getPreloader();
+    Preloader getPreloader(boolean initialise);
 
     default boolean isChunksStretched() {
         return true;

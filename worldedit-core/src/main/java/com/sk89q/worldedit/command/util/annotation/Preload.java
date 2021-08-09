@@ -32,7 +32,7 @@ public @interface Preload {
             @Override
             public void preload(Actor actor, InjectedValueAccess context) {
                 World world = context.injectedValue(Key.of(EditSession.class)).get().getWorld();
-                Preloader preloader = Fawe.imp().getPreloader();
+                Preloader preloader = Fawe.imp().getPreloader(true);
                 preloader.update(actor, world);
             }
         },

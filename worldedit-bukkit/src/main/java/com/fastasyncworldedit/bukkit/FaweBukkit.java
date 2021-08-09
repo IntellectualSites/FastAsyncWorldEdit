@@ -278,9 +278,9 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public Preloader getPreloader() {
+    public Preloader getPreloader(boolean initialise) {
         if (PaperLib.isPaper()) {
-            if (preloader == null) {
+            if (preloader == null && initialise) {
                 return preloader = new AsyncPreloader();
             }
             return preloader;

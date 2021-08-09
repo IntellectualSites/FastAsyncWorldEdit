@@ -163,8 +163,8 @@ public class Fawe {
     }
 
     public void onDisable() {
-        if (imp().getPreloader() != null) {
-            imp().getPreloader().cancel();
+        if (imp().getPreloader(false) != null) {
+            imp().getPreloader(false).cancel();
         }
     }
 
