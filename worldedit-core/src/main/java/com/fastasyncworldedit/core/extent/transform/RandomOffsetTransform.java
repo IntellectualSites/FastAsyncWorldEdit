@@ -1,5 +1,6 @@
-package com.fastasyncworldedit.core.extent;
+package com.fastasyncworldedit.core.extent.transform;
 
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -24,10 +25,24 @@ public class RandomOffsetTransform extends ResettableExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector3 pos, BiomeType biome) {
-        int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
-        int y = pos.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
-        int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        int x = position.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
+        int y = position.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
+        int z = position.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
+        if (!getExtent().contains(x, y, z)) {
+            return false;
+        }
+        return getExtent().setBiome(x, y, z, biome);
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        x = x + random.nextInt(1 + (dx << 1)) - dx;
+        y = y + random.nextInt(1 + (dy << 1)) - dy;
+        z = z + random.nextInt(1 + (dz << 1)) - dz;
+        if (!getExtent().contains(x, y, z)) {
+            return false;
+        }
         return getExtent().setBiome(x, y, z, biome);
     }
 
@@ -37,6 +52,9 @@ public class RandomOffsetTransform extends ResettableExtent {
         int x = pos.getBlockX() + random.nextInt(1 + (dx << 1)) - dx;
         int y = pos.getBlockY() + random.nextInt(1 + (dy << 1)) - dy;
         int z = pos.getBlockZ() + random.nextInt(1 + (dz << 1)) - dz;
+        if (!getExtent().contains(x, y, z)) {
+            return false;
+        }
         return getExtent().setBlock(x, y, z, block);
     }
 
@@ -46,6 +64,9 @@ public class RandomOffsetTransform extends ResettableExtent {
         x = x + random.nextInt(1 + (dx << 1)) - dx;
         y = y + random.nextInt(1 + (dy << 1)) - dy;
         z = z + random.nextInt(1 + (dz << 1)) - dz;
+        if (!getExtent().contains(x, y, z)) {
+            return false;
+        }
         return getExtent().setBlock(x, y, z, block);
     }
 

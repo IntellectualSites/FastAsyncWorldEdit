@@ -20,7 +20,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
      * Construct a new version with major, minor and release version.
      *
      * @param major   Major part of the version, only {@code 1} would make sense.
-     * @param minor   Minor part, full updates, e.g. Nether & Caves & Cliffs
+     * @param minor   Minor part, full updates, e.g. Nether &amp; Caves & Cliffs
      * @param release Release, changes for the server software during a minor update.
      */
     public MinecraftVersion(int major, int minor, int release) {
