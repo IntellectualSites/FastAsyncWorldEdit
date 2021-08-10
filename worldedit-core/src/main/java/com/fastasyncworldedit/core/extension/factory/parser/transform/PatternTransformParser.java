@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.extent.transform.PatternTransform;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,17 +27,21 @@ public class PatternTransformParser extends RichParser<ResettableExtent> {
     protected Stream<String> getSuggestions(String argumentInput, int index) {
         if (index == 0) {
             return worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
+        } else if (index == 1) {
+            return worldEdit.getTransformFactory().getSuggestions(argumentInput).stream();
         }
         return Stream.empty();
     }
 
     @Override
     protected ResettableExtent parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
-        if (arguments.length != 1) {
+        if (arguments.length > 2) {
             return null;
         }
         Pattern pattern = worldEdit.getPatternFactory().parseFromInput(arguments[0], context);
-        return new PatternTransform(context.requireExtent(), pattern);
+        Extent extent = arguments.length == 2 ? worldEdit.getTransformFactory().parseFromInput(arguments[1], context) :
+                context.requireExtent();
+        return new PatternTransform(extent, pattern);
     }
 
 }

@@ -65,6 +65,16 @@ public class MultiTransform extends RandomTransform {
         return result;
     }
 
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        // don't use streams for each block place, it'd be incredibly slow
+        boolean result = false;
+        for (AbstractDelegateExtent extent : extents) {
+            result |= extent.setBiome(x, y, z, biome);
+        }
+        return result;
+    }
+
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {

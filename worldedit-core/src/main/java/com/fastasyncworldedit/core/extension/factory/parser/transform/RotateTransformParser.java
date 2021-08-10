@@ -2,12 +2,11 @@ package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
 import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
-import com.fastasyncworldedit.core.extent.TransformExtent;
-import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import org.jetbrains.annotations.NotNull;
@@ -38,28 +37,21 @@ public class RotateTransformParser extends RichParser<ResettableExtent> {
 
     @Override
     protected ResettableExtent parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
-        if (arguments.length > 4) {
-            return null;
-        }
         AffineTransform transform = new AffineTransform();
-        if (arguments.length == 4) {
-            ResettableExtent extent = worldEdit.getTransformFactory().parseFromInput(arguments[3], context);
-            // search if there's already a transformation
-            ExtentTraverser<TransformExtent> traverser = new ExtentTraverser<>(extent).find(TransformExtent.class);
-            BlockTransformExtent affine = traverser != null ? traverser.get() : null;
-            if (affine != null) {
-                // found one, so we want to combine that with the new one later
-                transform = (AffineTransform) affine.getTransform();
-            }
-        }
+        Extent extent;
         if (arguments.length == 1) {
             transform = transform.rotateY(Double.parseDouble(arguments[0]));
-        } else if (arguments.length >= 3) {
+            extent = context.requireExtent();
+        } else if (arguments.length == 3 || arguments.length == 4) {
             transform = transform.rotateX(Double.parseDouble(arguments[0]));
             transform = transform.rotateY(Double.parseDouble(arguments[1]));
             transform = transform.rotateZ(Double.parseDouble(arguments[2]));
+            extent = arguments.length == 4 ? worldEdit.getTransformFactory().parseFromInput(arguments[3], context) :
+                    context.requireExtent();
+        } else {
+            return null;
         }
-        return new BlockTransformExtent(context.requireExtent(), transform);
+        return new BlockTransformExtent(extent, transform);
     }
 
 }

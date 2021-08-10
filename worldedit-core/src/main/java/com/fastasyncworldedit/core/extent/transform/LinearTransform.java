@@ -15,6 +15,7 @@ public class LinearTransform extends SelectTransform {
 
     @Override
     public ResettableExtent setExtent(Extent extent) {
+        super.setExtent(extent);
         for (ResettableExtent cur : extentsArray) {
             cur.setExtent(extent);
         }
