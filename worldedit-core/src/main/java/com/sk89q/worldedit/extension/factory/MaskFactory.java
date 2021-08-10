@@ -152,14 +152,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
             //FAWE end
         }
 
-        switch (masks.size()) {
-            case 0:
-                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
-            case 1:
-                return masks.get(0).optimize();
-            default:
-                return new MaskIntersection(masks).optimize();
-        }
+        return getMask(input, masks);
     }
 
     //FAWE start - rich mask parsing
@@ -195,6 +188,10 @@ public final class MaskFactory extends AbstractFactory<Mask> {
             parseFromParsers(context, masks, component, match);
         }
 
+        return getMask(input, masks);
+    }
+
+    private Mask getMask(final String input, final List<Mask> masks) {
         switch (masks.size()) {
             case 0:
                 throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));

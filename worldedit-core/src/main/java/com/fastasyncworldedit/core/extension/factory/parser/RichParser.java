@@ -73,6 +73,10 @@ public abstract class RichParser<E> extends InputParser<E> {
         return this.prefixes[0];
     }
 
+    public List<String> getAliases() {
+        return Arrays.asList(prefixes);
+    }
+
     @Override
     public Stream<String> getSuggestions(String input) {
         return Arrays.stream(this.prefixes)

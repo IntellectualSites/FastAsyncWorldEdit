@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.internal.registry;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
@@ -29,6 +30,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -99,6 +101,15 @@ public abstract class AbstractFactory<E> {
         checkNotNull(inputParser);
 
         parsers.add(parsers.size() - 1, inputParser);
+    }
+
+    public boolean containsAlias(String alias) {
+        return parsers.stream().anyMatch(p -> {
+            if (!(p instanceof RichParser)) {
+                return false;
+            }
+            return ((RichParser<E>) p).getAliases().contains(alias);
+        });
     }
 
 }

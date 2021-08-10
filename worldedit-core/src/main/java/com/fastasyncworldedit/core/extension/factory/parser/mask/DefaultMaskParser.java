@@ -66,51 +66,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                 Mask mask = null;
                 if (command.isEmpty()) {
                     mask = parseFromInput(StringMan.join(entry.getValue(), ','), context);
-                }
-                if (mask == null) {
-                    List<String> args = entry.getValue();
-                    try {
-                        mask = worldEdit.getMaskFactory().parseWithoutDefault(full, context);
-                    } catch (SuggestInputParseException rethrow) {
-                        throw rethrow;
-                    } catch (Throwable e) {
-                        throw SuggestInputParseException.of(e, full, () -> {
-                            try {
-                                String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
-                                List<Substring> split =
-                                        CommandArgParser.forArgString(cmdArgs).parseArgs().collect(Collectors.toList());
-                                List<String> argStrings = split
-                                        .stream()
-                                        .map(Substring::getSubstring)
-                                        .collect(Collectors.toList());
-                                MemoizingValueAccess access = getPlatform().initializeInjectedValues(() -> cmdArgs,
-                                        actor,
-                                        null, true
-                                );
-                                List<String> suggestions = getPlatform().getCommandManager().getSuggestions(
-                                        access,
-                                        argStrings
-                                ).stream().map(Suggestion::getSuggestion).collect(Collectors.toUnmodifiableList());
-                                List<String> result = new ArrayList<>();
-                                if (suggestions.size() <= 2) {
-                                    for (int i = 0; i < suggestions.size(); i++) {
-                                        String suggestion = suggestions.get(i);
-                                        if (suggestion.indexOf(' ') != 0) {
-                                            String[] splitSuggestion = suggestion.split(" ");
-                                            suggestion = "[" + StringMan.join(splitSuggestion, "][") + "]";
-                                            result.set(i, suggestion);
-                                        }
-                                    }
-                                }
-                                return result;
-                            } catch (Throwable e2) {
-                                e2.printStackTrace();
-                                throw new InputParseException(e2.getMessage());
-                            }
-                        });
-                    }
-                }
-                if (mask == null) {
+                } else if (!worldEdit.getMaskFactory().containsAlias(command)) {
                     // Legacy patterns
                     char char0 = command.charAt(0);
                     boolean charMask = input.length() > 1 && input.charAt(1) != '[';
@@ -171,22 +127,64 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                                 return mask;
                         }
                     }
-                }
-                if (mask == null) {
-                    if (command.startsWith("[")) {
-                        int end = command.lastIndexOf(']');
-                        mask = parseFromInput(command.substring(1, end == -1 ? command.length() : end), context);
-                    } else {
-                        BlockMaskBuilder builder = new BlockMaskBuilder();
-                        try {
-                            builder.addRegex(full);
-                        } catch (InputParseException ignored) {
+                    if (mask == null) {
+                        if (command.startsWith("[")) {
+                            int end = command.lastIndexOf(']');
+                            mask = parseFromInput(command.substring(1, end == -1 ? command.length() : end), context);
+                        } else {
+                            BlockMaskBuilder builder = new BlockMaskBuilder();
+                            try {
+                                builder.addRegex(full);
+                            } catch (InputParseException ignored) {
+                            }
+                            context.setPreferringWildcard(false);
+                            context.setRestricted(false);
+                            BaseBlock block = worldEdit.getBlockFactory().parseFromInput(full, context);
+                            builder.add(block);
+                            mask = builder.build(extent);
                         }
-                        context.setPreferringWildcard(false);
-                        context.setRestricted(false);
-                        BaseBlock block = worldEdit.getBlockFactory().parseFromInput(full, context);
-                        builder.add(block);
-                        mask = builder.build(extent);
+                    }
+                } else {
+                    List<String> args = entry.getValue();
+                    try {
+                        mask = worldEdit.getMaskFactory().parseWithoutDefault(full, context);
+                    } catch (SuggestInputParseException rethrow) {
+                        throw rethrow;
+                    } catch (Throwable e) {
+                        throw SuggestInputParseException.of(e, full, () -> {
+                            try {
+                                String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
+                                List<Substring> split =
+                                        CommandArgParser.forArgString(cmdArgs).parseArgs().collect(Collectors.toList());
+                                List<String> argStrings = split
+                                        .stream()
+                                        .map(Substring::getSubstring)
+                                        .collect(Collectors.toList());
+                                MemoizingValueAccess access = getPlatform().initializeInjectedValues(() -> cmdArgs,
+                                        actor,
+                                        null, true
+                                );
+                                List<String> suggestions = getPlatform().getCommandManager().getSuggestions(
+                                        access,
+                                        argStrings
+                                ).stream().map(Suggestion::getSuggestion).collect(Collectors.toUnmodifiableList());
+                                List<String> result = new ArrayList<>();
+                                if (suggestions.size() <= 2) {
+                                    for (int i = 0; i < suggestions.size(); i++) {
+                                        String suggestion = suggestions.get(i);
+                                        if (suggestion.indexOf(' ') != 0) {
+                                            String[] splitSuggestion = suggestion.split(" ");
+                                            suggestion = "[" + StringMan.join(splitSuggestion, "][") + "]";
+                                            result.set(i, suggestion);
+                                        }
+                                    }
+                                }
+                                return result;
+                            } catch (Throwable e2) {
+                                e2.printStackTrace();
+                                throw new InputParseException(e2.getMessage());
+                            }
+                        });
                     }
                 }
                 if (pe.isAnd()) {
