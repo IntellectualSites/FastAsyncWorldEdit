@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -31,7 +32,6 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 /**
@@ -63,9 +63,8 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
 
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
             try {
-                editSession.disableBuffering();
                 BlockVector3 blockPoint = pos.toVector().toBlockPoint();
-                BaseBlock applied = secondary.apply(blockPoint);
+                BaseBlock applied = secondary.applyBlock(blockPoint);
                 if (applied.getBlockType().getMaterial().isAir()) {
                     editSession.setBlock(blockPoint, secondary);
                 } else {
@@ -93,9 +92,8 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
 
         try (EditSession editSession = session.createEditSession(player, "LongRangeBuildTool")) {
             try {
-                editSession.disableBuffering();
                 BlockVector3 blockPoint = pos.toVector().toBlockPoint();
-                BaseBlock applied = primary.apply(blockPoint);
+                BaseBlock applied = primary.applyBlock(blockPoint);
                 if (applied.getBlockType().getMaterial().isAir()) {
                     editSession.setBlock(blockPoint, primary);
                 } else {
@@ -123,7 +121,7 @@ public class LongRangeBuildTool extends BrushTool implements DoubleActionTraceTo
         }
 
         if (target == null) {
-            player.printError(TranslatableComponent.of("worldedit.tool.no-block"));
+            player.print(Caption.of("worldedit.tool.no-block"));
             return null;
         }
 

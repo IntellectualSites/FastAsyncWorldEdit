@@ -28,7 +28,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.MultiDirection;
-import com.sk89q.worldedit.internal.annotation.OptionalArg;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.CommandManager;
@@ -39,8 +38,8 @@ import org.enginehub.piston.converter.SuccessfulConversion;
 import org.enginehub.piston.inject.InjectedValueAccess;
 import org.enginehub.piston.inject.Key;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 
 import static org.enginehub.piston.converter.SuggestionHelper.limitByPrefix;
 
@@ -56,26 +55,28 @@ public abstract class AbstractDirectionConverter<D> implements ArgumentConverter
         return new AutoAnnotation_AbstractDirectionConverter_multiDirection(includeDiagonals);
     }
 
-    protected static <D> void register(CommandManager commandManager, AbstractDirectionConverter<D> converter,
-                                       Class<D> keyClass, boolean includeDiagonals) {
+    protected static <D> void register(
+            CommandManager commandManager, AbstractDirectionConverter<D> converter,
+            Class<D> keyClass, boolean includeDiagonals
+    ) {
         commandManager.registerConverter(
-            Key.of(keyClass, direction(includeDiagonals)),
-            converter
+                Key.of(keyClass, direction(includeDiagonals)),
+                converter
         );
         commandManager.registerConverter(
-            Key.of(keyClass, multiDirection(includeDiagonals)),
-            CommaSeparatedValuesConverter.wrap(converter)
+                Key.of(keyClass, multiDirection(includeDiagonals)),
+                CommaSeparatedValuesConverter.wrap(converter)
         );
     }
 
     private static final ImmutableSet<String> ORTHOGONAL = ImmutableSet.of(
-        "north", "south", "east", "west", "up", "down"
+            "north", "south", "east", "west", "up", "down"
     );
     private static final ImmutableSet<String> RELATIVE = ImmutableSet.of(
-        "me", "forward", "back", "left", "right"
+            "me", "forward", "back", "left", "right"
     );
     private static final ImmutableSet<String> DIAGONAL = ImmutableSet.of(
-        "northeast", "northwest", "southeast", "southwest"
+            "northeast", "northwest", "southeast", "southwest"
     );
 
     private final WorldEdit worldEdit;
@@ -86,15 +87,19 @@ public abstract class AbstractDirectionConverter<D> implements ArgumentConverter
         this.worldEdit = worldEdit;
         this.includeDiagonals = includeDiagonals;
         suggestions = ImmutableList.<String>builder()
-            .addAll(ORTHOGONAL)
-            .addAll(RELATIVE)
-            .addAll(includeDiagonals ? DIAGONAL : ImmutableList.of())
-            .build();
+                .addAll(ORTHOGONAL)
+                .addAll(RELATIVE)
+                .addAll(includeDiagonals ? DIAGONAL : ImmutableList.of())
+                .build();
     }
 
     @Override
     public ConversionResult<D> convert(String argument, InjectedValueAccess context) {
-        Player player = context.injectedValue(Key.of(Actor.class)).filter(Player.class::isInstance).map(Player.class::cast).orElse(null);
+        Player player = context
+                .injectedValue(Key.of(Actor.class))
+                .filter(Player.class::isInstance)
+                .map(Player.class::cast)
+                .orElse(null);
         try {
             return SuccessfulConversion.fromSingle(convertDirection(argument, player, includeDiagonals));
         } catch (Exception e) {
@@ -102,12 +107,13 @@ public abstract class AbstractDirectionConverter<D> implements ArgumentConverter
         }
     }
 
-    protected abstract D convertDirection(String argument, @Nullable Player player, boolean includeDiagonals) throws UnknownDirectionException;
+    protected abstract D convertDirection(String argument, @Nullable Player player, boolean includeDiagonals) throws
+            UnknownDirectionException;
 
     @Override
     public Component describeAcceptableArguments() {
         return TextComponent.of("`me` to use facing direction, or any "
-            + (includeDiagonals ? "direction" : "non-diagonal direction"));
+                + (includeDiagonals ? "direction" : "non-diagonal direction"));
     }
 
     @Override
@@ -118,4 +124,5 @@ public abstract class AbstractDirectionConverter<D> implements ArgumentConverter
     protected WorldEdit getWorldEdit() {
         return worldEdit;
     }
+
 }

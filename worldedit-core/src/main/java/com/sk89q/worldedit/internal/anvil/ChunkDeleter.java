@@ -27,13 +27,12 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,10 +51,10 @@ import java.util.stream.Stream;
 public final class ChunkDeleter {
 
     public static final String DELCHUNKS_FILE_NAME = "delete_chunks.json";
-    private static final Logger logger = LoggerFactory.getLogger(ChunkDeleter.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final Comparator<BlockVector2> chunkSorter = Comparator.comparing(
-        pos -> (pos.getBlockX() & 31) + (pos.getBlockZ() & 31) * 32
+            pos -> (pos.getBlockX() & 31) + (pos.getBlockZ() & 31) * 32
     );
 
     private static final Gson chunkDeleterGson = new GsonBuilder()
@@ -64,12 +63,13 @@ public final class ChunkDeleter {
             .create();
 
     public static ChunkDeletionInfo readInfo(Path chunkFile) throws IOException, JsonSyntaxException {
-        String json = new String(Files.readAllBytes(chunkFile), StandardCharsets.UTF_8);
+        String json = Files.readString(chunkFile);
         return chunkDeleterGson.fromJson(json, ChunkDeletionInfo.class);
     }
 
     public static void writeInfo(ChunkDeletionInfo info, Path chunkFile) throws IOException, JsonIOException {
-        String json = chunkDeleterGson.toJson(info, new TypeToken<ChunkDeletionInfo>() {}.getType());
+        String json = chunkDeleterGson.toJson(info, new TypeToken<ChunkDeletionInfo>() {
+        }.getType());
         try (BufferedWriter writer = Files.newBufferedWriter(chunkFile)) {
             writer.write(json);
         }
@@ -80,15 +80,16 @@ public final class ChunkDeleter {
         try {
             chunkDeleter = createFromFile(chunkFile);
         } catch (JsonSyntaxException | IOException e) {
-            logger.error("Could not parse chunk deletion file. Invalid file?", e);
+            LOGGER.error("Could not parse chunk deletion file. Invalid file?", e);
             return;
         }
-        logger.info("Found chunk deletions. Proceeding with deletion...");
+        LOGGER.info("Found chunk deletions. Proceeding with deletion...");
         long start = System.currentTimeMillis();
         if (chunkDeleter.runDeleter()) {
-            logger.info("Successfully deleted {} matching chunks (out of {}, taking {} ms).",
+            LOGGER.info("Successfully deleted {} matching chunks (out of {}, taking {} ms).",
                     chunkDeleter.getDeletedChunkCount(), chunkDeleter.getDeletionsRequested(),
-                    System.currentTimeMillis() - start);
+                    System.currentTimeMillis() - start
+            );
             if (deleteOnSuccess) {
                 boolean deletedFile = false;
                 try {
@@ -96,13 +97,13 @@ public final class ChunkDeleter {
                 } catch (IOException ignored) {
                 }
                 if (!deletedFile) {
-                    logger.warn("Chunk deletion file could not be cleaned up. This may have unintended consequences"
-                        + " on next startup, or if /delchunks is used again.");
+                    LOGGER.warn("Chunk deletion file could not be cleaned up. This may have unintended consequences"
+                            + " on next startup, or if /delchunks is used again.");
                 }
             }
         } else {
-            logger.error("Error occurred while deleting chunks. "
-                + "If world errors occur, stop the server and restore the *.bak backup files.");
+            LOGGER.error("Error occurred while deleting chunks. "
+                    + "If world errors occur, stop the server and restore the *.bak backup files.");
         }
     }
 
@@ -131,7 +132,7 @@ public final class ChunkDeleter {
 
     private boolean runBatch(ChunkDeletionInfo.ChunkBatch chunkBatch) {
         int chunkCount = chunkBatch.getChunkCount();
-        logger.debug("Processing deletion batch with {} chunks.", chunkCount);
+        LOGGER.debug("Processing deletion batch with {} chunks.", chunkCount);
         final Map<Path, Stream<BlockVector2>> regionToChunkList = groupChunks(chunkBatch);
         BiPredicate<RegionAccess, BlockVector2> predicate = createPredicates(chunkBatch.deletionPredicates);
         shouldPreload = chunkBatch.chunks == null;
@@ -147,7 +148,7 @@ public final class ChunkDeleter {
                 try {
                     backupRegion(regionPath);
                 } catch (IOException e) {
-                    logger.warn("Error backing up region file: " + regionPath + ". Aborting the process.", e);
+                    LOGGER.warn("Error backing up region file: " + regionPath + ". Aborting the process.", e);
                     return false;
                 }
             }
@@ -159,10 +160,11 @@ public final class ChunkDeleter {
         Path worldPath = Paths.get(chunkBatch.worldPath);
         if (chunkBatch.chunks != null) {
             return chunkBatch.chunks.stream()
-                .collect(Collectors.groupingBy(RegionFilePos::new))
-                .entrySet().stream().collect(Collectors.toMap(
-                    e -> worldPath.resolve("region").resolve(e.getKey().getFileName()),
-                    e -> e.getValue().stream().sorted(chunkSorter)));
+                    .collect(Collectors.groupingBy(RegionFilePos::new))
+                    .entrySet().stream().collect(Collectors.toMap(
+                            e -> worldPath.resolve("region").resolve(e.getKey().getFileName()),
+                            e -> e.getValue().stream().sorted(chunkSorter)
+                    ));
         } else {
             final BlockVector2 minChunk = chunkBatch.minChunk;
             final BlockVector2 maxChunk = chunkBatch.maxChunk;
@@ -184,18 +186,20 @@ public final class ChunkDeleter {
                     int minZ = Math.max(Math.min(startZ, endZ), minChunk.getBlockZ());
                     int maxX = Math.min(Math.max(startX, endX), maxChunk.getBlockX());
                     int maxZ = Math.min(Math.max(startZ, endZ), maxChunk.getBlockZ());
-                    Stream<BlockVector2> stream = Stream.iterate(BlockVector2.at(minX, minZ),
-                        bv2 -> {
-                            int nextX = bv2.getBlockX();
-                            int nextZ = bv2.getBlockZ();
-                            if (++nextX > maxX) {
-                                nextX = minX;
-                                if (++nextZ > maxZ) {
-                                    return null;
+                    Stream<BlockVector2> stream = Stream.iterate(
+                            BlockVector2.at(minX, minZ),
+                            bv2 -> {
+                                int nextX = bv2.getBlockX();
+                                int nextZ = bv2.getBlockZ();
+                                if (++nextX > maxX) {
+                                    nextX = minX;
+                                    if (++nextZ > maxZ) {
+                                        return null;
+                                    }
                                 }
+                                return BlockVector2.at(nextX, nextZ);
                             }
-                            return BlockVector2.at(nextX, nextZ);
-                        });
+                    );
                     groupedChunks.put(regionPath, stream);
                 }
             }
@@ -251,10 +255,12 @@ public final class ChunkDeleter {
         backedUpRegions.add(backupFile);
     }
 
-    private boolean deleteChunks(Path regionFile, Stream<BlockVector2> chunks,
-                                 BiPredicate<RegionAccess, BlockVector2> deletionPredicate) {
+    private boolean deleteChunks(
+            Path regionFile, Stream<BlockVector2> chunks,
+            BiPredicate<RegionAccess, BlockVector2> deletionPredicate
+    ) {
         try (RegionAccess region = new RegionAccess(regionFile, shouldPreload)) {
-            for (Iterator<BlockVector2> iterator = chunks.iterator(); iterator.hasNext();) {
+            for (Iterator<BlockVector2> iterator = chunks.iterator(); iterator.hasNext(); ) {
                 BlockVector2 chunk = iterator.next();
                 if (chunk == null) {
                     break;
@@ -263,15 +269,15 @@ public final class ChunkDeleter {
                     region.deleteChunk(chunk);
                     totalChunksDeleted++;
                     if (debugRate != 0 && totalChunksDeleted % debugRate == 0) {
-                        logger.debug("Deleted {} chunks so far.", totalChunksDeleted);
+                        LOGGER.debug("Deleted {} chunks so far.", totalChunksDeleted);
                     }
                 } else {
-                    logger.debug("Chunk did not match predicates: " + chunk);
+                    LOGGER.debug("Chunk did not match predicates: " + chunk);
                 }
             }
             return true;
         } catch (IOException e) {
-            logger.warn("Error deleting chunks from region: " + regionFile + ". Aborting the process.", e);
+            LOGGER.warn("Error deleting chunks from region: " + regionFile + ". Aborting the process.", e);
             return false;
         }
     }
@@ -285,6 +291,7 @@ public final class ChunkDeleter {
     }
 
     private static class BlockVector2Adapter extends TypeAdapter<BlockVector2> {
+
         @Override
         public void write(JsonWriter out, BlockVector2 value) throws IOException {
             out.beginArray();
@@ -301,9 +308,11 @@ public final class ChunkDeleter {
             in.endArray();
             return BlockVector2.at(x, z);
         }
+
     }
 
     private static class RegionFilePos {
+
         private final int x;
         private final int z;
 
@@ -358,5 +367,7 @@ public final class ChunkDeleter {
         public String toString() {
             return "(" + x + ", " + z + ")";
         }
+
     }
+
 }

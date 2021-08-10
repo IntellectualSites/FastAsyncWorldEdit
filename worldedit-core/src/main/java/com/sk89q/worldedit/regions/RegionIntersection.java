@@ -19,14 +19,14 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IChunkSet;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import java.util.ArrayList;
@@ -118,13 +118,13 @@ public class RegionIntersection extends AbstractRegion {
     @Override
     public void expand(BlockVector3... changes) throws RegionOperationException {
         checkNotNull(changes);
-        throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.intersection.error.cannot-expand"));
+        throw new RegionOperationException(Caption.of("worldedit.selection.intersection.error.cannot-expand"));
     }
 
     @Override
     public void contract(BlockVector3... changes) throws RegionOperationException {
         checkNotNull(changes);
-        throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.intersection.error.cannot-contract"));
+        throw new RegionOperationException(Caption.of("worldedit.selection.intersection.error.cannot-contract"));
     }
 
     @Override
@@ -146,6 +146,7 @@ public class RegionIntersection extends AbstractRegion {
 
     }
 
+    //FAWE start
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
         for (Region region : regions) {
@@ -237,4 +238,5 @@ public class RegionIntersection extends AbstractRegion {
         }
         return false;
     }
+    //FAWE end
 }

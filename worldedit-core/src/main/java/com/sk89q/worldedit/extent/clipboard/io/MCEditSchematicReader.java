@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.google.common.collect.ImmutableList;
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -42,18 +43,20 @@ import com.sk89q.worldedit.extent.clipboard.io.legacycompat.NoteBlockCompatibili
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.Pre13HangingCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.SignCompatibilityHandler;
 import com.sk89q.worldedit.extent.clipboard.io.legacycompat.SkullBlockCompatibilityHandler;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.collection.BlockMap;
 import com.sk89q.worldedit.world.DataFixer;
+import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.storage.NBTConversions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,32 +65,31 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads schematic files that are compatible with MCEdit and other editors.
- * @deprecated Use SchematicStreamer
  */
-@Deprecated
 public class MCEditSchematicReader extends NBTSchematicReader {
 
-    private static final Logger log = LoggerFactory.getLogger(MCEditSchematicReader.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final NBTInputStream inputStream;
     private final DataFixer fixer;
     private static final ImmutableList<NBTCompatibilityHandler> COMPATIBILITY_HANDLERS
             = ImmutableList.of(
-                new SignCompatibilityHandler(),
-                new FlowerPotCompatibilityHandler(),
-                new NoteBlockCompatibilityHandler(),
-                new SkullBlockCompatibilityHandler(),
-                new BannerBlockCompatibilityHandler(),
-                new BedBlockCompatibilityHandler()
+            new SignCompatibilityHandler(),
+            new FlowerPotCompatibilityHandler(),
+            new NoteBlockCompatibilityHandler(),
+            new SkullBlockCompatibilityHandler(),
+            new BannerBlockCompatibilityHandler(),
+            new BedBlockCompatibilityHandler()
     );
     private static final ImmutableList<EntityNBTCompatibilityHandler> ENTITY_COMPATIBILITY_HANDLERS
             = ImmutableList.of(
-                    new Pre13HangingCompatibilityHandler()
+            new Pre13HangingCompatibilityHandler()
     );
 
     /**
@@ -99,8 +101,8 @@ public class MCEditSchematicReader extends NBTSchematicReader {
         checkNotNull(inputStream);
         this.inputStream = inputStream;
         this.fixer = null;
-                //com.sk89q.worldedit.WorldEdit.getInstance().getPlatformManager().queryCapability(
-                        //com.sk89q.worldedit.extension.platform.Capability.WORLD_EDITING).getDataFixer();
+        //com.sk89q.worldedit.WorldEdit.getInstance().getPlatformManager().queryCapability(
+        //com.sk89q.worldedit.extension.platform.Capability.WORLD_EDITING).getDataFixer();
     }
 
     @Override
@@ -186,8 +188,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
         // Need to pull out tile entities
         final ListTag tileEntityTag = getTag(schematic, "TileEntities", ListTag.class);
         List<Tag> tileEntities = tileEntityTag == null ? new ArrayList<>() : tileEntityTag.getValue();
-        Map<BlockVector3, Map<String, Tag>> tileEntitiesMap = new HashMap<>();
-        Map<BlockVector3, BlockState> blockStates = new HashMap<>();
+        BlockMap<BaseBlock> tileEntityBlocks = BlockMap.createForBaseBlock();
 
         for (Tag tag : tileEntities) {
             if (!(tag instanceof CompoundTag)) {
@@ -207,7 +208,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             if (newBlock != null) {
                 for (NBTCompatibilityHandler handler : COMPATIBILITY_HANDLERS) {
                     if (handler.isAffectedBlock(newBlock)) {
-                        newBlock = handler.updateNBT(block, values);
+                        newBlock = handler.updateNBT(block, values).toImmutableState();
                         if (newBlock == null || values.isEmpty()) {
                             break;
                         }
@@ -221,14 +222,26 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             }
 
             if (fixer != null && t != null) {
-                t = fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, t, -1);
+                //FAWE start
+                t = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                        DataFixer.FixTypes.BLOCK_ENTITY,
+                        t.asBinaryTag(),
+                        -1
+                ));
+                //FAWE end
             }
 
             BlockVector3 vec = BlockVector3.at(x, y, z);
-            if (t != null) {
-                tileEntitiesMap.put(vec, t.getValue());
+            // Insert into the map if we have changed the block or have a tag
+            BlockState blockToInsert = newBlock != null
+                    ? newBlock
+                    : (t != null ? block : null);
+            if (blockToInsert != null) {
+                BaseBlock baseBlock = t != null
+                        ? blockToInsert.toBaseBlock(new CompoundTag(t.getValue()))
+                        : blockToInsert.toBaseBlock();
+                tileEntityBlocks.put(vec, baseBlock);
             }
-            blockStates.put(vec, newBlock);
         }
 
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
@@ -241,21 +254,21 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                 for (int z = 0; z < length; ++z) {
                     int index = y * width * length + z * width + x;
                     BlockVector3 pt = BlockVector3.at(x, y, z);
-                    BlockState state = blockStates.computeIfAbsent(pt, p -> getBlockState(blocks[index], blockData[index]));
+                    BaseBlock state = Optional.ofNullable(tileEntityBlocks.get(pt))
+                            .orElseGet(() -> {
+                                BlockState blockState = getBlockState(blocks[index], blockData[index]);
+                                return blockState == null ? null : blockState.toBaseBlock();
+                            });
 
                     try {
                         if (state != null) {
-                            if (tileEntitiesMap.containsKey(pt)) {
-                                clipboard.setBlock(region.getMinimumPoint().add(pt), state.toBaseBlock(new CompoundTag(tileEntitiesMap.get(pt))));
-                            } else {
-                                clipboard.setBlock(region.getMinimumPoint().add(pt), state);
-                            }
+                            clipboard.setBlock(region.getMinimumPoint().add(pt), state);
                         } else {
                             short block = blocks[index];
                             byte data = blockData[index];
                             int combined = block << 8 | data;
                             if (unknownBlocks.add(combined)) {
-                                log.warn("Unknown block when loading schematic: "
+                                LOGGER.warn("Unknown block when loading schematic: "
                                         + block + ":" + data + ". This is most likely a bad schematic.");
                             }
                         }
@@ -276,10 +289,18 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                 if (tag instanceof CompoundTag) {
                     CompoundTag compound = (CompoundTag) tag;
                     if (fixer != null) {
-                        compound = fixer.fixUp(DataFixer.FixTypes.ENTITY, compound, -1);
+                        compound = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                                DataFixer.FixTypes.ENTITY,
+                                compound.asBinaryTag(),
+                                -1
+                        ));
                     }
                     String id = convertEntityId(compound.getString("id"));
-                    Location location = NBTConversions.toLocation(clipboard, compound.getListTag("Pos"), compound.getListTag("Rotation"));
+                    Location location = NBTConversions.toLocation(
+                            clipboard,
+                            compound.getListTag("Pos"),
+                            compound.getListTag("Rotation")
+                    );
                     if (!id.isEmpty()) {
                         EntityType entityType = EntityTypes.get(id.toLowerCase(Locale.ROOT));
                         if (entityType != null) {
@@ -291,7 +312,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                             BaseEntity state = new BaseEntity(entityType, compound);
                             clipboard.createEntity(location, state);
                         } else {
-                            log.warn("Unknown entity when pasting schematic: " + id.toLowerCase(Locale.ROOT));
+                            LOGGER.warn("Unknown entity when pasting schematic: " + id.toLowerCase(Locale.ROOT));
                         }
                     }
                 }
@@ -302,39 +323,71 @@ public class MCEditSchematicReader extends NBTSchematicReader {
     }
 
     private String convertEntityId(String id) {
-        switch(id) {
-            case "AreaEffectCloud": return "area_effect_cloud";
-            case "ArmorStand": return "armor_stand";
-            case "CaveSpider": return "cave_spider";
-            case "MinecartChest": return "chest_minecart";
-            case "DragonFireball": return "dragon_fireball";
-            case "ThrownEgg": return "egg";
-            case "EnderDragon": return "ender_dragon";
-            case "ThrownEnderpearl": return "ender_pearl";
-            case "FallingSand": return "falling_block";
-            case "FireworksRocketEntity": return "fireworks_rocket";
-            case "MinecartFurnace": return "furnace_minecart";
-            case "MinecartHopper": return "hopper_minecart";
-            case "EntityHorse": return "horse";
-            case "ItemFrame": return "item_frame";
-            case "LeashKnot": return "leash_knot";
-            case "LightningBolt": return "lightning_bolt";
-            case "LavaSlime": return "magma_cube";
-            case "MinecartRideable": return "minecart";
-            case "MushroomCow": return "mooshroom";
-            case "Ozelot": return "ocelot";
-            case "PolarBear": return "polar_bear";
-            case "ThrownPotion": return "potion";
-            case "ShulkerBullet": return "shulker_bullet";
-            case "SmallFireball": return "small_fireball";
-            case "MinecartSpawner": return "spawner_minecart";
-            case "SpectralArrow": return "spectral_arrow";
-            case "PrimedTnt": return "tnt";
-            case "MinecartTNT": return "tnt_minecart";
-            case "VillagerGolem": return "villager_golem";
-            case "WitherBoss": return "wither";
-            case "WitherSkull": return "wither_skull";
-            case "PigZombie": return "zombie_pigman";
+        switch (id) {
+            case "AreaEffectCloud":
+                return "area_effect_cloud";
+            case "ArmorStand":
+                return "armor_stand";
+            case "CaveSpider":
+                return "cave_spider";
+            case "MinecartChest":
+                return "chest_minecart";
+            case "DragonFireball":
+                return "dragon_fireball";
+            case "ThrownEgg":
+                return "egg";
+            case "EnderDragon":
+                return "ender_dragon";
+            case "ThrownEnderpearl":
+                return "ender_pearl";
+            case "FallingSand":
+                return "falling_block";
+            case "FireworksRocketEntity":
+                return "fireworks_rocket";
+            case "MinecartFurnace":
+                return "furnace_minecart";
+            case "MinecartHopper":
+                return "hopper_minecart";
+            case "EntityHorse":
+                return "horse";
+            case "ItemFrame":
+                return "item_frame";
+            case "LeashKnot":
+                return "leash_knot";
+            case "LightningBolt":
+                return "lightning_bolt";
+            case "LavaSlime":
+                return "magma_cube";
+            case "MinecartRideable":
+                return "minecart";
+            case "MushroomCow":
+                return "mooshroom";
+            case "Ozelot":
+                return "ocelot";
+            case "PolarBear":
+                return "polar_bear";
+            case "ThrownPotion":
+                return "potion";
+            case "ShulkerBullet":
+                return "shulker_bullet";
+            case "SmallFireball":
+                return "small_fireball";
+            case "MinecartSpawner":
+                return "spawner_minecart";
+            case "SpectralArrow":
+                return "spectral_arrow";
+            case "PrimedTnt":
+                return "tnt";
+            case "MinecartTNT":
+                return "tnt_minecart";
+            case "VillagerGolem":
+                return "villager_golem";
+            case "WitherBoss":
+                return "wither";
+            case "WitherSkull":
+                return "wither_skull";
+            case "PigZombie":
+                return "zombie_pigman";
             case "XPOrb":
             case "xp_orb":
                 return "experience_orb";
@@ -347,17 +400,25 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             case "EnderCrystal":
             case "ender_crystal":
                 return "end_crystal";
-            case "fireworks_rocket": return "firework_rocket";
+            case "fireworks_rocket":
+                return "firework_rocket";
             case "MinecartCommandBlock":
             case "commandblock_minecart":
                 return "command_block_minecart";
-            case "snowman": return "snow_golem";
-            case "villager_golem": return "iron_golem";
-            case "evocation_fangs": return "evoker_fangs";
-            case "evocation_illager": return "evoker";
-            case "vindication_illager": return "vindicator";
-            case "illusion_illager": return "illusioner";
-            default: return id;
+            case "snowman":
+                return "snow_golem";
+            case "villager_golem":
+                return "iron_golem";
+            case "evocation_fangs":
+                return "evoker_fangs";
+            case "evocation_illager":
+                return "evoker";
+            case "vindication_illager":
+                return "vindicator";
+            case "illusion_illager":
+                return "illusioner";
+            default:
+                return id;
         }
     }
 
@@ -421,4 +482,5 @@ public class MCEditSchematicReader extends NBTSchematicReader {
     public void close() throws IOException {
         inputStream.close();
     }
+
 }

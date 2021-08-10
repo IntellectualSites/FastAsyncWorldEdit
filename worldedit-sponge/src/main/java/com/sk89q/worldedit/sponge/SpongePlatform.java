@@ -184,6 +184,13 @@ class SpongePlatform extends AbstractPlatform implements MultiUserPlatform {
         return mod.getInternalVersion();
     }
 
+    //FAWE start
+    @Override
+    public String getId() {
+        return "intellectualsites:sponge";
+    }
+    //FAWE end
+
     @Override
     public Map<Capability, Preference> getCapabilities() {
         Map<Capability, Preference> capabilities = new EnumMap<>(Capability.class);

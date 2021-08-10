@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.translation.TranslationManager;
 import com.sk89q.worldedit.world.item.ItemType;
 
@@ -47,8 +47,8 @@ public class BundledItemRegistry implements ItemRegistry {
             // too much!
             return TextComponent.of(itemEntry.localizedName);
         }
-        return TranslatableComponent.of(
-            TranslationManager.makeTranslationKey("item", itemType.getId())
+        return Caption.of(
+                TranslationManager.makeTranslationKey("item", itemType.getId())
         );
     }
 
@@ -76,4 +76,5 @@ public class BundledItemRegistry implements ItemRegistry {
     public ItemMaterial getMaterial(ItemType itemType) {
         return new PassthroughItemMaterial(BundledItemData.getInstance().getMaterialById(itemType.getId()));
     }
+
 }

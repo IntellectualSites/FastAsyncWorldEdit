@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.jnbt.CompoundTag;
+
 import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.util.GuavaUtil.firstNonNull;
@@ -48,6 +50,7 @@ public class PassthroughBlockMaterial implements BlockMaterial {
         return blockMaterial.isAir();
     }
 
+    //FAWE start
     @Override
     public int getMapColor() {
         if (blockMaterial == null) {
@@ -56,6 +59,7 @@ public class PassthroughBlockMaterial implements BlockMaterial {
             return blockMaterial.getMapColor();
         }
     }
+    //FAWE end
 
     @Override
     public boolean isFullCube() {
@@ -102,10 +106,12 @@ public class PassthroughBlockMaterial implements BlockMaterial {
         return blockMaterial.getLightValue();
     }
 
+    //FAWE start
     @Override
     public int getLightOpacity() {
         return blockMaterial.getLightOpacity();
     }
+    //FAWE end
 
     @Override
     public boolean isFragileWhenPushed() {
@@ -151,4 +157,16 @@ public class PassthroughBlockMaterial implements BlockMaterial {
     public boolean hasContainer() {
         return blockMaterial.hasContainer();
     }
+
+    //FAWE start
+    @Override
+    public boolean isTile() {
+        return blockMaterial.isTile();
+    }
+
+    @Override
+    public CompoundTag getDefaultTile() {
+        return blockMaterial.getDefaultTile();
+    }
+    //FAWE end
 }

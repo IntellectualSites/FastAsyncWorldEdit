@@ -19,16 +19,18 @@
 
 package com.sk89q.jnbt;
 
+import com.fastasyncworldedit.core.jnbt.NumberTag;
+import com.sk89q.worldedit.util.nbt.FloatBinaryTag;
+
 /**
  * The {@code TAG_Float} tag.
+ *
+ * @deprecated Use {@link FloatBinaryTag}.
  */
+@Deprecated
 public final class FloatTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_FLOAT;
-    }
 
-    private final float value;
+    private final FloatBinaryTag innerTag;
 
     /**
      * Creates the tag with an empty name.
@@ -37,17 +39,29 @@ public final class FloatTag extends NumberTag {
      */
     public FloatTag(float value) {
         super();
-        this.value = value;
+        this.innerTag = FloatBinaryTag.of(value);
+    }
+
+    public FloatTag(FloatBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
+    }
+
+    @Override
+    public FloatBinaryTag asBinaryTag() {
+        return this.innerTag;
     }
 
     @Override
     public Float getValue() {
-        return value;
+        return innerTag.value();
     }
 
+    //FAWE start
     @Override
-    public String toString() {
-        return "TAG_Float(" + value + ")";
+    public int getTypeCode() {
+        return NBTConstants.TYPE_FLOAT;
     }
+    //FAWE end
 
 }

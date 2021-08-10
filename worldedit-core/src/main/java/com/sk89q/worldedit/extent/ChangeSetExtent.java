@@ -34,9 +34,9 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -50,7 +50,7 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
     /**
      * Create a new instance.
      *
-     * @param extent the extent
+     * @param extent    the extent
      * @param changeSet the change set
      */
     public ChangeSetExtent(Extent extent, ChangeSet changeSet) {
@@ -102,6 +102,7 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
     }
 
     private class TrackedEntity implements Entity {
+
         private final Entity entity;
 
         private TrackedEntity(Entity entity) {
@@ -145,5 +146,7 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
         public <T> T getFacet(Class<? extends T> cls) {
             return entity.getFacet(cls);
         }
+
     }
+
 }

@@ -34,20 +34,25 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RegionMaskingFilter implements RegionFunction {
 
     private final RegionFunction function;
-    private final Extent extent;
     private final Mask mask;
+    //FAWE start
+    private final Extent extent;
+    //FAWE end
 
     /**
      * Create a new masking filter.
      *
-     * @param mask the mask
+     * @param mask     the mask
      * @param function the function
      */
+    //FAWE start - Extent
     public RegionMaskingFilter(Extent extent, Mask mask, RegionFunction function) {
         checkNotNull(function);
         checkNotNull(mask);
+        //FAWE start
         checkNotNull(extent);
         this.extent = extent;
+        //FAWE end
         this.mask = mask;
         this.function = function;
     }

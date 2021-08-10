@@ -19,12 +19,13 @@
 
 package com.sk89q.worldedit.function.mask;
 
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.implementation.filter.MaskFilter;
-import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.extent.filter.MaskFilter;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.function.mask.InverseMask;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.math.BlockVector3;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.function.Consumer;
 
 /**
@@ -40,10 +41,6 @@ public interface Mask {
      */
     boolean test(BlockVector3 vector);
 
-    default <T extends Filter> MaskFilter<T> toFilter(T filter) {
-        return new MaskFilter<>(filter, this);
-    }
-
     /**
      * Get the 2D version of this mask if one exists.
      *
@@ -54,14 +51,21 @@ public interface Mask {
         return null;
     }
 
+    //FAWE start
+
     /**
      * Returns null if no optimization took place
      * otherwise a new/same mask
+     *
      * @return
      */
     @Nullable
     default Mask tryOptimize() {
         return null;
+    }
+
+    default <T extends Filter> MaskFilter<T> toFilter(T filter) {
+        return new MaskFilter<>(filter, this);
     }
 
     default Mask tryCombine(Mask other) {
@@ -103,7 +107,9 @@ public interface Mask {
 
     /**
      * Returns a copy of the mask. Usually for multi-threaded operation
+     *
      * @return a clone of the mask
      */
     Mask copy();
+    //FAWE end
 }

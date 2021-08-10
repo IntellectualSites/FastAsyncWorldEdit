@@ -1,5 +1,7 @@
 package com.sk89q.worldedit.function.mask;
 
+import com.fastasyncworldedit.core.function.mask.ABlockMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -7,11 +9,14 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class InverseSingleBlockTypeMask extends ABlockMask {
+
     private final int internalId;
+    private final boolean replacesAir;
 
     public InverseSingleBlockTypeMask(Extent extent, BlockType type) {
         super(extent);
         this.internalId = type.getInternalId();
+        this.replacesAir = type.getMaterial().isAir();
     }
 
     @Override
@@ -33,4 +38,10 @@ public class InverseSingleBlockTypeMask extends ABlockMask {
         // The mask is not mutable. There is no need to clone it.
         return this;
     }
+
+    @Override
+    public boolean replacesAir() {
+        return replacesAir;
+    }
+
 }

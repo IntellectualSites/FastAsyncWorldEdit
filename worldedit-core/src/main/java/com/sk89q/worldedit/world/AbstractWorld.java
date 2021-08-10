@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.world;
 
+import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Platform;
-import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -37,9 +37,9 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.PriorityQueue;
-import javax.annotation.Nullable;
 
 /**
  * An abstract implementation of {@link World}.
@@ -76,7 +76,9 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public Mask createLiquidMask() {
+        //FAWE start - use BlockMaskBuilder
         return new BlockMaskBuilder().addTypes(BlockTypes.LAVA, BlockTypes.WATER).build(this);
+        //FAWE end
     }
 
     @Override
@@ -162,6 +164,7 @@ public abstract class AbstractWorld implements World {
     }
 
     private class QueuedEffect implements Comparable<QueuedEffect> {
+
         private final Vector3 position;
         private final BlockType blockType;
         private final double priority;
@@ -181,6 +184,7 @@ public abstract class AbstractWorld implements World {
         public int compareTo(@Nullable QueuedEffect other) {
             return Double.compare(priority, other != null ? other.priority : 0);
         }
+
     }
 
 }

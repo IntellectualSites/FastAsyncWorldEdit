@@ -20,6 +20,7 @@
 package com.sk89q.jnbt;
 
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
 import java.util.Map;
@@ -29,7 +30,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A class which contains NBT-related utility methods.
  *
+ * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
+@Deprecated
 public final class NBTUtils {
 
     /**
@@ -49,7 +52,7 @@ public final class NBTUtils {
             return "TAG_Byte_Array";
         } else if (clazz.equals(ByteTag.class)) {
             return "TAG_Byte";
-        } else if (CompoundTag.class.isAssignableFrom(clazz)) {
+        } else if (clazz.equals(CompoundTag.class)) {
             return "TAG_Compound";
         } else if (clazz.equals(DoubleTag.class)) {
             return "TAG_Double";
@@ -85,36 +88,10 @@ public final class NBTUtils {
      * @throws IllegalArgumentException if the tag class is invalid.
      */
     public static int getTypeCode(Class<? extends Tag> clazz) {
-        if (clazz.equals(ByteArrayTag.class)) {
-            return NBTConstants.TYPE_BYTE_ARRAY;
-        } else if (clazz.equals(ByteTag.class)) {
-            return NBTConstants.TYPE_BYTE;
-        } else if (CompoundTag.class.isAssignableFrom(clazz)) {
-            return NBTConstants.TYPE_COMPOUND;
-        } else if (clazz.equals(DoubleTag.class)) {
-            return NBTConstants.TYPE_DOUBLE;
-        } else if (clazz.equals(EndTag.class)) {
-            return NBTConstants.TYPE_END;
-        } else if (clazz.equals(FloatTag.class)) {
-            return NBTConstants.TYPE_FLOAT;
-        } else if (clazz.equals(IntTag.class)) {
-            return NBTConstants.TYPE_INT;
-        } else if (clazz.equals(ListTag.class)) {
-            return NBTConstants.TYPE_LIST;
-        } else if (clazz.equals(LongTag.class)) {
-            return NBTConstants.TYPE_LONG;
-        } else if (clazz.equals(ShortTag.class)) {
-            return NBTConstants.TYPE_SHORT;
-        } else if (clazz.equals(StringTag.class)) {
-            return NBTConstants.TYPE_STRING;
-        } else if (clazz.equals(IntArrayTag.class)) {
-            return NBTConstants.TYPE_INT_ARRAY;
-        } else if (clazz.equals(LongArrayTag.class)) {
-            return NBTConstants.TYPE_LONG_ARRAY;
-        } else {
-            throw new IllegalArgumentException("Invalid tag class ("
-                    + clazz.getName() + ").");
+        if (LazyCompoundTag.class.isAssignableFrom(clazz)) {
+            return BinaryTagTypes.COMPOUND.id();
         }
+        return AdventureNBTConverter.getAdventureType(clazz).id();
     }
 
     /**
@@ -154,7 +131,7 @@ public final class NBTUtils {
                 return LongArrayTag.class;
             default:
                 throw new IllegalArgumentException("Invalid tag type : " + type
-                    + ".");
+                        + ".");
         }
     }
 
@@ -175,13 +152,14 @@ public final class NBTUtils {
     /**
      * Get child tag of a NBT structure.
      *
-     * @param items the map to read from
-     * @param key the key to look for
+     * @param items    the map to read from
+     * @param key      the key to look for
      * @param expected the expected NBT class type
      * @return child tag
      * @throws InvalidFormatException if the format of the items is invalid
      */
-    public static <T extends Tag> T getChildTag(Map<String, Tag> items, String key, Class<T> expected) throws InvalidFormatException {
+    public static <T extends Tag> T getChildTag(Map<String, Tag> items, String key, Class<T> expected) throws
+            InvalidFormatException {
         if (!items.containsKey(key)) {
             throw new InvalidFormatException("Missing a \"" + key + "\" tag");
         }

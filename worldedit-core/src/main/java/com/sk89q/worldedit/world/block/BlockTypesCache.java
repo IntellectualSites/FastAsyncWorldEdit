@@ -1,13 +1,15 @@
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.util.MathMan;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.world.block.BlockID;
 import com.google.common.primitives.Booleans;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.Registries;
@@ -18,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -25,15 +28,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class BlockTypesCache {
+
     /*
      -----------------------------------------------------
                     Settings
      -----------------------------------------------------
      */
     protected static final class Settings {
+
         protected final int internalId;
         protected final BlockState defaultState;
         protected final AbstractProperty<?>[] propertiesMapArr;
@@ -54,23 +57,25 @@ public class BlockTypesCache {
             }
 
             int maxInternalStateId = 0;
-            Map<String, ? extends Property<?>> properties = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getProperties(type);
+            Map<String, ? extends Property<?>> properties = WorldEdit.getInstance().getPlatformManager().queryCapability(
+                    Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getProperties(type);
             if (!properties.isEmpty()) {
                 // Ensure the properties are registered
                 int maxOrdinal = 0;
                 for (String key : properties.keySet()) {
-                    maxOrdinal = Math.max(PropertyKey.getOrCreate(key).ordinal(), maxOrdinal);
+                    maxOrdinal = Math.max(PropertyKey.getOrCreate(key).getId(), maxOrdinal);
                 }
                 this.propertiesMapArr = new AbstractProperty[maxOrdinal + 1];
                 int prop_arr_i = 0;
                 this.propertiesArr = new AbstractProperty[properties.size()];
-                HashMap<String, AbstractProperty<?>> propMap = new HashMap<>();
+                // Preserve properties order with LinkedHashMap
+                HashMap<String, AbstractProperty<?>> propMap = new LinkedHashMap<>();
 
                 int bitOffset = 0;
                 for (Map.Entry<String, ? extends Property<?>> entry : properties.entrySet()) {
                     PropertyKey key = PropertyKey.getOrCreate(entry.getKey());
                     AbstractProperty<?> property = ((AbstractProperty) entry.getValue()).withOffset(bitOffset);
-                    this.propertiesMapArr[key.ordinal()] = property;
+                    this.propertiesMapArr[key.getId()] = property;
                     this.propertiesArr[prop_arr_i++] = property;
                     propMap.put(entry.getKey(), property);
 
@@ -89,7 +94,13 @@ public class BlockTypesCache {
             }
             this.permutations = maxInternalStateId;
 
-            this.blockMaterial = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(type);
+            this.blockMaterial = WorldEdit
+                    .getInstance()
+                    .getPlatformManager()
+                    .queryCapability(Capability.GAME_HOOKS)
+                    .getRegistries()
+                    .getBlockRegistry()
+                    .getMaterial(type);
 
             if (!propertiesList.isEmpty()) {
                 this.stateOrdinals = generateStateOrdinals(internalId, states.size(), maxInternalStateId, propertiesList);
@@ -98,7 +109,14 @@ public class BlockTypesCache {
                     int ordinal = this.stateOrdinals[propId];
                     if (ordinal != -1) {
                         int stateId = internalId + (propId << BIT_OFFSET);
-                        BlockState state = new BlockState(type, stateId, ordinal);
+                        CompoundTag defaultNBT = blockMaterial.getDefaultTile();
+                        BlockState state = defaultNBT != null ? new BlockState(
+                                type,
+                                stateId,
+                                ordinal,
+                                blockMaterial.getDefaultTile()
+                        ) :
+                                new BlockState(type, stateId, ordinal);
                         states.add(state);
                     }
                 }
@@ -106,7 +124,14 @@ public class BlockTypesCache {
 
                 this.defaultState = states.get(this.stateOrdinals[defaultPropId]);
             } else {
-                this.defaultState = new BlockState(type, internalId, states.size());
+                CompoundTag defaultNBT = blockMaterial.getDefaultTile();
+                this.defaultState = defaultNBT != null ? new BlockState(
+                        type,
+                        internalId,
+                        states.size(),
+                        blockMaterial.getDefaultTile()
+                ) :
+                        new BlockState(type, internalId, states.size());
                 states.add(this.defaultState);
             }
         }
@@ -122,6 +147,7 @@ public class BlockTypesCache {
             }
             return id;
         }
+
     }
 
 
@@ -186,7 +212,9 @@ public class BlockTypesCache {
             Registries registries = platform.getRegistries();
             BlockRegistry blockReg = registries.getBlockRegistry();
             Collection<String> blocks = blockReg.values();
-            Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']' ? item.substring(0, item.indexOf('[')) : item, item -> item));
+            Map<String, String> blockMap = blocks.stream().collect(Collectors.toMap(item -> item.charAt(item.length() - 1) == ']'
+                    ? item.substring(0, item.indexOf('['))
+                    : item, item -> item));
 
             int size = blockMap.size() + 1;
             Field[] idFields = BlockID.class.getDeclaredFields();
@@ -205,7 +233,6 @@ public class BlockTypesCache {
                     String defaultState = blockMap.remove(id);
                     if (defaultState == null) {
                         if (internalId != 0) {
-                            getLogger(BlockTypesCache.class).info("Ignoring invalid block {}", id);
                             continue;
                         }
                         defaultState = id;
@@ -225,7 +252,6 @@ public class BlockTypesCache {
                     String defaultState = entry.getValue();
                     // Skip already registered ids
                     for (; values[internalId] != null; internalId++) {
-                        ;
                     }
                     BlockType type = register(defaultState, internalId, stateList, tickList);
                     values[internalId] = type;
@@ -260,4 +286,5 @@ public class BlockTypesCache {
         $NAMESPACES.add(nameSpace);
         return existing;
     }
+
 }

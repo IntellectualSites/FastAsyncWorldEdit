@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.input;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -47,7 +48,9 @@ public class ParserContext {
     private boolean restricted = true;
     private boolean tryLegacy = true;
     private boolean preferringWildcard;
+    //Fawe start
     private InjectedValueAccess injected;
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -156,7 +159,7 @@ public class ParserContext {
     public Extent requireExtent() throws InputParseException {
         Extent extent = getExtent();
         if (extent == null) {
-            throw new InputParseException("No Extent is known");
+            throw new InputParseException(Caption.of("worldedit.error.missing-extent"));
         }
         return extent;
     }
@@ -170,7 +173,7 @@ public class ParserContext {
     public LocalSession requireSession() throws InputParseException {
         LocalSession session = getSession();
         if (session == null) {
-            throw new InputParseException("No LocalSession is known");
+            throw new InputParseException(Caption.of("worldedit.error.missing-session"));
         }
         return session;
     }
@@ -184,7 +187,7 @@ public class ParserContext {
     public World requireWorld() throws InputParseException {
         World world = getWorld();
         if (world == null) {
-            throw new InputParseException("No world is known");
+            throw new InputParseException(Caption.of("worldedit.error.missing-world"));
         }
         return world;
     }
@@ -198,7 +201,7 @@ public class ParserContext {
     public Actor requireActor() throws InputParseException {
         Actor actor = getActor();
         if (actor == null) {
-            throw new InputParseException("No actor is known");
+            throw new InputParseException(Caption.of("worldedit.error.missing-actor"));
         }
         return actor;
     }
@@ -259,6 +262,7 @@ public class ParserContext {
         return tryLegacy;
     }
 
+    //FAWE start
     public void setInjected(InjectedValueAccess injected) {
         this.injected = injected;
     }
@@ -266,4 +270,5 @@ public class ParserContext {
     public InjectedValueAccess getInjected() {
         return injected;
     }
+    //FAWE end
 }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -33,7 +34,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionOperationException;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
@@ -54,31 +54,33 @@ import static com.sk89q.worldedit.internal.command.CommandUtil.requireIV;
 @CommandContainer
 public class ExpandCommands {
 
-    public static void register(CommandRegistrationHandler registration,
-                                CommandManager commandManager,
-                                CommandManagerService commandManagerService) {
+    public static void register(
+            CommandRegistrationHandler registration,
+            CommandManager commandManager,
+            CommandManagerService commandManagerService
+    ) {
         // Collect the general expand command
         CommandManager collect = commandManagerService.newCommandManager();
 
         registration.register(
-            collect,
-            ExpandCommandsRegistration.builder(),
-            new ExpandCommands()
+                collect,
+                ExpandCommandsRegistration.builder(),
+                new ExpandCommands()
         );
 
         Command expandBaseCommand = collect.getCommand("/expand")
-            .orElseThrow(() -> new IllegalStateException("No /expand command"));
+                .orElseThrow(() -> new IllegalStateException("No /expand command"));
 
         commandManager.register("/expand", command -> {
             command.condition(new PermissionCondition(ImmutableSet.of("worldedit.selection.expand")));
 
             command.addPart(SubCommandPart.builder(
-                TranslatableComponent.of("vert"),
-                TextComponent.of("Vertical expansion sub-command")
+                    Caption.of("vert"),
+                    TextComponent.of("Vertical expansion sub-command")
             )
-                .withCommands(ImmutableSet.of(createVertCommand(commandManager)))
-                .optional()
-                .build());
+                    .withCommands(ImmutableSet.of(createVertCommand(commandManager)))
+                    .optional()
+                    .build());
 
             command.addParts(expandBaseCommand.getParts());
             command.action(expandBaseCommand.getAction());
@@ -88,16 +90,16 @@ public class ExpandCommands {
 
     private static Command createVertCommand(CommandManager commandManager) {
         return commandManager.newCommand("vert")
-            .description(TranslatableComponent.of("worldedit.expand.description.vert"))
-            .action(parameters -> {
-                expandVert(
-                    requireIV(Key.of(LocalSession.class), "localSession", parameters),
-                    requireIV(Key.of(Actor.class), "actor", parameters),
-                    requireIV(Key.of(World.class), "world", parameters)
-                );
-                return 1;
-            })
-            .build();
+                .description(Caption.of("worldedit.expand.description.vert"))
+                .action(parameters -> {
+                    expandVert(
+                            requireIV(Key.of(LocalSession.class), "localSession", parameters),
+                            requireIV(Key.of(Actor.class), "actor", parameters),
+                            requireIV(Key.of(World.class), "world", parameters)
+                    );
+                    return 1;
+                })
+                .build();
     }
 
     private static void expandVert(LocalSession session, Actor actor, World world) throws IncompleteRegionException {
@@ -105,14 +107,15 @@ public class ExpandCommands {
         try {
             long oldSize = region.getVolume();
             region.expand(
-                BlockVector3.at(0, (world.getMaxY() + 1), 0),
-                BlockVector3.at(0, -(world.getMaxY() + 1), 0));
+                    BlockVector3.at(0, (world.getMaxY() + 1), 0),
+                    BlockVector3.at(0, -(world.getMaxY() + 1), 0)
+            );
             session.getRegionSelector(world).learnChanges();
             long newSize = region.getVolume();
             session.getRegionSelector(world).explainRegionAdjust(actor, session);
             long changeSize = newSize - oldSize;
-            actor.printInfo(
-                    TranslatableComponent.of("worldedit.expand.expanded.vert", TextComponent.of(changeSize))
+            actor.print(
+                    Caption.of("worldedit.expand.expanded.vert", TextComponent.of(changeSize))
             );
         } catch (RegionOperationException e) {
             actor.printError(TextComponent.of(e.getMessage()));
@@ -120,18 +123,20 @@ public class ExpandCommands {
     }
 
     @org.enginehub.piston.annotation.Command(
-        name = "/expand",
-        desc = "Expand the selection area"
+            name = "/expand",
+            desc = "Expand the selection area"
     )
     @Logging(REGION)
-    public void expand(Actor actor, World world, LocalSession session,
-                       @Arg(desc = "Amount to expand the selection by, can be `vert` to expand to the whole vertical column")
-                           int amount,
-                       @Arg(desc = "Amount to expand the selection by in the other direction", def = "0")
-                           int reverseAmount,
-                       @Arg(desc = "Direction to expand", def = Direction.AIM)
-                       @MultiDirection
-                           List<BlockVector3> direction) throws WorldEditException {
+    public void expand(
+            Actor actor, World world, LocalSession session,
+            @Arg(desc = "Amount to expand the selection by, can be `vert` to expand to the whole vertical column")
+                    int amount,
+            @Arg(desc = "Amount to expand the selection by in the other direction", def = "0")
+                    int reverseAmount,
+            @Arg(desc = "Direction to expand", def = Direction.AIM)
+            @MultiDirection
+                    List<BlockVector3> direction
+    ) throws WorldEditException {
         Region region = session.getSelection(world);
         long oldSize = region.getVolume();
 
@@ -151,7 +156,7 @@ public class ExpandCommands {
         session.getRegionSelector(world).explainRegionAdjust(actor, session);
 
         long changeSize = newSize - oldSize;
-        actor.printInfo(TranslatableComponent.of("worldedit.expand.expanded", TextComponent.of(changeSize)));
+        actor.print(Caption.of("worldedit.expand.expanded", TextComponent.of(changeSize)));
     }
 
 }

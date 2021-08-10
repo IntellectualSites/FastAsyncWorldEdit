@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -34,16 +35,15 @@ import com.sk89q.worldedit.regions.polyhedron.Triangle;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -71,10 +71,12 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         region = new ConvexPolyhedralRegion(world);
     }
 
+    //FAWE start
     public ConvexPolyhedralRegionSelector(ConvexPolyhedralRegion region) {
         checkNotNull(region);
         this.region = region;
     }
+    //FAWE end
 
     /**
      * Create a new selector.
@@ -192,8 +194,8 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     public List<Component> getSelectionInfoLines() {
         List<Component> ret = new ArrayList<>();
 
-        ret.add(TranslatableComponent.of("worldedit.selection.convex.info.vertices", TextComponent.of(region.getVertices().size())));
-        ret.add(TranslatableComponent.of("worldedit.selection.convex.info.triangles", TextComponent.of(region.getTriangles().size())));
+        ret.add(Caption.of("worldedit.selection.convex.info.vertices", TextComponent.of(region.getVertices().size())));
+        ret.add(Caption.of("worldedit.selection.convex.info.triangles", TextComponent.of(region.getTriangles().size())));
 
         return ret;
     }
@@ -206,7 +208,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
         session.describeCUI(player);
 
-        player.printInfo(TranslatableComponent.of("worldedit.selection.convex.explain.primary", TextComponent.of(pos.toString())));
+        player.print(Caption.of("worldedit.selection.convex.explain.primary", TextComponent.of(pos.toString())));
     }
 
     @Override
@@ -217,7 +219,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
 
         session.describeCUI(player);
 
-        player.printInfo(TranslatableComponent.of("worldedit.selection.convex.explain.secondary", TextComponent.of(pos.toString())));
+        player.print(Caption.of("worldedit.selection.convex.explain.secondary", TextComponent.of(pos.toString())));
     }
 
     @Override
@@ -277,8 +279,10 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         }
     }
 
+    //FAWE start
     @Override
     public List<BlockVector3> getVertices() {
         return new ArrayList<>(region.getVertices());
     }
+    //FAWE end
 }

@@ -48,8 +48,8 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
      * the folder to not look into a subdirectory.
      *
      * @param zipFile the ZIP file
-     * @param folder the folder to look into
-     * @throws IOException if there is an error opening the zip
+     * @param folder  the folder to look into
+     * @throws IOException  if there is an error opening the zip
      * @throws ZipException if there is an error opening the zip
      */
     public TrueZipMcRegionChunkStore(File zipFile, String folder) throws IOException, ZipException {
@@ -64,7 +64,7 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
      * be detected.
      *
      * @param zipFile the ZIP file
-     * @throws IOException if there is an error opening the zip
+     * @throws IOException  if there is an error opening the zip
      * @throws ZipException if there is an error opening the zip
      */
     public TrueZipMcRegionChunkStore(File zipFile) throws IOException, ZipException {
@@ -76,10 +76,10 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
     /**
      * Get the input stream for a chunk file.
      *
-     * @param name the name
+     * @param name      the name
      * @param worldName the world name
      * @return an input stream
-     * @throws IOException if there is an error getting the chunk data
+     * @throws IOException   if there is an error getting the chunk data
      * @throws DataException if there is an error getting the chunk data
      */
     @Override

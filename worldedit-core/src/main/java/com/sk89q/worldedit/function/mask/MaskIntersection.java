@@ -19,8 +19,11 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,10 +37,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Combines several masks and requires that all masks return true
@@ -46,9 +47,13 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 public class MaskIntersection extends AbstractMask {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     protected final Set<Mask> masks;
+    //FAWE start
     protected Mask[] masksArray;
     protected boolean defaultReturn;
+    //FAWE end
 
     /**
      * Create a new intersection.
@@ -58,9 +63,12 @@ public class MaskIntersection extends AbstractMask {
     public MaskIntersection(Collection<Mask> masks) {
         checkNotNull(masks);
         this.masks = new LinkedHashSet<>(masks);
+        //FAWE start
         formArray();
+        //FAWE end
     }
 
+    //FAWE start
     public static Mask of(Mask... masks) {
         Set<Mask> set = new LinkedHashSet<>();
         for (Mask mask : masks) {
@@ -81,9 +89,10 @@ public class MaskIntersection extends AbstractMask {
             case 1:
                 return set.iterator().next();
             default:
-                return new MaskIntersection(masks).optimize();
+                return new MaskIntersection(set).optimize();
         }
     }
+    //FAWE end
 
     /**
      * Create a new intersection.
@@ -94,6 +103,7 @@ public class MaskIntersection extends AbstractMask {
         this(Arrays.asList(checkNotNull(mask)));
     }
 
+    //FAWE start
     private void formArray() {
         if (masks.isEmpty()) {
             masksArray = new Mask[]{Masks.alwaysFalse()};
@@ -160,9 +170,9 @@ public class MaskIntersection extends AbstractMask {
         while (combineMasks(pairingFunction(), failedCombines) && --maxIteration > 0);
 
         if (maxIteration == 0) {
-            getLogger(MaskIntersection.class).error("Failed optimize MaskIntersection");
+            LOGGER.error("Failed optimize MaskIntersection");
             for (Mask mask : masks) {
-                getLogger(MaskIntersection.class).error(mask.getClass() + " / " + mask);
+                LOGGER.error(mask.getClass() + " / " + mask);
             }
         }
         // Return result
@@ -209,6 +219,7 @@ public class MaskIntersection extends AbstractMask {
         }
         return hasOptimized;
     }
+    //FAWE end
 
     /**
      * Add some masks to the list.
@@ -218,7 +229,9 @@ public class MaskIntersection extends AbstractMask {
     public void add(Collection<Mask> masks) {
         checkNotNull(masks);
         this.masks.addAll(masks);
+        //FAWE start
         formArray();
+        //FAWE end
     }
 
     /**
@@ -239,6 +252,7 @@ public class MaskIntersection extends AbstractMask {
         return masks;
     }
 
+    //FAWE start
     public final Mask[] getMasksArray() {
         return masksArray;
     }
@@ -246,13 +260,14 @@ public class MaskIntersection extends AbstractMask {
     @Override
     public boolean test(BlockVector3 vector) {
         for (Mask mask : masksArray) {
-            if (!mask.test( vector)) {
+            if (!mask.test(vector)) {
                 return false;
             }
         }
 
         return defaultReturn;
     }
+    //FAWE end
 
     @Nullable
     @Override
@@ -269,10 +284,22 @@ public class MaskIntersection extends AbstractMask {
         return new MaskIntersection2D(mask2dList);
     }
 
+    //FAWE start
     @Override
-    public Mask copy(){
+    public Mask copy() {
         Set<Mask> masks = this.masks.stream().map(Mask::copy).collect(Collectors.toSet());
         return new MaskIntersection(masks);
     }
+
+    @Override
+    public boolean replacesAir() {
+        for (Mask mask : masksArray) {
+            if (mask.replacesAir()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    //FAWE end
 
 }

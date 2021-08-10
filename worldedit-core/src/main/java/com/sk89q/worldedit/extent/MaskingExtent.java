@@ -19,19 +19,19 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.boydti.fawe.FaweCache;
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IBatchProcessor;
-import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.filter.block.CharFilterBlock;
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
-import com.boydti.fawe.beta.implementation.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -47,27 +47,33 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MaskingExtent extends AbstractDelegateExtent implements IBatchProcessor, Filter {
 
     private Mask mask;
+    //FAWE start
     private final LoadingCache<Long, ChunkFilterBlock> threadIdToFilter;
+    //FAWE end
 
     /**
      * Create a new instance.
      *
      * @param extent the extent
-     * @param mask the mask
+     * @param mask   the mask
      */
     public MaskingExtent(Extent extent, Mask mask) {
         super(extent);
         checkNotNull(mask);
         this.mask = mask;
+        //FAWE start
         this.threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
+        //FAWE end
     }
 
+    //FAWE start
     private MaskingExtent(Extent extent, Mask mask, LoadingCache<Long, ChunkFilterBlock> threadIdToFilter) {
         super(extent);
         checkNotNull(mask);
         this.mask = mask;
         this.threadIdToFilter = threadIdToFilter;
     }
+    //FAWE end
 
     /**
      * Get the mask.
@@ -88,14 +94,10 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
         this.mask = mask;
     }
 
+    //FAWE start
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block) throws WorldEditException {
         return this.mask.test(location) && super.setBlock(location, block);
-    }
-
-    @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
-        return this.mask.test(position.toBlockVector3()) && super.setBiome(position, biome);
     }
 
     @Override
@@ -134,4 +136,10 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     public Filter fork() {
         return new MaskingExtent(getExtent(), this.mask.copy(), this.threadIdToFilter);
     }
+
+    @Override
+    public ProcessorScope getScope() {
+        return ProcessorScope.REMOVING_BLOCKS;
+    }
+    //FAWE end
 }

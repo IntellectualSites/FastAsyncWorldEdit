@@ -25,6 +25,7 @@ package com.sk89q.worldedit.internal.expression;
 public interface LocalSlot {
 
     final class Constant implements LocalSlot {
+
         private final double value;
 
         public Constant(double value) {
@@ -40,9 +41,11 @@ public interface LocalSlot {
         public String toString() {
             return String.valueOf(value);
         }
+
     }
 
     final class Variable implements LocalSlot {
+
         private double value;
 
         public Variable(double value) {
@@ -62,6 +65,7 @@ public interface LocalSlot {
         public String toString() {
             return String.valueOf(value);
         }
+
     }
 
     double getValue();

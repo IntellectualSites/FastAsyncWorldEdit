@@ -19,8 +19,8 @@
 
 package com.sk89q.jnbt;
 
-import com.boydti.fawe.jnbt.streamer.StreamDelegate;
-import com.boydti.fawe.jnbt.streamer.ValueReader;
+import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
+import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -42,7 +42,10 @@ import java.util.Map;
  * found at <a href="https://minecraft.gamepedia.com/NBT_format">
  * https://minecraft.gamepedia.com/NBT_format</a>.
  * </p>
+ *
+ * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
+@Deprecated(forRemoval = true)
 public final class NBTInputStream implements Closeable {
 
     private final DataInputStream is;
@@ -59,6 +62,14 @@ public final class NBTInputStream implements Closeable {
 
     public NBTInputStream(DataInputStream dis) {
         this.is = dis;
+    }
+
+    public void mark(int mark) {
+        is.mark(mark);
+    }
+
+    public void reset() throws IOException {
+        is.reset();
     }
 
     /**
@@ -99,7 +110,7 @@ public final class NBTInputStream implements Closeable {
             if (child != null) {
                 child.acceptRoot(this, type, 0);
             } else {
-                readTagPaylodLazy(type, 0);
+                readTagPayloadLazy(type, 0);
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -119,7 +130,7 @@ public final class NBTInputStream implements Closeable {
 
     private byte[] buf;
 
-    public void readTagPaylodLazy(int type, int depth) throws IOException {
+    public void readTagPayloadLazy(int type, int depth) throws IOException {
         switch (type) {
             case NBTConstants.TYPE_END:
                 return;
@@ -152,20 +163,20 @@ public final class NBTInputStream implements Closeable {
                 int childType = is.readByte();
                 length = is.readInt();
                 for (int i = 0; i < length; ++i) {
-                    readTagPaylodLazy(childType, depth + 1);
+                    readTagPayloadLazy(childType, depth + 1);
                 }
                 return;
             }
             case NBTConstants.TYPE_COMPOUND: {
                 // readDataPayload
                 depth++;
-                while(true) {
+                while (true) {
                     int childType = is.readByte();
                     if (childType == NBTConstants.TYPE_END) {
                         return;
                     }
                     is.skipBytes(is.readShort() & 0xFFFF);
-                    readTagPaylodLazy(childType, depth + 1);
+                    readTagPayloadLazy(childType, depth + 1);
                 }
             }
             case NBTConstants.TYPE_INT_ARRAY: {
@@ -181,7 +192,7 @@ public final class NBTInputStream implements Closeable {
         }
     }
 
-    public void readTagPaylodLazy(int type, int depth, StreamDelegate scope) throws IOException {
+    public void readTagPayloadLazy(int type, int depth, StreamDelegate scope) throws IOException {
         switch (type) {
             case NBTConstants.TYPE_END:
                 return;
@@ -293,11 +304,11 @@ public final class NBTInputStream implements Closeable {
                 child = scope.get0();
                 if (child == null) {
                     for (int i = 0; i < length; ++i) {
-                        readTagPaylodLazy(childType, depth + 1);
+                        readTagPayloadLazy(childType, depth + 1);
                     }
                 } else {
                     for (int i = 0; i < length; ++i) {
-                        readTagPaylodLazy(childType, depth + 1, child);
+                        readTagPayloadLazy(childType, depth + 1, child);
                     }
                 }
                 return;
@@ -323,16 +334,16 @@ public final class NBTInputStream implements Closeable {
                         valueReader.apply(i, entry);
                     }
                 }
-                while(true) {
+                while (true) {
                     int childType = is.readByte();
                     if (childType == NBTConstants.TYPE_END) {
                         return;
                     }
                     StreamDelegate child = scope.get(is);
                     if (child == null) {
-                        readTagPaylodLazy(childType, depth + 1);
+                        readTagPayloadLazy(childType, depth + 1);
                     } else {
-                        readTagPaylodLazy(childType, depth + 1, child);
+                        readTagPayloadLazy(childType, depth + 1, child);
                     }
                 }
             }
@@ -554,7 +565,7 @@ public final class NBTInputStream implements Closeable {
     /**
      * Reads the payload of a tag given the type.
      *
-     * @param type the type
+     * @param type  the type
      * @param depth the depth
      * @return the tag
      * @throws IOException if an I/O error occurs.
@@ -564,7 +575,7 @@ public final class NBTInputStream implements Closeable {
             case NBTConstants.TYPE_END:
                 if (depth == 0) {
                     throw new IOException(
-                        "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+                            "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
                     return new EndTag();
                 }

@@ -44,9 +44,10 @@ public interface LayerFunction {
      * a {@link LayerVisitor} was used.</p>
      *
      * @param position the position
-     * @param depth the depth as a number starting from 0
+     * @param depth    the depth as a number starting from 0
      * @return true whether this method should be called for further layers
      * @throws WorldEditException thrown on an error
      */
     boolean apply(BlockVector3 position, int depth) throws WorldEditException;
+
 }

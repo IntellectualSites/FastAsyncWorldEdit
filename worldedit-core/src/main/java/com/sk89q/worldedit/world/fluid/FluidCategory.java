@@ -45,4 +45,5 @@ public class FluidCategory extends Category<FluidType> implements Keyed {
 //                .queryCapability(Capability.GAME_HOOKS).getRegistries()
 //                .getBlockCategoryRegistry().getCategorisedByName(this.id);
     }
+
 }

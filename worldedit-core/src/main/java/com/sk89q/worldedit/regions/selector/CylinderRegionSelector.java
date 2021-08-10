@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -36,13 +37,14 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -53,6 +55,8 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
     protected static final transient NumberFormat NUMBER_FORMAT;
     protected transient CylinderRegion region;
+    protected transient boolean selectedCenter;
+    protected transient boolean selectedRadius;
 
     static {
         NUMBER_FORMAT = (NumberFormat) NumberFormat.getInstance().clone();
@@ -66,10 +70,12 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         this((World) null);
     }
 
+    //FAWE start
     public CylinderRegionSelector(CylinderRegion region) {
         checkNotNull(region);
         this.region = region;
     }
+    //FAWE end
 
     /**
      * Create a new region selector.
@@ -92,6 +98,8 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
             final CylinderRegionSelector cylSelector = (CylinderRegionSelector) oldSelector;
 
             region = new CylinderRegion(cylSelector.region);
+            selectedCenter = cylSelector.selectedCenter;
+            selectedRadius = cylSelector.selectedRadius;
         } else {
             final Region oldRegion;
             try {
@@ -109,17 +117,20 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
             region.setMaximumY(Math.max(pos1.getBlockY(), pos2.getBlockY()));
             region.setMinimumY(Math.min(pos1.getBlockY(), pos2.getBlockY()));
+
+            selectedCenter = true;
+            selectedRadius = true;
         }
     }
 
     /**
      * Create a new selector.
      *
-     * @param world the world
+     * @param world  the world
      * @param center the center
      * @param radius the radius
-     * @param minY the minimum Y
-     * @param maxY the maximum Y
+     * @param minY   the minimum Y
+     * @param maxY   the maximum Y
      */
     public CylinderRegionSelector(@Nullable World world, BlockVector2 center, Vector2 radius, int minY, int maxY) {
         this(world);
@@ -129,6 +140,9 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
         region.setMinimumY(Math.min(minY, maxY));
         region.setMaximumY(Math.max(minY, maxY));
+
+        selectedCenter = true;
+        selectedRadius = true;
     }
 
     @Nullable
@@ -144,7 +158,7 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public boolean selectPrimary(BlockVector3 position, SelectorLimits limits) {
-        if (!region.getCenter().equals(Vector3.ZERO) && position.equals(region.getCenter().toBlockPoint())) {
+        if (selectedCenter && position.equals(region.getCenter().toBlockPoint()) && !selectedRadius) {
             return false;
         }
 
@@ -152,45 +166,47 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         region.setCenter(position.toBlockVector2());
         region.setY(position.getBlockY());
 
+        selectedCenter = true;
+        selectedRadius = false;
+
         return true;
     }
 
     @Override
     public boolean selectSecondary(BlockVector3 position, SelectorLimits limits) {
-        Vector3 center = region.getCenter();
-        if (center.equals(Vector3.ZERO)) {
+        if (!selectedCenter) {
             return true;
         }
 
-        final Vector2 diff = position.toVector3().subtract(center).toVector2();
+        final Vector2 diff = position.toVector3().subtract(region.getCenter()).toVector2();
         final Vector2 minRadius = diff.getMaximum(diff.multiply(-1.0));
         region.extendRadius(minRadius);
 
         region.setY(position.getBlockY());
+
+        selectedRadius = true;
 
         return true;
     }
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.printInfo(TranslatableComponent.of("worldedit.selection.cylinder.explain.primary", TextComponent.of(pos.toString())));
+        player.print(Caption.of("worldedit.selection.cylinder.explain.primary", TextComponent.of(pos.toString())));
 
         session.describeCUI(player);
     }
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        Vector3 center = region.getCenter();
-
-        if (!center.equals(Vector3.ZERO)) {
-            player.printInfo(TranslatableComponent.of(
+        if (selectedCenter) {
+            player.print(Caption.of(
                     "worldedit.selection.cylinder.explain.secondary",
                     TextComponent.of(NUMBER_FORMAT.format(region.getRadius().getX())),
                     TextComponent.of(NUMBER_FORMAT.format(region.getRadius().getZ())),
                     TextComponent.of(region.getVolume())
             ));
         } else {
-            player.printError(TranslatableComponent.of("worldedit.selection.cylinder.explain.secondary-missing"));
+            player.print(Caption.of("worldedit.selection.cylinder.explain.secondary-missing"));
             return;
         }
 
@@ -227,7 +243,8 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public boolean isDefined() {
-        return !region.getRadius().equals(Vector2.ZERO);
+        // selectedCenter is implied by selectedRadius
+        return selectedRadius;
     }
 
     @Override
@@ -249,10 +266,13 @@ public class CylinderRegionSelector implements RegionSelector, CUIRegion {
         final List<Component> lines = new ArrayList<>();
 
         if (!region.getCenter().equals(Vector3.ZERO)) {
-            lines.add(TranslatableComponent.of("worldedit.selection.cylinder.info.center", TextComponent.of(region.getCenter().toString())));
+            Vector3 center = region.getCenter();
+            lines.add(Caption.of("worldedit.selection.cylinder.info.center", TextComponent.of(center.toString())
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.COPY_TO_CLIPBOARD, center.toParserString()))
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to copy")))));
         }
         if (!region.getRadius().equals(Vector2.ZERO)) {
-            lines.add(TranslatableComponent.of("worldedit.selection.cylinder.info.radius", TextComponent.of(region.getRadius().toString())));
+            lines.add(Caption.of("worldedit.selection.cylinder.info.radius", TextComponent.of(region.getRadius().toString())));
         }
 
         return lines;

@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.world.snapshot;
 
-import com.boydti.fawe.object.collection.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -43,7 +43,9 @@ import java.util.Set;
  */
 public class SnapshotRestore {
 
+    //FAWE start - Set instead of ArrayList
     private final Map<BlockVector2, Set<BlockVector3>> neededChunks = new LinkedHashMap<>();
+    //FAWE end
     private final ChunkStore chunkStore;
     private final EditSession editSession;
     private ArrayList<BlockVector2> missingChunks;
@@ -53,9 +55,9 @@ public class SnapshotRestore {
     /**
      * Construct the snapshot restore operation.
      *
-     * @param chunkStore The {@link ChunkStore} to restore from
+     * @param chunkStore  The {@link ChunkStore} to restore from
      * @param editSession The {@link EditSession} to restore to
-     * @param region The {@link Region} to restore to
+     * @param region      The {@link Region} to restore to
      */
     public SnapshotRestore(ChunkStore chunkStore, EditSession editSession, Region region) {
         this.chunkStore = chunkStore;
@@ -129,7 +131,7 @@ public class SnapshotRestore {
     /**
      * Restores to world.
      *
-     * @throws MaxChangedBlocksException
+     * @throws MaxChangedBlocksException if the max block change limit is exceeded
      */
     public void restore() throws MaxChangedBlocksException {
 

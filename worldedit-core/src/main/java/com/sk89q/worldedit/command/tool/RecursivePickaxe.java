@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.object.mask.IdMask;
+import com.fastasyncworldedit.core.function.mask.IdMask;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -35,8 +35,8 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 
 /**
@@ -57,7 +57,14 @@ public class RecursivePickaxe implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked, @Nullable Direction face) {
+    public boolean actPrimary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         World world = (World) clicked.getExtent();
         final BlockVector3 pos = clicked.toBlockPoint();
 
@@ -75,6 +82,7 @@ public class RecursivePickaxe implements BlockTool {
         try (EditSession editSession = session.createEditSession(player, "RecursivePickaxe")) {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
 
+            //FAWE start
             final int radius = (int) range;
             final BlockReplace replace = new BlockReplace(editSession, (BlockTypes.AIR.getDefaultState()));
             editSession.setMask(null);
@@ -83,6 +91,7 @@ public class RecursivePickaxe implements BlockTool {
             //visitor.visit(pos);
             //Operations.completeBlindly(visitor);
             recurse(server, editSession, world, pos, origin, radius, initialType, visitor.getVisited());
+            //FAWE end
             editSession.flushQueue();
             session.remember(editSession);
         }
@@ -90,8 +99,10 @@ public class RecursivePickaxe implements BlockTool {
         return true;
     }
 
-    private static void recurse(Platform server, EditSession editSession, World world, BlockVector3 pos,
-            BlockVector3 origin, double size, BlockType initialType, Set<BlockVector3> visited) throws MaxChangedBlocksException {
+    private static void recurse(
+            Platform server, EditSession editSession, World world, BlockVector3 pos,
+            BlockVector3 origin, double size, BlockType initialType, Set<BlockVector3> visited
+    ) throws MaxChangedBlocksException {
 
         final double distanceSq = origin.distanceSq(pos);
         if (distanceSq > size * size || visited.contains(pos)) {
@@ -109,17 +120,23 @@ public class RecursivePickaxe implements BlockTool {
         world.queueBlockBreakEffect(server, pos, initialType, distanceSq);
 
         recurse(server, editSession, world, pos.add(1, 0, 0),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(server, editSession, world, pos.add(-1, 0, 0),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(server, editSession, world, pos.add(0, 0, 1),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(server, editSession, world, pos.add(0, 0, -1),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(server, editSession, world, pos.add(0, 1, 0),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
         recurse(server, editSession, world, pos.add(0, -1, 0),
-                origin, size, initialType, visited);
+                origin, size, initialType, visited
+        );
     }
 
 }

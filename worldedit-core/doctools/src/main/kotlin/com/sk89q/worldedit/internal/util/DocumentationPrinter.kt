@@ -149,7 +149,7 @@ class DocumentationPrinter private constructor() {
     }
 
     private fun writeHeader() {
-        cmdOutput.appendln("""
+        cmdOutput.appendLine("""
 ========
 Commands
 ========
@@ -166,7 +166,7 @@ Commands
     You can access a command listing in-game via the ``//help`` command.
 """.trim())
 
-        permsOutput.appendln("""
+        permsOutput.appendLine("""
 ===========
 Permissions
 ===========
@@ -184,11 +184,11 @@ See the :doc:`commands` page for an explanation of some of these commands.
   :header: Command, Permission
   :widths: 15, 25
 """.trim())
-        permsOutput.appendln()
+        permsOutput.appendLine()
     }
 
     private fun writeFooter() {
-        permsOutput.appendln()
+        permsOutput.appendLine()
         permsOutput.append("""
 Other Permissions
 ==================
@@ -254,10 +254,10 @@ Other Permissions
         val name = prefix + command.name
         val entries = commandTableEntries(command, parents)
 
-        cmdOutput.appendln(".. raw:: html")
-        cmdOutput.appendln()
-        cmdOutput.appendln("""    <span id="command-${linkSafe(name)}"></span>""")
-        cmdOutput.appendln()
+        cmdOutput.appendLine(".. raw:: html")
+        cmdOutput.appendLine()
+        cmdOutput.appendLine("""    <span id="command-${linkSafe(name)}"></span>""")
+        cmdOutput.appendLine()
         cmdOutput.append(".. topic:: ``$name``")
         if (!command.aliases.isEmpty()) {
             command.aliases.joinTo(cmdOutput, ", ",
@@ -265,19 +265,19 @@ Other Permissions
                     postfix = ")",
                     transform = { "``$prefix$it``" })
         }
-        cmdOutput.appendln()
-        cmdOutput.appendln("    :class: command-topic").appendln()
+        cmdOutput.appendLine()
+        cmdOutput.appendLine("    :class: command-topic").appendLine()
         CommandUtil.deprecationWarning(command).ifPresent { warning ->
-            cmdOutput.appendln("""
+            cmdOutput.appendLine("""
                 |    .. WARNING::
                 |        ${reduceToRst(warning).makeRstSafe("\n\n")}
             """.trimMargin())
         }
-        cmdOutput.appendln("""
+        cmdOutput.appendLine("""
             |    .. csv-table::
             |        :widths: 8, 15
         """.trimMargin())
-        cmdOutput.appendln()
+        cmdOutput.appendLine()
         for ((k, v) in entries) {
             val rstSafe = v.makeRstSafe("\n")
             cmdOutput.append("    ".repeat(2))
@@ -285,9 +285,9 @@ Other Permissions
                     .append(",")
                     .append('"')
                     .append(rstSafe)
-                    .append('"').appendln()
+                    .append('"').appendLine()
         }
-        cmdOutput.appendln()
+        cmdOutput.appendLine()
     }
 
     private fun String.makeRstSafe(lineJoiner: String) = trim()

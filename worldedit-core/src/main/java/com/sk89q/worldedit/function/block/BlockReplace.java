@@ -33,12 +33,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class BlockReplace implements RegionFunction {
 
     private final Extent extent;
-    private Pattern pattern;
+    private final Pattern pattern;
 
     /**
      * Create a new instance.
      *
-     * @param extent an extent
+     * @param extent  an extent
      * @param pattern a pattern
      */
     public BlockReplace(Extent extent, Pattern pattern) {
@@ -50,7 +50,7 @@ public class BlockReplace implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        return extent.setBlock(position, pattern.apply(position));
+        return extent.setBlock(position, pattern.applyBlock(position));
     }
 
 }

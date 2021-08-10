@@ -19,11 +19,12 @@
 
 package com.sk89q.worldedit;
 
+import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.function.mask.BlockMask;
-import com.sk89q.worldedit.function.mask.BlockMaskBuilder;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.io.file.ArchiveNioSupports;
 import com.sk89q.worldedit.util.logging.LogFormat;
@@ -33,8 +34,7 @@ import com.sk89q.worldedit.world.registry.LegacyMapper;
 import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 import com.sk89q.worldedit.world.snapshot.experimental.SnapshotDatabase;
 import com.sk89q.worldedit.world.snapshot.experimental.fs.FileSystemSnapshotDatabase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,7 +51,7 @@ import java.util.Set;
  */
 public abstract class LocalConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalConfiguration.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public boolean profile = false;
     public boolean traceUnflushedSessions = false;
@@ -101,7 +101,7 @@ public abstract class LocalConfiguration {
 
     protected String[] getDefaultDisallowedBlocks() {
         List<BlockType> blockTypes = Lists.newArrayList(
-                /*
+                /* FAWE start
                 BlockTypes.OAK_SAPLING,
                 BlockTypes.JUNGLE_SAPLING,
                 BlockTypes.DARK_OAK_SAPLING,
@@ -163,7 +163,7 @@ public abstract class LocalConfiguration {
                 BlockTypes.SUGAR_CANE,
                 // ores and stuff
                 BlockTypes.BEDROCK
-                */
+                FAWE end*/
         );
         return blockTypes.stream().filter(Objects::nonNull).map(BlockType::getId).toArray(String[]::new);
     }
@@ -220,8 +220,8 @@ public abstract class LocalConfiguration {
             if (experimental) {
                 try {
                     snapshotDatabase = FileSystemSnapshotDatabase.maybeCreate(
-                        Paths.get(directory),
-                        ArchiveNioSupports.combined()
+                            Paths.get(directory),
+                            ArchiveNioSupports.combined()
                     );
                     snapshotsConfigured = true;
                 } catch (IOException e) {
@@ -261,4 +261,5 @@ public abstract class LocalConfiguration {
             this.defaultLocale = TextUtils.getLocaleByMinecraftTag(localeName);
         }
     }
+
 }

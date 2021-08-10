@@ -42,4 +42,5 @@ public final class WeatherTypes {
     public static WeatherType get(final String id) {
         return WeatherType.REGISTRY.get(id);
     }
+
 }

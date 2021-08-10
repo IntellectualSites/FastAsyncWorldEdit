@@ -46,11 +46,12 @@ public class HeightConverter implements ArgumentConverter<Integer> {
     public static final String DEFAULT_VALUE = "default-vertical-height";
 
     private static final ArgumentConverter<Integer> INT_CONVERTER =
-        ArgumentConverters.get(TypeToken.of(int.class));
+            ArgumentConverters.get(TypeToken.of(int.class));
 
     public static void register(CommandManager commandManager) {
-        commandManager.registerConverter(Key.of(int.class, VertHeight.class),
-            new HeightConverter()
+        commandManager.registerConverter(
+                Key.of(int.class, VertHeight.class),
+                new HeightConverter()
         );
     }
 
@@ -66,9 +67,10 @@ public class HeightConverter implements ArgumentConverter<Integer> {
     public ConversionResult<Integer> convert(String argument, InjectedValueAccess context) {
         if (DEFAULT_VALUE.equals(argument)) {
             return SuccessfulConversion.fromSingle(
-                WorldEdit.getInstance().getConfiguration().defaultVerticalHeight
+                    WorldEdit.getInstance().getConfiguration().defaultVerticalHeight
             );
         }
         return INT_CONVERTER.convert(argument, context);
     }
+
 }

@@ -19,11 +19,13 @@
 
 package com.sk89q.worldedit.extension.factory.parser;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.jnbt.JSON2NBT;
-import com.boydti.fawe.jnbt.NBTException;
-import com.boydti.fawe.util.MathMan;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
+import com.fastasyncworldedit.core.jnbt.JSON2NBT;
+import com.fastasyncworldedit.core.jnbt.NBTException;
+import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.IncompleteRegionException;
@@ -43,11 +45,11 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
-import com.sk89q.worldedit.extent.inventory.SlottableBlockBag;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.HandSide;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockCategories;
@@ -80,12 +82,15 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             try {
                 return ((Player) actor).getBlockInHand(handSide);
             } catch (NotABlockException e) {
-                throw new InputParseException("You're not holding a block!");
+                throw new InputParseException(e.getRichMessage());
             } catch (WorldEditException e) {
-                throw new InputParseException("Unknown error occurred: " + e.getMessage(), e);
+                throw new InputParseException(Caption.of("worldedit.error.unknown", e.getRichMessage()), e);
             }
         } else {
-            throw new InputParseException("The user is not a player!");
+            throw new InputParseException(Caption.of(
+                    "worldedit.error.parser.player-only",
+                    TextComponent.of(handSide == HandSide.MAIN_HAND ? "hand" : "offhand")
+            ));
         }
     }
 
@@ -113,7 +118,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
     }
 
-    private static String[] EMPTY_STRING_ARRAY = {};
+    private static final String[] EMPTY_STRING_ARRAY = {};
 
     /**
      * Backwards compatibility for wool colours in block syntax.
@@ -166,7 +171,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
     }
 
-    private static Map<Property<?>, Object> parseProperties(BlockType type, String[] stateProperties, ParserContext context) throws NoMatchException {
+    private static Map<Property<?>, Object> parseProperties(
+            BlockType type,
+            String[] stateProperties,
+            ParserContext context
+    ) throws NoMatchException {
         Map<Property<?>, Object> blockStates = new HashMap<>();
 
         if (stateProperties.length > 0) { // Block data not yet detected
@@ -175,35 +184,53 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 try {
                     String[] parts = parseableData.split("=");
                     if (parts.length != 2) {
-                        throw new NoMatchException("Bad state format in " + parseableData);
+                        throw new InputParseException(
+                                Caption.of(
+                                        "worldedit.error.parser.bad-state-format",
+                                        TextComponent.of(parseableData)
+                                )
+                        );
                     }
 
                     @SuppressWarnings("unchecked")
                     Property<Object> propertyKey = (Property<Object>) type.getPropertyMap().get(parts[0]);
                     if (propertyKey == null) {
                         if (context.getActor() != null) {
-                            throw new NoMatchException("Unknown property " + parts[0] + " for block " + type.getId());
+                            throw new NoMatchException(Caption.of(
+                                    "worldedit.error.parser.unknown-property",
+                                    TextComponent.of(parts[0]),
+                                    TextComponent.of(type.getId())
+                            ));
                         } else {
                             WorldEdit.logger.debug("Unknown property " + parts[0] + " for block " + type.getId());
                         }
                         return Maps.newHashMap();
                     }
                     if (blockStates.containsKey(propertyKey)) {
-                        throw new NoMatchException("Duplicate property " + parts[0]);
+                        throw new InputParseException(Caption.of(
+                                "worldedit.error.parser.duplicate-property",
+                                TextComponent.of(parts[0])
+                        ));
                     }
                     Object value;
                     try {
                         value = propertyKey.getValueFor(parts[1]);
                     } catch (IllegalArgumentException e) {
-                        throw new NoMatchException("Unknown value " + parts[1] + " for state " + parts[0]);
+                        throw new NoMatchException(Caption.of(
+                                "worldedit.error.parser.unknown-value",
+                                TextComponent.of(parts[1]),
+                                TextComponent.of(propertyKey.getName())
+                        ));
                     }
 
                     blockStates.put(propertyKey, value);
                 } catch (NoMatchException e) {
                     throw e; // Pass-through
                 } catch (Exception e) {
-                    WorldEdit.logger.warn("Unknown state '" + parseableData + "'", e);
-                    throw new NoMatchException("Unknown state '" + parseableData + "'");
+                    throw new InputParseException(Caption.of(
+                            "worldedit.error.parser.bad-state-format",
+                            TextComponent.of(parseableData)
+                    ));
                 }
             }
         }
@@ -232,9 +259,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     }
 
     private BaseBlock parseLogic(String input, ParserContext context) throws InputParseException {
+        //FAWE start
         String[] blockAndExtraData = input.trim().split("\\|", 2);
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
         Map<Property<?>, Object> blockStates = new HashMap<>();
+        //FAWE end
 
         BlockState state = null;
 
@@ -243,14 +272,15 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             try {
                 String[] split = blockAndExtraData[0].split(":", 2);
                 if (split.length == 0) {
-                    throw new InputParseException("Invalid colon.");
+                    throw new InputParseException(Caption.of("worldedit.error.parser.invalid-colon"));
                 } else if (split.length == 1) {
                     state = LegacyMapper.getInstance().getBlockFromLegacy(Integer.parseInt(split[0]));
                 } else if (MathMan.isInteger(split[0])) {
                     int id = Integer.parseInt(split[0]);
                     int data = Integer.parseInt(split[1]);
+                    //FAWE start
                     if (data < 0 || data >= 16) {
-                        throw new InputParseException("Invalid data " + data);
+                        throw new InputParseException(Caption.of("fawe.error.parser.invalid-data", TextComponent.of(data)));
                     }
                     state = LegacyMapper.getInstance().getBlockFromLegacy(id, data);
                 } else {
@@ -258,7 +288,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     if (type != null) {
                         int data = Integer.parseInt(split[1]);
                         if (data < 0 || data >= 16) {
-                            throw new InputParseException("Invalid data " + data);
+                            throw new InputParseException(Caption.of("fawe.error.parser.invalid-data", TextComponent.of(data)));
                         }
                         state = LegacyMapper.getInstance().getBlockFromLegacy(type.getLegacyCombinedId() >> 4, data);
                     }
@@ -268,6 +298,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
 
         CompoundTag nbt = null;
+        //FAWE end
         if (state == null) {
             String typeString;
             String stateString = null;
@@ -277,11 +308,14 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             } else {
                 typeString = blockAndExtraData[0].substring(0, stateStart);
                 if (stateStart + 1 >= blockAndExtraData[0].length()) {
-                    throw new InputParseException("Invalid format. Hanging bracket @ " + stateStart + ".");
+                    throw new InputParseException(Caption.of(
+                            "worldedit.error.parser.hanging-lbracket",
+                            TextComponent.of(stateStart)
+                    ));
                 }
                 int stateEnd = blockAndExtraData[0].lastIndexOf(']');
                 if (stateEnd < 0) {
-                    throw new InputParseException("Invalid format. Unclosed property.");
+                    throw new InputParseException(Caption.of("worldedit.error.parser.missing-rbracket"));
                 }
                 stateString = blockAndExtraData[0].substring(stateStart + 1, blockAndExtraData[0].length() - 1);
             }
@@ -290,18 +324,25 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 stateProperties = stateString.split(",");
             }
             if (typeString.isEmpty()) {
-                throw new InputParseException("Invalid format");
+                throw new InputParseException(Caption.of(
+                        "worldedit.error.parser.bad-state-format",
+                        TextComponent.of(blockAndExtraData[0])
+                ));
             }
             if ("hand".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's hand.
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
+                //FAWE start
                 state = blockInHand.toBlockState();
                 nbt = blockInHand.getNbtData();
+                //FAWE end
             } else if ("offhand".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's off hand.
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
+                //FAWE start
                 state = blockInHand.toBlockState();
                 nbt = blockInHand.getNbtData();
+                //FAWE end
             } else if (typeString.matches("pos[0-9]+")) {
                 int index = Integer.parseInt(typeString.replaceAll("[a-z]+", ""));
                 // Get the block type from the "primary position"
@@ -310,25 +351,26 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 try {
                     primaryPosition = context.requireSession().getRegionSelector(world).getVertices().get(index - 1);
                 } catch (IncompleteRegionException e) {
-                    throw new InputParseException("Your selection is not complete.");
+                    throw new InputParseException(Caption.of("worldedit.error.incomplete-region"));
                 }
                 state = world.getBlock(primaryPosition);
+                //FAWE start
             } else if (typeString.matches("slot[0-9]+")) {
                 int slot = Integer.parseInt(typeString.substring(4)) - 1;
                 Actor actor = context.requireActor();
                 if (!(actor instanceof Player)) {
-                    throw new InputParseException("The user is not a player!");
+                    throw new InputParseException(Caption.of("worldedit.command.player-only"));
                 }
                 Player player = (Player) actor;
                 BlockBag bag = player.getInventoryBlockBag();
                 if (!(bag instanceof SlottableBlockBag)) {
-                    throw new InputParseException("Unsupported!");
+                    throw new InputParseException(Caption.of("fawe.error.unsupported"));
                 }
                 SlottableBlockBag slottable = (SlottableBlockBag) bag;
                 BaseItem item = slottable.getItem(slot);
 
                 if (!item.getType().hasBlockType()) {
-                    throw new InputParseException("You're not holding a block!");
+                    throw new InputParseException(Caption.of("worldedit.error.not-a-block"));
                 }
                 state = item.getType().getBlockType().getDefaultState();
                 nbt = item.getNbtData();
@@ -339,13 +381,13 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     state = type.getDefaultState();
                 }
                 if (state == null) {
-                    throw new NoMatchException(
-                        "Does not match a valid block type: '" + input + "'");
+                    throw new NoMatchException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)));
                 }
             }
             if (nbt == null) {
                 nbt = state.getNbtData();
             }
+            //FAWE end
 
             blockStates.putAll(parseProperties(state.getBlockType(), stateProperties, context));
             if (context.isPreferringWildcard()) {
@@ -371,7 +413,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
         // this should be impossible but IntelliJ isn't that smart
         if (state == null) {
-            throw new NoMatchException("Does not match a valid block type: '" + input + "'");
+            throw new NoMatchException(Caption.of("worldedit.error.unknown-block", TextComponent.of(input)));
         }
 
         if (blockAndExtraData.length > 1 && blockAndExtraData[1].startsWith("{")) {
@@ -379,7 +421,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             try {
                 nbt = JSON2NBT.getTagFromJson(joined);
             } catch (NBTException e) {
-                throw new NoMatchException(e.getMessage());
+                throw new NoMatchException(Caption.of(e.getMessage()));
             }
         }
 
@@ -390,12 +432,13 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             Actor actor = context.requireActor();
             if (actor != null && !actor.hasPermission("worldedit.anyblock")
                     && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
-                throw new DisallowedUsageException("You are not allowed to use '" + input + "'");
+                throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(input)));
             }
         }
 
         if (nbt != null) {
-            return validate(context, state.toBaseBlock(nbt));
+            BaseBlock result = blockStates.size() > 0 ? state.toBaseBlock(nbt) : new BlanketBaseBlock(state, nbt);
+            return validate(context, result);
         }
 
         if (blockType == BlockTypes.SIGN || blockType == BlockTypes.WALL_SIGN
@@ -413,11 +456,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 String mobName = blockAndExtraData[1];
                 EntityType ent = EntityTypes.get(mobName.toLowerCase(Locale.ROOT));
                 if (ent == null) {
-                    throw new NoMatchException("Unknown entity type '" + mobName + "'");
+                    throw new NoMatchException(Caption.of("worldedit.error.unknown-entity", TextComponent.of(mobName)));
                 }
                 mobName = ent.getId();
                 if (!worldEdit.getPlatformManager().queryCapability(Capability.USER_COMMANDS).isValidMobType(mobName)) {
-                    throw new NoMatchException("Unknown mob type '" + mobName + "'");
+                    throw new NoMatchException(Caption.of("worldedit.error.unknown-mob", TextComponent.of(mobName)));
                 }
                 return validate(context, new MobSpawnerBlock(state, mobName));
             } else {
@@ -438,19 +481,24 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
     }
 
+    //FAWE Start
     private <T extends BlockStateHolder> T validate(ParserContext context, T holder) {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (!actor.hasPermission("worldedit.anyblock") && worldEdit.getConfiguration().checkDisallowedBlocks(holder)) {
-                throw new DisallowedUsageException(Caption.toString(Caption.of("fawe.error.block.not.allowed", holder)));
+                throw new DisallowedUsageException(Caption.of(
+                        "worldedit.error.disallowed-block",
+                        TextComponent.of(String.valueOf(holder))
+                ));
             }
             CompoundTag nbt = holder.getNbtData();
             if (nbt != null) {
-                if (!actor.hasPermission("worldedit.anyblock")) {
-                    throw new DisallowedUsageException("You are not allowed to use nbt'");
+                if (!actor.hasPermission("worldedit.anyblock.nbt")) {
+                    throw new DisallowedUsageException(Caption.of("fawe.error.nbt.forbidden"));
                 }
             }
         }
         return holder;
     }
+    //FAWE end
 }

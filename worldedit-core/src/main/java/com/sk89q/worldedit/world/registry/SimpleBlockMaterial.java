@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.sk89q.jnbt.CompoundTag;
+
 class SimpleBlockMaterial implements BlockMaterial {
 
     private boolean isAir;
@@ -40,14 +42,19 @@ class SimpleBlockMaterial implements BlockMaterial {
     private boolean replacedDuringPlacement;
     private boolean isTranslucent;
     private boolean hasContainer;
+    //FAWE start
     private int lightOpacity;
     private int mapColor;
+    private boolean isTile;
+    private CompoundTag tile = null;
+    //FAWE end
 
     @Override
     public boolean isAir() {
         return this.isAir;
     }
 
+    //FAWE start
     @Override
     public int getMapColor() {
         return mapColor;
@@ -65,6 +72,7 @@ class SimpleBlockMaterial implements BlockMaterial {
     public void setLightOpacity(int lightOpacity) {
         this.lightOpacity = lightOpacity;
     }
+    //FAWE end
 
     public void setIsAir(boolean isAir) {
         this.isAir = isAir;
@@ -228,7 +236,28 @@ class SimpleBlockMaterial implements BlockMaterial {
         return this.hasContainer;
     }
 
+    //FAWE start
+    public void setIsTile(boolean isTile) {
+        this.isTile = isTile;
+    }
+
+    @Override
+    public boolean isTile() {
+        return isTile;
+    }
+
+    public void setDefaultTile(CompoundTag tile) {
+        this.tile = tile;
+    }
+
+    @Override
+    public CompoundTag getDefaultTile() {
+        return tile;
+    }
+    //FAWE end
+
     public void setHasContainer(boolean hasContainer) {
         this.hasContainer = hasContainer;
     }
+
 }

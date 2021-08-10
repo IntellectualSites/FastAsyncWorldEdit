@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.registry;
 
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
@@ -33,8 +34,8 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.registry.state.PropertyKey;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 import com.sk89q.worldedit.util.io.ResourceLoader;
 import com.sk89q.worldedit.world.DataFixer;
@@ -44,42 +45,45 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.item.ItemTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 public final class LegacyMapper {
 
-    private static final Logger log = LoggerFactory.getLogger(LegacyMapper.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static LegacyMapper INSTANCE;
     private final ResourceLoader resourceLoader;
 
+    //FAWE start
     private final Int2ObjectArrayMap<Integer> blockStateToLegacyId4Data = new Int2ObjectArrayMap<>();
     private final Int2ObjectArrayMap<Integer> extraId4DataToStateId = new Int2ObjectArrayMap<>();
     private final int[] blockArr = new int[4096];
     private final BiMap<Integer, ItemType> itemMap = HashBiMap.create();
-    private Map<String, String> blockEntries = new HashMap<>();
+    private final Map<String, String> blockEntries = new HashMap<>();
+    //FAWE end
     private final Map<String, BlockState> stringToBlockMap = new HashMap<>();
     private final Multimap<BlockState, String> blockToStringMap = HashMultimap.create();
-    private final Map<String, ItemType> stringToItemMap = new HashMap<>();
-    private final Multimap<ItemType, String> itemToStringMap = HashMultimap.create();
 
     /**
      * Create a new instance.
      */
     private LegacyMapper() {
-        this.resourceLoader = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader();
+        this.resourceLoader = WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.CONFIGURATION)
+                .getResourceLoader();
 
         try {
             loadFromResource();
         } catch (Throwable e) {
-            log.warn("Failed to load the built-in legacy id registry", e);
+            LOGGER.warn("Failed to load the built-in legacy id registry", e);
         }
     }
 
@@ -97,7 +101,8 @@ public final class LegacyMapper {
             throw new IOException("Could not find legacy.json");
         }
         String data = Resources.toString(url, Charset.defaultCharset());
-        LegacyDataFile dataFile = gson.fromJson(data, new TypeToken<LegacyDataFile>() {}.getType());
+        LegacyDataFile dataFile = gson.fromJson(data, new TypeToken<LegacyDataFile>() {
+        }.getType());
 
         DataFixer fixer = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataFixer();
         ParserContext parserContext = new ParserContext();
@@ -107,11 +112,14 @@ public final class LegacyMapper {
 
         for (Map.Entry<String, String> blockEntry : dataFile.blocks.entrySet()) {
             String id = blockEntry.getKey();
-            Integer combinedId = getCombinedId(blockEntry.getKey());
             final String value = blockEntry.getValue();
+            //FAWE start
+            Integer combinedId = getCombinedId(blockEntry.getKey());
             blockEntries.put(id, value);
+            //FAWE end
 
             BlockState state = null;
+            //FAWE start
             try {
                 state = BlockState.get(null, blockEntry.getValue());
                 BlockType type = state.getBlockType();
@@ -120,11 +128,12 @@ public final class LegacyMapper {
                 }
             } catch (InputParseException f) {
                 BlockFactory blockFactory = WorldEdit.getInstance().getBlockFactory();
+                //FAWE end
 
                 // if fixer is available, try using that first, as some old blocks that were renamed share names with new blocks
                 if (fixer != null) {
                     try {
-                        String newEntry = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, value, 1631);
+                        String newEntry = fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, value, Constants.DATA_VERSION_MC_1_13_2);
                         state = blockFactory.parseFromInput(newEntry, parserContext).toImmutableState();
                     } catch (InputParseException ignored) {
                     }
@@ -140,16 +149,17 @@ public final class LegacyMapper {
 
                 // if it's still null, both fixer and default failed
                 if (state == null) {
-                    log.debug("Unknown block: " + value);
+                    LOGGER.debug("Unknown block: " + value);
                 } else {
                     // it's not null so one of them succeeded, now use it
                     blockToStringMap.put(state, id);
                     stringToBlockMap.put(id, state);
                 }
             }
+            //FAWE start
             if (state != null) {
                 blockArr[combinedId] = state.getInternalId();
-                blockStateToLegacyId4Data.put(state.getInternalId(), (Integer) combinedId);
+                blockStateToLegacyId4Data.put(state.getInternalId(), combinedId);
                 blockStateToLegacyId4Data.putIfAbsent(state.getInternalBlockTypeId(), combinedId);
             }
         }
@@ -164,6 +174,7 @@ public final class LegacyMapper {
                 }
             }
         }
+        //FAWE end
 
         for (Map.Entry<String, String> itemEntry : dataFile.items.entrySet()) {
             String id = itemEntry.getKey();
@@ -174,7 +185,7 @@ public final class LegacyMapper {
                 type = ItemTypes.get(value);
             }
             if (type == null) {
-                log.debug("Unknown item: " + value);
+                LOGGER.debug("Unknown item: " + value);
             } else {
                 try {
                     itemMap.put(getCombinedId(id), type);
@@ -184,6 +195,7 @@ public final class LegacyMapper {
         }
     }
 
+    //FAWE start
     private int getCombinedId(String input) {
         String[] split = input.split(":");
         return (Integer.parseInt(split[0]) << 4) + (split.length == 2 ? Integer.parseInt(split[1]) : 0);
@@ -200,7 +212,9 @@ public final class LegacyMapper {
         }
         return itemMap.get(getCombinedId(input));
     }
+    //FAWE end
 
+    //FAWE start - use internal ids
     public BlockState getBlockFromLegacy(String input) {
         if (input.startsWith("minecraft:")) {
             input = input.substring(10);
@@ -212,6 +226,7 @@ public final class LegacyMapper {
         }
         return null;
     }
+    //FAWE end
 
     @Nullable
     public ItemType getItemFromLegacy(int legacyId, int data) {
@@ -233,6 +248,7 @@ public final class LegacyMapper {
         }
     }
 
+    //FAWE start
     @Nullable
     public BlockState getBlockFromLegacy(int legacyId) {
         return getBlock(legacyId << 4);
@@ -297,11 +313,12 @@ public final class LegacyMapper {
     public Integer getLegacyCombined(BlockType type) {
         return blockStateToLegacyId4Data.get(type.getDefaultState().getInternalId());
     }
+    //FAWE end
 
     @Deprecated
     public int[] getLegacyFromBlock(BlockState blockState) {
         Integer combinedId = getLegacyCombined(blockState);
-        return combinedId == null ? null : new int[] { combinedId >> 4, combinedId & 0xF };
+        return combinedId == null ? null : new int[]{combinedId >> 4, combinedId & 0xF};
     }
 
     public static LegacyMapper getInstance() {
@@ -313,7 +330,10 @@ public final class LegacyMapper {
 
     @SuppressWarnings({"MismatchedQueryAndUpdateOfCollection"})
     private static class LegacyDataFile {
+
         private Map<String, String> blocks;
         private Map<String, String> items;
+
     }
+
 }

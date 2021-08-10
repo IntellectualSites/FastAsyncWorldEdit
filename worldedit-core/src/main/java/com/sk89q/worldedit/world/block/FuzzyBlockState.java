@@ -19,8 +19,9 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,10 +33,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A Fuzzy BlockState. Used for partial matching.
  *
+ * <p>
  * Immutable, construct with {@link FuzzyBlockState.Builder}.
+ * </p>
  */
 public class FuzzyBlockState extends BlockState {
 
+    //FAWE start
     private final Map<PropertyKey, Object> props;
     private final Map<Property<?>, Object> values;
 
@@ -46,7 +50,9 @@ public class FuzzyBlockState extends BlockState {
     public FuzzyBlockState(BlockState state) {
         this(state, null);
     }
+    //FAWE end
 
+    //FAWE start - use internal ids
     private FuzzyBlockState(BlockState state, Map<Property<?>, Object> values) {
         super(state.getBlockType(), state.getInternalId(), state.getOrdinal());
         if (values == null || values.isEmpty()) {
@@ -61,6 +67,7 @@ public class FuzzyBlockState extends BlockState {
         }
 
     }
+    //FAWE end
 
     /**
      * Gets a full BlockState from this fuzzy one, filling in
@@ -78,6 +85,7 @@ public class FuzzyBlockState extends BlockState {
         return state;
     }
 
+    //FAWE start
     @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
         if (!getBlockType().equals(o.getBlockType())) {
@@ -93,7 +101,8 @@ public class FuzzyBlockState extends BlockState {
         return true;
     }
 
-    @Override public BaseBlock toBaseBlock() {
+    @Override
+    public BaseBlock toBaseBlock() {
         if (props == null || props.isEmpty()) {
             return super.toBaseBlock();
         }
@@ -113,6 +122,7 @@ public class FuzzyBlockState extends BlockState {
     public Map<Property<?>, Object> getStates() {
         return values;
     }
+    //FAWE end
 
     /**
      * Gets an instance of a builder.
@@ -123,12 +133,21 @@ public class FuzzyBlockState extends BlockState {
         return new Builder();
     }
 
+    //FAWE start
+    @Deprecated
+    @Override
+    public CompoundTag getNbtData() {
+        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
+    }
+    //FAWE end
+
     /**
      * Builder for FuzzyBlockState
      */
     public static class Builder {
+
         private BlockType type;
-        private Map<Property<?>, Object> values = new HashMap<>();
+        private final Map<Property<?>, Object> values = new HashMap<>();
 
         /**
          * The type of the Fuzzy BlockState
@@ -158,8 +177,8 @@ public class FuzzyBlockState extends BlockState {
          * Adds a property to the fuzzy BlockState
          *
          * @param property The property
-         * @param value The value
-         * @param <V> The property type
+         * @param value    The value
+         * @param <V>      The property type
          * @return The builder, for chaining
          */
         public <V> Builder withProperty(Property<V> property, V value) {
@@ -194,5 +213,7 @@ public class FuzzyBlockState extends BlockState {
             this.values.clear();
             return this;
         }
+
     }
+
 }

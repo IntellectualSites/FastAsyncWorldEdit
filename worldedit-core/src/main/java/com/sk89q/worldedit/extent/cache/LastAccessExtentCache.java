@@ -85,6 +85,7 @@ public class LastAccessExtentCache extends AbstractDelegateExtent {
     }
 
     private static class CachedBlock<B extends BlockStateHolder<B>> {
+
         private final BlockVector3 position;
         private final B block;
 
@@ -92,6 +93,7 @@ public class LastAccessExtentCache extends AbstractDelegateExtent {
             this.position = position;
             this.block = block;
         }
+
     }
 
 }

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.JarURLConnection;
@@ -26,7 +27,6 @@ import java.net.URL;
 import java.util.function.Supplier;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
-import javax.annotation.Nullable;
 
 /**
  * Represents WorldEdit info from the MANIFEST.MF file.
@@ -34,11 +34,32 @@ import javax.annotation.Nullable;
 public class WorldEditManifest {
 
     public static final String WORLD_EDIT_VERSION = "WorldEdit-Version";
+    public static final String WORLD_EDIT_KIND = "WorldEdit-Kind";
+
+    public enum Kind {
+        MOD("mods"),
+        PLUGIN("plugins"),
+        UNKNOWN("mods/plugins"),
+        ;
+
+        public final String folderName;
+
+        Kind(String folderName) {
+            this.folderName = folderName;
+        }
+    }
 
     public static WorldEditManifest load() {
         Attributes attributes = readAttributes();
+        Kind kind;
+        try {
+            kind = Kind.valueOf(readAttribute(attributes, WORLD_EDIT_KIND, () -> "UNKNOWN"));
+        } catch (IllegalArgumentException e) {
+            kind = Kind.UNKNOWN;
+        }
         return new WorldEditManifest(
-            readAttribute(attributes, WORLD_EDIT_VERSION, () -> "(unknown)")
+                readAttribute(attributes, WORLD_EDIT_VERSION, () -> "(unknown)"),
+                kind
         );
     }
 
@@ -61,8 +82,10 @@ public class WorldEditManifest {
         }
     }
 
-    private static String readAttribute(@Nullable Attributes attributes, String name,
-                                        Supplier<String> defaultAction) {
+    private static String readAttribute(
+            @Nullable Attributes attributes, String name,
+            Supplier<String> defaultAction
+    ) {
         if (attributes == null) {
             return defaultAction.get();
         }
@@ -71,12 +94,19 @@ public class WorldEditManifest {
     }
 
     private final String worldEditVersion;
+    private final Kind worldEditKind;
 
-    private WorldEditManifest(String worldEditVersion) {
+    private WorldEditManifest(String worldEditVersion, Kind worldEditKind) {
         this.worldEditVersion = worldEditVersion;
+        this.worldEditKind = worldEditKind;
     }
 
     public String getWorldEditVersion() {
         return worldEditVersion;
     }
+
+    public Kind getWorldEditKind() {
+        return worldEditKind;
+    }
+
 }

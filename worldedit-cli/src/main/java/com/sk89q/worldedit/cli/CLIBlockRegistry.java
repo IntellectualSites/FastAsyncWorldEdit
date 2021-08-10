@@ -31,11 +31,10 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.registry.BundledBlockRegistry;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 public class CLIBlockRegistry extends BundledBlockRegistry {
 
@@ -53,7 +52,11 @@ public class CLIBlockRegistry extends BundledBlockRegistry {
                 return new EnumProperty(key, values);
             }
             case "direction": {
-                List<Direction> fixedValues = values.stream().map(String::toUpperCase).map(Direction::valueOf).collect(Collectors.toList());
+                List<Direction> fixedValues = values
+                        .stream()
+                        .map(String::toUpperCase)
+                        .map(Direction::valueOf)
+                        .collect(Collectors.toList());
                 return new DirectionalProperty(key, fixedValues);
             }
             default:
@@ -66,8 +69,9 @@ public class CLIBlockRegistry extends BundledBlockRegistry {
     public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
         Map<String, FileRegistries.BlockProperty> properties =
                 CLIWorldEdit.inst.getFileRegistries().getDataFile().blocks.get(blockType.getId()).properties;
-        return ImmutableMap.copyOf(Maps.transformEntries(properties,
-                (Maps.EntryTransformer<String, FileRegistries.BlockProperty, Property<?>>)
-                        (key, value) -> createProperty(value.type, key, value.values)));
+        Maps.EntryTransformer<String, FileRegistries.BlockProperty, Property<?>> entryTransform =
+                (key, value) -> createProperty(value.type, key, value.values);
+        return ImmutableMap.copyOf(Maps.transformEntries(properties, entryTransform));
     }
+
 }

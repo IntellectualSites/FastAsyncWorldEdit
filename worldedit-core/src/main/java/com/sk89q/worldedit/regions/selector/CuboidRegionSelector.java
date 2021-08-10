@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -32,13 +33,14 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
+import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -99,7 +101,7 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
     /**
      * Create a new region selector with the given two positions.
      *
-     * @param world the world
+     * @param world     the world
      * @param position1 position 1
      * @param position2 position 2
      */
@@ -157,13 +159,13 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         checkNotNull(pos);
 
         if (position1 != null && position2 != null) {
-            player.printInfo(TranslatableComponent.of(
+            player.print(Caption.of(
                     "worldedit.selection.cuboid.explain.primary-area",
                     TextComponent.of(position1.toString()),
                     TextComponent.of(region.getVolume())
             ));
         } else if (position1 != null) {
-            player.printInfo(TranslatableComponent.of("worldedit.selection.cuboid.explain.primary", TextComponent.of(position1.toString())));
+            player.print(Caption.of("worldedit.selection.cuboid.explain.primary", TextComponent.of(position1.toString())));
         }
 
         session.dispatchCUIEvent(player, new SelectionPointEvent(0, pos, getVolume()));
@@ -176,13 +178,13 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         checkNotNull(pos);
 
         if (position1 != null && position2 != null) {
-            player.printInfo(TranslatableComponent.of(
+            player.print(Caption.of(
                     "worldedit.selection.cuboid.explain.secondary-area",
                     TextComponent.of(position2.toString()),
                     TextComponent.of(region.getVolume())
             ));
         } else if (position2 != null) {
-            player.printInfo(TranslatableComponent.of("worldedit.selection.cuboid.explain.secondary", TextComponent.of(position2.toString())));
+            player.print(Caption.of("worldedit.selection.cuboid.explain.secondary", TextComponent.of(position2.toString())));
         }
 
         session.dispatchCUIEvent(player, new SelectionPointEvent(1, pos, getVolume()));
@@ -256,11 +258,15 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         final List<Component> lines = new ArrayList<>();
 
         if (position1 != null) {
-            lines.add(TranslatableComponent.of("worldedit.selection.cuboid.info.pos1", TextComponent.of(position1.toString())));
+            lines.add(Caption.of("worldedit.selection.cuboid.info.pos1", TextComponent.of(position1.toString())
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.COPY_TO_CLIPBOARD, position1.toParserString()))
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to copy")))));
         }
 
         if (position2 != null) {
-            lines.add(TranslatableComponent.of("worldedit.selection.cuboid.info.pos2", TextComponent.of(position2.toString())));
+            lines.add(Caption.of("worldedit.selection.cuboid.info.pos2", TextComponent.of(position2.toString())
+                    .clickEvent(ClickEvent.of(ClickEvent.Action.COPY_TO_CLIPBOARD, position2.toParserString()))
+                    .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, TextComponent.of("Click to copy")))));
         }
 
         return lines;
@@ -310,8 +316,10 @@ public class CuboidRegionSelector implements RegionSelector, CUIRegion {
         return "cuboid";
     }
 
+    //FAWE start
     @Override
     public List<BlockVector3> getVertices() {
         return Arrays.asList(position1, position2);
     }
+    //FAWE end
 }

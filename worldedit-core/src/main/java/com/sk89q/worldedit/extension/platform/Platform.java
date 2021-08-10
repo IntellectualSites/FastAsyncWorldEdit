@@ -19,8 +19,12 @@
 
 package com.sk89q.worldedit.extension.platform;
 
+import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
+import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.io.ResourceLoader;
 import com.sk89q.worldedit.world.DataFixer;
@@ -28,10 +32,12 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * Represents a platform that WorldEdit has been implemented for.
@@ -39,7 +45,7 @@ import javax.annotation.Nullable;
  * <p>It is strongly recommended that implementations extend from
  * {@link AbstractPlatform}.</p>
  */
-public interface Platform {
+public interface Platform extends Keyed {
 
     /**
      * Return the resource loader.
@@ -86,9 +92,9 @@ public interface Platform {
      * Schedules the given {@code task} to be invoked once every
      * {@code period} ticks after an initial delay of {@code delay} ticks.
      *
-     * @param delay Delay in server ticks before executing first repeat
+     * @param delay  Delay in server ticks before executing first repeat
      * @param period Period in server ticks of the task
-     * @param task Task to be executed
+     * @param task   Task to be executed
      * @return Task id number (-1 if scheduling failed)
      */
     int schedule(long delay, long period, Runnable task);
@@ -118,7 +124,8 @@ public interface Platform {
      * @param player the player to match
      * @return a matched player, otherwise null
      */
-    @Nullable Player matchPlayer(Player player);
+    @Nullable
+    Player matchPlayer(Player player);
 
     /**
      * Create a duplicate of the given world.
@@ -128,10 +135,15 @@ public interface Platform {
      * @param world the world to match
      * @return a matched world, otherwise null
      */
-    @Nullable World matchWorld(World world);
+    @Nullable
+    World matchWorld(World world);
 
     /**
      * Register the commands contained within the given command manager.
+     *
+     * <p>
+     * This method should be ignored if the platform offers a command registration event.
+     * </p>
      *
      * @param commandManager the command manager
      */
@@ -139,8 +151,18 @@ public interface Platform {
 
     /**
      * Register game hooks.
+     *
+     * @deprecated Call {@link #setGameHooksEnabled(boolean)} with {@code true} instead
      */
-    void registerGameHooks();
+    @Deprecated
+    default void registerGameHooks() {
+        setGameHooksEnabled(true);
+    }
+
+    /**
+     * Set if the game hooks are enabled for this platform.
+     */
+    void setGameHooksEnabled(boolean enabled);
 
     /**
      * Get the configuration from this platform.
@@ -191,4 +213,27 @@ public interface Platform {
      * @return A set of supported side effects
      */
     Set<SideEffect> getSupportedSideEffects();
+
+    //FAWE start
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return an id
+     */
+    @NonAbstractForCompatibility(delegateName = "getPlatformName", delegateParams = {})
+    @Override
+    default String getId() {
+        return "legacy:" + getPlatformName().toLowerCase(Locale.ROOT).replaceAll("[^a-z_.-]", "_");
+    }
+
+    /**
+     * Get the {@link RelighterFactory} that can be used to obtain
+     * {@link Relighter}s.
+     *
+     * @return the relighter factory to be used.
+     */
+    @Nonnull
+    RelighterFactory getRelighterFactory();
+    //FAWE end
 }

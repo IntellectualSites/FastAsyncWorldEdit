@@ -24,7 +24,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.TreeGenerator;
-import com.sk89q.worldedit.world.block.BlockID;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -42,7 +41,7 @@ public class ForestGenerator implements RegionFunction {
      * Create a new instance.
      *
      * @param editSession the edit session
-     * @param treeType a tree generator
+     * @param treeType    a tree generator
      */
     public ForestGenerator(EditSession editSession, TreeGenerator.TreeType treeType) {
         this.editSession = editSession;
@@ -54,28 +53,23 @@ public class ForestGenerator implements RegionFunction {
         BlockState block = editSession.getBlock(position);
         BlockType t = block.getBlockType();
 
-        switch (t.getInternalId()) {
-            case BlockID.GRASS_BLOCK:
-            case BlockID.DIRT:
-            case BlockID.PODZOL:
-            case BlockID.COARSE_DIRT:
+        if (t.getMaterial().isSolid()) {
             return treeType.generate(editSession, position.add(0, 1, 0));
-            default:
-            if (t.getMaterial().isReplacedDuringPlacement()) {
-                // since the implementation's tree generators generally don't generate in non-air spots,
-                // we trick editsession history here in the first call
-                editSession.setBlock(position, BlockTypes.AIR.getDefaultState());
-                // and then trick the generator here by directly setting into the world
-                editSession.getWorld().setBlock(position, BlockTypes.AIR.getDefaultState());
-                // so that now the generator can generate the tree
-                boolean success = treeType.generate(editSession, position);
-                if (!success) {
-                    editSession.setBlock(position, block); // restore on failure
-                }
-                return success;
-            } else { // Trees won't grow on this!
-                return false;
+        } else if (t.getMaterial().isReplacedDuringPlacement()) {
+            // since the implementation's tree generators generally don't generate in non-air spots,
+            // we trick editsession history here in the first call
+            editSession.setBlock(position, BlockTypes.AIR.getDefaultState());
+            // and then trick the generator here by directly setting into the world
+            editSession.getWorld().setBlock(position, BlockTypes.AIR.getDefaultState());
+            // so that now the generator can generate the tree
+            boolean success = treeType.generate(editSession, position);
+            if (!success) {
+                editSession.setBlock(position, block); // restore on failure
             }
+            return success;
+        } else { // Trees won't grow on this!
+            return false;
         }
     }
+
 }

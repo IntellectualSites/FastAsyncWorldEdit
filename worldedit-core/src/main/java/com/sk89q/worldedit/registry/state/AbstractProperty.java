@@ -19,20 +19,24 @@
 
 package com.sk89q.worldedit.registry.state;
 
-import com.boydti.fawe.util.MathMan;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkState;
 
 public abstract class AbstractProperty<T> implements Property<T> {
 
+    //FAWE start
     private final PropertyKey key;
+    //FAWE end
     private String name;
     private final List<T> values;
 
+    //FAWE start
     private final int bitMask;
     private final int bitMaskInverse;
     private final int bitOffset;
@@ -45,6 +49,7 @@ public abstract class AbstractProperty<T> implements Property<T> {
     public AbstractProperty(final String name, final List<T> values, int bitOffset) {
         this.name = name;
         this.values = values;
+        //FAWE end
         this.numBits = MathMan.log2nlz(values.size());
         this.bitOffset = bitOffset + BlockTypesCache.BIT_OFFSET;
         this.bitMask = (((1 << numBits) - 1)) << this.bitOffset;
@@ -52,6 +57,7 @@ public abstract class AbstractProperty<T> implements Property<T> {
         this.key = PropertyKey.getOrCreate(name);
     }
 
+    //FAWE start
     @Override
     public PropertyKey getKey() {
         return key;
@@ -95,29 +101,11 @@ public abstract class AbstractProperty<T> implements Property<T> {
     public int getIndex(int state) {
         return (state & bitMask) >> bitOffset;
     }
+    //FAWE end
 
     @Override
     public List<T> getValues() {
         return this.values;
-    }
-
-    @Nullable
-    @Override
-    public T getValueFor(String string) throws IllegalArgumentException {
-        return (T) string;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Internal method for name setting post-deserialise. Do not use.
-     */
-    public void setName(final String name) {
-        checkState(this.name == null, "name already set");
-        this.name = name;
     }
 
     @Override
@@ -131,10 +119,31 @@ public abstract class AbstractProperty<T> implements Property<T> {
     }
 
     @Override
+    public String getName() {
+        return this.name;
+    }
+
+    //FAWE start
+    @Nullable
+    @Override
+    public T getValueFor(String string) throws IllegalArgumentException {
+        return (T) string;
+    }
+
+    /**
+     * Internal method for name setting post-deserialise. Do not use.
+     */
+    public void setName(final String name) {
+        checkState(this.name == null, "name already set");
+        this.name = name;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Property)) {
             return false;
         }
         return getName().equals(((Property<?>) obj).getName());
     }
+    //FAWE end
 }

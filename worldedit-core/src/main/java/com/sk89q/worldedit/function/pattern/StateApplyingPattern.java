@@ -35,7 +35,7 @@ import static com.sk89q.worldedit.blocks.Blocks.resolveProperties;
 public class StateApplyingPattern extends AbstractExtentPattern {
 
     private final Map<String, String> states;
-    private Map<BlockType, Map<Property<Object>, Object>> cache = Maps.newHashMap();
+    private final Map<BlockType, Map<Property<Object>, Object>> cache = Maps.newHashMap();
 
     public StateApplyingPattern(Extent extent, Map<String, String> statesToSet) {
         super(extent);
@@ -43,12 +43,17 @@ public class StateApplyingPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BlockState block = getExtent().getBlock(position);
         for (Entry<Property<Object>, Object> entry : cache
                 .computeIfAbsent(block.getBlockType(), (b -> resolveProperties(states, b))).entrySet()) {
-            block = block.with(entry.getKey(), entry.getValue());
+            //FAWE start
+            if (block.getBlockType().hasProperty(entry.getKey().getKey())) {
+                block = block.with(entry.getKey(), entry.getValue());
+            }
+            //FAWE end
         }
         return block.toBaseBlock();
     }
+
 }

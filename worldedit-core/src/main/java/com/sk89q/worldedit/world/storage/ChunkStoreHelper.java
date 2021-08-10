@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.world.storage;
 
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.Tag;
@@ -53,7 +54,7 @@ public class ChunkStoreHelper {
             Tag tag = nbt.readNamedTag().getTag();
             if (!(tag instanceof CompoundTag)) {
                 throw new ChunkStoreException("CompoundTag expected for chunk; got "
-                    + tag.getClass().getName());
+                        + tag.getClass().getName());
             }
 
             return (CompoundTag) tag;
@@ -78,7 +79,10 @@ public class ChunkStoreHelper {
                     tag = (CompoundTag) entry.getValue();
                     break;
                 } else {
-                    throw new ChunkStoreException("CompoundTag expected for 'Level'; got " + entry.getValue().getClass().getName());
+                    throw new ChunkStoreException("CompoundTag expected for 'Level'; got " + entry
+                            .getValue()
+                            .getClass()
+                            .getName());
                 }
             }
         }
@@ -93,10 +97,18 @@ public class ChunkStoreHelper {
         }
         final Platform platform = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING);
         final int currentDataVersion = platform.getDataVersion();
-        if (tag.getValue().containsKey("Sections") && dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
+        if (tag
+                .getValue()
+                .containsKey("Sections") && dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
             final DataFixer dataFixer = platform.getDataFixer();
             if (dataFixer != null) {
-                tag = (CompoundTag) dataFixer.fixUp(DataFixer.FixTypes.CHUNK, rootTag, dataVersion).getValue().get("Level");
+                //FAWE start - use Adventure
+                tag = (CompoundTag) ((CompoundTag) AdventureNBTConverter.fromAdventure(dataFixer.fixUp(
+                        DataFixer.FixTypes.CHUNK,
+                        rootTag.asBinaryTag(),
+                        dataVersion
+                ))).getValue().get("Level");
+                //FAWE end
                 dataVersion = currentDataVersion;
             }
         }
@@ -117,4 +129,5 @@ public class ChunkStoreHelper {
 
     private ChunkStoreHelper() {
     }
+
 }

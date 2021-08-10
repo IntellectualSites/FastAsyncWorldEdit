@@ -169,6 +169,7 @@ public class DataReport implements Report {
     }
 
     private static class Line {
+
         private final String key;
         private final String value;
 
@@ -176,6 +177,7 @@ public class DataReport implements Report {
             this.key = key;
             this.value = value;
         }
+
     }
 
 }

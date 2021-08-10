@@ -19,19 +19,19 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.worldedit.util.nbt.StringBinaryTag;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The {@code TAG_String} tag.
+ *
+ * @deprecated Use {@link StringBinaryTag}.
  */
+@Deprecated
 public final class StringTag extends Tag {
 
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_STRING;
-    }
-
-    private final String value;
+    private final StringBinaryTag innerTag;
 
     /**
      * Creates the tag with an empty name.
@@ -41,17 +41,29 @@ public final class StringTag extends Tag {
     public StringTag(String value) {
         super();
         checkNotNull(value);
-        this.value = value;
+        this.innerTag = StringBinaryTag.of(value);
+    }
+
+    public StringTag(StringBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
+    }
+
+    @Override
+    public StringBinaryTag asBinaryTag() {
+        return this.innerTag;
     }
 
     @Override
     public String getValue() {
-        return value;
+        return innerTag.value();
     }
 
+    //FAWE start
     @Override
-    public String toString() {
-        return "TAG_String(" + value + ")";
+    public int getTypeCode() {
+        return NBTConstants.TYPE_STRING;
     }
+    //FAWE end
 
 }

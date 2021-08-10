@@ -19,11 +19,14 @@
 
 package com.sk89q.worldedit.internal.wna;
 
-import com.sk89q.jnbt.CompoundTag;
+import com.google.common.collect.ImmutableMap;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.IntBinaryTag;
+import com.sk89q.worldedit.util.nbt.StringBinaryTag;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -35,13 +38,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Natively access and perform operations on the world.
  *
- * @param <NC> the native chunk type
+ * @param <NC>  the native chunk type
  * @param <NBS> the native block state type
- * @param <NP> the native position type
+ * @param <NP>  the native position type
  */
 public interface WorldNativeAccess<NC, NBS, NP> {
 
-    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+    default <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws
+            WorldEditException {
         checkNotNull(position);
         checkNotNull(block);
         setCurrentSideEffectSet(sideEffects);
@@ -66,17 +70,20 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         if (successful || old == newState) {
             if (block instanceof BaseBlock) {
                 BaseBlock baseBlock = (BaseBlock) block;
-                CompoundTag tag = baseBlock.getNbtData();
+                //FAWE start - use CompoundBinaryTag over CompoundTag
+                CompoundBinaryTag tag = baseBlock.getNbt();
                 if (tag != null) {
-                    tag = tag.createBuilder()
-                        .putString("id", baseBlock.getNbtId())
-                        .putInt("x", position.getX())
-                        .putInt("y", position.getY())
-                        .putInt("z", position.getZ())
-                        .build();
+                    tag = tag.put(ImmutableMap.of(
+                            "id", StringBinaryTag.of(baseBlock.getNbtId()),
+                            "x", IntBinaryTag.of(position.getX()),
+                            "y", IntBinaryTag.of(position.getY()),
+                            "z", IntBinaryTag.of(position.getZ())
+                    ));
+
                     // update if TE changed as well
                     successful = updateTileEntity(pos, tag);
                 }
+                //FAWE end
             }
         }
 
@@ -136,13 +143,13 @@ public interface WorldNativeAccess<NC, NBS, NP> {
 
     void updateLightingForBlock(NP position);
 
-    boolean updateTileEntity(NP position, CompoundTag tag);
+    boolean updateTileEntity(NP position, CompoundBinaryTag tag);
 
-    void notifyBlockUpdate(NP position, NBS oldState, NBS newState);
+    void notifyBlockUpdate(NC chunk, NP position, NBS oldState, NBS newState);
 
     boolean isChunkTicking(NC chunk);
 
-    void markBlockChanged(NP position);
+    void markBlockChanged(NC chunk, NP position);
 
     void notifyNeighbors(NP pos, NBS oldState, NBS newState);
 
@@ -166,10 +173,10 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         // Remove redundant branches
         if (isChunkTicking(chunk)) {
             if (sideEffectSet.shouldApply(SideEffect.ENTITY_AI)) {
-                notifyBlockUpdate(pos, oldState, newState);
+                notifyBlockUpdate(chunk, pos, oldState, newState);
             } else {
                 // If we want to skip entity AI, just mark the block for sending
-                markBlockChanged(pos);
+                markBlockChanged(chunk, pos);
             }
         }
 
@@ -178,12 +185,16 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         }
 
         // Make connection updates optional
-        if (sideEffectSet.shouldApply(SideEffect.VALIDATION)) {
+        if (sideEffectSet.shouldApply(SideEffect.NEIGHBORS)) {
             updateNeighbors(pos, oldState, newState, 512);
         }
 
         // Seems used only for PoI updates
         onBlockStateChange(pos, oldState, newState);
     }
+
+    //FAWE start
+    void flush();
+    //FAWE end
 
 }

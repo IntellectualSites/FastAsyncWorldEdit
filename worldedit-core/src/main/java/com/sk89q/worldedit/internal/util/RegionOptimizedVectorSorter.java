@@ -65,10 +65,10 @@ public class RegionOptimizedVectorSorter {
         long x = elem.getX();
         long z = elem.getZ();
         return (((x << (REGION_X_SHIFT - 9)) & REGION_X_MASK) ^ FLIP_REGION_X_SIGN)
-            | (((z << (REGION_Z_SHIFT - 9)) & REGION_Z_MASK) ^ FLIP_REGION_Z_SIGN)
-            | ((x << (CHUNK_X_SHIFT - 4)) & CHUNK_X_MASK)
-            | ((z << (CHUNK_Z_SHIFT - 4)) & CHUNK_Z_MASK)
-            | (Y_MAX - elem.getY());
+                | (((z << (REGION_Z_SHIFT - 9)) & REGION_Z_MASK) ^ FLIP_REGION_Z_SIGN)
+                | ((x << (CHUNK_X_SHIFT - 4)) & CHUNK_X_MASK)
+                | ((z << (CHUNK_Z_SHIFT - 4)) & CHUNK_Z_MASK)
+                | (Y_MAX - elem.getY());
     }
 
     private static final int NUMBER_OF_BITS = 64;
@@ -91,11 +91,11 @@ public class RegionOptimizedVectorSorter {
     }
 
     private static final ExecutorService SORT_SVC = Executors.newFixedThreadPool(
-        Runtime.getRuntime().availableProcessors(),
-        new ThreadFactoryBuilder()
-            .setDaemon(true)
-            .setNameFormat("worldedit-sort-svc-%d")
-            .build()
+            Runtime.getRuntime().availableProcessors(),
+            new ThreadFactoryBuilder()
+                    .setDaemon(true)
+                    .setNameFormat("worldedit-sort-svc-%d")
+                    .build()
     );
 
     public static void sort(List<BlockVector3> vectors) {
@@ -110,7 +110,7 @@ public class RegionOptimizedVectorSorter {
      * </p>
      *
      * @param parallel {@code true} to sort in parallel
-     * @param vectors the vectors to sort
+     * @param vectors  the vectors to sort
      */
     public static void sort(boolean parallel, List<BlockVector3> vectors) {
         // Currently we don't do an in-place radix sort, but we could in the future.
@@ -122,8 +122,8 @@ public class RegionOptimizedVectorSorter {
         BlockVector3[] source = vectors.toArray(new BlockVector3[0]);
         BlockVector3[] sorted = new BlockVector3[size];
         source = !parallel
-            ? serialSort(source, size, sorted)
-            : parallelSort(source, size, sorted);
+                ? serialSort(source, size, sorted)
+                : parallelSort(source, size, sorted);
         ListIterator<BlockVector3> it = vectors.listIterator();
         for (BlockVector3 blockVector3 : source) {
             it.next();
@@ -213,4 +213,5 @@ public class RegionOptimizedVectorSorter {
 
     private RegionOptimizedVectorSorter() {
     }
+
 }

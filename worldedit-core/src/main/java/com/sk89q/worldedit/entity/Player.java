@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.entity;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
-import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
-import com.boydti.fawe.regions.FaweMaskManager;
-import com.boydti.fawe.util.MainUtil;
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.core.regions.FaweMaskManager;
+import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
@@ -46,13 +46,14 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 
-import java.io.File;
 import javax.annotation.Nullable;
+import java.io.File;
 
 /**
  * Represents a player.
@@ -75,8 +76,8 @@ public interface Player extends Entity, Actor {
 
     /**
      * Get the player's cardinal direction (N, W, NW, etc.) with an offset. May return null.
-     * @param yawOffset offset that is added to the player's yaw before determining the cardinal direction
      *
+     * @param yawOffset offset that is added to the player's yaw before determining the cardinal direction
      * @return the direction
      */
     Direction getCardinalDirection(int yawOffset);
@@ -173,7 +174,7 @@ public interface Player extends Entity, Actor {
     /**
      * Ascend to the ceiling above.
      *
-     * @param clearance How many blocks to leave above the player's head
+     * @param clearance   How many blocks to leave above the player's head
      * @param alwaysGlass Always put glass under the player
      * @return whether the player was moved
      */
@@ -190,7 +191,7 @@ public interface Player extends Entity, Actor {
     /**
      * Just go up.
      *
-     * @param distance How far up to teleport
+     * @param distance    How far up to teleport
      * @param alwaysGlass Always put glass under the player
      * @return whether the player was moved
      */
@@ -227,7 +228,7 @@ public interface Player extends Entity, Actor {
      * Get the point of the block being looked at. May return null.
      * Will return the farthest away air block if useLastBlock is true and no other block is found.
      *
-     * @param range how far to checks for blocks
+     * @param range        how far to checks for blocks
      * @param useLastBlock try to return the last valid air block found
      * @return point
      */
@@ -237,9 +238,9 @@ public interface Player extends Entity, Actor {
      * Get the point of the block being looked at. May return null.
      * Will return the farthest away block before matching the stop mask if useLastBlock is true and no other block is found.
      *
-     * @param range how far to checks for blocks
+     * @param range        how far to checks for blocks
      * @param useLastBlock try to return the last valid block not matching the stop mask found
-     * @param stopMask the mask used to determine when to stop tracing
+     * @param stopMask     the mask used to determine when to stop tracing
      * @return point
      */
     Location getBlockTrace(int range, boolean useLastBlock, @Nullable Mask stopMask);
@@ -247,7 +248,7 @@ public interface Player extends Entity, Actor {
     /**
      * Get the face that the player is looking at.
      *
-     * @param range the range
+     * @param range        the range
      * @param useLastBlock try to return the last valid air block found
      * @return a face
      */
@@ -256,9 +257,9 @@ public interface Player extends Entity, Actor {
     /**
      * Get the face that the player is looking at.
      *
-     * @param range the range
+     * @param range        the range
      * @param useLastBlock try to return the last valid block not matching the stop mask found
-     * @param stopMask the mask used to determine when to stop tracing
+     * @param stopMask     the mask used to determine when to stop tracing
      * @return a face
      */
     Location getBlockTraceFace(int range, boolean useLastBlock, @Nullable Mask stopMask);
@@ -297,11 +298,11 @@ public interface Player extends Entity, Actor {
     /**
      * Move the player.
      *
-     * @param pos where to move them
+     * @param pos   where to move them
      * @param pitch the pitch (up/down) of the player's view in degrees
-     * @param yaw the yaw (left/right) of the player's view in degrees
+     * @param yaw   the yaw (left/right) of the player's view in degrees
      * @deprecated This method may fail without indication. Use
-     * {@link #trySetPosition(Vector3, float, float)} instead
+     *         {@link #trySetPosition(Vector3, float, float)} instead
      */
     @Deprecated
     default void setPosition(Vector3 pos, float pitch, float yaw) {
@@ -316,16 +317,14 @@ public interface Player extends Entity, Actor {
      * If so, this method will return {@code false}.
      * </p>
      *
-     * @param pos where to move them
+     * @param pos   where to move them
      * @param pitch the pitch (up/down) of the player's view in degrees
-     * @param yaw the yaw (left/right) of the player's view in degrees
+     * @param yaw   the yaw (left/right) of the player's view in degrees
      * @return if the move was able to occur
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "setPosition",
-        delegateParams = { Vector3.class, float.class, float.class }
+            delegateName = "setPosition",
+            delegateParams = {Vector3.class, float.class, float.class}
     )
     default boolean trySetPosition(Vector3 pos, float pitch, float yaw) {
         DeprecationUtil.checkDelegatingOverride(getClass());
@@ -339,15 +338,16 @@ public interface Player extends Entity, Actor {
      * Sends a fake block to the client.
      *
      * <p>
-     *     This block isn't real.
+     * This block isn't real.
      * </p>
      *
-     * @param pos The position of the block
+     * @param pos   The position of the block
      * @param block The block to send, null to reset
      */
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
 
-    public Region[] getCurrentRegions();
+    //FAWE start
+    Region[] getCurrentRegions();
 
     Region[] getCurrentRegions(FaweMaskManager.MaskType type);
 
@@ -383,14 +383,6 @@ public interface Player extends Entity, Actor {
      * @return Editing world
      */
     default World getWorldForEditing() {
-        VirtualWorld virtual = getSession().getVirtualWorld();
-        if (virtual != null) {
-            return virtual;
-        }
-//        CFICommands.CFISettings cfi = getMeta("CFISettings");
-//        if (cfi != null && cfi.hasGenerator() && cfi.getGenerator().hasPacketViewer()) {
-//            return cfi.getGenerator();
-//        }
         return WorldEdit.getInstance().getPlatformManager().getWorldForEditing(getWorld());
     }
 
@@ -402,7 +394,6 @@ public interface Player extends Entity, Actor {
         getSession().setClipboard(null);
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
             getSession().clearHistory();
-            getSession().unregisterTools(this);
         }
     }
 
@@ -412,8 +403,10 @@ public interface Player extends Entity, Actor {
      * Loads any history items from disk: - Should already be called if history on disk is enabled.
      */
     default void loadClipboardFromDisk() {
-        File file = MainUtil.getFile(Fawe.imp().getDirectory(),
-            Settings.IMP.PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd");
+        File file = MainUtil.getFile(
+                Fawe.imp().getDirectory(),
+                Settings.IMP.PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
+        );
         try {
             if (file.exists() && file.length() > 5) {
                 DiskOptimizedClipboard doc = new DiskOptimizedClipboard(file);
@@ -429,12 +422,19 @@ public interface Player extends Entity, Actor {
                 getSession().setClipboard(holder);
             }
         } catch (Exception event) {
-            printError("====== INVALID CLIPBOARD ======");
+            printError(TextComponent.of("====== INVALID CLIPBOARD ======"));
             event.printStackTrace();
-            printError("===============---=============");
-            printError("This shouldn't result in any failure");
-            printError("File: " + file.getName() + " (len:" + file.length() + ")");
-            printError("===============---=============");
+            print(Caption.of("fawe.error.stacktrace"));
+            print(Caption.of("fawe.error.no-failure"));
+            print(Caption.of(
+                    "File: ",
+                    TextComponent.of(file.getName()),
+                    TextComponent.of(" (len:"),
+                    TextComponent.of(file.length()),
+                    TextComponent.of(")")
+            ));
+            print(Caption.of("fawe.error.stacktrace"));
         }
     }
+    //FAWE end
 }

@@ -19,10 +19,12 @@
 
 package com.sk89q.worldedit.command.util;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.inject.InjectedValueAccess;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -43,25 +45,38 @@ public final class SubCommandPermissionCondition extends PermissionCondition {
     }
 
     public static class Generator {
+
         private final List<Command> subCommands;
 
-        public Generator(List<Command> subCommands) {
-            this.subCommands = subCommands;
+        public Generator(Collection<? extends Command> subCommands) {
+            this.subCommands = ImmutableList.copyOf(subCommands);
         }
 
         public Command.Condition build() {
-            final List<Command.Condition> conditions = subCommands.stream().map(Command::getCondition).collect(Collectors.toList());
-            final List<Optional<PermissionCondition>> permConds = conditions.stream().map(c -> c.as(PermissionCondition.class)).collect(Collectors.toList());
+            final List<Command.Condition> conditions = subCommands
+                    .stream()
+                    .map(Command::getCondition)
+                    .collect(Collectors.toList());
+            final List<Optional<PermissionCondition>> permConds = conditions
+                    .stream()
+                    .map(c -> c.as(PermissionCondition.class))
+                    .collect(Collectors.toList());
             if (permConds.stream().anyMatch(o -> !o.isPresent())) {
                 // if any sub-command doesn't require permissions, then this command doesn't require permissions
                 return new PermissionCondition(ImmutableSet.of());
             }
             // otherwise, this command requires any one subcommand to be available
-            final Set<String> perms = permConds.stream().map(Optional::get).flatMap(cond -> cond.getPermissions().stream()).collect(Collectors.toSet());
+            final Set<String> perms = permConds
+                    .stream()
+                    .map(Optional::get)
+                    .flatMap(cond -> cond.getPermissions().stream())
+                    .collect(Collectors.toSet());
             final Command.Condition aggregate = permConds.stream().map(Optional::get)
                     .map(c -> (Command.Condition) c)
                     .reduce(Command.Condition::or).orElse(TRUE);
             return new SubCommandPermissionCondition(perms, aggregate);
         }
+
     }
+
 }

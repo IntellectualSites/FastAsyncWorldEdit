@@ -1,17 +1,17 @@
 applyLibrariesConfiguration()
 
 dependencies {
-    "shade"("net.kyori:text-api:${Versions.TEXT}")
-    "shade"("net.kyori:text-serializer-gson:${Versions.TEXT}")
-    "shade"("net.kyori:text-serializer-legacy:${Versions.TEXT}")
-    "shade"("net.kyori:text-serializer-plain:${Versions.TEXT}")
-    "shade"("com.sk89q:jchronic:0.2.4a") {
+    "shade"(libs.adventureTextApi)
+    "shade"(libs.adventureTextSerializerGson)
+    "shade"(libs.adventureTextSerializerLegacy)
+    "shade"(libs.adventureTextSerializerPlain)
+    "shade"(libs.jchronic) {
         exclude(group = "junit", module = "junit")
     }
-    "shade"("com.thoughtworks.paranamer:paranamer:2.6")
-    "shade"("com.github.luben:zstd-jni:1.4.3-1")
-    "shade"("com.sk89q.lib:jlibnoise:1.0.0")
-    "shade"("org.enginehub.piston:core:${Versions.PISTON}")
-    "shade"("org.enginehub.piston.core-ap:runtime:${Versions.PISTON}")
-    "shade"("org.enginehub.piston:default-impl:${Versions.PISTON}")
+    "shade"(libs.paranamer)
+    "shade"(libs.jlibnoise)
+    "shade"(libs.piston)
+    "shade"(libs.pistonRuntime)
+    "shade"(libs.pistonImpl)
+    "shade"(libs.adventureNbt)
 }

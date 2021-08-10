@@ -60,7 +60,7 @@ public abstract class BlockBag {
             fetchBlock(blockState);
         } catch (OutOfBlocksException e) {
             BlockState placed = blockState; // TODO BlockType.getBlockBagItem(id, data);
-            if (placed == null || placed.getBlockType().getMaterial().isAir()) {
+            if (placed.getBlockType().getMaterial().isAir()) {
                 throw e; // TODO: check
             }
 
@@ -90,7 +90,7 @@ public abstract class BlockBag {
      * Store a block.
      *
      * @param blockState The block state
-     * @param amount The amount
+     * @param amount     The amount
      * @throws BlockBagException on error
      */
     public abstract void storeBlock(BlockState blockState, int amount) throws BlockBagException;
@@ -129,4 +129,5 @@ public abstract class BlockBag {
      * @param pos the position
      */
     public abstract void addSingleSourcePosition(Location pos);
+
 }

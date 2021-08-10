@@ -19,11 +19,12 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -32,7 +33,6 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.geom.Polygons;
 import com.sk89q.worldedit.regions.iterator.FlatRegion3DIterator;
 import com.sk89q.worldedit.regions.iterator.FlatRegionIterator;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
 import java.math.BigDecimal;
@@ -74,11 +74,11 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     /**
      * Construct the region.
      *
-     * @param world the world
+     * @param world  the world
      * @param center the center position
      * @param radius the radius along the X and Z axes
-     * @param minY the minimum Y, inclusive
-     * @param maxY the maximum Y, inclusive
+     * @param minY   the minimum Y, inclusive
+     * @param maxY   the maximum Y, inclusive
      */
     public CylinderRegion(World world, BlockVector3 center, Vector2 radius, int minY, int maxY) {
         super(world);
@@ -94,8 +94,8 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
      *
      * @param center the center position
      * @param radius the radius along the X and Z axes
-     * @param minY the minimum Y, inclusive
-     * @param maxY the maximum Y, inclusive
+     * @param minY   the minimum Y, inclusive
+     * @param maxY   the maximum Y, inclusive
      */
     public CylinderRegion(BlockVector3 center, Vector2 radius, int minY, int maxY) {
         super(null);
@@ -185,18 +185,11 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
 
     @Override
     public int getMaximumY() {
-        int worldMax = world != null ? world.getMaxY() - 1 : 255;
-        if (maxY > worldMax) {
-            return maxY = worldMax;
-        }
         return maxY;
     }
 
     @Override
     public int getMinimumY() {
-        if (minY < 0) {
-            return minY = 0;
-        }
         return minY;
     }
 
@@ -234,7 +227,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         }
 
         if ((diff.getBlockX() & 1) + (diff.getBlockZ() & 1) != 0) {
-            throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.cylinder.error.even-horizontal"));
+            throw new RegionOperationException(Caption.of("worldedit.selection.cylinder.error.even-horizontal"));
         }
 
         return diff.divide(2).floor();
@@ -304,7 +297,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     /**
      * Checks to see if a point is inside this region.
      */
-    /* Slow and unnecessary
+    /* FAWE start - Slow and unnecessary
     @Override
     public boolean contains(BlockVector3 position) {
         final int blockY = position.getBlockY();
@@ -339,6 +332,7 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
     public boolean contains(BlockVector3 position) {
         return contains(position.getX(), position.getY(), position.getZ());
     }
+    //FAWE end
 
     /**
      * Sets the height of the cylinder to fit the specified Y.
@@ -413,9 +407,12 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         return new CylinderRegion(center, radiusVec, minY, maxY);
     }
 
+    //FAWE start
     @Override
-    public void filter(final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
-        final IChunkGet get, final IChunkSet set, boolean full) {
+    public void filter(
+            final IChunk chunk, final Filter filter, final ChunkFilterBlock block,
+            final IChunkGet get, final IChunkSet set, boolean full
+    ) {
         int bcx = chunk.getX() >> 4;
         int bcz = chunk.getZ() >> 4;
         int tcx = bcx + 15;
@@ -426,4 +423,5 @@ public class CylinderRegion extends AbstractRegion implements FlatRegion {
         }
         super.filter(chunk, filter, block, get, set, full);
     }
+    //FAWE end
 }

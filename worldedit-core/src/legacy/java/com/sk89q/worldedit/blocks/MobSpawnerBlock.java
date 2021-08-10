@@ -37,7 +37,10 @@ import java.util.Map;
 
 /**
  * A mob spawner block.
+ * @deprecated WorldEdit does not handle interpreting NBT,
+ *     deprecated for removal without replacement
  */
+@Deprecated(forRemoval = true)
 public class MobSpawnerBlock extends BaseBlock {
 
     private String mobType;

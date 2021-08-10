@@ -37,8 +37,10 @@ import java.util.Set;
 public class CommandRegistration {
 
     static {
-        Bukkit.getServer().getHelpMap().registerHelpTopicFactory(DynamicPluginCommand.class,
-            new DynamicPluginCommandHelpTopic.Factory());
+        Bukkit.getServer().getHelpMap().registerHelpTopicFactory(
+                DynamicPluginCommand.class,
+                new DynamicPluginCommandHelpTopic.Factory()
+        );
     }
 
     protected final Plugin plugin;
@@ -72,8 +74,14 @@ public class CommandRegistration {
             return false;
         }
         for (CommandInfo command : registered) {
-            DynamicPluginCommand cmd = new DynamicPluginCommand(command.getAliases(),
-                    command.getDesc(), "/" + command.getAliases()[0] + " " + command.getUsage(), executor, command.getRegisteredWith(), plugin);
+            DynamicPluginCommand cmd = new DynamicPluginCommand(
+                    command.getAliases(),
+                    command.getDesc(),
+                    "/" + command.getAliases()[0] + " " + command.getUsage(),
+                    executor,
+                    command.getRegisteredWith(),
+                    plugin
+            );
             cmd.setPermissions(command.getPermissions());
             commandMap.register(plugin.getDescription().getName(), cmd);
         }
@@ -91,7 +99,7 @@ public class CommandRegistration {
         CommandMap commandMap = ReflectionUtil.getField(plugin.getServer().getPluginManager(), "commandMap");
         if (commandMap == null) {
             Bukkit.getServer().getLogger().severe(plugin.getDescription().getName()
-                + ": Could not retrieve server CommandMap, using fallback instead!");
+                    + ": Could not retrieve server CommandMap, using fallback instead!");
             fallbackCommands = commandMap = new SimpleCommandMap(Bukkit.getServer());
             Bukkit.getServer().getPluginManager().registerEvents(new FallbackRegistrationListener(fallbackCommands), plugin);
         } else {
@@ -108,7 +116,7 @@ public class CommandRegistration {
         if (knownCommands == null || aliases == null) {
             return false;
         }
-        for (Iterator<org.bukkit.command.Command> i = knownCommands.values().iterator(); i.hasNext();) {
+        for (Iterator<org.bukkit.command.Command> i = knownCommands.values().iterator(); i.hasNext(); ) {
             org.bukkit.command.Command cmd = i.next();
             if (cmd instanceof DynamicPluginCommand && ((DynamicPluginCommand) cmd).getOwner().equals(executor)) {
                 i.remove();

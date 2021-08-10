@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.internal.registry;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public abstract class AbstractFactory<E> {
     /**
      * Create a new factory.
      *
-     * @param worldEdit the WorldEdit instance
+     * @param worldEdit     the WorldEdit instance
      * @param defaultParser the parser to fall back to
      */
     protected AbstractFactory(WorldEdit worldEdit, InputParser<E> defaultParser) {
@@ -81,12 +81,12 @@ public abstract class AbstractFactory<E> {
             }
         }
 
-        throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(input)));
+        throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
     }
 
     public List<String> getSuggestions(String input) {
         return parsers.stream().flatMap(
-            p -> p.getSuggestions(input)
+                p -> p.getSuggestions(input)
         ).collect(Collectors.toList());
     }
 
@@ -100,4 +100,5 @@ public abstract class AbstractFactory<E> {
 
         parsers.add(parsers.size() - 1, inputParser);
     }
+
 }

@@ -30,10 +30,10 @@ import com.sk89q.worldedit.util.collection.BlockMap;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * An extent that can report back if an operation fails due to the extent(s) below it.
@@ -110,4 +110,5 @@ public class TracingExtent extends AbstractDelegateExtent {
     public String toString() {
         return "TracingExtent{delegate=" + getExtent() + "}";
     }
+
 }

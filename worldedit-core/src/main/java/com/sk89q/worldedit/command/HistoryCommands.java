@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -28,8 +29,8 @@ import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -55,94 +56,102 @@ public class HistoryCommands {
     }
 
     @Command(
-        name = "undo",
-        aliases = { "/undo" },
-        desc = "Undoes the last action (from history)"
+            name = "undo",
+            aliases = {"/undo"},
+            desc = "Undoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.undo", "worldedit.history.undo.self"})
-    public void undo(Player player, LocalSession session,
-                     @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of undoes to perform", def = "1")
-                         int times,
-                     @Arg(name = "player", desc = "Undo this player's operations", def = "")
-                         String playerName) throws WorldEditException {
+    public void undo(
+            Actor actor, LocalSession session,
+            @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of undoes to perform", def = "1")
+                    int times,
+            @Arg(name = "player", desc = "Undo this player's operations", def = "")
+                    String playerName
+    ) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession undoSession = session;
+        //FAWE start - Add fastmode check
         if (session.hasFastMode()) {
-            player.print(TranslatableComponent.of("fawe.worldedit.history.command.undo.disabled"));
+            actor.print(Caption.of("fawe.worldedit.history.command.undo.disabled"));
             return;
         }
+        //FAWE end
         if (playerName != null) {
-            player.checkPermission("worldedit.history.undo.other");
+            actor.checkPermission("worldedit.history.undo.other");
             undoSession = worldEdit.getSessionManager().findByName(playerName);
             if (undoSession == null) {
-                player.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
+                actor.print(Caption.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
                 return;
             }
         }
         int timesUndone = 0;
         for (int i = 0; i < times; ++i) {
-            EditSession undone = undoSession.undo(undoSession.getBlockBag(player), player);
+            BlockBag blockBag = actor instanceof Player ? undoSession.getBlockBag((Player) actor) : null;
+            EditSession undone = undoSession.undo(blockBag, actor);
             if (undone != null) {
                 timesUndone++;
-                worldEdit.flushBlockBag(player, undone);
+                worldEdit.flushBlockBag(actor, undone);
             } else {
                 break;
             }
         }
         if (timesUndone > 0) {
-            player.printInfo(TranslatableComponent.of("worldedit.undo.undone", TextComponent.of(timesUndone)));
+            actor.print(Caption.of("worldedit.undo.undone", TextComponent.of(timesUndone)));
         } else {
-            player.printError(TranslatableComponent.of("worldedit.undo.none"));
+            actor.print(Caption.of("worldedit.undo.none"));
         }
     }
 
     @Command(
-        name = "redo",
-        aliases = { "/redo" },
-        desc = "Redoes the last action (from history)"
+            name = "redo",
+            aliases = {"/redo"},
+            desc = "Redoes the last action (from history)"
     )
     @CommandPermissions({"worldedit.history.redo", "worldedit.history.redo.self"})
-    public void redo(Player player, LocalSession session,
-                     @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of redoes to perform", def = "1")
-                         int times,
-                     @Arg(name = "player", desc = "Redo this player's operations", def = "")
-                         String playerName) throws WorldEditException {
+    public void redo(
+            Actor actor, LocalSession session,
+            @Confirm(Confirm.Processor.LIMIT) @Arg(desc = "Number of redoes to perform", def = "1")
+                    int times,
+            @Arg(name = "player", desc = "Redo this player's operations", def = "")
+                    String playerName
+    ) throws WorldEditException {
         times = Math.max(1, times);
         LocalSession redoSession = session;
         if (playerName != null) {
-            player.checkPermission("worldedit.history.redo.other");
+            actor.checkPermission("worldedit.history.redo.other");
             redoSession = worldEdit.getSessionManager().findByName(playerName);
             if (redoSession == null) {
-                player.printError(TranslatableComponent.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
+                actor.print(Caption.of("worldedit.session.cant-find-session", TextComponent.of(playerName)));
                 return;
             }
         }
         int timesRedone = 0;
         for (int i = 0; i < times; ++i) {
-            EditSession redone = redoSession.redo(redoSession.getBlockBag(player), player);
+            BlockBag blockBag = actor instanceof Player ? redoSession.getBlockBag((Player) actor) : null;
+            EditSession redone = redoSession.redo(blockBag, actor);
             if (redone != null) {
                 timesRedone++;
-                worldEdit.flushBlockBag(player, redone);
+                worldEdit.flushBlockBag(actor, redone);
             } else {
                 break;
             }
         }
         if (timesRedone > 0) {
-            player.printInfo(TranslatableComponent.of("worldedit.redo.redone", TextComponent.of(timesRedone)));
+            actor.print(Caption.of("worldedit.redo.redone", TextComponent.of(timesRedone)));
         } else {
-            player.printError(TranslatableComponent.of("worldedit.redo.none"));
+            actor.print(Caption.of("worldedit.redo.none"));
         }
     }
 
     @Command(
-        name = "clearhistory",
-        aliases = { "/clearhistory" },
-        desc = "Clear your history"
+            name = "clearhistory",
+            aliases = {"/clearhistory"},
+            desc = "Clear your history"
     )
     @CommandPermissions("worldedit.history.clear")
     public void clearHistory(Actor actor, LocalSession session) {
         session.clearHistory();
-        actor.printInfo(TranslatableComponent.of("worldedit.clearhistory.cleared"));
+        actor.print(Caption.of("worldedit.clearhistory.cleared"));
     }
 
 }

@@ -22,7 +22,6 @@ package com.sk89q.worldedit.extent.world;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -36,13 +35,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class ChunkLoadingExtent extends AbstractDelegateExtent {
 
     private final World world;
-    private boolean enabled;
+    private final boolean enabled;
 
     /**
      * Create a new instance.
      *
-     * @param extent the extent
-     * @param world the world
+     * @param extent  the extent
+     * @param world   the world
      * @param enabled true to enable
      */
     public ChunkLoadingExtent(Extent extent, World world, boolean enabled) {
@@ -56,7 +55,7 @@ public class ChunkLoadingExtent extends AbstractDelegateExtent {
      * Create a new instance with chunk loading enabled.
      *
      * @param extent the extent
-     * @param world the world
+     * @param world  the world
      */
     public ChunkLoadingExtent(Extent extent, World world) {
         this(extent, world, true);
@@ -71,10 +70,11 @@ public class ChunkLoadingExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         if (enabled) {
-            world.checkLoadedChunk(position.toBlockVector3());
+            world.checkLoadedChunk(position);
         }
         return super.setBiome(position, biome);
     }
+
 }

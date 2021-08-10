@@ -49,7 +49,7 @@ public class NoMatchException extends InputParseException {
      * Create with a message and a cause.
      *
      * @param message the message
-     * @param cause the cause
+     * @param cause   the cause
      */
     public NoMatchException(Component message, Throwable cause) {
         super(message, cause);
@@ -59,7 +59,7 @@ public class NoMatchException extends InputParseException {
      * Create with a message and a cause.
      *
      * @param message the message
-     * @param cause the cause
+     * @param cause   the cause
      */
     @Deprecated
     public NoMatchException(String message, Throwable cause) {

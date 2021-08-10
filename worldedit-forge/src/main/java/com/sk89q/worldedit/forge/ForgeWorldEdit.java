@@ -24,6 +24,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
+import com.sk89q.worldedit.event.platform.SessionIdleEvent;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.forge.net.handler.InternalPacketHandler;
 import com.sk89q.worldedit.forge.net.handler.WECUIPacketHandler;
@@ -32,6 +33,7 @@ import com.sk89q.worldedit.forge.proxy.ClientProxy;
 import com.sk89q.worldedit.forge.proxy.CommonProxy;
 import com.sk89q.worldedit.forge.proxy.ServerProxy;
 import com.sk89q.worldedit.internal.anvil.ChunkDeleter;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockCategory;
@@ -48,6 +50,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickEmpty;
 import net.minecraftforge.eventbus.api.Event;
@@ -64,7 +67,6 @@ import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -83,7 +85,7 @@ import static com.sk89q.worldedit.internal.anvil.ChunkDeleter.DELCHUNKS_FILE_NAM
 @Mod(ForgeWorldEdit.MOD_ID)
 public class ForgeWorldEdit {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     public static final String MOD_ID = "worldedit";
     public static final String CUI_PLUGIN_CHANNEL = "cui";
 
@@ -282,6 +284,14 @@ public class ForgeWorldEdit {
             adaptPlayer(parseResults.getContext().getSource().asPlayer()),
             parseResults.getReader().getString()
         ));
+    }
+
+    @SubscribeEvent
+    public void onPlayerLogOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getPlayer() instanceof ServerPlayerEntity) {
+            WorldEdit.getInstance().getEventBus()
+                    .post(new SessionIdleEvent(new ForgePlayer.SessionKeyImpl((ServerPlayerEntity) event.getPlayer())));
+        }
     }
 
     /**

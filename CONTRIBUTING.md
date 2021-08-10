@@ -5,10 +5,7 @@ Thank you for your interest in contributing to FastAsyncWorldEdit! We appreciate
 effort, but to make sure that the inclusion of your patch is a smooth process, we
 ask that you make note of the following guidelines.
 
-* **Follow the [Oracle coding conventions](http://www.oracle.com/technetwork/java/codeconv-138413.html).**
-  We can't stress this enough; if your code has notable issues, it may delay
-  the process significantly.
-* **Target Java 8 for source and compilation.** Make sure to mark methods with
+* **Target Java 11 for source and compilation.** Make sure to mark methods with
   ` @Override` that override methods of parent classes, or that implement
   methods of interfaces.
 * **Use only spaces for indentation.** Our indents are 4-spaces long, and tabs
@@ -24,12 +21,19 @@ ask that you make note of the following guidelines.
   around ten minutes to think about what the code is doing and whether it
   seems awfully roundabout. If you had to copy the same large piece of
   code in several places, that's bad.
+* **Annotate modified upstream (WorldEdit) code.** Doing so makes it easier to differentiate
+  between modifications. Take a look at the [Examples](#example) how that's been done.
 * **Keep commit summaries under 70 characters.** For more details, place two
   new lines after the summary line and write away!
 * **Test your code.** We're not interested in broken code, for the obvious reasons.
 * **Write unit tests.** While this is strictly optional, we recommend it for
   complicated algorithms.
 
+
+Additional Notes
+----------------
+If you're submitting a feature, base your code on `main` and PR against the
+`main` branch.
 
 Checklist
 ---------
@@ -55,15 +59,33 @@ adjust past changes.
 Example
 -------
 
+### Code style
 This is **GOOD:**
 
+```java
     if (var.func(param1, param2)) {
         // do things
     }
+```
 
-This is **EXTREMELY BAD:**
-
+This is **VERY BAD:**
+```java
     if(var.func( param1, param2 ))
     {
         // do things
     }
+```
+
+### Diff Annotations
+```java
+//FAWE start
+public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
+        return WEManager.IMP.getMask(this, type);
+}
+//FAWE end
+```
+```java
+//FAWE start - extends PassthroughExtent > implements Extent
+public class EditSession extends PassthroughExtent implements AutoCloseable {
+//FAWE end
+```

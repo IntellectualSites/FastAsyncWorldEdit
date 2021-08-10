@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.tool;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -29,10 +30,11 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
+import javax.annotation.Nullable;
 
 /**
  * A mode that replaces one block.
@@ -51,10 +53,17 @@ public class BlockReplacer implements DoubleActionBlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
+    public boolean actPrimary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         BlockBag bag = session.getBlockBag(player);
 
-        try (EditSession editSession = session.createEditSession(player, "BlockReplacer")) {
+        try (EditSession editSession = session.createEditSession(player)) {
             try {
                 BlockVector3 position = clicked.toVector().toBlockPoint();
                 editSession.setBlock(position, pattern);
@@ -73,12 +82,19 @@ public class BlockReplacer implements DoubleActionBlockTool {
 
 
     @Override
-    public boolean actSecondary(Platform server, LocalConfiguration config, Player player, LocalSession session, Location clicked) {
+    public boolean actSecondary(
+            Platform server,
+            LocalConfiguration config,
+            Player player,
+            LocalSession session,
+            Location clicked,
+            @Nullable Direction face
+    ) {
         BaseBlock targetBlock = player.getWorld().getFullBlock(clicked.toVector().toBlockPoint());
 
         if (targetBlock != null) {
             pattern = targetBlock;
-            player.printInfo(TranslatableComponent.of("worldedit.tool.repl.switched", TextComponent.of(targetBlock.getBlockType().getName())));
+            player.print(Caption.of("worldedit.tool.repl.switched", targetBlock.getBlockType().getRichName()));
         }
 
         return true;

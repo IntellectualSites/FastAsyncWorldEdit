@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;
@@ -27,8 +28,6 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 
 import java.util.Iterator;
 
@@ -82,10 +81,10 @@ public class EntityVisitor implements Operation {
 
     @Override
     public Iterable<Component> getStatusMessages() {
-        return ImmutableList.of(TranslatableComponent.of(
+        return ImmutableList.of(Caption.of(
                 "worldedit.operation.affected.entity",
                 TextComponent.of(getAffected())
-        ).color(TextColor.GRAY));
+        ));
     }
 
 }

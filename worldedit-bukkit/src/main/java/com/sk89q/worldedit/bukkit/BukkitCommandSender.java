@@ -30,9 +30,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -100,7 +100,7 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(sender, WorldEditText.format(component, getLocale()));
+        TextAdapter.sendMessage(sender, WorldEditText.format(component, getLocale()));
     }
 
     @Override
@@ -113,8 +113,11 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
         return true;
     }
 
-    @Override public void setPermission(String permission, boolean value) {
+    //FAWE start
+    @Override
+    public void setPermission(String permission, boolean value) {
     }
+    //FAWE end
 
     @Override
     public void checkPermission(String permission) throws AuthorizationException {
@@ -140,10 +143,12 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
 
             @Override
             public boolean isActive() {
+                //FAWE start - check if sender instanceof Entity, before returning true
                 if (sender instanceof Entity) {
                     Entity entity = (Entity) sender;
                     return entity.isValid() && !entity.isDead();
                 }
+                //FAWE end
                 return true;
             }
 
@@ -158,4 +163,5 @@ public class BukkitCommandSender extends AbstractNonPlayerActor {
             }
         };
     }
+
 }

@@ -37,4 +37,5 @@ public @interface CommandPermissions {
     String[] value() default {};
 
     boolean queued() default true;
+
 }

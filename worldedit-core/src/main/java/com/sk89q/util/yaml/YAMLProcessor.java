@@ -19,9 +19,9 @@
 
 package com.sk89q.util.yaml;
 
+import com.fastasyncworldedit.core.configuration.Yaml;
 import com.sk89q.util.StringUtil;
 import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.reader.UnicodeReader;
@@ -184,7 +184,7 @@ public class YAMLProcessor extends YAMLNode {
                 yaml.dump(root, writer);
             } else {
                 // Iterate over each root-level property and dump
-                for (Entry<String, Object> entry: root.entrySet()) {
+                for (Entry<String, Object> entry : root.entrySet()) {
                     // Output comment, if present
                     String comment = comments.get(entry.getKey());
                     if (comment != null) {
@@ -246,9 +246,9 @@ public class YAMLProcessor extends YAMLNode {
     /**
      * Set a root-level comment.
      *
-     * @param key the property key
+     * @param key     the property key
      * @param comment the comment. May be {@code null}, in which case the comment
-     *      is removed.
+     *                is removed.
      */
     public void setComment(String key, String... comment) {
         if (comment != null && comment.length > 0) {
@@ -290,7 +290,7 @@ public class YAMLProcessor extends YAMLNode {
      * select a node from a node list.
      *
      * @param writeDefaults true to write default values when a property is
-     *      requested that doesn't exist
+     *                      requested that doesn't exist
      * @return a node
      */
     public static YAMLNode getEmptyNode(boolean writeDefaults) {
@@ -298,9 +298,11 @@ public class YAMLProcessor extends YAMLNode {
     }
 
     private static class FancyRepresenter extends Representer {
+
         private FancyRepresenter() {
             this.nullRepresenter = o -> representScalar(Tag.NULL, "");
         }
+
     }
 
 }

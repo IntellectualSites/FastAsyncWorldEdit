@@ -1,17 +1,17 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.0"
+    kotlin("jvm") version "1.5.0-RC"
     application
 }
 
 applyCommonConfiguration()
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 
-application.mainClassName = "com.sk89q.worldedit.internal.util.DocumentationPrinter"
+application.mainClass.set("com.sk89q.worldedit.internal.util.DocumentationPrinter")
 tasks.named<JavaExec>("run") {
     workingDir = rootProject.projectDir
 }
@@ -21,5 +21,5 @@ dependencies {
     "implementation"(project(":worldedit-core"))
     "implementation"(kotlin("stdlib-jdk8"))
     "implementation"(kotlin("reflect"))
-    "implementation"("com.google.guava:guava:${Versions.GUAVA}")
+    "implementation"("com.google.guava:guava")
 }

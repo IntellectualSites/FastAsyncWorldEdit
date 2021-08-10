@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -26,6 +27,7 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.block.BlockType;
 
@@ -58,18 +60,18 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> {
 
         BlockCategory category = BlockCategory.REGISTRY.get(tag);
         if (category == null) {
-            throw new InputParseException("Unknown block tag: " + tag);
+            throw new InputParseException(Caption.of("worldedit.error.unknown-tag", TextComponent.of(tag)));
         }
         RandomPattern randomPattern = new RandomPattern();
 
         Set<BlockType> blocks = category.getAll();
         if (blocks.isEmpty()) {
-            throw new InputParseException("Block tag " + category.getId() + " had no blocks!");
+            throw new InputParseException(Caption.of("worldedit.error.empty-tag", TextComponent.of(category.getId())));
         }
 
         if (anyState) {
             blocks.stream().flatMap(blockType -> blockType.getAllStates().stream()).forEach(state ->
-                randomPattern.add(state, 1.0));
+                    randomPattern.add(state, 1.0));
         } else {
             for (BlockType blockType : blocks) {
                 randomPattern.add(blockType.getDefaultState(), 1.0);
@@ -78,4 +80,5 @@ public class BlockCategoryPatternParser extends InputParser<Pattern> {
 
         return randomPattern;
     }
+
 }

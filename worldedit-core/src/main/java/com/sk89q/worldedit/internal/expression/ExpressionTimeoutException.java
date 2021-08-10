@@ -23,7 +23,9 @@ package com.sk89q.worldedit.internal.expression;
  * Thrown when an evaluation exceeds the timeout time.
  */
 public class ExpressionTimeoutException extends EvaluationException {
+
     public ExpressionTimeoutException(String message) {
         super(-1, message);
     }
+
 }

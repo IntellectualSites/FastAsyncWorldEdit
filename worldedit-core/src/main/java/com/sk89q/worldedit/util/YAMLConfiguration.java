@@ -25,10 +25,11 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.session.SessionManager;
 import com.sk89q.worldedit.util.report.Unreported;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Locale;
 
 /**
  * A less simple implementation of {@link LocalConfiguration}
@@ -36,8 +37,10 @@ import java.util.HashSet;
  */
 public class YAMLConfiguration extends LocalConfiguration {
 
-    @Unreported protected final YAMLProcessor config;
-    @Unreported protected final Logger logger;
+    @Unreported
+    protected final YAMLProcessor config;
+    @Unreported
+    protected final Logger logger;
 
     public YAMLConfiguration(YAMLProcessor config, Logger logger) {
         this.config = config;
@@ -54,22 +57,33 @@ public class YAMLConfiguration extends LocalConfiguration {
 
         profile = config.getBoolean("debug", profile);
         traceUnflushedSessions = config.getBoolean("debugging.trace-unflushed-sessions", traceUnflushedSessions);
-        wandItem = convertLegacyItem(config.getString("wand-item", wandItem));
+        wandItem = convertLegacyItem(config.getString("wand-item", wandItem)).toLowerCase(Locale.ROOT);
 
         defaultChangeLimit = Math.max(-1, config.getInt(
                 "limits.max-blocks-changed.default", defaultChangeLimit));
-        maxChangeLimit = Math.max(-1,
-                config.getInt("limits.max-blocks-changed.maximum", maxChangeLimit));
+        maxChangeLimit = Math.max(
+                -1,
+                config.getInt("limits.max-blocks-changed.maximum", maxChangeLimit)
+        );
 
-        defaultVerticalHeight = Math.max(1,
-                config.getInt("limits.vertical-height.default", defaultVerticalHeight));
+        defaultVerticalHeight = Math.max(
+                1,
+                config.getInt("limits.vertical-height.default", defaultVerticalHeight)
+        );
 
-        defaultMaxPolygonalPoints = Math.max(-1,
-                config.getInt("limits.max-polygonal-points.default", defaultMaxPolygonalPoints));
-        maxPolygonalPoints = Math.max(-1,
-                config.getInt("limits.max-polygonal-points.maximum", maxPolygonalPoints));
+        defaultMaxPolygonalPoints = Math.max(
+                -1,
+                config.getInt("limits.max-polygonal-points.default", defaultMaxPolygonalPoints)
+        );
+        maxPolygonalPoints = Math.max(
+                -1,
+                config.getInt("limits.max-polygonal-points.maximum", maxPolygonalPoints)
+        );
 
-        defaultMaxPolyhedronPoints = Math.max(-1, config.getInt("limits.max-polyhedron-points.default", defaultMaxPolyhedronPoints));
+        defaultMaxPolyhedronPoints = Math.max(
+                -1,
+                config.getInt("limits.max-polyhedron-points.default", defaultMaxPolyhedronPoints)
+        );
         maxPolyhedronPoints = Math.max(-1, config.getInt("limits.max-polyhedron-points.maximum", maxPolyhedronPoints));
 
         maxRadius = Math.max(-1, config.getInt("limits.max-radius", maxRadius));
@@ -80,8 +94,10 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherDefaultRadius = Math.max(-1, config.getInt("limits.butcher-radius.default", butcherDefaultRadius));
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
-        disallowedBlocks = new HashSet<>(config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks())));
-        disallowedBlocksMask = null;
+        disallowedBlocks = new HashSet<>(config.getStringList(
+                "limits.disallowed-blocks",
+                Lists.newArrayList(getDefaultDisallowedBlocks())
+        ));
         allowedDataCycleBlocks = new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
 
         registerHelp = config.getBoolean("register-help", true);
@@ -89,18 +105,24 @@ public class YAMLConfiguration extends LocalConfiguration {
         logFile = config.getString("logging.file", logFile);
         logFormat = config.getString("logging.format", logFormat);
 
-        superPickaxeDrop = config.getBoolean("super-pickaxe.drop-items",
-                superPickaxeDrop);
+        superPickaxeDrop = config.getBoolean(
+                "super-pickaxe.drop-items",
+                superPickaxeDrop
+        );
         superPickaxeManyDrop = config.getBoolean(
                 "super-pickaxe.many-drop-items", superPickaxeManyDrop);
 
         useInventory = config.getBoolean("use-inventory.enable", useInventory);
-        useInventoryOverride = config.getBoolean("use-inventory.allow-override",
-                useInventoryOverride);
-        useInventoryCreativeOverride = config.getBoolean("use-inventory.creative-mode-overrides",
-                useInventoryCreativeOverride);
+        useInventoryOverride = config.getBoolean(
+                "use-inventory.allow-override",
+                useInventoryOverride
+        );
+        useInventoryCreativeOverride = config.getBoolean(
+                "use-inventory.creative-mode-overrides",
+                useInventoryCreativeOverride
+        );
 
-        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand));
+        navigationWand = convertLegacyItem(config.getString("navigation-wand.item", navigationWand)).toLowerCase(Locale.ROOT);
         navigationWandMaxDistance = config.getInt("navigation-wand.max-distance", navigationWandMaxDistance);
         navigationUseGlass = config.getBoolean("navigation.use-glass", navigationUseGlass);
 

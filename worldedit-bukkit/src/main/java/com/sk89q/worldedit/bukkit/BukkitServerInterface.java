@@ -19,11 +19,13 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.google.common.collect.Sets;
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
@@ -32,16 +34,20 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.MultiUserPlatform;
 import com.sk89q.worldedit.extension.platform.Preference;
 import com.sk89q.worldedit.extension.platform.Watchdog;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.SideEffect;
-import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.registry.Registries;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.enginehub.piston.CommandManager;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -50,30 +56,29 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 import static com.sk89q.worldedit.util.formatting.WorldEditText.reduceToText;
 
 public class BukkitServerInterface extends AbstractPlatform implements MultiUserPlatform {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     public final Server server;
     public final WorldEditPlugin plugin;
     private final CommandRegistration dynamicCommands;
-    private final LazyReference<Watchdog> watchdog;
+    private final Lifecycled<Watchdog> watchdog;
+    //FAWE start
+    private RelighterFactory relighterFactory;
+    //FAWE end
     private boolean hookingEvents;
 
     public BukkitServerInterface(WorldEditPlugin plugin, Server server) {
         this.plugin = plugin;
         this.server = server;
         this.dynamicCommands = new CommandRegistration(plugin);
-        this.watchdog = LazyReference.from(() -> {
-            if (plugin.getBukkitImplAdapter() != null) {
-                return plugin.getBukkitImplAdapter().supportsWatchdog()
-                    ? new BukkitWatchdog(plugin.getBukkitImplAdapter())
-                    : null;
-            }
-            return null;
-        });
+        this.watchdog = plugin.getLifecycledBukkitImplAdapter()
+                .filter(BukkitImplAdapter::supportsWatchdog)
+                .map(BukkitWatchdog::new);
     }
 
     CommandRegistration getDynamicCommands() {
@@ -92,7 +97,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     @SuppressWarnings("deprecation")
     @Override
     public int getDataVersion() {
-        if (plugin.getBukkitImplAdapter() != null) {
+        if (plugin.getLifecycledBukkitImplAdapter() != null) {
             return Bukkit.getUnsafe().getDataVersion();
         }
         return -1;
@@ -111,8 +116,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         if (!type.startsWith("minecraft:")) {
             return false;
         }
-        @SuppressWarnings("deprecation")
-        final EntityType entityType = EntityType.fromName(type.substring(10));
+        @SuppressWarnings("deprecation") final EntityType entityType = EntityType.fromName(type.substring(10));
         return entityType != null && entityType.isAlive();
     }
 
@@ -128,7 +132,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public Watchdog getWatchdog() {
-        return watchdog.getValue();
+        return watchdog.value().orElse(null);
     }
 
     @Override
@@ -170,27 +174,34 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         BukkitCommandInspector inspector = new BukkitCommandInspector(plugin, dispatcher);
 
         dynamicCommands.register(dispatcher.getAllCommands()
-            .map(command -> {
-                String[] permissionsArray = command.getCondition()
-                    .as(PermissionCondition.class)
-                    .map(PermissionCondition::getPermissions)
-                    .map(s -> s.toArray(new String[0]))
-                    .orElseGet(() -> new String[0]);
+                .map(command -> {
+                    String[] permissionsArray = command.getCondition()
+                            .as(PermissionCondition.class)
+                            .map(PermissionCondition::getPermissions)
+                            .map(s -> s.toArray(new String[0]))
+                            .orElseGet(() -> new String[0]);
 
-                String[] aliases = Stream.concat(
-                    Stream.of(command.getName()),
-                    command.getAliases().stream()
-                ).toArray(String[]::new);
-                // TODO Handle localisation correctly
-                return new CommandInfo(reduceToText(command.getUsage(), WorldEdit.getInstance().getConfiguration().defaultLocale),
-                    reduceToText(command.getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale), aliases,
-                    inspector, permissionsArray);
-            }).collect(Collectors.toList()));
+                    String[] aliases = Stream.concat(
+                            Stream.of(command.getName()),
+                            command.getAliases().stream()
+                    ).toArray(String[]::new);
+                    // TODO Handle localisation correctly
+                    return new CommandInfo(
+                            reduceToText(
+                                    command.getUsage(),
+                                    WorldEdit.getInstance().getConfiguration().defaultLocale
+                            ),
+                            reduceToText(command.getDescription(), WorldEdit.getInstance().getConfiguration().defaultLocale),
+                            aliases,
+                            inspector,
+                            permissionsArray
+                    );
+                }).collect(Collectors.toList()));
     }
 
     @Override
-    public void registerGameHooks() {
-        hookingEvents = true;
+    public void setGameHooksEnabled(boolean enabled) {
+        this.hookingEvents = enabled;
     }
 
     @Override
@@ -212,6 +223,13 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     public String getPlatformVersion() {
         return plugin.getDescription().getVersion();
     }
+
+    //FAWE start
+    @Override
+    public String getId() {
+        return "intellectualsites:bukkit";
+    }
+    //FAWE end
 
     @Override
     public Map<Capability, Preference> getCapabilities() {
@@ -249,4 +267,16 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         }
         return users;
     }
+
+    //FAWE start
+    @Override
+    public @Nonnull
+    RelighterFactory getRelighterFactory() {
+        if (this.relighterFactory == null) {
+            this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
+            LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");
+        }
+        return this.relighterFactory;
+    }
+    //FAWE end
 }

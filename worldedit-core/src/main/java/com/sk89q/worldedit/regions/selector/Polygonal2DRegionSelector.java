@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions.selector;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -34,13 +35,12 @@ import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.limit.SelectorLimits;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -69,9 +69,11 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     }
 
 
+    //FAWE start
     public Polygonal2DRegionSelector(Polygonal2DRegion region) {
         this.region = region;
     }
+    //FAWE end
 
     /**
      * Create a new selector from another one.
@@ -107,10 +109,10 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
     /**
      * Create a new selector.
      *
-     * @param world the world
+     * @param world  the world
      * @param points a list of points
-     * @param minY the minimum Y
-     * @param maxY the maximum Y
+     * @param minY   the minimum Y
+     * @param maxY   the maximum Y
      */
     public Polygonal2DRegionSelector(@Nullable World world, List<BlockVector2> points, int minY, int maxY) {
         checkNotNull(points);
@@ -170,7 +172,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainPrimarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.printInfo(TranslatableComponent.of("worldedit.selection.polygon2d.explain.primary", TextComponent.of(pos.toString())));
+        player.print(Caption.of("worldedit.selection.polygon2d.explain.primary", TextComponent.of(pos.toString())));
 
         session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
         session.dispatchCUIEvent(player, new SelectionPoint2DEvent(0, pos, getVolume()));
@@ -179,7 +181,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public void explainSecondarySelection(Actor player, LocalSession session, BlockVector3 pos) {
-        player.printInfo(TranslatableComponent.of(
+        player.print(Caption.of(
                 "worldedit.selection.polygon2d.explain.secondary",
                 TextComponent.of(region.size()),
                 TextComponent.of(pos.toString())
@@ -242,7 +244,7 @@ public class Polygonal2DRegionSelector implements RegionSelector, CUIRegion {
 
     @Override
     public List<Component> getSelectionInfoLines() {
-        return Collections.singletonList(TranslatableComponent.of("worldedit.selection.polygon2d.info", TextComponent.of(region.size())));
+        return Collections.singletonList(Caption.of("worldedit.selection.polygon2d.info", TextComponent.of(region.size())));
     }
 
     @Override

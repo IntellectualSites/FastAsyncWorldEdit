@@ -19,16 +19,17 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.worldedit.util.nbt.ShortBinaryTag;
+
 /**
  * The {@code TAG_Short} tag.
+ *
+ * @deprecated Use {@link ShortBinaryTag}.
  */
-public final class ShortTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_SHORT;
-    }
+@Deprecated
+public final class ShortTag extends Tag {
 
-    private final short value;
+    private final ShortBinaryTag innerTag;
 
     /**
      * Creates the tag with an empty name.
@@ -37,17 +38,29 @@ public final class ShortTag extends NumberTag {
      */
     public ShortTag(short value) {
         super();
-        this.value = value;
+        this.innerTag = ShortBinaryTag.of(value);
+    }
+
+    public ShortTag(ShortBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
+    }
+
+    @Override
+    public ShortBinaryTag asBinaryTag() {
+        return this.innerTag;
     }
 
     @Override
     public Short getValue() {
-        return value;
+        return innerTag.value();
     }
 
+    //FAWE start
     @Override
-    public String toString() {
-        return "TAG_Short(" + value + ")";
+    public int getTypeCode() {
+        return NBTConstants.TYPE_SHORT;
     }
+    //FAWE end
 
 }

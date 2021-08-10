@@ -42,11 +42,11 @@ public final class ZipArchiveNioSupport implements ArchiveNioSupport {
             return Optional.empty();
         }
         FileSystem zipFs = FileSystems.newFileSystem(
-            archive, getClass().getClassLoader()
+                archive, getClass().getClassLoader()
         );
         Path root = ArchiveNioSupports.skipRootSameName(
-            zipFs.getPath("/"), archive.getFileName().toString()
-                .replaceFirst("\\.zip$", "")
+                zipFs.getPath("/"), archive.getFileName().toString()
+                        .replaceFirst("\\.zip$", "")
         );
         return Optional.of(new ArchiveDir() {
             @Override

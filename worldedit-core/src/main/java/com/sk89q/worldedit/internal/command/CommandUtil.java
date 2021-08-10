@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.internal.command;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -26,9 +27,9 @@ import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.NoInputCommandParameters;
@@ -50,17 +51,14 @@ import static java.util.stream.Collectors.toList;
 
 public class CommandUtil {
 
-    private static final Component DEPRECATION_MARKER = TextComponent.of("This command is deprecated.");
+    private static final Component DEPRECATION_MARKER = Caption.of("worldedit.command.deprecation");
 
-    private static Component makeDeprecatedFooter(String reason, Component newCommand) {
+    private static Component makeDeprecatedFooter(String reason, Component replacement) {
         return TextComponent.builder()
-            .append(DEPRECATION_MARKER)
-            .append(" " + reason + ".")
-            .append(TextComponent.newline())
-            .append(TextComponent.of("Use ", TextColor.GOLD, TextDecoration.ITALIC))
-            .append(newCommand)
-            .append(TextComponent.of(" instead.", TextColor.GOLD, TextDecoration.ITALIC))
-            .build();
+                .append(DEPRECATION_MARKER)
+                .append(" " + reason + ".")
+                .append(TextComponent.newline())
+                .build();
     }
 
     public interface NewCommandGenerator {
@@ -69,48 +67,76 @@ public class CommandUtil {
 
     }
 
-    public static Command deprecate(Command command, String reason,
-                                    NewCommandGenerator newCommandGenerator) {
+    public interface ReplacementMessageGenerator {
+
+        /**
+         * Generate text that says "Please use [cmd] instead." and allows clicking to dump
+         * the command to the text box.
+         */
+        static ReplacementMessageGenerator forNewCommand(NewCommandGenerator generator) {
+            return (oldCommand, oldParameters) -> {
+                String suggestedCommand = generator.newCommand(oldCommand, oldParameters);
+                return createNewCommandReplacementText(suggestedCommand);
+            };
+        }
+
+        Component getReplacement(Command oldCommand, CommandParameters oldParameters);
+
+    }
+
+    public static Component createNewCommandReplacementText(String suggestedCommand) {
+        return TranslatableComponent.builder("worldedit.command.deprecation-message")
+                .append(TextComponent.of(suggestedCommand)
+                        .clickEvent(ClickEvent.suggestCommand(suggestedCommand)))
+                .build();
+    }
+
+    public static Command deprecate(
+            Command command, String reason,
+            ReplacementMessageGenerator replacementMessageGenerator
+    ) {
         Component deprecatedWarning = makeDeprecatedFooter(
-            reason,
-            newCommandSuggestion(newCommandGenerator,
-                NoInputCommandParameters.builder().build(),
-                command)
+                reason,
+                replacementMessageGenerator.getReplacement(
+                        command,
+                        NoInputCommandParameters.builder().build()
+                )
         );
         return command.toBuilder()
-            .action(parameters ->
-                deprecatedCommandWarning(parameters, command, reason, newCommandGenerator))
-            .footer(command.getFooter()
-                .map(existingFooter -> existingFooter
-                    .append(TextComponent.newline()).append(deprecatedWarning))
-                .orElse(deprecatedWarning))
-            .build();
+                .action(parameters ->
+                        deprecatedCommandWarning(parameters, command, reason, replacementMessageGenerator))
+                .footer(command.getFooter()
+                        .map(existingFooter -> existingFooter
+                                .append(TextComponent.newline())
+                                .append(deprecatedWarning))
+                        .orElse(deprecatedWarning))
+                .build();
     }
 
     public static Optional<Component> footerWithoutDeprecation(Command command) {
         return command.getFooter()
-            .filter(footer -> anyComponent(footer, Predicate.isEqual(DEPRECATION_MARKER)))
-            .map(footer -> Optional.of(
-                replaceDeprecation(footer)
-            ))
-            .orElseGet(command::getFooter);
+                .filter(footer -> anyComponent(footer, Predicate.isEqual(DEPRECATION_MARKER)))
+                .map(footer -> Optional.of(
+                        replaceDeprecation(footer)
+                ))
+                .orElseGet(command::getFooter);
     }
 
     public static Optional<Component> deprecationWarning(Command command) {
         return command.getFooter()
-            .map(CommandUtil::extractDeprecation)
-            .orElseGet(command::getFooter);
+                .map(CommandUtil::extractDeprecation)
+                .orElseGet(command::getFooter);
     }
 
     public static boolean isDeprecated(Command command) {
         return command.getFooter()
-            .filter(footer -> anyComponent(footer, Predicate.isEqual(DEPRECATION_MARKER)))
-            .isPresent();
+                .filter(footer -> anyComponent(footer, Predicate.isEqual(DEPRECATION_MARKER)))
+                .isPresent();
     }
 
     private static boolean anyComponent(Component component, Predicate<Component> test) {
         return test.test(component) || component.children().stream()
-            .anyMatch(x -> anyComponent(x, test));
+                .anyMatch(x -> anyComponent(x, test));
     }
 
     private static Component replaceDeprecation(Component component) {
@@ -118,9 +144,9 @@ public class CommandUtil {
             return TextComponent.empty();
         }
         return component.children(
-            component.children().stream()
-                .map(CommandUtil::replaceDeprecation)
-                .collect(toList())
+                component.children().stream()
+                        .map(CommandUtil::replaceDeprecation)
+                        .collect(toList())
         );
     }
 
@@ -129,43 +155,45 @@ public class CommandUtil {
             return Optional.of(component);
         }
         return component.children().stream()
-            .map(CommandUtil::extractDeprecation)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .findAny();
+                .map(CommandUtil::extractDeprecation)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findAny();
     }
 
     private static int deprecatedCommandWarning(
-        CommandParameters parameters,
-        Command command,
-        String reason,
-        NewCommandGenerator generator
+            CommandParameters parameters,
+            Command command,
+            String reason,
+            ReplacementMessageGenerator generator
     ) throws Exception {
         parameters.injectedValue(Key.of(Actor.class))
-            .ifPresent(actor -> {
-                Component suggestion = newCommandSuggestion(generator, parameters, command);
-                actor.print(TextComponent.of(reason + ". Please use ", TextColor.GOLD)
-                    .append(suggestion)
-                    .append(TextComponent.of(" instead."))
+                .ifPresent(actor ->
+                        sendDeprecationMessage(parameters, command, reason, generator, actor)
                 );
-            });
         return command.getAction().run(parameters);
     }
 
-    private static Component newCommandSuggestion(NewCommandGenerator generator,
-                                                  CommandParameters parameters,
-                                                  Command command) {
-        String suggestedCommand = generator.newCommand(command, parameters);
-        return TextComponent.of(suggestedCommand)
-            .decoration(TextDecoration.UNDERLINED, true)
-            .clickEvent(ClickEvent.suggestCommand(suggestedCommand));
+    private static void sendDeprecationMessage(
+            CommandParameters parameters,
+            Command command,
+            String reason,
+            ReplacementMessageGenerator generator,
+            Actor actor
+    ) {
+        Component replacement = generator.getReplacement(command, parameters);
+        actor.print(
+                TextComponent.builder(reason + ". ", TextColor.GOLD)
+                        .append(replacement)
+                        .build()
+        );
     }
 
     public static Map<String, Command> getSubCommands(Command currentCommand) {
         return currentCommand.getParts().stream()
-            .filter(p -> p instanceof SubCommandPart)
-            .flatMap(p -> ((SubCommandPart) p).getCommands().stream())
-            .collect(Collectors.toMap(Command::getName, Function.identity()));
+                .filter(p -> p instanceof SubCommandPart)
+                .flatMap(p -> ((SubCommandPart) p).getCommands().stream())
+                .collect(Collectors.toMap(Command::getName, Function.identity()));
     }
 
     private static String clean(String input) {
@@ -173,7 +201,7 @@ public class CommandUtil {
     }
 
     private static final Comparator<Command> BY_CLEAN_NAME =
-        Comparator.comparing(c -> clean(c.getName()));
+            Comparator.comparing(c -> clean(c.getName()));
 
     public static Comparator<Command> byCleanName() {
         return BY_CLEAN_NAME;
@@ -184,15 +212,15 @@ public class CommandUtil {
      */
     public static List<String> fixSuggestions(String arguments, List<Substring> suggestions) {
         Substring lastArg = Iterables.getLast(
-            CommandArgParser.spaceSplit(arguments)
+                CommandArgParser.spaceSplit(arguments)
         );
         return suggestions.stream()
-            // Re-map suggestions to only operate on the last non-quoted word
-            .map(suggestion -> onlyOnLastQuotedWord(lastArg, suggestion))
-            .map(suggestion -> suggestLast(lastArg, suggestion))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .collect(toList());
+                // Re-map suggestions to only operate on the last non-quoted word
+                .map(suggestion -> onlyOnLastQuotedWord(lastArg, suggestion))
+                .map(suggestion -> suggestLast(lastArg, suggestion))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(toList());
     }
 
     private static Substring onlyOnLastQuotedWord(Substring lastArg, Substring suggestion) {
@@ -228,7 +256,8 @@ public class CommandUtil {
             return Optional.empty();
         }
         checkState(end <= builder.length(),
-            "Suggestion ends too late, last=%s, suggestion=", last, suggestion);
+                "Suggestion ends too late, last=%s, suggestion=", last, suggestion
+        );
         builder.replace(start, end, suggestion.getSubstring());
         return Optional.of(builder.toString());
     }
@@ -238,7 +267,7 @@ public class CommandUtil {
      * with the given message.
      *
      * @param condition the condition to check
-     * @param message the message for failure
+     * @param message   the message for failure
      */
     public static void checkCommandArgument(boolean condition, String message) {
         checkCommandArgument(condition, TextComponent.of(message));
@@ -249,7 +278,7 @@ public class CommandUtil {
      * with the given message.
      *
      * @param condition the condition to check
-     * @param message the message for failure
+     * @param message   the message for failure
      */
     public static void checkCommandArgument(boolean condition, Component message) {
         if (!condition) {
@@ -259,10 +288,11 @@ public class CommandUtil {
 
     public static <T> T requireIV(Key<T> type, String name, InjectedValueAccess injectedValueAccess) {
         return injectedValueAccess.injectedValue(type).orElseThrow(() ->
-            new IllegalStateException("No injected value for " + name + " (type " + type + ")")
+                new IllegalStateException("No injected value for " + name + " (type " + type + ")")
         );
     }
 
     private CommandUtil() {
     }
+
 }

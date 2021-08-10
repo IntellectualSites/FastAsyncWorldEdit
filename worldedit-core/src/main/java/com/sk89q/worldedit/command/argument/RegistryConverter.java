@@ -45,6 +45,7 @@ import org.enginehub.piston.inject.Key;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public final class RegistryConverter<V extends Keyed> implements ArgumentConverter<V> {
@@ -52,22 +53,22 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
     @SuppressWarnings("unchecked")
     public static void register(CommandManager commandManager) {
         ImmutableList.of(
-            BlockType.class,
-            BlockCategory.class,
-            ItemType.class,
-            ItemCategory.class,
-            BiomeType.class,
-            EntityType.class,
-            FluidType.class,
-            FluidCategory.class,
-            GameMode.class,
-            WeatherType.class
+                BlockType.class,
+                BlockCategory.class,
+                ItemType.class,
+                ItemCategory.class,
+                BiomeType.class,
+                EntityType.class,
+                FluidType.class,
+                FluidCategory.class,
+                GameMode.class,
+                WeatherType.class
         )
-            .stream()
-            .map(c -> (Class<Keyed>) c)
-            .forEach(registryType ->
-                commandManager.registerConverter(Key.of(registryType), from(registryType))
-            );
+                .stream()
+                .map(c -> (Class<Keyed>) c)
+                .forEach(registryType ->
+                        commandManager.registerConverter(Key.of(registryType), from(registryType))
+                );
     }
 
     @SuppressWarnings("unchecked")
@@ -98,10 +99,10 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
 
     @Override
     public ConversionResult<V> convert(String argument, InjectedValueAccess injectedValueAccess) {
-        V result = registry.get(argument);
+        V result = registry.get(argument.toLowerCase(Locale.ROOT));
         return result == null
                 ? FailedConversion.from(new IllegalArgumentException(
-                    "Not a valid " + registry.getName() + ": " + argument))
+                "Not a valid " + registry.getName() + ": " + argument))
                 : SuccessfulConversion.fromSingle(result);
     }
 
@@ -109,4 +110,5 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
     public List<String> getSuggestions(String input, InjectedValueAccess context) {
         return SuggestionHelper.getRegistrySuggestions(registry, input).collect(Collectors.toList());
     }
+
 }

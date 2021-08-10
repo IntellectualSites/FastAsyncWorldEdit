@@ -22,9 +22,7 @@ package com.sk89q.worldedit.bukkit;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import com.sk89q.worldedit.world.registry.BlockCategoryRegistry;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
-import com.sk89q.worldedit.world.registry.BundledItemRegistry;
 import com.sk89q.worldedit.world.registry.BundledRegistries;
-import com.sk89q.worldedit.world.registry.EntityRegistry;
 import com.sk89q.worldedit.world.registry.ItemCategoryRegistry;
 import com.sk89q.worldedit.world.registry.ItemRegistry;
 
@@ -35,9 +33,8 @@ class BukkitRegistries extends BundledRegistries {
 
     private static final BukkitRegistries INSTANCE = new BukkitRegistries();
     private final BlockRegistry blockRegistry = new BukkitBlockRegistry();
-    private final ItemRegistry itemRegistry = new BukkitItemRegistry();
     private final BiomeRegistry biomeRegistry = new BukkitBiomeRegistry();
-    private final EntityRegistry entityRegistry = new BukkitEntityRegistry();
+    private final ItemRegistry itemRegistry = new BukkitItemRegistry();
     private final BlockCategoryRegistry blockCategoryRegistry = new BukkitBlockCategoryRegistry();
     private final ItemCategoryRegistry itemCategoryRegistry = new BukkitItemCategoryRegistry();
 
@@ -58,6 +55,11 @@ class BukkitRegistries extends BundledRegistries {
     }
 
     @Override
+    public ItemRegistry getItemRegistry() {
+        return itemRegistry;
+    }
+
+    @Override
     public BlockCategoryRegistry getBlockCategoryRegistry() {
         return blockCategoryRegistry;
     }
@@ -65,11 +67,6 @@ class BukkitRegistries extends BundledRegistries {
     @Override
     public ItemCategoryRegistry getItemCategoryRegistry() {
         return itemCategoryRegistry;
-    }
-
-    @Override
-    public EntityRegistry getEntityRegistry() {
-        return entityRegistry;
     }
 
     /**
@@ -81,8 +78,4 @@ class BukkitRegistries extends BundledRegistries {
         return INSTANCE;
     }
 
-    @Override
-    public ItemRegistry getItemRegistry() {
-        return itemRegistry;
-    }
 }

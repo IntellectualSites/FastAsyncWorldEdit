@@ -52,8 +52,8 @@ public class SlotTable {
 
     public Optional<LocalSlot.Variable> getVariable(String name) {
         return getSlot(name)
-            .filter(LocalSlot.Variable.class::isInstance)
-            .map(LocalSlot.Variable.class::cast);
+                .filter(LocalSlot.Variable.class::isInstance)
+                .map(LocalSlot.Variable.class::cast);
     }
 
     public OptionalDouble getSlotValue(String name) {

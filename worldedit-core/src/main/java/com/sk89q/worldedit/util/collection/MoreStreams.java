@@ -74,10 +74,11 @@ public class MoreStreams {
         // Not SIZED, Not SUBSIZED
         chars &= ~(Spliterator.SIZED | Spliterator.SUBSIZED);
         return StreamSupport.stream(Spliterators.spliterator(
-            iter, spliterator.estimateSize(), chars
+                iter, spliterator.estimateSize(), chars
         ), stream.isParallel()).onClose(stream::close);
     }
 
     private MoreStreams() {
     }
+
 }

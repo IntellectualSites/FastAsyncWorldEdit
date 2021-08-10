@@ -44,7 +44,7 @@ public class ProgressIterator<V> implements Iterator<V>, ProgressObservable {
      * Create a new instance.
      *
      * @param iterator the iterator
-     * @param count the count
+     * @param count    the count
      */
     private ProgressIterator(Iterator<V> iterator, int count) {
         checkNotNull(iterator);
@@ -78,8 +78,8 @@ public class ProgressIterator<V> implements Iterator<V>, ProgressObservable {
      * Create a new instance.
      *
      * @param iterator the iterator
-     * @param count the number of objects
-     * @param <V> the type
+     * @param count    the number of objects
+     * @param <V>      the type
      * @return an instance
      */
     public static <V> ProgressIterator<V> create(Iterator<V> iterator, int count) {
@@ -90,7 +90,7 @@ public class ProgressIterator<V> implements Iterator<V>, ProgressObservable {
      * Create a new instance from a list.
      *
      * @param list a list
-     * @param <V> the type
+     * @param <V>  the type
      * @return an instance
      */
     public static <V> ProgressIterator<V> create(List<V> list) {

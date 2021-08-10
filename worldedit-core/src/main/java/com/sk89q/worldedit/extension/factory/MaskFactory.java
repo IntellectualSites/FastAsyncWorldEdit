@@ -19,33 +19,36 @@
 
 package com.sk89q.worldedit.extension.factory;
 
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.AdjacentMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.AngleMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.ExtremaMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.FalseMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.LiquidMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.ROCAngleMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.RichOffsetMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.SimplexMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.SurfaceAngleMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.SurfaceMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.TrueMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.WallMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.XAxisMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.YAxisMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.ZAxisMaskParser;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.parser.mask.AdjacentMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.AirMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.AngleMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BiomeMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockCategoryMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlockStateMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BlocksMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ExistingMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.ExpressionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ExtremaMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.FalseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.LazyRegionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.LiquidMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.NegateMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.NoiseMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.OffsetMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ROCAngleMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.RegionMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.SimplexMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.SolidMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.SurfaceMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.TrueMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.WallMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.XAxisMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.YAxisMaskParser;
-import com.sk89q.worldedit.extension.factory.parser.mask.ZAxisMaskParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -54,7 +57,6 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.internal.registry.AbstractFactory;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,6 +92,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
 
         register(new BlockCategoryMaskParser(worldEdit));
         register(new BiomeMaskParser(worldEdit));
+        //FAWE start
         // Mask Parsers from FAWE
         register(new AdjacentMaskParser(worldEdit));
         register(new AngleMaskParser(worldEdit));
@@ -97,6 +100,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new FalseMaskParser(worldEdit));
         register(new LiquidMaskParser(worldEdit));
         //register(new RadiusMaskParser(worldEdit)); TODO: Adapt to work with FAWE's Chunk I/O
+        register(new RichOffsetMaskParser(worldEdit));
         register(new ROCAngleMaskParser(worldEdit));
         register(new SimplexMaskParser(worldEdit));
         register(new SurfaceMaskParser(worldEdit));
@@ -105,6 +109,8 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new XAxisMaskParser(worldEdit));
         register(new YAxisMaskParser(worldEdit));
         register(new ZAxisMaskParser(worldEdit));
+        register(new SurfaceAngleMaskParser(worldEdit));
+        //FAWE end
 
     }
 
@@ -113,7 +119,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         final String[] split = input.split(" ");
         if (split.length > 1) {
             String prev = input.substring(0, input.lastIndexOf(" ")) + " ";
-            return super.getSuggestions(split[split.length -1]).stream().map(s -> prev + s).collect(Collectors.toList());
+            return super.getSuggestions(split[split.length - 1]).stream().map(s -> prev + s).collect(Collectors.toList());
         }
         return super.getSuggestions(input);
     }
@@ -136,14 +142,14 @@ public final class MaskFactory extends AbstractFactory<Mask> {
                 }
             }
             if (match == null) {
-                throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(component)));
+                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
             }
             masks.add(match);
         }
 
         switch (masks.size()) {
             case 0:
-                throw new NoMatchException(TranslatableComponent.of("worldedit.error.no-match", TextComponent.of(input)));
+                throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(input)));
             case 1:
                 return masks.get(0).optimize();
             default:

@@ -27,22 +27,24 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NullWorld;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 import org.bukkit.entity.EntityType;
 
-import java.lang.ref.WeakReference;
-import java.util.Locale;
 import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * An adapter to adapt a Bukkit entity into a WorldEdit one.
  */
+//FAWE start - made class public
 public class BukkitEntity implements Entity {
+//FAWE end
 
     private final WeakReference<org.bukkit.entity.Entity> entityRef;
+    //FAWE start
     private final EntityType type;
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -51,7 +53,9 @@ public class BukkitEntity implements Entity {
      */
     public BukkitEntity(org.bukkit.entity.Entity entity) {
         checkNotNull(entity);
+        //FAWE start
         this.type = entity.getType();
+        //FAWE end
         this.entityRef = new WeakReference<>(entity);
     }
 
@@ -86,11 +90,6 @@ public class BukkitEntity implements Entity {
     }
 
     @Override
-    public com.sk89q.worldedit.world.entity.EntityType getType() {
-        return EntityTypes.get(type.getName().toLowerCase(Locale.ROOT));
-    }
-
-    @Override
     public BaseEntity getState() {
         org.bukkit.entity.Entity entity = entityRef.get();
         if (entity != null) {
@@ -113,7 +112,11 @@ public class BukkitEntity implements Entity {
     public boolean remove() {
         org.bukkit.entity.Entity entity = entityRef.get();
         if (entity != null) {
-            entity.remove();
+            try {
+                entity.remove();
+            } catch (UnsupportedOperationException e) {
+                return false;
+            }
             return entity.isDead();
         } else {
             return true;
@@ -131,4 +134,5 @@ public class BukkitEntity implements Entity {
             return null;
         }
     }
+
 }

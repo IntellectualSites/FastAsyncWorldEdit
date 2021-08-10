@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.registry;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,12 +27,12 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 public class Registry<V extends Keyed> implements Iterable<V> {
+
     private final Map<String, V> map = new HashMap<>();
     private final String name;
 
@@ -43,9 +44,11 @@ public class Registry<V extends Keyed> implements Iterable<V> {
         return name;
     }
 
+    //FAWE start
     public Map<String, V> getMap() {
         return map;
     }
+    //FAWE end
 
     @Nullable
     public V get(final String key) {
@@ -61,6 +64,12 @@ public class Registry<V extends Keyed> implements Iterable<V> {
         this.map.put(key, value);
         return value;
     }
+
+    //FAWE start
+    public void clear() {
+        this.map.clear();
+    }
+    //FAWE end
 
     public Set<String> keySet() {
         return Collections.unmodifiableSet(this.map.keySet());

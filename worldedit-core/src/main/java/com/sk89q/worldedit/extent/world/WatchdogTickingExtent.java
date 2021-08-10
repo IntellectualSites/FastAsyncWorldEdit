@@ -25,7 +25,6 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -48,7 +47,7 @@ public class WatchdogTickingExtent extends AbstractDelegateExtent {
     /**
      * Create a new instance.
      *
-     * @param extent the extent
+     * @param extent   the extent
      * @param watchdog the watchdog to reset
      */
     public WatchdogTickingExtent(Extent extent, Watchdog watchdog) {
@@ -88,8 +87,9 @@ public class WatchdogTickingExtent extends AbstractDelegateExtent {
     }
 
     @Override
-    public boolean setBiome(BlockVector2 position, BiomeType biome) {
+    public boolean setBiome(BlockVector3 position, BiomeType biome) {
         onOperation();
         return super.setBiome(position, biome);
     }
+
 }

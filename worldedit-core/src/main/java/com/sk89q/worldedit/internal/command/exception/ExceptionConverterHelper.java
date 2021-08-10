@@ -88,6 +88,7 @@ public abstract class ExceptionConverterHelper implements ExceptionConverter {
     }
 
     private static class ExceptionHandler implements Comparable<ExceptionHandler> {
+
         final Class<? extends Throwable> cls;
         final Method method;
 
@@ -108,6 +109,7 @@ public abstract class ExceptionConverterHelper implements ExceptionConverter {
                 return cls.getCanonicalName().compareTo(o.cls.getCanonicalName());
             }
         }
+
     }
 
 }

@@ -19,16 +19,18 @@
 
 package com.sk89q.jnbt;
 
+import com.fastasyncworldedit.core.jnbt.NumberTag;
+import com.sk89q.worldedit.util.nbt.DoubleBinaryTag;
+
 /**
  * The {@code TAG_Double} tag.
+ *
+ * @deprecated Use {@link DoubleBinaryTag}.
  */
+@Deprecated
 public final class DoubleTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_DOUBLE;
-    }
 
-    private final double value;
+    private final DoubleBinaryTag innerTag;
 
     /**
      * Creates the tag with an empty name.
@@ -37,17 +39,29 @@ public final class DoubleTag extends NumberTag {
      */
     public DoubleTag(double value) {
         super();
-        this.value = value;
+        this.innerTag = DoubleBinaryTag.of(value);
+    }
+
+    public DoubleTag(DoubleBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
+    }
+
+    @Override
+    public DoubleBinaryTag asBinaryTag() {
+        return this.innerTag;
     }
 
     @Override
     public Double getValue() {
-        return value;
+        return innerTag.value();
     }
 
+    //FAWE start
     @Override
-    public String toString() {
-        return "TAG_Double(" + value + ")";
+    public int getTypeCode() {
+        return NBTConstants.TYPE_DOUBLE;
     }
+    //FAWE end
 
 }

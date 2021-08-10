@@ -21,16 +21,14 @@ package com.sk89q.worldedit.function.pattern;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
-
-import java.util.Map.Entry;
 
 /**
  * Applies a block type while retaining all possible states.
  */
 public class TypeApplyingPattern extends AbstractExtentPattern {
+
     private final BlockState blockState;
 
     public TypeApplyingPattern(Extent extent, BlockState blockState) {
@@ -39,14 +37,10 @@ public class TypeApplyingPattern extends AbstractExtentPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         BlockState oldBlock = getExtent().getBlock(position);
-        BlockState newBlock = blockState;
-        for (Entry<Property<?>, Object> entry : oldBlock.getStates().entrySet()) {
-            @SuppressWarnings("unchecked")
-            Property<Object> prop = (Property<Object>) entry.getKey();
-            newBlock = newBlock.with(prop, entry.getValue());
-        }
+        BlockState newBlock = blockState.withProperties(oldBlock);
         return newBlock.toBaseBlock();
     }
+
 }

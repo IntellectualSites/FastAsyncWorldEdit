@@ -41,6 +41,7 @@ import net.minecraft.entity.item.minecart.AbstractMinecartEntity;
 import net.minecraft.entity.passive.AmbientEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.passive.WaterMobEntity;
 import net.minecraft.entity.passive.GolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -147,5 +148,10 @@ public class ForgeEntityProperties implements EntityProperties {
     @Override
     public boolean isPasteable() {
         return !(entity instanceof ServerPlayerEntity || entity instanceof EnderDragonPartEntity);
+    }
+
+    @Override
+    public boolean isWaterCreature() {
+        return entity instanceof WaterMobEntity;
     }
 }

@@ -23,20 +23,21 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Tests true if the biome at applied points is the same as the one given.
  */
-public class BiomeMask extends AbstractMask {
+//FAWE start - AbstractExtentMask
+public class BiomeMask extends AbstractExtentMask {
+//FAWE end
 
-    private final Extent extent;
     private final Set<BiomeType> biomes = new HashSet<>();
 
     /**
@@ -46,9 +47,10 @@ public class BiomeMask extends AbstractMask {
      * @param biomes a list of biomes to match
      */
     public BiomeMask(Extent extent, Collection<BiomeType> biomes) {
-        checkNotNull(extent);
+        //FAWE start
+        super(extent);
+        //FAWE end
         checkNotNull(biomes);
-        this.extent = extent;
         this.biomes.addAll(biomes);
     }
 
@@ -56,7 +58,7 @@ public class BiomeMask extends AbstractMask {
      * Create a new biome mask.
      *
      * @param extent the extent
-     * @param biome an array of biomes to match
+     * @param biome  an array of biomes to match
      */
     public BiomeMask(Extent extent, BiomeType... biome) {
         this(extent, Arrays.asList(checkNotNull(biome)));
@@ -92,7 +94,7 @@ public class BiomeMask extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
-        BiomeType biome = extent.getBiome(vector);
+        BiomeType biome = getExtent().getBiome(vector);
         return biomes.contains(biome);
     }
 
@@ -102,9 +104,17 @@ public class BiomeMask extends AbstractMask {
         return null;
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
-        return new BiomeMask(extent, new HashSet<>(biomes));
+        return new BiomeMask(getExtent(), new HashSet<>(biomes));
+    }
+    //FAWE end
+
+    @Override
+    public boolean test(Extent extent, BlockVector3 position) {
+        BiomeType biome = getExtent().getBiome(position);
+        return biomes.contains(biome);
     }
 
 }

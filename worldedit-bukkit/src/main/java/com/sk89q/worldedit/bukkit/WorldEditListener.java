@@ -23,7 +23,9 @@ package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.event.platform.SessionIdleEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.block.Block;
@@ -35,6 +37,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.inject.InjectedValueStore;
@@ -73,13 +76,17 @@ public class WorldEditListener implements Listener {
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {
         InjectedValueStore store = MapBackedValueStore.create();
         store.injectValue(Key.of(Actor.class), context ->
-            Optional.of(plugin.wrapCommandSender(event.getPlayer())));
-        CommandManager commandManager = plugin.getWorldEdit().getPlatformManager().getPlatformCommandManager().getCommandManager();
+                Optional.of(plugin.wrapCommandSender(event.getPlayer())));
+        CommandManager commandManager = plugin
+                .getWorldEdit()
+                .getPlatformManager()
+                .getPlatformCommandManager()
+                .getCommandManager();
         event.getCommands().removeIf(name ->
-            // remove if in the manager and not satisfied
-            commandManager.getCommand(name)
-                .filter(command -> !command.getCondition().satisfied(store))
-                .isPresent()
+                // remove if in the manager and not satisfied
+                commandManager.getCommand(name)
+                        .filter(command -> !command.getCondition().satisfied(store))
+                        .isPresent()
         );
     }
 
@@ -105,13 +112,14 @@ public class WorldEditListener implements Listener {
         final Player player = plugin.wrapPlayer(event.getPlayer());
         final World world = player.getWorld();
         final WorldEdit we = plugin.getWorldEdit();
+        final Direction direction = BukkitAdapter.adapt(event.getBlockFace());
 
         Action action = event.getAction();
         if (action == Action.LEFT_CLICK_BLOCK) {
             final Block clickedBlock = event.getClickedBlock();
             final Location pos = new Location(world, clickedBlock.getX(), clickedBlock.getY(), clickedBlock.getZ());
 
-            if (we.handleBlockLeftClick(player, pos)) {
+            if (we.handleBlockLeftClick(player, pos, direction)) {
                 event.setCancelled(true);
             }
 
@@ -129,7 +137,7 @@ public class WorldEditListener implements Listener {
             final Block clickedBlock = event.getClickedBlock();
             final Location pos = new Location(world, clickedBlock.getX(), clickedBlock.getY(), clickedBlock.getZ());
 
-            if (we.handleBlockRightClick(player, pos)) {
+            if (we.handleBlockRightClick(player, pos, direction)) {
                 event.setCancelled(true);
             }
 
@@ -142,4 +150,10 @@ public class WorldEditListener implements Listener {
             }
         }
     }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        plugin.getWorldEdit().getEventBus().post(new SessionIdleEvent(new BukkitPlayer.SessionKeyImpl(event.getPlayer())));
+    }
+
 }

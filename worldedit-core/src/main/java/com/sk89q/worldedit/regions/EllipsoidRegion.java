@@ -20,16 +20,16 @@
 package com.sk89q.worldedit.regions;
 
 
-import com.boydti.fawe.beta.Filter;
-import com.boydti.fawe.beta.IChunk;
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.IChunkSet;
-import com.boydti.fawe.beta.implementation.filter.block.ChunkFilterBlock;
-import com.boydti.fawe.util.MathMan;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
+import com.fastasyncworldedit.core.queue.Filter;
+import com.fastasyncworldedit.core.queue.IChunk;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
@@ -53,10 +53,12 @@ public class EllipsoidRegion extends AbstractRegion {
      */
     private Vector3 radius;
 
+    //FAWE start
     private Vector3 radiusSqr;
     private Vector3 inverseRadius;
     private int radiusLengthSqr;
     private boolean sphere;
+    //FAWE end
 
     /**
      * Construct a new instance of this ellipsoid region.
@@ -71,7 +73,7 @@ public class EllipsoidRegion extends AbstractRegion {
     /**
      * Construct a new instance of this ellipsoid region.
      *
-     * @param world the world
+     * @param world  the world
      * @param center the center
      * @param radius the radius
      */
@@ -126,7 +128,7 @@ public class EllipsoidRegion extends AbstractRegion {
         BlockVector3 diff = BlockVector3.ZERO.add(changes);
 
         if ((diff.getBlockX() & 1) + (diff.getBlockY() & 1) + (diff.getBlockZ() & 1) != 0) {
-            throw new RegionOperationException(TranslatableComponent.of("worldedit.selection.ellipsoid.error.even-horizontal"));
+            throw new RegionOperationException(Caption.of("worldedit.selection.ellipsoid.error.even-horizontal"));
         }
 
         return diff.divide(2).floor();
@@ -194,10 +196,12 @@ public class EllipsoidRegion extends AbstractRegion {
      */
     public void setRadius(Vector3 radius) {
         this.radius = radius.add(0.5, 0.5, 0.5);
+        //FAWE start
         radiusSqr = radius.multiply(radius);
         radiusLengthSqr = (int) radiusSqr.getX();
         this.sphere = radius.getY() == radius.getX() && radius.getX() == radius.getZ();
         inverseRadius = Vector3.ONE.divide(radius);
+        //FAWE end
     }
 
     @Override
@@ -215,8 +219,8 @@ public class EllipsoidRegion extends AbstractRegion {
                 }
 
                 chunks.add(BlockVector2.at(
-                    x >> ChunkStore.CHUNK_SHIFTS,
-                    z >> ChunkStore.CHUNK_SHIFTS
+                        x >> ChunkStore.CHUNK_SHIFTS,
+                        z >> ChunkStore.CHUNK_SHIFTS
                 ));
             }
         }
@@ -224,6 +228,7 @@ public class EllipsoidRegion extends AbstractRegion {
         return chunks;
     }
 
+    //FAWE start
     @Override
     public boolean contains(int x, int y, int z) {
         int cx = x - center.getBlockX();
@@ -238,7 +243,7 @@ public class EllipsoidRegion extends AbstractRegion {
         }
         int cy = y - center.getBlockY();
         int cy2 = cy * cy;
-        if (radiusSqr.getBlockY() < 255 && cy2 > radiusSqr.getBlockY()) {
+        if (radiusSqr.getBlockY() < getWorldMaxY() && cy2 > radiusSqr.getBlockY()) {
             return false;
         }
         if (sphere) {
@@ -250,13 +255,13 @@ public class EllipsoidRegion extends AbstractRegion {
         return cxd + cyd + czd <= 1;
     }
 
-    /*
+    /* FAWE start
     /* Slow and unnecessary
     @Override
     public boolean contains(BlockVector3 position) {
         return position.subtract(center).toVector3().divide(radius).lengthSq() <= 1;
     }
-    */
+     */
 
     @Override
     public boolean contains(BlockVector3 position) {
@@ -279,6 +284,7 @@ public class EllipsoidRegion extends AbstractRegion {
         double czd = cz2 * inverseRadius.getZ();
         return cxd + czd <= 1;
     }
+    //FAWE end
 
     /**
      * Returns string representation in the format
@@ -300,8 +306,11 @@ public class EllipsoidRegion extends AbstractRegion {
         return (EllipsoidRegion) super.clone();
     }
 
-    private void filterSpherePartial(int y1, int y2, int bx, int bz, Filter filter,
-        ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+    //FAWE start
+    private void filterSpherePartial(
+            int y1, int y2, int bx, int bz, Filter filter,
+            ChunkFilterBlock block, IChunkGet get, IChunkSet set
+    ) {
         int minSection = y1 >> 4;
         int maxSection = y2 >> 4;
         int yStart = (y1 & 15);
@@ -311,7 +320,7 @@ public class EllipsoidRegion extends AbstractRegion {
             filterSpherePartial(minSection, 0, 15, bx, bz, filter, block, get, set);
         }
 
-        if (yStart != 0) {
+        if (yStart != getWorldMinY()) {
             filterSpherePartial(minSection, yStart, 15, bx, bz, filter, block, get, set);
             minSection++;
         }
@@ -326,8 +335,10 @@ public class EllipsoidRegion extends AbstractRegion {
         }
     }
 
-    private void filterSpherePartial(int layer, int y1, int y2, int bx, int bz, Filter filter,
-        ChunkFilterBlock block, IChunkGet get, IChunkSet set) {
+    private void filterSpherePartial(
+            int layer, int y1, int y2, int bx, int bz, Filter filter,
+            ChunkFilterBlock block, IChunkGet get, IChunkSet set
+    ) {
         int cx = center.getBlockX();
         int cy = center.getBlockY();
         int cz = center.getBlockZ();
@@ -359,8 +370,10 @@ public class EllipsoidRegion extends AbstractRegion {
     }
 
     @Override
-    public void filter(IChunk chunk, Filter filter, ChunkFilterBlock block, IChunkGet get,
-        IChunkSet set, boolean full) {
+    public void filter(
+            IChunk chunk, Filter filter, ChunkFilterBlock block, IChunkGet get,
+            IChunkSet set, boolean full
+    ) {
         // Check bounds
         // This needs to be able to perform 50M blocks/sec otherwise it becomes a bottleneck
         int cx = center.getBlockX();
@@ -405,28 +418,28 @@ public class EllipsoidRegion extends AbstractRegion {
             int cy = center.getBlockY();
             int diffYFull = MathMan.usqrt(diffY2);
 
-            int yBotFull = Math.max(0, cy - diffYFull);
-            int yTopFull = Math.min(255, cy + diffYFull);
+            int yBotFull = Math.max(getWorldMinY(), cy - diffYFull);
+            int yTopFull = Math.min(getWorldMaxY(), cy + diffYFull);
 
             if (yBotFull == yTopFull || yBotFull > yTopFull) {
             }
             // Set those layers
             filter(chunk, filter, block, get, set, yBotFull, yTopFull, full);
 
-            if (yBotFull == 0 && yTopFull == 255) {
+            if (yBotFull == getWorldMinY() && yTopFull == getWorldMaxY()) {
                 return;
             }
 
             int diffYPartial = MathMan.usqrt(radiusLengthSqr - cxMin * cxMin - czMin * czMin);
 
             //Fill the remaining layers
-            if (yBotFull != 0) {
-                int yBotPartial = Math.max(0, cy - diffYPartial);
+            if (yBotFull != getWorldMinY()) {
+                int yBotPartial = Math.max(getWorldMinY(), cy - diffYPartial);
                 filterSpherePartial(yBotPartial, yBotFull - 1, bx, bz, filter, block, get, set);
             }
 
-            if (yTopFull != 255) {
-                int yTopPartial = Math.min(255, cy + diffYPartial);
+            if (yTopFull != getWorldMaxY()) {
+                int yTopPartial = Math.min(getWorldMaxY(), cy + diffYPartial);
                 filterSpherePartial(yTopFull + 1, yTopPartial, bx, bz, filter, block, get, set);
             }
 
@@ -434,4 +447,5 @@ public class EllipsoidRegion extends AbstractRegion {
             super.filter(chunk, filter, block, get, set, full);
         }
     }
+    //FAWE end
 }

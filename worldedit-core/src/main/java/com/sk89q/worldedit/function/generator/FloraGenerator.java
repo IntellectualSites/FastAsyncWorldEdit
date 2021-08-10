@@ -37,7 +37,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 public class FloraGenerator implements RegionFunction {
 
     private final EditSession editSession;
-    private boolean biomeAware = false;
+    private final boolean biomeAware = false;
     private final Pattern desertPattern = getDesertPattern();
     private final Pattern temperatePattern = getTemperatePattern();
 
@@ -106,10 +106,10 @@ public class FloraGenerator implements RegionFunction {
         BlockState block = editSession.getBlock(position);
 
         if (block.getBlockType() == BlockTypes.GRASS_BLOCK) {
-            editSession.setBlock(position.add(0, 1, 0), temperatePattern.apply(position));
+            editSession.setBlock(position.add(0, 1, 0), temperatePattern.applyBlock(position));
             return true;
         } else if (block.getBlockType() == BlockTypes.SAND) {
-            editSession.setBlock(position.add(0, 1, 0), desertPattern.apply(position));
+            editSession.setBlock(position.add(0, 1, 0), desertPattern.applyBlock(position));
             return true;
         }
 

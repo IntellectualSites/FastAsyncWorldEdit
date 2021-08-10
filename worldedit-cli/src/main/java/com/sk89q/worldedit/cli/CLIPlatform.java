@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.cli;
 
+import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
+import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
@@ -30,7 +32,9 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.Registries;
 import org.enginehub.piston.CommandManager;
+import javax.annotation.Nonnull;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -38,8 +42,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.annotation.Nullable;
 
 class CLIPlatform extends AbstractPlatform {
 
@@ -122,7 +124,7 @@ class CLIPlatform extends AbstractPlatform {
     }
 
     @Override
-    public void registerGameHooks() {
+    public void setGameHooksEnabled(boolean enabled) {
     }
 
     @Override
@@ -161,7 +163,13 @@ class CLIPlatform extends AbstractPlatform {
         return ImmutableSet.of();
     }
 
+    @Override
+    public @Nonnull RelighterFactory getRelighterFactory() {
+        return (_a, _b, _c) -> NullRelighter.INSTANCE;
+    }
+
     public void addWorld(World world) {
         worlds.add(world);
     }
+
 }

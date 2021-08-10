@@ -19,41 +19,49 @@
 
 package com.sk89q.worldedit.session.request;
 
-import com.boydti.fawe.object.collection.CleanableThreadLocal;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 /**
- * Describes the current request using a {@link ThreadLocal}.
+ * Describes the current request
  */
 public final class Request {
 
-    private static final CleanableThreadLocal<Request> threadLocal = new CleanableThreadLocal<>(Request::new);
+    private static final LoadingCache<Thread, Request> THREAD_TO_REQUEST = CacheBuilder.newBuilder()
+            .weakKeys()
+            .build(CacheLoader.from(Request::new));
 
     @Nullable
     private World world;
     @Nullable
-    private Actor actor;
-    @Nullable
     private LocalSession session;
     @Nullable
     private EditSession editSession;
+    private boolean valid;
+    //FAWE start
+    @Nullable
+    private Actor actor;
     @Nullable
     private Extent extent;
-    private boolean valid;
+    //FAWE end
 
     private Request() {
     }
 
-    public static List<Request> getAll() {
-        return threadLocal.getAll();
+    //FAWE start
+    public static Collection<Request> getAll() {
+        return THREAD_TO_REQUEST.asMap().values();
     }
+    //FAWE end
 
     /**
      * Get the request world.
@@ -74,6 +82,7 @@ public final class Request {
         this.world = world;
     }
 
+    //FAWE start
     public void setExtent(@Nullable Extent extent) {
         this.extent = extent;
     }
@@ -100,6 +109,7 @@ public final class Request {
     public void setActor(@Nullable Actor actor) {
         this.actor = actor;
     }
+    //FAWE end
 
     /**
      * Get the request session.
@@ -111,6 +121,8 @@ public final class Request {
         return session;
     }
 
+    //FAWE start
+
     /**
      * Get the request session.
      *
@@ -119,6 +131,7 @@ public final class Request {
     public void setSession(@Nullable LocalSession session) {
         this.session = session;
     }
+    //FAWE end
 
     /**
      * Get the {@link EditSession}.
@@ -145,7 +158,7 @@ public final class Request {
      * @return the current request
      */
     public static Request request() {
-        return threadLocal.get();
+        return THREAD_TO_REQUEST.getUnchecked(Thread.currentThread());
     }
 
     /**
@@ -153,7 +166,7 @@ public final class Request {
      */
     public static void reset() {
         request().invalidate();
-        threadLocal.remove();
+        THREAD_TO_REQUEST.invalidate(Thread.currentThread());
     }
 
     /**
@@ -168,4 +181,5 @@ public final class Request {
     private void invalidate() {
         valid = false;
     }
+
 }

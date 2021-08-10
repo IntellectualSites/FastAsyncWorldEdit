@@ -1,44 +1,41 @@
 <p align="center">
-  <img src="fawe-logo.png" width="300">
+  <img src="fawe-logo.png" width="150">
 </p>
 
 ---
 
-FAWE is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
+FastAsyncWorldEdit is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
 
-## Links 
+**A Minecraft Map Editor... that runs in-game!**
 
-* [Spigot Page](https://www.spigotmc.org/threads/fast-async-worldedit.100104/)
-* [Discord](https://discord.gg/KxkjDVg)
-* [Wiki](https://wiki.intellectualsites.com/FastAsyncWorldEdit/index)
+* With selections, schematics, copy and paste, brushes, and scripting!
+* Use it in creative, survival in single player or on your server.
+* Use it on your Minecraft server to fix grieving and mistakes.
+
+Java Edition required. FastAsyncWorldEdit is compatible with Bukkit, Spigot, Paper, and Tuinity.
+
+## Download FastAsyncWorldEdit
+* Spigot: https://www.spigotmc.org/resources/fast-async-worldedit.13932/
+* Older, unsupported, versions: https://intellectualsites.github.io/download/fawe.html
+
+## Links
+
+* [Discord](https://discord.gg/intellectualsites)
+* [Wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki)
 * [Report Issue](https://github.com/IntellectualSites/FastAsyncWorldEdit/issues)
-* [Crowdin](https://intellectualsites.crowdin.com/fastasyncworldedit)
-* [JavaDocs](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/javadoc/)
+* [Crowdin (Translations)](https://intellectualsites.crowdin.com/fastasyncworldedit)
+* [JavaDocs](https://ci.athion.net/job/FastAsyncWorldEdit-1.17-Javadocs/javadoc/)
 
-## Downloads
-### 1.15+
-* [Download](https://www.spigotmc.org/resources/fast-async-worldedit.13932/)
-* [Jenkins](https://ci.athion.net/job/FastAsyncWorldEdit-1.16/)
+## Edit The Code
 
-Looking builds for older versions? Download them [here](https://intellectualsites.github.io/download/).
+Want to add new features to FastAsyncWorldEdit or fix bugs yourself? You can get the game running, with FastAsyncWorldEdit, from the code here:
 
+For additional information about compiling FastAsyncWorldEdit, see [COMPILING.md](COMPILING.md).
 
-## Building
-FAWE uses gradle to build  
-You can safely ignore `gradlew setupDecompWorkspace` if you are not planning to work on the forge side of FAWE.
+## Submitting Your Changes
+FastAsyncWorldEdit is open source (specifically licensed under GPL v3), so note that your contributions will also be open source. The best way to submit a change is to create a fork on GitHub, put your changes there, and then create a "pull request" on our FastAsyncWorldEdit repository.
 
-```
-$ gradlew setupDecompWorkspace
-$ gradlew build
-```
-
-The jar is located in `worldedit-bukkit/build/libs/FastAsyncWorldEdit-1.16-###.jar`
-
-## Contributing
-Have an idea for an optimization, or a cool feature?
- - We will accept most PR's
- - Let us know what you've tested / what may need further testing
- - If you need any help, create a ticket or discuss on [Discord](https://discord.gg/KxkjDVg)
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for important guidelines to follow.
 
 ## YourKit
 <a href="https://www.yourkit.com">

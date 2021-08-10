@@ -21,8 +21,8 @@ package com.sk89q.worldedit.world.registry;
 
 public class SimpleItemMaterial implements ItemMaterial {
 
-    private int maxStackSize;
-    private int maxDamage;
+    private final int maxStackSize;
+    private final int maxDamage;
 
     public SimpleItemMaterial(int maxStackSize, int maxDamage) {
         this.maxStackSize = maxStackSize;
@@ -38,4 +38,5 @@ public class SimpleItemMaterial implements ItemMaterial {
     public int getMaxDamage() {
         return maxDamage;
     }
+
 }

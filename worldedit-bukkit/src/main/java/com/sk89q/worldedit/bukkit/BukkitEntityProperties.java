@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
+import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.ArmorStand;
@@ -40,11 +41,25 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.entity.Tameable;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.WaterMob;
 import org.bukkit.entity.minecart.ExplosiveMinecart;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 class BukkitEntityProperties implements EntityProperties {
+
+    private static final boolean HAS_ABSTRACT_VILLAGER;
+
+    static {
+        boolean temp;
+        try {
+            Class.forName("org.bukkit.entity.AbstractVillager");
+            temp = true;
+        } catch (ClassNotFoundException e) {
+            temp = false;
+        }
+        HAS_ABSTRACT_VILLAGER = temp;
+    }
 
     private final Entity entity;
 
@@ -120,6 +135,9 @@ class BukkitEntityProperties implements EntityProperties {
 
     @Override
     public boolean isNPC() {
+        if (HAS_ABSTRACT_VILLAGER) {
+            return entity instanceof AbstractVillager;
+        }
         return entity instanceof Villager;
     }
 
@@ -147,4 +165,10 @@ class BukkitEntityProperties implements EntityProperties {
     public boolean isPasteable() {
         return !(entity instanceof Player || entity instanceof ComplexEntityPart);
     }
+
+    @Override
+    public boolean isWaterCreature() {
+        return entity instanceof WaterMob;
+    }
+
 }

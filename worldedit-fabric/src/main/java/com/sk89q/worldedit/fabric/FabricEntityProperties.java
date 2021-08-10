@@ -35,6 +35,7 @@ import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.decoration.painting.PaintingEntity;
 import net.minecraft.entity.mob.AmbientEntity;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.passive.GolemEntity;
@@ -147,5 +148,10 @@ public class FabricEntityProperties implements EntityProperties {
     @Override
     public boolean isPasteable() {
         return !(entity instanceof ServerPlayerEntity || entity instanceof EnderDragonEntity);
+    }
+
+    @Override
+    public boolean isWaterCreature() {
+        return entity instanceof WaterCreatureEntity;
     }
 }

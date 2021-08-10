@@ -19,7 +19,8 @@
 
 package com.sk89q.worldedit.history.changeset;
 
-import com.boydti.fawe.object.changeset.SimpleChangeSetSummary;
+import com.fastasyncworldedit.core.history.changeset.ChangeSetSummary;
+import com.fastasyncworldedit.core.history.changeset.SimpleChangeSetSummary;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
@@ -74,6 +75,7 @@ public class ArrayListHistory implements ChangeSet {
         return changes.size();
     }
 
+    //FAWE start
     @Override
     public ChangeSetSummary summarize(Region region, boolean shallow) {
         SimpleChangeSetSummary summary = new SimpleChangeSetSummary();
@@ -86,4 +88,5 @@ public class ArrayListHistory implements ChangeSet {
         }
         return summary;
     }
+    //FAWE end
 }

@@ -19,22 +19,25 @@
 
 package com.sk89q.worldedit.world.block;
 
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.TagStringIO;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
+import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -49,23 +52,27 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
-    private BlockState blockState;
-    @Nullable private CompoundTag nbtData;
+    private final BlockState blockState;
+    @Nullable
+    //FAWE start - LR<CBT> instead of CompoundTat
+    private final LazyReference<CompoundBinaryTag> nbtData;
+    //FAWE end
 
-    @Deprecated
-    public BaseBlock() {
-        this(BlockTypes.AIR.getDefaultState());
-    }
+    //FAWE start
 
     /**
      * Construct a block with the given type and default data.
-     * @deprecated Just use the BlockType.getDefaultState()
+     *
      * @param blockType The block type
+     * @deprecated FAWE deprecation - Just use the {@link BlockType#getDefaultState()}
      */
     @Deprecated
     public BaseBlock(BlockType blockType) {
         this(blockType.getDefaultState());
     }
+    //FAWE end
+
+    //FAWE start - made public from protected
 
     /**
      * Construct a block with a state.
@@ -74,25 +81,43 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
      */
     public BaseBlock(BlockState blockState) {
         this.blockState = blockState;
-        nbtData = null;
+        this.nbtData = null;
     }
+    //FAWE end
+
+    //FAWE start - deprecated upstream method and replaced CompoundTag with LR
 
     /**
      * Construct a block with the given ID, data value and NBT data structure.
      *
-     * @param state The block state
+     * @param state   The block state
      * @param nbtData NBT data, which must be provided
      */
+    @Deprecated
     public BaseBlock(BlockState state, CompoundTag nbtData) {
+        this(state, LazyReference.from(checkNotNull(nbtData)::asBinaryTag));
+    }
+    //FAWE end
+
+
+    /**
+     * Construct a block with the given ID, data value and NBT data structure.
+     *
+     * @param state   The block state
+     * @param nbtData NBT data, which must be provided
+     */
+    protected BaseBlock(BlockState state, LazyReference<CompoundBinaryTag> nbtData) {
         checkNotNull(nbtData);
         this.blockState = state;
         this.nbtData = nbtData;
     }
 
+    //FAWE start
+
     /**
      * Construct a block with the given ID and data value.
      *
-     * @param id ID value
+     * @param id   ID value
      * @param data data value
      */
     @Deprecated
@@ -107,6 +132,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
         }
         return blockState;
     }
+    //FAWE end
 
     /**
      * Gets a map of state to state values.
@@ -125,7 +151,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
     @Override
     public <V> BaseBlock with(Property<V> property, V value) {
-        return toImmutableState().with(property, value).toBaseBlock(getNbtData());
+        return toImmutableState().with(property, value).toBaseBlock(getNbtReference());
     }
 
     /**
@@ -140,29 +166,28 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Override
-    public boolean hasNbtData() {
-        return getNbtData() != null;
-    }
-
-    @Override
     public String getNbtId() {
-        CompoundTag nbtData = getNbtData();
+        //FAWE start - LR<CBT> > CompoundTag
+        LazyReference<CompoundBinaryTag> nbtData = this.nbtData;
         if (nbtData == null) {
             return "";
         }
-        Tag idTag = nbtData.getValue().get("id");
-        if (idTag instanceof StringTag) {
-            return ((StringTag) idTag).getValue();
-        } else {
-            return "";
-        }
+        return nbtData.getValue().getString("id");
+        //FAWE end
     }
 
+    //FAWE start
     @Nullable
     @Override
-    public CompoundTag getNbtData() {
+    public LazyReference<CompoundBinaryTag> getNbtReference() {
         return this.nbtData;
     }
+
+    @Override
+    public void setNbtReference(@Nullable LazyReference<CompoundBinaryTag> nbtData) {
+        throw new UnsupportedOperationException("This class is immutable.");
+    }
+    //FAWE end
 
     /**
      * Checks whether the type ID and data value are equal.
@@ -170,7 +195,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof BaseBlock)) {
-            if (!hasNbtData() && o instanceof BlockStateHolder) {
+            if (nbtData == null && o instanceof BlockStateHolder) {
                 return Objects.equals(toImmutableState(), ((BlockStateHolder<?>) o).toImmutableState());
             }
             return false;
@@ -178,9 +203,10 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
 
         final BaseBlock otherBlock = (BaseBlock) o;
 
-        return this.blockState.equalsFuzzy(otherBlock.blockState) && Objects.equals(getNbtData(), otherBlock.getNbtData());
+        return this.blockState.equalsFuzzy(otherBlock.blockState) && Objects.equals(getNbt(), otherBlock.getNbt());
     }
 
+    //FAWE start
     @Override
     public int getInternalId() {
         return blockState.getInternalId();
@@ -195,6 +221,12 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public int getOrdinal() {
         return blockState.getOrdinal();
     }
+
+    @Override
+    public final char getOrdinalChar() {
+        return blockState.getOrdinalChar();
+    }
+    //FAWE end
 
     /**
      * Checks if the type is the same, and if the matched states are the same.
@@ -213,15 +245,11 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Override
-    public final char getOrdinalChar() {
-        return blockState.getOrdinalChar();
-    }
-
-    @Override
     public BaseBlock toBaseBlock() {
         return this;
     }
 
+    //FAWE start
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         set.setFullBlock(extent, this);
@@ -257,7 +285,7 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     }
 
     @Override
-    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+    public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
         if (compoundTag == null) {
             return this.blockState.toBaseBlock();
         } else if (compoundTag == this.nbtData) {
@@ -276,14 +304,26 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public int hashCode() {
         return getOrdinal();
     }
+    //FAWE end
 
     @Override
     public String toString() {
-        // TODO use a json serializer for the NBT data
-        return blockState.getAsString() + (hasNbtData() ? "{hasNbt}" : "");
+        String nbtString = "";
+        //FAWE start - use CBT
+        CompoundBinaryTag nbtData = getNbt();
+        if (nbtData != null) {
+            try {
+                nbtString = TagStringIO.get().asString(nbtData);
+            } catch (IOException e) {
+                WorldEdit.logger.error("Failed to serialize NBT of Block", e);
+            }
+        }
+
+        return blockState.getAsString() + nbtString;
     }
 
     public BlockState toBlockState() {
         return blockState;
     }
+    //FAWE end
 }

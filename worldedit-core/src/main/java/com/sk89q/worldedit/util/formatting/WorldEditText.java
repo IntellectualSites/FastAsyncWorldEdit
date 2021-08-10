@@ -29,6 +29,7 @@ import org.enginehub.piston.util.TextHelper;
 import java.util.Locale;
 
 public class WorldEditText {
+
     private static final ConfigRenderer RENDERER = ConfigRenderer.getInstance();
     public static final ConfigHolder CONFIG_HOLDER = ConfigHolder.create();
 
@@ -38,8 +39,8 @@ public class WorldEditText {
 
     public static Component format(Component component, Locale locale) {
         return WorldEdit.getInstance().getTranslationManager().convertText(
-            RENDERER.render(component, CONFIG_HOLDER),
-            locale
+                RENDERER.render(component, CONFIG_HOLDER),
+                locale
         );
     }
 

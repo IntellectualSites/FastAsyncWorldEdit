@@ -24,7 +24,10 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
 
-public class TracedEditSession extends EditSession {
+/**
+ * Internal use only.
+ */
+class TracedEditSession extends EditSession {
 
     TracedEditSession(EventBus eventBus, World world, int maxBlocks, BlockBag blockBag, EditSessionEvent event) {
         super(eventBus, world, maxBlocks, blockBag, event);
@@ -42,4 +45,5 @@ public class TracedEditSession extends EditSession {
             WorldEdit.logger.warn("Here is a stacktrace from the creation of this EditSession:", stacktrace);
         }
     }
+
 }

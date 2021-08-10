@@ -1,0 +1,46 @@
+package com.fastasyncworldedit.core.extent.clipboard;
+
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.session.ClipboardHolder;
+
+import java.net.URI;
+import java.util.Collections;
+import java.util.Set;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+
+public class URIClipboardHolder extends ClipboardHolder {
+
+    private final URI uri;
+
+    public URIClipboardHolder(URI uri, Clipboard clipboard) {
+        super(clipboard);
+        checkNotNull(uri);
+        this.uri = uri;
+    }
+
+    public boolean contains(URI uri) {
+        checkNotNull(uri);
+        return this.uri.equals(uri);
+    }
+
+    /**
+     * Get the original clipboard source, typically a file or uri.
+     *
+     * @return the source of the clipboard
+     * @deprecated If a holder has multiple sources, this will return an empty URI
+     */
+    @Deprecated
+    public URI getUri() {
+        return uri;
+    }
+
+    public Set<URI> getURIs() {
+        return Collections.singleton(uri);
+    }
+
+    public URI getURI(Clipboard clipboard) {
+        return getClipboard() == clipboard ? getUri() : null;
+    }
+
+}

@@ -33,4 +33,5 @@ public class CLIItemCategoryRegistry implements ItemCategoryRegistry {
                 .map(ItemType.REGISTRY::get)
                 .collect(Collectors.toSet());
     }
+
 }

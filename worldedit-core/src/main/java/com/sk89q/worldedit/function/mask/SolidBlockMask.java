@@ -24,6 +24,7 @@ import com.sk89q.worldedit.extent.Extent;
 import javax.annotation.Nullable;
 
 public class SolidBlockMask extends BlockMask {
+
     public SolidBlockMask(Extent extent) {
         super(extent);
         add(state -> state.getMaterial().isMovementBlocker());
@@ -35,9 +36,11 @@ public class SolidBlockMask extends BlockMask {
         return null;
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new SolidBlockMask(getExtent());
     }
+    //FAWE end
 
 }

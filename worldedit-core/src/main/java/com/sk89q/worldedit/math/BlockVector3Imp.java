@@ -24,11 +24,11 @@ package com.sk89q.worldedit.math;
  */
 public final class BlockVector3Imp extends BlockVector3 {
 
-    public static final BlockVector3Imp ZERO   = new BlockVector3Imp(0, 0, 0);
+    public static final BlockVector3Imp ZERO = new BlockVector3Imp(0, 0, 0);
     public static final BlockVector3Imp UNIT_X = new BlockVector3Imp(1, 0, 0);
     public static final BlockVector3Imp UNIT_Y = new BlockVector3Imp(0, 1, 0);
     public static final BlockVector3Imp UNIT_Z = new BlockVector3Imp(0, 0, 1);
-    public static final BlockVector3Imp ONE    = new BlockVector3Imp(1, 1, 1);
+    public static final BlockVector3Imp ONE = new BlockVector3Imp(1, 1, 1);
 
     public static BlockVector3Imp at(double x, double y, double z) {
         return at((int) Math.floor(x), (int) Math.floor(y), (int) Math.floor(z));
@@ -84,4 +84,5 @@ public final class BlockVector3Imp extends BlockVector3 {
     public String toString() {
         return "(" + getX() + ", " + getY() + ", " + getZ() + ")";
     }
+
 }

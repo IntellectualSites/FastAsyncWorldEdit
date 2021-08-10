@@ -23,4 +23,5 @@ package com.sk89q.worldedit.extent.inventory;
  * Thrown when a block bag detects a problem.
  */
 public class BlockBagException extends Exception {
+
 }

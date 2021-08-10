@@ -22,8 +22,8 @@ package com.sk89q.worldedit.util.eventbus;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SetMultimap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -47,12 +47,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public final class EventBus {
 
-    private final Logger logger = LoggerFactory.getLogger(EventBus.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     private final SetMultimap<Class<?>, EventHandler> handlersByType =
-        HashMultimap.create();
+            HashMultimap.create();
 
     /**
      * Strategy for finding handler methods in registered objects.  Currently,
@@ -61,12 +61,12 @@ public final class EventBus {
      */
     private final SubscriberFindingStrategy finder = new AnnotatedSubscriberFinder();
 
-    private HierarchyCache flattenHierarchyCache = new HierarchyCache();
+    private final HierarchyCache flattenHierarchyCache = new HierarchyCache();
 
     /**
      * Registers the given handler for the given class to receive events.
      *
-     * @param clazz the event class to register
+     * @param clazz   the event class to register
      * @param handler the handler to register
      */
     public void subscribe(Class<?> clazz, EventHandler handler) {
@@ -98,7 +98,7 @@ public final class EventBus {
     /**
      * Unregisters the given handler for the given class.
      *
-     * @param clazz the class
+     * @param clazz   the class
      * @param handler the handler
      */
     public void unsubscribe(Class<?> clazz, EventHandler handler) {
@@ -144,7 +144,7 @@ public final class EventBus {
     /**
      * Unregisters all handler methods on a registered {@code object}.
      *
-     * @param object  object whose handler methods should be unregistered.
+     * @param object object whose handler methods should be unregistered.
      * @throws IllegalArgumentException if the object was not previously registered.
      */
     public void unregister(Object object) {
@@ -156,7 +156,7 @@ public final class EventBus {
      * successfully after the event has been posted to all handlers, and
      * regardless of any exceptions thrown by handlers.
      *
-     * @param event  event to post.
+     * @param event event to post.
      */
     public void post(Object event) {
         List<EventHandler> dispatching = new ArrayList<>();
@@ -185,14 +185,14 @@ public final class EventBus {
     /**
      * Dispatches {@code event} to the handler in {@code handler}.
      *
-     * @param event  event to dispatch.
-     * @param handler  handler that will call the handler.
+     * @param event   event to dispatch.
+     * @param handler handler that will call the handler.
      */
     private void dispatch(Object event, EventHandler handler) {
         try {
             handler.handleEvent(event);
         } catch (InvocationTargetException e) {
-            logger.error("Could not dispatch event: " + event + " to handler " + handler, e);
+            LOGGER.error("Could not dispatch event: " + event + " to handler " + handler, e);
         }
     }
 

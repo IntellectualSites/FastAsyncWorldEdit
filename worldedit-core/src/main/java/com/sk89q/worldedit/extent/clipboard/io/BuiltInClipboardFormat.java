@@ -19,13 +19,18 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.boydti.fawe.object.io.PGZIPOutputStream;
-import com.boydti.fawe.object.io.ResettableFileInputStream;
-import com.boydti.fawe.object.schematic.MinecraftStructure;
-import com.boydti.fawe.object.schematic.PNGWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
+import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
+import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
+import com.fastasyncworldedit.core.extent.clipboard.io.schematic.PNGWriter;
+import com.fastasyncworldedit.core.internal.io.ResettableFileInputStream;
 import com.google.common.collect.ImmutableSet;
+import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.NamedTag;
+import com.sk89q.jnbt.Tag;
+import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -35,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -44,41 +50,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public enum BuiltInClipboardFormat implements ClipboardFormat {
 
-    /**
-     * The Schematic format used by MCEdit.
-     */
-    MCEDIT_SCHEMATIC("mcedit", "mce", "schematic") {
-
-        @Override
-        public String getPrimaryFileExtension() {
-            return "schematic";
-        }
-
-        @Override
-        public ClipboardReader getReader(InputStream inputStream) throws IOException {
-            if (inputStream instanceof FileInputStream) {
-                inputStream = new ResettableFileInputStream((FileInputStream) inputStream);
-            }
-            BufferedInputStream buffered = new BufferedInputStream(inputStream);
-            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
-            SchematicReader input = new SchematicReader(nbtStream);
-            input.setUnderlyingStream(inputStream);
-            return input;
-        }
-
-        @Override
-        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
-            throw new IOException("This format does not support saving, use `schem` or `sponge` as format"); // Is more helpful
-        }
-
-        @Override
-        public boolean isFormat(File file) {
-            String name = file.getName().toLowerCase(Locale.ROOT);
-            return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
-        }
-    },
-    SPONGE_SCHEMATIC("sponge", "schem") {
-
+    //FAWE start - register fast clipboard io
+    FAST("fast", "fawe") {
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
@@ -97,11 +70,11 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             OutputStream gzip;
-            if (outputStream instanceof PGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+            if (outputStream instanceof ParallelGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
                 gzip = outputStream;
             } else {
                 outputStream = new BufferedOutputStream(outputStream);
-                gzip = new PGZIPOutputStream(outputStream);
+                gzip = new ParallelGZIPOutputStream(outputStream);
             }
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new FastSchematicWriter(nbtStream);
@@ -111,6 +84,118 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         public boolean isFormat(File file) {
             String name = file.getName().toLowerCase(Locale.ROOT);
             return name.endsWith(".schem") || name.endsWith(".sponge");
+        }
+
+    },
+    //FAWE end
+
+    /**
+     * The Schematic format used by MCEdit.
+     */
+    MCEDIT_SCHEMATIC("mcedit", "mce", "schematic") {
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schematic";
+        }
+
+        @Override
+        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+            NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(inputStream));
+            return new MCEditSchematicReader(nbtStream);
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            //FAWE start - be a more helpful exception
+            throw new IOException("The formats `.schematic`, `.mcedit` and `.mce` are discontinued on versions newer than" +
+                    "1.12 and superseded by the sponge schematic implementation known for `.schem` files.");
+            //FAWE end
+        }
+
+        @Override
+        public boolean isFormat(File file) {
+            String name = file.getName().toLowerCase(Locale.ROOT);
+            return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
+        }
+    },
+
+    SPONGE_SCHEMATIC("sponge", "schem") {
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schem";
+        }
+
+        @Override
+        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+            NBTInputStream nbtStream = new NBTInputStream(new GZIPInputStream(inputStream));
+            return new SpongeSchematicReader(nbtStream);
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            NBTOutputStream nbtStream = new NBTOutputStream(new GZIPOutputStream(outputStream));
+            return new SpongeSchematicWriter(nbtStream);
+        }
+
+        @Override
+        public boolean isFormat(File file) {
+            try (NBTInputStream str = new NBTInputStream(new GZIPInputStream(new FileInputStream(file)))) {
+                NamedTag rootTag = str.readNamedTag();
+                if (!rootTag.getName().equals("Schematic")) {
+                    return false;
+                }
+                CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
+
+                // Check
+                Map<String, Tag> schematic = schematicTag.getValue();
+                if (!schematic.containsKey("Version")) {
+                    return false;
+                }
+            } catch (Exception e) {
+                return false;
+            }
+
+            return true;
+        }
+    },
+
+    //FAWE start - recover schematics with bad entity data & register other clipboard formats
+    BROKENENTITY("brokenentity", "legacyentity", "le", "be", "brokenentities", "legacyentities") {
+        @Override
+        public String getPrimaryFileExtension() {
+            return "schem";
+        }
+
+        @Override
+        public ClipboardReader getReader(InputStream inputStream) throws IOException {
+            if (inputStream instanceof FileInputStream) {
+                inputStream = new ResettableFileInputStream((FileInputStream) inputStream);
+            }
+            BufferedInputStream buffered = new BufferedInputStream(inputStream);
+            NBTInputStream nbtStream = new NBTInputStream(new BufferedInputStream(new GZIPInputStream(buffered)));
+            FastSchematicReader reader = new FastSchematicReader(nbtStream);
+            reader.setBrokenEntities(true);
+            return reader;
+        }
+
+        @Override
+        public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
+            OutputStream gzip;
+            if (outputStream instanceof ParallelGZIPOutputStream || outputStream instanceof GZIPOutputStream) {
+                gzip = outputStream;
+            } else {
+                outputStream = new BufferedOutputStream(outputStream);
+                gzip = new ParallelGZIPOutputStream(outputStream);
+            }
+            NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
+            FastSchematicWriter writer = new FastSchematicWriter(nbtStream);
+            writer.setBrokenEntities(true);
+            return writer;
+        }
+
+        @Override
+        public boolean isFormat(File file) {
+            return false;
         }
 
     },
@@ -135,7 +220,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
         @Override
         public ClipboardWriter getWriter(OutputStream outputStream) throws IOException {
             outputStream = new BufferedOutputStream(outputStream);
-            OutputStream gzip = new PGZIPOutputStream(outputStream);
+            OutputStream gzip = new ParallelGZIPOutputStream(outputStream);
             NBTOutputStream nbtStream = new NBTOutputStream(new BufferedOutputStream(gzip));
             return new MinecraftStructure(nbtStream);
         }
@@ -151,7 +236,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
      * Isometric PNG writer.
      */
     PNG("png", "image") {
-
         @Override
         public ClipboardReader getReader(InputStream inputStream) {
             return null;
@@ -172,6 +256,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return "png";
         }
     };
+    //FAWE end
 
     private final ImmutableSet<String> aliases;
 

@@ -19,6 +19,10 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.fastasyncworldedit.core.function.mask.ABlockMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
+import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -27,14 +31,13 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import com.sk89q.worldedit.world.block.ImmutableBaseBlock;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,8 +48,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>This mask checks for both an exact block type and state value match,
  * respecting fuzzy status of the BlockState.</p>
  */
+//FAWE start - ABlockMask > AbstractExtentMask
 public class BlockMask extends ABlockMask {
+//FAWE end
 
+    //FAWE start
     private final boolean[] ordinals;
 
     public BlockMask() {
@@ -61,6 +67,7 @@ public class BlockMask extends ABlockMask {
         super(extent == null ? new NullExtent() : extent);
         this.ordinals = ordinals;
     }
+    //FAWE end
 
     /**
      * Create a new block mask.
@@ -80,12 +87,13 @@ public class BlockMask extends ABlockMask {
      * Create a new block mask.
      *
      * @param extent the extent
-     * @param block an array of blocks to match
+     * @param block  an array of blocks to match
      */
     public BlockMask(Extent extent, BaseBlock... block) {
         this(extent, Arrays.asList(checkNotNull(block)));
     }
 
+    //FAWE start
     public BlockMask add(Predicate<BlockState> predicate) {
         for (int i = 0; i < ordinals.length; i++) {
             if (!ordinals[i]) {
@@ -144,6 +152,7 @@ public class BlockMask extends ABlockMask {
         }
         return this;
     }
+    //FAWE end
 
     /**
      * Add the given blocks to the list of criteria.
@@ -154,8 +163,9 @@ public class BlockMask extends ABlockMask {
     @Deprecated
     public void add(Collection<BaseBlock> blocks) {
         checkNotNull(blocks);
+        //FAWE start - get ordinals
         for (BaseBlock block : blocks) {
-            if (block instanceof ImmutableBaseBlock) {
+            if (block instanceof BlanketBaseBlock) {
                 for (BlockState state : block.getBlockType().getAllStates()) {
                     ordinals[state.getOrdinal()] = true;
                 }
@@ -163,6 +173,7 @@ public class BlockMask extends ABlockMask {
                 add(block.toBlockState());
             }
         }
+        //FAWE end
     }
 
     /**
@@ -180,12 +191,15 @@ public class BlockMask extends ABlockMask {
      * @return a list of blocks
      */
     public Collection<BaseBlock> getBlocks() {
+        //FAWE start
         return Collections.emptyList(); //TODO Not supported in FAWE yet
+        //FAWE end
     }
 
+    //FAWE start
     @Override
     public boolean test(BlockState state) {
-        return ordinals[state.getOrdinal()] || replacesAir() && state.getOrdinal() <= 3;
+        return ordinals[state.getOrdinal()] || replacesAir() && state.getOrdinal() == 0;
     }
 
     @Override
@@ -197,8 +211,8 @@ public class BlockMask extends ABlockMask {
     @Override
     public boolean replacesAir() {
         return ordinals[BlockTypes.AIR.getDefaultState().getOrdinal()]
-            || ordinals[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()]
-            || ordinals[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()];
+                || ordinals[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()]
+                || ordinals[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()];
     }
 
     @Override
@@ -259,19 +273,16 @@ public class BlockMask extends ABlockMask {
 
         int setTypes = 0;
         BlockType setType = null;
-        BlockType unsetType = null;
         int totalTypes = 0;
 
         for (BlockType type : BlockTypesCache.values) {
             if (type != null) {
                 totalTypes++;
                 boolean hasAll = true;
-                boolean hasAny = false;
                 List<BlockState> all = type.getAllStates();
                 for (BlockState state : all) {
                     totalStates++;
                     hasAll &= test(state);
-                    hasAny = true;
                 }
                 if (hasAll) {
                     setTypes++;
@@ -326,6 +337,7 @@ public class BlockMask extends ABlockMask {
             cloned[BlockTypes.AIR.getDefaultState().getOrdinal()] = false;
             cloned[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()] = false;
             cloned[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()] = false;
+            cloned[0] = false;
         }
         return new BlockMask(getExtent(), cloned);
     }
@@ -334,4 +346,5 @@ public class BlockMask extends ABlockMask {
     public Mask copy() {
         return new BlockMask(getExtent(), ordinals.clone());
     }
+    //FAWE end
 }

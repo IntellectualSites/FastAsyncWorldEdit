@@ -19,16 +19,17 @@
 
 package com.sk89q.jnbt;
 
+import com.sk89q.worldedit.util.nbt.LongBinaryTag;
+
 /**
  * The {@code TAG_Long} tag.
+ *
+ * @deprecated Use {@link LongBinaryTag}.
  */
-public final class LongTag extends NumberTag {
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_LONG;
-    }
+@Deprecated
+public final class LongTag extends Tag {
 
-    private final long value;
+    private final LongBinaryTag innerTag;
 
     /**
      * Creates the tag with an empty name.
@@ -37,17 +38,29 @@ public final class LongTag extends NumberTag {
      */
     public LongTag(long value) {
         super();
-        this.value = value;
+        this.innerTag = LongBinaryTag.of(value);
+    }
+
+    public LongTag(LongBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
+    }
+
+    @Override
+    public LongBinaryTag asBinaryTag() {
+        return this.innerTag;
     }
 
     @Override
     public Long getValue() {
-        return value;
+        return innerTag.value();
     }
 
+    //FAWE start
     @Override
-    public String toString() {
-        return "TAG_Long(" + value + ")";
+    public int getTypeCode() {
+        return NBTConstants.TYPE_LONG;
     }
+    //FAWE end
 
 }

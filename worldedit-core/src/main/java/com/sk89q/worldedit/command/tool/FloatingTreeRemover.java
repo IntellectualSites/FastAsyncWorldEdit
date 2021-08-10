@@ -19,7 +19,8 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.object.collection.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -30,14 +31,13 @@ import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockCategories;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -46,6 +46,7 @@ import java.util.Set;
  * to anything else).
  */
 public class FloatingTreeRemover implements BlockTool {
+
     private final int rangeSq;
 
     public FloatingTreeRemover() {
@@ -67,15 +68,17 @@ public class FloatingTreeRemover implements BlockTool {
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config,
-                              Player player, LocalSession session, Location clicked,
-                              @Nullable Direction face) {
+    public boolean actPrimary(
+            Platform server, LocalConfiguration config,
+            Player player, LocalSession session, Location clicked,
+            @Nullable Direction face
+    ) {
 
         final World world = (World) clicked.getExtent();
         final BlockState state = world.getBlock(clicked.toVector().toBlockPoint());
 
         if (!isTreeBlock(state.getBlockType())) {
-            player.printError(TranslatableComponent.of("worldedit.tool.deltree.not-tree"));
+            player.print(Caption.of("worldedit.tool.deltree.not-tree"));
             return true;
         }
 
@@ -83,7 +86,7 @@ public class FloatingTreeRemover implements BlockTool {
             try {
                 final Set<BlockVector3> blockSet = bfs(world, clicked.toVector().toBlockPoint());
                 if (blockSet == null) {
-                    player.printError(TranslatableComponent.of("worldedit.tool.deltree.not-floating"));
+                    player.print(Caption.of("worldedit.tool.deltree.not-floating"));
                     return true;
                 }
 
@@ -94,7 +97,7 @@ public class FloatingTreeRemover implements BlockTool {
                     }
                 }
             } catch (MaxChangedBlocksException e) {
-                player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
+                player.print(Caption.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);
             }
@@ -115,13 +118,15 @@ public class FloatingTreeRemover implements BlockTool {
     /**
      * Helper method.
      *
-     * @param world the world that contains the tree
+     * @param world  the world that contains the tree
      * @param origin any point contained in the floating tree
      * @return a set containing all blocks in the tree/shroom or null if this is not a floating tree/shroom.
      */
     private Set<BlockVector3> bfs(World world, BlockVector3 origin) {
+        //FAWE start - Use a LBVS over a HashMap & LinkedList
         final LocalBlockVectorSet visited = new LocalBlockVectorSet();
         final LocalBlockVectorSet queue = new LocalBlockVectorSet();
+        //FAWE end
 
         queue.add(origin);
         visited.add(origin);
@@ -141,7 +146,7 @@ public class FloatingTreeRemover implements BlockTool {
                     if (visited.add(next)) {
                         BlockState state = world.getBlock(next);
                         if (state.getBlockType().getMaterial().isAir()
-                            || state.getBlockType() == BlockTypes.SNOW) {
+                                || state.getBlockType() == BlockTypes.SNOW) {
                             continue;
                         }
                         if (isTreeBlock(state.getBlockType())) {
@@ -150,7 +155,7 @@ public class FloatingTreeRemover implements BlockTool {
                             // we hit something solid - evaluate where we came from
                             final BlockType currentType = world.getBlock(current).getBlockType();
                             if (!BlockCategories.LEAVES.contains(currentType)
-                                && currentType != BlockTypes.VINE) {
+                                    && currentType != BlockTypes.VINE) {
                                 // log/shroom touching a wall/the ground => this is not a floating tree, bail out
                                 return null;
                             }
@@ -162,4 +167,5 @@ public class FloatingTreeRemover implements BlockTool {
 
         return visited;
     }
+
 }

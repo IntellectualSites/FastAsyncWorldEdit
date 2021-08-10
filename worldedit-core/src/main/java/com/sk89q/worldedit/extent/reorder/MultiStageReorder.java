@@ -132,15 +132,19 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
         BlockCategories.DOORS.getAll().forEach(type -> priorityMap.put(type, PlacementPriority.FINAL));
         BlockCategories.BANNERS.getAll().forEach(type -> priorityMap.put(type, PlacementPriority.FINAL));
         BlockCategories.SIGNS.getAll().forEach(type -> priorityMap.put(type, PlacementPriority.FINAL));
-        priorityMap.put(BlockTypes.SIGN, PlacementPriority.FINAL);
-        priorityMap.put(BlockTypes.WALL_SIGN, PlacementPriority.FINAL);
+        @SuppressWarnings("deprecation")
+        BlockType sign = BlockTypes.SIGN;
+        priorityMap.put(sign, PlacementPriority.FINAL);
+        @SuppressWarnings("deprecation")
+        BlockType wallSign = BlockTypes.WALL_SIGN;
+        priorityMap.put(wallSign, PlacementPriority.FINAL);
         priorityMap.put(BlockTypes.CACTUS, PlacementPriority.FINAL);
         priorityMap.put(BlockTypes.SUGAR_CANE, PlacementPriority.FINAL);
         priorityMap.put(BlockTypes.PISTON_HEAD, PlacementPriority.FINAL);
         priorityMap.put(BlockTypes.MOVING_PISTON, PlacementPriority.FINAL);
     }
 
-    private Map<PlacementPriority, BlockMap<BaseBlock>> stages = new HashMap<>();
+    private final Map<PlacementPriority, BlockMap<BaseBlock>> stages = new HashMap<>();
 
     private boolean enabled;
 
@@ -166,7 +170,7 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
     /**
      * Create a new instance.
      *
-     * @param extent the extent
+     * @param extent  the extent
      * @param enabled true to enable
      */
     public MultiStageReorder(Extent extent, boolean enabled) {
@@ -221,7 +225,9 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
         PlacementPriority srcPriority = getPlacementPriority(existing);
 
         if (srcPriority != PlacementPriority.FIRST) {
-            BaseBlock replacement = (block.getBlockType().getMaterial().isAir() ? block : BlockTypes.AIR.getDefaultState()).toBaseBlock();
+            BaseBlock replacement = (block.getBlockType().getMaterial().isAir()
+                    ? block
+                    : BlockTypes.AIR.getDefaultState()).toBaseBlock();
 
             switch (srcPriority) {
                 case FINAL:
@@ -232,6 +238,8 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
                     break;
                 case LAST:
                     stages.get(PlacementPriority.CLEAR_LAST).put(location, replacement);
+                    break;
+                default:
                     break;
             }
 
@@ -277,4 +285,5 @@ public class MultiStageReorder extends AbstractBufferingExtent implements Reorde
 
         return new OperationQueue(operations);
     }
+
 }

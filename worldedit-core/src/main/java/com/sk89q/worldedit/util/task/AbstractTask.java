@@ -21,9 +21,9 @@ package com.sk89q.worldedit.util.task;
 
 import com.google.common.util.concurrent.AbstractFuture;
 
+import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.UUID;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -42,7 +42,7 @@ public abstract class AbstractTask<V> extends AbstractFuture<V> implements Task<
     /**
      * Create a new instance.
      *
-     * @param name the name
+     * @param name  the name
      * @param owner the owner
      */
     protected AbstractTask(String name, @Nullable Object owner) {
@@ -71,4 +71,5 @@ public abstract class AbstractTask<V> extends AbstractFuture<V> implements Task<
     public Date getCreationDate() {
         return creationDate;
     }
+
 }

@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
+import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
@@ -21,15 +22,13 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "java")
     apply(plugin = "eclipse")
     apply(plugin = "idea")
-    apply(plugin = "maven")
-//    apply(plugin = "checkstyle")
+    apply(plugin = "maven-publish")
     apply(plugin = "com.github.johnrengelman.shadow")
 
-    ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
-
-    configure<JavaPluginConvention> {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    if (project.hasProperty("buildnumber")) {
+        ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
+    } else {
+        ext["internalVersion"] = "$version"
     }
 
     tasks
@@ -39,27 +38,29 @@ fun Project.applyPlatformAndCoreConfiguration() {
             val disabledLint = listOf(
                 "processing", "path", "fallthrough", "serial"
             )
-            //options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
+            options.release.set(11)
+            options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
             options.isDeprecation = false
             options.encoding = "UTF-8"
+            options.compilerArgs.add("-parameters")
         }
 
-//    configure<CheckstyleExtension> {
-//        configFile = rootProject.file("config/checkstyle/checkstyle.xml")
-//        toolVersion = "8.34"
-//    }
+    configurations.all {
+        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 16)
+    }
 
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
     }
 
     dependencies {
-        "compileOnly"("org.jetbrains:annotations:20.1.0")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:${Versions.JUNIT}")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-params:${Versions.JUNIT}")
-        "testImplementation"("org.mockito:mockito-core:${Versions.MOCKITO}")
-        "testImplementation"("org.mockito:mockito-junit-jupiter:${Versions.MOCKITO}")
-        "testRuntime"("org.junit.jupiter:junit-jupiter-engine:${Versions.JUNIT}")
+        "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.7.2")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.7.2")
+        "testImplementation"("org.mockito:mockito-core:3.11.2")
+        "testImplementation"("org.mockito:mockito-junit-jupiter:3.11.2")
+        "testImplementation"("net.bytebuddy:byte-buddy:1.11.9")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:3.11.2")
     }
 
     // Java 8 turns on doclint which we fail
@@ -76,7 +77,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     tasks.register<Jar>("javadocJar") {
         dependsOn("javadoc")
-        archiveClassifier.set("javadoc")
+        archiveClassifier.set(null as String?)
+        archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-javadoc.${archiveExtension.getOrElse("jar")}")
         from(tasks.getByName<Javadoc>("javadoc").destinationDir)
     }
 
@@ -92,7 +94,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
     if (name == "worldedit-core" || name == "worldedit-bukkit") {
         tasks.register<Jar>("sourcesJar") {
             dependsOn("classes")
-            archiveClassifier.set("sources")
+            archiveClassifier.set(null as String?)
+            archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-sources.${archiveExtension.getOrElse("jar")}")
             from(sourceSets["main"].allSource)
         }
 
@@ -104,21 +107,26 @@ fun Project.applyPlatformAndCoreConfiguration() {
         }
     }
 
-//    tasks.named("check").configure {
-//        dependsOn("checkstyleMain", "checkstyleTest")
-//    }
+    if (name != "worldedit-fabric") {
+        configurations["compileClasspath"].apply {
+            resolutionStrategy.componentSelection {
+                withModule("org.slf4j:slf4j-api") {
+                    reject("No SLF4J allowed on compile classpath")
+                }
+            }
+        }
+    }
 
 }
 
 fun Project.applyShadowConfiguration() {
     tasks.named<ShadowJar>("shadowJar") {
-//        archiveClassifier.set("dist")
         dependencies {
             include(project(":worldedit-libs:core"))
             include(project(":worldedit-libs:${project.name.replace("worldedit-", "")}"))
             include(project(":worldedit-core"))
+            exclude("com.google.code.findbugs:jsr305")
         }
-        archiveFileName.set("FastAsyncWorldEdit-${project.version}.jar")
         exclude("GradleStart**")
         exclude(".cache")
         exclude("LICENSE*")
@@ -129,5 +137,31 @@ fun Project.applyShadowConfiguration() {
 
 val CLASSPATH = listOf("truezip", "truevfs", "js")
     .map { "$it.jar" }
-    .flatMap { listOf(it, "WorldEdit/$it") }
+    .flatMap { listOf(it, "FastAsyncWorldEdit/$it") }
     .joinToString(separator = " ")
+
+sealed class WorldEditKind(
+    val name: String,
+    val mainClass: String = "com.sk89q.worldedit.internal.util.InfoEntryPoint"
+) {
+    class Standalone(mainClass: String) : WorldEditKind("STANDALONE", mainClass)
+    object Mod : WorldEditKind("MOD")
+    object Plugin : WorldEditKind("PLUGIN")
+}
+
+fun Project.addJarManifest(kind: WorldEditKind, includeClasspath: Boolean = false) {
+    tasks.named<Jar>("jar") {
+        val version = project(":worldedit-core").version
+        inputs.property("version", version)
+        val attributes = mutableMapOf(
+            "Implementation-Version" to version,
+            "WorldEdit-Version" to version,
+            "WorldEdit-Kind" to kind.name,
+            "Main-Class" to kind.mainClass
+        )
+        if (includeClasspath) {
+            attributes["Class-Path"] = CLASSPATH
+        }
+        manifest.attributes(attributes)
+    }
+}

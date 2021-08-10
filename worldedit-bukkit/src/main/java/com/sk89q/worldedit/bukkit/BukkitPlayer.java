@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.util.TaskManager;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.VaultResolver;
 import com.sk89q.worldedit.WorldEdit;
@@ -46,6 +46,7 @@ import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -62,35 +63,53 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.PermissionAttachment;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Nullable;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
     private final Player player;
     private final WorldEditPlugin plugin;
+    //FAWE start
     private final PermissionAttachment permAttachment;
 
-    public BukkitPlayer(Player player) {
-        super(getExistingMap(WorldEditPlugin.getInstance(), player));
+    /**
+     * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
+     *
+     * @param player The corresponding {@link Player} or null if you need a null WorldEdit player for some reason.
+     */
+    public BukkitPlayer(@Nullable Player player) {
+        super(player != null ? getExistingMap(WorldEditPlugin.getInstance(), player) : new ConcurrentHashMap<>());
         this.plugin = WorldEditPlugin.getInstance();
         this.player = player;
         this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
     }
+    //FAWE end
 
-    public BukkitPlayer(WorldEditPlugin plugin, Player player) {
+    /**
+     * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
+     *
+     * @param plugin The running instance of {@link WorldEditPlugin}
+     * @param player The corresponding {@link Player} or null if you need a null WorldEdit player for some reason.
+     */
+    public BukkitPlayer(@Nonnull WorldEditPlugin plugin, @Nullable Player player) {
         this.plugin = plugin;
         this.player = player;
+        //FAWE start
         this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
-        if (Settings.IMP.CLIPBOARD.USE_DISK) {
+        if (player != null && Settings.IMP.CLIPBOARD.USE_DISK) {
             loadClipboardFromDisk();
         }
+        //FAWE end
     }
 
+    //FAWE start
     private static Map<String, Object> getExistingMap(WorldEditPlugin plugin, Player player) {
         BukkitPlayer cached = plugin.getCachedPlayer(player);
         if (cached != null) {
@@ -98,6 +117,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         return new ConcurrentHashMap<>();
     }
+    //FAWE end
 
     @Override
     public UUID getUniqueId() {
@@ -130,6 +150,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         return player.getDisplayName();
     }
 
+    //FAWE start
     @Override
     public void giveItem(BaseItemStack itemStack) {
         final PlayerInventory inv = player.getInventory();
@@ -141,14 +162,13 @@ public class BukkitPlayer extends AbstractPlayerActor {
         player.getInventory().setItemInMainHand(newItem);
         HashMap<Integer, ItemStack> overflow = inv.addItem(item);
         if (!overflow.isEmpty()) {
-            TaskManager.IMP.sync(new RunnableVal<Object>() {
+            TaskManager.IMP.sync(new RunnableVal<>() {
                 @Override
                 public void run(Object value) {
                     for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
                         ItemStack stack = entry.getValue();
                         if (stack.getType() != Material.AIR && stack.getAmount() > 0) {
-                            Item
-                                dropped = player.getWorld().dropItem(player.getLocation(), stack);
+                            Item dropped = player.getWorld().dropItem(player.getLocation(), stack);
                             PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
                             Bukkit.getPluginManager().callEvent(event);
                             if (event.isCancelled()) {
@@ -161,7 +181,9 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         player.updateInventory();
     }
+    //FAWE end
 
+    @Deprecated
     @Override
     public void printRaw(String msg) {
         for (String part : msg.split("\n")) {
@@ -169,6 +191,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    @Deprecated
     @Override
     public void print(String msg) {
         for (String part : msg.split("\n")) {
@@ -176,6 +199,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    @Deprecated
     @Override
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
@@ -183,6 +207,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    @Deprecated
     @Override
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
@@ -192,12 +217,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void print(Component component) {
+        //FAWE start - Add FAWE prefix to all messages
         component = Caption.color(TranslatableComponent.of("prefix", component), getLocale());
-        TextAdapter.sendComponent(player, component);
+        //FAWE end
+        TextAdapter.sendMessage(player, WorldEditText.format(component, getLocale()));
     }
 
     @Override
     public boolean trySetPosition(Vector3 pos, float pitch, float yaw) {
+        //FAWE start
         org.bukkit.World world = player.getWorld();
         if (pos instanceof com.sk89q.worldedit.util.Location) {
             com.sk89q.worldedit.util.Location loc = (com.sk89q.worldedit.util.Location) pos;
@@ -207,7 +235,15 @@ public class BukkitPlayer extends AbstractPlayerActor {
             }
         }
         org.bukkit.World finalWorld = world;
-        return TaskManager.IMP.sync(() -> player.teleport(new Location(finalWorld, pos.getX(), pos.getY(), pos.getZ(), yaw, pitch)));
+        //FAWE end
+        return TaskManager.IMP.sync(() -> player.teleport(new Location(
+                finalWorld,
+                pos.getX(),
+                pos.getY(),
+                pos.getZ(),
+                yaw,
+                pitch
+        )));
     }
 
     @Override
@@ -234,9 +270,10 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public boolean hasPermission(String perm) {
         return (!plugin.getLocalConfiguration().noOpPermissions && player.isOp())
                 || plugin.getPermissionsResolver().hasPermission(
-                    player.getWorld().getName(), player, perm);
+                player.getWorld().getName(), player, perm);
     }
 
+    //FAWE start
     @Override
     public void setPermission(String permission, boolean value) {
         /*
@@ -259,6 +296,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
             permAttachment.setPermission(permission, value);
         }
     }
+    //FAWE end
 
     @Override
     public World getWorld() {
@@ -272,7 +310,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         if (params.length > 0) {
             send = send + "|" + StringUtil.joinString(params, "|");
         }
-        player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(CUIChannelListener.UTF_8_CHARSET));
+        player.sendPluginMessage(plugin, WorldEditPlugin.CUI_PLUGIN_CHANNEL, send.getBytes(StandardCharsets.UTF_8));
     }
 
     public Player getPlayer() {
@@ -302,7 +340,8 @@ public class BukkitPlayer extends AbstractPlayerActor {
                 getWorld(),
                 position,
                 nativeLocation.getYaw(),
-                nativeLocation.getPitch());
+                nativeLocation.getPitch()
+        );
     }
 
     @Override
@@ -317,10 +356,14 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void sendAnnouncements() {
-        if (WorldEditPlugin.getInstance().getBukkitImplAdapter() == null) {
-            printError(TranslatableComponent.of("worldedit.version.bukkit.unsupported-adapter",
+        if (WorldEditPlugin.getInstance().getLifecycledBukkitImplAdapter() == null) {
+            //FAWE start - swap out EH download url with ours
+            print(Caption.of(
+                    "worldedit.version.bukkit.unsupported-adapter",
                     TextComponent.of("https://intellectualsites.github.io/download/fawe.html", TextColor.AQUA)
-                        .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))));
+                            .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/download/fawe.html"))
+            ));
+            //FAWE end
         }
     }
 
@@ -332,18 +375,18 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public SessionKey getSessionKey() {
-        return new SessionKeyImpl(this.player.getUniqueId(), player.getName());
+        return new SessionKeyImpl(this.player);
     }
 
-    private static class SessionKeyImpl implements SessionKey {
+    static class SessionKeyImpl implements SessionKey {
         // If not static, this will leak a reference
 
         private final UUID uuid;
         private final String name;
 
-        private SessionKeyImpl(UUID uuid, String name) {
-            this.uuid = uuid;
-            this.name = name;
+        SessionKeyImpl(Player player) {
+            this.uuid = player.getUniqueId();
+            this.name = player.getName();
         }
 
         @Override
@@ -380,11 +423,12 @@ public class BukkitPlayer extends AbstractPlayerActor {
             player.sendBlockChange(loc, player.getWorld().getBlockAt(loc).getBlockData());
         } else {
             player.sendBlockChange(loc, BukkitAdapter.adapt(block));
-            if (block instanceof BaseBlock && ((BaseBlock) block).hasNbtData()) {
-                BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
-                if (adapter != null) {
-                    if (block.getBlockType() == BlockTypes.STRUCTURE_BLOCK) {
-                        adapter.sendFakeNBT(player, pos, ((BaseBlock) block).getNbtData());
+            BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+            if (adapter != null) {
+                if (block.getBlockType() == BlockTypes.STRUCTURE_BLOCK && block instanceof BaseBlock) {
+                    CompoundBinaryTag nbt = ((BaseBlock) block).getNbt();
+                    if (nbt != null) {
+                        adapter.sendFakeNBT(player, pos, nbt);
                         adapter.sendFakeOP(player);
                     }
                 }
@@ -392,6 +436,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
     }
 
+    //FAWE start
     @Override
     public void sendTitle(Component title, Component sub) {
         String titleStr = WorldEditText.reduceToText(title, getLocale());
@@ -405,4 +450,5 @@ public class BukkitPlayer extends AbstractPlayerActor {
         plugin.getPermissionAttachmentManager().removeAttachment(player);
         super.unregister();
     }
+    //FAWE end
 }

@@ -52,4 +52,5 @@ public class UndoContext {
     public void setExtent(@Nullable Extent extent) {
         this.extent = extent;
     }
+
 }

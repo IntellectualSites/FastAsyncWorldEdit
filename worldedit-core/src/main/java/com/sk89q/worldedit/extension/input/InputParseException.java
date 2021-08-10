@@ -50,7 +50,7 @@ public class InputParseException extends WorldEditException {
      * Throw with a message and a cause.
      *
      * @param message the message
-     * @param cause the cause
+     * @param cause   the cause
      */
     public InputParseException(Component message, Throwable cause) {
         super(message, cause);
@@ -60,7 +60,7 @@ public class InputParseException extends WorldEditException {
      * Throw with a message and a cause.
      *
      * @param message the message
-     * @param cause the cause
+     * @param cause   the cause
      */
     @Deprecated
     public InputParseException(String message, Throwable cause) {

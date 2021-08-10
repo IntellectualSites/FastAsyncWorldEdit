@@ -19,14 +19,14 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.boydti.fawe.object.RunnableVal;
-import com.boydti.fawe.object.clipboard.URIClipboardHolder;
-import com.boydti.fawe.object.io.PGZIPOutputStream;
-import com.boydti.fawe.util.MainUtil;
+import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import org.anarres.parallelgzip.ParallelGZIPOutputStream;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -99,10 +99,13 @@ public interface ClipboardFormat {
      */
     Set<String> getFileExtensions();
 
+    //FAWE start
+
     /**
      * Sets the actor's clipboard.
-     * @param actor the actor
-     * @param uri the URI of the schematic to hold
+     *
+     * @param actor       the actor
+     * @param uri         the URI of the schematic to hold
      * @param inputStream the input stream
      * @throws IOException thrown on I/O error
      */
@@ -131,9 +134,8 @@ public interface ClipboardFormat {
         return getReader(stream).read();
     }
 
-
     default URL upload(final Clipboard clipboard) {
-        return MainUtil.upload(null, null, getPrimaryFileExtension(), new RunnableVal<OutputStream>() {
+        return MainUtil.upload(null, null, getPrimaryFileExtension(), new RunnableVal<>() {
             @Override
             public void run(OutputStream value) {
                 write(value, clipboard);
@@ -143,7 +145,7 @@ public interface ClipboardFormat {
 
     default void write(OutputStream value, Clipboard clipboard) {
         try {
-            try (PGZIPOutputStream gzip = new PGZIPOutputStream(value)) {
+            try (ParallelGZIPOutputStream gzip = new ParallelGZIPOutputStream(value)) {
                 try (ClipboardWriter writer = getWriter(gzip)) {
                     writer.write(clipboard);
                 }
@@ -152,4 +154,5 @@ public interface ClipboardFormat {
             throw new RuntimeException(e);
         }
     }
+    //FAWE end
 }

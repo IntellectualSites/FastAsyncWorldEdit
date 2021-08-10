@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.boydti.fawe.object.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -43,7 +43,9 @@ public interface ClipboardReader extends Closeable {
      * @throws IOException thrown on I/O error
      */
     default Clipboard read() throws IOException {
+        //FAWE start
         return read(UUID.randomUUID());
+        //FAWe end
     }
 
     /**
@@ -55,6 +57,7 @@ public interface ClipboardReader extends Closeable {
         return OptionalInt.empty();
     }
 
+    //FAWE start
     default Clipboard read(UUID uuid) throws IOException {
         return read(uuid, DiskOptimizedClipboard::new);
     }
@@ -62,4 +65,5 @@ public interface ClipboardReader extends Closeable {
     default Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
         return read();
     }
+    //FAWE end
 }

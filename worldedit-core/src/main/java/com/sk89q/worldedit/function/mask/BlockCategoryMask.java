@@ -22,6 +22,7 @@ package com.sk89q.worldedit.function.mask;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockCategory;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
 
@@ -38,7 +39,9 @@ public class BlockCategoryMask extends AbstractExtentMask {
         super(extent);
         checkNotNull(category);
         this.category = category;
+        //FAWE start
         this.category.getAll(); // load category so BlockCategory#contains actually works
+        //FAWE end
     }
 
     @Override
@@ -46,10 +49,12 @@ public class BlockCategoryMask extends AbstractExtentMask {
         return category.contains(getExtent().getBlock(vector));
     }
 
+    //FAWE start
     @Override
     public boolean test(Extent extent, BlockVector3 vector) {
         return category.contains(extent.getBlock(vector));
     }
+    //FAWE end
 
     @Nullable
     @Override
@@ -57,8 +62,15 @@ public class BlockCategoryMask extends AbstractExtentMask {
         return null;
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new BlockCategoryMask(getExtent(), category);
     }
+
+    @Override
+    public boolean replacesAir() {
+        return category.contains(BlockTypes.AIR);
+    }
+    //FAWE end
 }

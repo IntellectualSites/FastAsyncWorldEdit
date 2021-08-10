@@ -49,4 +49,5 @@ public abstract class InputParser<E> {
     public Stream<String> getSuggestions(String input) {
         return Stream.empty();
     }
+
 }

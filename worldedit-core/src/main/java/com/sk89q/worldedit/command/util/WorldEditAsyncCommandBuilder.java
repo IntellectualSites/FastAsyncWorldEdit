@@ -24,13 +24,14 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
-import java.util.concurrent.Callable;
 import javax.annotation.Nullable;
+import java.util.concurrent.Callable;
 
 /**
  * For internal WorldEdit use only.
  */
 public final class WorldEditAsyncCommandBuilder {
+
     private WorldEditAsyncCommandBuilder() {
     }
 
@@ -42,11 +43,15 @@ public final class WorldEditAsyncCommandBuilder {
     public static void createAndSendMessage(Actor actor, Callable<Component> task, @Nullable Component desc) {
         final AsyncCommandBuilder<Component> builder = AsyncCommandBuilder.wrap(task, actor);
         if (desc != null) {
-            builder.sendMessageAfterDelay(desc);
+            builder.setDelayMessage(desc);
         }
         builder
                 .onSuccess((String) null, actor::printInfo)
-                .onFailure((String) null, WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getExceptionConverter())
+                .onFailure(
+                        (String) null,
+                        WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getExceptionConverter()
+                )
                 .buildAndExec(WorldEdit.getInstance().getExecutorService());
     }
+
 }

@@ -19,12 +19,15 @@
 
 package com.sk89q.worldedit.function.operation;
 
-import com.boydti.fawe.object.extent.BlockTranslateExtent;
-import com.boydti.fawe.object.extent.PositionTransformExtent;
-import com.boydti.fawe.object.function.block.BiomeCopy;
-import com.boydti.fawe.object.function.block.CombinedBlockCopy;
-import com.boydti.fawe.object.function.block.SimpleBlockCopy;
-import com.boydti.fawe.util.MaskTraverser;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.BlockTranslateExtent;
+import com.fastasyncworldedit.core.extent.PositionTransformExtent;
+import com.fastasyncworldedit.core.function.RegionMaskTestFunction;
+import com.fastasyncworldedit.core.function.block.BiomeCopy;
+import com.fastasyncworldedit.core.function.block.CombinedBlockCopy;
+import com.fastasyncworldedit.core.function.block.SimpleBlockCopy;
+import com.fastasyncworldedit.core.function.visitor.IntersectRegionFunction;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
@@ -33,13 +36,11 @@ import com.sk89q.worldedit.entity.metadata.EntityProperties;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
-import com.sk89q.worldedit.function.RegionMaskTestFunction;
 import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.entity.ExtentEntityCopy;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
-import com.sk89q.worldedit.function.visitor.IntersectRegionFunction;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -49,13 +50,9 @@ import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -82,10 +79,12 @@ public class ForwardExtentCopy implements Operation {
     private RegionFunction sourceFunction = null;
     private Transform transform = new Identity();
     private Transform currentTransform = null;
-    private int affectedBlocks;
+
     private RegionFunction filterFunction;
     private RegionVisitor lastBiomeVisitor;
     private EntityVisitor lastEntityVisitor;
+
+    private int affectedBlocks;
     private int affectedBiomeCols;
     private int affectedEntities;
 
@@ -93,10 +92,10 @@ public class ForwardExtentCopy implements Operation {
      * Create a new copy using the region's lowest minimum point as the
      * "from" position.
      *
-     * @param source the source extent
-     * @param region the region to copy
+     * @param source      the source extent
+     * @param region      the region to copy
      * @param destination the destination extent
-     * @param to the destination position
+     * @param to          the destination position
      * @see #ForwardExtentCopy(Extent, Region, BlockVector3, Extent, BlockVector3) the main constructor
      */
     public ForwardExtentCopy(Extent source, Region region, Extent destination, BlockVector3 to) {
@@ -106,11 +105,11 @@ public class ForwardExtentCopy implements Operation {
     /**
      * Create a new copy.
      *
-     * @param source the source extent
-     * @param region the region to copy
-     * @param from the source position
+     * @param source      the source extent
+     * @param region      the region to copy
+     * @param from        the source position
      * @param destination the destination extent
-     * @param to the destination position
+     * @param to          the destination position
      */
     public ForwardExtentCopy(Extent source, Region region, BlockVector3 from, Extent destination, BlockVector3 to) {
         checkNotNull(source);
@@ -169,9 +168,11 @@ public class ForwardExtentCopy implements Operation {
         this.sourceMask = sourceMask;
     }
 
+    //FAWE start
     public void setFilterFunction(RegionFunction filterFunction) {
         this.filterFunction = filterFunction;
     }
+    //FAWE end
 
     /**
      * Get the function that gets applied to all source blocks <em>after</em>
@@ -263,9 +264,11 @@ public class ForwardExtentCopy implements Operation {
      * @param copyingBiomes true if copying
      */
     public void setCopyingBiomes(boolean copyingBiomes) {
+        //FAWE start - FlatRegion
         if (copyingBiomes && !(region instanceof FlatRegion)) {
             throw new UnsupportedOperationException("Can't copy biomes from region that doesn't implement FlatRegion");
         }
+        //FAWE end
         this.copyingBiomes = copyingBiomes;
     }
 
@@ -280,9 +283,11 @@ public class ForwardExtentCopy implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
+        //FAWE start
         if (currentTransform == null) {
             currentTransform = transform;
         }
+        //FAWE end
         if (lastBiomeVisitor != null) {
             affectedBiomeCols += lastBiomeVisitor.getAffected();
             lastBiomeVisitor = null;
@@ -292,13 +297,21 @@ public class ForwardExtentCopy implements Operation {
             lastEntityVisitor = null;
         }
 
+        //FAWE start
         Extent finalDest = destination;
         BlockVector3 translation = to.subtract(from);
 
         if (!translation.equals(BlockVector3.ZERO)) {
-            finalDest = new BlockTranslateExtent(finalDest, translation.getBlockX(), translation.getBlockY(), translation.getBlockZ());
+            finalDest = new BlockTranslateExtent(
+                    finalDest,
+                    translation.getBlockX(),
+                    translation.getBlockY(),
+                    translation.getBlockZ()
+            );
         }
+        //FAWE end
 
+        //FAWE start - RegionVisitor > ExtentBlockCopy
         RegionFunction copy;
         RegionVisitor blockCopy = null;
         PositionTransformExtent transExt = null;
@@ -334,7 +347,8 @@ public class ForwardExtentCopy implements Operation {
             if (sourceFunction != null) {
                 BlockVector3 disAbs = translation.abs();
                 BlockVector3 size = region.getMaximumPoint().subtract(region.getMinimumPoint()).add(1, 1, 1);
-                boolean overlap = (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size.getBlockZ());
+                boolean overlap = (disAbs.getBlockX() < size.getBlockX() && disAbs.getBlockY() < size.getBlockY() && disAbs.getBlockZ() < size
+                        .getBlockZ());
 
                 RegionFunction copySrcFunc = sourceFunction;
                 if (overlap && translation.length() != 0) {
@@ -344,7 +358,11 @@ public class ForwardExtentCopy implements Operation {
                     int z = translation.getBlockZ();
 
                     maskFunc = position -> {
-                        BlockVector3 bv = BlockVector3.at(position.getBlockX() + x, position.getBlockY() + y, position.getBlockZ() + z);
+                        BlockVector3 bv = BlockVector3.at(
+                                position.getBlockX() + x,
+                                position.getBlockY() + y,
+                                position.getBlockZ() + z
+                        );
                         if (region.contains(bv)) {
                             return sourceFunction.apply(bv);
                         }
@@ -352,7 +370,11 @@ public class ForwardExtentCopy implements Operation {
                     };
 
                     copySrcFunc = position -> {
-                        BlockVector3 bv = BlockVector3.at(position.getBlockX() - x, position.getBlockY() - y, position.getBlockZ() - z);
+                        BlockVector3 bv = BlockVector3.at(
+                                position.getBlockX() - x,
+                                position.getBlockY() - y,
+                                position.getBlockZ() - z
+                        );
                         if (!region.contains(bv)) {
                             return sourceFunction.apply(position);
                         }
@@ -391,12 +413,17 @@ public class ForwardExtentCopy implements Operation {
             entities = Collections.emptyList();
         }
 
-
         for (int i = 0; i < repetitions; i++) {
             Operations.completeBlindly(blockCopy);
 
             if (!entities.isEmpty()) {
-                ExtentEntityCopy entityCopy = new ExtentEntityCopy(source, from.toVector3(), destination, to.toVector3(), currentTransform);
+                ExtentEntityCopy entityCopy = new ExtentEntityCopy(
+                        source,
+                        from.toVector3(),
+                        destination,
+                        to.toVector3(),
+                        currentTransform
+                );
                 entityCopy.setRemoving(removingEntities);
                 List<? extends Entity> entities2 = Lists.newArrayList(source.getEntities(region));
                 entities2.removeIf(entity -> {
@@ -415,6 +442,7 @@ public class ForwardExtentCopy implements Operation {
 
         }
         affectedBlocks += blockCopy.getAffected();
+        //FAWE end
         return null;
     }
 
@@ -425,12 +453,18 @@ public class ForwardExtentCopy implements Operation {
     @Override
     public Iterable<Component> getStatusMessages() {
         return ImmutableList.of(
-                TranslatableComponent.of("worldedit.operation.affected.block",
-                        TextComponent.of(affectedBlocks)).color(TextColor.LIGHT_PURPLE),
-                TranslatableComponent.of("worldedit.operation.affected.biome",
-                        TextComponent.of(affectedBiomeCols)).color(TextColor.LIGHT_PURPLE),
-                TranslatableComponent.of("worldedit.operation.affected.entity",
-                        TextComponent.of(affectedEntities)).color(TextColor.LIGHT_PURPLE)
+                Caption.of(
+                        "worldedit.operation.affected.block",
+                        TextComponent.of(affectedBlocks)
+                ),
+                Caption.of(
+                        "worldedit.operation.affected.biome",
+                        TextComponent.of(affectedBiomeCols)
+                ),
+                Caption.of(
+                        "worldedit.operation.affected.entity",
+                        TextComponent.of(affectedEntities)
+                )
         );
     }
 

@@ -48,7 +48,7 @@ public interface SessionStore {
     /**
      * Save the given session identified by the given UUID.
      *
-     * @param id the UUID
+     * @param id      the UUID
      * @param session a session
      * @throws IOException thrown on read error
      */

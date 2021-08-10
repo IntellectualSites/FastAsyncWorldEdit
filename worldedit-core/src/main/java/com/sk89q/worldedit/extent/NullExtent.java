@@ -34,15 +34,16 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * An extent that returns air blocks for all blocks and does not
  * pass on any changes.
  */
 public class NullExtent implements Extent {
+
     public static final NullExtent INSTANCE = new NullExtent();
 
     @Override
@@ -92,12 +93,6 @@ public class NullExtent implements Extent {
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
-        throws WorldEditException {
-        return false;
-    }
-
-    @Override
     public boolean fullySupports3DBiomes() {
         return false;
     }
@@ -112,10 +107,18 @@ public class NullExtent implements Extent {
         return false;
     }
 
+    //FAWE start
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return false;
     }
+
+    @Override
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
+            throws WorldEditException {
+        return false;
+    }
+    //FAWE end
 
     @Nullable
     @Override

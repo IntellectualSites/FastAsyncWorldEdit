@@ -1,0 +1,72 @@
+package com.fastasyncworldedit.bukkit.adapter;
+
+import co.aikar.timings.Timings;
+import com.fastasyncworldedit.bukkit.listener.ChunkListener;
+import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+public class BukkitQueueHandler extends QueueHandler {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
+    private volatile boolean timingsEnabled;
+    private static boolean alertTimingsChange = true;
+
+    private static Method timingsCheck;
+    private static Field asyncCatcher;
+
+    static {
+        try {
+            timingsCheck = Class.forName("co.aikar.timings.TimingsManager").getDeclaredMethod("recheckEnabled");
+            timingsCheck.setAccessible(true);
+        } catch (Throwable ignored) {
+        }
+        try {
+            asyncCatcher = Class.forName("org.spigotmc.AsyncCatcher").getDeclaredField("enabled");
+            asyncCatcher.setAccessible(true);
+        } catch (Throwable ignored) {
+        }
+    }
+
+    @Override
+    public void startSet(boolean parallel) {
+        ChunkListener.physicsFreeze = true;
+        if (parallel) {
+            try {
+                asyncCatcher.setBoolean(asyncCatcher, false);
+                timingsEnabled = Timings.isTimingsEnabled();
+                if (timingsEnabled) {
+                    if (alertTimingsChange) {
+                        alertTimingsChange = false;
+                        LOGGER.debug("Having `parallel-threads` > 1 interferes with the timings.");
+                    }
+                    Timings.setTimingsEnabled(false);
+                    timingsCheck.invoke(null);
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void endSet(boolean parallel) {
+        ChunkListener.physicsFreeze = false;
+        if (parallel) {
+            try {
+                asyncCatcher.setBoolean(asyncCatcher, true);
+                if (timingsEnabled) {
+                    Timings.setTimingsEnabled(true);
+                    timingsCheck.invoke(null);
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+}

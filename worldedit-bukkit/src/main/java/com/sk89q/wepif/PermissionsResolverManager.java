@@ -21,14 +21,14 @@ package com.sk89q.wepif;
 
 import com.sk89q.util.yaml.YAMLFormat;
 import com.sk89q.util.yaml.YAMLProcessor;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,23 +41,25 @@ import java.util.List;
 public class PermissionsResolverManager implements PermissionsResolver {
 
     private static final String CONFIG_HEADER = "#\r\n"
-        + "# WEPIF Configuration File\r\n"
-        + "#\r\n"
-        + "# This file handles permissions configuration for every plugin using WEPIF\r\n"
-        + "#\r\n"
-        + "# About editing this file:\r\n"
-        + "# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If\r\n"
-        + "#   you use an editor like Notepad++ (recommended for Windows users), you\r\n"
-        + "#   must configure it to \"replace tabs with spaces.\" In Notepad++, this can\r\n"
-        + "#   be changed in Settings > Preferences > Language Menu.\r\n"
-        + "# - Don't get rid of the indents. They are indented so some entries are\r\n"
-        + "#   in categories (like \"enforce-single-session\" is in the \"protection\"\r\n"
-        + "#   category.\r\n"
-        + "# - If you want to check the format of this file before putting it\r\n"
-        + "#   into WEPIF, paste it into https://yaml-online-parser.appspot.com/\r\n"
-        + "#   and see if it gives \"ERROR:\".\r\n"
-        + "# - Lines starting with # are comments and so they are ignored.\r\n"
-        + "\r\n";
+            + "# WEPIF Configuration File\r\n"
+            + "#\r\n"
+            + "# This file handles permissions configuration for every plugin using WEPIF\r\n"
+            + "#\r\n"
+            + "# About editing this file:\r\n"
+            + "# - DO NOT USE TABS. You MUST use spaces or Bukkit will complain. If\r\n"
+            + "#   you use an editor like Notepad++ (recommended for Windows users), you\r\n"
+            + "#   must configure it to \"replace tabs with spaces.\" In Notepad++, this can\r\n"
+            + "#   be changed in Settings > Preferences > Language Menu.\r\n"
+            + "# - Don't get rid of the indents. They are indented so some entries are\r\n"
+            + "#   in categories (like \"enforce-single-session\" is in the \"protection\"\r\n"
+            + "#   category.\r\n"
+            + "# - If you want to check the format of this file before putting it\r\n"
+            + "#   into WEPIF, paste it into https://yaml-online-parser.appspot.com/\r\n"
+            + "#   and see if it gives \"ERROR:\".\r\n"
+            + "# - Lines starting with # are comments and so they are ignored.\r\n"
+            + "\r\n";
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static PermissionsResolverManager instance;
 
@@ -81,19 +83,18 @@ public class PermissionsResolverManager implements PermissionsResolver {
     private final Server server;
     private PermissionsResolver permissionResolver;
     private YAMLProcessor config;
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final List<Class<? extends PermissionsResolver>> enabledResolvers = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
-    protected Class<? extends PermissionsResolver>[] availableResolvers = new Class[] {
-        PluginPermissionsResolver.class,
-        PermissionsExResolver.class,
-        bPermissionsResolver.class,
-        GroupManagerResolver.class,
-        NijiPermissionsResolver.class,
-        VaultResolver.class,
-        DinnerPermsResolver.class,
-        FlatFilePermissionsResolver.class
+    protected Class<? extends PermissionsResolver>[] availableResolvers = new Class[]{
+            PluginPermissionsResolver.class,
+            PermissionsExResolver.class,
+            bPermissionsResolver.class,
+            GroupManagerResolver.class,
+            NijiPermissionsResolver.class,
+            VaultResolver.class,
+            DinnerPermsResolver.class,
+            FlatFilePermissionsResolver.class
     };
 
     protected PermissionsResolverManager(Plugin plugin) {
@@ -115,7 +116,7 @@ public class PermissionsResolverManager implements PermissionsResolver {
                     break;
                 }
             } catch (Throwable e) {
-                logger.warn("Error in factory method for " + resolverClass.getSimpleName(), e);
+                LOGGER.warn("Error in factory method for " + resolverClass.getSimpleName(), e);
                 continue;
             }
         }
@@ -123,7 +124,7 @@ public class PermissionsResolverManager implements PermissionsResolver {
             permissionResolver = new ConfigurationPermissionsResolver(config);
         }
         permissionResolver.load();
-        logger.info("WEPIF: " + permissionResolver.getDetectionMessage());
+        LOGGER.info("WEPIF: " + permissionResolver.getDetectionMessage());
     }
 
     public void setPluginPermissionsResolver(Plugin plugin) {
@@ -132,7 +133,7 @@ public class PermissionsResolverManager implements PermissionsResolver {
         }
 
         permissionResolver = new PluginPermissionsResolver((PermissionsProvider) plugin, plugin);
-        logger.info("WEPIF: " + permissionResolver.getDetectionMessage());
+        LOGGER.info("WEPIF: " + permissionResolver.getDetectionMessage());
     }
 
     @Override
@@ -191,14 +192,14 @@ public class PermissionsResolverManager implements PermissionsResolver {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                logger.warn("Failed to create new configuration file", e);
+                LOGGER.warn("Failed to create new configuration file", e);
             }
         }
         config = new YAMLProcessor(file, false, YAMLFormat.EXTENDED);
         try {
             config.load();
         } catch (IOException e) {
-            logger.warn("Error loading WEPIF configuration", e);
+            LOGGER.warn("Error loading WEPIF configuration", e);
         }
         List<String> keys = config.getKeys(null);
         config.setHeader(CONFIG_HEADER);
@@ -220,7 +221,7 @@ public class PermissionsResolverManager implements PermissionsResolver {
         } else {
             List<String> disabledResolvers = config.getStringList("resolvers.disabled", new ArrayList<>());
             List<String> stagedEnabled = config.getStringList("resolvers.enabled", null);
-            for (Iterator<String> i = stagedEnabled.iterator(); i.hasNext();) {
+            for (Iterator<String> i = stagedEnabled.iterator(); i.hasNext(); ) {
                 String nextName = i.next();
                 Class<?> next = null;
                 try {
@@ -229,7 +230,7 @@ public class PermissionsResolverManager implements PermissionsResolver {
                 }
 
                 if (next == null || !PermissionsResolver.class.isAssignableFrom(next)) {
-                    logger.warn("WEPIF: Invalid or unknown class found in enabled resolvers: "
+                    LOGGER.warn("WEPIF: Invalid or unknown class found in enabled resolvers: "
                             + nextName + ". Moving to disabled resolvers list.");
                     i.remove();
                     disabledResolvers.add(nextName);
@@ -241,11 +242,11 @@ public class PermissionsResolverManager implements PermissionsResolver {
 
             for (Class<?> clazz : availableResolvers) {
                 if (!stagedEnabled.contains(clazz.getSimpleName())
-                    && !disabledResolvers.contains(clazz.getSimpleName())) {
+                        && !disabledResolvers.contains(clazz.getSimpleName())) {
                     disabledResolvers.add(clazz.getSimpleName());
-                    logger.info("New permissions resolver: "
-                        + clazz.getSimpleName() + " detected. "
-                        + "Added to disabled resolvers list.");
+                    LOGGER.info("New permissions resolver: "
+                            + clazz.getSimpleName() + " detected. "
+                            + "Added to disabled resolvers list.");
                     isUpdated = true;
                 }
             }
@@ -264,16 +265,18 @@ public class PermissionsResolverManager implements PermissionsResolver {
             isUpdated = true;
         }
         if (isUpdated) {
-            logger.info("WEPIF: Updated config file");
+            LOGGER.info("WEPIF: Updated config file");
             config.save();
         }
         return isUpdated;
     }
 
     public static class MissingPluginException extends Exception {
+
     }
 
     class ServerListener implements org.bukkit.event.Listener {
+
         @EventHandler
         public void onPluginEnable(PluginEnableEvent event) {
             Plugin plugin = event.getPlugin();
@@ -302,6 +305,7 @@ public class PermissionsResolverManager implements PermissionsResolver {
         void register(Plugin plugin) {
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
         }
+
     }
 
 }

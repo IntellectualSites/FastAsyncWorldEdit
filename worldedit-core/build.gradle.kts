@@ -1,64 +1,70 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.mendhak.gradlecrowdin.DownloadTranslationsTask
-import com.mendhak.gradlecrowdin.UploadSourceFileTask
 import org.gradle.plugins.ide.idea.model.IdeaModel
 
 plugins {
-    id("java-library")
-    id("net.ltgt.apt-eclipse")
-    id("net.ltgt.apt-idea")
-    id("antlr")
-    id("com.mendhak.gradlecrowdin")
+    `java-library`
+    antlr
 }
 
-repositories {
-    maven { url = uri("https://plotsquared.com/mvn") }
-    maven { url = uri("https://mvn.intellectualsites.com/content/groups/public/") }
-    mavenCentral()
-
-}
+project.description = "Core"
 
 applyPlatformAndCoreConfiguration()
 
-configurations.all {
-    resolutionStrategy {
-        force("com.google.guava:guava:21.0")
-    }
-}
-
 dependencies {
-    "api"(project(":worldedit-libs:core"))
-    "implementation"("de.schlichtherle:truezip:6.8.3")
-    "implementation"("net.java.truevfs:truevfs-profile-default_2.13:0.12.1")
-    "implementation"("org.mozilla:rhino-runtime:1.7.12")
-    "implementation"("org.yaml:snakeyaml:1.23")
-    "implementation"("com.google.guava:guava:${Versions.GUAVA}")
-    "implementation"("com.google.code.findbugs:jsr305:3.0.2")
-    "implementation"("com.google.code.gson:gson:${Versions.GSON}")
-    "implementation"("org.slf4j:slf4j-api:1.7.27")
-    "implementation"("it.unimi.dsi:fastutil:${Versions.FAST_UTIL}")
+    constraints {
+        implementation( "org.yaml:snakeyaml") {
+            version { strictly("1.28") }
+            because("Bukkit provides SnakeYaml")
+        }
+    }
 
-    val antlrVersion = "4.7.2"
-    "antlr"("org.antlr:antlr4:$antlrVersion")
-    "implementation"("org.antlr:antlr4-runtime:$antlrVersion")
+    // Modules
+    api(projects.worldeditLibs.core)
+    compileOnly(projects.worldeditLibs.core.ap)
+    annotationProcessor(projects.worldeditLibs.core.ap)
 
-    "implementation"("com.googlecode.json-simple:json-simple:1.1.1") { isTransitive = false }
-    "compileOnly"(project(":worldedit-libs:core:ap"))
-    "annotationProcessor"(project(":worldedit-libs:core:ap"))
+    // Minecraft expectations
+    implementation(libs.fastutil)
+    implementation(libs.guava)
+    implementation(libs.gson)
+
+    // Platform expectations
+    implementation("org.yaml:snakeyaml")
+
+    // Logging
+    implementation(libs.log4j) {
+        because("Mojang provides Log4J 2.14.1")
+    }
+
+    // Plugins
+    compileOnly(libs.redprotect)
+    api(libs.plotsquaredV4) { isTransitive = false }
+    api(libs.plotsquaredV6Core) { isTransitive = false }
+
     // ensure this is on the classpath for the AP
-    "annotationProcessor"("com.google.guava:guava:21.0")
-    "compileOnly"("com.google.auto.value:auto-value-annotations:${Versions.AUTO_VALUE}")
-    "annotationProcessor"("com.google.auto.value:auto-value:${Versions.AUTO_VALUE}")
-    "testImplementation"("ch.qos.logback:logback-core:${Versions.LOGBACK}")
-    "testImplementation"("ch.qos.logback:logback-classic:${Versions.LOGBACK}")
-    "compile"("com.github.luben:zstd-jni:1.4.3-1")
-    "compileOnly"("net.fabiozumbi12:redprotect:1.9.6")
-    "compile"("com.github.intellectualsites.plotsquared:PlotSquared-API:latest") {
-        isTransitive = false
-    }
-    "compile"("com.plotsquared:PlotSquared-Core:5.12.2") {
-        isTransitive = false
-    }
+    annotationProcessor(libs.guava)
+    compileOnly(libs.autoValueAnnotations)
+    annotationProcessor(libs.autoValue)
+
+    // Third party
+    implementation(libs.truezip)
+    implementation(libs.findbugs)
+    implementation(libs.rhino)
+    compileOnly(libs.adventure)
+    compileOnlyApi(libs.adventureNbt)
+    compileOnlyApi(libs.adventureMiniMessage)
+    implementation(libs.zstd)
+    api(libs.paster)
+    compileOnly(libs.lz4Java) { isTransitive = false }
+    compileOnly(libs.lz4JavaStream)
+    compileOnly(libs.sparsebitset)
+    compileOnly(libs.parallelgzip)
+    antlr(libs.antlr4)
+    implementation(libs.antlr4Runtime)
+    implementation(libs.jsonSimple) { isTransitive = false }
+
+    // Tests
+    testRuntimeOnly(libs.log4jCore)
+    testImplementation(libs.adventureNbt)
 }
 
 tasks.named<Test>("test") {
@@ -74,9 +80,13 @@ tasks.named<AntlrTask>("generateGrammarSource").configure {
     val pkg = "com.sk89q.worldedit.antlr"
     outputDirectory = file("build/generated-src/antlr/main/${pkg.replace('.', '/')}")
     arguments = listOf(
-        "-visitor", "-package", pkg,
-        "-Xexact-output-dir"
+            "-visitor", "-package", pkg,
+            "-Xexact-output-dir"
     )
+}
+
+tasks.named("sourcesJar") {
+    mustRunAfter("generateGrammarSource")
 }
 
 // Give intellij info about where ANTLR code comes from
@@ -92,11 +102,7 @@ plugins.withId("idea") {
 
 sourceSets.named("main") {
     java {
-        srcDir("src/main/java")
         srcDir("src/legacy/java")
-    }
-    resources {
-        srcDir("src/main/resources")
     }
 }
 
@@ -105,43 +111,5 @@ tasks.named<Copy>("processResources") {
         expand("version" to "$version",
                 "commit" to "${rootProject.ext["revision"]}",
                 "date" to "${rootProject.ext["date"]}")
-    }
-}
-tasks.named<ShadowJar>("shadowJar") {
-    dependencies {
-        include(dependency("com.github.luben:zstd-jni:1.4.3-1"))
-
-    }
-}
-
-val crowdinApiKey = "crowdin_apikey"
-
-if (project.hasProperty(crowdinApiKey) && !gradle.startParameter.isOffline) {
-    tasks.named<UploadSourceFileTask>("crowdinUpload") {
-        apiKey = "${project.property(crowdinApiKey)}"
-        projectId = "worldedit-core"
-        files = arrayOf(
-            object {
-                var name = "strings.json"
-                var source = "${file("src/main/resources/lang/strings.json")}"
-            }
-        )
-    }
-
-    val dlTranslationsTask = tasks.named<DownloadTranslationsTask>("crowdinDownload") {
-        apiKey = "${project.property(crowdinApiKey)}"
-        destination = "${buildDir.resolve("crowdin-i18n")}"
-        projectId = "worldedit-core"
-    }
-
-    tasks.named<Copy>("processResources") {
-        dependsOn(dlTranslationsTask)
-        from(dlTranslationsTask.get().destination) {
-            into("lang")
-        }
-    }
-
-    tasks.named("classes") {
-        dependsOn("crowdinDownload")
     }
 }

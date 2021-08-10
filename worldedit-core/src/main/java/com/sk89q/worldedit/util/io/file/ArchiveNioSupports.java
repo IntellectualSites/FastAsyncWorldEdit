@@ -35,14 +35,9 @@ public class ArchiveNioSupports {
 
     static {
         ImmutableList.Builder<ArchiveNioSupport> builder = ImmutableList.builder();
-        try {
-            builder.add(TrueVfsArchiveNioSupport.getInstance());
-        } catch (NoClassDefFoundError ignored) {
-            // No TrueVFS available. That's OK.
-        }
         SUPPORTS = builder.add(ZipArchiveNioSupport.getInstance())
-            .addAll(ServiceLoader.load(ArchiveNioSupport.class))
-            .build();
+                .addAll(ServiceLoader.load(ArchiveNioSupport.class))
+                .build();
     }
 
     public static Optional<ArchiveDir> tryOpenAsDir(Path archive) throws IOException {
@@ -59,6 +54,7 @@ public class ArchiveNioSupports {
 
     /**
      * Get an {@link ArchiveNioSupport} that combines all known instances.
+     *
      * @return a combined {@link ArchiveNioSupport} instance
      */
     public static ArchiveNioSupport combined() {
@@ -96,4 +92,5 @@ public class ArchiveNioSupports {
 
     private ArchiveNioSupports() {
     }
+
 }

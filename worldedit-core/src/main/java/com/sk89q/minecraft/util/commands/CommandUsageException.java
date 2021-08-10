@@ -31,4 +31,5 @@ public class CommandUsageException extends CommandException {
     public String getUsage() {
         return usage;
     }
+
 }

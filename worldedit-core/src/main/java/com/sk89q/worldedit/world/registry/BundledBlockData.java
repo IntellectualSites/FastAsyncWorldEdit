@@ -28,19 +28,19 @@ import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 import com.sk89q.worldedit.util.io.ResourceLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Provides block data based on the built-in block database that is bundled
@@ -55,7 +55,7 @@ import javax.annotation.Nullable;
  */
 public final class BundledBlockData {
 
-    private static final Logger log = LoggerFactory.getLogger(BundledBlockData.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static BundledBlockData INSTANCE;
     private final ResourceLoader resourceLoader;
 
@@ -65,12 +65,16 @@ public final class BundledBlockData {
      * Create a new instance.
      */
     private BundledBlockData() {
-        this.resourceLoader = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader();
+        this.resourceLoader = WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.CONFIGURATION)
+                .getResourceLoader();
 
         try {
             loadFromResource();
         } catch (Throwable e) {
-            log.warn("Failed to load the built-in block registry", e);
+            LOGGER.warn("Failed to load the built-in block registry", e);
         }
     }
 
@@ -82,6 +86,7 @@ public final class BundledBlockData {
     private void loadFromResource() throws IOException {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
+        //FAWE start
         gsonBuilder.registerTypeAdapter(int.class, (JsonDeserializer<Integer>) (json, typeOfT, context) -> {
             JsonPrimitive primitive = (JsonPrimitive) json;
             if (primitive.isString()) {
@@ -93,10 +98,17 @@ public final class BundledBlockData {
             }
             return primitive.getAsInt();
         });
+        //FAWE end
         Gson gson = gsonBuilder.create();
         URL url = null;
-        final int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
-        if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
+        final int dataVersion = WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.WORLD_EDITING)
+                .getDataVersion();
+        if (dataVersion >= Constants.DATA_VERSION_MC_1_17) {
+            url = resourceLoader.getResource(BundledBlockData.class, "blocks.117.json");
+        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
             url = resourceLoader.getResource(BundledBlockData.class, "blocks.116.json");
         } else if (dataVersion >= Constants.DATA_VERSION_MC_1_15) {
             url = resourceLoader.getResource(BundledBlockData.class, "blocks.115.json");
@@ -107,9 +119,10 @@ public final class BundledBlockData {
         if (url == null) {
             throw new IOException("Could not find blocks.json");
         }
-        log.debug("Using {} for bundled block data.", url);
+        LOGGER.debug("Using {} for bundled block data.", url);
         String data = Resources.toString(url, Charset.defaultCharset());
-        List<BlockEntry> entries = gson.fromJson(data, new TypeToken<List<BlockEntry>>() {}.getType());
+        List<BlockEntry> entries = gson.fromJson(data, new TypeToken<List<BlockEntry>>() {
+        }.getType());
 
         for (BlockEntry entry : entries) {
             idMap.put(entry.id, entry);
@@ -160,9 +173,12 @@ public final class BundledBlockData {
     }
 
     public static class BlockEntry {
+
+        //FAWE start - made public
         public String id;
         public String localizedName;
         public SimpleBlockMaterial material = new SimpleBlockMaterial();
+        //FAWE end
     }
 
 }

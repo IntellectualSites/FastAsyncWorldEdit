@@ -19,12 +19,11 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.boydti.fawe.config.Settings;
-import com.boydti.fawe.object.brush.visualization.VirtualWorld;
-import com.boydti.fawe.object.exception.FaweException;
-import com.boydti.fawe.object.pattern.PatternTraverser;
-import com.boydti.fawe.wrappers.LocationMaskedPlayerWrapper;
-import com.boydti.fawe.wrappers.WorldWrapper;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.function.pattern.PatternTraverser;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
+import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -40,17 +39,19 @@ import com.sk89q.worldedit.event.platform.ConfigurationLoadEvent;
 import com.sk89q.worldedit.event.platform.Interaction;
 import com.sk89q.worldedit.event.platform.PlatformInitializeEvent;
 import com.sk89q.worldedit.event.platform.PlatformReadyEvent;
+import com.sk89q.worldedit.event.platform.PlatformUnreadyEvent;
+import com.sk89q.worldedit.event.platform.PlatformsRegisteredEvent;
 import com.sk89q.worldedit.event.platform.PlayerInputEvent;
-import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.eventbus.Subscribe;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -59,7 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -71,7 +71,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class PlatformManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlatformManager.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final WorldEdit worldEdit;
     private final PlatformCommandManager platformCommandManager;
@@ -104,7 +104,7 @@ public class PlatformManager {
     public synchronized void register(Platform platform) {
         checkNotNull(platform);
 
-        logger.info("Got request to register " + platform.getClass() + " with WorldEdit [" + super.toString() + "]");
+        LOGGER.info("Got request to register " + platform.getClass() + " with WorldEdit [" + super.toString() + "]");
 
         // Just add the platform to the list of platforms: we'll pick favorites
         // once all the platforms have been loaded
@@ -113,8 +113,12 @@ public class PlatformManager {
         // Make sure that versions are in sync
         if (firstSeenVersion != null) {
             if (!firstSeenVersion.equals(platform.getVersion())) {
-                logger.warn("Multiple ports of WorldEdit are installed but they report different versions ({} and {}). "
-                                + "If these two versions are truly different, then you may run into unexpected crashes and errors.", firstSeenVersion, platform.getVersion());
+                LOGGER.warn(
+                        "Multiple ports of WorldEdit are installed but they report different versions ({} and {}). "
+                                + "If these two versions are truly different, then you may run into unexpected crashes and errors.",
+                        firstSeenVersion,
+                        platform.getVersion()
+                );
             }
         } else {
             firstSeenVersion = platform.getVersion();
@@ -135,7 +139,7 @@ public class PlatformManager {
         boolean removed = platforms.remove(platform);
 
         if (removed) {
-            logger.info("Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
+            LOGGER.info("Unregistering " + platform.getClass().getCanonicalName() + " from WorldEdit");
 
             boolean choosePreferred = false;
 
@@ -145,7 +149,7 @@ public class PlatformManager {
             while (it.hasNext()) {
                 Entry<Capability, Platform> entry = it.next();
                 if (entry.getValue().equals(platform)) {
-                    entry.getKey().unload(this, entry.getValue());
+                    entry.getKey().uninitialize(this, entry.getValue());
                     it.remove();
                     choosePreferred = true; // Have to choose new favorites
                 }
@@ -160,8 +164,7 @@ public class PlatformManager {
     }
 
     /**
-     * Get the preferred platform for handling a certain capability. Returns
-     * null if none is available.
+     * Get the preferred platform for handling a certain capability. Throws if none are available.
      *
      * @param capability the capability
      * @return the platform
@@ -173,12 +176,13 @@ public class PlatformManager {
             return platform;
         } else {
             if (preferences.isEmpty()) {
-                // Use the first available if preferences have not been decided yet.
-                if (platforms.isEmpty()) {
-                    // No platforms registered, this is being called too early!
-                    throw new NoCapablePlatformException("No platforms have been registered yet! Please wait until WorldEdit is initialized.");
-                }
-                return platforms.get(0);
+                // Not all platforms registered, this is being called too early!
+                //FAWE start - exchange WE -> FAWE
+                throw new NoCapablePlatformException(
+                        "Not all platforms have been registered yet!"
+                                + " Please wait until FastAsyncWorldEdit is initialized."
+                );
+                //FAWE end
             }
             throw new NoCapablePlatformException("No platform was found supporting " + capability.name());
         }
@@ -191,14 +195,22 @@ public class PlatformManager {
         for (Capability capability : Capability.values()) {
             Platform preferred = findMostPreferred(capability);
             if (preferred != null) {
-                preferences.put(capability, preferred);
-                capability.initialize(this, preferred);
+                Platform oldPreferred = preferences.put(capability, preferred);
+                // only (re)initialize if it changed
+                if (preferred != oldPreferred) {
+                    // uninitialize if needed
+                    if (oldPreferred != null) {
+                        capability.uninitialize(this, oldPreferred);
+                    }
+                    capability.initialize(this, preferred);
+                }
             }
         }
 
         // Fire configuration event
         if (preferences.containsKey(Capability.CONFIGURATION) && configured.compareAndSet(false, true)) {
-            worldEdit.getEventBus().post(new ConfigurationLoadEvent(queryCapability(Capability.CONFIGURATION).getConfiguration()));
+            worldEdit.getEventBus().post(new ConfigurationLoadEvent(queryCapability(Capability.CONFIGURATION)
+                    .getConfiguration()));
         }
     }
 
@@ -282,9 +294,11 @@ public class PlatformManager {
         }
     }
 
-    private <T extends Player> T  proxyFawe(T player) {
+    //FAWE start
+    private <T extends Player> T proxyFawe(T player) {
         return (T) new LocationMaskedPlayerWrapper(player, player.getLocation(), true);
     }
+    //FAWE end
 
     /**
      * Get the command manager.
@@ -311,12 +325,40 @@ public class PlatformManager {
         return queryCapability(Capability.WORLD_EDITING).getSupportedSideEffects();
     }
 
+    /**
+     * You shouldn't have been calling this anyways, but this is now deprecated. Either don't
+     * fire this event at all, or fire the new event via the event bus if you're a platform.
+     */
+    @Deprecated
+    public void handlePlatformReady(@SuppressWarnings("unused") PlatformReadyEvent event) {
+        handlePlatformsRegistered(new PlatformsRegisteredEvent());
+    }
+
+    /**
+     * Internal, do not call.
+     */
     @Subscribe
-    public void handlePlatformReady(PlatformReadyEvent event) {
+    public void handlePlatformsRegistered(PlatformsRegisteredEvent event) {
         choosePreferred();
         if (initialized.compareAndSet(false, true)) {
             worldEdit.getEventBus().post(new PlatformInitializeEvent());
         }
+    }
+
+    /**
+     * Internal, do not call.
+     */
+    @Subscribe
+    public void handleNewPlatformReady(PlatformReadyEvent event) {
+        preferences.forEach((cap, platform) -> cap.ready(this, platform));
+    }
+
+    /**
+     * Internal, do not call.
+     */
+    @Subscribe
+    public void handleNewPlatformUnready(PlatformUnreadyEvent event) {
+        preferences.forEach((cap, platform) -> cap.unready(this, platform));
     }
 
     private <T extends Tool> T reset(T tool) {
@@ -344,29 +386,18 @@ public class PlatformManager {
         Request.request().setWorld(player.getWorld());
 
         try {
-            Vector3 vector = location.toVector();
-
-            VirtualWorld virtual = session.getVirtualWorld();
-            if (virtual != null) {
-                if (Settings.IMP.EXPERIMENTAL.OTHER) {
-                    logger.info("virtualWorld was not null in handlePlayerInput()");
-                }
-
-                virtual.handleBlockInteract(player, vector.toBlockPoint(), event);
-                if (event.isCancelled()) {
-                    return;
-                }
-            }
-
             if (event.getType() == Interaction.HIT) {
                 // superpickaxe is special because its primary interaction is a left click, not a right click
                 // in addition, it is implicitly bound to all pickaxe items, not just a single tool item
                 if (session.hasSuperPickAxe() && player.isHoldingPickAxe()) {
                     final BlockTool superPickaxe = session.getSuperPickaxe();
                     if (superPickaxe != null && superPickaxe.canUse(player)) {
+                        //FAWE start - run async
                         player.runAction(() -> reset(superPickaxe)
-                            .actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                        getConfiguration(), player, session, location), false, true);
+                                .actPrimary(queryCapability(Capability.WORLD_EDITING),
+                                        getConfiguration(), player, session, location, event.getFace()
+                                ), false, true);
+                        //FAWE end
                         event.setCancelled(true);
                         return;
                     }
@@ -374,24 +405,31 @@ public class PlatformManager {
 
                 Tool tool = session.getTool(player);
                 if (tool instanceof DoubleActionBlockTool && tool.canUse(player)) {
+                    //FAWE start - run async
                     player.runAction(() -> reset((DoubleActionBlockTool) tool)
-                        .actSecondary(queryCapability(Capability.WORLD_EDITING),
-                                      getConfiguration(), player, session, location), false, true);
+                            .actSecondary(queryCapability(Capability.WORLD_EDITING),
+                                    getConfiguration(), player, session, location, event.getFace()
+                            ), false, true);
+                    //FAWE end
                     event.setCancelled(true);
                 }
 
             } else if (event.getType() == Interaction.OPEN) {
+                //FAWE start - get general tool over item in main hand & run async
                 Tool tool = session.getTool(player);
                 if (tool instanceof BlockTool && tool.canUse(player)) {
                     if (player.checkAction()) {
+                        // FAWE run async
                         player.runAction(() -> {
                             BlockTool blockTool = (BlockTool) tool;
                             if (!(tool instanceof BrushTool)) {
                                 blockTool = reset(blockTool);
                             }
                             blockTool.actPrimary(queryCapability(Capability.WORLD_EDITING),
-                                                 getConfiguration(), player, session, location);
+                                    getConfiguration(), player, session, location, event.getFace()
+                            );
                         }, false, true);
+                        //FAWE end
                         event.setCancelled(true);
                     }
                 }
@@ -403,16 +441,18 @@ public class PlatformManager {
         }
     }
 
+    //FAWE start
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);
         if (faweException != null) {
-            actor.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
+            actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
         } else {
-            actor.printError("Please report this error: [See console]");
-            actor.printRaw(e.getClass().getName() + ": " + e.getMessage());
+            actor.print(Caption.of("worldedit.command.error.report"));
+            actor.print(Caption.of(e.getClass().getName(), TextComponent.of(": "), TextComponent.of(e.getMessage())));
             e.printStackTrace();
         }
     }
+    //FAWE end
 
     @Subscribe
     public void handlePlayerInput(PlayerInputEvent event) {
@@ -420,24 +460,18 @@ public class PlatformManager {
         // making changes to the world
         Player player = createProxyActor(event.getPlayer());
         LocalSession session = worldEdit.getSessionManager().get(player);
-        VirtualWorld virtual = session.getVirtualWorld();
-        if (virtual != null) {
-            if (Settings.IMP.EXPERIMENTAL.OTHER) {
-                logger.info("virtualWorld was not null in handlePlayerInput()");
-            }
-            virtual.handlePlayerInput(player,  event);
-            if (event.isCancelled()) {
-                return;
-            }
-        }
 
         try {
             switch (event.getInputType()) {
                 case PRIMARY: {
                     Tool tool = session.getTool(player);
                     if (tool instanceof DoubleActionTraceTool && tool.canUse(player)) {
-                        player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool).actSecondary(queryCapability(Capability.WORLD_EDITING),
-                            getConfiguration(), player, session));
+                        //FAWE start - run async
+                        player.runAsyncIfFree(() -> reset((DoubleActionTraceTool) tool)
+                                .actSecondary(queryCapability(Capability.WORLD_EDITING),
+                                        getConfiguration(), player, session
+                                ));
+                        //FAWE end
                         event.setCancelled(true);
                         return;
                     }
@@ -448,9 +482,12 @@ public class PlatformManager {
                 case SECONDARY: {
                     Tool tool = session.getTool(player);
                     if (tool instanceof TraceTool && tool.canUse(player)) {
+                        //FAWE start - run async
                         //todo this needs to be fixed so the event is canceled after actPrimary is used and returns true
                         player.runAction(() -> reset((TraceTool) tool).actPrimary(queryCapability(Capability.WORLD_EDITING),
-                            getConfiguration(), player, session), false, true);
+                                getConfiguration(), player, session
+                        ), false, true);
+                        //FAWE end
                         event.setCancelled(true);
                         return;
                     }
@@ -458,15 +495,17 @@ public class PlatformManager {
                     break;
                 }
             }
+            //FAWE start - add own message
         } catch (Throwable e) {
             FaweException faweException = FaweException.get(e);
             if (faweException != null) {
-                player.print(TranslatableComponent.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
+                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
             } else {
-                player.printError("Please report this error: [See console]");
-                player.printRaw(e.getClass().getName() + ": " + e.getMessage());
+                player.print(Caption.of("worldedit.command.error.report"));
+                player.print(Caption.of(e.getClass().getName() + ": " + e.getMessage()));
                 e.printStackTrace();
             }
+            //FAWE end
         } finally {
             Request.reset();
         }

@@ -34,8 +34,10 @@ class ExpressionValidator extends ExpressionBaseListener {
     private final Set<String> variableNames = new HashSet<>();
     private final Functions functions;
 
-    ExpressionValidator(Collection<String> variableNames,
-                        Functions functions) {
+    ExpressionValidator(
+            Collection<String> variableNames,
+            Functions functions
+    ) {
         this.variableNames.addAll(variableNames);
         this.functions = functions;
     }
@@ -58,11 +60,13 @@ class ExpressionValidator extends ExpressionBaseListener {
     public void enterIdExpr(ExpressionParser.IdExprContext ctx) {
         String text = ctx.source.getText();
         check(variableNames.contains(text), ctx,
-            "Variable '" + text + "' is not bound");
+                "Variable '" + text + "' is not bound"
+        );
     }
 
     @Override
     public void enterFunctionCall(ExpressionParser.FunctionCallContext ctx) {
         resolveFunction(functions, ctx);
     }
+
 }

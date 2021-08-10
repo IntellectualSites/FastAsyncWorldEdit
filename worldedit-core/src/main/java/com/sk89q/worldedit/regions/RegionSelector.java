@@ -31,8 +31,8 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.World;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,8 +78,8 @@ public interface RegionSelector {
     /**
      * Tell the player information about his/her primary selection.
      *
-     * @param actor the actor
-     * @param session the session
+     * @param actor    the actor
+     * @param session  the session
      * @param position position
      */
     void explainPrimarySelection(Actor actor, LocalSession session, BlockVector3 position);
@@ -87,8 +87,8 @@ public interface RegionSelector {
     /**
      * Tell the player information about his/her secondary selection.
      *
-     * @param actor the actor
-     * @param session the session
+     * @param actor    the actor
+     * @param session  the session
      * @param position position
      */
     void explainSecondarySelection(Actor actor, LocalSession session, BlockVector3 position);
@@ -97,7 +97,7 @@ public interface RegionSelector {
      * Tell the player information about the region's changes. This may resend
      * all the defining region information if needed.
      *
-     * @param actor the actor
+     * @param actor   the actor
      * @param session the session
      */
     void explainRegionAdjust(Actor actor, LocalSession session);
@@ -147,12 +147,10 @@ public interface RegionSelector {
      * Get the number of blocks inside the region.
      *
      * @return number of blocks, or -1 if undefined
-     * @apiNote This must be overridden by new subclasses. See {@link NonAbstractForCompatibility}
-     *          for details
      */
     @NonAbstractForCompatibility(
-        delegateName = "getArea",
-        delegateParams = {}
+            delegateName = "getArea",
+            delegateParams = {}
     )
     default long getVolume() {
         DeprecationUtil.checkDelegatingOverride(getClass());
@@ -207,4 +205,5 @@ public interface RegionSelector {
     default List<BlockVector3> getVertices() throws IncompleteRegionException {
         return Collections.singletonList(getPrimaryPosition());
     }
+
 }

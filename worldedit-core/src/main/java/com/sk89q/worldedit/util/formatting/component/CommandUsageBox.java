@@ -29,8 +29,8 @@ import org.enginehub.piston.CommandParameters;
 import org.enginehub.piston.config.ColorConfig;
 import org.enginehub.piston.util.HelpGenerator;
 
-import java.util.List;
 import javax.annotation.Nullable;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.internal.command.CommandUtil.getSubCommands;
@@ -43,24 +43,27 @@ public class CommandUsageBox extends TextComponentProducer {
     /**
      * Create a new usage box.
      *
-     * @param commands the commands to describe
-     * @param commandString the commands that were used, such as "/we" or "/brush sphere"
+     * @param commands        the commands to describe
+     * @param commandString   the commands that were used, such as "/we" or "/brush sphere"
      * @param helpRootCommand the command used to get subcommand help
      */
-    public CommandUsageBox(List<Command> commands, String commandString, String helpRootCommand) throws InvalidComponentException {
+    public CommandUsageBox(List<Command> commands, String commandString, String helpRootCommand) throws
+            InvalidComponentException {
         this(commands, commandString, helpRootCommand, null);
     }
 
     /**
      * Create a new usage box.
      *
-     * @param commands the commands to describe
-     * @param commandString the commands that were used, such as "/we" or "/brush sphere"
+     * @param commands        the commands to describe
+     * @param commandString   the commands that were used, such as "/we" or "/brush sphere"
      * @param helpRootCommand the command used to get subcommand help
-     * @param parameters list of parameters to use
+     * @param parameters      list of parameters to use
      */
-    public CommandUsageBox(List<Command> commands, String commandString, String helpRootCommand,
-                           @Nullable CommandParameters parameters) throws InvalidComponentException {
+    public CommandUsageBox(
+            List<Command> commands, String commandString, String helpRootCommand,
+            @Nullable CommandParameters parameters
+    ) throws InvalidComponentException {
         checkNotNull(commands);
         checkNotNull(commandString);
         checkNotNull(helpRootCommand);
@@ -69,19 +72,21 @@ public class CommandUsageBox extends TextComponentProducer {
 
     private void attachCommandUsage(List<Command> commands, String commandString, String helpRootCommand) {
         TextComponentProducer boxContent = new TextComponentProducer()
-            .append(HelpGenerator.create(commands).getFullHelp());
+                .append(HelpGenerator.create(commands).getFullHelp());
         if (getSubCommands(Iterables.getLast(commands)).size() > 0) {
             boxContent.append(TextComponent.newline())
-                .append(ColorConfig.helpText().wrap(TextComponent.builder("> ")
-                    .append(ColorConfig.mainText().wrap(TextComponent.builder("List Subcommands")
-                        .decoration(TextDecoration.ITALIC, true)
-                        .clickEvent(ClickEvent.runCommand(helpRootCommand + " -s " + commandString))
-                        .hoverEvent(HoverEvent.showText(TextComponent.of("List all subcommands of this command")))
-                        .build()))
-                    .build()));
+                    .append(ColorConfig.helpText().wrap(TextComponent.builder("> ")
+                            .append(ColorConfig.mainText().wrap(TextComponent.builder("List Subcommands")
+                                    .decoration(TextDecoration.ITALIC, true)
+                                    .clickEvent(ClickEvent.runCommand(helpRootCommand + " -s " + commandString))
+                                    .hoverEvent(HoverEvent.showText(TextComponent.of("List all subcommands of this command")))
+                                    .build()))
+                            .build()));
         }
-        MessageBox box = new MessageBox("Help for " + commandString,
-            boxContent);
+        MessageBox box = new MessageBox(
+                "Help for " + commandString,
+                boxContent
+        );
 
         append(box.create());
     }

@@ -33,8 +33,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
-* An implementation of a dynamically registered {@link org.bukkit.command.Command} attached to a plugin.
-*/
+ * An implementation of a dynamically registered {@link org.bukkit.command.Command} attached to a plugin.
+ */
 @SuppressWarnings("deprecation")
 public class DynamicPluginCommand extends org.bukkit.command.Command implements PluginIdentifiableCommand {
 
@@ -43,7 +43,14 @@ public class DynamicPluginCommand extends org.bukkit.command.Command implements 
     protected final Plugin owningPlugin;
     protected String[] permissions = new String[0];
 
-    public DynamicPluginCommand(String[] aliases, String desc, String usage, CommandExecutor owner, Object registeredWith, Plugin plugin) {
+    public DynamicPluginCommand(
+            String[] aliases,
+            String desc,
+            String usage,
+            CommandExecutor owner,
+            Object registeredWith,
+            Plugin plugin
+    ) {
         super(aliases[0], desc, usage, Arrays.asList(aliases));
         this.owner = owner;
         this.owningPlugin = plugin;
@@ -118,4 +125,5 @@ public class DynamicPluginCommand extends org.bukkit.command.Command implements 
         }
         return super.testPermissionSilent(sender);
     }
+
 }

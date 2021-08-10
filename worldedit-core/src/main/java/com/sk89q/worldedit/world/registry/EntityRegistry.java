@@ -20,11 +20,7 @@
 package com.sk89q.worldedit.world.registry;
 
 import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.world.entity.EntityType;
-import com.sk89q.worldedit.world.entity.EntityTypes;
 
-import java.util.Collection;
-import java.util.Collections;
 import javax.annotation.Nullable;
 
 /**
@@ -39,15 +35,6 @@ public interface EntityRegistry {
      * @return the entity, which may be null if the entity does not exist
      */
     @Nullable
-    default BaseEntity createFromId(String id) {
-        EntityType entType = EntityTypes.get(id);
-        return entType == null ? null : new BaseEntity(entType);
-    }
+    BaseEntity createFromId(String id);
 
-    /**
-     * Register all entities.
-     */
-    default Collection<String> registerEntities() {
-        return Collections.emptyList();
-    }
 }

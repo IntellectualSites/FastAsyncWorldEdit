@@ -19,8 +19,19 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
+import com.fastasyncworldedit.core.util.MemUtil;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
@@ -28,27 +39,45 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import java.util.Iterator;
 
 /**
  * Utility class to apply region functions to {@link com.sk89q.worldedit.regions.Region}.
- * @deprecated Let the queue iterate, not the region function which lacks any kind of optimizations / parallelism
+ *
+ * @deprecated - FAWE deprecation: Let the queue iterate, not the region function which lacks any kind of optimizations / parallelism
  */
-@Deprecated
-public class RegionVisitor implements Operation {
+@Deprecated public class RegionVisitor implements Operation {
 
+    public final Iterable<? extends BlockVector3> iterable;
     private final Region region;
     private final RegionFunction function;
     private int affected = 0;
+    private SingleThreadQueueExtent singleQueue;
 
     /**
      * @deprecated Use other constructors which will preload chunks during iteration
      */
-    @Deprecated
-    public RegionVisitor(Region region, RegionFunction function) {
-        this.region = region;
+    @Deprecated public RegionVisitor(Region region, RegionFunction function) {
+        this(region, function, null);
+    }
+
+    /**
+     * Allows for preloading chunks, and non-specific "regions" to be visited.
+     *
+     * @param iterable Can be supplied as a region, or a raw iterator
+     * @param function The function to be applied to each BlockVector3 iterated over
+     * @param extent   Supplied editsession/extent to attempt to extract {@link SingleThreadQueueExtent} from
+     */
+    public RegionVisitor(Iterable<BlockVector3> iterable, RegionFunction function, Extent extent) {
+        region = iterable instanceof Region ? (Region) iterable : null;
+        this.iterable = iterable;
         this.function = function;
+        if (extent != null) {
+            ExtentTraverser<ParallelQueueExtent> queueTraverser = new ExtentTraverser<>(extent).find(ParallelQueueExtent.class);
+            this.singleQueue = queueTraverser != null ? (SingleThreadQueueExtent) queueTraverser.get().getExtent() : null;
+        } else {
+            this.singleQueue = null;
+        }
     }
 
     /**
@@ -60,27 +89,132 @@ public class RegionVisitor implements Operation {
         return affected;
     }
 
-    @Override
-    public Operation resume(RunContext run) throws WorldEditException {
-        for (BlockVector3 pt : region) {
-            if (function.apply(pt)) {
-                affected++;
+    @Override public Operation resume(RunContext run) throws WorldEditException {
+        //FAWE start > allow chunk preloading
+        if (singleQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNKS > 1) {
+            /*
+             * The following is done to reduce iteration cost
+             *  - Preload chunks just in time
+             *  - Only check every 16th block for potential chunk loads
+             *  - Stop iteration on exception instead of hasNext
+             *  - Do not calculate the stacktrace as it is expensive
+             */
+            Iterator<? extends BlockVector3> trailIter = iterable.iterator();
+            Iterator<? extends BlockVector3> leadIter = iterable.iterator();
+            int lastTrailChunkX = Integer.MIN_VALUE;
+            int lastTrailChunkZ = Integer.MIN_VALUE;
+            int lastLeadChunkX = Integer.MIN_VALUE;
+            int lastLeadChunkZ = Integer.MIN_VALUE;
+            int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNKS;
+            try {
+                for (; ; ) {
+                    BlockVector3 pt = trailIter.next();
+                    apply(pt);
+                    int cx = pt.getBlockX() >> 4;
+                    int cz = pt.getBlockZ() >> 4;
+                    if (cx != lastTrailChunkX || cz != lastTrailChunkZ) {
+                        lastTrailChunkX = cx;
+                        lastTrailChunkZ = cz;
+                        int amount;
+                        if (lastLeadChunkX == Integer.MIN_VALUE) {
+                            lastLeadChunkX = cx;
+                            lastLeadChunkZ = cz;
+                            amount = loadingTarget;
+                        } else {
+                            amount = 1;
+                        }
+                        for (int count = 0; count < amount; ) {
+                            BlockVector3 v = leadIter.next();
+                            int vcx = v.getBlockX() >> 4;
+                            int vcz = v.getBlockZ() >> 4;
+                            if (vcx != lastLeadChunkX || vcz != lastLeadChunkZ) {
+                                lastLeadChunkX = vcx;
+                                lastLeadChunkZ = vcz;
+                                queueChunkLoad(vcx, vcz);
+                                count++;
+                            }
+                            // Skip the next 15 blocks
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                            leadIter.next();
+                        }
+                    }
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                }
+            } catch (FaweException e) {
+                throw new RuntimeException(e);
+            } catch (Throwable ignore) {
+            }
+            try {
+                for (; ; ) {
+                    apply(trailIter.next());
+                    apply(trailIter.next());
+                }
+            } catch (FaweException e) {
+                throw new RuntimeException(e);
+            } catch (Throwable ignore) {
+            }
+        } else {
+            for (BlockVector3 pt : region) {
+                apply(pt);
             }
         }
+        //FAWE end
 
         return null;
     }
 
-    @Override
-    public void cancel() {
+    //FAWE start > extract methods for slightly clean resume method
+    private void apply(BlockVector3 pt) throws WorldEditException {
+        if (function.apply(pt)) {
+            affected++;
+        }
     }
 
-    @Override
-    public Iterable<Component> getStatusMessages() {
-        return ImmutableList.of(TranslatableComponent.of(
-                "worldedit.operation.affected.block",
-                TextComponent.of(getAffected())
-        ).color(TextColor.LIGHT_PURPLE));
+    private void queueChunkLoad(int cx, int cz) {
+        TaskManager.IMP.sync(() -> {
+            boolean lowMem = MemUtil.isMemoryLimited();
+            if (!singleQueue.isQueueEnabled() || (!(lowMem && singleQueue.size() > Settings.IMP.QUEUE.PARALLEL_THREADS + 8)
+                && singleQueue.size() < Settings.IMP.QUEUE.TARGET_SIZE && Fawe.get().getQueueHandler().isUnderutilized())) {
+                //The GET chunk is what will take longest.
+                ((ChunkHolder)singleQueue.getOrCreateChunk(cx, cz)).getOrCreateGet();
+            }
+            return null;
+        });
+    }
+    //FAWE end
+
+    @Override public void cancel() {
+    }
+
+    @Override public Iterable<Component> getStatusMessages() {
+        return ImmutableList.of(Caption.of("worldedit.operation.affected.block", TextComponent.of(getAffected())));
     }
 
 }

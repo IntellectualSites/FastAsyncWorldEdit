@@ -27,7 +27,8 @@ configurations.all {
 
 dependencies {
     "api"(project(":worldedit-core"))
-    "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.11.2")
+    "implementation"(enforcedPlatform("org.apache.logging.log4j:log4j-bom:2.11.2") {
+        because("Forge provides Log4J at 2.11.2 (Mojang provides 2.8.1, but Forge bumps)")
 
     "minecraft"("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
 }
@@ -88,19 +89,13 @@ tasks.named<Copy>("processResources") {
     from(project(":worldedit-core").tasks.named("processResources"))
 }
 
-addJarManifest(includeClasspath = false)
+addJarManifest(WorldEditKind.Mod, includeClasspath = false)
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
-        relocate("org.slf4j", "com.sk89q.worldedit.slf4j")
-        relocate("org.apache.logging.slf4j", "com.sk89q.worldedit.log4jbridge")
         relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
 
-        include(dependency("org.slf4j:slf4j-api"))
-        include(dependency("org.apache.logging.log4j:log4j-slf4j-impl"))
         include(dependency("org.antlr:antlr4-runtime"))
-        include(dependency("de.schlichtherle:truezip"))
-        include(dependency("net.java.truevfs:truevfs-profile-default_2.13"))
         include(dependency("org.mozilla:rhino-runtime"))
     }
     minimize {

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -30,26 +31,22 @@ import com.sk89q.worldedit.command.util.WorldEditAsyncCommandBuilder;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
-import com.sk89q.worldedit.function.FlatRegionFunction;
-import com.sk89q.worldedit.function.FlatRegionMaskingFilter;
+import com.sk89q.worldedit.function.RegionFunction;
+import com.sk89q.worldedit.function.RegionMaskingFilter;
 import com.sk89q.worldedit.function.biome.BiomeReplace;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.Mask2D;
 import com.sk89q.worldedit.function.operation.Operations;
-import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
+import com.sk89q.worldedit.function.visitor.RegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.regions.Regions;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.component.PaginationBox;
 import com.sk89q.worldedit.util.formatting.component.TextUtils;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.world.World;
-import com.sk89q.worldedit.world.biome.BiomeData;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.registry.BiomeRegistry;
 import org.enginehub.piston.annotation.Command;
@@ -78,46 +75,47 @@ public class BiomeCommands {
     }
 
     @Command(
-        name = "biomelist",
-        aliases = { "biomels", "/biomelist", "/listbiomes" },
-        desc = "Gets all biomes available."
+            name = "biomelist",
+            aliases = {"biomels", "/biomelist", "/listbiomes"},
+            desc = "Gets all biomes available."
     )
     @CommandPermissions("worldedit.biome.list")
-    public void biomeList(Actor actor,
-                          @ArgFlag(name = 'p', desc = "Page number.", def = "1")
-                              int page) {
+    public void biomeList(
+            Actor actor,
+            @ArgFlag(name = 'p', desc = "Page number.", def = "1")
+                    int page
+    ) {
         WorldEditAsyncCommandBuilder.createAndSendMessage(actor, () -> {
-            BiomeRegistry biomeRegistry =
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
-                    .getRegistries().getBiomeRegistry();
+            BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
+                    .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
 
-            PaginationBox paginationBox = PaginationBox
-                .fromStrings("Available Biomes", "/biomelist -p %page%",
-                    BiomeType.REGISTRY.values().stream().map(biomeType -> {
-                        String id = biomeType.getId();
-                        final BiomeData data = biomeRegistry.getData(biomeType);
-                        if (data != null) {
-                            String name = data.getName();
-                            return id + " (" + name + ")";
-                        } else {
-                            return id;
-                        }
-                    }).collect(Collectors.toList()));
+            PaginationBox paginationBox = PaginationBox.fromComponents("Available Biomes", "/biomelist -p %page%",
+                    BiomeType.REGISTRY.values().stream()
+                            .map(biomeType -> TextComponent.builder()
+                                    .append(biomeType.getId())
+                                    .append(" (")
+                                    .append(biomeRegistry.getRichName(biomeType))
+                                    .append(")")
+                                    .build())
+                            .collect(Collectors.toList())
+            );
             return paginationBox.create(page);
         }, (Component) null);
     }
 
     @Command(
-        name = "biomeinfo",
-        desc = "Get the biome of the targeted block.",
-        descFooter = "By default, uses all blocks in your selection."
+            name = "biomeinfo",
+            desc = "Get the biome of the targeted block.",
+            descFooter = "By default, uses all blocks in your selection."
     )
     @CommandPermissions("worldedit.biome.info")
-    public void biomeInfo(Player player, LocalSession session,
-                          @Switch(name = 't', desc = "Use the block you are looking at.")
-                              boolean useLineOfSight,
-                          @Switch(name = 'p', desc = "Use the block you are currently in.")
-                              boolean usePosition) throws WorldEditException {
+    public void biomeInfo(
+            Player player, LocalSession session,
+            @Switch(name = 't', desc = "Use the block you are looking at.")
+                    boolean useLineOfSight,
+            @Switch(name = 'p', desc = "Use the block you are currently in.")
+                    boolean usePosition
+    ) throws WorldEditException {
         BiomeRegistry biomeRegistry = WorldEdit.getInstance().getPlatformManager()
                 .queryCapability(Capability.GAME_HOOKS).getRegistries().getBiomeRegistry();
         Set<BiomeType> biomes = new HashSet<>();
@@ -126,7 +124,7 @@ public class BiomeCommands {
         if (useLineOfSight) {
             Location blockPosition = player.getBlockTrace(300);
             if (blockPosition == null) {
-                player.printError(TranslatableComponent.of("worldedit.raytrace.noblock"));
+                player.print(Caption.of("worldedit.raytrace.noblock"));
                 return;
             }
 
@@ -150,32 +148,30 @@ public class BiomeCommands {
             messageKey = "worldedit.biomeinfo.selection";
         }
 
-        List<Component> components = biomes.stream().map(biome -> {
-            BiomeData data = biomeRegistry.getData(biome);
-            if (data != null) {
-                return TextComponent.of(data.getName()).hoverEvent(HoverEvent.showText(TextComponent.of(biome.getId())));
-            } else {
-                return TextComponent.of(biome.getId());
-            }
-        }).collect(Collectors.toList());
-        player.printInfo(TranslatableComponent.of(messageKey, TextUtils.join(components, TextComponent.of(", "))));
+        List<Component> components = biomes.stream().map(biome ->
+                biomeRegistry.getRichName(biome).hoverEvent(
+                        HoverEvent.showText(TextComponent.of(biome.getId()))
+                )
+        ).collect(Collectors.toList());
+        player.print(Caption.of(messageKey, TextUtils.join(components, TextComponent.of(", "))));
     }
 
     @Command(
-        name = "/setbiome",
-        desc = "Sets the biome of your current block or region.",
-        descFooter = "By default, uses all the blocks in your selection"
+            name = "/setbiome",
+            desc = "Sets the biome of your current block or region.",
+            descFooter = "By default, uses all the blocks in your selection"
     )
     @Logging(REGION)
     @CommandPermissions("worldedit.biome.set")
-    public void setBiome(Player player, LocalSession session, EditSession editSession,
-                         @Arg(desc = "Biome type.") BiomeType target,
-                         @Switch(name = 'p', desc = "Use your current position")
-                             boolean atPosition) throws WorldEditException {
+    public void setBiome(
+            Player player, LocalSession session, EditSession editSession,
+            @Arg(desc = "Biome type.") BiomeType target,
+            @Switch(name = 'p', desc = "Use your current position")
+                    boolean atPosition
+    ) throws WorldEditException {
         World world = player.getWorld();
         Region region;
         Mask mask = editSession.getMask();
-        Mask2D mask2d = mask != null ? mask.toMask2D() : null;
 
         if (atPosition) {
             final BlockVector3 pos = player.getLocation().toVector().toBlockPoint();
@@ -184,14 +180,16 @@ public class BiomeCommands {
             region = session.getSelection(world);
         }
 
-        FlatRegionFunction replace = new BiomeReplace(editSession, target);
-        if (mask2d != null) {
-            replace = new FlatRegionMaskingFilter(mask2d, replace);
+        RegionFunction replace = new BiomeReplace(editSession, target);
+        if (mask != null) {
+            replace = new RegionMaskingFilter(editSession, mask, replace);
         }
-        FlatRegionVisitor visitor = new FlatRegionVisitor(Regions.asFlatRegion(region), replace);
+        //FAWE start > add extent to RegionVisitor to allow chunk preloading
+        RegionVisitor visitor = new RegionVisitor(region, replace, editSession);
+        //FAWE end
         Operations.completeLegacy(visitor);
 
-        player.printInfo(TranslatableComponent.of(
+        player.print(Caption.of(
                 "worldedit.setbiome.changed",
                 TextComponent.of(visitor.getAffected())
         ));

@@ -35,6 +35,7 @@ import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 import com.sk89q.worldedit.world.snapshot.experimental.SnapshotDatabase;
 import com.sk89q.worldedit.world.snapshot.experimental.SnapshotInfo;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -46,7 +47,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -58,22 +58,22 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
     private static final String SCHEME = "snapfs";
 
     private static final List<SnapshotDateTimeParser> DATE_TIME_PARSERS =
-        new ImmutableList.Builder<SnapshotDateTimeParser>()
-            .add(FileNameDateTimeParser.getInstance())
-            .addAll(ServiceLoader.load(SnapshotDateTimeParser.class))
-            .add(ModificationDateTimeParser.getInstance())
-            .build();
+            new ImmutableList.Builder<SnapshotDateTimeParser>()
+                    .add(FileNameDateTimeParser.getInstance())
+                    .addAll(ServiceLoader.load(SnapshotDateTimeParser.class))
+                    .add(ModificationDateTimeParser.getInstance())
+                    .build();
 
     public static ZonedDateTime tryParseDate(Path path) {
         return tryParseDateInternal(path)
-            .orElseThrow(() -> new IllegalStateException("Could not detect date of " + path));
+                .orElseThrow(() -> new IllegalStateException("Could not detect date of " + path));
     }
 
     private static Optional<ZonedDateTime> tryParseDateInternal(Path path) {
         return DATE_TIME_PARSERS.stream()
-            .map(parser -> parser.detectDateTime(path))
-            .filter(Objects::nonNull)
-            .findFirst();
+                .map(parser -> parser.detectDateTime(path))
+                .filter(Objects::nonNull)
+                .findFirst();
     }
 
     public static URI createUri(String name) {
@@ -81,8 +81,8 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
     }
 
     public static FileSystemSnapshotDatabase maybeCreate(
-        Path root,
-        ArchiveNioSupport archiveNioSupport
+            Path root,
+            ArchiveNioSupport archiveNioSupport
     ) throws IOException {
         Files.createDirectories(root);
         return new FileSystemSnapshotDatabase(root, archiveNioSupport);
@@ -118,7 +118,7 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
 
     private Snapshot createSnapshot(Path idPath, Path ioPath, @Nullable Closer closeCallback) {
         return new FolderSnapshot(
-            createSnapshotInfo(idPath, ioPath), ioPath, closeCallback
+                createSnapshotInfo(idPath, ioPath), ioPath, closeCallback
         );
     }
 
@@ -217,32 +217,32 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
            with some files, e.g. world.qux.zip/world.qux is invalid, but world.qux.zip/world isn't.
          */
         return SafeFiles.noLeakFileList(root)
-            .flatMap(IOFunction.unchecked(entry -> {
-                String worldEntry = getWorldEntry(worldName, entry);
-                if (worldEntry != null) {
-                    return Stream.of(worldEntry);
-                }
-                String fileName = SafeFiles.canonicalFileName(entry);
-                if (fileName.equals(worldName)
-                    && Files.isDirectory(entry)
-                    && !Files.exists(entry.resolve("level.dat"))) {
-                    // world dir with timestamp entries
-                    return listTimestampedEntries(worldName, entry)
-                        .map(id -> worldName + "/" + id);
-                }
-                return getTimestampedEntries(worldName, entry);
-            }))
-            .map(IOFunction.unchecked(id ->
-                getSnapshot(id)
-                    .orElseThrow(() ->
-                        new AssertionError("Could not find discovered snapshot: " + id)
-                    )
-            ));
+                .flatMap(IOFunction.unchecked(entry -> {
+                    String worldEntry = getWorldEntry(worldName, entry);
+                    if (worldEntry != null) {
+                        return Stream.of(worldEntry);
+                    }
+                    String fileName = SafeFiles.canonicalFileName(entry);
+                    if (fileName.equals(worldName)
+                            && Files.isDirectory(entry)
+                            && !Files.exists(entry.resolve("level.dat"))) {
+                        // world dir with timestamp entries
+                        return listTimestampedEntries(worldName, entry)
+                                .map(id -> worldName + "/" + id);
+                    }
+                    return getTimestampedEntries(worldName, entry);
+                }))
+                .map(IOFunction.unchecked(id ->
+                        getSnapshot(id)
+                                .orElseThrow(() ->
+                                        new AssertionError("Could not find discovered snapshot: " + id)
+                                )
+                ));
     }
 
     private Stream<String> listTimestampedEntries(String worldName, Path directory) throws IOException {
         return SafeFiles.noLeakFileList(directory)
-            .flatMap(IOFunction.unchecked(entry -> getTimestampedEntries(worldName, entry)));
+                .flatMap(IOFunction.unchecked(entry -> getTimestampedEntries(worldName, entry)));
     }
 
     private Stream<String> getTimestampedEntries(String worldName, Path entry) throws IOException {
@@ -255,7 +255,7 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
         if (Files.isDirectory(entry)) {
             // timestamped directory, find worlds inside
             return listWorldEntries(worldName, entry)
-                .map(id -> fileName + "/" + id);
+                    .map(id -> fileName + "/" + id);
         }
         if (!Files.isRegularFile(entry)) {
             // not an archive either?
@@ -266,16 +266,16 @@ public class FileSystemSnapshotDatabase implements SnapshotDatabase {
             // timestamped archive
             ArchiveDir dir = asArchive.get();
             return listWorldEntries(worldName, dir.getPath())
-                .map(id -> fileName + "/" + id)
-                .onClose(IORunnable.unchecked(dir::close));
+                    .map(id -> fileName + "/" + id)
+                    .onClose(IORunnable.unchecked(dir::close));
         }
         return Stream.of();
     }
 
     private Stream<String> listWorldEntries(String worldName, Path directory) throws IOException {
         return SafeFiles.noLeakFileList(directory)
-            .map(IOFunction.unchecked(entry -> getWorldEntry(worldName, entry)))
-            .filter(Objects::nonNull);
+                .map(IOFunction.unchecked(entry -> getWorldEntry(worldName, entry)))
+                .filter(Objects::nonNull);
     }
 
     private String getWorldEntry(String worldName, Path entry) throws IOException {

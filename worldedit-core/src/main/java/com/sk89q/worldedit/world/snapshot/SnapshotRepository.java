@@ -23,6 +23,7 @@ package com.sk89q.worldedit.world.snapshot;
 
 import com.sk89q.worldedit.world.storage.MissingWorldException;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.time.ZoneOffset;
@@ -32,7 +33,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import javax.annotation.Nullable;
 
 /**
  * A repository contains zero or more snapshots.
@@ -215,9 +215,9 @@ public class SnapshotRepository {
         if (file.isFile()) {
             String lowerCaseFileName = file.getName().toLowerCase(Locale.ROOT);
             return lowerCaseFileName.endsWith(".zip")
-                || lowerCaseFileName.endsWith(".tar.bz2")
-                || lowerCaseFileName.endsWith(".tar.gz")
-                || lowerCaseFileName.endsWith(".tar");
+                    || lowerCaseFileName.endsWith(".tar.bz2")
+                    || lowerCaseFileName.endsWith(".tar.gz")
+                    || lowerCaseFileName.endsWith(".tar");
         }
         return false;
     }

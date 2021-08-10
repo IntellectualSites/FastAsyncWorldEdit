@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class ConfigurationPermissionsResolver implements PermissionsResolver {
+
     private final YAMLProcessor config;
     private final Map<String, Set<String>> userPermissionsCache = new HashMap<>();
     private final Set<String> defaultPermissionsCache = new HashSet<>();
@@ -41,14 +42,14 @@ public class ConfigurationPermissionsResolver implements PermissionsResolver {
     }
 
     public static YAMLNode generateDefaultPerms(YAMLNode section) {
-        section.setProperty("groups.default.permissions", new String[] {
-            "worldedit.reload",
-            "worldedit.selection",
-            "worlds.creative.worldedit.region"
+        section.setProperty("groups.default.permissions", new String[]{
+                "worldedit.reload",
+                "worldedit.selection",
+                "worlds.creative.worldedit.region"
         });
-        section.setProperty("groups.admins.permissions", new String[] { "*" });
-        section.setProperty("users.sk89q.permissions", new String[] { "worldedit" });
-        section.setProperty("users.sk89q.groups", new String[] { "admins" });
+        section.setProperty("groups.admins.permissions", new String[]{"*"});
+        section.setProperty("users.sk89q.permissions", new String[]{"worldedit"});
+        section.setProperty("users.sk89q.groups", new String[]{"admins"});
         return section;
     }
 

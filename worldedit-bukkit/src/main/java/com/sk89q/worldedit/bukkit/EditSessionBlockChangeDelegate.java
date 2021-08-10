@@ -21,8 +21,6 @@ package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.math.BlockVector3;
-
 import org.bukkit.BlockChangeDelegate;
 import org.bukkit.block.data.BlockData;
 
@@ -31,7 +29,7 @@ import org.bukkit.block.data.BlockData;
  */
 public class EditSessionBlockChangeDelegate implements BlockChangeDelegate {
 
-    private EditSession editSession;
+    private final EditSession editSession;
 
     public EditSessionBlockChangeDelegate(EditSession editSession) {
         this.editSession = editSession;

@@ -47,11 +47,7 @@ public class Edge {
             return true;
         }
 
-        if ((this.end == otherEdge.end) && (this.start == otherEdge.start)) {
-            return true;
-        }
-
-        return false;
+        return (this.end == otherEdge.end) && (this.start == otherEdge.start);
     }
 
     @Override

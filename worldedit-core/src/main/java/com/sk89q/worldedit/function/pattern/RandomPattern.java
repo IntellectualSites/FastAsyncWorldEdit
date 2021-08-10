@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.function.pattern;
 
-import com.boydti.fawe.object.collection.RandomCollection;
-import com.boydti.fawe.object.random.SimpleRandom;
-import com.boydti.fawe.object.random.TrueRandom;
+import com.fastasyncworldedit.core.math.random.SimpleRandom;
+import com.fastasyncworldedit.core.math.random.TrueRandom;
+import com.fastasyncworldedit.core.util.collection.RandomCollection;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -39,11 +39,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RandomPattern extends AbstractPattern {
 
+    //FAWE start - SimpleRandom > Random, LHS<P> > List
     private final SimpleRandom random;
     private Map<Pattern, Double> weights = new HashMap<>();
     private RandomCollection<Pattern> collection;
     private LinkedHashSet<Pattern> patterns = new LinkedHashSet<>();
+    //FAWE end
 
+    //FAWE start
     public RandomPattern() {
         this(new TrueRandom());
     }
@@ -64,6 +67,7 @@ public class RandomPattern extends AbstractPattern {
         this.collection = RandomCollection.of(weights, random);
         this.patterns = parent.patterns;
     }
+    //FAWE end
 
     /**
      * Add a pattern to the weight list of patterns.
@@ -72,10 +76,11 @@ public class RandomPattern extends AbstractPattern {
      * the sum of the probabilities of all added patterns.</p>
      *
      * @param pattern the pattern
-     * @param chance the chance, which can be any positive number
+     * @param chance  the chance, which can be any positive number
      */
     public void add(Pattern pattern, double chance) {
         checkNotNull(pattern);
+        //FAWE start - Double, weights, patterns and collection
         Double existingWeight = weights.get(pattern);
         if (existingWeight != null) {
             chance += existingWeight;
@@ -94,15 +99,14 @@ public class RandomPattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
-        return collection.next(position.getBlockX(), position.getBlockY(), position.getBlockZ()).apply(position);
+    public BaseBlock applyBlock(BlockVector3 position) {
+        return collection.next(position.getBlockX(), position.getBlockY(), position.getBlockZ()).applyBlock(position);
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         return collection.next(get.getBlockX(), get.getBlockY(), get.getBlockZ()).apply(extent, get, set);
     }
-
-
+    //FAWE end
 
 }

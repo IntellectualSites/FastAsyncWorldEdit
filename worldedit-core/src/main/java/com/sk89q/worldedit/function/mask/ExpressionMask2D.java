@@ -24,8 +24,8 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector2;
 
-import java.util.function.IntSupplier;
 import javax.annotation.Nullable;
+import java.util.function.IntSupplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -72,9 +72,11 @@ public class ExpressionMask2D extends AbstractMask2D {
         }
     }
 
+    //FAWE start
     @Override
     public Mask2D copy2D() {
         return new ExpressionMask2D(expression.clone(), timeout);
     }
+    //FAWE end
 
 }

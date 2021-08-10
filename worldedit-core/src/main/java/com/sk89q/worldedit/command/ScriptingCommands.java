@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
@@ -26,7 +27,6 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
@@ -58,58 +58,63 @@ public class ScriptingCommands {
     }
 
     @Command(
-        name = "cs",
-        aliases = { "/cs" },
-        desc = "Execute a CraftScript"
+            name = "cs",
+            aliases = {"/cs"},
+            desc = "Execute a CraftScript"
     )
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void execute(Player player, LocalSession session,
-                        @Arg(desc = "Filename of the CraftScript to load")
-                            String filename,
-                        @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
-                            List<String> args) throws WorldEditException {
+    public void execute(
+            Player player, LocalSession session,
+            @Arg(desc = "Filename of the CraftScript to load")
+                    String filename,
+            @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
+                    List<String> args
+    ) throws WorldEditException {
         if (!player.hasPermission("worldedit.scripting.execute." + filename)) {
-            player.printError(TranslatableComponent.of("worldedit.execute.script-permissions"));
+            player.print(Caption.of("worldedit.execute.script-permissions"));
             return;
         }
 
         session.setLastScript(filename);
 
-        File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().scriptsDir);
+        File dir = worldEdit.getWorkingDirectoryPath(worldEdit.getConfiguration().scriptsDir).toFile();
         File f = worldEdit.getSafeOpenFile(player, dir, filename, "js", "js");
 
         worldEdit.runScript(player, f, Stream.concat(Stream.of(filename), args.stream())
-            .toArray(String[]::new));
+                .toArray(String[]::new));
     }
 
     @Command(
-        name = ".s",
-        aliases = { "/.s" },
-        desc = "Execute last CraftScript"
+            name = ".s",
+            aliases = {"/.s"},
+            desc = "Execute last CraftScript"
     )
     @CommandPermissions("worldedit.scripting.execute")
     @Logging(ALL)
-    public void executeLast(Player player, LocalSession session,
-                            @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
-                                List<String> args) throws WorldEditException {
+    public void executeLast(
+            Player player, LocalSession session,
+            @Arg(desc = "Arguments to the CraftScript", def = "", variable = true)
+                    List<String> args
+    ) throws WorldEditException {
 
         String lastScript = session.getLastScript();
 
         if (!player.hasPermission("worldedit.scripting.execute." + lastScript)) {
-            player.printError(TranslatableComponent.of("worldedit.execute.script-permissions"));
+            player.print(Caption.of("worldedit.execute.script-permissions"));
             return;
         }
 
         if (lastScript == null) {
-            player.printError(TranslatableComponent.of("worldedit.executelast.no-script"));
+            player.print(Caption.of("worldedit.executelast.no-script"));
             return;
         }
 
-        File dir = worldEdit.getWorkingDirectoryFile(worldEdit.getConfiguration().scriptsDir);
+        File dir = worldEdit.getWorkingDirectoryPath(worldEdit.getConfiguration().scriptsDir).toFile();
         File f = worldEdit.getSafeOpenFile(player, dir, lastScript, "js", "js");
 
         worldEdit.runScript(player, f, Stream.concat(Stream.of(lastScript), args.stream())
-            .toArray(String[]::new));
+                .toArray(String[]::new));
     }
+
 }

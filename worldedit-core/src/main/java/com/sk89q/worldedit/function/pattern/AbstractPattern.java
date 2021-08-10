@@ -23,4 +23,5 @@ package com.sk89q.worldedit.function.pattern;
  * An abstract implementation for {@link Pattern}s.
  */
 public abstract class AbstractPattern implements Pattern {
+
 }

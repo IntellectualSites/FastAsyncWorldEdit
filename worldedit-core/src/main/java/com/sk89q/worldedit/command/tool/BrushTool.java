@@ -19,33 +19,24 @@
 
 package com.sk89q.worldedit.command.tool;
 
-import com.boydti.fawe.Fawe;
-import com.boydti.fawe.beta.implementation.IChunkExtent;
-import com.boydti.fawe.beta.implementation.processors.NullProcessor;
-import com.boydti.fawe.beta.implementation.processors.PersistentChunkSendProcessor;
-import com.boydti.fawe.config.Caption;
-import com.boydti.fawe.object.brush.BrushSettings;
-import com.boydti.fawe.object.brush.MovableTool;
-import com.boydti.fawe.object.brush.ResettableTool;
-import com.boydti.fawe.object.brush.TargetMode;
-import com.boydti.fawe.object.brush.scroll.Scroll;
-import com.boydti.fawe.object.brush.scroll.ScrollTool;
-import com.boydti.fawe.object.brush.visualization.VisualExtent;
-import com.boydti.fawe.object.brush.visualization.VisualMode;
-import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.object.mask.MaskedTargetBlock;
-import com.boydti.fawe.object.pattern.PatternTraverser;
-import com.boydti.fawe.util.BrushCache;
-import com.boydti.fawe.util.EditSessionBuilder;
-import com.boydti.fawe.util.ExtentTraverser;
-import com.boydti.fawe.util.MaskTraverser;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.core.command.tool.MovableTool;
+import com.fastasyncworldedit.core.command.tool.ResettableTool;
+import com.fastasyncworldedit.core.command.tool.TargetMode;
+import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
+import com.fastasyncworldedit.core.command.tool.scroll.Scroll;
+import com.fastasyncworldedit.core.command.tool.scroll.ScrollTool;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.function.mask.MaskedTargetBlock;
+import com.fastasyncworldedit.core.function.pattern.PatternTraverser;
+import com.fastasyncworldedit.core.util.BrushCache;
+import com.fastasyncworldedit.core.util.MaskTraverser;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
@@ -61,17 +52,12 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.session.request.Request;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
-import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.function.Supplier;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -79,33 +65,34 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Builds a shape at the place being looked at.
  */
 public class BrushTool
-    implements DoubleActionTraceTool, ScrollTool, MovableTool, ResettableTool, Serializable {
+        //FAWE start - All implements but TraceTool
+        implements DoubleActionTraceTool, ScrollTool, MovableTool, ResettableTool, Serializable, TraceTool {
     //    TODO:
     // Serialize methods
     // serialize BrushSettings (primary and secondary only if different)
     // set transient values e.g., context
 
 
-    public enum BrushAction {
-        PRIMARY, SECONDARY
+    enum BrushAction {
+        PRIMARY,
+        SECONDARY
     }
-
+    //FAWE end
 
     protected static int MAX_RANGE = 500;
-    protected static int DEFAULT_RANGE = 240; // 500 is laggy as the default
     protected int range = -1;
-    private VisualMode visualMode = VisualMode.NONE;
-    private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
     private Mask traceMask = null;
+    //FAWE start
+    protected static int DEFAULT_RANGE = 240; // 500 is laggy as the default
+    private TargetMode targetMode = TargetMode.TARGET_BLOCK_RANGE;
     private int targetOffset;
 
     private transient BrushSettings primary = new BrushSettings();
     private transient BrushSettings secondary = new BrushSettings();
     private transient BrushSettings context = primary;
 
-    private transient PersistentChunkSendProcessor visualExtent;
-
     private transient BaseItem holder;
+    //FAWE end
 
     /**
      * Construct the tool.
@@ -117,6 +104,7 @@ public class BrushTool
         getContext().addPermission(permission);
     }
 
+    //FAWE start
     public BrushTool() {
     }
 
@@ -214,15 +202,6 @@ public class BrushTool
      *
      * @return the filter
      */
-    public Mask getMask() {
-        return getContext().getMask();
-    }
-
-    /**
-     * Get the filter.
-     *
-     * @return the filter
-     */
     //TODO A better description is needed here to explain what makes a source-mask different from a regular mask.
     public Mask getSourceMask() {
         return getContext().getSourceMask();
@@ -246,6 +225,16 @@ public class BrushTool
         this.getContext().setMask(filter);
         update();
     }
+    //FAWE end
+
+    /**
+     * Get the filter.
+     *
+     * @return the filter
+     */
+    public Mask getMask() {
+        return getContext().getMask();
+    }
 
     /**
      * Get the mask used for identifying where to stop traces.
@@ -267,6 +256,8 @@ public class BrushTool
         update();
     }
 
+    //FAWE start
+
     /**
      * Set the block filter used for identifying blocks to replace.
      *
@@ -276,19 +267,22 @@ public class BrushTool
         this.getContext().setSourceMask(filter);
         update();
     }
+    //FAWE end
 
     /**
      * Set the brush.
      *
-     * @param brush the brush
+     * @param brush      the brush
      * @param permission the permission
      */
     public void setBrush(Brush brush, String permission) {
+        //FAWE start - We use our own logic
         BrushSettings current = getContext();
         current.clearPerms();
         current.setBrush(brush);
         current.addPermission(permission);
         update();
+        //FAWE end
     }
 
     /**
@@ -365,11 +359,16 @@ public class BrushTool
     }
 
     @Override
-    public boolean actPrimary(Platform server, LocalConfiguration config, Player player,
-        LocalSession session) {
+    public boolean actPrimary(
+            Platform server, LocalConfiguration config, Player player,
+            LocalSession session
+    ) {
+        //FAWE start - Use logic previously declared as FAWE-like
         return act(BrushAction.PRIMARY, player, session);
+        //FAWE end
     }
 
+    //FAWE start
     public BlockVector3 getPosition(EditSession editSession, Player player) {
         Location loc = player.getLocation();
         switch (targetMode) {
@@ -381,7 +380,7 @@ public class BrushTool
                 pitch = 23 - (pitch / 4);
                 d += (int) (Math.sin(Math.toRadians(pitch)) * 50);
                 final Vector3 vector = loc.getDirection().withY(0).normalize().multiply(d)
-                    .add(loc.getX(), loc.getY(), loc.getZ());
+                        .add(loc.getX(), loc.getY(), loc.getZ());
                 return offset(vector, loc).toBlockPoint();
             }
             case TARGET_POINT_HEIGHT: {
@@ -438,7 +437,7 @@ public class BrushTool
 
         if (!current.canUse(player)) {
             player.print(
-                Caption.of("fawe.error.no-perm", StringMan.join(current.getPermissions(), ",")));
+                    Caption.of("fawe.error.no-perm", StringMan.join(current.getPermissions(), ",")));
             return false;
         }
         try (EditSession editSession = session.createEditSession(player, current.toString())) {
@@ -446,7 +445,7 @@ public class BrushTool
 
             if (target == null) {
                 editSession.cancel();
-                player.printError(TranslatableComponent.of("worldedit.tool.no-block"));
+                player.print(Caption.of("worldedit.tool.no-block"));
                 return true;
             }
             BlockBag bag = session.getBlockBag(player);
@@ -481,7 +480,7 @@ public class BrushTool
                 WorldEdit.getInstance().checkMaxBrushRadius(size);
                 brush.build(editSession, target.toBlockPoint(), current.getMaterial(), size);
             } catch (MaxChangedBlocksException e) {
-                player.printError(TranslatableComponent.of("worldedit.tool.max-block-changes"));
+                player.print(Caption.of("worldedit.tool.max-block-changes"));
             } finally {
                 session.remember(editSession);
                 if (bag != null) {
@@ -496,11 +495,12 @@ public class BrushTool
     }
 
     @Override
-    public boolean actSecondary(Platform server, LocalConfiguration config, Player player,
-        LocalSession session) {
+    public boolean actSecondary(
+            Platform server, LocalConfiguration config, Player player,
+            LocalSession session
+    ) {
         return act(BrushAction.SECONDARY, player, session);
     }
-
 
 
     public void setScrollAction(Scroll scrollAction) {
@@ -518,26 +518,6 @@ public class BrushTool
         update();
     }
 
-    public void setVisualMode(Player player, VisualMode visualMode) {
-        if (visualMode == null) {
-            visualMode = VisualMode.NONE;
-        }
-        if (this.visualMode != visualMode) {
-            if (this.visualMode != VisualMode.NONE) {
-                clear(player);
-            }
-            this.visualMode = visualMode;
-            if (visualMode != VisualMode.NONE) {
-                try {
-                    queueVisualization(player);
-                } catch (Throwable e) {
-                    WorldEdit.getInstance().getPlatformManager().handleThrowable(e, player);
-                }
-            }
-        }
-        update();
-    }
-
     public TargetMode getTargetMode() {
         return targetMode;
     }
@@ -546,114 +526,20 @@ public class BrushTool
         return targetOffset;
     }
 
-    public VisualMode getVisualMode() {
-        return visualMode;
-    }
-
     @Override
     public boolean increment(Player player, int amount) {
         BrushSettings current = getContext();
         Scroll tmp = current.getScrollAction();
         if (tmp != null) {
             tmp.setTool(this);
-            if (tmp.increment(player, amount)) {
-                if (visualMode != VisualMode.NONE) {
-                    try {
-                        queueVisualization(player);
-                    } catch (Throwable e) {
-                        WorldEdit.getInstance().getPlatformManager().handleThrowable(e, player);
-                    }
-                }
-                return true;
-            }
-        }
-        if (visualMode != VisualMode.NONE) {
-            clear(player);
+            return tmp.increment(player, amount);
         }
         return false;
-    }
-
-    public void queueVisualization(Player player) {
-        Fawe.get().getVisualQueue().queue(player);
-    }
-
-    @Deprecated
-    public synchronized void visualize(BrushTool.BrushAction action, Player player)
-        throws WorldEditException {
-        VisualMode mode = getVisualMode();
-        if (mode == VisualMode.NONE) {
-            return;
-        }
-        BrushSettings current = getContext();
-        Brush brush = current.getBrush();
-        if (brush == null) {
-            return;
-        }
-
-        EditSessionBuilder builder =
-            new EditSessionBuilder(player.getWorld()).command(current.toString()).player(player)
-                .allowedRegionsEverywhere().autoQueue(false).blockBag(null).changeSetNull()
-                .fastmode(true).combineStages(true);
-        EditSession editSession = builder.build();
-
-        World world = editSession.getWorld();
-        Supplier<Collection<Player>> players = () -> Collections.singleton(player);
-
-        PersistentChunkSendProcessor newVisualExtent =
-            new PersistentChunkSendProcessor(world, this.visualExtent, players);
-        ExtentTraverser<IChunkExtent> traverser =
-            new ExtentTraverser<>(editSession).find(IChunkExtent.class);
-        if (traverser == null) {
-            throw new IllegalStateException("No queue found");
-        }
-
-        IChunkExtent chunkExtent = traverser.get();
-        if (this.visualExtent != null) {
-            this.visualExtent.init(chunkExtent);
-        }
-        newVisualExtent.init(chunkExtent);
-
-        editSession.addProcessor(newVisualExtent);
-        editSession.addProcessor(NullProcessor.getInstance());
-
-        BlockVector3 position = getPosition(editSession, player);
-        if (position != null) {
-            switch (mode) {
-                case POINT:
-                    editSession.setBlock(position, VisualExtent.VISUALIZE_BLOCK_DEFAULT);
-                    break;
-                case OUTLINE: {
-                    new PatternTraverser(current).reset(editSession);
-                    brush.build(editSession, position, current.getMaterial(), current.getSize());
-                    break;
-                }
-                default:
-                    throw new IllegalStateException("Unexpected value: " + mode);
-            }
-        }
-        editSession.flushQueue();
-
-        if (visualExtent != null) {
-            // clear old data
-            visualExtent.flush();
-        }
-        visualExtent = newVisualExtent;
-        newVisualExtent.flush();
-    }
-
-    public void clear(Player player) {
-        Fawe.get().getVisualQueue().dequeue(player);
-        if (visualExtent != null) {
-            visualExtent.clear();
-        }
     }
 
     @Override
     public boolean move(Player player) {
-        if (visualMode != VisualMode.NONE) {
-            queueVisualization(player);
-            return true;
-        }
         return false;
     }
+    //FAWE end
 }

@@ -19,8 +19,8 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.math.MutableVector3;
 import com.sk89q.worldedit.math.noise.NoiseGenerator;
 
 import javax.annotation.Nullable;
@@ -41,7 +41,7 @@ public class NoiseFilter extends AbstractMask {
      * Create a new noise filter.
      *
      * @param noiseGenerator the noise generator
-     * @param density the density
+     * @param density        the density
      */
     public NoiseFilter(NoiseGenerator noiseGenerator, double density) {
         setNoiseGenerator(noiseGenerator);
@@ -96,9 +96,11 @@ public class NoiseFilter extends AbstractMask {
         return new NoiseFilter2D(getNoiseGenerator(), getDensity());
     }
 
+    //FAWE start
     @Override
     public Mask copy() {
         return new NoiseFilter(noiseGenerator, density);
     }
+    //FAWE end
 
 }

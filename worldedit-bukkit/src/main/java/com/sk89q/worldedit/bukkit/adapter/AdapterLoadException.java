@@ -38,4 +38,5 @@ public class AdapterLoadException extends Exception {
     public AdapterLoadException(Throwable cause) {
         super(cause);
     }
+
 }

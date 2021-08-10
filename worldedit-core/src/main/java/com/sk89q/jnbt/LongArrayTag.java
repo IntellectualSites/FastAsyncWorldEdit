@@ -19,21 +19,19 @@
 
 package com.sk89q.jnbt;
 
-import java.util.Locale;
+import com.sk89q.worldedit.util.nbt.LongArrayBinaryTag;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * The {@code TAG_Long_Array} tag.
+ *
+ * @deprecated Use {@link LongArrayBinaryTag}.
  */
+@Deprecated
 public class LongArrayTag extends Tag {
 
-    @Override
-    public int getTypeCode() {
-        return NBTConstants.TYPE_LONG_ARRAY;
-    }
-
-    private final long[] value;
+    private final LongArrayBinaryTag innerTag;
 
     /**
      * Creates the tag with an empty name.
@@ -43,25 +41,29 @@ public class LongArrayTag extends Tag {
     public LongArrayTag(long[] value) {
         super();
         checkNotNull(value);
-        this.value = value;
+        this.innerTag = LongArrayBinaryTag.of(value);
+    }
+
+    public LongArrayTag(LongArrayBinaryTag adventureTag) {
+        super();
+        this.innerTag = adventureTag;
+    }
+
+    @Override
+    public LongArrayBinaryTag asBinaryTag() {
+        return this.innerTag;
     }
 
     @Override
     public long[] getValue() {
-        return value;
+        return innerTag.value();
     }
 
+    //FAWE start
     @Override
-    public String toString() {
-        StringBuilder hex = new StringBuilder();
-        for (long b : value) {
-            String hexDigits = Long.toHexString(b).toUpperCase(Locale.ROOT);
-            if (hexDigits.length() == 1) {
-                hex.append("0");
-            }
-            hex.append(hexDigits).append(" ");
-        }
-        return "TAG_Long_Array(" + hex + ")";
+    public int getTypeCode() {
+        return NBTConstants.TYPE_LONG_ARRAY;
     }
+    //FAWE end
 
 }

@@ -31,18 +31,21 @@ public enum Capability {
     GAME_HOOKS {
         @Override
         void initialize(PlatformManager platformManager, Platform platform) {
-            platform.registerGameHooks();
+            platform.setGameHooksEnabled(true);
         }
 
         @Override
-        void unload(PlatformManager platformManager, Platform platform) {
+        void uninitialize(PlatformManager platformManager, Platform platform) {
+            platform.setGameHooksEnabled(false);
         }
     },
 
     /**
      * The capability of providing configuration.
      */
+    //FAWE start
     CONFIGURATION,
+    //FAWE end
 
     /**
      * The capability of handling user commands entered in chat or console.
@@ -54,11 +57,12 @@ public enum Capability {
         }
 
         @Override
-        void unload(PlatformManager platformManager, Platform platform) {
+        void uninitialize(PlatformManager platformManager, Platform platform) {
             platformManager.getPlatformCommandManager().removeCommands();
         }
     },
 
+    //FAWE start
     /**
      * The capability of a platform to assess whether a given
      * {@link Actor} has sufficient authorization to perform a task.
@@ -76,7 +80,7 @@ public enum Capability {
     WORLD_EDITING {
         /*
         @Override
-        void initialize(PlatformManager platformManager, Platform platform) {
+        void ready(PlatformManager platformManager, Platform platform) {
             BlockRegistry blockRegistry = platform.getRegistries().getBlockRegistry();
             for (BlockType type : BlockType.REGISTRY) {
                 for (BlockState state : type.getAllStates()) {
@@ -86,18 +90,36 @@ public enum Capability {
         }
 
         @Override
-        void unload(PlatformManager platformManager, Platform platform) {
+        void unready(PlatformManager platformManager, Platform platform) {
             BlockStateIdAccess.clear();
         }
         */
     };
+    //FAWE end
 
+    /**
+     * Initialize platform-wide state.
+     */
     void initialize(PlatformManager platformManager, Platform platform) {
 
     }
 
-    void unload(PlatformManager platformManager, Platform platform) {
+    /**
+     * Un-initialize platform-wide state.
+     */
+    void uninitialize(PlatformManager platformManager, Platform platform) {
+    }
 
+    /**
+     * Initialize per-level state.
+     */
+    void ready(PlatformManager platformManager, Platform platform) {
+    }
+
+    /**
+     * Un-initialize per-level state.
+     */
+    void unready(PlatformManager platformManager, Platform platform) {
     }
 
 }

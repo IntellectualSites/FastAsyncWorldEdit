@@ -26,19 +26,19 @@ import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.Constants;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.util.gson.VectorAdapter;
 import com.sk89q.worldedit.util.io.ResourceLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * Provides item data based on the built-in item database that is bundled
@@ -53,7 +53,7 @@ import javax.annotation.Nullable;
  */
 public final class BundledItemData {
 
-    private static final Logger log = LoggerFactory.getLogger(BundledItemData.class);
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static BundledItemData INSTANCE;
     private final ResourceLoader resourceLoader;
 
@@ -63,12 +63,16 @@ public final class BundledItemData {
      * Create a new instance.
      */
     private BundledItemData() {
-        this.resourceLoader = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.CONFIGURATION).getResourceLoader();
+        this.resourceLoader = WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.CONFIGURATION)
+                .getResourceLoader();
 
         try {
             loadFromResource();
         } catch (Throwable e) {
-            log.warn("Failed to load the built-in item registry", e);
+            LOGGER.warn("Failed to load the built-in item registry", e);
         }
     }
 
@@ -82,8 +86,14 @@ public final class BundledItemData {
         gsonBuilder.registerTypeAdapter(Vector3.class, new VectorAdapter());
         Gson gson = gsonBuilder.create();
         URL url = null;
-        final int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getDataVersion();
-        if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
+        final int dataVersion = WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.WORLD_EDITING)
+                .getDataVersion();
+        if (dataVersion >= Constants.DATA_VERSION_MC_1_17) {
+            url = resourceLoader.getResource(BundledBlockData.class, "items.117.json");
+        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
             url = resourceLoader.getResource(BundledBlockData.class, "items.116.json");
         } else if (dataVersion >= Constants.DATA_VERSION_MC_1_15) {
             url = resourceLoader.getResource(BundledBlockData.class, "items.115.json");
@@ -94,9 +104,10 @@ public final class BundledItemData {
         if (url == null) {
             throw new IOException("Could not find items.json");
         }
-        log.debug("Using {} for bundled item data.", url);
+        LOGGER.debug("Using {} for bundled item data.", url);
         String data = Resources.toString(url, Charset.defaultCharset());
-        List<ItemEntry> entries = gson.fromJson(data, new TypeToken<List<ItemEntry>>() {}.getType());
+        List<ItemEntry> entries = gson.fromJson(data, new TypeToken<List<ItemEntry>>() {
+        }.getType());
 
         for (ItemEntry entry : entries) {
             idMap.put(entry.id, entry);
@@ -148,11 +159,13 @@ public final class BundledItemData {
     }
 
     public static class ItemEntry {
+
         private String id;
         private String unlocalizedName;
         public String localizedName;
         private int maxDamage;
         private int maxStackSize;
+
     }
 
 }

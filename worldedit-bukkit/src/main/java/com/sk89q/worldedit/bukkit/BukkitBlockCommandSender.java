@@ -31,11 +31,10 @@ import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.adapter.bukkit.TextAdapter;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
@@ -68,6 +67,7 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
     }
 
     @Override
+    @Deprecated
     public void printRaw(String msg) {
         for (String part : msg.split("\n")) {
             sender.sendMessage(part);
@@ -75,6 +75,7 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
     }
 
     @Override
+    @Deprecated
     public void print(String msg) {
         for (String part : msg.split("\n")) {
             print(TextComponent.of(part, TextColor.LIGHT_PURPLE));
@@ -82,6 +83,7 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
     }
 
     @Override
+    @Deprecated
     public void printDebug(String msg) {
         for (String part : msg.split("\n")) {
             print(TextComponent.of(part, TextColor.GRAY));
@@ -89,6 +91,7 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
     }
 
     @Override
+    @Deprecated
     public void printError(String msg) {
         for (String part : msg.split("\n")) {
             print(TextComponent.of(part, TextColor.RED));
@@ -97,7 +100,7 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendComponent(sender, WorldEditText.format(component, getLocale()));
+        TextAdapter.sendMessage(sender, WorldEditText.format(component, getLocale()));
     }
 
     @Override
@@ -142,10 +145,12 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
         return sender.hasPermission(permission);
     }
 
+    //FAWE start
     @Override
     public boolean togglePermission(String permission) {
         return true;
     }
+    //FAWE end
 
     @Override
     public void setPermission(String permission, boolean value) {
@@ -158,6 +163,21 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
     @Override
     public SessionKey getSessionKey() {
         return new SessionKey() {
+
+            private volatile boolean active = true;
+
+            private void updateActive() {
+                Block block = sender.getBlock();
+                if (!block.getWorld().isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)) {
+                    active = false;
+                    return;
+                }
+                Material type = block.getType();
+                active = type == Material.COMMAND_BLOCK
+                        || type == Material.CHAIN_COMMAND_BLOCK
+                        || type == Material.REPEATING_COMMAND_BLOCK;
+            }
+
             @Override
             public String getName() {
                 return sender.getName();
@@ -165,14 +185,20 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
 
             @Override
             public boolean isActive() {
-                @NotNull Block block = sender.getBlock();
-                @NotNull World world = block.getWorld();
-                if (world.isChunkLoaded(block.getX() >> 4, block.getZ() >> 4)) {
-                    return sender.getBlock().getType() == Material.COMMAND_BLOCK
-                            || sender.getBlock().getType() == Material.CHAIN_COMMAND_BLOCK
-                            || sender.getBlock().getType() == Material.REPEATING_COMMAND_BLOCK;
+                if (Bukkit.isPrimaryThread()) {
+                    // we can update eagerly
+                    updateActive();
+                } else {
+                    // we should update it eventually
+                    Bukkit.getScheduler().callSyncMethod(
+                            plugin,
+                            () -> {
+                                updateActive();
+                                return null;
+                            }
+                    );
                 }
-                return false;
+                return active;
             }
 
             @Override
@@ -186,4 +212,5 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
             }
         };
     }
+
 }

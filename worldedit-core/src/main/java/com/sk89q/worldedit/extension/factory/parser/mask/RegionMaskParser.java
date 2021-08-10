@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.WorldEdit;
@@ -48,7 +49,8 @@ public class RegionMaskParser extends SimpleInputParser<Mask> {
         try {
             return new RegionMask(context.requireSession().getSelection(context.requireWorld()).clone());
         } catch (IncompleteRegionException e) {
-            throw new InputParseException("Please make a selection first.");
+            throw new InputParseException(Caption.of("worldedit.error.incomplete-region"));
         }
     }
+
 }

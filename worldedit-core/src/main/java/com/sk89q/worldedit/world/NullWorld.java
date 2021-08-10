@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.world;
 
-import com.boydti.fawe.beta.IChunkGet;
-import com.boydti.fawe.beta.implementation.blocks.NullChunkGet;
-import com.boydti.fawe.beta.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.NullChunkGet;
+import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.google.common.collect.ImmutableSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -48,10 +48,10 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.annotation.Nullable;
 
 /**
  * A null implementation of {@link World} that drops all changes and
@@ -75,7 +75,8 @@ public class NullWorld extends AbstractWorld {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) throws
+            WorldEditException {
         return false;
     }
 
@@ -94,6 +95,7 @@ public class NullWorld extends AbstractWorld {
     public boolean clearContainerBlockContents(BlockVector3 position) {
         return false;
     }
+
     @Override
     public boolean fullySupports3DBiomes() {
         return false;
@@ -160,6 +162,7 @@ public class NullWorld extends AbstractWorld {
         return BlockVector3.ZERO;
     }
 
+    //FAWE start
     @Override
     public void refreshChunk(int chunkX, int chunkZ) {
 
@@ -169,6 +172,7 @@ public class NullWorld extends AbstractWorld {
     public IChunkGet get(int x, int z) {
         return NullChunkGet.getInstance();
     }
+    //FAWE end
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
@@ -190,10 +194,12 @@ public class NullWorld extends AbstractWorld {
         return false;
     }
 
+    //FAWE start
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return false;
     }
+    //FAWE end
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
@@ -225,6 +231,7 @@ public class NullWorld extends AbstractWorld {
         return INSTANCE;
     }
 
+    //FAWE start
     @Override
     public void sendFakeChunk(@Nullable Player player, ChunkPacket packet) {
     }
@@ -233,4 +240,9 @@ public class NullWorld extends AbstractWorld {
     public boolean regenerate(Region region, Extent extent, RegenOptions options) {
         return false;
     }
+
+    @Override
+    public void flush() {
+    }
+    //FAWE end
 }

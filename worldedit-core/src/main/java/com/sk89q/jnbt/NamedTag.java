@@ -23,7 +23,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A tag that has a name.
+ *
+ * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
+@Deprecated(forRemoval = true)
 public class NamedTag {
 
     private final String name;
@@ -33,7 +36,7 @@ public class NamedTag {
      * Create a new named tag.
      *
      * @param name the name
-     * @param tag the tag
+     * @param tag  the tag
      */
     public NamedTag(String name, Tag tag) {
         checkNotNull(name);

@@ -33,5 +33,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.PARAMETER)
 @InjectAnnotation
 public @interface MultiDirection {
+
     boolean includeDiagonals() default false;
+
 }

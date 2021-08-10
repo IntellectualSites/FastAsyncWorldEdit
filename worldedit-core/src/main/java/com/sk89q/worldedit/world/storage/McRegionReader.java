@@ -87,10 +87,9 @@ public class McRegionReader {
      * Construct the reader.
      *
      * @param stream the stream
-     * @throws DataException
-     * @throws IOException
+     * @throws IOException if there is an error getting the region data
      */
-    public McRegionReader(InputStream stream) throws DataException, IOException {
+    public McRegionReader(InputStream stream) throws IOException {
         this.stream = new ForwardSeekableInputStream(stream);
         this.dataStream = new DataInputStream(this.stream);
 
@@ -100,7 +99,7 @@ public class McRegionReader {
     /**
      * Read the header.
      *
-     * @throws IOException
+     * @throws IOException if there is an error getting the header data
      */
     private void readHeader() throws IOException {
         offsets = new int[SECTOR_INTS];
@@ -116,8 +115,8 @@ public class McRegionReader {
      *
      * @param position chunk position
      * @return an input stream
-     * @throws IOException
-     * @throws DataException
+     * @throws IOException   if there is an error getting the chunk data
+     * @throws DataException if there is an error getting the chunk data
      */
     public synchronized InputStream getChunkInputStream(BlockVector2 position) throws IOException, DataException {
         int x = position.getBlockX() & 31;
@@ -191,4 +190,5 @@ public class McRegionReader {
     public void close() throws IOException {
         stream.close();
     }
+
 }

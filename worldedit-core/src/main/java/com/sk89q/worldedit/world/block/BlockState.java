@@ -19,10 +19,14 @@
 
 package com.sk89q.worldedit.world.block;
 
-import com.boydti.fawe.beta.ITileInput;
-import com.boydti.fawe.command.SuggestInputParseException;
-import com.boydti.fawe.object.string.MutableCharSequence;
-import com.boydti.fawe.util.StringMan;
+import com.fastasyncworldedit.core.command.SuggestInputParseException;
+import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
+import com.fastasyncworldedit.core.queue.ITileInput;
+import com.fastasyncworldedit.core.registry.state.PropertyKey;
+import com.fastasyncworldedit.core.util.MutableCharSequence;
+import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
+import com.fastasyncworldedit.core.world.block.CompoundInput;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import com.sk89q.jnbt.CompoundTag;
@@ -34,48 +38,61 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.NullExtent;
 import com.sk89q.worldedit.extent.OutputExtent;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.SingleBlockStateMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.registry.state.PropertyKey;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 /**
  * An immutable class that represents the state a block can be in.
  */
 @SuppressWarnings("unchecked")
 public class BlockState implements BlockStateHolder<BlockState>, Pattern {
+
+    //FAWE start
     private final int internalId;
     private final int ordinal;
     private final char ordinalChar;
-    private final BlockType blockType;
     private BlockMaterial material;
     private final BaseBlock emptyBaseBlock;
     private CompoundInput compoundInput = CompoundInput.NULL;
+    //FAWE end
+    private final BlockType blockType;
 
-    protected BlockState(BlockType blockType, int internalId, int ordinal) {
+    //FAWE start
+    public BlockState(BlockType blockType, int internalId, int ordinal) {
         this.blockType = blockType;
         this.internalId = internalId;
         this.ordinal = ordinal;
         this.ordinalChar = (char) ordinal;
-        this.emptyBaseBlock = new ImmutableBaseBlock(this);
+        this.emptyBaseBlock = new BlanketBaseBlock(this);
+    }
+
+    public BlockState(BlockType blockType, int internalId, int ordinal, @Nonnull CompoundTag tile) {
+        this.blockType = blockType;
+        this.internalId = internalId;
+        this.ordinal = ordinal;
+        this.ordinalChar = (char) ordinal;
+        this.emptyBaseBlock = new BlanketBaseBlock(this, tile);
     }
 
     /**
      * Returns a temporary BlockState for a given internal id.
-     * @deprecated Magic Numbers
+     *
      * @return BlockState
+     * @deprecated Magic Numbers
      */
-
     @Deprecated
     public static BlockState getFromInternalId(int combinedId) throws InputParseException {
         return BlockTypes.getFromStateId(combinedId).withStateId(combinedId);
@@ -88,6 +105,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
 
     /**
      * Returns a temporary BlockState for a given type and string.
+     *
      * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
@@ -100,7 +118,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
      *
      * <p>It's faster if a BlockType is provided compared to parsing the string.</p>
      *
-     * @param type BlockType e.g., BlockTypes.STONE (or null)
+     * @param type  BlockType e.g., BlockTypes.STONE (or null)
      * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
@@ -113,7 +131,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
      *
      * <p>It's faster if a BlockType is provided compared to parsing the string.</p>
      *
-     * @param type BlockType e.g., BlockTypes.STONE (or null)
+     * @param type  BlockType e.g., BlockTypes.STONE (or null)
      * @param state String e.g., minecraft:water[level=4]
      * @return BlockState
      */
@@ -132,7 +150,8 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             type = BlockTypes.get(key);
             if (type == null) {
                 String input = key.toString();
-                throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(BlockTypesCache.values)
+                throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(
+                        BlockTypesCache.values)
                         .filter(b -> StringMan.blockStateMatches(input, b.getId()))
                         .map(BlockType::getId)
                         .sorted(StringMan.blockStateComparator(input))
@@ -186,19 +205,27 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                         stateId = property.modifyIndex(stateId, index);
                     } else {
                         // suggest
-                        PropertyKey key = PropertyKey.get(charSequence);
+                        PropertyKey key = PropertyKey.getByName(charSequence);
                         if (key == null || !type.hasProperty(key)) {
                             // Suggest property
                             String input = charSequence.toString();
                             BlockType finalType = type;
-                            throw new SuggestInputParseException("Invalid property " + key + ":" + input + " for type " + type, input, () ->
-                                finalType.getProperties().stream()
-                                .map(Property::getName)
-                                .filter(p -> StringMan.blockStateMatches(input, p))
-                                .sorted(StringMan.blockStateComparator(input))
-                                .collect(Collectors.toList()));
+                            throw new SuggestInputParseException(
+                                    "Invalid property " + key + ":" + input + " for type " + type,
+                                    input,
+                                    () ->
+                                            finalType.getProperties().stream()
+                                                    .map(Property::getName)
+                                                    .filter(p -> StringMan.blockStateMatches(input, p))
+                                                    .sorted(StringMan.blockStateComparator(input))
+                                                    .collect(Collectors.toList())
+                            );
                         } else {
-                            throw new SuggestInputParseException("No operator for " + state, "", () -> Collections.singletonList("="));
+                            throw new SuggestInputParseException(
+                                    "No operator for " + state,
+                                    "",
+                                    () -> Collections.singletonList("=")
+                            );
                         }
                     }
                     property = null;
@@ -234,7 +261,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     @Override
-    public BaseBlock apply(BlockVector3 position) {
+    public BaseBlock applyBlock(BlockVector3 position) {
         return this.toBaseBlock();
     }
 
@@ -303,13 +330,13 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             return this;
         }
         BlockState newState = this;
-        for (Property<?> prop: ot.getProperties()) {
+        for (Property<?> prop : ot.getProperties()) {
             PropertyKey key = prop.getKey();
             if (blockType.hasProperty(key)) {
                 newState = newState.with(key, other.getState(key));
             }
         }
-        return this;
+        return newState;
     }
 
     @Override
@@ -319,6 +346,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
         return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
     }
+    //FAWE end
 
     @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
@@ -351,14 +379,23 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         return getState(getBlockType().getProperty(key));
     }
 
+    //FAWE start
+    @Deprecated
     @Override
-    public BaseBlock toBaseBlock(CompoundTag compoundTag) {
+    public CompoundTag getNbtData() {
+        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
+    }
+    //FAWE end
+
+    @Override
+    public BaseBlock toBaseBlock(LazyReference<CompoundBinaryTag> compoundTag) {
         if (compoundTag == null) {
             return toBaseBlock();
         }
         return new BaseBlock(this, compoundTag);
     }
 
+    //FAWE start
     @Override
     public int getInternalId() {
         return internalId;
@@ -370,7 +407,13 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             if (blockType == BlockTypes.__RESERVED__) {
                 return this.material = blockType.getMaterial();
             }
-            this.material = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getMaterial(this);
+            this.material = WorldEdit
+                    .getInstance()
+                    .getPlatformManager()
+                    .queryCapability(Capability.GAME_HOOKS)
+                    .getRegistries()
+                    .getBlockRegistry()
+                    .getMaterial(this);
             if (this.material.hasContainer()) {
                 this.compoundInput = CompoundInput.CONTAINER;
             }
@@ -408,15 +451,12 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     public boolean isAir() {
-        try {
-            return material.isAir();
-        } catch (NullPointerException ignored) {
-            return getMaterial().isAir();
-        }
+        return blockType.getMaterial().isAir();
     }
 
     @Override
     public BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {
         return compoundInput.get(this, input, x, y, z);
     }
+    //FAWE end
 }

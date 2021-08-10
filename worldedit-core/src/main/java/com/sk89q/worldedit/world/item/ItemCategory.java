@@ -57,4 +57,5 @@ public class ItemCategory extends Category<ItemType> implements Keyed {
     public boolean contains(BaseItem baseItem) {
         return this.getAll().contains(baseItem.getType());
     }
+
 }
