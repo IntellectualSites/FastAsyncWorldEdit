@@ -72,6 +72,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
                 "implSpec:a:Implementation Requirements:",
                 "implNote:a:Implementation Note:"
             )
+            options.encoding = "UTF-8"
         }
     }
 
