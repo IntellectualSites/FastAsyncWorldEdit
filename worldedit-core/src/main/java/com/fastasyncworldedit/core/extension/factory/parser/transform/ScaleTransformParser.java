@@ -1,10 +1,10 @@
-package com.sk89q.worldedit.extension.factory.parser.transform;
+package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
-import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.object.extent.ScaleTransform;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.transform.ScaleTransform;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.stream.Stream;
 
 public class ScaleTransformParser extends RichParser<ResettableExtent> {
+
     /**
      * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
      *
@@ -45,4 +46,5 @@ public class ScaleTransformParser extends RichParser<ResettableExtent> {
         }
         return new ScaleTransform(context.requireExtent(), xScale, yScale, zScale);
     }
+
 }

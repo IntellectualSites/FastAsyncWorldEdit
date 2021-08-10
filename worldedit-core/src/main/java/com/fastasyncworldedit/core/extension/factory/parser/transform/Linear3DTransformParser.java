@@ -1,11 +1,10 @@
-package com.sk89q.worldedit.extension.factory.parser.transform;
+package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
-import com.boydti.fawe.object.extent.Linear3DTransform;
-import com.boydti.fawe.object.extent.LinearTransform;
-import com.boydti.fawe.object.extent.RandomTransform;
-import com.boydti.fawe.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.transform.Linear3DTransform;
+import com.fastasyncworldedit.core.extent.transform.RandomTransform;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import org.jetbrains.annotations.NotNull;
@@ -42,4 +41,5 @@ public class Linear3DTransformParser extends RichParser<ResettableExtent> {
         }
         return inner; // TODO what about non-random transforms?
     }
+
 }

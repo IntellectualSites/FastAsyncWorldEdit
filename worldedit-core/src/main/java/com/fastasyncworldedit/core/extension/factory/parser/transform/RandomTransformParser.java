@@ -1,7 +1,7 @@
-package com.sk89q.worldedit.extension.factory.parser.transform;
+package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
-import com.boydti.fawe.object.extent.RandomTransform;
-import com.boydti.fawe.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.transform.RandomTransform;
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -54,4 +54,5 @@ public class RandomTransformParser extends InputParser<ResettableExtent> {
         }
         return randomTransform;
     }
+
 }

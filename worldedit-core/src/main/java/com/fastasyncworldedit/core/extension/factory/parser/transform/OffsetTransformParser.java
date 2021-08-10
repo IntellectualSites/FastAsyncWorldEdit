@@ -1,10 +1,10 @@
-package com.sk89q.worldedit.extension.factory.parser.transform;
+package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
-import com.boydti.fawe.object.extent.OffsetExtent;
-import com.boydti.fawe.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
+import com.fastasyncworldedit.core.extent.OffsetExtent;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -35,12 +35,15 @@ public class OffsetTransformParser extends RichParser<ResettableExtent> {
     @Override
     protected ResettableExtent parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 3) {
-            throw new InputParseException(TranslatableComponent.of("fawe.error.command.syntax",
-                    TextComponent.of("#offset[x][y][z]")));
+            throw new InputParseException(TranslatableComponent.of(
+                    "fawe.error.command.syntax",
+                    TextComponent.of("#offset[x][y][z]")
+            ));
         }
         int xOffset = Integer.parseInt(arguments[0]);
         int yOffset = Integer.parseInt(arguments[1]);
         int zOffset = Integer.parseInt(arguments[2]);
         return new OffsetExtent(context.requireExtent(), xOffset, yOffset, zOffset);
     }
+
 }

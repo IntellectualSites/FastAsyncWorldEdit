@@ -1,9 +1,9 @@
-package com.sk89q.worldedit.extension.factory.parser.transform;
+package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
-import com.boydti.fawe.object.extent.PatternTransform;
-import com.boydti.fawe.object.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.transform.PatternTransform;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -38,4 +38,5 @@ public class PatternTransformParser extends RichParser<ResettableExtent> {
         Pattern pattern = worldEdit.getPatternFactory().parseFromInput(arguments[0], context);
         return new PatternTransform(context.requireExtent(), pattern);
     }
+
 }

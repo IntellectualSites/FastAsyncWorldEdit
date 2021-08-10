@@ -1,11 +1,11 @@
-package com.sk89q.worldedit.extension.factory.parser.transform;
+package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
-import com.boydti.fawe.object.extent.ResettableExtent;
-import com.boydti.fawe.object.extent.TransformExtent;
-import com.boydti.fawe.util.ExtentTraverser;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.TransformExtent;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.sk89q.worldedit.extension.factory.parser.RichParser;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
@@ -61,4 +61,5 @@ public class RotateTransformParser extends RichParser<ResettableExtent> {
         }
         return new BlockTransformExtent(context.requireExtent(), transform);
     }
+
 }
