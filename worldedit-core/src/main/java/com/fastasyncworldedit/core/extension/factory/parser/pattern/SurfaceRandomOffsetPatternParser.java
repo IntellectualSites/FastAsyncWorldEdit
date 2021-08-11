@@ -21,7 +21,7 @@ public class SurfaceRandomOffsetPatternParser extends RichParser<Pattern> {
      * @param worldEdit the worldedit instance.
      */
     public SurfaceRandomOffsetPatternParser(WorldEdit worldEdit) {
-        super(worldEdit, "#solidspread");
+        super(worldEdit, "#surfacespread");
     }
 
     @Override
