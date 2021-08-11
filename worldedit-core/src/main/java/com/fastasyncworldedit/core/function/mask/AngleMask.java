@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.function.mask;
 
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
@@ -22,8 +21,6 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
     protected final int minY;
     protected final int distance;
 
-    protected transient MutableBlockVector3 mutable = new MutableBlockVector3();
-
     public AngleMask(Extent extent, double min, double max, boolean overlay, int distance) {
         super(extent);
         this.mask = new CachedMask(new SolidBlockMask(extent));
@@ -38,7 +35,6 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
 
     @Override
     public void reset() {
-        mutable = new MutableBlockVector3();
         cacheBotX = Integer.MIN_VALUE;
         cacheBotZ = Integer.MIN_VALUE;
         lastX = Integer.MIN_VALUE;

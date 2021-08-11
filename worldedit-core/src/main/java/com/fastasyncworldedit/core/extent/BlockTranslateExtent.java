@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.extent;
 
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -15,7 +14,6 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
     private final int dx;
     private final int dy;
     private final int dz;
-    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public BlockTranslateExtent(Extent extent, int dx, int dy, int dz) {
         super(extent);
@@ -26,15 +24,12 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
-        mutable.mutX(location.getX() + dx);
-        mutable.mutY(location.getY() + dy);
-        mutable.mutZ(location.getZ() + dz);
-        return getExtent().setBlock(mutable, block);
+        return getExtent().setBlock(location.getX() + dx, location.getY() + dy, location.getZ() + dz, block);
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-        return this.setBlock(BlockVector3.at(x, y, z), block);
+        return getExtent().setBlock(x + dx, y + dy, z + dz, block);
     }
 
     @Override

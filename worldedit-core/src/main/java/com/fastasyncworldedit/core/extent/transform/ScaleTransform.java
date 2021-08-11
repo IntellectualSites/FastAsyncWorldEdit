@@ -39,24 +39,22 @@ public class ScaleTransform extends ResettableExtent {
         return super.setExtent(extent);
     }
 
-    private BlockVector3 getPos(BlockVector3 pos) {
+    private void getPos(BlockVector3 pos) {
         if (min == null) {
             min = pos;
         }
         mutable.mutX(min.getX() + (pos.getX() - min.getX()) * dx);
         mutable.mutY(min.getY() + (pos.getY() - min.getY()) * dy);
         mutable.mutZ(min.getZ() + (pos.getZ() - min.getZ()) * dz);
-        return mutable;
     }
 
-    private BlockVector3 getPos(int x, int y, int z) {
+    private void getPos(int x, int y, int z) {
         if (min == null) {
             min = BlockVector3.at(x, y, z);
         }
         mutable.mutX(min.getX() + (x - min.getX()) * dx);
         mutable.mutY(min.getY() + (y - min.getY()) * dy);
         mutable.mutZ(min.getZ() + (z - min.getZ()) * dz);
-        return mutable;
     }
 
 
@@ -64,17 +62,17 @@ public class ScaleTransform extends ResettableExtent {
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
             throws WorldEditException {
         boolean result = false;
-        MutableBlockVector3 pos = new MutableBlockVector3(getPos(location));
-        double sx = pos.getX();
-        double sy = pos.getY();
-        double sz = pos.getZ();
+        getPos(location);
+        double sx = mutable.getX();
+        double sy = mutable.getY();
+        double sz = mutable.getZ();
         double ex = sx + dx;
         double ey = Math.min(maxy, sy + dy);
         double ez = sz + dz;
-        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
-            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
-                    result |= super.setBlock(pos, block);
+        for (mutable.mutY(sy); mutable.getY() < ey; mutable.mutY(mutable.getY() + 1)) {
+            for (mutable.mutZ(sz); mutable.getZ() < ez; mutable.mutZ(mutable.getZ() + 1)) {
+                for (mutable.mutX(sx); mutable.getX() < ex; mutable.mutX(mutable.getX() + 1)) {
+                    result |= super.setBlock(mutable, block);
                 }
             }
         }
@@ -84,17 +82,17 @@ public class ScaleTransform extends ResettableExtent {
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
         boolean result = false;
-        MutableBlockVector3 pos = new MutableBlockVector3(getPos(position));
-        double sx = pos.getX();
-        double sy = pos.getY();
-        double sz = pos.getZ();
+        getPos(position);
+        double sx = mutable.getX();
+        double sy = mutable.getY();
+        double sz = mutable.getZ();
         double ex = sx + dx;
         double ey = Math.min(maxy, sy + dy);
         double ez = sz + dz;
-        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
-            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
-                    result |= super.setBiome(pos, biome);
+        for (mutable.mutY(sy); mutable.getY() < ey; mutable.mutY(mutable.getY() + 1)) {
+            for (mutable.mutZ(sz); mutable.getZ() < ez; mutable.mutZ(mutable.getZ() + 1)) {
+                for (mutable.mutX(sx); mutable.getX() < ex; mutable.mutX(mutable.getX() + 1)) {
+                    result |= super.setBiome(mutable, biome);
                 }
             }
         }
@@ -105,17 +103,17 @@ public class ScaleTransform extends ResettableExtent {
     public <B extends BlockStateHolder<B>> boolean setBlock(int x1, int y1, int z1, B block)
             throws WorldEditException {
         boolean result = false;
-        MutableBlockVector3 pos = new MutableBlockVector3(getPos(x1, y1, z1));
-        double sx = pos.getX();
-        double sy = pos.getY();
-        double sz = pos.getZ();
-        double ex = pos.getX() + dx;
+        getPos(x1, y1, z1);
+        double sx = mutable.getX();
+        double sy = mutable.getY();
+        double sz = mutable.getZ();
+        double ex = mutable.getX() + dx;
         double ey = Math.min(maxy, sy + dy);
-        double ez = pos.getZ() + dz;
-        for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
-            for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
-                for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
-                    result |= super.setBlock(pos, block);
+        double ez = mutable.getZ() + dz;
+        for (mutable.mutY(sy); mutable.getY() < ey; mutable.mutY(mutable.getY() + 1)) {
+            for (mutable.mutZ(sz); mutable.getZ() < ez; mutable.mutZ(mutable.getZ() + 1)) {
+                for (mutable.mutX(sx); mutable.getX() < ex; mutable.mutX(mutable.getX() + 1)) {
+                    result |= super.setBlock(mutable, block);
                 }
             }
         }
@@ -125,8 +123,9 @@ public class ScaleTransform extends ResettableExtent {
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
+        getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         Location newLoc = new Location(location.getExtent(),
-                getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()).toVector3(),
+                mutable.toVector3(),
                 location.getYaw(), location.getPitch()
         );
         return super.createEntity(newLoc, entity);
