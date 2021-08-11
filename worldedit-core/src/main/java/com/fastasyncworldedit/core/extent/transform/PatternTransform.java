@@ -31,8 +31,8 @@ public class PatternTransform extends ResettableExtent {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block)
             throws WorldEditException {
-        BlockVector3 pos = BlockVector3.at(x, y, z);
-        return pattern.apply(extent, pos, pos);
+        BlockVector3 vector3 = BlockVector3.at(x, y, z);
+        return pattern.apply(extent, vector3, vector3);
     }
 
 }

@@ -309,7 +309,6 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     public void forEach(BlockVectorSetVisitor visitor) {
         int size = size();
         int index = -1;
-        BlockVector3 mVec = MutableBlockVector3.get(0, 0, 0);
         for (int i = 0; i < size; i++) {
             index = set.nextSetBit(index + 1);
             int b1 = (index & 0xFF);

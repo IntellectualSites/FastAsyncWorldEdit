@@ -36,9 +36,9 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
 
     private BlockVector3 travel(BlockVector3 pos) {
         cur.setComponents(pos);
+        MutableBlockVector3 next;
         for (int move = 0; move < moves; move++) {
             int index = 0;
-            MutableBlockVector3 next;
             for (int i = 0; i < allowed.length; i++) {
                 next = buffer[i];
                 BlockVector3 dir = BreadthFirstSearch.DIAGONAL_DIRECTIONS[i];

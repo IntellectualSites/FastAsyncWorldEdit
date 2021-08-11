@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.util.collection;
 
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.google.common.collect.AbstractIterator;
 import com.sk89q.worldedit.math.BlockVector3;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -64,18 +65,19 @@ class VectorPositionList implements PositionList {
 
     @Override
     public Iterator<BlockVector3> iterator() {
-        return new AbstractIterator<BlockVector3>() {
+        return new AbstractIterator<>() {
 
             private final IntIterator iteratorX = delegateX.iterator();
             private final IntIterator iteratorY = delegateY.iterator();
             private final IntIterator iteratorZ = delegateZ.iterator();
+            private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
             @Override
             protected BlockVector3 computeNext() {
                 if (!iteratorX.hasNext()) {
                     return endOfData();
                 }
-                return BlockVector3.at(
+                return mutable.setComponents(
                         iteratorX.nextInt(),
                         iteratorY.nextInt(),
                         iteratorZ.nextInt()
@@ -91,13 +93,14 @@ class VectorPositionList implements PositionList {
             private final IntListIterator iteratorX = delegateX.listIterator(delegateX.size());
             private final IntListIterator iteratorY = delegateY.listIterator(delegateY.size());
             private final IntListIterator iteratorZ = delegateZ.listIterator(delegateZ.size());
+            private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
             @Override
             protected BlockVector3 computeNext() {
                 if (!iteratorX.hasPrevious()) {
                     return endOfData();
                 }
-                return BlockVector3.at(
+                return mutable.setComponents(
                         iteratorX.previousInt(),
                         iteratorY.previousInt(),
                         iteratorZ.previousInt()

@@ -342,7 +342,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             int yy = pos.getY() + rely;
             int zz = pos.getZ() + relz;
             if (pasteBiomes) {
-                extent.setBiome(xx, yy, zz, Clipboard.this.getBiome(BlockVector3.at(pos.getX(), pos.getY(), pos.getZ())));
+                extent.setBiome(xx, yy, zz, Clipboard.this.getBiome(pos));
             }
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                 continue;
