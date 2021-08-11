@@ -24,20 +24,12 @@ public class BlockTranslateExtent extends AbstractDelegateExtent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(BlockVector3 location, T block) throws WorldEditException {
-<<<<<<< Updated upstream
-        return getExtent().setBlock(location.getX(), location.getY(), location.getZ(), block);
-=======
         return getExtent().setBlock(location.getX() + dx, location.getY() + dy, location.getZ() + dz, block);
->>>>>>> Stashed changes
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block) throws WorldEditException {
-<<<<<<< Updated upstream
-        return getExtent().setBlock(x, y, z, block);
-=======
         return getExtent().setBlock(x + dx, y + dy, z + dz, block);
->>>>>>> Stashed changes
     }
 
     @Override
