@@ -64,7 +64,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
                 transforms.add(match);
                 continue;
             }
-            parseFromParsers(context, transforms, component, match);
+            parseFromParsers(context, transforms, component);
         }
 
         return getResettableExtent(input, transforms);
@@ -73,9 +73,9 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
     private void parseFromParsers(
             final ParserContext context,
             final List<ResettableExtent> ResettableExtents,
-            final String component,
-            ResettableExtent match
+            final String component
     ) {
+        ResettableExtent match = null;
         for (InputParser<ResettableExtent> parser : getParsers()) {
             match = parser.parseFromInput(component, context);
 
@@ -106,9 +106,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
                 continue;
             }
 
-            ResettableExtent match = null;
-
-            parseFromParsers(context, ResettableExtents, component, match);
+            parseFromParsers(context, ResettableExtents, component);
         }
 
         return getResettableExtent(input, ResettableExtents);

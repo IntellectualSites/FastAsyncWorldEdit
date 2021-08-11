@@ -36,7 +36,6 @@ import com.fastasyncworldedit.core.extension.factory.parser.mask.WallMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.XAxisMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.YAxisMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.ZAxisMaskParser;
-import com.fastasyncworldedit.core.extension.factory.parser.transform.DefaultTransformParser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.mask.AirMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BiomeMaskParser;
@@ -149,7 +148,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
                 masks.add(match);
                 continue;
             }
-            parseFromParsers(context, masks, component, match);
+            parseFromParsers(context, masks, component);
             //FAWE end
         }
 
@@ -160,9 +159,9 @@ public final class MaskFactory extends AbstractFactory<Mask> {
     private void parseFromParsers(
             final ParserContext context,
             final List<Mask> masks,
-            final String component,
-            Mask match
+            final String component
     ) {
+        Mask match = null;
         for (InputParser<Mask> parser : getParsers()) {
             match = parser.parseFromInput(component, context);
 
@@ -173,14 +172,14 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         if (match == null) {
             throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
         }
-        masks.add(match);
+        masks.add(null);
     }
 
     /**
      * Parses a mask without considering parsing through the {@link DefaultMaskParser}, therefore not accepting
      * "richer" parsing where & and , are used. Exists to prevent stack overflows.
      *
-     * @param input input string
+     * @param input   input string
      * @param context input context
      * @return parsed result
      * @throws InputParseException if no result found
@@ -193,9 +192,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
                 continue;
             }
 
-            Mask match = null;
-
-            parseFromParsers(context, masks, component, match);
+            parseFromParsers(context, masks, component);
         }
 
         return getMask(input, masks);

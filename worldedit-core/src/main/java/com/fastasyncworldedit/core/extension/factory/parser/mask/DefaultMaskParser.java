@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.extension.factory.parser.mask;
 
-import com.fastasyncworldedit.core.extension.factory.parser.FaweParser;
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.FaweParser;
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
 import com.fastasyncworldedit.core.function.mask.MaskUnion;
 import com.fastasyncworldedit.core.util.StringMan;
@@ -18,6 +18,7 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.session.request.Request;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import org.enginehub.piston.inject.MemoizingValueAccess;
 import org.enginehub.piston.suggestion.Suggestion;
@@ -83,7 +84,12 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                     }
                     if (char0 == '#') {
                         throw new SuggestInputParseException(
-                                new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full)),
+                                new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
+                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Masks"
+                                ).clickEvent(ClickEvent.of(
+                                        ClickEvent.Action.OPEN_URL,
+                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Masks"
+                                ))),
                                 full,
                                 () -> {
                                     if (full.length() == 1) {

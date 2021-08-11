@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
+import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.FaweParser;
-import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.extent.transform.MultiTransform;
 import com.fastasyncworldedit.core.extent.transform.RandomTransform;
@@ -15,6 +15,7 @@ import com.sk89q.worldedit.extension.input.NoMatchException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.expression.Expression;
+import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,12 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
                         }
                         transform = parseFromInput(command, context);
                     } else {
-                        throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", pe.getFull()));
+                        throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", pe.getFull(),
+                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                        ).clickEvent(ClickEvent.of(
+                                ClickEvent.Action.OPEN_URL,
+                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                        )));
                     }
                 } else {
                     try {
@@ -81,7 +87,12 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {
-                        throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", pe.getFull()));
+                        throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", pe.getFull(),
+                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                        ).clickEvent(ClickEvent.of(
+                                ClickEvent.Action.OPEN_URL,
+                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                        )));
                     }
                 }
                 if (pe.isAnd()) { // &
@@ -128,7 +139,12 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
             intersectionChances.clear();
         }
         if (union.isEmpty()) {
-            throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", input));
+            throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", input,
+                    "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+            ).clickEvent(ClickEvent.of(
+                    ClickEvent.Action.OPEN_URL,
+                    "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+            )));
         } else if (union.size() == 1) {
             return union.get(0);
         } else {
