@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TextureHolder;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
@@ -18,10 +19,10 @@ public class SaturatePattern extends AbstractPattern {
     private final Extent extent;
 
 
-    public SaturatePattern(Extent extent, TextureHolder texture, int color) {
+    public SaturatePattern(Extent extent, TextureHolder texture, int r, int g, int b) {
         this.extent = extent;
         this.holder = texture;
-        this.color = new Color(color).getRGB();
+        this.color = new Color(MathMan.clamp(r, 0, 255), MathMan.clamp(g, 0, 255), MathMan.clamp(b, 0, 255)).getRGB();
     }
 
     @Override

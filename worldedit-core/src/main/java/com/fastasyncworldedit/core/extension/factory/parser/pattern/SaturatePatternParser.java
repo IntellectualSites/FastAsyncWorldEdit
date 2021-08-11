@@ -26,21 +26,25 @@ public class SaturatePatternParser extends RichParser<Pattern> {
 
     @Override
     public Stream<String> getSuggestions(String argumentInput, int index) {
-        if (index == 0) {
-            return SuggestionHelper.suggestPositiveIntegers(argumentInput);
+        if (index > 3) {
+            return Stream.empty();
         }
-        return Stream.empty();
+        return SuggestionHelper.suggestPositiveIntegers(argumentInput);
     }
 
     @Override
     public Pattern parseFromInput(@Nonnull String[] input, ParserContext context) throws InputParseException {
-        if (input.length != 1) {
+        if (input.length != 3) {
             throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",
-                    TextComponent.of(getPrefix() + "[color] (e.g. " + getPrefix() + "[129])")
+                    TextComponent.of(getPrefix() + "[r][g][b] (e.g. " + getPrefix() + "[156][100][0])")
             ));
         }
-        return new SaturatePattern(context.requireExtent(), context.requireSession(), Integer.parseInt(input[0]));
+        return new SaturatePattern(context.requireExtent(), context.requireSession(),
+                Integer.parseInt(input[0]),
+                Integer.parseInt(input[1]),
+                Integer.parseInt(input[2])
+        );
     }
 
 }

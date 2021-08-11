@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.function.pattern;
 
+import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TextureHolder;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
@@ -15,10 +16,10 @@ public class AverageColorPattern extends AbstractExtentPattern {
     private final transient TextureHolder holder;
     private final int color;
 
-    public AverageColorPattern(Extent extent, TextureHolder util, int color) {
+    public AverageColorPattern(Extent extent, TextureHolder util, int r, int g, int b) {
         super(extent);
         this.holder = util;
-        this.color = new Color(color).getRGB();
+        this.color = new Color(MathMan.clamp(r, 0, 255), MathMan.clamp(g, 0, 255), MathMan.clamp(b, 0, 255)).getRGB();
     }
 
     @Override
