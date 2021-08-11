@@ -18,6 +18,8 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     private final int dx;
     private final int dy;
     private final int dz;
+    private final int minY;
+    private final int maxY;
     private final Pattern pattern;
 
     private final int dx2;
@@ -26,25 +28,27 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     private final MutableBlockVector3 mutable;
     private final SplittableRandom r;
 
-    public static boolean[] getTypes() {
-        boolean[] types = new boolean[BlockTypes.size()];
-        for (BlockType type : BlockTypesCache.values) {
-            types[type.getInternalId()] = type.getMaterial().isSolid();
-        }
-        return types;
-    }
-
-    public SolidRandomOffsetPattern(Pattern pattern, int dx, int dy, int dz) {
+    public SolidRandomOffsetPattern(Pattern pattern, int dx, int dy, int dz, int minY, int maxY) {
         this.pattern = pattern;
         this.dx = dx;
         this.dy = dy;
         this.dz = dz;
+        this.minY = minY;
+        this.maxY = maxY;
 
         this.dx2 = dx * 2 + 1;
         this.dy2 = dy * 2 + 1;
         this.dz2 = dz * 2 + 1;
         this.r = new SplittableRandom();
         this.mutable = new MutableBlockVector3();
+    }
+
+    public static boolean[] getTypes() {
+        boolean[] types = new boolean[BlockTypes.size()];
+        for (BlockType type : BlockTypesCache.values) {
+            types[type.getInternalId()] = type.getMaterial().isSolid();
+        }
+        return types;
     }
 
     @Override
@@ -63,6 +67,9 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         mutable.mutX(set.getX() + r.nextInt(dx2) - dx);
         mutable.mutY(set.getY() + r.nextInt(dy2) - dy);
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return false;
+        }
         mutable.mutZ(set.getZ() + r.nextInt(dz2) - dz);
         BaseBlock block = pattern.applyBlock(mutable);
         if (block.getMaterial().isSolid()) {

@@ -11,11 +11,15 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 public class RelativePattern extends AbstractPattern implements ResettablePattern {
 
     private final Pattern pattern;
-    private BlockVector3 origin;
+    private final int minY;
+    private final int maxY;
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
+    private BlockVector3 origin;
 
-    public RelativePattern(Pattern pattern) {
+    public RelativePattern(Pattern pattern, int minY, int maxY) {
         this.pattern = pattern;
+        this.minY = minY;
+        this.maxY = maxY;
     }
 
     @Override
@@ -36,6 +40,9 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         }
         mutable.mutX(set.getX() - origin.getX());
         mutable.mutY(set.getY() - origin.getY());
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return false;
+        }
         mutable.mutZ(set.getZ() - origin.getZ());
         return pattern.apply(extent, get, mutable);
     }

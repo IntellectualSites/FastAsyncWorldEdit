@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.function.pattern.RelativePattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
@@ -40,7 +41,8 @@ public class RelativePatternParser extends RichParser<Pattern> {
             ));
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(input[0], context);
-        return new RelativePattern(inner);
+        Extent extent = context.requireExtent();
+        return new RelativePattern(inner, extent.getMinY(), extent.getMaxY());
     }
 
 }

@@ -7,6 +7,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
@@ -46,7 +47,8 @@ public class SurfaceRandomOffsetPatternParser extends RichParser<Pattern> {
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(arguments[0], context);
         int distance = Integer.parseInt(arguments[1]);
-        return new SurfaceRandomOffsetPattern(inner, distance);
+        Extent extent = context.requireExtent();
+        return new SurfaceRandomOffsetPattern(inner, distance, extent.getMinY(), extent.getMaxY());
     }
 
 }

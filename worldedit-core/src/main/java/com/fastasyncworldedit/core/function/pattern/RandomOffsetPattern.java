@@ -15,6 +15,8 @@ public class RandomOffsetPattern extends AbstractPattern {
     private final int dx;
     private final int dy;
     private final int dz;
+    private final int minY;
+    private final int maxY;
     private final Pattern pattern;
 
     private final transient int dx2;
@@ -23,7 +25,7 @@ public class RandomOffsetPattern extends AbstractPattern {
     private final transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private final transient SplittableRandom r;
 
-    public RandomOffsetPattern(Pattern pattern, int dx, int dy, int dz) {
+    public RandomOffsetPattern(Pattern pattern, int dx, int dy, int dz, int minY, int maxY) {
         this.pattern = pattern;
         this.dx = dx;
         this.dy = dy;
@@ -32,6 +34,8 @@ public class RandomOffsetPattern extends AbstractPattern {
         this.dy2 = dy * 2 + 1;
         this.dz2 = dz * 2 + 1;
         this.r = new SplittableRandom();
+        this.minY = minY;
+        this.maxY = maxY;
 
     }
 
@@ -48,6 +52,9 @@ public class RandomOffsetPattern extends AbstractPattern {
         mutable.mutX((set.getX() + r.nextInt(dx2) - dx));
         mutable.mutY((set.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((set.getZ() + r.nextInt(dz2) - dz));
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return false;
+        }
         return pattern.apply(extent, get, mutable);
     }
 

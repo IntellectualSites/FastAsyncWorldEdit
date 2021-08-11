@@ -7,6 +7,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
@@ -57,7 +58,8 @@ public class RandomOffsetPatternParser extends RichParser<Pattern> {
         } else {
             x = y = z = Integer.parseInt(arguments[1]);
         }
-        return new RandomOffsetPattern(inner, x, y, z);
+        Extent extent = context.requireExtent();
+        return new RandomOffsetPattern(inner, x, y, z, extent.getMinY(), extent.getMaxY());
     }
 
 }

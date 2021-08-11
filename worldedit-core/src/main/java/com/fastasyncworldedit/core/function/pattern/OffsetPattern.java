@@ -13,13 +13,17 @@ public class OffsetPattern extends AbstractPattern {
     private final int dx;
     private final int dy;
     private final int dz;
+    private final int minY;
+    private final int maxY;
     private final transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private final Pattern pattern;
 
-    public OffsetPattern(Pattern pattern, int dx, int dy, int dz) {
+    public OffsetPattern(Pattern pattern, int dx, int dy, int dz, int minY, int maxY) {
         this.dx = dx;
         this.dy = dy;
         this.dz = dz;
+        this.minY = minY;
+        this.maxY = maxY;
         this.pattern = pattern;
     }
 
@@ -35,6 +39,9 @@ public class OffsetPattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         mutable.mutX(get.getX() + dx);
         mutable.mutY(get.getY() + dy);
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return false;
+        }
         mutable.mutZ(get.getZ() + dz);
         return pattern.apply(extent, get, mutable);
     }
