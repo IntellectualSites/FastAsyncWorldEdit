@@ -25,7 +25,7 @@ public class BiomePatternParser extends RichParser<Pattern> {
      * @param worldEdit the worldedit instance.
      */
     public BiomePatternParser(WorldEdit worldEdit) {
-        super(worldEdit, "#biome");
+        super(worldEdit, "#biome", "$");
     }
 
     // overridden to provide $<biome> too

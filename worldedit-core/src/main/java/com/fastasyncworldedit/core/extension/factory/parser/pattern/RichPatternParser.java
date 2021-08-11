@@ -70,7 +70,7 @@ public class RichPatternParser extends FaweParser<Pattern> {
                     if (charPattern && input.charAt(0) == '=') {
                         return parseFromInput(char0 + "[" + input.substring(1) + "]", context);
                     }
-                    if (char0 == '#') {
+                    if (char0 == '#' && command.length() > 1 && command.charAt(1) != '#') {
                         throw new SuggestInputParseException(
                                 new NoMatchException(Caption.of("fawe.error.parse.unknown-pattern", full,
                                         TextComponent
@@ -93,18 +93,9 @@ public class RichPatternParser extends FaweParser<Pattern> {
                         );
                     }
 
-
                     if (charPattern) {
-                        if (char0 == '$') {
-                            String value = command.substring(1) + ((entry.getValue().isEmpty()) ? ""
-                                    : "[" + StringMan.join(entry.getValue(), "][") + "]");
-                            if (value.contains(":")) {
-                                if (value.charAt(0) == ':') {
-                                    value = value.replaceFirst(":", "");
-                                }
-                                value = value.replaceAll(":", "][");
-                            }
-                            pattern = parseFromInput(char0 + "[" + value + "]", context);
+                        if (char0 == '$' || char0 == '^' || char0 == '*' || (char0 == '#' && input.charAt(1) == '#')) {
+                            pattern = worldEdit.getPatternFactory().parseWithoutRich(full, context);
                         }
                     }
                     if (pattern == null) {
