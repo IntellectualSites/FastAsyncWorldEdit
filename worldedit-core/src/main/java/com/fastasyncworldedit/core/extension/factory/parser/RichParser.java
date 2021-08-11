@@ -69,10 +69,20 @@ public abstract class RichParser<E> extends InputParser<E> {
         };
     }
 
+    /**
+     * Gives the default prefix/name of the pattern/mask/transform.
+     *
+     * @return default prefix
+     */
     public String getPrefix() {
         return this.prefixes[0];
     }
 
+    /**
+     * Return all prefix/name aliases of the pattern/mask/transform
+     *
+     * @return all prefix/name aliases
+     */
     public List<String> getAliases() {
         return Arrays.asList(prefixes);
     }

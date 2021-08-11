@@ -11,6 +11,12 @@ public class PatternTransform extends ResettableExtent {
 
     private final Pattern pattern;
 
+    /**
+     * New instance
+     *
+     * @param parent  extent to set to
+     * @param pattern pattern to apply
+     */
     public PatternTransform(Extent parent, Pattern pattern) {
         super(parent);
         this.pattern = pattern;

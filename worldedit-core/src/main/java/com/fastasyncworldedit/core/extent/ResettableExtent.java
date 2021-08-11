@@ -39,7 +39,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
                 && next instanceof ResettableExtent) {
             ((ResettableExtent) next).setExtent(extent);
         } else {
-            new ExtentTraverser(this).setNext(extent);
+            new ExtentTraverser<Extent>(this).setNext(extent);
         }
         return this;
     }

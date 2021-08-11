@@ -23,6 +23,14 @@ public class ScaleTransform extends ResettableExtent {
     private transient int maxy;
     private transient BlockVector3 min;
 
+    /**
+     * New instance
+     *
+     * @param parent extent to set to
+     * @param dx x axis scaling
+     * @param dy y axis scaling
+     * @param dz z axis scaling
+     */
     public ScaleTransform(Extent parent, double dx, double dy, double dz) {
         super(parent);
         this.dx = dx;

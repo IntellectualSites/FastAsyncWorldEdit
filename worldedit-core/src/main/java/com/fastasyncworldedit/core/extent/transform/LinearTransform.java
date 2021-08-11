@@ -9,6 +9,11 @@ public class LinearTransform extends SelectTransform {
     private final ResettableExtent[] extentsArray;
     private int index;
 
+    /**
+     * New instance
+     *
+     * @param extents list of extents to choose from
+     */
     public LinearTransform(ResettableExtent[] extents) {
         this.extentsArray = extents;
     }

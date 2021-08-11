@@ -839,7 +839,7 @@ public final class PlatformCommandManager {
     }
     //FAWE end
 
-    //FAWE start - Event & suggestions
+    //FAWE start - Event & suggestions, make method public
     public MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event, boolean isSuggestions) {
         //FAWE end
         InjectedValueStore store = MapBackedValueStore.create();

@@ -89,7 +89,16 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
         ResettableExtents.add(match);
     }
 
-    public ResettableExtent parseWithoutDefault(String input, ParserContext context) throws InputParseException {
+    /**
+     * Parses a transform without considering parsing through the {@link DefaultTransformParser}, therefore not accepting
+     * "richer" parsing where & and , are used. Exists to prevent stack overflows.
+     *
+     * @param input input string
+     * @param context input context
+     * @return parsed result
+     * @throws InputParseException if no result found
+     */
+    public ResettableExtent parseWithoutRich(String input, ParserContext context) throws InputParseException {
         List<ResettableExtent> ResettableExtents = new ArrayList<>();
 
         for (String component : input.split(" ")) {
@@ -123,7 +132,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
     // TODO is there a better default?
     private static final class NullTransformParser extends InputParser<ResettableExtent> {
 
-        protected NullTransformParser(WorldEdit worldEdit) {
+        private NullTransformParser(WorldEdit worldEdit) {
             super(worldEdit);
         }
 

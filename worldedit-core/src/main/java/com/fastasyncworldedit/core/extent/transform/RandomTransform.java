@@ -29,6 +29,11 @@ public class RandomTransform extends SelectTransform {
         this(new TrueRandom());
     }
 
+    /**
+     * New instance
+     *
+     * @param random {@link SimpleRandom} used to choose between transforms, given weights
+     */
     public RandomTransform(SimpleRandom random) {
         this.random = random;
     }

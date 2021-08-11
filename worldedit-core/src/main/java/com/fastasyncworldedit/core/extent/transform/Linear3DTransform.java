@@ -8,6 +8,11 @@ public class Linear3DTransform extends SelectTransform {
 
     private final ResettableExtent[] extentsArray;
 
+    /**
+     * New instance
+     *
+     * @param extents list of extents to choose from
+     */
     public Linear3DTransform(ResettableExtent[] extents) {
         this.extentsArray = extents;
     }

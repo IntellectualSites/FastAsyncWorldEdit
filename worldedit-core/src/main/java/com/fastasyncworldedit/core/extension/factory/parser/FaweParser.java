@@ -1,9 +1,9 @@
-package com.fastasyncworldedit.core.command;
+package com.fastasyncworldedit.core.extension.factory.parser;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
-import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.internal.registry.InputParser;
 
@@ -19,6 +19,15 @@ public abstract class FaweParser<T> extends InputParser<T> {
         super(worldEdit);
     }
 
+    /**
+     * Parse an input into a list of {@link java.util.Map.Entry} of {@link ParseEntry} and a list of the given arguments, where
+     * arguments are given in square brackets, e.g. {@code #offset[2][10][2]}. Different entries may be separated by , or &
+     * (OR and AND respectively)
+     *
+     * @param toParse the string to parse
+     * @return a list of parsed entries and their arguments
+     * @throws InputParseException if the input is not complete (has dangling characters)
+     */
     public static List<Map.Entry<ParseEntry, List<String>>> parse(String toParse) throws InputParseException {
         List<Map.Entry<ParseEntry, List<String>>> keys = new ArrayList<>();
         List<String> inputs = new ArrayList<>();
@@ -35,7 +44,7 @@ public abstract class FaweParser<T> extends InputParser<T> {
                         inputs.add(result);
                         and.add(c == '&');
                     } else {
-                        throw new InputParseException("Invalid dangling character " + c);
+                        throw new InputParseException(Caption.of("fawe.error.parse.invalid-dangling-character", c));
                     }
                     last = i + 1;
                     continue outer;
@@ -72,20 +81,11 @@ public abstract class FaweParser<T> extends InputParser<T> {
         return keys;
     }
 
-    public PlatformCommandManager getPlatform() {
+    protected PlatformCommandManager getPlatform() {
         return PlatformCommandManager.getInstance();
     }
 
-    public T catchSuggestion(String currentInput, String nextInput, ParserContext context) throws InputParseException {
-        try {
-            return parseFromInput(nextInput, context);
-        } catch (SuggestInputParseException e) {
-            e.prepend(currentInput.substring(0, currentInput.length() - nextInput.length()));
-            throw e;
-        }
-    }
-
-    protected static class ParseEntry {
+    public static class ParseEntry {
 
         private final boolean and;
         private final String input;
@@ -97,14 +97,29 @@ public abstract class FaweParser<T> extends InputParser<T> {
             this.and = type;
         }
 
+        /**
+         * Gives if the parsed entry was appended to the original input as an AND.
+         *
+         * @return if appended to input with '&' rather than ','
+         */
         public boolean isAnd() {
             return and;
         }
 
+        /**
+         * The input "name" e.g. for {@code #offset[2][10][2]}, returns "offset"
+         *
+         * @return input name
+         */
         public String getInput() {
             return input;
         }
 
+        /**
+         * The original full input, including arguments e.g. for {@code #offset[2][10][2]}, returns "#offset[2][10][2]"
+         *
+         * @return original full input
+         */
         public String getFull() {
             return full;
         }

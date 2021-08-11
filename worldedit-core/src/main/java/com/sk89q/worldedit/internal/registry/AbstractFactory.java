@@ -30,7 +30,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -72,6 +71,16 @@ public abstract class AbstractFactory<E> {
         return Collections.unmodifiableList(parsers);
     }
 
+    //FAWE start - javadoc
+    /**
+     * Parse a string and context to each {@link InputParser} added to this factory. If no result found, throws {@link InputParseException}
+     *
+     * @param input input string
+     * @param context input context
+     * @return parsed result
+     * @throws InputParseException if no result found
+     */
+    //FAWE end
     public E parseFromInput(String input, ParserContext context) throws InputParseException {
         E match;
 
@@ -103,6 +112,12 @@ public abstract class AbstractFactory<E> {
         parsers.add(parsers.size() - 1, inputParser);
     }
 
+    /**
+     * Test all parsers to see if alias is contained by one of them
+     *
+     * @param alias alias to test
+     * @return if a parser contains the alias
+     */
     public boolean containsAlias(String alias) {
         return parsers.stream().anyMatch(p -> {
             if (!(p instanceof RichParser)) {

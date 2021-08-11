@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
-import com.fastasyncworldedit.core.command.FaweParser;
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.FaweParser;
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.extent.transform.MultiTransform;
@@ -17,11 +18,18 @@ import com.sk89q.worldedit.internal.expression.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
+/**
+ * Attempts to parse transforms given rich inputs, allowing for & and ,. Also allows for nested transforms
+ */
 public class DefaultTransformParser extends FaweParser<ResettableExtent> {
 
+    /**
+     * New instance
+     *
+     * @param worldEdit {@link WorldEdit} instance.
+     */
     public DefaultTransformParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
@@ -47,7 +55,7 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
             for (Map.Entry<ParseEntry, List<String>> entry : parsed) {
                 ParseEntry pe = entry.getKey();
                 String command = pe.getInput();
-                ResettableExtent transform = null;
+                ResettableExtent transform;
                 double chance = 1;
                 if (command.isEmpty()) {
                     transform = parseFromInput(StringMan.join(entry.getValue(), ','), context);
@@ -65,15 +73,15 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
                         }
                         transform = parseFromInput(command, context);
                     } else {
-                        throw new NoMatchException("See: //transforms");
+                        throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", pe.getFull()));
                     }
                 } else {
                     try {
-                        transform = worldEdit.getTransformFactory().parseWithoutDefault(pe.getFull(), context);
+                        transform = worldEdit.getTransformFactory().parseWithoutRich(pe.getFull(), context);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {
-                        throw new NoMatchException("See: //transforms");
+                        throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", pe.getFull()));
                     }
                 }
                 if (pe.isAnd()) { // &
@@ -82,7 +90,7 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
                 } else {
                     if (!intersection.isEmpty()) {
                         if (intersection.size() == 1) {
-                            throw new InputParseException("Error, floating &");
+                            throw new InputParseException(Caption.of("fawe.error.parse.invalid-dangling-character", "&"));
                         }
                         MultiTransform multi = new MultiTransform();
                         double total = 0;
@@ -101,11 +109,11 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
                 }
             }
         } catch (Throwable e) {
-            throw new InputParseException(e.getMessage(), e);
+            throw new InputParseException(Caption.of(e.getMessage()), e);
         }
         if (!intersection.isEmpty()) {
             if (intersection.size() == 1) {
-                throw new InputParseException("Error, floating &");
+                throw new InputParseException(Caption.of("fawe.error.parse.invalid-dangling-character", "&"));
             }
             MultiTransform multi = new MultiTransform();
             double total = 0;
@@ -120,7 +128,7 @@ public class DefaultTransformParser extends FaweParser<ResettableExtent> {
             intersectionChances.clear();
         }
         if (union.isEmpty()) {
-            throw new NoMatchException("See: //transforms");
+            throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", input));
         } else if (union.size() == 1) {
             return union.get(0);
         } else {

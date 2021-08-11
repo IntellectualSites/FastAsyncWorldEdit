@@ -20,6 +20,7 @@
 package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -242,6 +243,12 @@ public final class WorldEdit {
         return patternFactory;
     }
 
+    /**
+     * Get the transform factory from which new {@link ResettableExtent}s
+     * can be constructed.
+     *
+     * @return the transform factory
+     */
     public TransformFactory getTransformFactory() {
         return transformFactory;
     }

@@ -36,6 +36,7 @@ import com.fastasyncworldedit.core.extension.factory.parser.mask.WallMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.XAxisMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.YAxisMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.ZAxisMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.transform.DefaultTransformParser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.parser.mask.AirMaskParser;
 import com.sk89q.worldedit.extension.factory.parser.mask.BiomeMaskParser;
@@ -175,7 +176,16 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         masks.add(match);
     }
 
-    public Mask parseWithoutDefault(String input, ParserContext context) throws InputParseException {
+    /**
+     * Parses a mask without considering parsing through the {@link DefaultMaskParser}, therefore not accepting
+     * "richer" parsing where & and , are used. Exists to prevent stack overflows.
+     *
+     * @param input input string
+     * @param context input context
+     * @return parsed result
+     * @throws InputParseException if no result found
+     */
+    public Mask parseWithoutRich(String input, ParserContext context) throws InputParseException {
         List<Mask> masks = new ArrayList<>();
 
         for (String component : input.split(" ")) {

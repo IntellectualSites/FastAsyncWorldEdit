@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.extension.factory.parser.mask;
 
-import com.fastasyncworldedit.core.command.FaweParser;
+import com.fastasyncworldedit.core.extension.factory.parser.FaweParser;
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
@@ -29,8 +29,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Attempts to parse masks given rich inputs, allowing for & and ,. Also allows for nested masks
+ */
 public class DefaultMaskParser extends FaweParser<Mask> {
 
+    /**
+     * New instance
+     *
+     * @param worldEdit {@link WorldEdit} instance.
+     */
     public DefaultMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
@@ -75,7 +83,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                     }
                     if (char0 == '#') {
                         throw new SuggestInputParseException(
-                                new NoMatchException("Unknown mask: " + full + ", See: //masks"),
+                                new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full)),
                                 full,
                                 () -> {
                                     if (full.length() == 1) {
@@ -147,7 +155,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                 } else {
                     List<String> args = entry.getValue();
                     try {
-                        mask = worldEdit.getMaskFactory().parseWithoutDefault(full, context);
+                        mask = worldEdit.getMaskFactory().parseWithoutRich(full, context);
                     } catch (SuggestInputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {
@@ -182,7 +190,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
                                 return result;
                             } catch (Throwable e2) {
                                 e2.printStackTrace();
-                                throw new InputParseException(e2.getMessage());
+                                throw new InputParseException(Caption.of(e2.getMessage()));
                             }
                         });
                     }
@@ -196,7 +204,7 @@ public class DefaultMaskParser extends FaweParser<Mask> {
             throw rethrow;
         } catch (Throwable e) {
             e.printStackTrace();
-            throw new InputParseException(e.getMessage(), e);
+            throw new InputParseException(Caption.of(e.getMessage()), e);
         }
         List<Mask> maskUnions = new ArrayList<>();
         for (List<Mask> maskList : masks) {

@@ -13,6 +13,14 @@ public class OffsetTransform extends ResettableExtent {
     private final int dy;
     private final int dz;
 
+    /**
+     * New instance
+     *
+     * @param parent extent to set to
+     * @param dx offset x
+     * @param dy offset y
+     * @param dz offset z
+     */
     public OffsetTransform(Extent parent, int dx, int dy, int dz) {
         super(parent);
         this.dx = dx;

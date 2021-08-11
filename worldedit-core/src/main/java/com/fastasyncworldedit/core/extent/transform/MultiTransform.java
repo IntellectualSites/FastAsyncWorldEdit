@@ -17,6 +17,11 @@ public class MultiTransform extends RandomTransform {
 
     private ResettableExtent[] extents;
 
+    /**
+     * New instance
+     *
+     * @param extents list of extents to set blocks to
+     */
     public MultiTransform(Collection<ResettableExtent> extents) {
         for (ResettableExtent extent : extents) {
             add(extent, 1);

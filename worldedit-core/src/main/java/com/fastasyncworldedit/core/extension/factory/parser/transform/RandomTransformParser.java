@@ -13,6 +13,11 @@ import java.util.stream.Stream;
 
 public class RandomTransformParser extends InputParser<ResettableExtent> {
 
+    /**
+     * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
+     *
+     * @param worldEdit the worldedit instance.
+     */
     public RandomTransformParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
