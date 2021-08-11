@@ -26,7 +26,7 @@ public class BlockVector3ChunkMap<T> implements IAdaptedMap<BlockVector3, T, Sho
         int x = MathMan.untripleBlockCoordX(key);
         int y = MathMan.untripleBlockCoordY(key);
         int z = MathMan.untripleBlockCoordZ(key);
-        return MutableBlockVector3.get(x, y, z);
+        return BlockVector3.at(x, y, z);
     }
 
     @Override

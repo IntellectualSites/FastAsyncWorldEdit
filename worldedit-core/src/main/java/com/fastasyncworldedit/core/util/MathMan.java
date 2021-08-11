@@ -352,8 +352,18 @@ public class MathMan {
         if (str.charAt(0) == '-') {
             if (length == 1) {
                 return false;
+                //VERY basic check for >< int min/max value without spending time trying to parse the int
+            } else if (length > 11) {
+                return false;
+            } else if (length == 11 && str.charAt(0) > '2' && str.charAt(0) > '1') {
+                return false;
             }
             i = 1;
+            //VERY basic check for >< int min/max value without spending time trying to parse the int
+        } else if (length > 10) {
+            return false;
+        } else if (length == 10 && str.charAt(0) > '2' && str.charAt(0) > '1') {
+            return false;
         }
         for (; i < length; i++) {
             char c = str.charAt(i);

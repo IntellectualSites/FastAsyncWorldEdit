@@ -45,9 +45,20 @@ public class PositionTransformExtent extends ResettableExtent {
         return min.add(tmp.roundHalfUp().toBlockPoint());
     }
 
+    private BlockVector3 getPos(int x, int y, int z) {
+        if (min == null) {
+            min = BlockVector3.at(x, y, z);
+        }
+        mutable.mutX(x - min.getX());
+        mutable.mutY(y - min.getY());
+        mutable.mutZ(z - min.getZ());
+        MutableVector3 tmp = new MutableVector3(transform.apply(mutable.toVector3()));
+        return min.add(tmp.roundHalfUp().toBlockPoint());
+    }
+
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return super.getBlock(getPos(BlockVector3.at(x, y, z)));
+        return super.getBlock(getPos(x, y, z));
     }
 
     @Override
@@ -65,12 +76,12 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(position.getBlockY());
-        return super.getBiome(getPos(mutable));
+        return super.getBiome(getPos(mutable.getX(), mutable.getY(), mutable.getZ()));
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
-        return this.setBlock(getPos(BlockVector3.at(x, y, z)), block);
+        return this.setBlock(getPos(x, y, z), block);
     }
 
 
@@ -84,7 +95,7 @@ public class PositionTransformExtent extends ResettableExtent {
         mutable.mutX(position.getBlockX());
         mutable.mutZ(position.getBlockZ());
         mutable.mutY(position.getBlockY());
-        return super.setBiome(getPos(mutable), biome);
+        return super.setBiome(getPos(mutable.getX(), mutable.getY(), mutable.getZ()), biome);
     }
 
     public void setTransform(Transform transform) {

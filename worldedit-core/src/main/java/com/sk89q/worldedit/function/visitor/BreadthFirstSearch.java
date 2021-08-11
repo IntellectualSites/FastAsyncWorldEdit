@@ -64,12 +64,12 @@ public abstract class BreadthFirstSearch implements Operation {
     public static final BlockVector3[] DIAGONAL_DIRECTIONS;
 
     static {
-        DEFAULT_DIRECTIONS[0] = (BlockVector3.at(0, -1, 0));
-        DEFAULT_DIRECTIONS[1] = (BlockVector3.at(0, 1, 0));
-        DEFAULT_DIRECTIONS[2] = (BlockVector3.at(-1, 0, 0));
-        DEFAULT_DIRECTIONS[3] = (BlockVector3.at(1, 0, 0));
-        DEFAULT_DIRECTIONS[4] = (BlockVector3.at(0, 0, -1));
-        DEFAULT_DIRECTIONS[5] = (BlockVector3.at(0, 0, 1));
+        DEFAULT_DIRECTIONS[0] = (BlockVector3.UNIT_MINUS_Y);
+        DEFAULT_DIRECTIONS[1] = (BlockVector3.UNIT_Y);
+        DEFAULT_DIRECTIONS[2] = (BlockVector3.UNIT_MINUS_X);
+        DEFAULT_DIRECTIONS[3] = (BlockVector3.UNIT_X);
+        DEFAULT_DIRECTIONS[4] = (BlockVector3.UNIT_MINUS_Z);
+        DEFAULT_DIRECTIONS[5] = (BlockVector3.UNIT_Z);
         List<BlockVector3> list = new ArrayList<>();
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {

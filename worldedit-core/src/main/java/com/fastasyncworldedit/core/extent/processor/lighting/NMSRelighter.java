@@ -807,6 +807,7 @@ public class NMSRelighter implements Relighter {
         if (current != 0 && current < currentLight) {
             iChunk.setBlockLight(x, y, z, 0);
             if (current > 1) {
+                mutableBlockPos.setComponents(x, y, z);
                 if (!visited.containsKey(mutableBlockPos)) {
                     MutableBlockVector3 index = new MutableBlockVector3(x, y, z);
                     visited.put(index, present);

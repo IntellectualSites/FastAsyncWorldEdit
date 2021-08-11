@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.function.visitor;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.math.IntTriple;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -40,12 +41,12 @@ public abstract class DFSVisitor implements Operation {
         this.hashQueue = new LinkedHashSet<>();
         this.visited = new LinkedHashMap<>();
         this.function = function;
-        this.directions.add(BlockVector3.at(0, -1, 0));
-        this.directions.add(BlockVector3.at(0, 1, 0));
-        this.directions.add(BlockVector3.at(-1, 0, 0));
-        this.directions.add(BlockVector3.at(1, 0, 0));
-        this.directions.add(BlockVector3.at(0, 0, -1));
-        this.directions.add(BlockVector3.at(0, 0, 1));
+        this.directions.add(BlockVector3.UNIT_MINUS_Y);
+        this.directions.add(BlockVector3.UNIT_Y);
+        this.directions.add(BlockVector3.UNIT_MINUS_X);
+        this.directions.add(BlockVector3.UNIT_X);
+        this.directions.add(BlockVector3.UNIT_MINUS_Z);
+        this.directions.add(BlockVector3.UNIT_Z);
         this.maxDepth = maxDepth;
         this.maxBranch = maxBranching;
     }
@@ -76,8 +77,8 @@ public abstract class DFSVisitor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        //        MutableBlockVector3 mutable = new MutableBlockVector3();
-//        MutableBlockVector3 mutable2 = new MutableBlockVector3();
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+        MutableBlockVector3 mutable2 = new MutableBlockVector3();
         IntTriple[] dirs = getIntDirections();
 
         while (!queue.isEmpty()) {
@@ -87,23 +88,18 @@ public abstract class DFSVisitor implements Operation {
             if (visited.containsKey(from)) {
                 continue;
             }
-//            mutable.mutX(from.getX());
-//            mutable.mutY(from.getY());
-//            mutable.mutZ(from.getZ());
-            BlockVector3 bv = BlockVector3.at(from.getX(), from.getY(), from.getZ());
-            function.apply(bv);
+            mutable.mutX(from.getX());
+            mutable.mutY(from.getY());
+            mutable.mutZ(from.getZ());
+            function.apply(mutable);
             int countAdd = 0;
             int countAttempt = 0;
             for (IntTriple direction : dirs) {
-//                mutable2.mutX(from.getX() + direction.x);
-//                mutable2.mutY(from.getY() + direction.y);
-//                mutable2.mutZ(from.getZ() + direction.z);
-                BlockVector3 bv2 = BlockVector3
-                        .at(from.getX() + direction.getX(), from.getY() + direction.getY(),
-                                from.getZ() + direction.getZ()
-                        );
-                if (isVisitable(bv, bv2)) {
-                    Node adjacent = new Node(bv2.getBlockX(), bv2.getBlockY(), bv2.getBlockZ());
+                mutable2.mutX(from.getX() + direction.getX());
+                mutable2.mutY(from.getY() + direction.getY());
+                mutable2.mutZ(from.getZ() + direction.getZ());
+                if (isVisitable(mutable, mutable2)) {
+                    Node adjacent = new Node(mutable2.getBlockX(), mutable2.getBlockY(), mutable2.getBlockZ());
                     if (!adjacent.equals(current.from)) {
                         AtomicInteger adjacentCount = visited.get(adjacent);
                         if (adjacentCount == null) {
