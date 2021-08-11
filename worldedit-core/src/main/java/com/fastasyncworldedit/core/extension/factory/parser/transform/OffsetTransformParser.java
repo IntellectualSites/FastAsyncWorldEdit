@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
 import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
-import com.fastasyncworldedit.core.extent.OffsetExtent;
+import com.fastasyncworldedit.core.extent.transform.OffsetTransform;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
@@ -49,7 +49,7 @@ public class OffsetTransformParser extends RichParser<ResettableExtent> {
         Extent extent;
         extent = arguments.length == 4 ? worldEdit.getTransformFactory().parseFromInput(arguments[3], context) :
                 context.requireExtent();
-        return new OffsetExtent(extent, xOffset, yOffset, zOffset);
+        return new OffsetTransform(extent, xOffset, yOffset, zOffset);
     }
 
 }

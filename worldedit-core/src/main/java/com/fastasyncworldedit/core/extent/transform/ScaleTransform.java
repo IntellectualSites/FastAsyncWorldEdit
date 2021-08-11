@@ -75,6 +75,9 @@ public class ScaleTransform extends ResettableExtent {
         for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
             for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
                 for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+                    if (!getExtent().contains(pos)) {
+                        continue;
+                    }
                     result |= super.setBlock(pos, block);
                 }
             }
@@ -95,6 +98,9 @@ public class ScaleTransform extends ResettableExtent {
         for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
             for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
                 for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+                    if (!getExtent().contains(pos)) {
+                        continue;
+                    }
                     result |= super.setBiome(pos, biome);
                 }
             }
@@ -116,6 +122,9 @@ public class ScaleTransform extends ResettableExtent {
         for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
             for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
                 for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+                    if (!getExtent().contains(pos)) {
+                        continue;
+                    }
                     result |= super.setBlock(pos, block);
                 }
             }
@@ -136,6 +145,9 @@ public class ScaleTransform extends ResettableExtent {
         for (pos.mutY(sy); pos.getY() < ey; pos.mutY(pos.getY() + 1)) {
             for (pos.mutZ(sz); pos.getZ() < ez; pos.mutZ(pos.getZ() + 1)) {
                 for (pos.mutX(sx); pos.getX() < ex; pos.mutX(pos.getX() + 1)) {
+                    if (!getExtent().contains(pos)) {
+                        continue;
+                    }
                     result |= super.setBiome(pos, biome);
                 }
             }
@@ -150,6 +162,9 @@ public class ScaleTransform extends ResettableExtent {
                 getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()).toVector3(),
                 location.getYaw(), location.getPitch()
         );
+        if (!getExtent().contains(newLoc.toBlockPoint())) {
+            return null;
+        }
         return super.createEntity(newLoc, entity);
     }
 
