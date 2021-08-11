@@ -24,14 +24,14 @@ import java.util.Map;
 /**
  * Attempts to parse transforms given rich inputs, allowing for & and ,. Also allows for nested transforms
  */
-public class DefaultTransformParser extends FaweParser<ResettableExtent> {
+public class RichTransformParser extends FaweParser<ResettableExtent> {
 
     /**
      * New instance
      *
      * @param worldEdit {@link WorldEdit} instance.
      */
-    public DefaultTransformParser(WorldEdit worldEdit) {
+    public RichTransformParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 

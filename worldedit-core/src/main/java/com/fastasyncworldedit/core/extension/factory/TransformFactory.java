@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.extension.factory;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.extension.factory.parser.transform.DefaultTransformParser;
+import com.fastasyncworldedit.core.extension.factory.parser.transform.RichTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.Linear3DTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.LinearTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.OffsetTransformParser;
@@ -26,7 +26,7 @@ import java.util.List;
 
 public class TransformFactory extends AbstractFactory<ResettableExtent> {
 
-    private final DefaultTransformParser defaultTransformParser;
+    private final RichTransformParser richTransformParser;
 
     /**
      * Create a new factory.
@@ -36,7 +36,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
     public TransformFactory(WorldEdit worldEdit) {
         super(worldEdit, new NullTransformParser(worldEdit));
 
-        defaultTransformParser = new DefaultTransformParser(worldEdit);
+        richTransformParser = new RichTransformParser(worldEdit);
 
         // split and parse each sub-transform
         register(new RandomTransformParser(worldEdit));
@@ -59,7 +59,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
                 continue;
             }
 
-            ResettableExtent match = defaultTransformParser.parseFromInput(component, context);
+            ResettableExtent match = richTransformParser.parseFromInput(component, context);
             if (match != null) {
                 transforms.add(match);
                 continue;
@@ -90,7 +90,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
     }
 
     /**
-     * Parses a transform without considering parsing through the {@link DefaultTransformParser}, therefore not accepting
+     * Parses a transform without considering parsing through the {@link RichTransformParser}, therefore not accepting
      * "richer" parsing where & and , are used. Exists to prevent stack overflows.
      *
      * @param input input string

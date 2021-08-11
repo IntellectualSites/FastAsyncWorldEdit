@@ -33,14 +33,14 @@ import java.util.stream.Stream;
 /**
  * Attempts to parse masks given rich inputs, allowing for & and ,. Also allows for nested masks
  */
-public class DefaultMaskParser extends FaweParser<Mask> {
+public class RichMaskParser extends FaweParser<Mask> {
 
     /**
      * New instance
      *
      * @param worldEdit {@link WorldEdit} instance.
      */
-    public DefaultMaskParser(WorldEdit worldEdit) {
+    public RichMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 

@@ -22,7 +22,7 @@ package com.sk89q.worldedit.extension.factory;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.AdjacentMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.AngleMaskParser;
-import com.fastasyncworldedit.core.extension.factory.parser.mask.DefaultMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.RichMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.ExtremaMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.FalseMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.LiquidMaskParser;
@@ -73,7 +73,7 @@ import java.util.stream.Collectors;
 public final class MaskFactory extends AbstractFactory<Mask> {
 
     //FAWE start - rich mask parsing
-    private final DefaultMaskParser defaultMaskParser;
+    private final RichMaskParser richMaskParser;
     //FAWE end
 
     /**
@@ -85,7 +85,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         super(worldEdit, new BlocksMaskParser(worldEdit));
 
         //FAWE start - rich mask parsing
-        defaultMaskParser = new DefaultMaskParser(worldEdit);
+        richMaskParser = new RichMaskParser(worldEdit);
         //FAWE end
 
         register(new ExistingMaskParser(worldEdit));
@@ -143,7 +143,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
             }
 
             //FAWE start - rich mask parsing
-            Mask match = defaultMaskParser.parseFromInput(component, context);
+            Mask match = richMaskParser.parseFromInput(component, context);
             if (match != null) {
                 masks.add(match);
                 continue;
@@ -176,7 +176,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
     }
 
     /**
-     * Parses a mask without considering parsing through the {@link DefaultMaskParser}, therefore not accepting
+     * Parses a mask without considering parsing through the {@link RichMaskParser}, therefore not accepting
      * "richer" parsing where & and , are used. Exists to prevent stack overflows.
      *
      * @param input   input string
