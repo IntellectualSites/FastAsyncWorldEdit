@@ -25,6 +25,7 @@ import com.fastasyncworldedit.core.extension.factory.parser.pattern.AverageColor
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.BiomePatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.BufferedPattern2DParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.BufferedPatternParser;
+import com.fastasyncworldedit.core.extension.factory.parser.pattern.ColorPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.DarkenPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.DesaturatePatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.ExistingPatternParser;
@@ -109,6 +110,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         register(new BiomePatternParser(worldEdit));
         register(new BufferedPatternParser(worldEdit));
         register(new BufferedPattern2DParser(worldEdit));
+        register(new ColorPatternParser(worldEdit));
         register(new DarkenPatternParser(worldEdit));
         register(new DesaturatePatternParser(worldEdit));
         register(new ExistingPatternParser(worldEdit));
