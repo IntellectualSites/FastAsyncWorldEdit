@@ -86,9 +86,9 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
                 throw new InputParseException(Caption.of("worldedit.error.parser.clipboard.missing-coordinates"));
             }
             offset = BlockVector3.at(
-                    Integer.valueOf(offsetSplit[0]),
-                    Integer.valueOf(offsetSplit[1]),
-                    Integer.valueOf(offsetSplit[2])
+                    Integer.parseInt(offsetSplit[0]),
+                    Integer.parseInt(offsetSplit[1]),
+                    Integer.parseInt(offsetSplit[2])
             );
         }
 

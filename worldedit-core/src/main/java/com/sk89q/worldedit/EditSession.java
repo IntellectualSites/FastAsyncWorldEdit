@@ -1333,7 +1333,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(pattern);
         checkArgument(radius >= 0, "radius >= 0");
         checkArgument(depth >= 1, "depth >= 1");
-        if (direction.equals(BlockVector3.at(0, -1, 0))) {
+        if (direction.equals(BlockVector3.UNIT_MINUS_Y)) {
             return fillXZ(origin, pattern, radius, depth, false);
         }
         Mask mask = new MaskIntersection(
@@ -2493,29 +2493,36 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int minY = Math.max(getWorld().getMinY(), centerY - height);
         int maxY = Math.min(getWorld().getMaxY(), centerY + height);
 
+        //FAWE start - mutable
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+        MutableBlockVector3 mutable2 = new MutableBlockVector3();
+        //FAWE end
+
         int ceilRadius = (int) Math.ceil(radius);
         for (int x = ox - ceilRadius; x <= ox + ceilRadius; ++x) {
             for (int z = oz - ceilRadius; z <= oz + ceilRadius; ++z) {
-                if ((BlockVector3.at(x, oy, z)).distanceSq(position) > radiusSq) {
+                //FAWE start - mutable
+                if ((mutable.setComponents(x, oy, z)).distanceSq(position) > radiusSq) {
+                    //FAWE end
                     continue;
                 }
 
                 for (int y = maxY; y > minY; --y) {
-                    BlockVector3 pt = BlockVector3.at(x, y, z);
-                    BlockVector3 below = BlockVector3.at(x, y - 1, z);
-                    BlockType id = getBlock(pt).getBlockType();
+                    //FAWE start - mutable
+                    mutable.setComponents(x, y, z);
+                    mutable2.setComponents(x, y - 1, z);
+                    BlockType id = getBlock(mutable).getBlockType();
 
                     if (id == BlockTypes.ICE) {
-                        if (setBlock(pt, water)) {
+                        if (setBlock(mutable, water)) {
                             ++affected;
                         }
                     } else if (id == BlockTypes.SNOW) {
-                        //FAWE start
-                        if (setBlock(pt, air)) {
+                        if (setBlock(mutable, air)) {
                             if (y > 0) {
-                                BlockState block = getBlock(below);
+                                BlockState block = getBlock(mutable2);
                                 if (block.getStates().containsKey(snowy)) {
-                                    if (setBlock(below, block.with(snowy, false))) {
+                                    if (setBlock(mutable2, block.with(snowy, false))) {
                                         affected++;
                                     }
                                 }
@@ -2627,20 +2634,29 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         final int minY = Math.max(getWorld().getMinY(), centerY - height);
         final int maxY = Math.min(getWorld().getMaxY(), centerY + height);
 
+        //FAWE start - mutable
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+        //FAWE end
+
         final int ceilRadius = (int) Math.ceil(radius);
         for (int x = ox - ceilRadius; x <= ox + ceilRadius; ++x) {
             for (int z = oz - ceilRadius; z <= oz + ceilRadius; ++z) {
-                if ((BlockVector3.at(x, oy, z)).distanceSq(position) > radiusSq) {
+                //FAWE start - mutable
+                if (mutable.setComponents(x, oy, z).distanceSq(position) > radiusSq) {
+                    //FAWE end
                     continue;
                 }
 
                 for (int y = maxY; y > minY; --y) {
-                    final BlockVector3 pt = BlockVector3.at(x, y, z);
-                    final BlockState block = getBlock(pt);
+                    //FAWE start - mutable
+                    final BlockState block = getBlock(mutable.mutY(y));
+                    //FAWE end
 
                     if (block.getBlockType() == BlockTypes.DIRT
                             || (!onlyNormalDirt && block.getBlockType() == BlockTypes.COARSE_DIRT)) {
-                        if (setBlock(pt, grass)) {
+                        //FAWE start - mutable
+                        if (setBlock(mutable.mutY(y), grass)) {
+                            //FAWE end
                             ++affected;
                         }
                         break;
@@ -2958,24 +2974,34 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             final int maxY = max.getBlockY();
             final int maxZ = max.getBlockZ();
 
+            //FAWE start - mutable
+            MutableBlockVector3 mutable = new MutableBlockVector3();
+            //FAWE end
+
             for (int x = minX; x <= maxX; ++x) {
                 for (int y = minY; y <= maxY; ++y) {
-                    recurseHollow(region, BlockVector3.at(x, y, minZ), outside, mask);
-                    recurseHollow(region, BlockVector3.at(x, y, maxZ), outside, mask);
+                    //FAWE start - mutable
+                    recurseHollow(region, mutable.setComponents(x, y, minZ), outside, mask);
+                    recurseHollow(region, mutable.setComponents(x, y, maxZ), outside, mask);
+                    //FAWE end
                 }
             }
 
             for (int y = minY; y <= maxY; ++y) {
                 for (int z = minZ; z <= maxZ; ++z) {
-                    recurseHollow(region, BlockVector3.at(minX, y, z), outside, mask);
-                    recurseHollow(region, BlockVector3.at(maxX, y, z), outside, mask);
+                    //FAWE start - mutable
+                    recurseHollow(region, mutable.setComponents(minX, y, z), outside, mask);
+                    recurseHollow(region, mutable.setComponents(maxX, y, z), outside, mask);
+                    //FAWE end
                 }
             }
 
             for (int z = minZ; z <= maxZ; ++z) {
                 for (int x = minX; x <= maxX; ++x) {
-                    recurseHollow(region, BlockVector3.at(x, minY, z), outside, mask);
-                    recurseHollow(region, BlockVector3.at(x, maxY, z), outside, mask);
+                    //FAWE start - mutable
+                    recurseHollow(region, mutable.setComponents(x, minY, z), outside, mask);
+                    recurseHollow(region, mutable.setComponents(x, maxY, z), outside, mask);
+                    //FAWE end
                 }
             }
 
@@ -3035,8 +3061,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int drawLine(Pattern pattern, BlockVector3 pos1, BlockVector3 pos2, double radius, boolean filled, boolean flat)
             throws MaxChangedBlocksException {
 
+        //FAWE start - LocalBlockVectorSet
         LocalBlockVectorSet vset = new LocalBlockVectorSet();
-        //FAWE start
         boolean notdrawn = true;
         //FAWE end
 
@@ -3054,8 +3080,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int dz = Math.abs(z2 - z1);
 
         if (dx + dy + dz == 0) {
-            vset.add(BlockVector3.at(tipx, tipy, tipz));
-            //FAWE start
+            //FAWE start - LocalBlockVectorSet
+            vset.add(tipx, tipy, tipz);
             notdrawn = false;
             //FAWE end
         }
@@ -3069,7 +3095,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 tipy = (int) Math.round(y1 + domstep * (double) dy / (double) dx * (y2 - y1 > 0 ? 1 : -1));
                 tipz = (int) Math.round(z1 + domstep * (double) dz / (double) dx * (z2 - z1 > 0 ? 1 : -1));
 
-                vset.add(BlockVector3.at(tipx, tipy, tipz));
+                //FAWE start - LocalBlockVectorSet
+                vset.add(tipx, tipy, tipz);
+                //FAWE end
             }
             //FAWE start - notdrawn
         } else if (dMax == dy && notdrawn) {
@@ -3079,7 +3107,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 tipx = (int) Math.round(x1 + domstep * (double) dx / (double) dy * (x2 - x1 > 0 ? 1 : -1));
                 tipz = (int) Math.round(z1 + domstep * (double) dz / (double) dy * (z2 - z1 > 0 ? 1 : -1));
 
-                vset.add(BlockVector3.at(tipx, tipy, tipz));
+                //FAWE start - LocalBlockVectorSet
+                vset.add(tipx, tipy, tipz);
+                //FAWE end
             }
             //FAWE start - notdrawn
         } else if (dMax == dz && notdrawn) {
@@ -3089,7 +3119,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 tipy = (int) Math.round(y1 + domstep * (double) dy / (double) dz * (y2 - y1 > 0 ? 1 : -1));
                 tipx = (int) Math.round(x1 + domstep * (double) dx / (double) dz * (x2 - x1 > 0 ? 1 : -1));
 
-                vset.add(BlockVector3.at(tipx, tipy, tipz));
+                //FAWE start - LocalBlockVectorSet
+                vset.add(tipx, tipy, tipz);
+                //FAWE end
             }
         }
         //FAWE start - set BV3
@@ -3457,6 +3489,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         final Set<BlockVector2> chunks = region.getChunks();
         MutableBlockVector3 mutable = new MutableBlockVector3();
+        MutableBlockVector3 mutable2 = new MutableBlockVector3();
         MutableBlockVector2 mutable2D = new MutableBlockVector2();
         for (BlockVector2 chunk : chunks) {
             final int cx = chunk.getBlockX();
@@ -3493,13 +3526,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 }
             } else {
                 if (!conNextX) {
-                    setExistingBlocks(BlockVector3.at(bx + 16, 0, bz), BlockVector3.at(bx + 31, maxY, bz + 15));
+                    setExistingBlocks(mutable.setComponents(bx + 16, 0, bz), mutable2.setComponents(bx + 31, maxY, bz + 15));
                 }
                 if (!conNextZ) {
-                    setExistingBlocks(BlockVector3.at(bx, 0, bz + 16), BlockVector3.at(bx + 15, maxY, bz + 31));
+                    setExistingBlocks(mutable.setComponents(bx, 0, bz + 16), mutable2.setComponents(bx + 15, maxY, bz + 31));
                 }
                 if (!chunks.contains(mutable2D.setComponents(cx + 1, cz + 1)) && !conNextX && !conNextZ) {
-                    setExistingBlocks(BlockVector3.at(bx + 16, 0, bz + 16), BlockVector3.at(bx + 31, maxY, bz + 31));
+                    setExistingBlocks(mutable.setComponents(bx + 16, 0, bz + 16), mutable2.setComponents(bx + 31, maxY, bz + 31));
                 }
                 for (int x = 0; x < 16; x++) {
                     int xx = x + bx;

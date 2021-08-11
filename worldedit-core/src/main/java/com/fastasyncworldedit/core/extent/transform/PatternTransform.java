@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent.transform;
 
 import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -10,6 +11,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 public class PatternTransform extends ResettableExtent {
 
     private final Pattern pattern;
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
     public PatternTransform(Extent parent, Pattern pattern) {
         super(parent);
@@ -22,4 +24,14 @@ public class PatternTransform extends ResettableExtent {
         return pattern.apply(getExtent(), location, location);
     }
 
+<<<<<<< Updated upstream
+=======
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block)
+            throws WorldEditException {
+        mutable.setComponents(x, y, z);
+        return pattern.apply(extent, mutable, mutable);
+    }
+
+>>>>>>> Stashed changes
 }

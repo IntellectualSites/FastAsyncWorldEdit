@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -25,6 +26,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class HistoryExtent extends AbstractDelegateExtent {
 
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private AbstractChangeSet changeSet;
 
     /**
@@ -97,7 +99,7 @@ public class HistoryExtent extends AbstractDelegateExtent {
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType newBiome) {
         BiomeType oldBiome = this.getBiome(position);
-        if (oldBiome.getId() != newBiome.getId()) {
+        if (!oldBiome.getId().equals(newBiome.getId())) {
             this.changeSet.addBiomeChange(position.getBlockX(), position.getBlockY(), position.getBlockZ(), oldBiome, newBiome);
             return getExtent().setBiome(position, newBiome);
         } else {
@@ -107,8 +109,8 @@ public class HistoryExtent extends AbstractDelegateExtent {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType newBiome) {
-        BiomeType oldBiome = this.getBiome(BlockVector3.at(x, y, z));
-        if (oldBiome.getId() != newBiome.getId()) {
+        BiomeType oldBiome = this.getBiome(mutable.setComponents(x, y, z));
+        if (!oldBiome.getId().equals(newBiome.getId())) {
             this.changeSet.addBiomeChange(x, y, z, oldBiome, newBiome);
             return getExtent().setBiome(x, y, z, newBiome);
         } else {

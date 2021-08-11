@@ -213,11 +213,13 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY, Mask filter) {
-        maxY = Math.min(maxY, getMaxY());
-        minY = Math.max(getMinY(), minY);
-        BlockVector3 pos = MutableBlockVector3.at(x, minY, z);
+        maxY = Math.min(maxY, Math.max(0, maxY));
+        minY = Math.max(0, minY);
+
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+
         for (int y = maxY; y >= minY; --y) {
-            if (filter.test(pos.mutY(y))) {
+            if (filter.test(mutable.setComponents(x, y, z))) {
                 return y;
             }
         }
