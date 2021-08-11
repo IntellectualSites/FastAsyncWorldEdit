@@ -18,7 +18,7 @@ public class SaturatePattern extends AbstractPattern {
     private final Extent extent;
 
 
-    public SaturatePattern(Extent extent, int color, TextureHolder texture) {
+    public SaturatePattern(Extent extent, TextureHolder texture, int color) {
         this.extent = extent;
         this.holder = texture;
         this.color = new Color(color).getRGB();

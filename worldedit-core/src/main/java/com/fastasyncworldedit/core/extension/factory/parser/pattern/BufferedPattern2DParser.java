@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 
-import com.fastasyncworldedit.core.function.pattern.BufferedPattern;
+import com.fastasyncworldedit.core.function.pattern.BufferedPattern2D;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -12,16 +12,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class BufferedPatternParser extends SimpleInputParser<Pattern> {
+public class BufferedPattern2DParser extends SimpleInputParser<Pattern> {
 
-    private static final List<String> aliases = Collections.singletonList("#buffer");
+    private static final List<String> aliases = Collections.singletonList("#buffer2d");
 
     /**
      * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
      *
      * @param worldEdit the worldedit instance.
      */
-    public BufferedPatternParser(WorldEdit worldEdit) {
+    public BufferedPattern2DParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
 
@@ -38,7 +38,7 @@ public class BufferedPatternParser extends SimpleInputParser<Pattern> {
     @Override
     public Pattern parseFromSimpleInput(@Nonnull String input, ParserContext context) throws InputParseException {
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(input, context);
-        return new BufferedPattern(context.requireActor(), inner);
+        return new BufferedPattern2D(context.requireActor(), inner);
     }
 
 }

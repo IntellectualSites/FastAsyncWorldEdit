@@ -18,16 +18,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RandomFullClipboardPattern extends AbstractPattern {
 
-    private final Extent extent;
     private final List<ClipboardHolder> clipboards;
     private final boolean randomRotate;
     private final boolean randomFlip;
     private final Vector3 flipVector = Vector3.at(1, 0, 0).multiply(-2).add(1, 1, 1);
 
-    public RandomFullClipboardPattern(Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate, boolean randomFlip) {
+    public RandomFullClipboardPattern(List<ClipboardHolder> clipboards, boolean randomRotate, boolean randomFlip) {
         checkNotNull(clipboards);
         this.clipboards = clipboards;
-        this.extent = extent;
         this.randomRotate = randomRotate;
         this.randomFlip = randomFlip;
     }

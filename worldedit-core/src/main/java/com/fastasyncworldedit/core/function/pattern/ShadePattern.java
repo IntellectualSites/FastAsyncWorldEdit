@@ -16,7 +16,7 @@ public class ShadePattern extends AbstractPattern {
     private final Extent extent;
     private final boolean darken;
 
-    public ShadePattern(Extent extent, boolean darken, TextureUtil util) {
+    public ShadePattern(Extent extent, TextureUtil util, boolean darken) {
         checkNotNull(extent);
         this.extent = extent;
         this.util = util;

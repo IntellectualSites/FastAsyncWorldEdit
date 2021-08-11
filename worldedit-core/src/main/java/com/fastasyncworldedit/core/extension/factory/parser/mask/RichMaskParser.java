@@ -117,7 +117,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                                         ) + "]");
                                 if (value.contains(":")) {
                                     if (value.charAt(0) == ':') {
-                                        value.replaceFirst(":", "");
+                                        value = value.replaceFirst(":", "");
                                     }
                                     value = value.replaceAll(":", "][");
                                 }

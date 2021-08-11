@@ -15,7 +15,7 @@ public class AverageColorPattern extends AbstractExtentPattern {
     private final transient TextureHolder holder;
     private final int color;
 
-    public AverageColorPattern(Extent extent, int color, TextureHolder util) {
+    public AverageColorPattern(Extent extent, TextureHolder util, int color) {
         super(extent);
         this.holder = util;
         this.color = new Color(color).getRGB();

@@ -139,6 +139,8 @@
     "fawe.error.parse.invalid-dangling-character": "Invalid dangling character {0}.",
     "fawe.error.parse.unknown-mask": "Unknown mask: {0}, See: {1}",
     "fawe.error.parse.unknown-transform": "Unknown transform: {0}, See: {1}",
+    "fawe.error.parse.no-clipboard": "To use {0}, please first copy something to your clipboard",
+    "fawe.error.parse.no-clipboard-source": "No clipboards found at given source: {0}",
 
     "fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {0}",
