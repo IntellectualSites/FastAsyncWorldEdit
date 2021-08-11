@@ -18,6 +18,7 @@ import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.session.request.Request;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import org.enginehub.piston.inject.MemoizingValueAccess;
@@ -86,11 +87,13 @@ public class RichMaskParser extends FaweParser<Mask> {
                     if (char0 == '#') {
                         throw new SuggestInputParseException(
                                 new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
-                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Masks"
-                                ).clickEvent(ClickEvent.of(
-                                        ClickEvent.Action.OPEN_URL,
-                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Masks"
-                                ))),
+                                        TextComponent
+                                                .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                )
+                                                .clickEvent(ClickEvent.openUrl(
+                                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                ))
+                                )),
                                 full,
                                 () -> {
                                     if (full.length() == 1) {

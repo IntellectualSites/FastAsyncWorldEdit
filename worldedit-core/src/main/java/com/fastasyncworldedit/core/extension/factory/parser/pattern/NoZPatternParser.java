@@ -1,21 +1,18 @@
 package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 
+import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.function.pattern.NoZPattern;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import com.sk89q.worldedit.internal.registry.SimpleInputParser;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
-public class NoZPatternParser extends SimpleInputParser<Pattern> {
-
-    private static final List<String> aliases = Arrays.asList("#!z", "#nz", "#noz");
+public class NoZPatternParser extends RichParser<Pattern> {
 
     /**
      * Create a new rich parser with a defined prefix for the result, e.g. {@code #simplex}.
@@ -23,22 +20,26 @@ public class NoZPatternParser extends SimpleInputParser<Pattern> {
      * @param worldEdit the worldedit instance.
      */
     public NoZPatternParser(WorldEdit worldEdit) {
-        super(worldEdit);
+        super(worldEdit, "#!z", "#nz", "#noz");
     }
 
     @Override
-    public List<String> getMatchedAliases() {
-        return aliases;
+    public Stream<String> getSuggestions(String argumentInput, int index) {
+        if (index == 0) {
+            return this.worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
+        }
+        return Stream.empty();
     }
 
     @Override
-    public Stream<String> getSuggestions(String argumentInput) {
-        return this.worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
-    }
-
-    @Override
-    public Pattern parseFromSimpleInput(@Nonnull String input, ParserContext context) throws InputParseException {
-        Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(input, context);
+    public Pattern parseFromInput(@Nonnull String[] input, ParserContext context) throws InputParseException {
+        if (input.length != 1) {
+            throw new InputParseException(Caption.of(
+                    "fawe.error.command.syntax",
+                    TextComponent.of(getPrefix() + "[pattern] (e.g. " + getPrefix() + "[stone,dirt])")
+            ));
+        }
+        Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(input[0], context);
         return new NoZPattern(inner);
     }
 

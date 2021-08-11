@@ -16,6 +16,7 @@ import com.sk89q.worldedit.function.pattern.RandomPattern;
 import com.sk89q.worldedit.internal.command.CommandArgParser;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.util.Substring;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.enginehub.piston.inject.MemoizingValueAccess;
@@ -72,11 +73,14 @@ public class RichPatternParser extends FaweParser<Pattern> {
                     if (char0 == '#') {
                         throw new SuggestInputParseException(
                                 new NoMatchException(Caption.of("fawe.error.parse.unknown-pattern", full,
-                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
-                                ).clickEvent(ClickEvent.of(
-                                        ClickEvent.Action.OPEN_URL,
-                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
-                                ))),
+                                        TextComponent
+                                                .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                )
+                                                .clickEvent(
+                                                        ClickEvent.openUrl(
+                                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                        ))
+                                )),
                                 full,
                                 () -> {
                                     if (full.length() == 1) {
@@ -124,11 +128,14 @@ public class RichPatternParser extends FaweParser<Pattern> {
                                     pattern = worldEdit.getBlockFactory().parseFromInput(pe.getFull(), context);
                                 } catch (NoMatchException e) {
                                     throw new NoMatchException(Caption.of("fawe.error.parse.unknown-pattern", full,
-                                            "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
-                                    ).clickEvent(ClickEvent.of(
-                                            ClickEvent.Action.OPEN_URL,
-                                            "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
-                                    )));
+                                            TextComponent
+                                                    .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                    )
+                                                    .clickEvent(
+                                                            com.sk89q.worldedit.util.formatting.text.event.ClickEvent.openUrl(
+                                                                    "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                            ))
+                                    ));
                                 }
                             }
                         }
