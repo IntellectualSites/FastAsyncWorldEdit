@@ -2079,7 +2079,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int px = mutableBlockVector3.getBlockX();
         int py = mutableBlockVector3.getBlockY();
         int pz = mutableBlockVector3.getBlockZ();
-        MutableBlockVector3 mutable = new MutableBlockVector3();
 
         final int ceilRadiusX = (int) Math.ceil(radiusX);
         final int ceilRadiusZ = (int) Math.ceil(radiusZ);
@@ -2122,10 +2121,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     }
 
                     for (int y = 0; y < height; ++y) {
-                        this.setBlock(mutable.setComponents(px + x, py + y, pz + z), block);
-                        this.setBlock(mutable.setComponents(px - x, py + y, pz + z), block);
-                        this.setBlock(mutable.setComponents(px + x, py + y, pz - z), block);
-                        this.setBlock(mutable.setComponents(px - x, py + y, pz - z), block);
+                        this.setBlock(mutableBlockVector3.setComponents(px + x, py + y, pz + z), block);
+                        this.setBlock(mutableBlockVector3.setComponents(px - x, py + y, pz + z), block);
+                        this.setBlock(mutableBlockVector3.setComponents(px + x, py + y, pz - z), block);
+                        this.setBlock(mutableBlockVector3.setComponents(px - x, py + y, pz - z), block);
                     }
                 }
             }
@@ -2158,10 +2157,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
                     for (int y = 0; y < height; ++y) {
                         //FAWE start - mutable
-                        this.setBlock(mutable.setComponents(px + x, py + y, pz + z), block);
-                        this.setBlock(mutable.setComponents(px - x, py + y, pz + z), block);
-                        this.setBlock(mutable.setComponents(px + x, py + y, pz - z), block);
-                        this.setBlock(mutable.setComponents(px - x, py + y, pz - z), block);
+                        this.setBlock(mutableBlockVector3.setComponents(px + x, py + y, pz + z), block);
+                        this.setBlock(mutableBlockVector3.setComponents(px - x, py + y, pz + z), block);
+                        this.setBlock(mutableBlockVector3.setComponents(px + x, py + y, pz - z), block);
+                        this.setBlock(mutableBlockVector3.setComponents(px - x, py + y, pz - z), block);
                         //FAWE end
                     }
                 }

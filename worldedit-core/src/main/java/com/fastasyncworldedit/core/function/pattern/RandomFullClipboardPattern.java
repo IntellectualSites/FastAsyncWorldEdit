@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.function.pattern;
 
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -20,10 +19,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class RandomFullClipboardPattern extends AbstractPattern {
 
     private final Extent extent;
-    private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private final List<ClipboardHolder> clipboards;
     private final boolean randomRotate;
     private final boolean randomFlip;
+    private final Vector3 flipVector = Vector3.at(1, 0, 0).multiply(-2).add(1, 1, 1);
 
     public RandomFullClipboardPattern(Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate, boolean randomFlip) {
         checkNotNull(clipboards);
@@ -42,7 +41,7 @@ public class RandomFullClipboardPattern extends AbstractPattern {
             holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
         }
         if (randomFlip) {
-            transform = transform.scale(Vector3.at(1, 0, 0).multiply(-2).add(1, 1, 1));
+            transform = transform.scale(flipVector);
         }
         if (!transform.isIdentity()) {
             holder.setTransform(transform);
