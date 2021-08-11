@@ -172,7 +172,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         if (match == null) {
             throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
         }
-        masks.add(null);
+        masks.add(match);
     }
 
     /**

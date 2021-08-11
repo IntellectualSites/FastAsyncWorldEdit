@@ -42,7 +42,7 @@ public class MaskedPatternParser extends RichParser<Pattern> {
         if (arguments.length != 3) {
             throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",
-                    TextComponent.of(getPrefix() + "[pattern] (e.g. " + getPrefix() + "[oak_planks][dirt][stone])")
+                    TextComponent.of(getPrefix() + "[mask][pattern][pattern] (e.g. " + getPrefix() + "[oak_planks][dirt][stone])")
             ));
         }
         Mask mask = this.worldEdit.getMaskFactory().parseFromInput(arguments[0], context);

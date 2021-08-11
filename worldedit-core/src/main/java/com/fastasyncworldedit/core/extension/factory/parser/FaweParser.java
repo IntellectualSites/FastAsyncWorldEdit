@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public abstract class FaweParser<T> extends InputParser<T> {
+public abstract class FaweParser<T> extends InputParser<T> implements AliasedParser {
 
     protected FaweParser(WorldEdit worldEdit) {
         super(worldEdit);

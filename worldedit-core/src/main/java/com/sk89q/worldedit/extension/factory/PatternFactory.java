@@ -174,7 +174,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
         if (match == null) {
             throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
         }
-        patterns.add(null);
+        patterns.add(match);
     }
 
     /**

@@ -19,11 +19,11 @@
 
 package com.sk89q.worldedit.internal.registry;
 
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
@@ -32,18 +32,11 @@ import java.util.stream.Stream;
  *
  * @param <E> the element
  */
-public abstract class SimpleInputParser<E> extends InputParser<E> {
+public abstract class SimpleInputParser<E> extends InputParser<E> implements AliasedParser {
 
     protected SimpleInputParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
-
-    /**
-     * The strings this parser matches.
-     *
-     * @return the matching aliases
-     */
-    public abstract List<String> getMatchedAliases();
 
     @Override
     public E parseFromInput(String input, ParserContext context) throws InputParseException {

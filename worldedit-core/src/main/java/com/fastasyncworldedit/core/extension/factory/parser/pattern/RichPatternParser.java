@@ -22,6 +22,7 @@ import org.enginehub.piston.inject.MemoizingValueAccess;
 import org.enginehub.piston.suggestion.Suggestion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -197,6 +198,11 @@ public class RichPatternParser extends FaweParser<Pattern> {
             random.add(patterns.get(i), chances.get(i));
         }
         return random;
+    }
+
+    @Override
+    public List<String> getMatchedAliases() {
+        return Collections.emptyList();
     }
 
 }

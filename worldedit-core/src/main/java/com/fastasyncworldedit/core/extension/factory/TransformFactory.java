@@ -72,7 +72,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
 
     private void parseFromParsers(
             final ParserContext context,
-            final List<ResettableExtent> ResettableExtents,
+            final List<ResettableExtent> transforms,
             final String component
     ) {
         ResettableExtent match = null;
@@ -86,7 +86,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
         if (match == null) {
             throw new NoMatchException(Caption.of("worldedit.error.no-match", TextComponent.of(component)));
         }
-        ResettableExtents.add(match);
+        transforms.add(match);
     }
 
     /**
@@ -99,17 +99,17 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
      * @throws InputParseException if no result found
      */
     public ResettableExtent parseWithoutRich(String input, ParserContext context) throws InputParseException {
-        List<ResettableExtent> ResettableExtents = new ArrayList<>();
+        List<ResettableExtent> transforms = new ArrayList<>();
 
         for (String component : input.split(" ")) {
             if (component.isEmpty()) {
                 continue;
             }
 
-            parseFromParsers(context, ResettableExtents, component);
+            parseFromParsers(context, transforms, component);
         }
 
-        return getResettableExtent(input, ResettableExtents);
+        return getResettableExtent(input, transforms);
     }
 
     private ResettableExtent getResettableExtent(final String input, final List<ResettableExtent> transforms) {

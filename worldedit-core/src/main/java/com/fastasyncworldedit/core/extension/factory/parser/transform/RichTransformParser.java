@@ -18,6 +18,7 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -156,5 +157,10 @@ public class RichTransformParser extends FaweParser<ResettableExtent> {
         }
     }
 
+
+    @Override
+    public List<String> getMatchedAliases() {
+        return Collections.emptyList();
+    }
 
 }

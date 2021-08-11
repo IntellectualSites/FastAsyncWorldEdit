@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  *
  * @param <E> the parse result.
  */
-public abstract class RichParser<E> extends InputParser<E> {
+public abstract class RichParser<E> extends InputParser<E> implements AliasedParser {
 
     private final String[] prefixes;
 
@@ -83,7 +83,7 @@ public abstract class RichParser<E> extends InputParser<E> {
      *
      * @return all prefix/name aliases
      */
-    public List<String> getAliases() {
+    public List<String> getMatchedAliases() {
         return Arrays.asList(prefixes);
     }
 
@@ -154,7 +154,7 @@ public abstract class RichParser<E> extends InputParser<E> {
                 }
             }
         }
-        if (!requireClosing)
+        if (!requireClosing) {
             if (open > 0) {
                 arguments.add(input.substring(openIndex + 1));
             } else {
@@ -163,6 +163,7 @@ public abstract class RichParser<E> extends InputParser<E> {
                     arguments.add(input.substring(last));
                 }
             }
+        }
         if (requireClosing && open != 0) {
             throw new InputParseException(Caption.of("fawe.error.invalid-bracketing", TextComponent.of("'[' or ']'?")));
         }
