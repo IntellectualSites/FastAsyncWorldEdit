@@ -47,7 +47,6 @@ import java.util.zip.ZipFile;
 
 import static org.apache.logging.log4j.LogManager.getLogger;
 
-// TODO FIXME
 public class TextureUtil implements TextureHolder {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
