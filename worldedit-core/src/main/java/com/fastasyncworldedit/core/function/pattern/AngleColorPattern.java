@@ -9,6 +9,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class AngleColorPattern extends AnglePattern {
 
@@ -62,7 +63,13 @@ public class AngleColorPattern extends AnglePattern {
         if (slope == -1) {
             return block;
         }
-        int color = holder.getTextureUtil().getColor(block.getBlockType());
+        BlockType type = block.getBlockType();
+        int color;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            color = holder.getTextureUtil().getColor(extent.getBiome(position));
+        } else {
+            color = holder.getTextureUtil().getColor(type);
+        }
         if (color == 0) {
             return block;
         }
@@ -77,7 +84,13 @@ public class AngleColorPattern extends AnglePattern {
         if (slope == -1) {
             return false;
         }
-        int color = holder.getTextureUtil().getColor(block.getBlockType());
+        BlockType type = block.getBlockType();
+        int color;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            color = holder.getTextureUtil().getColor(extent.getBiome(get));
+        } else {
+            color = holder.getTextureUtil().getColor(type);
+        }
         if (color == 0) {
             return false;
         }

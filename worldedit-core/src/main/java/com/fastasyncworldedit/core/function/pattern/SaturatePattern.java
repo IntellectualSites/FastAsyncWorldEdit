@@ -10,6 +10,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.awt.Color;
 
@@ -38,24 +39,34 @@ public class SaturatePattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        BlockType block = extent.getBlock(position).getBlockType();
+        BlockType type = extent.getBlock(position).getBlockType();
         TextureUtil util = holder.getTextureUtil();
-        int currentColor = util.getColor(block);
+        int currentColor;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            currentColor = holder.getTextureUtil().getColor(extent.getBiome(position));
+        } else {
+            currentColor = holder.getTextureUtil().getColor(type);
+        }
         int newColor = util.multiplyColor(currentColor, color);
         return util.getNearestBlock(newColor).getDefaultState().toBaseBlock();
     }
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        BlockType block = get.getBlock(extent).getBlockType();
+        BlockType type = get.getBlock(extent).getBlockType();
         TextureUtil util = holder.getTextureUtil();
-        int currentColor = util.getColor(block);
+        int currentColor;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            currentColor = holder.getTextureUtil().getColor(extent.getBiome(get));
+        } else {
+            currentColor = holder.getTextureUtil().getColor(type);
+        }
         if (currentColor == 0) {
             return false;
         }
         int newColor = util.multiplyColor(currentColor, color);
         BlockType newBlock = util.getNearestBlock(newColor);
-        if (newBlock.equals(block)) {
+        if (newBlock.equals(type)) {
             return false;
         }
         return set.setBlock(extent, newBlock.getDefaultState());

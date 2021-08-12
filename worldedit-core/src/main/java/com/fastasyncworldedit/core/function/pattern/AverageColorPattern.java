@@ -9,6 +9,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.awt.Color;
 
@@ -38,7 +39,13 @@ public class AverageColorPattern extends AbstractExtentPattern {
     public BaseBlock applyBlock(BlockVector3 position) {
         BaseBlock block = getExtent().getFullBlock(position);
         TextureUtil util = holder.getTextureUtil();
-        int currentColor = util.getColor(block.getBlockType());
+        BlockType type = block.getBlockType();
+        int currentColor;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            currentColor = holder.getTextureUtil().getColor(getExtent().getBiome(position));
+        } else {
+            currentColor = holder.getTextureUtil().getColor(type);
+        }
         int newColor = util.averageColor(currentColor, color);
         return util.getNearestBlock(newColor).getDefaultState().toBaseBlock();
     }
@@ -47,7 +54,12 @@ public class AverageColorPattern extends AbstractExtentPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockType blockType = get.getBlock(extent).getBlockType();
         TextureUtil util = holder.getTextureUtil();
-        int currentColor = util.getColor(blockType);
+        int currentColor;
+        if (blockType == BlockTypes.GRASS_BLOCK) {
+            currentColor = holder.getTextureUtil().getColor(extent.getBiome(get));
+        } else {
+            currentColor = holder.getTextureUtil().getColor(blockType);
+        }
         if (currentColor == 0) {
             return false;
         }

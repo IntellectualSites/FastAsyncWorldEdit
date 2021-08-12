@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 
 import java.awt.image.BufferedImage;
@@ -48,8 +49,23 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
+    public BlockType getLighterBlock(final int color) {
+        return parent.getLighterBlock(color);
+    }
+
+    @Override
+    public BlockType getDarkerBlock(final int color) {
+        return parent.getDarkerBlock(color);
+    }
+
+    @Override
     public int getColor(BlockType block) {
         return parent.getColor(block);
+    }
+
+    @Override
+    public int getColor(final BiomeType biome) {
+        return parent.getColor(biome);
     }
 
     @Override

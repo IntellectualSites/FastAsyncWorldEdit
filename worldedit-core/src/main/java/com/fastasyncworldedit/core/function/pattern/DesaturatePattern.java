@@ -9,6 +9,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class DesaturatePattern extends AbstractPattern {
 
@@ -31,9 +32,14 @@ public class DesaturatePattern extends AbstractPattern {
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        BlockType block = extent.getBlock(position).getBlockType();
+        BlockType type = extent.getBlock(position).getBlockType();
         TextureUtil util = holder.getTextureUtil();
-        int color = getColor(util.getColor(block));
+        int color;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            color = holder.getTextureUtil().getColor(extent.getBiome(position));
+        } else {
+            color = holder.getTextureUtil().getColor(type);
+        }
         return util.getNearestBlock(color).getDefaultState().toBaseBlock();
     }
 
@@ -53,7 +59,12 @@ public class DesaturatePattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockType type = get.getBlock(extent).getBlockType();
         TextureUtil util = holder.getTextureUtil();
-        int color = util.getColor(type);
+        int color;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            color = holder.getTextureUtil().getColor(extent.getBiome(get));
+        } else {
+            color = holder.getTextureUtil().getColor(type);
+        }
         int newColor = getColor(color);
         if (newColor == color) {
             return false;
