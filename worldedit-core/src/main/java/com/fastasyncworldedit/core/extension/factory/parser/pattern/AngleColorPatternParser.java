@@ -37,7 +37,7 @@ public class AngleColorPatternParser extends RichParser<Pattern> {
         if (input.length != 1) {
             throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",
-                    TextComponent.of(getPrefix() + "[pattern] (e.g. " + getPrefix() + "[stone])")
+                    TextComponent.of(getPrefix() + "[distance] (e.g. " + getPrefix() + "[10])")
             ));
         }
         int distance = Integer.parseInt(input[0]);

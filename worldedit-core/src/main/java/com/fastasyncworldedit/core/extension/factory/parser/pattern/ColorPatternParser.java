@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -26,7 +27,7 @@ public class ColorPatternParser extends RichParser<Pattern> {
 
     @Override
     public Stream<String> getSuggestions(String argumentInput, int index) {
-        if (index > 3) {
+        if (index > 4) {
             return Stream.empty();
         }
         return SuggestionHelper.suggestPositiveIntegers(argumentInput);
@@ -34,13 +35,18 @@ public class ColorPatternParser extends RichParser<Pattern> {
 
     @Override
     public Pattern parseFromInput(@Nonnull String[] input, ParserContext context) throws InputParseException {
-        if (input.length != 3) {
+        if (input.length != 4) {
             throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",
-                    TextComponent.of(getPrefix() + "[r][g][b] (e.g. " + getPrefix() + "[156][100][0])")
+                    TextComponent.of(getPrefix() + "[r][g][b][a] (e.g. " + getPrefix() + "[156][100][0][120])")
             ));
         }
-        Color color = new Color(Integer.parseInt(input[0]), Integer.parseInt(input[1]), Integer.parseInt(input[2]));
+        Color color = new Color(
+                MathMan.clamp(Integer.parseInt(input[0]), 0, 255),
+                MathMan.clamp(Integer.parseInt(input[1]), 0, 255),
+                MathMan.clamp(Integer.parseInt(input[2]), 0, 255),
+                MathMan.clamp(Integer.parseInt(input[3]), 0, 255)
+        );
         return context.requireSession().getTextureUtil().getNearestBlock(color.getRGB());
     }
 

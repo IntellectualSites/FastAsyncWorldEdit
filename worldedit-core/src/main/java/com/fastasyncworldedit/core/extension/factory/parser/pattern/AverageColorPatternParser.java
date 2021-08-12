@@ -26,7 +26,7 @@ public class AverageColorPatternParser extends RichParser<Pattern> {
 
     @Override
     public Stream<String> getSuggestions(String argumentInput, int index) {
-        if (index > 3) {
+        if (index > 4) {
             return Stream.empty();
         }
         return SuggestionHelper.suggestPositiveIntegers(argumentInput);
@@ -34,10 +34,10 @@ public class AverageColorPatternParser extends RichParser<Pattern> {
 
     @Override
     public Pattern parseFromInput(@Nonnull String[] input, ParserContext context) throws InputParseException {
-        if (input.length != 3) {
+        if (input.length != 4) {
             throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",
-                    TextComponent.of(getPrefix() + "[r][g][b] (e.g. " + getPrefix() + "[156][100][0])")
+                    TextComponent.of(getPrefix() + "[r][g][b][a] (e.g. " + getPrefix() + "[156][100][0][120])")
             ));
         }
         return new AverageColorPattern(
@@ -45,7 +45,8 @@ public class AverageColorPatternParser extends RichParser<Pattern> {
                 context.requireSession(),
                 Integer.parseInt(input[0]),
                 Integer.parseInt(input[1]),
-                Integer.parseInt(input[2])
+                Integer.parseInt(input[2]),
+                Integer.parseInt(input[3])
         );
     }
 
