@@ -25,6 +25,16 @@ public class RandomOffsetPattern extends AbstractPattern {
     private final transient MutableBlockVector3 mutable = new MutableBlockVector3();
     private final transient SplittableRandom r;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param pattern pattern to apply
+     * @param dx      offset x
+     * @param dy      offset y
+     * @param dz      offset z
+     * @param minY    min applicable y (inclusive
+     * @param maxY    max applicable y (inclusive
+     */
     public RandomOffsetPattern(Pattern pattern, int dx, int dy, int dz, int minY, int maxY) {
         this.pattern = pattern;
         this.dx = dx;

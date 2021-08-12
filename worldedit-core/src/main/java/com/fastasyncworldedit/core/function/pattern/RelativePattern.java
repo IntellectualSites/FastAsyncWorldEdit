@@ -16,6 +16,13 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private BlockVector3 origin;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param pattern pattern to apply
+     * @param minY    min applicable y (inclusive
+     * @param maxY    max applicable y (inclusive
+     */
     public RelativePattern(Pattern pattern, int minY, int maxY) {
         this.pattern = pattern;
         this.minY = minY;

@@ -20,6 +20,11 @@ public class ExpressionPatternParser extends SimpleInputParser<Pattern> {
 
     private final List<String> aliases = Collections.singletonList("=");
 
+    /**
+     * Create a new simple parser with a defined prefix for the result.
+     *
+     * @param worldEdit the worldedit instance.
+     */
     public ExpressionPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
     }

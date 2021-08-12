@@ -3,22 +3,30 @@ package com.fastasyncworldedit.core.function.pattern;
 import com.fastasyncworldedit.core.util.TextureHolder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
-public class AngleColorPattern extends DataAnglePattern {
+public class AngleColorPattern extends AnglePattern {
 
     protected transient TextureHolder holder;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent   extent to set to
+     * @param holder   {@link TextureHolder} to use to get textures
+     * @param distance distance to use too calculate angle
+     */
     public AngleColorPattern(Extent extent, TextureHolder holder, int distance) {
         super(extent, distance);
         this.holder = holder.getTextureUtil();
     }
 
-    public int getColor(int color, int slope) {
+    private int getColor(int color, int slope) {
         if (slope == 0) {
             return color;
         }

@@ -11,8 +11,6 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
-import java.util.UUID;
-
 public class BufferedPattern extends AbstractPattern implements ResettablePattern {
 
     protected final LocalBlockVectorSet set = new LocalBlockVectorSet();
@@ -20,10 +18,14 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
     protected final long[] actionTime;
 
     protected final Pattern pattern;
-    protected final UUID uuid;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param actor  actor associated with the pattern
+     * @param parent pattern to set
+     */
     public BufferedPattern(Actor actor, Pattern parent) {
-        this.uuid = actor.getUniqueId();
         long[] tmp = actor.getMeta("lastActionTime");
         if (tmp == null) {
             actor.setMeta("lastActionTime", tmp = new long[2]);

@@ -20,6 +20,14 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
     private final MutableBlockVector3[] buffer;
     private final MutableBlockVector3[] allowed;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param pattern  pattern to apply
+     * @param distance number of "spreads" to make
+     * @param minY     min applicable y (inclusive
+     * @param maxY     max applicable y (inclusive
+     */
     public SurfaceRandomOffsetPattern(Pattern pattern, int distance, int minY, int maxY) {
         this.pattern = pattern;
         this.minY = minY;

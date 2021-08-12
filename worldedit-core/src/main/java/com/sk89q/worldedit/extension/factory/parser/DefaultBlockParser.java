@@ -475,6 +475,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
             return validate(context, new SkullBlock(state, type.replace(" ", "_"))); // valid MC usernames
         } else {
+            //FAWE start
             nbt = state.getNbtData();
             BaseBlock result;
             if (nbt != null) {
@@ -484,6 +485,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 result = state.toBaseBlock();
             }
             return validate(context, result);
+            //FAWE end
         }
     }
 

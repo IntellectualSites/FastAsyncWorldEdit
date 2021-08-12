@@ -32,6 +32,11 @@ import java.util.stream.Stream;
 
 public class RichPatternParser extends FaweParser<Pattern> {
 
+    /**
+     * Create a new rich pattern-parser.
+     *
+     * @param worldEdit the worldedit instance.
+     */
     public RichPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
     }

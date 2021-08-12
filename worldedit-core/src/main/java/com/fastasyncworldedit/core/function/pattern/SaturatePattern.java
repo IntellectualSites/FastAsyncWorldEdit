@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -18,10 +19,19 @@ public class SaturatePattern extends AbstractPattern {
     private final int color;
     private final Extent extent;
 
-
-    public SaturatePattern(Extent extent, TextureHolder texture, int r, int g, int b, int a) {
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent extent to set to
+     * @param holder {@link TextureHolder} to use to get textures
+     * @param r      red channel, clamped 0 -> 255
+     * @param g      green channel, clamped 0 -> 255
+     * @param b      blue channel, clamped 0 -> 255
+     * @param a      alpha channel, clamped 0 -> 255
+     */
+    public SaturatePattern(Extent extent, TextureHolder holder, int r, int g, int b, int a) {
         this.extent = extent;
-        this.holder = texture;
+        this.holder = holder;
         this.color = new Color(MathMan.clamp(r, 0, 255), MathMan.clamp(g, 0, 255), MathMan.clamp(b, 0, 255), MathMan.clamp(a, 0
                 , 255)).getRGB();
     }

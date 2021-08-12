@@ -14,6 +14,11 @@ public class DarkenPatternParser extends SimpleInputParser<Pattern> {
 
     private final List<String> aliases = Collections.singletonList("#darken");
 
+    /**
+     * Create a new simple parser with a defined prefix for the result.
+     *
+     * @param worldEdit the worldedit instance.
+     */
     public DarkenPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
     }
@@ -25,7 +30,7 @@ public class DarkenPatternParser extends SimpleInputParser<Pattern> {
 
     @Override
     public Pattern parseFromSimpleInput(String input, ParserContext context) throws InputParseException {
-        return new ShadePattern(context.requireExtent(), context.requireSession().getTextureUtil(), true);
+        return new ShadePattern(context.requireExtent(), context.requireSession(), true);
     }
 
 }

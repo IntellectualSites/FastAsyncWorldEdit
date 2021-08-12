@@ -28,6 +28,16 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     private final MutableBlockVector3 mutable;
     private final SplittableRandom r;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param pattern pattern to apply
+     * @param dx      offset x
+     * @param dy      offset y
+     * @param dz      offset z
+     * @param minY    min applicable y (inclusive
+     * @param maxY    max applicable y (inclusive
+     */
     public SolidRandomOffsetPattern(Pattern pattern, int dx, int dy, int dz, int minY, int maxY) {
         this.pattern = pattern;
         this.dx = dx;

@@ -32,7 +32,9 @@ import java.util.stream.Stream;
  *
  * @param <E> the element
  */
+//FAWE start - AliasedParser interface, rather than method being here
 public abstract class SimpleInputParser<E> extends InputParser<E> implements AliasedParser {
+//FAWE end
 
     protected SimpleInputParser(WorldEdit worldEdit) {
         super(worldEdit);

@@ -55,7 +55,7 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
         try {
             boolean rotate = arguments.length == 2 && Boolean.getBoolean(arguments[1]);
             boolean flip = arguments.length == 3 && Boolean.getBoolean(arguments[2]);
-            List<ClipboardHolder> clipboards = null;
+            List<ClipboardHolder> clipboards;
             switch (arguments[0].toLowerCase()) {
                 case "#copy":
                 case "#clipboard":
