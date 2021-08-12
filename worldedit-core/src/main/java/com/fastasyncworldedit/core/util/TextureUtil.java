@@ -349,14 +349,12 @@ public class TextureUtil implements TextureHolder {
         if (!folder.exists()) {
             try {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
-                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/")
-                        .mkdirs();
+                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/").mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
                         new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/"
-                                     + "/.minecraft/versions/1.17.1.jar")) {
+                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.17.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -633,36 +631,28 @@ public class TextureUtil implements TextureHolder {
         if (folder.exists()) {
             // Get all the jar files
             File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-//            for (BlockType blockType : BlockTypesCache.values) {
-//                BlockMaterial material = blockType.getMaterial();
-//                if (!material.isSolid() || !material.isFullCube()) {
-//                    continue;
-//                }
-//                int color = material.getMapColor();
-//                if (color != 0) {
-//                    colorMap.put(blockType.getInternalId(), (Integer) color);
-//                }
-//            }
             if (files.length == 0) {
-                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/" + "/.minecraft/versions/")
+                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/")
                         .mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
                         new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/"
-                                     + "/.minecraft/versions/1.17.1.jar")) {
+                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.17.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
                         fileOutputStream.write(dataBuffer, 0, bytesRead);
                     }
+                    fileOutputStream.close();
+                    files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
                 } catch (IOException e) {
                     LOGGER.error(
                             "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
                     LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
-            } else {
+            }
+            if ((files.length > 0)) {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);
 
