@@ -20,7 +20,7 @@ public class AngleColorPattern extends AnglePattern {
      *
      * @param extent   extent to set to
      * @param holder   {@link TextureHolder} to use to get textures
-     * @param distance distance to use too calculate angle
+     * @param distance distance to use to calculate angle
      */
     public AngleColorPattern(Extent extent, TextureHolder holder, int distance) {
         super(extent, distance);
