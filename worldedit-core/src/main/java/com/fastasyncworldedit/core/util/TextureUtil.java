@@ -45,8 +45,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-
 public class TextureUtil implements TextureHolder {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -339,10 +337,16 @@ public class TextureUtil implements TextureHolder {
      */
     protected BiomeColor[] validBiomes;
 
+    /**
+     * Do not use. Use {@link Fawe#getTextureUtil()}
+     */
     public TextureUtil() throws FileNotFoundException {
         this(MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.TEXTURES));
     }
 
+    /**
+     * Do not use. Use {@link Fawe#getTextureUtil()}
+     */
     public TextureUtil(File folder) throws FileNotFoundException {
         this.folder = folder;
         if (!folder.exists()) {
@@ -362,14 +366,16 @@ public class TextureUtil implements TextureHolder {
                     LOGGER.info("Asset jar down has been downloaded successfully.");
                 } catch (IOException e) {
                     LOGGER.error(
-                            "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar in it.");
+                            "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
+                                    "folder with a `.minecraft/versions` jar in it.");
                     LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
             } catch (AccessControlException e) {
                 LOGGER.error(
                         "Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
                 LOGGER.error(
-                        "Please create the following folder manually: `FastAsyncWorldEdit/textures` with `.minecraft/versions` jar in it.");
+                        "Please create the following folder manually: `FastAsyncWorldEdit/textures` with a `" +
+                                ".minecraft/versions` jar in it.");
 
             }
         }
@@ -424,11 +430,143 @@ public class TextureUtil implements TextureHolder {
         return (int) ((r * r + g * g + b * b) >> 25);
     }
 
+    protected static long colorDistance(int c1, int c2) {
+        int red1 = (c1 >> 16) & 0xFF;
+        int green1 = (c1 >> 8) & 0xFF;
+        int blue1 = (c1) & 0xFF;
+        return colorDistance(red1, green1, blue1, c2);
+    }
+
+    private static long colorDistance(int red1, int green1, int blue1, int c2) {
+        int red2 = (c2 >> 16) & 0xFF;
+        int green2 = (c2 >> 8) & 0xFF;
+        int blue2 = (c2) & 0xFF;
+        int rmean = (red1 + red2) >> 1;
+        int r = red1 - red2;
+        int g = green1 - green2;
+        int b = blue1 - blue2;
+        int hd = hueDistance(red1, green1, blue1, red2, green2, blue2);
+        return (((long) (512 + rmean) * r * r) >> 8) + 4L * g * g + (((long) (767 - rmean) * b * b) >> 8) + ((long) hd * hd);
+    }
+
+    /**
+     * Combine two colors by multipling
+     *
+     * @param c1 color 1
+     * @param c2 color 2
+     * @return new color
+     */
+    public static int multiplyColor(int c1, int c2) {
+        int alpha1 = (c1 >> 24) & 0xFF;
+        int alpha2 = (c2 >> 24) & 0xFF;
+        int red1 = (c1 >> 16) & 0xFF;
+        int green1 = (c1 >> 8) & 0xFF;
+        int blue1 = (c1) & 0xFF;
+        int red2 = (c2 >> 16) & 0xFF;
+        int green2 = (c2 >> 8) & 0xFF;
+        int blue2 = (c2) & 0xFF;
+        int red = ((red1 * red2)) / 255;
+        int green = ((green1 * green2)) / 255;
+        int blue = ((blue1 * blue2)) / 255;
+        int alpha = ((alpha1 * alpha2)) / 255;
+        return (alpha << 24) + (red << 16) + (green << 8) + (blue);
+    }
+
+    /**
+     * Combine two colors by averaging
+     *
+     * @param c1 color 1
+     * @param c2 color 2
+     * @return new color
+     */
+    public static int averageColor(int c1, int c2) {
+        int alpha1 = (c1 >> 24) & 0xFF;
+        int alpha2 = (c2 >> 24) & 0xFF;
+        int red1 = (c1 >> 16) & 0xFF;
+        int green1 = (c1 >> 8) & 0xFF;
+        int blue1 = (c1) & 0xFF;
+        int red2 = (c2 >> 16) & 0xFF;
+        int green2 = (c2 >> 8) & 0xFF;
+        int blue2 = (c2) & 0xFF;
+        int red = ((red1 + red2)) >> 1;
+        int green = ((green1 + green2)) >> 1;
+        int blue = ((blue1 + blue2)) >> 1;
+        int alpha = ((alpha1 + alpha2)) >> 1;
+        return (alpha << 24) + (red << 16) + (green << 8) + (blue);
+    }
+
+    /**
+     * Combine multiple colors by multipling
+     *
+     * @param colors colors
+     * @return new color
+     */
+    public static int averageColor(int... colors) {
+        int alpha = 0;
+        int red = 0;
+        int green = 0;
+        int blue = 0;
+        for (int c : colors) {
+            alpha += (c >> 24) & 0xFF;
+            red += (c >> 16) & 0xFF;
+            green += (c >> 8) & 0xFF;
+            blue += (c) & 0xFF;
+        }
+        int num = colors.length;
+        alpha /= num;
+        red /= num;
+        green /= num;
+        blue /= num;
+        return (alpha << 24) + (red << 16) + (green << 8) + (blue);
+    }
+
+    /**
+     * Assumes the top layer is a transparent color and the bottom is opaque
+     */
+    public static int combineTransparency(int top, int bottom) {
+        int alpha1 = (top >> 24) & 0xFF;
+        int alpha2 = 255 - alpha1;
+        int red1 = (top >> 16) & 0xFF;
+        int green1 = (top >> 8) & 0xFF;
+        int blue1 = (top) & 0xFF;
+        int red2 = (bottom >> 16) & 0xFF;
+        int green2 = (bottom >> 8) & 0xFF;
+        int blue2 = (bottom) & 0xFF;
+        int red = ((red1 * alpha1) + (red2 * alpha2)) / 255;
+        int green = ((green1 * alpha1) + (green2 * alpha2)) / 255;
+        int blue = ((blue1 * alpha1) + (blue2 * alpha2)) / 255;
+        return (red << 16) + (green << 8) + (blue) + (255 << 24);
+    }
+
+    private static long getDistance(BufferedImage image, int c1) {
+        long totalDistSqr = 0;
+        int width = image.getWidth();
+        int height = image.getHeight();
+        int area = width * height;
+        int red1 = (c1 >> 16) & 0xFF;
+        int green1 = (c1 >> 8) & 0xFF;
+        int blue1 = (c1) & 0xFF;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int c2 = image.getRGB(x, y);
+                long distance = colorDistance(red1, green1, blue1, c2);
+                totalDistSqr += distance * distance;
+            }
+        }
+        return totalDistSqr / area;
+    }
+
     @Override
     public TextureUtil getTextureUtil() {
         return this;
     }
 
+    /**
+     * Get the block most closely matching a color based on the block's average color
+     *
+     * @param color color to match
+     * @return matching block
+     */
     public BlockType getNearestBlock(int color) {
         long min = Long.MAX_VALUE;
         int closest = 0;
@@ -452,14 +590,12 @@ public class TextureUtil implements TextureHolder {
         return BlockTypes.get(closest);
     }
 
-    public BlockType getNearestBlock(BlockType block) {
-        int color = getColor(block);
-        if (color == 0) {
-            return null;
-        }
-        return getNextNearestBlock(color);
-    }
-
+    /**
+     * Get the block most closely matching a color, without matching the color, based on the block's average color
+     *
+     * @param color color to match
+     * @return matching block
+     */
     public BlockType getNextNearestBlock(int color) {
         long min = Long.MAX_VALUE;
         int closest = 0;
@@ -508,22 +644,52 @@ public class TextureUtil implements TextureHolder {
         return layerBuffer;
     }
 
+    /**
+     * Get the next lightest block
+     *
+     * @param block input block
+     * @return next lightest block
+     */
     public BlockType getLighterBlock(BlockType block) {
         return getNearestBlock(block, false);
     }
 
+    /**
+     * Get the next darkest block
+     *
+     * @param block input block
+     * @return next darkest block
+     */
     public BlockType getDarkerBlock(BlockType block) {
         return getNearestBlock(block, true);
     }
 
+    /**
+     * Get the next lightest block
+     *
+     * @param color input color
+     * @return next lightest block
+     */
     public BlockType getLighterBlock(int color) {
         return getNearestBlock(color, false);
     }
 
+    /**
+     * Get the next darkest block
+     *
+     * @param color input color
+     * @return next darkest block
+     */
     public BlockType getDarkerBlock(int color) {
         return getNearestBlock(color, true);
     }
 
+    /**
+     * Get the integer representation of a block's RGBA color.
+     *
+     * @param block input block
+     * @return integer RGBA color
+     */
     public int getColor(BlockType block) {
         if (block == BlockTypes.GRASS_BLOCK) {
             return validBiomes[0].grassCombined;
@@ -531,15 +697,27 @@ public class TextureUtil implements TextureHolder {
         return blockColors[block.getInternalId()];
     }
 
+    /**
+     * Get the integer representation of a biomes's RGBA color when applied to grass.
+     *
+     * @param biome input biome
+     * @return integer RGBA color
+     */
     public int getColor(BiomeType biome) {
         return validBiomes[biome.getInternalId()].grassCombined;
     }
 
+    /**
+     * Get the {@link BiomeColor} entry from a biome's ID
+     *
+     * @param biome biome id
+     * @return the {@link BiomeColor} entry
+     */
     public BiomeColor getBiome(int biome) {
         return biomes[biome];
     }
 
-    public boolean getIsBlockCloserThanBiome(char[] blockAndBiomeIdOutput, int color, int biomePriority) {
+    protected boolean getIsBlockCloserThanBiome(char[] blockAndBiomeIdOutput, int color, int biomePriority) {
         BlockType block = getNearestBlock(color);
         TextureUtil.BiomeColor biome = getNearestBiome(color);
         int blockColor = getColor(block);
@@ -548,7 +726,7 @@ public class TextureUtil implements TextureHolder {
         return colorDistance(biome.grassCombined, color) - biomePriority > colorDistance(blockColor, color);
     }
 
-    public int getBiomeMix(int[] biomeIdsOutput, int color) {
+    protected int getBiomeMix(int[] biomeIdsOutput, int color) {
         long closest = Long.MAX_VALUE;
         int closestAverage = Integer.MAX_VALUE;
         long min = Long.MAX_VALUE;
@@ -573,6 +751,12 @@ public class TextureUtil implements TextureHolder {
         return closestAverage;
     }
 
+    /**
+     * Get the biome most closely matching a color based on the block's average color
+     *
+     * @param color color to match
+     * @return matching block
+     */
     public BiomeColor getNearestBiome(int color) {
         int grass = blockColors[BlockTypes.GRASS_BLOCK.getInternalId()];
         if (grass == 0) {
@@ -593,15 +777,8 @@ public class TextureUtil implements TextureHolder {
         return closest;
     }
 
-    public File getFolder() {
+    protected File getFolder() {
         return folder;
-    }
-
-    public long colorDistance(int c1, int c2) {
-        int red1 = (c1 >> 16) & 0xFF;
-        int green1 = (c1 >> 8) & 0xFF;
-        int blue1 = (c1) & 0xFF;
-        return colorDistance(red1, green1, blue1, c2);
     }
 
     private BufferedImage readImage(ZipFile zipFile, String name) throws IOException {
@@ -647,7 +824,8 @@ public class TextureUtil implements TextureHolder {
                     files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
                 } catch (IOException e) {
                     LOGGER.error(
-                            "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` folder with `.minecraft/versions` jar or mods in it.");
+                            "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
+                                    "folder with a `.minecraft/versions` jar or mods in it.");
                     LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
             }
@@ -685,7 +863,7 @@ public class TextureUtil implements TextureHolder {
                         String modelFileName = String.format(modelsDir, nameSpace, name);
                         ZipEntry entry = getEntry(zipFile, modelFileName);
                         if (entry == null) {
-                            getLogger(TextureUtil.class).error("Cannot find {} in {}", modelFileName, file);
+                            LOGGER.error("Cannot find {} in {}", modelFileName, file);
                             continue;
                         }
 
@@ -723,7 +901,7 @@ public class TextureUtil implements TextureHolder {
 
                         BufferedImage image = readImage(zipFile, textureFileName);
                         if (image == null) {
-                            getLogger(TextureUtil.class).error("Cannot find {}", textureFileName);
+                            LOGGER.error("Cannot find {}", textureFileName);
                             continue;
                         }
                         int color = ImageUtil.getColor(image);
@@ -841,75 +1019,6 @@ public class TextureUtil implements TextureHolder {
         calculateLayerArrays();
     }
 
-    public int multiplyColor(int c1, int c2) {
-        int alpha1 = (c1 >> 24) & 0xFF;
-        int alpha2 = (c2 >> 24) & 0xFF;
-        int red1 = (c1 >> 16) & 0xFF;
-        int green1 = (c1 >> 8) & 0xFF;
-        int blue1 = (c1) & 0xFF;
-        int red2 = (c2 >> 16) & 0xFF;
-        int green2 = (c2 >> 8) & 0xFF;
-        int blue2 = (c2) & 0xFF;
-        int red = ((red1 * red2)) / 255;
-        int green = ((green1 * green2)) / 255;
-        int blue = ((blue1 * blue2)) / 255;
-        int alpha = ((alpha1 * alpha2)) / 255;
-        return (alpha << 24) + (red << 16) + (green << 8) + (blue);
-    }
-
-    public int averageColor(int c1, int c2) {
-        int alpha1 = (c1 >> 24) & 0xFF;
-        int alpha2 = (c2 >> 24) & 0xFF;
-        int red1 = (c1 >> 16) & 0xFF;
-        int green1 = (c1 >> 8) & 0xFF;
-        int blue1 = (c1) & 0xFF;
-        int red2 = (c2 >> 16) & 0xFF;
-        int green2 = (c2 >> 8) & 0xFF;
-        int blue2 = (c2) & 0xFF;
-        int red = ((red1 + red2)) >> 1;
-        int green = ((green1 + green2)) >> 1;
-        int blue = ((blue1 + blue2)) >> 1;
-        int alpha = ((alpha1 + alpha2)) >> 1;
-        return (alpha << 24) + (red << 16) + (green << 8) + (blue);
-    }
-
-    public int averageColor(int... colors) {
-        int alpha = 0;
-        int red = 0;
-        int green = 0;
-        int blue = 0;
-        for (int c : colors) {
-            alpha += (c >> 24) & 0xFF;
-            red += (c >> 16) & 0xFF;
-            green += (c >> 8) & 0xFF;
-            blue += (c) & 0xFF;
-        }
-        int num = colors.length;
-        alpha /= num;
-        red /= num;
-        green /= num;
-        blue /= num;
-        return (alpha << 24) + (red << 16) + (green << 8) + (blue);
-    }
-
-    /**
-     * Assumes the top layer is a transparent color and the bottom is opaque
-     */
-    public int combineTransparency(int top, int bottom) {
-        int alpha1 = (top >> 24) & 0xFF;
-        int alpha2 = 255 - alpha1;
-        int red1 = (top >> 16) & 0xFF;
-        int green1 = (top >> 8) & 0xFF;
-        int blue1 = (top) & 0xFF;
-        int red2 = (bottom >> 16) & 0xFF;
-        int green2 = (bottom >> 8) & 0xFF;
-        int blue2 = (bottom) & 0xFF;
-        int red = ((red1 * alpha1) + (red2 * alpha2)) / 255;
-        int green = ((green1 * alpha1) + (green2 * alpha2)) / 255;
-        int blue = ((blue1 * alpha1) + (blue2 * alpha2)) / 255;
-        return (red << 16) + (green << 8) + (blue) + (255 << 24);
-    }
-
     protected void calculateLayerArrays() {
         Int2ObjectOpenHashMap<int[]> colorLayerMap = new Int2ObjectOpenHashMap<>();
         for (int i = 0; i < validBlockIds.length; i++) {
@@ -994,36 +1103,6 @@ public class TextureUtil implements TextureHolder {
     protected boolean hasAlpha(int color) {
         int alpha = (color >> 24) & 0xFF;
         return alpha != 255;
-    }
-
-    protected long colorDistance(int red1, int green1, int blue1, int c2) {
-        int red2 = (c2 >> 16) & 0xFF;
-        int green2 = (c2 >> 8) & 0xFF;
-        int blue2 = (c2) & 0xFF;
-        int rmean = (red1 + red2) >> 1;
-        int r = red1 - red2;
-        int g = green1 - green2;
-        int b = blue1 - blue2;
-        int hd = hueDistance(red1, green1, blue1, red2, green2, blue2);
-        return (((long) (512 + rmean) * r * r) >> 8) + 4L * g * g + (((long) (767 - rmean) * b * b) >> 8) + ((long) hd * hd);
-    }
-
-    public long getDistance(BufferedImage image, int c1) {
-        long totalDistSqr = 0;
-        int width = image.getWidth();
-        int height = image.getHeight();
-        int area = width * height;
-        int red1 = (c1 >> 16) & 0xFF;
-        int green1 = (c1 >> 8) & 0xFF;
-        int blue1 = (c1) & 0xFF;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int c2 = image.getRGB(x, y);
-                long distance = colorDistance(red1, green1, blue1, c2);
-                totalDistSqr += distance * distance;
-            }
-        }
-        return totalDistSqr / area;
     }
 
     public int[] getValidBlockIds() {

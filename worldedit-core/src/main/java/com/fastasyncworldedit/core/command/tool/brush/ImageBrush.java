@@ -63,7 +63,7 @@ public class ImageBrush implements Brush {
                         } else {
                             existingColor = tu.getColor(type);
                         }
-                        return tu.combineTransparency(color, existingColor);
+                        return TextureUtil.combineTransparency(color, existingColor);
 
                 }
             };
