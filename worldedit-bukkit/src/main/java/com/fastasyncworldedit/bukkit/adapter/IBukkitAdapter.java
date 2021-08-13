@@ -381,6 +381,13 @@ public interface IBukkitAdapter {
         );
     }
 
+    /**
+     * Retrieve the list of Bukkit entities ({@link org.bukkit.entity.Entity}) in the given world. If overridden by adapters
+     * will attempt retrieval asynchronously.
+     *
+     * @param world world to retrieve entities in
+     * @return list of {@link org.bukkit.entity.Entity}
+     */
     default List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
         return TaskManager.IMP.sync(world::getEntities);
     }
