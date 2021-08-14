@@ -34,8 +34,6 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index) {
         switch (index) {
-            case 0:
-                return Stream.empty();
             case 1:
             case 2:
                 return SuggestionHelper.suggestBoolean(argumentInput);
@@ -53,7 +51,7 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
             ));
         }
         try {
-            boolean rotate = arguments.length == 2 && Boolean.getBoolean(arguments[1]);
+            boolean rotate = arguments.length >= 2 && Boolean.getBoolean(arguments[1]);
             boolean flip = arguments.length == 3 && Boolean.getBoolean(arguments[2]);
             List<ClipboardHolder> clipboards;
             switch (arguments[0].toLowerCase()) {

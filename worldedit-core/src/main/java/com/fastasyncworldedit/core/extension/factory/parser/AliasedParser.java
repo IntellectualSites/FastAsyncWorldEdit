@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.extension.factory.parser;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface AliasedParser {
 
@@ -9,6 +9,6 @@ public interface AliasedParser {
      *
      * @return the matching aliases
      */
-    List<String> getMatchedAliases();
+    Collection<String> getMatchedAliases();
 
 }

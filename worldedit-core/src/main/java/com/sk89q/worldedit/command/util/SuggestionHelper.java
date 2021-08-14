@@ -243,12 +243,12 @@ public final class SuggestionHelper {
      */
     public static Stream<String> suggestBoolean(String argumentInput) {
         if (argumentInput.isEmpty()) {
-            return Arrays.stream(new String[]{"true", "false"});
+            return Stream.of("true", "false");
         }
         if ("true".startsWith(argumentInput)) {
-            return Stream.ofNullable("true");
+            return Stream.of("true");
         } else if ("false".startsWith(argumentInput)) {
-            return Stream.ofNullable("false");
+            return Stream.of("false");
         }
         // no valid input anymore
         return Stream.empty();
