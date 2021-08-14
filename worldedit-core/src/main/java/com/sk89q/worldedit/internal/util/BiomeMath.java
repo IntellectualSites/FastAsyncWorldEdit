@@ -19,11 +19,10 @@
 
 package com.sk89q.worldedit.internal.util;
 
-import net.royawesome.jlibnoise.MathHelper;
-
 public class BiomeMath {
 
-    //FAWE - Removed because its bad.
+    //FAWE - Removed because it's unneeded, and it would require effort to have it work with worlds of differing heights across
+    // different game versions
 
 //    // From BiomeArray / BiomeContainer
 //    public static final int HORIZONTAL_SECTION_COUNT = (int) Math.round(Math.log(16.0D) / Math.log(2.0D)) - 2;
