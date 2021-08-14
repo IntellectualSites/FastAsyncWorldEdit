@@ -49,12 +49,9 @@ public class RandomTransformParser extends InputParser<ResettableExtent> {
         if (split.size() == 1) {
             return null;
         }
-        ResettableExtent[] transforms = new ResettableExtent[split.size()];
-        for (int i = 0; i < split.size(); i++) {
-            transforms[i] = worldEdit.getTransformFactory().parseFromInput(split.get(i), context);
-        }
         RandomTransform randomTransform = new RandomTransform();
-        for (ResettableExtent transform : transforms) {
+        for (int i = 0; i < split.size(); i++) {
+            ResettableExtent transform = worldEdit.getTransformFactory().parseFromInput(split.get(i), context);
             randomTransform.add(transform, 1d);
         }
         return randomTransform;
