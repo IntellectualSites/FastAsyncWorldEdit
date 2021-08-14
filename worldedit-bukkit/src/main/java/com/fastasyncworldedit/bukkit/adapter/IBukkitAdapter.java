@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.bukkit.util.BukkitItemStack;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.NotABlockException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -36,6 +37,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Locale;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -362,10 +364,10 @@ public interface IBukkitAdapter {
     /**
      * Generate a given tree type to the given editsession.
      *
-     * @param type Type of tree to generate
+     * @param type        Type of tree to generate
      * @param editSession Editsession to set blocks to
-     * @param pt Point to generate tree at
-     * @param world World to "generate" tree from (seed-wise)
+     * @param pt          Point to generate tree at
+     * @param world       World to "generate" tree from (seed-wise)
      * @return If successsful
      */
     default boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt, org.bukkit.World world) {
@@ -377,6 +379,17 @@ public interface IBukkitAdapter {
                 BukkitAdapter.adapt(world, pt), bukkitType,
                 new EditSessionBlockChangeDelegate(editSession)
         );
+    }
+
+    /**
+     * Retrieve the list of Bukkit entities ({@link org.bukkit.entity.Entity}) in the given world. If overridden by adapters
+     * will attempt retrieval asynchronously.
+     *
+     * @param world world to retrieve entities in
+     * @return list of {@link org.bukkit.entity.Entity}
+     */
+    default List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
+        return TaskManager.IMP.sync(world::getEntities);
     }
 
 }
