@@ -331,6 +331,7 @@ public class WorldEditPlugin extends JavaPlugin {
             }
         }
     }
+    // FAWE end
 
     private void loadAdapter() {
         WorldEdit worldEdit = WorldEdit.getInstance();
