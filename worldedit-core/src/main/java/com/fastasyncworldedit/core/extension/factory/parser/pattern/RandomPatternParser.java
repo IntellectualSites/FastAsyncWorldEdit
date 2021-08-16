@@ -15,6 +15,11 @@ import java.util.stream.Stream;
 
 public class RandomPatternParser extends InputParser<Pattern> {
 
+    /**
+     * Create a new input parser.
+     *
+     * @param worldEdit the worldedit instance.
+     */
     public RandomPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
     }

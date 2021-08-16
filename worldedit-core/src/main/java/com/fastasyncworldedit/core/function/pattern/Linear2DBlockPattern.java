@@ -13,6 +13,13 @@ public class Linear2DBlockPattern extends AbstractPattern {
     private final int xScale;
     private final int zScale;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param patterns array of patterns to linearly choose from based on x/z coordinates
+     * @param xScale   x-axis scale
+     * @param zScale   z-axis scale
+     */
     public Linear2DBlockPattern(Pattern[] patterns, int xScale, int zScale) {
         this.patternsArray = patterns;
         this.xScale = xScale;

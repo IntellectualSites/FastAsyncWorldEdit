@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  *
  * @param <E> the parse result.
  */
-public abstract class RichParser<E> extends InputParser<E> {
+public abstract class RichParser<E> extends InputParser<E> implements AliasedParser {
 
     private final String[] prefixes;
 
@@ -51,7 +51,7 @@ public abstract class RichParser<E> extends InputParser<E> {
     @Nonnull
     private Function<String, Stream<? extends String>> extractArguments(String input) {
         return prefix -> {
-            if (input.length() > prefix.length()) {
+            if (input.length() > prefix.length() && prefix.startsWith(input + "[")) {
                 // input already contains argument(s) -> extract them
                 String[] strings = extractArguments(input.substring(prefix.length()), false);
                 // rebuild the argument string without the last argument
@@ -69,8 +69,22 @@ public abstract class RichParser<E> extends InputParser<E> {
         };
     }
 
+    /**
+     * Gives the default prefix/name of the pattern/mask/transform.
+     *
+     * @return default prefix
+     */
     public String getPrefix() {
         return this.prefixes[0];
+    }
+
+    /**
+     * Return all prefix/name aliases of the pattern/mask/transform
+     *
+     * @return all prefix/name aliases
+     */
+    public List<String> getMatchedAliases() {
+        return Arrays.asList(prefixes);
     }
 
     @Override
@@ -140,8 +154,15 @@ public abstract class RichParser<E> extends InputParser<E> {
                 }
             }
         }
-        if (!requireClosing && open > 0) {
-            arguments.add(input.substring(openIndex + 1));
+        if (!requireClosing) {
+            if (open > 0) {
+                arguments.add(input.substring(openIndex + 1));
+            } else {
+                int last = input.lastIndexOf(']');
+                if (last != -1) {
+                    arguments.add(input.substring(last));
+                }
+            }
         }
         if (requireClosing && open != 0) {
             throw new InputParseException(Caption.of("fawe.error.invalid-bracketing", TextComponent.of("'[' or ']'?")));

@@ -81,74 +81,74 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public List<Entity> getEntities() {
-        return Collections.emptyList();
+        throw reason;
     }
 
     @Nullable
     @Override
     public Entity createEntity(Location arg0, BaseEntity arg1) {
-        return null;
+        throw reason;
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return BlockTypes.AIR.getDefaultState();
+        throw reason;
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return BlockTypes.AIR.getDefaultState();
+        throw reason;
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return getBlock(position).toBaseBlock();
+        throw reason;
     }
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        return getBlock(x, y, z).toBaseBlock();
+        throw reason;
     }
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        return BiomeTypes.THE_VOID;
+        throw reason;
     }
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        return BiomeTypes.THE_VOID;
+        throw reason;
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
-        return false;
+        throw reason;
     }
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
-        return false;
+        throw reason;
     }
 
     @Override
     public ResettableExtent setExtent(Extent extent) {
-        return this;
+        throw reason;
     }
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
-        return false;
+        throw reason;
     }
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
-        return false;
+        throw reason;
     }
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return false;
+        throw reason;
     }
 
     @Override
@@ -376,7 +376,7 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public ProcessorScope getScope() {
-        return ProcessorScope.ADDING_BLOCKS;
+        throw reason;
     }
 
 }

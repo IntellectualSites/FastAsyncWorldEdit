@@ -17,6 +17,11 @@ public class MultiTransform extends RandomTransform {
 
     private ResettableExtent[] extents;
 
+    /**
+     * New instance
+     *
+     * @param extents list of extents to set blocks to
+     */
     public MultiTransform(Collection<ResettableExtent> extents) {
         for (ResettableExtent extent : extents) {
             add(extent, 1);
@@ -61,6 +66,16 @@ public class MultiTransform extends RandomTransform {
         boolean result = false;
         for (AbstractDelegateExtent extent : extents) {
             result |= extent.setBiome(position, biome);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        // don't use streams for each block place, it'd be incredibly slow
+        boolean result = false;
+        for (AbstractDelegateExtent extent : extents) {
+            result |= extent.setBiome(x, y, z, biome);
         }
         return result;
     }

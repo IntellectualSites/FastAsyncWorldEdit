@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.extent.transform;
 
 import com.fastasyncworldedit.core.extent.ResettableExtent;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -12,6 +11,12 @@ public class PatternTransform extends ResettableExtent {
 
     private final Pattern pattern;
 
+    /**
+     * New instance
+     *
+     * @param parent  extent to set to
+     * @param pattern pattern to apply
+     */
     public PatternTransform(Extent parent, Pattern pattern) {
         super(parent);
         this.pattern = pattern;

@@ -13,13 +13,25 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
 
     private final Pattern pattern;
     private final int moves;
+    private final int minY;
+    private final int maxY;
 
     private final MutableBlockVector3 cur;
     private final MutableBlockVector3[] buffer;
     private final MutableBlockVector3[] allowed;
 
-    public SurfaceRandomOffsetPattern(Pattern pattern, int distance) {
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param pattern  pattern to apply
+     * @param distance number of "spreads" to make
+     * @param minY     min applicable y (inclusive
+     * @param maxY     max applicable y (inclusive
+     */
+    public SurfaceRandomOffsetPattern(Pattern pattern, int distance, int minY, int maxY) {
         this.pattern = pattern;
+        this.minY = minY;
+        this.maxY = maxY;
         this.moves = Math.min(255, distance);
         cur = new MutableBlockVector3();
         this.buffer = new MutableBlockVector3[BreadthFirstSearch.DIAGONAL_DIRECTIONS.length];
@@ -70,12 +82,12 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
         int y = v.getBlockY();
         int z = v.getBlockZ();
         v.mutY(y + 1);
-        if (canPassthrough(v)) {
+        if (y < maxY && canPassthrough(v)) {
             v.mutY(y);
             return true;
         }
         v.mutY(y - 1);
-        if (canPassthrough(v)) {
+        if (y > minY && canPassthrough(v)) {
             v.mutY(y);
             return true;
         }

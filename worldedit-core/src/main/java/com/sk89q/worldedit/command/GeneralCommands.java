@@ -86,6 +86,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class GeneralCommands {
 
+    private final WorldEdit worldEdit;
+
+    /**
+     * Create a new instance.
+     *
+     * @param worldEdit reference to WorldEdit
+     */
+    public GeneralCommands(WorldEdit worldEdit) {
+        checkNotNull(worldEdit);
+        this.worldEdit = worldEdit;
+    }
+
     public static void register(
             CommandRegistrationHandler registration,
             CommandManager commandManager,
@@ -147,18 +159,6 @@ public class GeneralCommands {
                 return TextComponent.of("There is no replacement for //fast " + arg0);
         }
         return CommandUtil.createNewCommandReplacementText("//perf " + flipped);
-    }
-
-    private final WorldEdit worldEdit;
-
-    /**
-     * Create a new instance.
-     *
-     * @param worldEdit reference to WorldEdit
-     */
-    public GeneralCommands(WorldEdit worldEdit) {
-        checkNotNull(worldEdit);
-        this.worldEdit = worldEdit;
     }
 
     @Command(
@@ -451,50 +451,6 @@ public class GeneralCommands {
         );
     }
 
-    private static class ItemSearcher implements Callable<Component> {
-
-        private final boolean blocksOnly;
-        private final boolean itemsOnly;
-        private final String search;
-        private final int page;
-
-        ItemSearcher(String search, boolean blocksOnly, boolean itemsOnly, int page) {
-            this.blocksOnly = blocksOnly;
-            this.itemsOnly = itemsOnly;
-            this.search = search;
-            this.page = page;
-        }
-
-        @Override
-        public Component call() throws Exception {
-            String command = "/searchitem " + (blocksOnly ? "-b " : "") + (itemsOnly ? "-i " : "") + "-p %page% " + search;
-            Map<String, Component> results = new TreeMap<>();
-            String idMatch = search.replace(' ', '_');
-            String nameMatch = search.toLowerCase(Locale.ROOT);
-            for (ItemType searchType : ItemType.REGISTRY) {
-                if (blocksOnly && !searchType.hasBlockType()) {
-                    continue;
-                }
-
-                if (itemsOnly && searchType.hasBlockType()) {
-                    continue;
-                }
-                final String id = searchType.getId();
-                if (id.contains(idMatch)) {
-                    Component name = searchType.getRichName();
-                    results.put(id, TextComponent.builder()
-                            .append(name)
-                            .append(" (" + id + ")")
-                            .build());
-                }
-            }
-            List<Component> list = new ArrayList<>(results.values());
-            return PaginationBox.fromComponents("Search results for '" + search + "'", command, list)
-                    .create(page);
-        }
-
-    }
-
     //FAWE start
     @Command(
             name = "/gtexture",
@@ -592,15 +548,18 @@ public class GeneralCommands {
         }
     }
 
-
     @Command(
             name = "/gtransform",
             aliases = {"gtransform"},
             desc = "Set the global transform"
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
-    public void gtransform(Player player, EditSession editSession, LocalSession session, ResettableExtent transform) throws
-            WorldEditException {
+    public void gtransform(
+            Player player,
+            EditSession editSession,
+            LocalSession session,
+            @Arg(desc = "The transform to set", def = "") ResettableExtent transform
+    ) throws WorldEditException {
         session.setTransform(transform);
         if (transform == null) {
             player.print(Caption.of("fawe.worldedit.general.transform.disabled"));
@@ -647,6 +606,50 @@ public class GeneralCommands {
             session.setFastMode(true);
             actor.print(Caption.of("worldedit.fast.enabled"));
         }
+    }
+
+    private static class ItemSearcher implements Callable<Component> {
+
+        private final boolean blocksOnly;
+        private final boolean itemsOnly;
+        private final String search;
+        private final int page;
+
+        ItemSearcher(String search, boolean blocksOnly, boolean itemsOnly, int page) {
+            this.blocksOnly = blocksOnly;
+            this.itemsOnly = itemsOnly;
+            this.search = search;
+            this.page = page;
+        }
+
+        @Override
+        public Component call() throws Exception {
+            String command = "/searchitem " + (blocksOnly ? "-b " : "") + (itemsOnly ? "-i " : "") + "-p %page% " + search;
+            Map<String, Component> results = new TreeMap<>();
+            String idMatch = search.replace(' ', '_');
+            String nameMatch = search.toLowerCase(Locale.ROOT);
+            for (ItemType searchType : ItemType.REGISTRY) {
+                if (blocksOnly && !searchType.hasBlockType()) {
+                    continue;
+                }
+
+                if (itemsOnly && searchType.hasBlockType()) {
+                    continue;
+                }
+                final String id = searchType.getId();
+                if (id.contains(idMatch)) {
+                    Component name = searchType.getRichName();
+                    results.put(id, TextComponent.builder()
+                            .append(name)
+                            .append(" (" + id + ")")
+                            .build());
+                }
+            }
+            List<Component> list = new ArrayList<>(results.values());
+            return PaginationBox.fromComponents("Search results for '" + search + "'", command, list)
+                    .create(page);
+        }
+
     }
     //FAWE end
 }

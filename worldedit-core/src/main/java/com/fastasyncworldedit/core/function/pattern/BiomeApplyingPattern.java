@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.function.pattern;
 
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -10,6 +11,12 @@ public class BiomeApplyingPattern extends AbstractExtentPattern {
 
     private final BiomeType biomeType;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent    extent to set to
+     * @param biomeType biome type to set
+     */
     public BiomeApplyingPattern(Extent extent, BiomeType biomeType) {
         super(extent);
         this.biomeType = biomeType;

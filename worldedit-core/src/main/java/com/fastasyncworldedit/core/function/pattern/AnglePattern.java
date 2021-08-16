@@ -1,15 +1,14 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.fastasyncworldedit.core.extent.ExtentHeightCacher;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-public class DataAnglePattern extends AbstractPattern {
+public abstract class AnglePattern extends AbstractPattern {
 
     public final double factor;
     public final Extent extent;
@@ -17,7 +16,13 @@ public class DataAnglePattern extends AbstractPattern {
     public final int minY;
     public final int distance;
 
-    public DataAnglePattern(Extent extent, int distance) {
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent   extent to set to
+     * @param distance distance to calculate angle with
+     */
+    public AnglePattern(Extent extent, int distance) {
         this.extent = new ExtentHeightCacher(extent);
         this.maxY = extent.getMaxY();
         this.minY = extent.getMinY();
@@ -60,25 +65,9 @@ public class DataAnglePattern extends AbstractPattern {
     }
 
     @Override
-    public BaseBlock applyBlock(BlockVector3 position) {
-        BlockState block = extent.getBlock(position);
-        int slope = getSlope(block, position, extent);
-        if (slope == -1) {
-            return block.toBaseBlock();
-        }
-        int data = Math.min(slope, 255) >> 4;
-        return block.withPropertyId(data).toBaseBlock();
-    }
+    public abstract BaseBlock applyBlock(BlockVector3 position);
 
     @Override
-    public boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition) throws WorldEditException {
-        BlockState block = extent.getBlock(getPosition);
-        int slope = getSlope(block, getPosition, extent);
-        if (slope == -1) {
-            return false;
-        }
-        int data = Math.min(slope, 255) >> 4;
-        return extent.setBlock(setPosition, block.withPropertyId(data));
-    }
+    public abstract boolean apply(Extent extent, BlockVector3 setPosition, BlockVector3 getPosition);
 
 }
