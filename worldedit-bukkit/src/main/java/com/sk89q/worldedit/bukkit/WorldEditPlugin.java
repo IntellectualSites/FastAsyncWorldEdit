@@ -317,7 +317,7 @@ public class WorldEditPlugin extends JavaPlugin {
             for (org.bukkit.World world : Bukkit.getWorlds()) {
                 // cast is needed, thanks to raw types <3
                 for (final NamespacedKey biome : ((BukkitImplAdapter<?>) adapter.value().get()).getRegisteredBiomes(world)) {
-                    if (BiomeTypes.get(biome.toString()) == null) { // only register once
+                    if (BiomeType.REGISTRY.get(biome.toString()) == null) { // only register once
                         BiomeType.REGISTRY.register(biome.toString(), new BiomeType(biome.toString()));
                     }
                 }
@@ -325,7 +325,7 @@ public class WorldEditPlugin extends JavaPlugin {
         } else {
             LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
             for (Biome biome : Biome.values()) {
-                if (BiomeTypes.get(biome.toString()) == null) { // only register once
+                if (BiomeType.REGISTRY.get(biome.toString()) == null) { // only register once
                     BiomeType.REGISTRY.register(biome.getKey().toString(), new BiomeType(biome.getKey().toString()));
                 }
             }
