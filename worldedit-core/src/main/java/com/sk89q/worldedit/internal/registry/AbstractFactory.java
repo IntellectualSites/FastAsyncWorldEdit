@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.internal.registry;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.NoMatchException;
@@ -70,6 +71,17 @@ public abstract class AbstractFactory<E> {
         return Collections.unmodifiableList(parsers);
     }
 
+    //FAWE start - javadoc
+
+    /**
+     * Parse a string and context to each {@link InputParser} added to this factory. If no result found, throws {@link InputParseException}
+     *
+     * @param input   input string
+     * @param context input context
+     * @return parsed result
+     * @throws InputParseException if no result found
+     */
+    //FAWE end
     public E parseFromInput(String input, ParserContext context) throws InputParseException {
         E match;
 
@@ -99,6 +111,21 @@ public abstract class AbstractFactory<E> {
         checkNotNull(inputParser);
 
         parsers.add(parsers.size() - 1, inputParser);
+    }
+
+    /**
+     * Test all parsers to see if alias is contained by one of them
+     *
+     * @param alias alias to test
+     * @return if a parser contains the alias
+     */
+    public boolean containsAlias(String alias) {
+        return parsers.stream().anyMatch(p -> {
+            if (!(p instanceof AliasedParser)) {
+                return false;
+            }
+            return ((AliasedParser) p).getMatchedAliases().contains(alias);
+        });
     }
 
 }

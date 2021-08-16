@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.command.tool.TargetMode;
 import com.fastasyncworldedit.core.command.tool.brush.BrushSettings;
 import com.fastasyncworldedit.core.command.tool.scroll.Scroll;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.collect.Iterables;
@@ -360,33 +361,33 @@ public class ToolUtilCommands {
         player.print(Caption.of("fawe.worldedit.brush.brush.source.mask"));
     }
 
-    // TODO: Ping @MattBDev to reimplement 2020-02-04
-//    @Command(
-//            name = "transform",
-//            desc = "Set the brush transform"
-//    )
-//    @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
-//    public void transform(Player player, LocalSession session, EditSession editSession,
-//                          @Arg(desc = "The transform", def = "") ResettableExtent transform,
-//                          @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-//                                  boolean offHand,
-//                          Arguments arguments) throws WorldEditException {
-//        BrushTool tool = session.getBrushTool(player, false);
-//        if (tool == null) {
-//            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.none"));
-//            return;
-//        }
-//        if (transform == null) {
-//            player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform.disabled"));
-//            tool.setTransform(null);
-//            return;
-//        }
-//        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
-//        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
-//        settings.addSetting(BrushSettings.SettingType.TRANSFORM, lastArg);
-//        settings.setTransform(transform);
-//        tool.update();
-//        player.print(TranslatableComponent.of("fawe.worldedit.brush.brush.transform"));
-//    }
+    @Command(
+            name = "transform",
+            aliases = {"/transform"},
+            desc = "Set the brush transform"
+    )
+    @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
+    public void transform(Player player, LocalSession session, EditSession editSession,
+                          @Arg(desc = "The transform", def = "") ResettableExtent transform,
+                          @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
+                                  boolean offHand,
+                          Arguments arguments) throws WorldEditException {
+        BrushTool tool = session.getBrushTool(player, false);
+        if (tool == null) {
+            player.print(Caption.of("fawe.worldedit.brush.brush.none"));
+            return;
+        }
+        if (transform == null) {
+            player.print(Caption.of("fawe.worldedit.brush.brush.transform.disabled"));
+            tool.setTransform(null);
+            return;
+        }
+        BrushSettings settings = offHand ? tool.getOffHand() : tool.getContext();
+        String lastArg = Iterables.getLast(CommandArgParser.spaceSplit(arguments.get())).getSubstring();
+        settings.addSetting(BrushSettings.SettingType.TRANSFORM, lastArg);
+        settings.setTransform(transform);
+        tool.update();
+        player.print(Caption.of("fawe.worldedit.brush.brush.transform"));
+    }
     //FAWE end
 }

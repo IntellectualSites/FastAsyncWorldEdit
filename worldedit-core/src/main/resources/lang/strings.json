@@ -60,6 +60,7 @@
 	"fawe.worldedit.brush.spline.secondary": "Created spline",
 	"fawe.worldedit.brush.brush.source.mask.disabled": "Brush source mask disabled",
 	"fawe.worldedit.brush.brush.source.mask": "Brush source mask set",
+	"fawe.worldedit.brush.brush.transform.disabled": "Brush transform disabled",
 	"fawe.worldedit.brush.brush.transform": "Brush transform set",
 
 	"fawe.worldedit.rollback.rollback.element": "Undoing {0}",
@@ -135,6 +136,12 @@
     "fawe.error.input-parser-exception": "Invalid empty string instead of boolean.",
     "fawe.error.invalid-boolean": "Invalid boolean {0}",
     "fawe.error.schematic.not.found": "Schematic {0} not found.",
+    "fawe.error.parse.invalid-dangling-character": "Invalid dangling character {0}.",
+    "fawe.error.parse.unknown-mask": "Unknown mask: {0}, See: {1}",
+    "fawe.error.parse.unknown-pattern": "Unknown pattern: {0}, See: {1}",
+    "fawe.error.parse.unknown-transform": "Unknown transform: {0}, See: {1}",
+    "fawe.error.parse.no-clipboard": "To use {0}, please first copy something to your clipboard",
+    "fawe.error.parse.no-clipboard-source": "No clipboards found at given source: {0}",
 
     "fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {0}",

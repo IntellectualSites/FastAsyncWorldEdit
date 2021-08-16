@@ -403,10 +403,32 @@ public interface Extent extends InputExtent, OutputExtent {
         }
     }
 
+    /**
+     * Returns true if the extent contains the given position
+     *
+     * @param pt position
+     * @return if position is contained
+     */
     default boolean contains(BlockVector3 pt) {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
         return pt.containedWithin(min, max);
+    }
+
+    /**
+     * Returns true if the extent contains the given position
+     *
+     * @param x position x
+     * @param y position y
+     * @param z position z
+     * @return if position is contained
+     */
+    default boolean contains(int x, int y, int z) {
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+        return min.getX() <= x && max.getX() >= x
+                && min.getY() <= y && max.getY() >= y
+                && min.getZ() <= z && max.getZ() >= z;
     }
 
     default void addOre(

@@ -14,6 +14,13 @@ public class MaskedPattern extends AbstractPattern {
     private final Pattern secondary;
     private final Mask mask;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param mask      mask to use
+     * @param primary   pattern if mask true
+     * @param secondary pattern if mask false
+     */
     public MaskedPattern(Mask mask, Pattern primary, Pattern secondary) {
         this.mask = mask;
         this.primary = primary;

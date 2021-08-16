@@ -5,9 +5,11 @@ import com.fastasyncworldedit.core.util.TextureUtil;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class DesaturatePattern extends AbstractPattern {
 
@@ -15,21 +17,33 @@ public class DesaturatePattern extends AbstractPattern {
     private final Extent extent;
     private final double value;
 
-    public DesaturatePattern(Extent extent, double value, TextureHolder util) {
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param extent extent to set to
+     * @param holder {@link TextureHolder} to use for textures
+     * @param value  decimal percent to desaturate by (0 -> 1)
+     */
+    public DesaturatePattern(Extent extent, TextureHolder holder, double value) {
         this.extent = extent;
-        this.holder = util;
+        this.holder = holder;
         this.value = Math.max(0, Math.min(1, value));
     }
 
     @Override
     public BaseBlock applyBlock(BlockVector3 position) {
-        BlockType block = extent.getBlock(position).getBlockType();
+        BlockType type = extent.getBlock(position).getBlockType();
         TextureUtil util = holder.getTextureUtil();
-        int color = getColor(util.getColor(block));
+        int color;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            color = holder.getTextureUtil().getColor(extent.getBiome(position));
+        } else {
+            color = holder.getTextureUtil().getColor(type);
+        }
         return util.getNearestBlock(color).getDefaultState().toBaseBlock();
     }
 
-    public int getColor(int color) {
+    private int getColor(int color) {
         int r = (color >> 16) & 0xFF;
         int g = (color >> 8) & 0xFF;
         int b = (color >> 0) & 0xFF;
@@ -45,7 +59,12 @@ public class DesaturatePattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockType type = get.getBlock(extent).getBlockType();
         TextureUtil util = holder.getTextureUtil();
-        int color = util.getColor(type);
+        int color;
+        if (type == BlockTypes.GRASS_BLOCK) {
+            color = holder.getTextureUtil().getColor(extent.getBiome(get));
+        } else {
+            color = holder.getTextureUtil().getColor(type);
+        }
         int newColor = getColor(color);
         if (newColor == color) {
             return false;
