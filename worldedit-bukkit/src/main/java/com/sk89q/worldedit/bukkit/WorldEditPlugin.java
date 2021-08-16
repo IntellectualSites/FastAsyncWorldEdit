@@ -242,7 +242,7 @@ public class WorldEditPlugin extends JavaPlugin {
 
     @SuppressWarnings({"deprecation", "unchecked"})
     private void initializeRegistries() {
-        /* Biome FAWE start - move to own method
+        /* FAWE start - move Biomes to their own method
         for (Biome biome : Biome.values()) {
             String lowerCaseBiomeName = biome.name().toLowerCase(Locale.ROOT);
             BiomeType.REGISTRY.register("minecraft:" + lowerCaseBiomeName, new BiomeType("minecraft:" + lowerCaseBiomeName));
