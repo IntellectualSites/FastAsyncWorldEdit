@@ -349,13 +349,17 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         return addWriteTask(writeTask, Fawe.isMainThread());
     }
 
-    public Future<?> addWriteTask(Runnable writeTask, boolean completeNow) {
+    public Future<?> addWriteTask(final Runnable writeTask, final boolean completeNow) {
         AbstractChangeSet.this.waitingCombined.incrementAndGet();
         Runnable wrappedTask = () -> {
             try {
                 writeTask.run();
             } catch (Throwable t) {
-                t.printStackTrace();
+                if (completeNow) {
+                    throw t;
+                } else {
+                    t.printStackTrace();
+                }
             } finally {
                 if (AbstractChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
                     synchronized (AbstractChangeSet.this.waitingAsync) {
