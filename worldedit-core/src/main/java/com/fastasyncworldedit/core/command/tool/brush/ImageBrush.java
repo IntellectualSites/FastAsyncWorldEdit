@@ -18,6 +18,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -54,8 +56,14 @@ public class ImageBrush implements Brush {
                     default:
                         BlockState block = extent.getBlock(pos);
                         TextureUtil tu = session.getTextureUtil();
-                        int existingColor = tu.getColor(block.getBlockType());
-                        return tu.combineTransparency(color, existingColor);
+                        BlockType type = block.getBlockType();
+                        int existingColor;
+                        if (type == BlockTypes.GRASS_BLOCK) {
+                            existingColor = tu.getColor(extent.getBiome(pos));
+                        } else {
+                            existingColor = tu.getColor(type);
+                        }
+                        return TextureUtil.combineTransparency(color, existingColor);
 
                 }
             };

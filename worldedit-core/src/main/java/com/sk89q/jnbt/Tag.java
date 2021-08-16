@@ -26,7 +26,7 @@ import com.sk89q.worldedit.util.nbt.BinaryTagLike;
  *
  * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
  */
-@Deprecated
+@Deprecated(forRemoval = true)
 public abstract class Tag implements BinaryTagLike {
 
     /**

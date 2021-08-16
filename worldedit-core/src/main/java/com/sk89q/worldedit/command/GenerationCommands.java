@@ -103,10 +103,42 @@ public class GenerationCommands {
             @Radii(2)
                     List<Double> radii,
             @Arg(desc = "The height of the cylinder", def = "1")
-                    int height
+                    int height,
+            //FAWE start - hcyl thickness
+            @Arg(desc = "Thickness of the cyclinder. 0 creates a normal //hcyl.", def = "0")
+                    double thickness
     ) throws WorldEditException {
-        return cyl(actor, session, editSession, pattern, radii, height, true);
+        final double radiusX;
+        final double radiusZ;
+        switch (radii.size()) {
+            case 1:
+                radiusX = radiusZ = Math.max(1, radii.get(0));
+                break;
+
+            case 2:
+                radiusX = Math.max(1, radii.get(0));
+                radiusZ = Math.max(1, radii.get(1));
+                break;
+
+            default:
+                actor.print(Caption.of("worldedit.cyl.invalid-radius"));
+                return 0;
+        }
+        worldEdit.checkMaxRadius(radiusX);
+        worldEdit.checkMaxRadius(radiusZ);
+        worldEdit.checkMaxRadius(height);
+
+        if (thickness > radiusX || thickness > radiusZ) {
+            actor.print(Caption.of("worldedit.hcyl.thickness-too-large"));
+            return 0;
+        }
+
+        BlockVector3 pos = session.getPlacementPosition(actor);
+        int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, height, thickness, false);
+        actor.print(Caption.of("worldedit.cyl.created", TextComponent.of(affected)));
+        return affected;
     }
+    //FAWE end
 
     @Command(
             name = "/cyl",
@@ -241,9 +273,6 @@ public class GenerationCommands {
             @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                     double density
     ) throws WorldEditException {
-        //FAWE start
-        actor.print(TextComponent.of("Warning: This brush is currently not undo-able due to a Spigot bug!").color(TextColor.RED));
-        //FAWE end
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
         density /= 100;

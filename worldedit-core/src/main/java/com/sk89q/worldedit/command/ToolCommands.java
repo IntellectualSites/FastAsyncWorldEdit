@@ -242,9 +242,6 @@ public class ToolCommands {
                     TreeGenerator.TreeType type
     ) throws WorldEditException {
         setTool(player, session, new TreePlanter(type), "worldedit.tool.tree.equip");
-        //FAWE start
-        player.print(TextComponent.of("Warning: This brush is currently not undo-able due to a Spigot bug!").color(TextColor.RED));
-        //FAWE end
     }
 
     @Command(

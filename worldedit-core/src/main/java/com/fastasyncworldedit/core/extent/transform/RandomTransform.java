@@ -29,6 +29,11 @@ public class RandomTransform extends SelectTransform {
         this(new TrueRandom());
     }
 
+    /**
+     * New instance
+     *
+     * @param random {@link SimpleRandom} used to choose between transforms, given weights
+     */
     public RandomTransform(SimpleRandom random) {
         this.random = random;
     }
@@ -49,6 +54,7 @@ public class RandomTransform extends SelectTransform {
             collection = RandomCollection.of(weights, random);
             extents = new LinkedHashSet<>(weights.keySet());
         }
+        super.setExtent(extent);
         for (ResettableExtent current : extents) {
             current.setExtent(extent);
         }

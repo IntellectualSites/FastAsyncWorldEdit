@@ -11,6 +11,12 @@ public class PatternTransform extends ResettableExtent {
 
     private final Pattern pattern;
 
+    /**
+     * New instance
+     *
+     * @param parent  extent to set to
+     * @param pattern pattern to apply
+     */
     public PatternTransform(Extent parent, Pattern pattern) {
         super(parent);
         this.pattern = pattern;
@@ -20,6 +26,13 @@ public class PatternTransform extends ResettableExtent {
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
             throws WorldEditException {
         return pattern.apply(getExtent(), location, location);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block)
+            throws WorldEditException {
+        BlockVector3 vector3 = BlockVector3.at(x, y, z);
+        return pattern.apply(extent, vector3, vector3);
     }
 
 }

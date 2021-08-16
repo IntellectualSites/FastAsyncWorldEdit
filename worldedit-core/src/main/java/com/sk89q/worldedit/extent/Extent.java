@@ -215,8 +215,11 @@ public interface Extent extends InputExtent, OutputExtent {
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY, Mask filter) {
         maxY = Math.min(maxY, Math.max(0, maxY));
         minY = Math.max(0, minY);
+
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+
         for (int y = maxY; y >= minY; --y) {
-            if (filter.test(MutableBlockVector3.get(x, y, z))) {
+            if (filter.test(mutable.setComponents(x, y, z))) {
                 return y;
             }
         }
@@ -286,28 +289,29 @@ public interface Extent extends InputExtent, OutputExtent {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        boolean state = !mask.test(MutableBlockVector3.get(x, y, z));
+        BlockVector3 pos = MutableBlockVector3.get(x, y, z);
+        boolean state = !mask.test(pos);
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            if (mask.test(MutableBlockVector3.get(x, y1, z)) != state) {
+            if (mask.test(pos.mutY(y1)) != state) {
                 return y1 - offset;
             }
             int y2 = y - d;
-            if (mask.test(MutableBlockVector3.get(x, y2, z)) != state) {
+            if (mask.test(pos.mutY(y2)) != state) {
                 return y2 + offset;
             }
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) {
+                    if (mask.test(pos.mutY(layer)) != state) {
                         return layer + offset;
                     }
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) {
+                    if (mask.test(pos.mutY(layer)) != state) {
                         return layer - offset;
                     }
                 }
@@ -399,10 +403,32 @@ public interface Extent extends InputExtent, OutputExtent {
         }
     }
 
+    /**
+     * Returns true if the extent contains the given position
+     *
+     * @param pt position
+     * @return if position is contained
+     */
     default boolean contains(BlockVector3 pt) {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
         return pt.containedWithin(min, max);
+    }
+
+    /**
+     * Returns true if the extent contains the given position
+     *
+     * @param x position x
+     * @param y position y
+     * @param z position z
+     * @return if position is contained
+     */
+    default boolean contains(int x, int y, int z) {
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+        return min.getX() <= x && max.getX() >= x
+                && min.getY() <= y && max.getY() >= y
+                && min.getZ() <= z && max.getZ() >= z;
     }
 
     default void addOre(

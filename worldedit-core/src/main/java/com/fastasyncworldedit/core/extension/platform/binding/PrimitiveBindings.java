@@ -39,32 +39,6 @@ public class PrimitiveBindings extends Bindings {
         }
     }
 
-// TODO: Ping @MattBDev to reimplement 2020-02-04
-//
-//    /**
-//     * Gets an {@link Extent} from a {@link Binding}.
-//     *
-//     * @param argument the context
-//     * @return an extent
-//     * @throws InputParseException on other error
-//     */
-//    @Binding
-//    public ResettableExtent getResettableExtent(Actor actor, String argument) throws InputParseException {
-//        if (argument.equalsIgnoreCase("#null")) {
-//            return new NullExtent();
-//        }
-//        DefaultTransformParser parser = Fawe.get().getTransformParser();
-//        ParserContext parserContext = new ParserContext();
-//        if (actor instanceof Entity) {
-//            Extent extent = ((Entity) actor).getExtent();
-//            if (extent instanceof World) {
-//                parserContext.setWorld((World) extent);
-//            }
-//        }
-//        parserContext.setSession(WorldEdit.getInstance().getSessionManager().get(actor));
-//        return parser.parseFromInput(argument, parserContext);
-//    }
-
     /**
      * Gets a type from a {@link Binding}.
      *

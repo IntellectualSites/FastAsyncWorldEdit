@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.util.eventbus;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,7 +36,7 @@ public class MethodEventHandler extends EventHandler {
      * Create a new event handler.
      *
      * @param priority the priority
-     * @param method   the method
+     * @param method the method
      */
     public MethodEventHandler(Priority priority, Object object, Method method) {
         super(priority);
@@ -72,7 +73,8 @@ public class MethodEventHandler extends EventHandler {
         if (!method.equals(that.method)) {
             return false;
         }
-        return object != null ? object.equals(that.object) : that.object == null;
+
+        return Objects.equals(object, that.object);
     }
 
     @Override
@@ -81,5 +83,4 @@ public class MethodEventHandler extends EventHandler {
         result = 31 * result + method.hashCode();
         return result;
     }
-
 }

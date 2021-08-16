@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.fastasyncworldedit.core.registry.state.PropertyKeySet;
 import com.fastasyncworldedit.core.util.MutableCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.BlockMask;
@@ -423,6 +424,9 @@ public class BlockMaskBuilder {
 
     public <T extends BlockStateHolder<T>> BlockMaskBuilder add(BlockStateHolder<T> state) {
         BlockType type = state.getBlockType();
+        if (state instanceof BlanketBaseBlock) {
+            return add(type);
+        }
         int i = type.getInternalId();
         long[] states = bitSets[i];
         if (states != ALL) {
