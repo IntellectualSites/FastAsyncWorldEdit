@@ -311,8 +311,8 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     /**
      * Returns an iterable of all biomes known to the server.
      *
-     * @return all biomes known to the server.
      * @param world the world to load the registered biomes from.
+     * @return all biomes known to the server.
      */
     default Iterable<NamespacedKey> getRegisteredBiomes(World world) {
         return Arrays.stream(Biome.values())

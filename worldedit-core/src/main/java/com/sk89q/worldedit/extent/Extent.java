@@ -200,6 +200,15 @@ public interface Extent extends InputExtent, OutputExtent {
          - TODO: actually optimize these
      */
 
+    /**
+     * Returns the highest solid 'terrain' block.
+     *
+     * @param x    the X coordinate
+     * @param z    the Z coordinate
+     * @param minY minimal height
+     * @param maxY maximal height
+     * @return height of highest block found or 'minY'
+     */
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
         for (int y = maxY; y >= minY; --y) {
             BlockState block = getBlock(x, y, z);
@@ -210,6 +219,16 @@ public interface Extent extends InputExtent, OutputExtent {
         return minY;
     }
 
+    /**
+     * Returns the highest solid 'terrain' block.
+     *
+     * @param x      the X coordinate
+     * @param z      the Z coordinate
+     * @param minY   minimal height
+     * @param maxY   maximal height
+     * @param filter a mask of blocks to consider, or null to consider any solid (movement-blocking) block
+     * @return height of highest block found or 'minY'
+     */
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY, Mask filter) {
         maxY = Math.min(maxY, getMaxY());
         minY = Math.max(getMinY(), minY);

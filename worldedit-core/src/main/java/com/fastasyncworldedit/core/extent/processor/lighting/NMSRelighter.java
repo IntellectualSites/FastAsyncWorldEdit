@@ -1248,7 +1248,7 @@ public class NMSRelighter implements Relighter {
         public int bitmask;
         public boolean smooth;
 
-        public RelightSkyEntry(int x, int z, byte[] fix, int bitmask, int minY, int maxY) {
+        private RelightSkyEntry(int x, int z, byte[] fix, int bitmask, int minY, int maxY) {
             this.x = x;
             this.z = z;
             byte[] array = new byte[256];
@@ -1263,6 +1263,7 @@ public class NMSRelighter implements Relighter {
             }
         }
 
+        //Following are public because they are public in Object. NONE of this nested class is API.
         @Override
         public String toString() {
             return x + "," + z;

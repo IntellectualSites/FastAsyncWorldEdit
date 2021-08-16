@@ -336,6 +336,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         return minSectionIndex;
     }
 
+    // Checks and updates the various section arrays against the new layer index
     private void updateSectionIndexRange(int layer) {
         if (layer >= minSectionIndex && layer <= maxSectionIndex) {
             return;
