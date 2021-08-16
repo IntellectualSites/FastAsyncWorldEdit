@@ -10,8 +10,8 @@ import java.util.Arrays;
 
 public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
-    public CharGetBlocks(final int minLayer, final int maxLayer) {
-        super(minLayer, maxLayer);
+    public CharGetBlocks(final int minSectionIndex, final int maxSectionIndex) {
+        super(minSectionIndex, maxSectionIndex);
     }
 
     @Override

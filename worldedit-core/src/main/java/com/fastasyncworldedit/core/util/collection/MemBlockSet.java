@@ -28,17 +28,17 @@ public final class MemBlockSet extends BlockSet {
     public static final IRow NULL_ROW_Y = new NullRowY();
     public final IRow[] rows;
     public final MutableBlockVector3 mutable;
-    private final int minLayer;
-    private final int maxLayer;
+    private final int minSectionIndex;
+    private final int maxSectionIndex;
 
-    public MemBlockSet(int size, int offsetX, int offsetZ, int minLayer, int maxLayer) {
+    public MemBlockSet(int size, int offsetX, int offsetZ, int minSectionIndex, int maxSectionIndex) {
         super(offsetX, offsetZ);
         this.rows = new IRow[size];
         for (int i = 0; i < size; i++) {
             rows[i] = NULL_ROW_X;
         }
-        this.minLayer = minLayer;
-        this.maxLayer = maxLayer;
+        this.minSectionIndex = minSectionIndex;
+        this.maxSectionIndex = maxSectionIndex;
         this.mutable = new MutableBlockVector3();
     }
 
@@ -53,14 +53,14 @@ public final class MemBlockSet extends BlockSet {
     public boolean add(int x, int y, int z) {
         x -= getBlockOffsetX();
         z -= getBlockOffsetZ();
-        return rows[x >> 4].add(this.rows, x, y, z - getBlockOffsetZ(), minLayer, maxLayer);
+        return rows[x >> 4].add(this.rows, x, y, z - getBlockOffsetZ(), minSectionIndex, maxSectionIndex);
     }
 
     @Override
     public void set(int x, int y, int z) {
         x -= getBlockOffsetX();
         z -= getBlockOffsetZ();
-        rows[x >> 4].set(this.rows, x, y, z - getBlockOffsetZ(), minLayer, maxLayer);
+        rows[x >> 4].set(this.rows, x, y, z - getBlockOffsetZ(), minSectionIndex, maxSectionIndex);
     }
 
     @Override
@@ -234,7 +234,7 @@ public final class MemBlockSet extends BlockSet {
                     @Override
                     public BlockVector3 next() {
                         mutable.setComponents(
-                                setX + getBlockOffsetX(), setY - (minLayer << 4), setZ + getBlockOffsetX());
+                                setX + getBlockOffsetX(), setY - (minSectionIndex << 4), setZ + getBlockOffsetX());
                         init();
                         return mutable;
                     }
@@ -282,7 +282,7 @@ public final class MemBlockSet extends BlockSet {
                     if (rowx instanceof RowX) {
                         IRow rowz = ((RowX) rowx).rows[other.getZ()];
                         if (rowz instanceof RowZ) {
-                            return ((RowZ) rowz).rows[other.getY() - (minLayer << 4) - getChunkOffsetZ()] instanceof RowY;
+                            return ((RowZ) rowz).rows[other.getY() - (minSectionIndex << 4) - getChunkOffsetZ()] instanceof RowY;
                         }
                     }
                 }
@@ -293,7 +293,7 @@ public final class MemBlockSet extends BlockSet {
 
     @Override
     public int getMinimumY() {
-        int maxY = maxLayer;
+        int maxY = maxSectionIndex;
         int maxy = 16;
         int by = Integer.MAX_VALUE;
         for (IRow nullRowX : rows) {
@@ -357,7 +357,7 @@ public final class MemBlockSet extends BlockSet {
                 }
                 RowZ rowz = (RowZ) nullRowZ;
                 outer:
-                for (int Y = maxLayer; Y >= maxY; Y--) {
+                for (int Y = maxSectionIndex; Y >= maxY; Y--) {
                     IRow nullRowY = rowz.rows[Y];
                     if (!(nullRowY instanceof RowY)) {
                         continue;
@@ -376,8 +376,8 @@ public final class MemBlockSet extends BlockSet {
                                     maxy = y + 1;
                                 }
                                 by = (Y << 4) + y;
-                                if (by == (maxLayer << 4) + 15) {
-                                    return (maxLayer << 4) + 15;
+                                if (by == (maxSectionIndex << 4) + 15) {
+                                    return (maxSectionIndex << 4) + 15;
                                 }
                                 break outer;
                             }
@@ -582,7 +582,7 @@ public final class MemBlockSet extends BlockSet {
                     if (!(nullRowY instanceof RowY)) {
                         continue;
                     }
-                    int by = ((Y - minLayer) << 4);
+                    int by = ((Y - minSectionIndex) << 4);
                     RowY rowY = (RowY) nullRowY;
                     for (int y = 0, i = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z += 4, i++) {
@@ -817,10 +817,10 @@ public final class MemBlockSet extends BlockSet {
             return false;
         }
 
-        void set(IRow[] rows, int x, int y, int z, int minLayer, int maxLayer);
+        void set(IRow[] rows, int x, int y, int z, int minSectionIndex, int maxSectionIndex);
 
-        default boolean add(IRow[] rows, int x, int y, int z, int minLayer, int maxLayer) {
-            set(rows, x, y, z, minLayer, maxLayer);
+        default boolean add(IRow[] rows, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
+            set(rows, x, y, z, minSectionIndex, maxSectionIndex);
             return true;
         }
 
@@ -837,10 +837,10 @@ public final class MemBlockSet extends BlockSet {
     public static final class NullRowX implements IRow {
 
         @Override
-        public void set(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
+        public void set(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
             IRow row = new RowX(parent.length);
             parent[x >> 4] = row;
-            row.set(parent, x, y, z, minLayer, maxLayer);
+            row.set(parent, x, y, z, minSectionIndex, maxSectionIndex);
         }
 
     }
@@ -848,10 +848,10 @@ public final class MemBlockSet extends BlockSet {
     public static final class NullRowZ implements IRow {
 
         @Override
-        public void set(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
-            IRow row = new RowZ(minLayer, maxLayer);
+        public void set(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
+            IRow row = new RowZ(minSectionIndex, maxSectionIndex);
             parent[z >> 4] = row;
-            row.set(parent, x, y, z, minLayer, maxLayer);
+            row.set(parent, x, y, z, minSectionIndex, maxSectionIndex);
         }
 
     }
@@ -859,10 +859,10 @@ public final class MemBlockSet extends BlockSet {
     public static final class NullRowY implements IRow {
 
         @Override
-        public void set(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
+        public void set(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
             IRow row = new RowY();
             parent[y >> 4] = row;
-            row.set(parent, x, y, z, minLayer, maxLayer);
+            row.set(parent, x, y, z, minSectionIndex, maxSectionIndex);
         }
 
     }
@@ -884,13 +884,13 @@ public final class MemBlockSet extends BlockSet {
         }
 
         @Override
-        public void set(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
-            this.rows[z >> 4].set(this.rows, x, y, z, minLayer, maxLayer);
+        public void set(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
+            this.rows[z >> 4].set(this.rows, x, y, z, minSectionIndex, maxSectionIndex);
         }
 
         @Override
-        public boolean add(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
-            return this.rows[z >> 4].add(this.rows, x, y, z, minLayer, maxLayer);
+        public boolean add(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
+            return this.rows[z >> 4].add(this.rows, x, y, z, minSectionIndex, maxSectionIndex);
         }
 
         @Override
@@ -909,8 +909,8 @@ public final class MemBlockSet extends BlockSet {
 
         public final IRow[] rows;
 
-        public RowZ(int minLayer, int maxLayer) {
-            this.rows = new IRow[maxLayer - minLayer + 1];
+        public RowZ(int minSectionIndex, int maxSectionIndex) {
+            this.rows = new IRow[maxSectionIndex - minSectionIndex + 1];
             reset();
         }
 
@@ -924,13 +924,13 @@ public final class MemBlockSet extends BlockSet {
         }
 
         @Override
-        public void set(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
-            this.rows[y >> 4].set(this.rows, x, y, z, minLayer, maxLayer);
+        public void set(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
+            this.rows[y >> 4].set(this.rows, x, y, z, minSectionIndex, maxSectionIndex);
         }
 
         @Override
-        public boolean add(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
-            return this.rows[y >> 4].add(this.rows, x, y, z, minLayer, maxLayer);
+        public boolean add(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
+            return this.rows[y >> 4].add(this.rows, x, y, z, minSectionIndex, maxSectionIndex);
         }
 
         @Override
@@ -982,13 +982,13 @@ public final class MemBlockSet extends BlockSet {
         }
 
         @Override
-        public void set(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
+        public void set(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
             int i = ((y & 15) << 8) | ((z & 15) << 4) | (x & 15);
             bits[i >> 6] |= (1L << (i & 0x3F));
         }
 
         @Override
-        public boolean add(IRow[] parent, int x, int y, int z, int minLayer, int maxLayer) {
+        public boolean add(IRow[] parent, int x, int y, int z, int minSectionIndex, int maxSectionIndex) {
             int i = ((y & 15) << 8) | ((z & 15) << 4) | (x & 15);
             int offset = i >> 6;
             long value = bits[offset];
