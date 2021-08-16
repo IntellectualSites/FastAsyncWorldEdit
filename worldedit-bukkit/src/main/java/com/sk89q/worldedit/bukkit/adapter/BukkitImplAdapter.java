@@ -50,7 +50,9 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import org.bukkit.Keyed;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.block.Biome;
@@ -60,9 +62,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * An interface for adapters of various Bukkit implementations.
@@ -302,6 +306,18 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     default int getInternalBiomeId(BiomeType biome) {
         return Biome.BADLANDS.ordinal();
+    }
+
+    /**
+     * Returns an iterable of all biomes known to the server.
+     *
+     * @return all biomes known to the server.
+     * @param world the world to load the registered biomes from.
+     */
+    default Iterable<NamespacedKey> getRegisteredBiomes(World world) {
+        return Arrays.stream(Biome.values())
+                .map(Keyed::getKey)
+                .collect(Collectors.toList());
     }
 
     default RelighterFactory getRelighterFactory() {
