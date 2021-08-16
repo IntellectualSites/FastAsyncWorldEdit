@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class AsyncPreloader implements Preloader, Runnable {
 
     private final ConcurrentHashMap<UUID, MutablePair<World, Set<BlockVector2>>> update;
-    private AtomicBoolean cancelled = new AtomicBoolean(false);
+    private final AtomicBoolean cancelled = new AtomicBoolean(false);
 
     public AsyncPreloader() {
         this.update = new ConcurrentHashMap<>();
@@ -115,7 +115,7 @@ public class AsyncPreloader implements Preloader, Runnable {
         TaskManager.IMP.laterAsync(this, 20);
     }
 
-    public void queueLoad(World world, BlockVector2 chunk) {
+    private void queueLoad(World world, BlockVector2 chunk) {
         world.checkLoadedChunk(BlockVector3.at(chunk.getX() << 4, 0, chunk.getZ() << 4));
     }
 
