@@ -54,6 +54,9 @@ public interface IBlocks extends Trimable {
 
     IBlocks reset();
 
+    /**
+     * Get the number of stores sections
+     */
     int getSectionCount();
 
     /**

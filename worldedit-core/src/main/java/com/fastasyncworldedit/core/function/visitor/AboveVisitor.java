@@ -22,6 +22,9 @@ public class AboveVisitor extends RecursiveVisitor {
      * @param mask     the mask
      * @param function the function
      * @param baseY    the base Y
+     * @param depth    maximum number of iterations
+     * @param minY     min visitable y value. Inclusive.
+     * @param maxY     max visitable y value. Inclusive.
      */
     public AboveVisitor(Mask mask, RegionFunction function, int baseY, int depth, int minY, int maxY) {
         super(mask, function, depth, minY, maxY);

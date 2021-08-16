@@ -11,6 +11,13 @@ public class ArrayHeightMap extends ScalableHeightMap {
     private double rx;
     private double rz;
 
+    /**
+     * New height map represented by byte array[][] of values x*z to be scaled given a set size
+     *
+     * @param height array of height values
+     * @param minY min y value allowed to be set. Inclusive.
+     * @param maxY max y value allowed to be set. Inclusive.
+     */
     public ArrayHeightMap(byte[][] height, int minY, int maxY) {
         super(minY, maxY);
         setSize(5);

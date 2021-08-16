@@ -107,6 +107,12 @@ public interface IChunkSet extends IBlocks, OutputExtent {
         return null;
     }
 
+    /**
+     * If the given layer has biomes stored to be set to the world. Can be negative
+     *
+     * @param layer layer to check
+     * @return if the layer has biomes stored to be set to the world
+     */
     boolean hasBiomes(int layer);
 
 }

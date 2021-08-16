@@ -19,8 +19,21 @@ public class DirectionalVisitor extends RecursiveVisitor {
     private final BlockVector3 origin;
     private final BlockVector3 dirVec;
 
-    public DirectionalVisitor(Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction, int distance,
-                              int minY, int maxY) {
+    /**
+     * New visitor. Only visits in the given direction
+     *
+     * @param mask      block mask
+     * @param function  function to apply
+     * @param origin    start position
+     * @param direction allowable direction to visit between
+     * @param distance  max number of iterations
+     * @param minY      min visitable y value. Inclusive.
+     * @param maxY      max visitable y value. Inclusive.
+     */
+    public DirectionalVisitor(
+            Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction, int distance,
+            int minY, int maxY
+    ) {
         super(mask, function, distance, minY, maxY);
         checkNotNull(mask);
         this.origin = origin;

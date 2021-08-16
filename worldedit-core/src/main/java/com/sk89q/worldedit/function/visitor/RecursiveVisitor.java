@@ -21,7 +21,6 @@ package com.sk89q.worldedit.function.visitor;
 
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.function.mask.MaskIntersection;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,12 +33,25 @@ public class RecursiveVisitor extends BreadthFirstSearch {
 
     private final Mask mask;
 
-    //FAWE start
     /**
      * Create a new recursive visitor.
      *
      * @param mask     the mask
      * @param function the function
+     */
+    public RecursiveVisitor(Mask mask, RegionFunction function) {
+        //FAWE start - int depth, min/max y
+        this(mask, function, Integer.MAX_VALUE, 0, 255);
+    }
+
+    /**
+     * Create a new recursive visitor.
+     *
+     * @param mask     the mask
+     * @param function the function
+     * @param maxDepth maximum number of iterations
+     * @param minY     minimum allowable y to visit. Inclusive.
+     * @param maxY     maximum allowable y to visit. Inclusive.
      */
     public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth, int minY, int maxY) {
         super(function, maxDepth, minY, maxY);

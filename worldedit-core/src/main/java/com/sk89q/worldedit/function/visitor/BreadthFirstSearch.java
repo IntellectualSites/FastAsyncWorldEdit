@@ -103,13 +103,18 @@ public abstract class BreadthFirstSearch implements Operation {
      * @param function the function to apply to visited blocks
      */
     public BreadthFirstSearch(RegionFunction function) {
-        //FAWE start
+        //FAWE start - int depth, min/max y
         this(function, Integer.MAX_VALUE, 0, 255);
-        //FAWE end
-        checkNotNull(function);
     }
 
-    //FAWE start
+    /**
+     * Create a new instance.
+     *
+     * @param function the function to apply to visited blocks
+     * @param maxDepth maximum number of visits allowed
+     * @param minY     minimum y value to visit. Inclusive.
+     * @param maxY     maximum y value to visit. Inclusive.
+     */
     public BreadthFirstSearch(RegionFunction function, int maxDepth, int minY, int maxY) {
         checkNotNull(function);
         this.function = function;

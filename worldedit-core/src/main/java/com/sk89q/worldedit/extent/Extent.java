@@ -243,6 +243,18 @@ public interface Extent extends InputExtent, OutputExtent {
         return minY;
     }
 
+    /**
+     * Returns the nearest surface layer (up/down from start)
+     * <p>
+     * TODO: Someone understand this..?
+     *
+     * @param x    x to search from
+     * @param z    y to search from
+     * @param y    z to search from
+     * @param minY min y to search (inclusive)
+     * @param maxY max y to search (inclusive)
+     * @return nearest surface layer
+     */
     default int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
@@ -272,7 +284,7 @@ public interface Extent extends InputExtent, OutputExtent {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getBlock(x, layer, z);
                     if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
-                        return ((layer + offset) << 4) + 0;
+                        return (layer + offset) << 4;
                     }
                     data1 = PropertyGroup.LEVEL.get(block);
                 }
@@ -289,18 +301,20 @@ public interface Extent extends InputExtent, OutputExtent {
         return (state ? minY : maxY) << 4;
     }
 
-    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
-        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY, ignoreAir);
-    }
-
-    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY);
-    }
-
-    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
-        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, true);
-    }
-
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc) where the block conforms to a given mask. Searches in the x,z column given.
+     *
+     * @param x         column x
+     * @param z         column z
+     * @param y         start y
+     * @param minY      minimum y height to consider. Inclusive.
+     * @param maxY      maximum y height to consider. Inclusive.
+     * @param failedMin if nothing found, the minimum y value to return if returning min
+     * @param failedMax if nothing found, the maximum y value to return if returning max
+     * @param mask      mask to test blocks against
+     * @return The y value of the nearest terrain block
+     */
     default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
         y = Math.max(minY, Math.min(maxY, y));
         int clearanceAbove = maxY - y;
@@ -337,6 +351,68 @@ public interface Extent extends InputExtent, OutputExtent {
         return state ? failedMin : failedMax;
     }
 
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc). Searches in the x,z column given.
+     *
+     * @param x         column x
+     * @param z         column z
+     * @param y         start y
+     * @param minY      minimum y height to consider. Inclusive.
+     * @param maxY      maximum y height to consider. Inclusive.
+     * @param ignoreAir if air at the final value if no block found should be considered for return, else return -1
+     * @return The y value of the nearest terrain block
+     */
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY, ignoreAir);
+    }
+
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc). Searches in the x,z column given.
+     *
+     * @param x    column x
+     * @param z    column z
+     * @param y    start y
+     * @param minY minimum y height to consider. Inclusive.
+     * @param maxY maximum y height to consider. Inclusive.
+     * @return The y value of the nearest terrain block
+     */
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY);
+    }
+
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc). Searches in the x,z column given.
+     *
+     * @param x         column x
+     * @param z         column z
+     * @param y         start y
+     * @param minY      minimum y height to consider. Inclusive.
+     * @param maxY      maximum y height to consider. Inclusive.
+     * @param failedMin if nothing found, the minimum y value to return if returning min
+     * @param failedMax if nothing found, the maximum y value to return if returning max
+     * @return The y value of the nearest terrain block
+     */
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, true);
+    }
+
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc). Searches in the x,z column given.
+     *
+     * @param x         column x
+     * @param z         column z
+     * @param y         start y
+     * @param minY      minimum y height to consider. Inclusive.
+     * @param maxY      maximum y height to consider. Inclusive.
+     * @param failedMin if nothing found, the minimum y value to return if returning min
+     * @param failedMax if nothing found, the maximum y value to return if returning max
+     * @param ignoreAir if air at the final value if no block found should be considered for return, else return -1
+     * @return The y value of the nearest terrain block
+     */
     default int getNearestSurfaceTerrainBlock(
             int x,
             int z,

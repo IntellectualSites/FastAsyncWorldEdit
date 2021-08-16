@@ -67,6 +67,9 @@ public abstract class CharBlocks implements IBlocks {
     protected int maxSectionIndex;
     protected int sectionCount;
 
+    /**
+     * New instance given initial min/max section indices. Can be negative.
+     */
     public CharBlocks(int minSectionIndex, int maxSectionIndex) {
         this.minSectionIndex = minSectionIndex;
         this.maxSectionIndex = maxSectionIndex;

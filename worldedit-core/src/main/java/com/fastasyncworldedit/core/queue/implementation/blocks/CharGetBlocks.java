@@ -10,6 +10,9 @@ import java.util.Arrays;
 
 public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
+    /**
+     * New instance given the min/max section indices
+     */
     public CharGetBlocks(final int minSectionIndex, final int maxSectionIndex) {
         super(minSectionIndex, maxSectionIndex);
     }

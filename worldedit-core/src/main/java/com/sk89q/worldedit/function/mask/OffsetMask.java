@@ -43,6 +43,20 @@ public class OffsetMask extends AbstractMask {
      *
      * @param mask   the mask
      * @param offset the offset
+     * @deprecated use {@link OffsetMask#OffsetMask(Mask, BlockVector3, int, int)}
+     */
+    @Deprecated
+    public OffsetMask(Mask mask, BlockVector3 offset) {
+        this(mask, offset, 0, 255);
+    }
+
+    /**
+     * Create a new instance.
+     *
+     * @param mask   the mask
+     * @param offset the offset
+     * @param minY   minimum allowable y value to be set. Inclusive.
+     * @param maxY   maximum allowable y value to be set. Inclusive.
      */
     //FAWE start - ignore resultant position outside world height range
     public OffsetMask(Mask mask, BlockVector3 offset, int minY, int maxY) {

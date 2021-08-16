@@ -18,7 +18,6 @@ public interface HeightMap {
 
     void setSize(int size);
 
-
     default void perform(
             EditSession session,
             Mask mask,

@@ -26,14 +26,16 @@ public class ScalableHeightMap implements HeightMap {
         CYLINDER,
     }
 
+    /**
+     * New height map.
+     *
+     * @param minY min y value allowed to be set. Inclusive.
+     * @param maxY max y value allowed to be set. Inclusive.
+     */
     public ScalableHeightMap(final int minY, final int maxY) {
         this.minY = minY;
         this.maxY = maxY;
         setSize(5);
-    }
-
-    public ScalableHeightMap(int size) {
-        setSize(size);
     }
 
     @Override

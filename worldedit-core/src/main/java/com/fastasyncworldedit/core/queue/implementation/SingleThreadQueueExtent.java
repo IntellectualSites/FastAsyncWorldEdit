@@ -66,6 +66,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     public SingleThreadQueueExtent() {}
 
+    /**
+     * New instance given inclusive world height bounds.
+     */
     public SingleThreadQueueExtent(int minY, int maxY) {
         this.minY = minY;
         this.maxY = maxY;
