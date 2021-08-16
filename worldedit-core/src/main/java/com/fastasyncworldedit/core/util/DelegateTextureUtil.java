@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
 
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 
 import java.awt.image.BufferedImage;
@@ -20,11 +21,6 @@ public class DelegateTextureUtil extends TextureUtil {
     @Override
     public BlockType getNearestBlock(int color) {
         return parent.getNearestBlock(color);
-    }
-
-    @Override
-    public BlockType getNearestBlock(BlockType block) {
-        return parent.getNearestBlock(block);
     }
 
     @Override
@@ -48,8 +44,23 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
+    public BlockType getLighterBlock(final int color) {
+        return parent.getLighterBlock(color);
+    }
+
+    @Override
+    public BlockType getDarkerBlock(final int color) {
+        return parent.getDarkerBlock(color);
+    }
+
+    @Override
     public int getColor(BlockType block) {
         return parent.getColor(block);
+    }
+
+    @Override
+    public int getColor(final BiomeType biome) {
+        return parent.getColor(biome);
     }
 
     @Override
@@ -78,11 +89,6 @@ public class DelegateTextureUtil extends TextureUtil {
     }
 
     @Override
-    public int combineTransparency(int top, int bottom) {
-        return parent.combineTransparency(top, bottom);
-    }
-
-    @Override
     public void calculateLayerArrays() {
         parent.calculateLayerArrays();
     }
@@ -90,11 +96,6 @@ public class DelegateTextureUtil extends TextureUtil {
     @Override
     public void loadModTextures() throws IOException {
         parent.loadModTextures();
-    }
-
-    @Override
-    public int multiplyColor(int c1, int c2) {
-        return parent.multiplyColor(c1, c2);
     }
 
     @Override
@@ -110,21 +111,6 @@ public class DelegateTextureUtil extends TextureUtil {
     @Override
     public boolean hasAlpha(int color) {
         return parent.hasAlpha(color);
-    }
-
-    @Override
-    public long colorDistance(int c1, int c2) {
-        return parent.colorDistance(c1, c2);
-    }
-
-    @Override
-    public long colorDistance(int red1, int green1, int blue1, int c2) {
-        return parent.colorDistance(red1, green1, blue1, c2);
-    }
-
-    @Override
-    public long getDistance(BufferedImage image, int c1) {
-        return parent.getDistance(image, c1);
     }
 
 }

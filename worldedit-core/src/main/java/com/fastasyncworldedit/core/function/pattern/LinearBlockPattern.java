@@ -12,6 +12,11 @@ public class LinearBlockPattern extends AbstractPattern implements ResettablePat
     private final Pattern[] patternsArray;
     private transient int index;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param patterns array of patterns to linearly choose from based on x/z coordinates
+     */
     public LinearBlockPattern(Pattern[] patterns) {
         this.patternsArray = patterns;
     }

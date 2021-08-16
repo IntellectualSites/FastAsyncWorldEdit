@@ -350,7 +350,7 @@ public final class StringUtil {
      */
     public static List<String> split(String input, char delimiter, char open, char close) {
         if (input.indexOf(open) == -1 && input.indexOf(close) == -1) {
-            return Arrays.asList(input.split(String.valueOf(delimiter)));
+            return Arrays.asList(input.split(String.valueOf(delimiter), -1));
         }
         int level = 0;
         int begin = 0;
@@ -366,7 +366,7 @@ public final class StringUtil {
                 level--;
             }
         }
-        if (begin < input.length()) {
+        if (begin <= input.length()) {
             split.add(input.substring(begin));
         }
         return split;
