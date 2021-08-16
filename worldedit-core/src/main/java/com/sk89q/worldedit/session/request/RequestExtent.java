@@ -122,7 +122,9 @@ public class RequestExtent implements Extent {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        return getExtent().setBiome(BlockVector3.at(x, y, z), biome);
+        //FAWE start - no BV3
+        return getExtent().setBiome(x, y, z, biome);
+        //FAWE end
     }
 
     @Override

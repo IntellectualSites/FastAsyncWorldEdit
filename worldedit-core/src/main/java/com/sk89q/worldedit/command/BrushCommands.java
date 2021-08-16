@@ -1209,6 +1209,11 @@ public class BrushCommands {
                     Expression radius,
             @Arg(desc = "The height of the cylinder", def = "1")
                     int height,
+            //FAWE start - hcyl thickness
+            @Arg(desc = "The thickness of the cylinder. Requires -h switch be given. 0 creates a standard hollow cylinder.",
+                    def = "0")
+                    double thickness,
+            //FAWE end
             @Switch(name = 'h', desc = "Create hollow cylinders instead")
                     boolean hollow
     ) throws WorldEditException {
@@ -1217,7 +1222,9 @@ public class BrushCommands {
 
         BrushSettings settings;
         if (hollow) {
-            settings = set(context, new HollowCylinderBrush(height));
+            //FAWE start - hcyl thickness
+            settings = set(context, new HollowCylinderBrush(height, thickness));
+            //FAWE end
         } else {
             settings = set(context, new CylinderBrush(height));
         }

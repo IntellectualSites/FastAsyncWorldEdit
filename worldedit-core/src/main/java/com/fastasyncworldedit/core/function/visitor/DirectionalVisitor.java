@@ -29,13 +29,14 @@ public class DirectionalVisitor extends RecursiveVisitor {
         this.origin = origin;
         this.dirVec = direction;
 
+
         setDirections(
-                BlockVector3.at(1, 0, 0),
-                BlockVector3.at(-1, 0, 0),
-                BlockVector3.at(0, 0, 1),
-                BlockVector3.at(0, 0, -1),
-                BlockVector3.at(0, -1, 0),
-                BlockVector3.at(0, 1, 0)
+                BlockVector3.UNIT_MINUS_X,
+                BlockVector3.UNIT_X,
+                BlockVector3.UNIT_MINUS_Y,
+                BlockVector3.UNIT_Y,
+                BlockVector3.UNIT_MINUS_Z,
+                BlockVector3.UNIT_Z
         );
     }
 

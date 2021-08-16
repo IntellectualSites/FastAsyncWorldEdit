@@ -234,6 +234,27 @@ public final class SuggestionHelper {
         return Stream.empty();
     }
 
+    //FAWE start
+    /**
+     * Returns a stream of suggestions for booleans.
+     *
+     * @param argumentInput the given input to filter with.
+     * @return a stream of suggestions.
+     */
+    public static Stream<String> suggestBoolean(String argumentInput) {
+        if (argumentInput.isEmpty()) {
+            return Stream.of("true", "false");
+        }
+        if ("true".startsWith(argumentInput)) {
+            return Stream.of("true");
+        } else if ("false".startsWith(argumentInput)) {
+            return Stream.of("false");
+        }
+        // no valid input anymore
+        return Stream.empty();
+    }
+    //FAWE end
+
     private static boolean isDouble(String input) {
         boolean point = false;
         for (char c : input.toCharArray()) {

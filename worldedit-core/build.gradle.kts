@@ -65,6 +65,7 @@ dependencies {
     // Tests
     testRuntimeOnly(libs.log4jCore)
     testImplementation(libs.adventureNbt)
+    testImplementation(libs.parallelgzip)
 }
 
 tasks.named<Test>("test") {

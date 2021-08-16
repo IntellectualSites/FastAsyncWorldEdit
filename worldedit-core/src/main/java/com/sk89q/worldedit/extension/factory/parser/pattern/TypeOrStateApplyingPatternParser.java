@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -33,12 +34,15 @@ import com.sk89q.worldedit.function.pattern.TypeApplyingPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-
-public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> {
+//FAWE start - aliased
+public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> implements AliasedParser {
+//FAWE end
 
     public TypeOrStateApplyingPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -127,5 +131,12 @@ public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> {
             }
         }
     }
+
+    //FAWE start - aliased
+    @Override
+    public List<String> getMatchedAliases() {
+        return Collections.singletonList("^");
+    }
+    //FAWE end
 
 }

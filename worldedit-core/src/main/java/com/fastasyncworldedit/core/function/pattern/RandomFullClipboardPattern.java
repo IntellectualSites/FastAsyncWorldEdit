@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.core.function.pattern;
 
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
@@ -19,16 +19,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class RandomFullClipboardPattern extends AbstractPattern {
 
-    private final Extent extent;
-    private final MutableBlockVector3 mutable = new MutableBlockVector3();
     private final List<ClipboardHolder> clipboards;
     private final boolean randomRotate;
     private final boolean randomFlip;
+    private final Vector3 flipVector = Vector3.at(1, 0, 0).multiply(-2).add(1, 1, 1);
 
-    public RandomFullClipboardPattern(Extent extent, List<ClipboardHolder> clipboards, boolean randomRotate, boolean randomFlip) {
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param clipboards   list of clipboards to choose from. Does not paste air
+     * @param randomRotate if the clipboard should be randomly rotated (through multiples of 90)
+     * @param randomFlip   if the clipboard should be randomly flipped
+     */
+    public RandomFullClipboardPattern(List<ClipboardHolder> clipboards, boolean randomRotate, boolean randomFlip) {
         checkNotNull(clipboards);
         this.clipboards = clipboards;
-        this.extent = extent;
         this.randomRotate = randomRotate;
         this.randomFlip = randomFlip;
     }
@@ -41,8 +46,8 @@ public class RandomFullClipboardPattern extends AbstractPattern {
             transform = transform.rotateY(ThreadLocalRandom.current().nextInt(4) * 90);
             holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
         }
-        if (randomFlip) {
-            transform = transform.scale(Vector3.at(1, 0, 0).multiply(-2).add(1, 1, 1));
+        if (randomFlip && ThreadLocalRandom.current().nextBoolean()) {
+            transform = transform.scale(flipVector);
         }
         if (!transform.isIdentity()) {
             holder.setTransform(transform);

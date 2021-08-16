@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -28,9 +29,13 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.FuzzyBlockState;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
-public class RandomStatePatternParser extends InputParser<Pattern> {
+//FAWE start - aliased
+public class RandomStatePatternParser extends InputParser<Pattern> implements AliasedParser {
+//FAWE end
 
     public RandomStatePatternParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -67,5 +72,12 @@ public class RandomStatePatternParser extends InputParser<Pattern> {
             return null; // only should happen if parseLogic changes
         }
     }
+
+    //FAWE start - aliased
+    @Override
+    public List<String> getMatchedAliases() {
+        return Collections.singletonList("*");
+    }
+    //FAWE end
 
 }

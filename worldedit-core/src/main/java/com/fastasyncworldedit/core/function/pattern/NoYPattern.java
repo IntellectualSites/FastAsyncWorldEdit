@@ -13,6 +13,11 @@ public class NoYPattern extends AbstractPattern {
     private final Pattern pattern;
     private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param pattern pattern to apply
+     */
     public NoYPattern(Pattern pattern) {
         this.pattern = pattern;
     }

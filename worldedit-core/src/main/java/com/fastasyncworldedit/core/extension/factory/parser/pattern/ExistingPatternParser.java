@@ -14,6 +14,11 @@ public class ExistingPatternParser extends SimpleInputParser<Pattern> {
 
     private final List<String> aliases = Collections.singletonList("#existing");
 
+    /**
+     * Create a new simple parser with a defined prefix for the result.
+     *
+     * @param worldEdit the worldedit instance.
+     */
     public ExistingPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
     }

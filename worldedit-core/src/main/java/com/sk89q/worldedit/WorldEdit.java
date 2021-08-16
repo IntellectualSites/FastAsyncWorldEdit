@@ -20,6 +20,7 @@
 package com.sk89q.worldedit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -37,6 +38,7 @@ import com.sk89q.worldedit.extension.factory.BlockFactory;
 import com.sk89q.worldedit.extension.factory.ItemFactory;
 import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.factory.PatternFactory;
+import com.fastasyncworldedit.core.extension.factory.TransformFactory;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
@@ -138,6 +140,7 @@ public final class WorldEdit {
     private final ItemFactory itemFactory = new ItemFactory(this);
     private final MaskFactory maskFactory = new MaskFactory(this);
     private final PatternFactory patternFactory = new PatternFactory(this);
+    private final TransformFactory transformFactory = new TransformFactory(this);
 
     static {
         getVersion();
@@ -238,6 +241,16 @@ public final class WorldEdit {
      */
     public PatternFactory getPatternFactory() {
         return patternFactory;
+    }
+
+    /**
+     * Get the transform factory from which new {@link ResettableExtent}s
+     * can be constructed.
+     *
+     * @return the transform factory
+     */
+    public TransformFactory getTransformFactory() {
+        return transformFactory;
     }
 
     /**

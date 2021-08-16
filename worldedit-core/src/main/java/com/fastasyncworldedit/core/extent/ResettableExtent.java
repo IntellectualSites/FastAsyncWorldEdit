@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -38,7 +39,7 @@ public class ResettableExtent extends AbstractDelegateExtent implements Serializ
                 && next instanceof ResettableExtent) {
             ((ResettableExtent) next).setExtent(extent);
         } else {
-            new ExtentTraverser(this).setNext(new AbstractDelegateExtent(extent));
+            new ExtentTraverser<Extent>(this).setNext(extent);
         }
         return this;
     }

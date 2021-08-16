@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.wrappers;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
@@ -89,14 +90,16 @@ public class AsyncPlayer extends PlayerProxy {
         int z = pos.getBlockZ();
         Extent world = getLocation().getExtent();
 
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+
         // No free space above
-        if (!world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isAir()) {
+        if (!world.getBlock(mutable.setComponents(x, y, z)).getBlockType().getMaterial().isAir()) {
             return false;
         }
 
         while (y <= world.getMaximumPoint().getY()) {
             // Found a ceiling!
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+            if (world.getBlock(mutable.mutY(y)).getBlockType().getMaterial()
                     .isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
                 floatAt(x, platformY + 1, z, alwaysGlass);
@@ -124,8 +127,10 @@ public class AsyncPlayer extends PlayerProxy {
         final int maxY = Math.min(getWorld().getMaxY() + 1, initialY + distance);
         final Extent world = getLocation().getExtent();
 
+        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
+
         while (y <= world.getMaximumPoint().getY() + 2) {
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+            if (world.getBlock(mutable.mutY(y)).getBlockType().getMaterial()
                     .isMovementBlocker()) {
                 break; // Hit something
             } else if (y > maxY + 1) {
@@ -211,9 +216,11 @@ public class AsyncPlayer extends PlayerProxy {
             int freeToFind = 2;
             boolean inFree = false;
 
+            MutableBlockVector3 mutable = new MutableBlockVector3();
+
             while ((block = hitBlox.getNextBlock()) != null) {
                 boolean free = !world.getBlock(
-                        BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ()))
+                                mutable.setComponents(block.getBlockX(), block.getBlockY(), block.getBlockZ()))
                         .getBlockType().getMaterial().isMovementBlocker();
 
                 if (firstBlock) {

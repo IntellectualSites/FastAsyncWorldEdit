@@ -14,6 +14,14 @@ public class Linear3DBlockPattern extends AbstractPattern {
     private final int yScale;
     private final int zScale;
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param patterns array of patterns to linearly choose from based on x/y/z coordinates
+     * @param xScale   x-axis scale
+     * @param yScale   y-axis scale
+     * @param zScale   z-axis scale
+     */
     public Linear3DBlockPattern(Pattern[] patterns, int xScale, int yScale, int zScale) {
         this.patternsArray = patterns;
         this.xScale = xScale;

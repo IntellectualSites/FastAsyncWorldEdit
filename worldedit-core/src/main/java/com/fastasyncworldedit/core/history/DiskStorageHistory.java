@@ -14,6 +14,7 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 
@@ -133,8 +134,14 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     public void undo(Player player, Region[] regions) {
+        try {
+            close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
         EditSession session = toEditSession(player, regions);
-        session.undo(session);
+        session.setBlocks(this, ChangeSetExecutor.Type.UNDO);
         deleteFiles();
     }
 
@@ -143,12 +150,18 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     public void redo(Player player, Region[] regions) {
+        try {
+            close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
         EditSession session = toEditSession(player, regions);
-        session.redo(session);
+        session.setBlocks(this, ChangeSetExecutor.Type.REDO);
     }
 
     public void redo(Player player) {
-        undo(player, null);
+        redo(player, null);
     }
 
     public UUID getUUID() {
