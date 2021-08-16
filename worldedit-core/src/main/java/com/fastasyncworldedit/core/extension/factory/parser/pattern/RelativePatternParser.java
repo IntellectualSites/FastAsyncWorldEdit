@@ -41,8 +41,7 @@ public class RelativePatternParser extends RichParser<Pattern> {
             ));
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(input[0], context);
-        Extent extent = context.requireExtent();
-        return new RelativePattern(inner, extent.getMinY(), extent.getMaxY());
+        return new RelativePattern(inner, context.getMinY(), context.getMaxY());
     }
 
 }

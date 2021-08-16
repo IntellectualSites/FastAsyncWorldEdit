@@ -1,6 +1,8 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.BreadthFirstSearch;
@@ -39,6 +41,11 @@ public class SurfaceRandomOffsetPattern extends AbstractPattern {
             buffer[i] = new MutableBlockVector3();
         }
         allowed = new MutableBlockVector3[buffer.length];
+    }
+
+    @Override
+    public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
+        return super.apply(extent, get, set);
     }
 
     @Override

@@ -58,8 +58,7 @@ public class SolidRandomOffsetPatternParser extends RichParser<Pattern> {
         } else {
             x = y = z = Integer.parseInt(arguments[1]);
         }
-        Extent extent = context.requireExtent();
-        return new SolidRandomOffsetPattern(inner, x, y, z, extent.getMinY(), extent.getMaxY());
+        return new SolidRandomOffsetPattern(inner, x, y, z, context.getMinY(), context.getMaxY());
     }
 
 }

@@ -7,6 +7,7 @@ import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class RelativePattern extends AbstractPattern implements ResettablePattern {
 
@@ -37,6 +38,9 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         mutable.mutX(pos.getX() - origin.getX());
         mutable.mutY(pos.getY() - origin.getY());
         mutable.mutZ(pos.getZ() - origin.getZ());
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        }
         return pattern.applyBlock(mutable);
     }
 
@@ -47,10 +51,10 @@ public class RelativePattern extends AbstractPattern implements ResettablePatter
         }
         mutable.mutX(set.getX() - origin.getX());
         mutable.mutY(set.getY() - origin.getY());
-        if (mutable.getY() < minY || mutable.getY() > maxY) {
+        mutable.mutZ(set.getZ() - origin.getZ());
+        if (mutable.getY() < extent.getMinY() || mutable.getY() > extent.getMaxY()) {
             return false;
         }
-        mutable.mutZ(set.getZ() - origin.getZ());
         return pattern.apply(extent, get, mutable);
     }
 

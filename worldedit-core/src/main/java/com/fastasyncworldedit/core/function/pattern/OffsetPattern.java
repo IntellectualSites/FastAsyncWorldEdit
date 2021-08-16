@@ -7,6 +7,7 @@ import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 public class OffsetPattern extends AbstractPattern {
 
@@ -42,6 +43,9 @@ public class OffsetPattern extends AbstractPattern {
         mutable.mutX(position.getX() + dx);
         mutable.mutY(position.getY() + dy);
         mutable.mutZ(position.getZ() + dz);
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        }
         return pattern.applyBlock(mutable);
     }
 
@@ -49,10 +53,10 @@ public class OffsetPattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         mutable.mutX(get.getX() + dx);
         mutable.mutY(get.getY() + dy);
-        if (mutable.getY() < minY || mutable.getY() > maxY) {
+        mutable.mutZ(get.getZ() + dz);
+        if (mutable.getY() < extent.getMinY() || mutable.getY() > extent.getMaxY()) {
             return false;
         }
-        mutable.mutZ(get.getZ() + dz);
         return pattern.apply(extent, get, mutable);
     }
 

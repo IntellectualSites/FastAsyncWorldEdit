@@ -58,10 +58,7 @@ public class OffsetPatternParser extends RichParser<Pattern> {
         } else {
             x = y = z = Integer.parseInt(arguments[1]);
         }
-        Extent extent = context.requireExtent();
-        int minY = extent.getMinY();
-        int maxY = extent.getMaxY();
-        return new OffsetPattern(inner, x, y, z, minY, maxY);
+        return new OffsetPattern(inner, x, y, z, context.getMinY(), context.getMaxY());
     }
 
 }
