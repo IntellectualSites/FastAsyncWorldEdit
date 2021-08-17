@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
@@ -1249,6 +1250,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } catch (Throwable e) {
             player.print(Caption.of("fawe.error.lighting"));
             e.printStackTrace();
+        }
+        // Cancel any preloader associated with the actor if present
+        if (getPlayer() != null) {
+            Fawe.imp().getPreloader(false).cancel(getPlayer());
         }
         // Enqueue it
         if (getChangeSet() != null) {

@@ -1,9 +1,12 @@
 package com.fastasyncworldedit.core.queue.implementation.preloader;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.FaweTimer;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.MutablePair;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -72,7 +75,7 @@ public class AsyncPreloader implements Preloader, Runnable {
             }
             synchronized (existing) { // Ensure key & value are mutated together
                 existing.setKey(world);
-                existing.setValue(region.getChunks());
+                existing.setValue(ImmutableSet.copyOf(Iterables.limit(region.getChunks(), Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT)));
             }
             synchronized (update) {
                 update.notify();
