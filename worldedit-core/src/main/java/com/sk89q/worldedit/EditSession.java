@@ -49,6 +49,7 @@ import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
@@ -1253,7 +1254,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         // Cancel any preloader associated with the actor if present
         if (getPlayer() != null) {
-            Fawe.imp().getPreloader(false).cancel(getPlayer());
+            Preloader preloader = Fawe.imp().getPreloader(false);
+            if (preloader != null) {
+                preloader.cancel(getPlayer());
+            }
         }
         // Enqueue it
         if (getChangeSet() != null) {
