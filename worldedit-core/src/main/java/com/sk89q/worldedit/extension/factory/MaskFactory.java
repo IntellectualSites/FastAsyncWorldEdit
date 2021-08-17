@@ -22,11 +22,12 @@ package com.sk89q.worldedit.extension.factory;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.AdjacentMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.AngleMaskParser;
-import com.fastasyncworldedit.core.extension.factory.parser.mask.RichMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.ExtremaMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.FalseMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.LiquidMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.ROCAngleMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.RadiusMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.RichMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.RichOffsetMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.SimplexMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.SurfaceAngleMaskParser;
@@ -108,7 +109,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         register(new ExtremaMaskParser(worldEdit));
         register(new FalseMaskParser(worldEdit));
         register(new LiquidMaskParser(worldEdit));
-        //register(new RadiusMaskParser(worldEdit)); TODO: Adapt to work with FAWE's Chunk I/O
+        register(new RadiusMaskParser(worldEdit));
         register(new RichOffsetMaskParser(worldEdit));
         register(new ROCAngleMaskParser(worldEdit));
         register(new SimplexMaskParser(worldEdit));
