@@ -18,7 +18,6 @@ public interface HeightMap {
 
     void setSize(int size);
 
-
     default void perform(
             EditSession session,
             Mask mask,
@@ -83,8 +82,8 @@ public interface HeightMap {
             boolean towards,
             final boolean layers
     ) {
-        BlockVector3 top = session.getMaximumPoint();
-        int maxY = top.getBlockY();
+        int maxY = session.getMaxY();
+        int minY = session.getMinY();
         int diameter = 2 * size + 1;
         int centerX = pos.getBlockX();
         int centerZ = pos.getBlockZ();
@@ -121,15 +120,15 @@ public interface HeightMap {
                     }
                     int height;
                     if (layers) {
-                        height = tmpY = session.getNearestSurfaceLayer(xx, zz, tmpY, 0, maxY);
+                        height = tmpY = session.getNearestSurfaceLayer(xx, zz, tmpY, minY, maxY);
                     } else {
-                        height = tmpY = session.getNearestSurfaceTerrainBlock(xx, zz, tmpY, 0, maxY);
+                        height = tmpY = session.getNearestSurfaceTerrainBlock(xx, zz, tmpY, minY, maxY);
                         if (height == -1) {
                             continue;
                         }
                     }
                     oldData[index] = height;
-                    if (height == 0) {
+                    if (height == minY) {
                         newData[index] = centerY;
                         continue;
                     }
@@ -137,8 +136,9 @@ public interface HeightMap {
                     int diff = targetY - height;
                     double raiseScaled = diff * (raisePow * sizePowInv);
                     double raiseScaledAbs = Math.abs(raiseScaled);
-                    int random = ThreadLocalRandom.current().nextInt(256) < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(
-                            raiseScaledAbs)) * 256) ? (diff > 0 ? 1 : -1) : 0;
+                    int random =
+                            ThreadLocalRandom.current().nextInt(maxY + 1 - minY) - minY < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(
+                            raiseScaledAbs)) * (maxY + 1 - minY)) ? (diff > 0 ? 1 : -1) : 0;
                     int raiseScaledInt = (int) raiseScaled + random;
                     newData[index] = height + raiseScaledInt;
                 }
@@ -166,20 +166,22 @@ public interface HeightMap {
                             break;
                     }
                     if (layers) {
-                        height = session.getNearestSurfaceLayer(xx, zz, height, 0, maxY);
+                        height = session.getNearestSurfaceLayer(xx, zz, height, minY, maxY);
                     } else {
-                        height = session.getNearestSurfaceTerrainBlock(xx, zz, height, 0, maxY);
-                        if (height == -1) {
+                        height = session.getNearestSurfaceTerrainBlock(xx, zz, height, minY, maxY);
+                        if (height == minY - 1) {
                             continue;
                         }
                     }
                     oldData[index] = height;
-                    if (height == 0) {
+                    if (height == minY) {
                         newData[index] = centerY;
                         continue;
                     }
                     raise = (yscale * raise);
-                    int random = ThreadLocalRandom.current().nextInt(256) < (int) ((raise - (int) raise) * (256)) ? 1 : 0;
+                    int random =
+                            ThreadLocalRandom.current().nextInt(maxY + 1 - minY) - minY < (int) ((raise - (int) raise) * (maxY - minY + 1))
+                            ? 1 : 0;
                     int newHeight = height + (int) raise + random;
                     newData[index] = newHeight;
                 }

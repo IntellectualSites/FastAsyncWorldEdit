@@ -45,8 +45,8 @@ public class AngleColorPattern extends AnglePattern {
             int x = vector.getBlockX();
             int y = vector.getBlockY();
             int z = vector.getBlockZ();
-            int height = extent.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
-            if (height > 0) {
+            int height = extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
+            if (height > minY) {
                 BlockState below = extent.getBlock(x, height - 1, z);
                 if (!below.getBlockType().getMaterial().isMovementBlocker()) {
                     return Integer.MAX_VALUE;

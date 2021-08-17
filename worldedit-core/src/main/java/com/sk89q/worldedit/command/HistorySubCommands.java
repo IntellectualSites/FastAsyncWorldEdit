@@ -133,8 +133,8 @@ public class HistorySubCommands {
         Location origin = player.getLocation();
         BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
         BlockVector3 top = origin.toBlockPoint().add(radius, radius, radius);
-        bot = bot.clampY(0, world.getMaxY());
-        top = top.clampY(0, world.getMaxY());
+        bot = bot.clampY(world.getMinY(), world.getMaxY());
+        top = top.clampY(world.getMinY(), world.getMaxY());
         // TODO mask the regions bot / top to the bottom and top coord in the allowedRegions
         // TODO: then mask the edit to the bot / top
         //        if (allowedRegions.length != 1 || !allowedRegions[0].isGlobal()) {
@@ -196,9 +196,9 @@ public class HistorySubCommands {
                                             .summarize(RegionWrapper.GLOBAL(), false);
                                     if (summary != null) {
                                         rollback.setDimensions(
-                                                BlockVector3.at(summary.minX, 0, summary.minZ),
+                                                BlockVector3.at(summary.minX, world.getMinY(), summary.minZ),
                                                 BlockVector3
-                                                        .at(summary.maxX, 255, summary.maxZ)
+                                                        .at(summary.maxX, world.getMaxY(), summary.maxZ)
                                         );
                                         rollback.setTime(historyFile.lastModified());
                                         RollbackDatabase db = DBHandler.IMP
@@ -410,8 +410,8 @@ public class HistorySubCommands {
 
             BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
             BlockVector3 top = origin.toBlockPoint().add(radius, radius, radius);
-            bot = bot.clampY(0, world.getMaxY());
-            top = top.clampY(0, world.getMaxY());
+            bot = bot.clampY(world.getMinY(), world.getMaxY());
+            top = top.clampY(world.getMinY(), world.getMaxY());
 
             long minTime = System.currentTimeMillis() - timeDiff;
             Iterable<Supplier<RollbackOptimizedHistory>> edits = database.getEdits(other, minTime, bot, top, false, false);

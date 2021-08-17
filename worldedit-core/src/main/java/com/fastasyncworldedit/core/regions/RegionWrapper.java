@@ -10,6 +10,8 @@ public class RegionWrapper extends CuboidRegion {
             Integer.MIN_VALUE,
             Integer.MAX_VALUE,
             Integer.MIN_VALUE,
+            Integer.MAX_VALUE,
+            Integer.MIN_VALUE,
             Integer.MAX_VALUE
     );
 
@@ -20,16 +22,16 @@ public class RegionWrapper extends CuboidRegion {
     public int minZ;
     public int maxZ;
 
-    public static RegionWrapper GLOBAL() {
-        return GLOBAL;
-    }
-
+    /**
+     * @deprecated use {@link RegionWrapper#RegionWrapper(int, int, int, int, int, int)}
+     */
+    @Deprecated
     public RegionWrapper(final int minX, final int maxX, final int minZ, final int maxZ) {
         this(minX, maxX, 0, 255, minZ, maxZ);
     }
 
     public RegionWrapper(final int minX, final int maxX, final int minY, final int maxY, final int minZ, final int maxZ) {
-        this(BlockVector3.at(minX, 0, minZ), BlockVector3.at(maxX, 255, maxZ));
+        this(BlockVector3.at(minX, minY, minZ), BlockVector3.at(maxX, maxY, maxZ));
     }
 
     public RegionWrapper(final BlockVector3 pos1, final BlockVector3 pos2) {
@@ -40,6 +42,10 @@ public class RegionWrapper extends CuboidRegion {
         this.maxZ = Math.max(pos1.getBlockZ(), pos2.getBlockZ());
         this.minY = Math.min(pos1.getBlockY(), pos2.getBlockY());
         this.maxY = Math.max(pos1.getBlockY(), pos2.getBlockY());
+    }
+
+    public static RegionWrapper GLOBAL() {
+        return GLOBAL;
     }
 
     @Override
@@ -134,7 +140,8 @@ public class RegionWrapper extends CuboidRegion {
 
     @Override
     public boolean isGlobal() {
-        return minX == Integer.MIN_VALUE && minZ == Integer.MIN_VALUE && maxX == Integer.MAX_VALUE && maxZ == Integer.MAX_VALUE && minY <= 0 && maxY >= 255;
+        return minX == Integer.MIN_VALUE && minY == Integer.MIN_VALUE && minZ == Integer.MIN_VALUE
+                && maxX == Integer.MAX_VALUE && maxY == Integer.MAX_VALUE && maxZ == Integer.MAX_VALUE;
     }
 
     public boolean contains(RegionWrapper current) {

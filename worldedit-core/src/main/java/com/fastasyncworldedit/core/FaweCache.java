@@ -64,9 +64,6 @@ public enum FaweCache implements Trimable {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public final int BLOCKS_PER_LAYER = 4096;
-    public final int CHUNK_LAYERS = 16;
-    public final int WORLD_HEIGHT = CHUNK_LAYERS << 4;
-    public final int WORLD_MAX_Y = WORLD_HEIGHT - 1;
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 

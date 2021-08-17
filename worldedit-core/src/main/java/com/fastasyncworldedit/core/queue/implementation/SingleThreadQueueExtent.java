@@ -52,6 +52,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     // Chunks currently being queued / worked on
     private final Long2ObjectLinkedOpenHashMap<IQueueChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
 
+    private World world = null;
+    private int minY = 0;
+    private int maxY = 255;
+
     private IChunkCache<IChunkGet> cacheGet;
     private IChunkCache<IChunkSet> cacheSet;
     private boolean initialized;
@@ -68,7 +72,15 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     private final ReentrantLock getChunkLock = new ReentrantLock();
 
-    private World world = null;
+    public SingleThreadQueueExtent() {}
+
+    /**
+     * New instance given inclusive world height bounds.
+     */
+    public SingleThreadQueueExtent(int minY, int maxY) {
+        this.minY = minY;
+        this.maxY = maxY;
+    }
 
     /**
      * Safety check to ensure that the thread being used matches the one being initialized on. - Can
@@ -111,6 +123,16 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         return fastmode;
     }
 
+    @Override
+    public int getMinY() {
+        return minY;
+    }
+
+    @Override
+    public int getMaxY() {
+        return maxY;
+    }
+
     /**
      * Resets the queue.
      */
@@ -142,6 +164,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     @Override
     public synchronized void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set) {
         reset();
+        this.minY = extent.getMinY();
+        this.maxY = extent.getMaxY();
         currentThread = Thread.currentThread();
         if (get == null) {
             get = (x, z) -> {

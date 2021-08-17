@@ -69,7 +69,7 @@ public class OffsetMaskParser extends InputParser<Mask> implements AliasedParser
             submask = new ExistingBlockMask(context.requireExtent());
         }
         //FAWE start - OffsetMask > OffsetsMask
-        return new OffsetMask(submask, BlockVector3.at(0, firstChar == '>' ? -1 : 1, 0));
+        return new OffsetMask(submask, BlockVector3.at(0, firstChar == '>' ? -1 : 1, 0), context.getMinY(), context.getMaxY());
         //FAWE end
     }
 

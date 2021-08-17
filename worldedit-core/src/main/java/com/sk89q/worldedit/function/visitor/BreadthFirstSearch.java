@@ -95,6 +95,8 @@ public abstract class BreadthFirstSearch implements Operation {
     private BlockVectorSet visited = new BlockVectorSet();
     private BlockVector3[] directions;
     //FAWE end
+    protected final int minY;
+    protected final int maxY;
     private int affected = 0;
     //FAWE start
     private int currentDepth = 0;
@@ -107,21 +109,21 @@ public abstract class BreadthFirstSearch implements Operation {
      * @param function the function to apply to visited blocks
      */
     public BreadthFirstSearch(RegionFunction function) {
-        //FAWE start
-        this(function, Integer.MAX_VALUE);
-        //FAWE end
-        checkNotNull(function);
+        //FAWE start - int depth, min/max y
+        this(function, Integer.MAX_VALUE, 0, 255, null);
     }
 
-    //FAWE start
+    //FAWE start - int depth, min/max y, preloading
     /**
      * Create a new instance.
      *
      * @param function the function to apply to visited blocks
-     * @param maxDepth the maximum number of iterations
+     * @param depth    maximum number of iterations
+     * @param minY     minimum allowable y to visit. Inclusive.
+     * @param maxY     maximum allowable y to visit. Inclusive.
      */
-    public BreadthFirstSearch(RegionFunction function, int maxDepth) {
-        this(function, maxDepth, null);
+    public BreadthFirstSearch(RegionFunction function, int depth, int minY, int maxY) {
+        this(function, depth, minY, maxY, null);
     }
 
     /**
@@ -129,13 +131,17 @@ public abstract class BreadthFirstSearch implements Operation {
      *
      * @param function the function to apply to visited blocks
      * @param maxDepth the maximum number of iterations
+     * @param minY     minimum y value to visit. Inclusive.
+     * @param maxY     maximum y value to visit. Inclusive.
      * @param extent   extent to use for preloading
      */
-    public BreadthFirstSearch(RegionFunction function, int maxDepth, Extent extent) {
+    public BreadthFirstSearch(RegionFunction function, int maxDepth, int minY, int maxY, Extent extent) {
         checkNotNull(function);
         this.function = function;
         this.directions = DEFAULT_DIRECTIONS;
         this.maxDepth = maxDepth;
+        this.minY = minY;
+        this.maxY = maxY;
         if (extent != null) {
             ExtentTraverser<ParallelQueueExtent> queueTraverser = new ExtentTraverser<>(extent).find(ParallelQueueExtent.class);
             this.singleQueue = queueTraverser != null ? (SingleThreadQueueExtent) queueTraverser.get().getExtent() : null;
@@ -314,7 +320,7 @@ public abstract class BreadthFirstSearch implements Operation {
                 for (int i = 0, j = 0; i < dirs.length && j < maxBranch; i++) {
                     BlockVector3 direction = dirs[i];
                     int y = from.getBlockY() + direction.getY();
-                    if (y < 0 || y >= 256) {
+                    if (y < minY || y > maxY) {
                         continue;
                     }
                     int x = from.getBlockX() + direction.getX();

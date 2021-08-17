@@ -25,11 +25,17 @@ public class Flood {
     private int chunkYLayer;
     private int chunkZ;
     private final ConcurrentLinkedQueue<int[]> queuePool = new ConcurrentLinkedQueue<>();
+    private final int minSectionIndex;
+    private final int maxSectionIndex;
+    private final int sectionCount;
 
-    public Flood(int maxBranch, int maxDepth, Direction[] directions) {
+    public Flood(int maxBranch, int maxDepth, Direction[] directions, int minSectionIndex, int maxSectionIndex) {
         this.maxBranch = maxBranch;
         this.maxDepth = maxDepth;
         this.directions = directions;
+        this.minSectionIndex = minSectionIndex;
+        this.maxSectionIndex = maxSectionIndex;
+        this.sectionCount = maxSectionIndex - minSectionIndex + 1;
 
         this.queues = new int[27][];
         this.visits = new long[27][];
@@ -64,7 +70,7 @@ public class Flood {
         int chunkX = x >> 4;
         int chunkZ = z >> 4;
         long pair = MathMan.pairInt(chunkX, chunkZ);
-        int layer = y >> 4;
+        int layer = (y >> 4) - minSectionIndex;
         int[] section = getOrCreateQueue(pair, layer);
         int val = (x & 15) + ((z & 15) << 4) + ((y & 15) << 8) + (depth << 12);
         push(section, val);
@@ -73,7 +79,7 @@ public class Flood {
     private int[] getOrCreateQueue(long pair, int layer) {
         int[][] arrs = chunkQueues.get(pair);
         if (arrs == null) {
-            chunkQueues.put(pair, arrs = new int[16][]);
+            chunkQueues.put(pair, arrs = new int[sectionCount][]);
         }
         int[] section = arrs[layer];
         if (section == null) {
@@ -154,7 +160,7 @@ public class Flood {
                 if (visit == null || queue == null) {
                     long pair = MathMan.pairInt(this.chunkX + nextX, this.chunkZ + nextZ);
                     int layer = this.chunkYLayer + nextY;
-                    if (layer < 0 || layer > 15) {
+                    if (layer < minSectionIndex || layer > maxSectionIndex) {
                         continue;
                     }
                     queues[sectionIndex] = queue = getOrCreateQueue(pair, layer);

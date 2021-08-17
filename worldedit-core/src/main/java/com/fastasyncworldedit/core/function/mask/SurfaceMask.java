@@ -9,7 +9,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 public class SurfaceMask extends AdjacentAnyMask {
 
     public SurfaceMask(Extent extent) {
-        super(getMask(extent));
+        super(getMask(extent), extent.getMinY(), extent.getMaxY());
     }
 
     public static AbstractExtentMask getMask(Extent extent) {

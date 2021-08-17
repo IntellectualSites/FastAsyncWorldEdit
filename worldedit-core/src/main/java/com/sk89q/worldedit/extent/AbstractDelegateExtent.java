@@ -203,6 +203,11 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public int getMinY() {
+        return extent.getMinY();
+    }
+
+    @Override
     public boolean relight(int x, int y, int z) {
         return extent.relight(x, y, z);
     }
@@ -317,7 +322,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(
-            int x, @Range(from = 0, to = 255) int y,
+            int x, int y,
             int z, T block
     ) throws WorldEditException {
         return extent.setBlock(x, y, z, block);

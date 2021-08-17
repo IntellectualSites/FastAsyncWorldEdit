@@ -34,7 +34,6 @@ public class RecursiveVisitor extends BreadthFirstSearch {
 
     private final Mask mask;
 
-    //FAWE start
     /**
      * Create a new recursive visitor.
      *
@@ -42,30 +41,37 @@ public class RecursiveVisitor extends BreadthFirstSearch {
      * @param function the function
      */
     public RecursiveVisitor(Mask mask, RegionFunction function) {
-        this(mask, function, Integer.MAX_VALUE);
+        this(mask, function, Integer.MAX_VALUE, 0, 255, null);
+        //FAWE end
     }
 
+    //FAWE start - int depth, min/max y
     /**
      * Create a new recursive visitor.
      *
      * @param mask     the mask
      * @param function the function
      * @param maxDepth the maximum number of iterations
+     * @param minY     minimum allowable y to visit. Inclusive.
+     * @param maxY     maximum allowable y to visit. Inclusive.
      */
-    public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth) {
-        this(mask, function, maxDepth, null);
+    public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth, int minY, int maxY) {
+        this(mask, function, maxDepth, minY, maxY, null);
     }
 
+    //FAWE start - int depth, min/max y
     /**
      * Create a new recursive visitor.
      *
      * @param mask     the mask
      * @param function the function
      * @param maxDepth the maximum number of iterations
+     * @param minY     minimum allowable y to visit. Inclusive.
+     * @param maxY     maximum allowable y to visit. Inclusive.
      * @param extent   the extent for preloading
      */
-    public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth, Extent extent) {
-        super(function, maxDepth, extent);
+    public RecursiveVisitor(Mask mask, RegionFunction function, int maxDepth, int minY, int maxY, Extent extent) {
+        super(function, maxDepth, minY, maxY, extent);
         checkNotNull(mask);
         this.mask = mask;
     }

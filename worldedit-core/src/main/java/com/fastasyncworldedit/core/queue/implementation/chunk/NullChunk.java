@@ -82,6 +82,11 @@ public final class NullChunk implements IQueueChunk {
         return new char[0][];
     }
 
+    @Override
+    public boolean hasBiomes(final int layer) {
+        return false;
+    }
+
     @Nonnull
     public int[] getHeightMap(@Nullable HeightMapType type) {
         return new int[256];
@@ -182,15 +187,35 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Override
-    public void setLightingToGet(char[][] lighting) {
+    public void setLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
     }
 
     @Override
-    public void setSkyLightingToGet(char[][] lighting) {
+    public void setSkyLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
     }
 
     @Override
     public void setHeightmapToGet(HeightMapType type, int[] data) {
+    }
+
+    @Override
+    public int getMaxY() {
+        return 0;
+    }
+
+    @Override
+    public int getMinY() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxSectionIndex() {
+        return 0;
+    }
+
+    @Override
+    public int getMinSectionIndex() {
+        return 0;
     }
 
     @Nullable
@@ -204,6 +229,11 @@ public final class NullChunk implements IQueueChunk {
 
     public boolean trim(boolean aggressive, int layer) {
         return true;
+    }
+
+    @Override
+    public int getSectionCount() {
+        return 0;
     }
 
     private NullChunk() {

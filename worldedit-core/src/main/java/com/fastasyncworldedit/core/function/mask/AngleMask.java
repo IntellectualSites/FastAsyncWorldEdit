@@ -18,6 +18,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
     protected final boolean overlay;
     protected final boolean checkFirst;
     protected final int maxY;
+    protected final int minY;
     protected final int distance;
 
     public AngleMask(Extent extent, double min, double max, boolean overlay, int distance) {
@@ -26,7 +27,8 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         this.min = min;
         this.max = max;
         this.checkFirst = max >= (Math.tan(90 * (Math.PI / 180)));
-        this.maxY = extent.getMaximumPoint().getBlockY();
+        this.maxY = extent.getMaxY();
+        this.minY = extent.getMinY();
         this.overlay = overlay;
         this.distance = distance;
     }
@@ -77,7 +79,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
             }
             int result = cacheHeights[index] & 0xFF;
             if (y > result) {
-                cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, 0, maxY));
+                cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
             }
             return result;
         } catch (Throwable e) {
@@ -141,10 +143,10 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         if (!mask.test(x, y, z - 1)) {
             return true;
         }
-        if (y < 255 && !mask.test(x, y + 1, z)) {
+        if (y < maxY && !mask.test(x, y + 1, z)) {
             return true;
         }
-        return y > 0 && !mask.test(x, y - 1, z);
+        return y > minY && !mask.test(x, y - 1, z);
     }
 
     @Override
@@ -164,7 +166,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
             return false;
         }
         if (overlay) {
-            if (y < 255 && !adjacentAir(vector)) {
+            if (y < maxY && !adjacentAir(vector)) {
                 return lastValue = false;
             }
         }

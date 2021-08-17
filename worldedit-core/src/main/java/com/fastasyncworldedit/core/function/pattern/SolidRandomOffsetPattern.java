@@ -66,6 +66,12 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
         mutable.mutX(position.getX() + r.nextInt(dx2) - dx);
         mutable.mutY(position.getY() + r.nextInt(dy2) - dy);
         mutable.mutZ(position.getZ() + r.nextInt(dz2) - dz);
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        }
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        }
         BaseBlock block = pattern.applyBlock(mutable);
         if (block.getMaterial().isSolid()) {
             return block;
@@ -77,10 +83,10 @@ public class SolidRandomOffsetPattern extends AbstractPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         mutable.mutX(set.getX() + r.nextInt(dx2) - dx);
         mutable.mutY(set.getY() + r.nextInt(dy2) - dy);
-        if (mutable.getY() < minY || mutable.getY() > maxY) {
+        mutable.mutZ(set.getZ() + r.nextInt(dz2) - dz);
+        if (mutable.getY() < extent.getMinY() || mutable.getY() > extent.getMaxY()) {
             return false;
         }
-        mutable.mutZ(set.getZ() + r.nextInt(dz2) - dz);
         BaseBlock block = pattern.applyBlock(mutable);
         if (block.getMaterial().isSolid()) {
             return pattern.apply(extent, get, mutable);

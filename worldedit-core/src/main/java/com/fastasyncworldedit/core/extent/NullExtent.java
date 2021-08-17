@@ -218,6 +218,11 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
+    public int getMinY() {
+        throw reason;
+    }
+
+    @Override
     public BlockArrayClipboard lazyCopy(Region region) {
         throw reason;
     }
@@ -270,21 +275,6 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
 
     @Override
     public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
-        throw reason;
-    }
-
-    @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
-        throw reason;
-    }
-
-    @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-        throw reason;
-    }
-
-    @Override
-    public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
         throw reason;
     }
 

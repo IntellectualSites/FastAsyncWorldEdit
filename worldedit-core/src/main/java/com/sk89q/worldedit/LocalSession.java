@@ -211,6 +211,13 @@ public class LocalSession implements TextureHolder {
         if (defaultSelector != null) {
             this.selector = defaultSelector.createSelector();
         }
+        //FAWE start
+        if (worldOverride != null) {
+            this.selector.setWorld(worldOverride);
+        } else {
+            this.selector.setWorld(currentWorld);
+        }
+        //FAWE end
     }
 
     //FAWE start

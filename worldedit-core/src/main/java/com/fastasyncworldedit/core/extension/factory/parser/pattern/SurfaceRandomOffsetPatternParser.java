@@ -47,8 +47,7 @@ public class SurfaceRandomOffsetPatternParser extends RichParser<Pattern> {
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(arguments[0], context);
         int distance = Integer.parseInt(arguments[1]);
-        Extent extent = context.requireExtent();
-        return new SurfaceRandomOffsetPattern(inner, distance, extent.getMinY(), extent.getMaxY());
+        return new SurfaceRandomOffsetPattern(inner, distance, context.getMinY(), context.getMaxY());
     }
 
 }

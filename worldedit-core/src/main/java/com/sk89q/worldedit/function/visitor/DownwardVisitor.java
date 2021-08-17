@@ -37,19 +37,22 @@ public class DownwardVisitor extends RecursiveVisitor {
 
     private final int baseY;
 
-    //FAWE start
-
     /**
      * Create a new visitor.
      *
      * @param mask     the mask
      * @param function the function
      * @param baseY    the base Y
+     * @deprecated Use {@link DownwardVisitor#DownwardVisitor(Mask, RegionFunction, int, int, int, int)}
      */
+    @Deprecated
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
-        this(mask, function, baseY, Integer.MAX_VALUE);
+        //FAWE start - int depth, min/max y
+        this(mask, function, baseY, Integer.MAX_VALUE, 0, 255, null);
+        //FAWE end
     }
 
+    //FAWE start - int depth, min/max y, preloading
     /**
      * Create a new visitor.
      *
@@ -57,9 +60,11 @@ public class DownwardVisitor extends RecursiveVisitor {
      * @param function the function
      * @param baseY    the base Y
      * @param depth    maximum number of iterations
+     * @param minY     minimum allowable y to visit. Inclusive.
+     * @param maxY     maximum allowable y to visit. Inclusive.
      */
-    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth) {
-        this (mask, function, baseY, depth, null);
+    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, int minY, int maxY) {
+        this(mask, function, baseY, depth, minY, maxY, null);
     }
 
     /**
@@ -69,10 +74,12 @@ public class DownwardVisitor extends RecursiveVisitor {
      * @param function the function
      * @param baseY    the base Y
      * @param depth    maximum number of iterations
+     * @param minY     minimum allowable y to visit. Inclusive.
+     * @param maxY     maximum allowable y to visit. Inclusive.
      * @param extent   extent for preloading
      */
-    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, Extent extent) {
-        super(mask, function, depth, extent);
+    public DownwardVisitor(Mask mask, RegionFunction function, int baseY, int depth, int minY, int maxY, Extent extent) {
+        super(mask, function, depth, minY, maxY, extent);
         checkNotNull(mask);
 
         this.baseY = baseY;

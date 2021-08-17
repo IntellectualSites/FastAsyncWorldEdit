@@ -62,6 +62,11 @@ public interface SimpleWorld extends World {
     }
 
     @Override
+    default int getMinY() {
+        return getMinimumPoint().getBlockY();
+    }
+
+    @Override
     default Mask createLiquidMask() {
         return new BlockMask(this).add(BlockTypes.LAVA, BlockTypes.WATER);
     }

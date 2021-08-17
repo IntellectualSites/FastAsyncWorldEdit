@@ -36,10 +36,12 @@ public class LayerBrush implements Brush {
                 BlockTypes.AIR,
                 BlockTypes.CAVE_AIR,
                 BlockTypes.VOID_AIR
-        ));
+        ), editSession.getMinY(), editSession.getMaxY());
         final SolidBlockMask solid = new SolidBlockMask(editSession);
         final RadiusMask radius = new RadiusMask(0, (int) size);
-        visitor = new RecursiveVisitor(new MaskIntersection(adjacent, solid, radius), function -> true);
+        visitor = new RecursiveVisitor(new MaskIntersection(adjacent, solid, radius), funcion -> true, Integer.MAX_VALUE,
+                editSession.getMinY(),
+                editSession.getMaxY());
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         Operations.completeBlindly(visitor);
@@ -48,7 +50,7 @@ public class LayerBrush implements Brush {
             int depth = visitor.getDepth();
             Pattern currentPattern = layers[depth];
             return currentPattern.apply(editSession, pos, pos);
-        }, layers.length - 1);
+        }, layers.length - 1, editSession.getMinY(), editSession.getMaxY());
         for (BlockVector3 pos : visited) {
             visitor.visit(pos);
         }

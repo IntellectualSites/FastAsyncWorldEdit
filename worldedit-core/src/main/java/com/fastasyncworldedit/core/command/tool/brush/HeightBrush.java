@@ -27,8 +27,9 @@ public class HeightBrush implements Brush {
     public final boolean layers;
     public final boolean smooth;
 
-    public HeightBrush(InputStream stream, int rotation, double yscale, boolean layers, boolean smooth, Clipboard clipboard) {
-        this(stream, rotation, yscale, layers, smooth, clipboard, ScalableHeightMap.Shape.CONE);
+    public HeightBrush(InputStream stream, int rotation, double yscale, boolean layers, boolean smooth, Clipboard clipboard,
+                       int minY, int maxY) {
+        this(stream, rotation, yscale, layers, smooth, clipboard, ScalableHeightMap.Shape.CONE, minY, maxY);
     }
 
     public HeightBrush(
@@ -38,7 +39,9 @@ public class HeightBrush implements Brush {
             boolean layers,
             boolean smooth,
             Clipboard clipboard,
-            ScalableHeightMap.Shape shape
+            ScalableHeightMap.Shape shape,
+            int minY,
+            int maxY
     ) {
         this.rotation = (rotation / 90) % 4;
         this.yscale = yscale;
@@ -46,14 +49,14 @@ public class HeightBrush implements Brush {
         this.smooth = smooth;
         if (stream != null) {
             try {
-                heightMap = ScalableHeightMap.fromPNG(stream);
+                heightMap = ScalableHeightMap.fromPNG(stream, minY, maxY);
             } catch (IOException e) {
                 throw new FaweException(Caption.of("fawe.worldedit.brush.brush.height.invalid"));
             }
         } else if (clipboard != null) {
-            heightMap = ScalableHeightMap.fromClipboard(clipboard);
+            heightMap = ScalableHeightMap.fromClipboard(clipboard, minY, maxY);
         } else {
-            heightMap = ScalableHeightMap.fromShape(shape);
+            heightMap = ScalableHeightMap.fromShape(shape, minY, maxY);
         }
     }
 

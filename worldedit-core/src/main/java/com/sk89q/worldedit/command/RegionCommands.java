@@ -363,17 +363,23 @@ public class RegionCommands {
             @Selection Region region,
             @Arg(name = "pattern", desc = "The pattern of blocks to lay") Pattern patternArg
     ) throws WorldEditException {
-        BlockVector3 max = region.getMaximumPoint();
-        int maxY = max.getBlockY();
+        //FAWE start - world min/maxY
+        int maxY = region.getMaximumY();
+        int minY = region.getMinimumY();
+        //FAWE end
         Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
         Iterator<BlockVector2> iter = flat.iterator();
-        int y = 0;
+        //FAWE start - world min/maxY
+        int y = minY;
+        //FAWE end
         int affected = 0;
         while (iter.hasNext()) {
             BlockVector2 pos = iter.next();
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
-            y = editSession.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
+            //FAWE start - world min/maxY
+            y = editSession.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
+            //FAWE end
             editSession.setBlock(x, y, z, patternArg);
             affected++;
         }
@@ -856,6 +862,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.flora")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int flora(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -867,7 +874,7 @@ public class RegionCommands {
         FloraGenerator generator = new FloraGenerator(editSession);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(editSession), generator);
         //FAWE start - provide extent for preloading
-        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground, editSession);
+        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
         //FAWE end
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);

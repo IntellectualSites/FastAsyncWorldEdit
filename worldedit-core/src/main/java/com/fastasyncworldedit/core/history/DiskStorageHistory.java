@@ -102,6 +102,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         nbttFile = new File(folder, index + ".nbtt");
         entfFile = new File(folder, index + ".entf");
         enttFile = new File(folder, index + ".entt");
+        //Switch file ending due to new (sort-of) format. (Added e for Extended height)
         bdFile = new File(folder, index + ".bd");
         bioFile = new File(folder, index + ".bio");
     }
@@ -430,6 +431,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             try (FileInputStream fis = new FileInputStream(bdFile)) {
                 final FaweInputStream gis = MainUtil.getCompressedIS(fis);
                 // skip mode
+                gis.skipFully(1);
+                // skip version
                 gis.skipFully(1);
                 // origin
                 ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());

@@ -21,9 +21,11 @@ public class FlattenBrush extends HeightBrush {
             boolean layers,
             boolean smooth,
             Clipboard clipboard,
-            ScalableHeightMap.Shape shape
+            ScalableHeightMap.Shape shape,
+            int minY,
+            int maxY
     ) {
-        super(stream, rotation, yscale, layers, smooth, clipboard, shape);
+        super(stream, rotation, yscale, layers, smooth, clipboard, shape, minY, maxY);
     }
 
     @Override

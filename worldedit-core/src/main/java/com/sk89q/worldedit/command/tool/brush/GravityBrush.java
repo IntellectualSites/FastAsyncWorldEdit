@@ -39,8 +39,8 @@ public class GravityBrush implements Brush {
             MaxChangedBlocksException {
         //FAWE start - Ours operates differently to upstream, but does the same
         double endY = position.getY() + size;
-        double startPerformY = Math.max(0, position.getY() - size);
-        double startCheckY = fullHeight ? 0 : startPerformY;
+        double startPerformY = Math.max(editSession.getMinY(), position.getY() - size);
+        double startCheckY = fullHeight ? editSession.getMinY() : startPerformY;
         for (double x = position.getX() + size; x > position.getX() - size; --x) {
             for (double z = position.getZ() + size; z > position.getZ() - size; --z) {
                 double freeSpot = startCheckY;

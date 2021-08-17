@@ -85,8 +85,8 @@ public class AsyncPlayer extends PlayerProxy {
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
         Location pos = getBlockLocation();
         int x = pos.getBlockX();
-        int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 2);
+        int initialY = Math.max(getWorld().getMinY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() + 2);
         int z = pos.getBlockZ();
         Extent world = getLocation().getExtent();
 
@@ -121,15 +121,15 @@ public class AsyncPlayer extends PlayerProxy {
     public boolean ascendUpwards(int distance, boolean alwaysGlass) {
         final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
-        final int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 1);
+        final int initialY = Math.max(getWorld().getMinY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() + 1);
         final int z = pos.getBlockZ();
         final int maxY = Math.min(getWorld().getMaxY() + 1, initialY + distance);
         final Extent world = getLocation().getExtent();
 
         MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
 
-        while (y <= world.getMaximumPoint().getY() + 2) {
+        while (y <= world.getMaxY() + 2) {
             if (world.getBlock(mutable.mutY(y)).getBlockType().getMaterial()
                     .isMovementBlocker()) {
                 break; // Hit something

@@ -178,7 +178,7 @@ public class TargetBlock {
             } else {
                 if (searchForLastBlock) {
                     lastBlock = getCurrentBlock();
-                    if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
+                    if (lastBlock.getBlockY() <= world.getMinY() || lastBlock.getBlockY() >= world.getMaxY()) {
                         searchForLastBlock = false;
                     }
                 }

@@ -347,7 +347,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                 continue;
             }
-            if (pos.getY() < 0) {
+            if (pos.getY() < extent.getMinY()) {
                 throw new RuntimeException("Y-Position cannot be less than 0!");
             }
             extent.setBlock(xx, yy, zz, block);

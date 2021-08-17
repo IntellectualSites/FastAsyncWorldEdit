@@ -29,29 +29,32 @@ import com.sk89q.worldedit.math.BlockVector3;
  */
 public class NonRisingVisitor extends RecursiveVisitor {
 
-    //FAWE start - max int
-
     /**
-     * Create a new recursive visitor.
+     * Create a new resursive visitor.
      *
      * @param mask     the mask
      * @param function the function
+     * @deprecated Use {@link NonRisingVisitor#NonRisingVisitor(Mask, RegionFunction, int, int, int, Extent)}
      */
+    @Deprecated
     public NonRisingVisitor(Mask mask, RegionFunction function) {
-        this(mask, function, Integer.MAX_VALUE);
+        //FAWE start - int depth, y min/max
+        this(mask, function, Integer.MAX_VALUE, 0, 255, null);
+        //FAWE end
     }
-    //FAWE end
 
-    //FAWE start - int depth, preloading
+    //FAWE start - int depth, preloading, min/max y
     /**
      * Create a new recursive visitor.
      *
      * @param mask     the mask
      * @param function the function
      * @param depth    the maximum number of iterations
+     * @param minY     minimum allowable y to visit. Inclusive.
+     * @param maxY     maximum allowable y to visit. Inclusive.
      */
-    public NonRisingVisitor(Mask mask, RegionFunction function, int depth) {
-        this(mask, function, depth, null);
+    public NonRisingVisitor(Mask mask, RegionFunction function, int depth, int minY, int maxY) {
+        this(mask, function, Integer.MAX_VALUE, minY, maxY, null);
     }
 
     /**
@@ -60,10 +63,12 @@ public class NonRisingVisitor extends RecursiveVisitor {
      * @param mask     the mask
      * @param function the function
      * @param depth    the maximum number of iterations
+     * @param minY     minimum allowable y to visit. Inclusive.
+     * @param maxY     maximum allowable y to visit. Inclusive.
      * @param extent   the extent for preloading
      */
-    public NonRisingVisitor(Mask mask, RegionFunction function, int depth, Extent extent) {
-        super(mask, function, depth, extent);
+    public NonRisingVisitor(Mask mask, RegionFunction function, int depth, int minY, int maxY, Extent extent) {
+        super(mask, function, depth, minY, maxY, extent);
         setDirections(
                 BlockVector3.UNIT_X,
                 BlockVector3.UNIT_MINUS_X,
