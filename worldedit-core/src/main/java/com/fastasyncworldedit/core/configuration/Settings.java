@@ -320,7 +320,8 @@ public class Settings extends Config {
                 " - Low values may result in FAWE waiting on requests to the main thread",
                 " - Higher values use more memory and isn't noticeably faster",
                 " - A good (relatively) safe way to set this is",
-                " - Use 32 x GB of RAM / number of players expected to be using WE at the same time"
+                " - Use 32 x GB of RAM / number of players expected to be using WE at the same time",
+                " - Paper and derivatives only."
         })
         // Renamed from PRELOAD_CHUNK because it was set to 100000... something that lots of servers will now have which is
         // wayyy too much...
