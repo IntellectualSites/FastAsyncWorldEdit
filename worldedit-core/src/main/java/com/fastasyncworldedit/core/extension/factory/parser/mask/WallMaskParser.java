@@ -15,15 +15,8 @@ import java.util.stream.Stream;
 
 public class WallMaskParser extends RichParser<Mask> {
 
-    private final List<String> aliases = ImmutableList.of("#wall", "|");
-
     public WallMaskParser(WorldEdit worldEdit) {
-        super(worldEdit);
-    }
-
-    @Override
-    public List<String> getMatchedAliases() {
-        return aliases;
+        super(worldEdit, "#wall", "|");
     }
 
     @Override
