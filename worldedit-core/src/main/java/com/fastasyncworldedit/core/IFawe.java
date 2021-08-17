@@ -35,7 +35,13 @@ public interface IFawe {
 
     QueueHandler getQueueHandler();
 
-    Preloader getPreloader();
+    /**
+     * Get the preloader instance and initialise if needed
+     *
+     * @param initialise if the preloader should be initialised if null
+     * @return preloader instance
+     */
+    Preloader getPreloader(boolean initialise);
 
     default boolean isChunksStretched() {
         return true;

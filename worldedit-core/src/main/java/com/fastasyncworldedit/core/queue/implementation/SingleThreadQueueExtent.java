@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.queue.implementation;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.PassthroughExtent;
 import com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
@@ -19,9 +20,15 @@ import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.queue.implementation.chunk.NullChunk;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.MemUtil;
+import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.math.BlockVector2;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import org.apache.logging.log4j.Logger;
 
@@ -60,6 +67,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private boolean fastmode = false;
 
     private final ReentrantLock getChunkLock = new ReentrantLock();
+
+    private World world = null;
 
     /**
      * Safety check to ensure that the thread being used matches the one being initialized on. - Can
@@ -124,6 +133,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.initialized = false;
         this.setProcessor(EmptyBatchProcessor.getInstance());
         this.setPostProcessor(EmptyBatchProcessor.getInstance());
+        this.world = null;
     }
 
     /**
@@ -146,6 +156,14 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.setProcessor(EmptyBatchProcessor.getInstance());
         this.setPostProcessor(EmptyBatchProcessor.getInstance());
         initialized = true;
+
+        if (extent.isWorld()) {
+            world = (World) ((extent instanceof PassthroughExtent) ? ((PassthroughExtent) extent).getExtent() : extent);
+        } else if (extent instanceof EditSession) {
+            world = ((EditSession) extent).getWorld();
+        } else {
+            world = WorldWrapper.unwrap(extent);
+        }
     }
 
     @Override
@@ -286,6 +304,37 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return chunk;
         } finally {
             getChunkLock.unlock();
+        }
+    }
+
+    /**
+     * Load a chunk in the world associated with this {@link SingleThreadQueueExtent} instance
+     *
+     * @param cx chunk X coordinate
+     * @param cz chunk Z coordinate
+     */
+    public void addChunkLoad(int cx, int cz) {
+        if (world == null) {
+            return;
+        }
+        world.checkLoadedChunk(BlockVector3.at(cx << 4, 0, cz << 4));
+    }
+
+    /**
+     * Define a region to be "preloaded" to the number of chunks provided by {@link Settings.QUEUE#PRELOAD_CHUNK_COUNT}
+     *
+     * @param region region of chunks
+     */
+    public void preload(Region region) {
+        if (Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
+            int loadCount = 0;
+            for (BlockVector2 from : region.getChunks()) {
+                if (loadCount >= Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT) {
+                    break;
+                }
+                loadCount++;
+                addChunkLoad(from.getBlockX(), from.getBlockZ());
+            }
         }
     }
 

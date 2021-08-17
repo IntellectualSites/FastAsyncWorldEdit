@@ -106,6 +106,7 @@ import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
 import com.sk89q.worldedit.command.util.annotation.ConfirmHandler;
+import com.sk89q.worldedit.command.util.annotation.PreloadHandler;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.Event;
@@ -219,7 +220,10 @@ public final class PlatformCommandManager {
                 ImmutableList.of(
                         new CommandLoggingHandler(worldEdit, COMMAND_LOG),
                         new MethodInjector(),
-                        new ConfirmHandler()
+                        //FAWE start
+                        new ConfirmHandler(),
+                        new PreloadHandler()
+                        //FAWE end
 
                 ));
         // setup separate from main constructor

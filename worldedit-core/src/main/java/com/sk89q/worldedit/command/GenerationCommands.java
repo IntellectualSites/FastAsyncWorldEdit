@@ -33,6 +33,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
@@ -435,6 +436,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int generateBiome(
             Actor actor, LocalSession session, EditSession editSession,
@@ -511,6 +513,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.caves")
     @Logging(PLACEMENT)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void caves(
             Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
@@ -548,6 +551,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void ores(
             Actor actor,
@@ -619,6 +623,7 @@ public class GenerationCommands {
     @Command(name = "/ore", desc = "Generates ores")
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void ore(
             Actor actor,

@@ -20,8 +20,12 @@
 package com.sk89q.worldedit.function.visitor;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.FlatRegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.RunContext;
@@ -37,10 +41,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class FlatRegionVisitor implements Operation {
 
+    //FAWE start - chunk preloading
+    private final SingleThreadQueueExtent singleQueue;
+    private final FlatRegion flatRegion;
+    //FAWE end
     private final FlatRegionFunction function;
     private int affected = 0;
-    private final Iterable<BlockVector2> iterator;
 
+    //FAWE start - chunk preloading
     /**
      * Create a new visitor.
      *
@@ -48,12 +56,30 @@ public class FlatRegionVisitor implements Operation {
      * @param function   a function to apply to columns
      */
     public FlatRegionVisitor(FlatRegion flatRegion, FlatRegionFunction function) {
+        this(flatRegion, function, null);
+    }
+
+    /**
+     * Create a new visitor.
+     *
+     * @param flatRegion a flat region
+     * @param function   a function to apply to columns
+     * @param extent     the extent for preloading
+     */
+    public FlatRegionVisitor(FlatRegion flatRegion, FlatRegionFunction function, Extent extent) {
         checkNotNull(flatRegion);
         checkNotNull(function);
 
         this.function = function;
-        this.iterator = flatRegion.asFlatRegion();
+        this.flatRegion = flatRegion;
+        if (extent != null) {
+            ExtentTraverser<ParallelQueueExtent> queueTraverser = new ExtentTraverser<>(extent).find(ParallelQueueExtent.class);
+            this.singleQueue = queueTraverser != null ? (SingleThreadQueueExtent) queueTraverser.get().getExtent() : null;
+        } else {
+            this.singleQueue = null;
+        }
     }
+    //FAWE end
 
     /**
      * Get the number of affected objects.
@@ -66,7 +92,12 @@ public class FlatRegionVisitor implements Operation {
 
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
-        for (BlockVector2 pt : this.iterator) {
+        //FAWE start - chunk preloading
+        if (singleQueue != null) {
+            singleQueue.preload(flatRegion);
+        }
+        for (BlockVector2 pt : this.flatRegion.asFlatRegion()) {
+            //FAWE end
             if (function.apply(pt)) {
                 affected++;
             }
