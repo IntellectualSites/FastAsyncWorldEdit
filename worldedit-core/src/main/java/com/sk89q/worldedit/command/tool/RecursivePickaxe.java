@@ -91,7 +91,8 @@ public class RecursivePickaxe implements BlockTool {
                     replace,
                     radius,
                     editSession.getMinY(),
-                    editSession.getMaxY()
+                    editSession.getMaxY(),
+                    editSession
             );
             //TODO: Fix below
             //visitor.visit(pos);

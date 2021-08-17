@@ -18,7 +18,7 @@ public class AngleMaskParser extends RichParser<Mask> {
     private final String[] flags = new String[]{"-o"};
 
     public AngleMaskParser(WorldEdit worldEdit) {
-        super(worldEdit, "/");
+        super(worldEdit, "/", "#angle", "\\");
     }
 
     @Override

@@ -32,6 +32,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.GroundFunction;
@@ -105,6 +106,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     public int set(
             Actor actor, EditSession editSession,
             @Selection Region region,
@@ -125,6 +127,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     public void air(Actor actor, EditSession editSession, @Selection Region region) throws WorldEditException {
         set(actor, editSession, region, BlockTypes.AIR);
     }
@@ -305,6 +308,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.replace")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int replace(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -351,6 +355,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void lay(
             Player player,
@@ -435,6 +440,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.faces")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int faces(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -453,6 +459,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.smooth")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int smooth(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -528,6 +535,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int move(
             Actor actor, World world, EditSession editSession, LocalSession session,
@@ -592,6 +600,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.fall")
     @Logging(ORIENTATION_REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void fall(
             Player player, EditSession editSession, LocalSession session,
@@ -610,6 +619,7 @@ public class RegionCommands {
             desc = "Repeat the contents of the selection"
     )
     @CommandPermissions("worldedit.region.stack")
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Logging(ORIENTATION_REGION)
     public int stack(
             Actor actor, World world, EditSession editSession, LocalSession session,
@@ -719,6 +729,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int deform(
             Actor actor, LocalSession session, EditSession editSession,
@@ -794,6 +805,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int hollow(
             Actor actor, EditSession editSession,
@@ -829,6 +841,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.forest")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int forest(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -849,6 +862,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.flora")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int flora(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -859,7 +873,9 @@ public class RegionCommands {
         density = density / 100;
         FloraGenerator generator = new FloraGenerator(editSession);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(editSession), generator);
+        //FAWE start - provide extent for preloading
         LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
+        //FAWE end
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
 

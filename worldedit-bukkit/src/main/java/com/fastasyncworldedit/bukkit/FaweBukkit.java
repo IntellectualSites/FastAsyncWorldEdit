@@ -58,6 +58,7 @@ public class FaweBukkit implements IFawe, Listener {
     private boolean listeningImages;
     private final boolean chunksStretched;
     private final FAWEPlatformAdapterImpl platformAdapter;
+    private Preloader preloader;
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
@@ -277,9 +278,12 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public Preloader getPreloader() {
+    public Preloader getPreloader(boolean initialise) {
         if (PaperLib.isPaper()) {
-            return new AsyncPreloader();
+            if (preloader == null && initialise) {
+                return preloader = new AsyncPreloader();
+            }
+            return preloader;
         }
         return null;
     }

@@ -27,6 +27,9 @@ import com.fastasyncworldedit.core.function.block.BiomeCopy;
 import com.fastasyncworldedit.core.function.block.CombinedBlockCopy;
 import com.fastasyncworldedit.core.function.block.SimpleBlockCopy;
 import com.fastasyncworldedit.core.function.visitor.IntersectRegionFunction;
+import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
+import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -398,7 +401,9 @@ public class ForwardExtentCopy implements Operation {
             if (copyingBiomes && (source.isWorld() || region instanceof FlatRegion)) {
                 copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
             }
-            blockCopy = new RegionVisitor(region, copy);
+            ExtentTraverser<ParallelQueueExtent> queueTraverser = new ExtentTraverser<>(finalDest).find(ParallelQueueExtent.class);
+            Extent preloader = queueTraverser != null ? queueTraverser.get() : source;
+            blockCopy = new RegionVisitor(region, copy, preloader);
         }
 
         List<? extends Entity> entities;

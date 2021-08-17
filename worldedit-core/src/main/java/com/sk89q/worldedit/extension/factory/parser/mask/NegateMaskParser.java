@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -27,9 +29,14 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.internal.registry.InputParser;
 
+import java.util.List;
 import java.util.stream.Stream;
 
-public class NegateMaskParser extends InputParser<Mask> {
+//FAWE start - aliased
+public class NegateMaskParser extends InputParser<Mask> implements AliasedParser {
+
+    private final List<String> aliases = ImmutableList.of("!");
+    //FAWE end
 
     public NegateMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -58,5 +65,12 @@ public class NegateMaskParser extends InputParser<Mask> {
             throw new InputParseException(Caption.of("worldedit.error.parser.negate-nothing"));
         }
     }
+
+    //FAWE start - aliased
+    @Override
+    public List<String> getMatchedAliases() {
+        return aliases;
+    }
+    //FAWE end
 
 }

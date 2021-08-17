@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
@@ -48,6 +49,7 @@ import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
@@ -1260,6 +1262,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             player.print(Caption.of("fawe.error.lighting"));
             e.printStackTrace();
         }
+        // Cancel any preloader associated with the actor if present
+        if (getPlayer() != null) {
+            Preloader preloader = Fawe.imp().getPreloader(false);
+            if (preloader != null) {
+                preloader.cancel(getPlayer());
+            }
+        }
         // Enqueue it
         if (getChangeSet() != null) {
             if (Settings.IMP.HISTORY.COMBINE_STAGES) {
@@ -1418,11 +1427,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         // Pick how we're going to visit blocks
         RecursiveVisitor visitor;
-        //FAWE start - world min/maxY
+        //FAWE start - provide extent for preloading, min/max y
         if (recursive) {
-            visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), minY, maxY);
+            visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), minY, maxY, this);
         } else {
-            visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1), minY, maxY);
+            visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1), minY, maxY, this);
         }
         //FAWE end
 
@@ -1679,7 +1688,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int minY = region.getMinimumPoint().getBlockY();
         int maxY = Math.min(getMaximumPoint().getBlockY(), region.getMaximumPoint().getBlockY() + 1);
         SurfaceRegionFunction surface = new SurfaceRegionFunction(this, offset, minY, maxY);
-        FlatRegionVisitor visitor = new FlatRegionVisitor(asFlatRegion(region), surface);
+        FlatRegionVisitor visitor = new FlatRegionVisitor(asFlatRegion(region), surface, this);
         //FAWE end
         Operations.completeBlindly(visitor);
         return this.changes = visitor.getAffected();
@@ -1698,7 +1707,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         Naturalizer naturalizer = new Naturalizer(this);
         FlatRegion flatRegion = Regions.asFlatRegion(region);
-        LayerVisitor visitor = new LayerVisitor(flatRegion, minimumBlockY(region), maximumBlockY(region), naturalizer);
+        //FAWE start - provide extent for preloading
+        LayerVisitor visitor = new LayerVisitor(flatRegion, minimumBlockY(region), maximumBlockY(region), naturalizer, this);
+        //FAWE end
         Operations.completeBlindly(visitor);
         return this.changes = naturalizer.getAffected();
     }
@@ -1949,8 +1960,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             replace = new BlockReplace(this, BlockTypes.AIR.getDefaultState());
         }
-        //FAWE start - min/maxY
-        RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), minY, maxY);
+        //FAWE start - provide extent for preloading, min/max y
+        RecursiveVisitor visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), minY, maxY, this);
         //FAWE end
 
         // Around the origin in a 3x3 block
@@ -1994,8 +2005,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         );
 
         BlockReplace replace = new BlockReplace(this, fluid.getDefaultState());
-        //FAWE start - world min/maxY
-        NonRisingVisitor visitor = new NonRisingVisitor(mask, replace, Integer.MAX_VALUE, minY, maxY);
+        //FAWE start - provide extent for preloading, world min/maxY
+        NonRisingVisitor visitor = new NonRisingVisitor(mask, replace, Integer.MAX_VALUE, minY, maxY, this);
         //FAWE end
 
         // Around the origin in a 3x3 block
@@ -2603,7 +2614,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(region);
 
         SnowSimulator snowSimulator = new SnowSimulator(this, stack);
-        LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), snowSimulator);
+        //FAWE start - provide extent for preloading
+        LayerVisitor layerVisitor = new LayerVisitor(region, region.getMinimumY(), region.getMaximumY(), snowSimulator, this);
+        //FAWE end
         Operations.completeLegacy(layerVisitor);
         return snowSimulator.getAffected();
     }
@@ -2715,7 +2728,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         );
 
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
-        LayerVisitor visitor = new LayerVisitor(region, minimumBlockY(region), maximumBlockY(region), ground);
+        LayerVisitor visitor = new LayerVisitor(region, minimumBlockY(region), maximumBlockY(region), ground, this);
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
         return this.changes = ground.getAffected();
@@ -2749,7 +2762,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int makeForest(Region region, double density, TreeGenerator.TreeType treeType) throws MaxChangedBlocksException {
         ForestGenerator generator = new ForestGenerator(this, treeType);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(this), generator);
-        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
+        //FAWE start - provide extent for preloading
+        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground, this);
+        //FAWE end
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
         return ground.getAffected();

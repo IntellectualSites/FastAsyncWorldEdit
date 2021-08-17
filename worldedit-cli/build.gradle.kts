@@ -2,7 +2,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     `java-library`
-    id("net.minecrell.plugin-yml.bukkit") version "0.4.0"
+
+    alias(libs.plugins.pluginyml)
 }
 
 project.description = "CLI"

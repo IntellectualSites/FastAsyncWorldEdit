@@ -163,6 +163,9 @@ public class Fawe {
     }
 
     public void onDisable() {
+        if (imp().getPreloader(false) != null) {
+            imp().getPreloader(false).cancel();
+        }
     }
 
     public QueueHandler getQueueHandler() {
