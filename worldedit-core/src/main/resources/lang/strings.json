@@ -90,8 +90,6 @@
 	"fawe.worldedit.selector.selector.fuzzy.pos1": "Region set and expanded from {0} {1}.",
 	"fawe.worldedit.selector.selector.fuzzy.pos2": "Added expansion of {0} {1}.",
 
-	"fawe.worldedit.help.command.clarifying.bracket": "Added clarifying bracket for {0}",
-
 	"fawe.progress.progress.message": "{1}/{0} ({2}%) @{3}cps {4}s left",
 	"fawe.progress.progress.finished": "[ Done! ]",
 

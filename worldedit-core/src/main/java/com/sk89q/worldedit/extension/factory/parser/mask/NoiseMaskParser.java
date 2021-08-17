@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -26,9 +28,14 @@ import com.sk89q.worldedit.function.mask.NoiseFilter;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.noise.RandomNoise;
 
+import java.util.List;
 import java.util.stream.Stream;
 
-public class NoiseMaskParser extends InputParser<Mask> {
+//FAWE start - aliased
+public class NoiseMaskParser extends InputParser<Mask> implements AliasedParser {
+
+    private final List<String> aliases = ImmutableList.of("%");
+    //FAWE end
 
     public NoiseMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -51,8 +58,28 @@ public class NoiseMaskParser extends InputParser<Mask> {
             return null;
         }
 
-        int i = Integer.parseInt(input.substring(1));
+        //FAWE start - richer parsing
+        if (input.charAt(1) == '[') {
+            int end = input.lastIndexOf(']');
+            if (end == -1) {
+                return null;
+            }
+            input = input.substring(2, end);
+        } else {
+            input = input.substring(1);
+        }
+
+        int i = Integer.parseInt(input);
+        //FAWE end
+
         return new NoiseFilter(new RandomNoise(), ((double) i) / 100);
     }
+
+    //FAWE start - aliased
+    @Override
+    public List<String> getMatchedAliases() {
+        return aliases;
+    }
+    //FAWE end
 
 }

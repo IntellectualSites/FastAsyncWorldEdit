@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -28,9 +30,14 @@ import com.sk89q.worldedit.function.mask.OffsetMask;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 
+import java.util.List;
 import java.util.stream.Stream;
 
-public class OffsetMaskParser extends InputParser<Mask> {
+//FAWE start - aliased
+public class OffsetMaskParser extends InputParser<Mask> implements AliasedParser {
+
+    private final List<String> aliases = ImmutableList.of(">", "<");
+    //FAWE end
 
     public OffsetMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -65,5 +72,12 @@ public class OffsetMaskParser extends InputParser<Mask> {
         return new OffsetMask(submask, BlockVector3.at(0, firstChar == '>' ? -1 : 1, 0));
         //FAWE end
     }
+
+    //FAWE start - aliased
+    @Override
+    public List<String> getMatchedAliases() {
+        return aliases;
+    }
+    //FAWE end
 
 }

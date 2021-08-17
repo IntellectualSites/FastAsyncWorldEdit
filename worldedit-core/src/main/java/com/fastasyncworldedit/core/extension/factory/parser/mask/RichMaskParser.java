@@ -29,6 +29,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -108,11 +109,11 @@ public class RichMaskParser extends FaweParser<Mask> {
                     // Legacy syntax
                     if (charMask) {
                         switch (char0) {
-                            case '\\': //
-                            case '/': //
-                            case '{': //
-                            case '$': //
-                            case '%': {
+                            case '\\':
+                            case '/':
+                            case '{':
+                            case '|':
+                            case '~': {
                                 String value = command.substring(1) + ((entry.getValue().isEmpty())
                                         ? ""
                                         : "[" + StringMan.join(
@@ -125,23 +126,16 @@ public class RichMaskParser extends FaweParser<Mask> {
                                     }
                                     value = value.replaceAll(":", "][");
                                 }
-                                mask = parseFromInput("#" + char0 + "[" + value + "]", context);
+                                mask = parseFromInput(char0 + "[" + value + "]", context);
                                 break;
                             }
-                            case '|':
-                            case '~':
+                            case '%':
+                            case '$':
                             case '<':
                             case '>':
                             case '!':
                                 input = input.substring(input.indexOf(char0) + 1);
                                 mask = parseFromInput(char0 + "[" + input + "]", context);
-                                if (actor != null) {
-                                    actor.print(Caption.of(
-                                            "fawe.worldedit.help.command.clarifying.bracket",
-                                            char0 + "[" + input +
-                                                    "]"
-                                    ));
-                                }
                                 return mask;
                         }
                     }
@@ -154,6 +148,26 @@ public class RichMaskParser extends FaweParser<Mask> {
                             try {
                                 builder.addRegex(full);
                             } catch (InputParseException ignored) {
+                            } catch (PatternSyntaxException e) {
+                                throw new SuggestInputParseException(
+                                        new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
+                                                TextComponent
+                                                        .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                        )
+                                                        .clickEvent(ClickEvent.openUrl(
+                                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                        ))
+                                        )),
+                                        full,
+                                        () -> {
+                                            if (full.length() == 1) {
+                                                return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions(""));
+                                            }
+                                            return new ArrayList<>(worldEdit
+                                                    .getMaskFactory()
+                                                    .getSuggestions(command.toLowerCase(Locale.ROOT)));
+                                        }
+                                );
                             }
                             context.setPreferringWildcard(false);
                             context.setRestricted(false);
