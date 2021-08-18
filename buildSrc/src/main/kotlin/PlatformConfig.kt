@@ -77,7 +77,9 @@ fun Project.applyPlatformAndCoreConfiguration() {
                     "https://javadoc.io/doc/com.google.guava/guava/21.0/",
                     "https://www.antlr.org/api/Java/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/core/0.5.7/",
-                    "https://docs.enginehub.org/javadoc/org.enginehub.piston/default-impl/0.5.7/"
+                    "https://docs.enginehub.org/javadoc/org.enginehub.piston/default-impl/0.5.7/",
+                    "https://papermc.io/javadocs/paper/1.17/",
+                    "https://ci.athion.net/job/FastAsyncWorldEdit-1.17-Core-Javadocs/javadoc/" // needed for other module linking
             )
         }
     }
