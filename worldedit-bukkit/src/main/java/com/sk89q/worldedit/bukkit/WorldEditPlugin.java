@@ -49,7 +49,6 @@ import com.sk89q.worldedit.util.lifecycle.Lifecycled;
 import com.sk89q.worldedit.util.lifecycle.SimpleLifecycled;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockCategory;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameModes;
@@ -321,8 +320,10 @@ public class WorldEditPlugin extends JavaPlugin {
         } else {
             LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
             for (Biome biome : Biome.values()) {
-                if (BiomeType.REGISTRY.get(biome.toString()) == null) { // only register once
-                    BiomeType.REGISTRY.register(biome.getKey().toString(), new BiomeType(biome.getKey().toString()));
+                String lowerCaseBiome = biome.getKey().namespace().toLowerCase(Locale.ROOT) + ":" + biome.name().toLowerCase(Locale.ROOT);
+                // only register once
+                if (BiomeType.REGISTRY.get(lowerCaseBiome) == null) {
+                    BiomeType.REGISTRY.register(lowerCaseBiome, new BiomeType(lowerCaseBiome));
                 }
             }
         }
