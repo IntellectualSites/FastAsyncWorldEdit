@@ -320,7 +320,7 @@ public class WorldEditPlugin extends JavaPlugin {
         } else {
             LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
             for (Biome biome : Biome.values()) {
-                String lowerCaseBiome = biome.getKey().namespace().toLowerCase(Locale.ROOT) + ":" + biome.name().toLowerCase(Locale.ROOT);
+                String lowerCaseBiome = biome.getKey().toString().toLowerCase(Locale.ROOT);
                 // only register once
                 if (BiomeType.REGISTRY.get(lowerCaseBiome) == null) {
                     BiomeType.REGISTRY.register(lowerCaseBiome, new BiomeType(lowerCaseBiome));
