@@ -72,7 +72,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                         int index = (z << 4) | x;
                         if (!updated[i].get(index) // ignore if that position was already set
                                 && type.includes(block)) {
-                            heightmaps[i][index] = y + 1; // mc requires + 1
+                            heightmaps[i][index] = y + 1 - minY; // mc requires + 1, heightmaps are normalized internally
                             updated[i].set(index); // mark as updated
                         }
                     }
