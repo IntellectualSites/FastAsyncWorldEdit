@@ -79,6 +79,7 @@ import com.sk89q.worldedit.command.tool.brush.HollowCylinderBrush;
 import com.sk89q.worldedit.command.tool.brush.HollowSphereBrush;
 import com.sk89q.worldedit.command.tool.brush.OperationFactoryBrush;
 import com.sk89q.worldedit.command.tool.brush.SmoothBrush;
+import com.sk89q.worldedit.command.tool.brush.SnowSmoothBrush;
 import com.sk89q.worldedit.command.tool.brush.SphereBrush;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
@@ -1292,20 +1293,65 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.smooth")
     public void smoothBrush(
             Player player, LocalSession session,
+            //FAWE start - Expression > double
             @Arg(desc = "The radius to sample for softening", def = "2")
                     Expression radius,
+            //FAWE end
             @Arg(desc = "The number of iterations to perform", def = "4")
                     int iterations,
             @Arg(desc = "The mask of blocks to use for the heightmap", def = "")
-                    Mask maskOpt,
+                    Mask mask,
             InjectedValueAccess context
     ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
 
+        //FAWE start
         FaweLimit limit = Settings.IMP.getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        //FAWE end
 
-        set(context, new SmoothBrush(iterations, maskOpt)).setSize(radius);
+        set(context, new SmoothBrush(iterations, mask)).setSize(radius);
+        player.print(Caption.of(
+                "worldedit.brush.smooth.equip",
+                radius,
+                iterations,
+                Caption.of("worldedit.brush.smooth." + (mask == null ? "no" : "") + "filter")
+        ));
+    }
+
+    @Command(
+            name = "snowsmooth",
+            desc = "Choose the snow terrain softener brush",
+            descFooter = "Example: '/brush snowsmooth 5 1 -l 3'"
+    )
+    @CommandPermissions("worldedit.brush.snowsmooth")
+    public void snowSmoothBrush(
+            Player player, LocalSession session,
+            //FAWE start - Expression > double
+            @Arg(desc = "The radius to sample for softening", def = "2")
+                    Expression radius,
+            //FAWE end
+            @Arg(desc = "The number of iterations to perform", def = "4")
+                    int iterations,
+            @ArgFlag(name = 'l', desc = "The number of snow blocks under snow", def = "1")
+                    int snowBlockCount,
+            @ArgFlag(name = 'm', desc = "The mask of blocks to use for the heightmap")
+                    Mask mask, InjectedValueAccess context
+    ) throws WorldEditException {
+        worldEdit.checkMaxBrushRadius(radius);
+
+        //FAWE start
+        FaweLimit limit = Settings.IMP.getLimit(player);
+        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        //FAWE end
+
+        set(context, new SnowSmoothBrush(iterations, mask)).setSize(radius);
+        player.print(Caption.of(
+                "worldedit.brush.smooth.equip",
+                radius,
+                iterations,
+                Caption.of("worldedit.brush.smooth." + (mask == null ? "no" : "") + "filter")
+        ));
     }
 
     @Command(

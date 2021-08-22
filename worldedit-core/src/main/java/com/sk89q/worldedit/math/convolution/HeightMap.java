@@ -180,7 +180,7 @@ public class HeightMap {
         System.arraycopy(data, 0, newData, 0, data.length);
 
         for (int i = 0; i < iterations; ++i) {
-            newData = filter.filter(newData, width, height);
+            newData = filter.filter(newData, width, height, 0.5F);
         }
 
         //FAWE start - check layers
@@ -229,7 +229,7 @@ public class HeightMap {
                     BlockStateHolder<BlockState> existing = session.getBlock(xr, curBlock, zr);
 
                     // Skip water/lava
-                    if (existing.getBlockType().getMaterial().isMovementBlocker()) {
+                    if (!existing.getBlockType().getMaterial().isLiquid()) {
                         // Grow -- start from 1 below top replacing airblocks
                         for (int setY = newBlock - 1, getY = curBlock; setY >= curBlock; --setY, getY--) {
                             BlockStateHolder<BlockState> get = session.getBlock(xr, getY, zr);
