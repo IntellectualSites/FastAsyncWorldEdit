@@ -321,7 +321,7 @@ public class WorldEditPlugin extends JavaPlugin {
             LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
             for (Biome biome : Biome.values()) {
                 // Custom is bad
-                if (biome == Biome.CUSTOM) {
+                if (biome.name().equals("CUSTOM")) {
                     continue;
                 }
                 String lowerCaseBiome = biome.getKey().toString().toLowerCase(Locale.ROOT);
