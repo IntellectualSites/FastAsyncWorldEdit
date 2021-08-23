@@ -40,14 +40,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class SnowHeightMap {
 
+    //FAWE start - this can be static
+    private static final Property<Integer> LAYERS = BlockTypes.SNOW.getProperty("layers");
+    //FAWE end
     private final float[] data;
     private final int width;
     private final int height;
-
     private final Region region;
     private final EditSession session;
-
-    private final Property<Integer> layers;
 
     /**
      * Constructs the SnowHeightMap.
@@ -66,8 +66,6 @@ public class SnowHeightMap {
         this.width = region.getWidth();
         this.height = region.getLength();
 
-        this.layers = BlockTypes.SNOW.getProperty("layers");
-
         int minX = region.getMinimumPoint().getBlockX();
         int minY = region.getMinimumPoint().getBlockY();
         int minZ = region.getMinimumPoint().getBlockZ();
@@ -77,13 +75,22 @@ public class SnowHeightMap {
         data = new float[width * height];
         for (int z = 0; z < height; ++z) {
             for (int x = 0; x < width; ++x) {
-                int highestBlockY = session.getHighestTerrainBlock(x + minX, z + minZ, minY, maxY, mask);
-                BlockState upper = session.getBlock(BlockVector3.at(x + minX, highestBlockY + 1, z + minZ));
+                //FAWE start - mask is nullable, avoid BlockVector3 creation for no reason
+                int highestBlockY;
+                if (mask != null) {
+                    highestBlockY = session.getHighestTerrainBlock(x + minX, z + minZ, minY, maxY, mask);
+                } else {
+                    highestBlockY = session.getHighestTerrainBlock(x + minX, z + minZ, minY, maxY);
+                }
+                BlockState upper = session.getBlock(x + minX, highestBlockY + 1, z + minZ);
+                //FAWE end
                 if (upper.getBlockType() == BlockTypes.SNOW) {
-                    Integer amountLayers = upper.getState(layers);
+                    Integer amountLayers = upper.getState(LAYERS);
                     data[z * width + x] = (highestBlockY + 1 + (((float) amountLayers - 1) / 8));
                 } else {
-                    BlockState block = session.getBlock(BlockVector3.at(x + minX, highestBlockY, z + minZ));
+                    //FAWE start - avoid BlockVector3 creation for no reason
+                    BlockState block = session.getBlock(x + minX, highestBlockY, z + minZ);
+                    //FAWE end
                     if (block.getBlockType().getMaterial().isAir()) {
                         data[z * width + x] = highestBlockY;
                     } else {
@@ -104,7 +111,10 @@ public class SnowHeightMap {
     public float[] applyFilter(HeightMapFilter filter, int iterations) {
         checkNotNull(filter);
 
-        float[] newData = data.clone();
+        //FAWE start - don't use Array#clone
+        float[] newData = new float[data.length];
+        System.arraycopy(data, 0, newData, 0, data.length);
+        //FAWE end
 
         for (int i = 0; i < iterations; ++i) {
             // add an offset from 0.0625F to the values (snowlayer half)
@@ -159,7 +169,9 @@ public class SnowHeightMap {
                 // Depending on growing or shrinking we need to start at the bottom or top
                 if (newHeight >= curHeight) {
                     // Set the top block of the column to be the same type (this might go wrong with rounding)
-                    BlockState existing = session.getBlock(BlockVector3.at(xr, curHeight, zr));
+                    //FAWE start - avoid BlockVector3 creation for no reason
+                    BlockState existing = session.getBlock(xr, (int) Math.floor(curHeight), zr);
+                    //FAWE end
 
                     // Skip water/lava
                     if (!existing.getBlockType().getMaterial().isLiquid()) {
@@ -169,11 +181,15 @@ public class SnowHeightMap {
                         // Grow -- start from 1 below top replacing airblocks
                         for (int y = (int) newHeight - 1 - originY; y >= 0; --y) {
                             if (y >= newHeight - 1 - originY - layerBlocks) {
-                                session.setBlock(BlockVector3.at(xr, originY + y, zr), fillerSnow);
+                                //FAWE start - avoid BlockVector3 creation for no reason
+                                session.setBlock(xr, originY + y, zr, fillerSnow);
+                                //FAWE end
                             } else {
                                 int copyFrom = (int) (y * scale);
-                                BlockState block = session.getBlock(BlockVector3.at(xr, originY + copyFrom, zr));
-                                session.setBlock(BlockVector3.at(xr, originY + y, zr), block);
+                                //FAWE start - avoid BlockVector3 creation for no reason
+                                BlockState block = session.getBlock(xr, originY + copyFrom, zr);
+                                session.setBlock(xr, originY + y, zr, block);
+                                //FAWE end
                             }
                             ++blocksChanged;
                         }
@@ -182,11 +198,15 @@ public class SnowHeightMap {
                     // Shrink -- start from bottom
                     for (int y = 0; y < (int) newHeight - originY; ++y) {
                         if (y >= (int) newHeight - originY - layerBlocks) {
-                            session.setBlock(BlockVector3.at(xr, originY + y, zr), fillerSnow);
+                            //FAWE start - avoid BlockVector3 creation for no reason
+                            session.setBlock(xr, originY + y, zr, fillerSnow);
+                            //FAWE end
                         } else {
                             int copyFrom = (int) (y * scale);
-                            BlockState block = session.getBlock(BlockVector3.at(xr, originY + copyFrom, zr));
-                            session.setBlock(BlockVector3.at(xr, originY + y, zr), block);
+                            //FAWE start - avoid BlockVector3 creation for no reason
+                            BlockState block = session.getBlock(xr, originY + copyFrom, zr);
+                            session.setBlock(xr, originY + y, zr, block);
+                            //FAWE end
                         }
                         ++blocksChanged;
                     }
@@ -196,7 +216,9 @@ public class SnowHeightMap {
 
                     // Fill rest with air
                     for (int y = (int) newHeight + 1; y <= curHeight; ++y) {
-                        session.setBlock(BlockVector3.at(xr, y, zr), fillerAir);
+                        //FAWE start - avoid BlockVector3 creation for no reason
+                        session.setBlock(xr, y, zr, fillerAir);
+                        //FAWE end
                         ++blocksChanged;
                     }
                 }
@@ -209,10 +231,9 @@ public class SnowHeightMap {
 
     private void setSnowLayer(int x, int z, float newHeight) throws MaxChangedBlocksException {
         int numOfLayers = (int) ((newHeight % 1) * 8) + 1;
-        session.setBlock(
-                BlockVector3.at(x, (int) newHeight, z),
-                BlockTypes.SNOW.getState(ImmutableMap.of(this.layers, numOfLayers))
-        );
+        //FAWE start - avoid BlockVector3 creation for no reason
+        session.setBlock(x, (int) newHeight, z, BlockTypes.SNOW.getState(ImmutableMap.of(LAYERS, numOfLayers)));
+        //FAWE end
     }
 
 }
