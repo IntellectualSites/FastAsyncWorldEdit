@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.math.convolution;
 
-import com.google.common.collect.ImmutableMap;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -232,7 +231,7 @@ public class SnowHeightMap {
     private void setSnowLayer(int x, int z, float newHeight) throws MaxChangedBlocksException {
         int numOfLayers = (int) ((newHeight % 1) * 8) + 1;
         //FAWE start - avoid BlockVector3 creation for no reason
-        session.setBlock(x, (int) newHeight, z, BlockTypes.SNOW.getState(ImmutableMap.of(LAYERS, numOfLayers)));
+        session.setBlock(x, (int) newHeight, z, BlockTypes.SNOW.getDefaultState().with(LAYERS, numOfLayers));
         //FAWE end
     }
 
