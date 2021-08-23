@@ -286,10 +286,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             if (chunk.chunkSet.getSkyLight() != null) {
                 int layer = y >> 4;
                 layer -= chunk.chunkSet.getMinSectionIndex();
-                if (chunk.chunkSet.getSkyLight()[layer] != null) {
-                    int setLightValue = chunk.chunkSet.getSkyLight()[layer][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
-                    if (setLightValue < 16) {
-                        return setLightValue;
+                if (layer >= 0 && layer < chunk.chunkSet.getSectionCount()) {
+                    if (chunk.chunkSet.getSkyLight()[layer] != null) {
+                        int setLightValue = chunk.chunkSet.getSkyLight()[layer][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
+                        if (setLightValue < 16) {
+                            return setLightValue;
+                        }
                     }
                 }
             }
@@ -301,10 +303,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             if (chunk.chunkSet.getLight() != null) {
                 int layer = y >> 4;
                 layer -= chunk.chunkSet.getMinSectionIndex();
-                if (chunk.chunkSet.getLight()[layer] != null) {
-                    int setLightValue = chunk.chunkSet.getLight()[layer][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
-                    if (setLightValue < 16) {
-                        return setLightValue;
+                if (layer >= 0 && layer < chunk.chunkSet.getSectionCount()) {
+                    if (chunk.chunkSet.getLight()[layer] != null) {
+                        int setLightValue = chunk.chunkSet.getLight()[layer][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
+                        if (setLightValue < 16) {
+                            return setLightValue;
+                        }
                     }
                 }
             }
@@ -598,10 +602,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             if (chunk.chunkSet.getSkyLight() != null) {
                 int layer = y >> 4;
                 layer -= chunk.chunkSet.getMinSectionIndex();
-                if (chunk.chunkSet.getSkyLight()[layer] != null) {
-                    int setLightValue = chunk.chunkSet.getSkyLight()[layer][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
-                    if (setLightValue < 16) {
-                        return setLightValue;
+                if (layer >= 0 && layer < chunk.chunkSet.getSectionCount()) {
+                    if (chunk.chunkSet.getSkyLight()[layer] != null) {
+                        int setLightValue = chunk.chunkSet.getSkyLight()[layer][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
+                        if (setLightValue < 16) {
+                            return setLightValue;
+                        }
                     }
                 }
             }
@@ -616,10 +622,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             if (chunk.chunkSet.getLight() != null) {
                 int layer = y >> 4;
                 layer -= chunk.chunkSet.getMinSectionIndex();
-                if (chunk.chunkSet.getLight()[layer] != null) {
-                    int setLightValue = chunk.chunkSet.getLight()[layer][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
-                    if (setLightValue < 16) {
-                        return setLightValue;
+                if (layer >= 0 && layer < chunk.chunkSet.getSectionCount()) {
+                    if (chunk.chunkSet.getLight()[layer] != null) {
+                        int setLightValue = chunk.chunkSet.getLight()[layer][(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
+                        if (setLightValue < 16) {
+                            return setLightValue;
+                        }
                     }
                 }
             }
