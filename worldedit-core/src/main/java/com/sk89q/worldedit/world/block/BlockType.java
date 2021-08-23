@@ -269,7 +269,9 @@ public class BlockType implements Keyed, Pattern {
      * Gets a state of this BlockType with the given properties.
      *
      * @return The state, if it exists
+     * @deprecated Not working. Not necessarily for removal, but WARNING DO NOT USE FOR NOW
      */
+    @Deprecated(forRemoval = true)
     public BlockState getState(Map<Property<?>, Object> key) {
         //FAWE start - use ids & btp (block type property)
         int id = getInternalId();
