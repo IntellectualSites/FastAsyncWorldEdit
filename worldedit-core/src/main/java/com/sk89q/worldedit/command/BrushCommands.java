@@ -1327,12 +1327,12 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.snowsmooth")
     public void snowSmoothBrush(
             Player player, LocalSession session,
-            //FAWE start - Expression > double
+            //FAWE start - Expression > double, default iteration number 1 is much better.
             @Arg(desc = "The radius to sample for softening", def = "2")
                     Expression radius,
-            //FAWE end
-            @Arg(desc = "The number of iterations to perform", def = "4")
+            @Arg(desc = "The number of iterations to perform", def = "1")
                     int iterations,
+            //FAWE end
             @ArgFlag(name = 'l', desc = "The number of snow blocks under snow", def = "1")
                     int snowBlockCount,
             @ArgFlag(name = 'm', desc = "The mask of blocks to use for the heightmap")
