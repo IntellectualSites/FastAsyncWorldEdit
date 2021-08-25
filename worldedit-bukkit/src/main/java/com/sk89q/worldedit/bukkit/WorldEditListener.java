@@ -21,6 +21,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.SessionIdleEvent;
@@ -37,6 +38,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.enginehub.piston.CommandManager;
@@ -68,9 +70,28 @@ public class WorldEditListener implements Listener {
             return;
         }
 
-        // this will automatically refresh their session, we don't have to do anything
-        WorldEdit.getInstance().getSessionManager().get(plugin.wrapPlayer(event.getPlayer()));
+        //FAWE start - correctly handle refreshing LocalSession
+        Player player = plugin.wrapPlayer(event.getPlayer());
+        LocalSession session;
+        if ((session = WorldEdit.getInstance().getSessionManager().getIfPresent(player)) == null) {
+            session = WorldEdit.getInstance().getSessionManager().get(player);
+        }
+        session.loadDefaults(player, true);
     }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onJoin(PlayerJoinEvent event) {
+        if (!plugin.getInternalPlatform().isHookingEvents()) {
+            return;
+        }
+
+        Player player = plugin.wrapPlayer(event.getPlayer());
+        LocalSession session;
+        if ((session = WorldEdit.getInstance().getSessionManager().getIfPresent(player)) != null) {
+            session.loadDefaults(player, true);
+        }
+    }
+    //FAWE end
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onPlayerCommandSend(PlayerCommandSendEvent event) {

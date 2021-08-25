@@ -1071,10 +1071,26 @@ public class LocalSession implements TextureHolder {
      */
     @Nullable
     @Deprecated
-    public Tool getTool(ItemType item) {
+    //FAWE start - refresh wand item if permissions change
+    public Tool getTool(ItemType item, Player player) {
+        Tool tool;
         synchronized (this.tools) {
-            return tools.get(item.getInternalId());
+            tool = tools.get(item.getInternalId());
         }
+        if (tool == SelectionWand.INSTANCE && !SelectionWand.INSTANCE.canUse(player)) {
+            tools.remove(wandItem.getInternalId());
+            loadDefaults(player, true); // Permissions have changed so redo the player's current tools.
+            return null;
+        }
+        if (tool != null) {
+            return tool;
+        } else if (item.getInternalId() == wandItem.getInternalId() && SelectionWand.INSTANCE.canUse(player)) {
+            loadDefaults(player, true); // Permissions have changed so redo the player's current tools.
+            return SelectionWand.INSTANCE;
+        } else {
+            return null;
+        }
+        //FAWE end
     }
 
     //FAWE start
@@ -1098,7 +1114,7 @@ public class LocalSession implements TextureHolder {
                 return tool;
             }
         }
-        return getTool(item.getType());
+        return getTool(item.getType(), player);
     }
 
     public void loadDefaults(Actor actor, boolean force) {
