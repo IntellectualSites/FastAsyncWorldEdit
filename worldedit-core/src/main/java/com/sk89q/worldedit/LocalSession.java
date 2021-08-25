@@ -576,7 +576,10 @@ public class LocalSession implements TextureHolder {
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
         //FAWE start - use our logic
-        World world = ((Player) actor).getWorldForEditing();
+        World world = (actor instanceof Player) ? ((Player) actor).getWorldForEditing() : getWorldOverride();
+        if (world == null) {
+            throw new MissingWorldException();
+        }
         loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() < history.size()) {
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
@@ -617,7 +620,10 @@ public class LocalSession implements TextureHolder {
     //FAWE start - use our logic
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        World world = ((Player) actor).getWorldForEditing();
+        World world = (actor instanceof Player) ? ((Player) actor).getWorldForEditing() : getWorldOverride();
+        if (world == null) {
+            throw new MissingWorldException();
+        }
         loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
