@@ -341,7 +341,8 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         BlockType type = this.getBlockType();
         // Lazily initialize the map
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
-        return Collections.unmodifiableMap(map);
+        //noinspection RedundantCast - This is required for compilation, etc.
+        return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
         //FAWE end
     }
 
