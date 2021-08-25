@@ -623,15 +623,17 @@ public class LocalSession implements TextureHolder {
             setDirty();
             historyNegativeIndex--;
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(world)
-                    .allowedRegionsEverywhere()
+            EditSessionBuilder builder = new EditSessionBuilder(world)
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
                     .limitUnprocessed((Player) actor)
                     .player((Player) actor)
-                    .blockBag(getBlockBag((Player) actor))
-                    .build()) {
+                    .blockBag(getBlockBag((Player) actor));
+            if (!actor.getLimit().RESTRICT_HISTORY_TO_REGIONS) {
+                builder.allowedRegionsEverywhere();
+            }
+            try (EditSession newEditSession = builder.build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
                 return newEditSession;
             }
