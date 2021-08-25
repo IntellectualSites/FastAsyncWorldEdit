@@ -52,8 +52,8 @@ public class FuzzyBlockState extends BlockState {
     }
     //FAWE end
 
-    //FAWE start - use internal ids
     private FuzzyBlockState(BlockState state, Map<Property<?>, Object> values) {
+        //FAWE start - use internal ids
         super(state.getBlockType(), state.getInternalId(), state.getOrdinal());
         if (values == null || values.isEmpty()) {
             props = Collections.emptyMap();
@@ -65,9 +65,8 @@ public class FuzzyBlockState extends BlockState {
             }
             this.values = new HashMap<>(values);
         }
-
+        //FAWE end
     }
-    //FAWE end
 
     /**
      * Gets a full BlockState from this fuzzy one, filling in
@@ -83,6 +82,11 @@ public class FuzzyBlockState extends BlockState {
             state = state.with(objKey, entry.getValue());
         }
         return state;
+    }
+
+    @Override
+    public BlockState toImmutableState() {
+        return getFullState();
     }
 
     //FAWE start
@@ -114,13 +118,14 @@ public class FuzzyBlockState extends BlockState {
     }
 
     @Override
-    public BlockState toImmutableState() {
-        return getFullState();
-    }
-
-    @Override
     public Map<Property<?>, Object> getStates() {
         return values;
+    }
+
+    @Deprecated
+    @Override
+    public CompoundTag getNbtData() {
+        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
     }
     //FAWE end
 
@@ -132,14 +137,6 @@ public class FuzzyBlockState extends BlockState {
     public static Builder builder() {
         return new Builder();
     }
-
-    //FAWE start
-    @Deprecated
-    @Override
-    public CompoundTag getNbtData() {
-        return getBlockType().getMaterial().isTile() ? getBlockType().getMaterial().getDefaultTile() : null;
-    }
-    //FAWE end
 
     /**
      * Builder for FuzzyBlockState

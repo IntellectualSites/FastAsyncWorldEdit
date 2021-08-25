@@ -93,6 +93,15 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     <V> B with(final Property<V> property, final V value);
 
     /**
+     * Gets the value for the given state.
+     *
+     * @param property The state
+     * @return The value
+     */
+    <V> V getState(Property<V> property);
+
+    //FAWE start
+    /**
      * Returns a BlockStateHolder with the given state and value applied.
      *
      * @param property The property key
@@ -107,15 +116,8 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      * @param property The state
      * @return The value
      */
-    <V> V getState(Property<V> property);
-
-    /**
-     * Gets the value for the given state.
-     *
-     * @param property The state
-     * @return The value
-     */
     <V> V getState(final PropertyKey property);
+    //FAWE end
 
     /**
      * Gets an immutable collection of the states.
@@ -145,8 +147,6 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
      * @return The BaseBlock
      */
     BaseBlock toBaseBlock();
-
-    //FAWE start
 
     /**
      * Gets a {@link BaseBlock} from this BlockStateHolder.
@@ -193,6 +193,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
         return toBaseBlock();
     }
 
+    //FAWE start
     void applyTileEntity(OutputExtent output, int x, int y, int z);
 
     default BaseBlock toBaseBlock(ITileInput input, int x, int y, int z) {

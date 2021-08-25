@@ -60,17 +60,15 @@ public class BlockType implements Keyed, Pattern {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final String id;
-    private final BlockTypesCache.Settings settings;
     private final LazyReference<FuzzyBlockState> emptyFuzzy
             = LazyReference.from(() -> new FuzzyBlockState(this));
+    //FAWE start
+    private final BlockTypesCache.Settings settings;
     @Deprecated
     private final LazyReference<String> name = LazyReference.from(() -> WorldEdit.getInstance().getPlatformManager()
             .queryCapability(Capability.GAME_HOOKS).getRegistries().getBlockRegistry().getName(this));
 
     //FAWE start
-    private final LazyReference<Integer> legacyId = LazyReference.from(() -> computeLegacy(0));
-    private final LazyReference<Integer> legacyData = LazyReference.from(() -> computeLegacy(1));
-
     private Integer legacyCombinedId;
     private boolean initItemType;
     private ItemType itemType;
@@ -382,6 +380,11 @@ public class BlockType implements Keyed, Pattern {
         //FAWE end
     }
 
+    @Override
+    public String toString() {
+        return getId();
+    }
+
     //FAWE start
 
     /**
@@ -395,11 +398,6 @@ public class BlockType implements Keyed, Pattern {
      */
     public int getInternalId() {
         return this.settings.internalId;
-    }
-
-    @Override
-    public String toString() {
-        return getId();
     }
 
     @Override
