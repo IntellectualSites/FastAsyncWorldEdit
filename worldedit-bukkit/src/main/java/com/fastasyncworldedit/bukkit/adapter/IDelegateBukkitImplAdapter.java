@@ -13,6 +13,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -124,13 +125,24 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
         return getParent().getMaterial(blockState);
     }
 
+    @Override
     default Tag toNative(T foreign) {
         return getParent().toNative(foreign);
     }
 
     @Override
+    default BinaryTag toNativeBinary(T foreign) {
+        return getParent().toNativeBinary(foreign);
+    }
+
+    @Override
     default T fromNative(Tag foreign) {
         return getParent().fromNative(foreign);
+    }
+
+    @Override
+    default T fromNativeBinary(BinaryTag foreign) {
+        return getParent().fromNativeBinary(foreign);
     }
 
     @Override
