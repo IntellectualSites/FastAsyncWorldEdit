@@ -79,11 +79,12 @@ public class RichPatternParser extends FaweParser<Pattern> {
                         throw new SuggestInputParseException(
                                 new NoMatchException(Caption.of("fawe.error.parse.unknown-pattern", full,
                                         TextComponent
-                                                .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki" +
+                                                        "/Patterns"
                                                 )
                                                 .clickEvent(
                                                         ClickEvent.openUrl(
-                                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
                                                         ))
                                 )),
                                 full,
@@ -125,11 +126,11 @@ public class RichPatternParser extends FaweParser<Pattern> {
                                 } catch (NoMatchException e) {
                                     throw new NoMatchException(Caption.of("fawe.error.parse.unknown-pattern", full,
                                             TextComponent
-                                                    .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                    .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
                                                     )
                                                     .clickEvent(
                                                             com.sk89q.worldedit.util.formatting.text.event.ClickEvent.openUrl(
-                                                                    "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                                    "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
                                                             ))
                                     ));
                                 }

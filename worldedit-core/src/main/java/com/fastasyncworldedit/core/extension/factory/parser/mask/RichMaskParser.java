@@ -89,10 +89,10 @@ public class RichMaskParser extends FaweParser<Mask> {
                         throw new SuggestInputParseException(
                                 new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
                                         TextComponent
-                                                .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
                                                 )
                                                 .clickEvent(ClickEvent.openUrl(
-                                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
                                                 ))
                                 )),
                                 full,
@@ -152,10 +152,10 @@ public class RichMaskParser extends FaweParser<Mask> {
                                 throw new SuggestInputParseException(
                                         new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
                                                 TextComponent
-                                                        .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                        .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Masks"
                                                         )
                                                         .clickEvent(ClickEvent.openUrl(
-                                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Masks"
                                                         ))
                                         )),
                                         full,
