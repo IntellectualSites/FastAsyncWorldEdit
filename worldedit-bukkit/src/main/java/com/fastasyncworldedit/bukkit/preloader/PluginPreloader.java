@@ -9,6 +9,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.PluginBase;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -184,6 +185,14 @@ public class PluginPreloader extends PluginBase {
     @Override
     @Nullable
     public ChunkGenerator getDefaultWorldGenerator(@Nonnull String worldName, @Nullable String id) {
+        return null;
+    }
+
+    @Override
+    public @Nullable BiomeProvider getDefaultBiomeProvider(
+            @Nonnull final String worldName,
+            @Nullable final String id
+    ) {
         return null;
     }
 
