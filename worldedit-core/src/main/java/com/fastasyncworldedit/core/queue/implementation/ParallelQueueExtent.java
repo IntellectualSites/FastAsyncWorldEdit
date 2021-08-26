@@ -54,6 +54,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     private final boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     private int changes;
     private final boolean fastmode;
+    private int lastException = Integer.MIN_VALUE;
+    private int exceptionCount = 0;
 
     public ParallelQueueExtent(QueueHandler handler, World world, boolean fastmode) {
         super(handler.getQueue(world, new BatchProcessorHolder(), new BatchProcessorHolder()));
@@ -146,8 +148,16 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
                         }
                     }
                 } catch (Throwable e) {
-                    System.out.println(e.getClass().getSimpleName());
-                    e.printStackTrace();
+                    String message = e.getMessage();
+                    int hash = message.hashCode();
+                    if (lastException != hash) {
+                        lastException = hash;
+                        exceptionCount = 0;
+                        e.printStackTrace();
+                    } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                        exceptionCount++;
+                        LOGGER.warn(message);
+                    }
                 }
             })).toArray(ForkJoinTask[]::new);
             // Join filters

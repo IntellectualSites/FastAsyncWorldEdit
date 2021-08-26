@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweBlockBagException;
-import com.fastasyncworldedit.core.internal.exception.FaweChunkLoadException;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.internal.exception.FaweException.Type;
 import com.fastasyncworldedit.core.math.BitArray;
@@ -33,7 +32,6 @@ import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
@@ -134,7 +132,6 @@ public enum FaweCache implements Trimable {
     /*
     Exceptions
      */
-    public static final FaweChunkLoadException CHUNK = new FaweChunkLoadException();
     public static final FaweBlockBagException BLOCK_BAG = new FaweBlockBagException();
     public static final FaweException MANUAL = new FaweException(
             Caption.of("fawe.cancel.worldedit.cancel.reason.manual"),
@@ -567,35 +564,35 @@ public enum FaweCache implements Trimable {
             private int lastException = Integer.MIN_VALUE;
             private int count = 0;
 
-            protected synchronized void afterExecute(Runnable r, Throwable t) {
-                super.afterExecute(r, t);
-                if (t == null && r instanceof Future<?>) {
+            protected synchronized void afterExecute(Runnable runnable, Throwable throwable) {
+                super.afterExecute(runnable, throwable);
+                if (throwable == null && runnable instanceof Future<?>) {
                     try {
-                        Future<?> future = (Future<?>) r;
+                        Future<?> future = (Future<?>) runnable;
                         if (future.isDone()) {
                             future.get();
                         }
                     } catch (CancellationException ce) {
-                        t = ce;
+                        throwable = ce;
                     } catch (ExecutionException ee) {
-                        t = ee.getCause();
+                        throwable = ee.getCause();
                     } catch (InterruptedException ie) {
                         Thread.currentThread().interrupt();
                     }
                 }
-                if (t != null) {
-                    if (t instanceof FaweException) {
-                        handleFaweException((FaweException) t);
-                    } else if (t.getCause() instanceof FaweException) {
-                        handleFaweException((FaweException) t.getCause());
+                if (throwable != null) {
+                    if (throwable instanceof FaweException) {
+                        handleFaweException((FaweException) throwable);
+                    } else if (throwable.getCause() instanceof FaweException) {
+                        handleFaweException((FaweException) throwable.getCause());
                     } else {
-                        int hash = t.getMessage().hashCode();
+                        int hash = throwable.getMessage().hashCode();
                         if (hash != lastException) {
                             lastException = hash;
-                            t.printStackTrace();
+                            throwable.printStackTrace();
                             count = 0;
                         } else if (count < Settings.IMP.QUEUE.PARALLEL_THREADS) {
-                            LOGGER.warn(t.getMessage());
+                            LOGGER.warn(throwable.getMessage());
                             count++;
                         }
                     }

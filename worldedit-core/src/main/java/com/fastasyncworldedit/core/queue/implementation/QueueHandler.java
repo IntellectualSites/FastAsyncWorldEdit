@@ -16,9 +16,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
 import com.google.common.util.concurrent.Futures;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.World;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;

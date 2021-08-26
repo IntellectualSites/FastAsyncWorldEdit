@@ -41,7 +41,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Single threaded implementation for IQueueExtent (still abstract) - Does not implement creation of
  * chunks (that has to implemented by the platform e.g., Bukkit)
  * <p>
- * This queue is reusable {@link #init(Extent, IChunkCache, IChunkCache)} }
+ * This queue is reusable {@link #init(Extent, IChunkCache, IChunkCache)}
  */
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
@@ -67,6 +67,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private boolean enabledQueue = true;
     private boolean fastmode = false;
     private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
+    private int lastException = Integer.MIN_VALUE;
+    private int exceptionCount = 0;
 
     public SingleThreadQueueExtent() {
     }
@@ -130,6 +132,14 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         return maxY;
     }
 
+    /**
+     * Sets the cached boolean array of length {@code FaweException.Type.values().length} that determines if a thrown
+     * {@link FaweException} of type {@link FaweException.Type} should be output to console, rethrown to attempt to be visible
+     * to the player, etc. Allows the same array to be used as widely as possible across the edit to avoid spam to console.
+     *
+     * @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
+     *                                 FaweException.Type.values().length}
+     */
     public void setFaweExceptionArray(final boolean[] faweExceptionReasonsUsed) {
         this.faweExceptionReasonsUsed = faweExceptionReasonsUsed;
     }
@@ -393,7 +403,16 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                             if (e.getCause() instanceof FaweException) {
                                 Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause());
                             } else {
-                                e.printStackTrace();
+                                String message = e.getMessage();
+                                int hash = message.hashCode();
+                                if (lastException != hash) {
+                                    lastException = hash;
+                                    exceptionCount = 0;
+                                    e.printStackTrace();
+                                } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                                    exceptionCount++;
+                                    LOGGER.warn(message);
+                                }
                             }
                         } finally {
                             /*
@@ -424,7 +443,16 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             if (e.getCause() instanceof FaweException) {
                 Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause());
             } else {
-                e.printStackTrace();
+                String message = e.getMessage();
+                int hash = message.hashCode();
+                if (lastException != hash) {
+                    lastException = hash;
+                    exceptionCount = 0;
+                    e.printStackTrace();
+                } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                    exceptionCount++;
+                    LOGGER.warn(message);
+                }
             }
         }
     }

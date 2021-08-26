@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent.processor;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
@@ -36,6 +37,8 @@ public class MultiBatchProcessor implements IBatchProcessor {
             FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
     private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     private IBatchProcessor[] processors;
+    private int lastException = Integer.MIN_VALUE;
+    private int exceptionCount = 0;
 
     public MultiBatchProcessor(IBatchProcessor... processors) {
         this.processors = processors;
@@ -146,7 +149,16 @@ public class MultiBatchProcessor implements IBatchProcessor {
             } else if (e.getCause() instanceof FaweException) {
                 Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause());
             } else {
-                e.printStackTrace();
+                String message = e.getMessage();
+                int hash = message.hashCode();
+                if (lastException != hash) {
+                    lastException = hash;
+                    exceptionCount = 0;
+                    e.printStackTrace();
+                } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                    exceptionCount++;
+                    LOGGER.warn(message);
+                }
             }
             return null;
         }
@@ -222,6 +234,14 @@ public class MultiBatchProcessor implements IBatchProcessor {
         return ProcessorScope.valueOf(0);
     }
 
+    /**
+     * Sets the cached boolean array of length {@code FaweException.Type.values().length} that determines if a thrown
+     * {@link FaweException} of type {@link FaweException.Type} should be output to console, rethrown to attempt to be visible
+     * to the player, etc. Allows the same array to be used as widely as possible across the edit to avoid spam to console.
+     *
+     * @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
+     *                                 FaweException.Type.values().length}
+     */
     public void setFaweExceptionArray(final boolean[] faweExceptionReasonsUsed) {
         this.faweExceptionReasonsUsed = faweExceptionReasonsUsed;
     }
