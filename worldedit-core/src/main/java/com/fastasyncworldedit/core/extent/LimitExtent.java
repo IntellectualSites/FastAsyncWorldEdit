@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.extent.processor;
+package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.filter.block.ExtentFilterBlock;
