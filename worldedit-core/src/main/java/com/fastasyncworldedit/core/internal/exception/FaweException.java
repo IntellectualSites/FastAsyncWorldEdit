@@ -16,14 +16,14 @@ public class FaweException extends RuntimeException {
     private final Type type;
 
     /**
-     * New instance. Defaults to {@link FaweException.Type} OTHER.
+     * New instance. Defaults to {@link FaweException.Type#OTHER}.
      */
     public FaweException(String reason) {
         this(TextComponent.of(reason));
     }
 
     /**
-     * New instance. Defaults to {@link FaweException.Type} OTHER.
+     * New instance. Defaults to {@link FaweException.Type#OTHER}.
      */
     public FaweException(Component reason) {
         this(reason, Type.OTHER);
