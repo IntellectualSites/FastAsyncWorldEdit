@@ -12,7 +12,7 @@ import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.extent.SlowExtent;
 import com.fastasyncworldedit.core.extent.StripNBTExtent;
 import com.fastasyncworldedit.core.extent.processor.HeightmapProcessor;
-import com.fastasyncworldedit.core.extent.processor.LimitExtent;
+import com.fastasyncworldedit.core.extent.LimitExtent;
 import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightProcessor;

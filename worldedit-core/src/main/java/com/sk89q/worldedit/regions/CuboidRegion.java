@@ -752,7 +752,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             return set;
         }
         if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
-            trimY(set, minY, maxY);
+            if (minY > set.getMinSectionIndex() << 4 || maxY < (set.getMaxSectionIndex() << 4) + 15) {
+                trimY(set, minY, maxY);
+            }
             final int lowerX = Math.max(0, minX - bx);
             final int upperX = Math.min(15, 15 + maxX - tx);
 
@@ -770,7 +772,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {
                         int indexY = 0;
-                        for (int y = getWorldMinY(); y < 16; y++, indexY += getWorldMaxY()) {
+                        for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
                             int index;
                             if (trimZ) {
                                 index = indexY;
