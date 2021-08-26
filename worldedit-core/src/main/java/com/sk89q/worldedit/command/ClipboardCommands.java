@@ -193,7 +193,7 @@ public class ClipboardCommands {
                 .getZ() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.checks"));
+            throw FaweCache.MAX_CHECKS;
         }
         session.setClipboard(null);
         ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
@@ -558,7 +558,7 @@ public class ClipboardCommands {
         PasteEvent event = new PasteEvent(player, clipboard, uri, editSession, to);
         WorldEdit.getInstance().getEventBus().post(event);
         if (event.isCancelled()) {
-            throw new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.manual"));
+            throw FaweCache.MANUAL;
         }
     }
     //FAWE end

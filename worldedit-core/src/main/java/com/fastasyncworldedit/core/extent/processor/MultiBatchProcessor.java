@@ -1,6 +1,8 @@
 package com.fastasyncworldedit.core.extent.processor;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
@@ -9,6 +11,8 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -26,9 +30,12 @@ import java.util.function.Supplier;
 
 public class MultiBatchProcessor implements IBatchProcessor {
 
-    private IBatchProcessor[] processors;
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private final LoadingCache<Class<?>, Map<Long, Filter>> classToThreadIdToFilter =
             FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
+    private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
+    private IBatchProcessor[] processors;
 
     public MultiBatchProcessor(IBatchProcessor... processors) {
         this.processors = processors;
@@ -72,41 +79,36 @@ public class MultiBatchProcessor implements IBatchProcessor {
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         Map<Integer, Set<IBatchProcessor>> ordered = new HashMap<>();
-        try {
-            IChunkSet chunkSet = set;
-            for (IBatchProcessor processor : processors) {
-                if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
-                    ordered.merge(
-                            processor.getScope().intValue(),
-                            new HashSet<>(Collections.singleton(processor)),
-                            (existing, theNew) -> {
-                                existing.add(processor);
-                                return existing;
-                            }
-                    );
+        IChunkSet chunkSet = set;
+        for (IBatchProcessor processor : processors) {
+            if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
+                ordered.merge(
+                        processor.getScope().intValue(),
+                        new HashSet<>(Collections.singleton(processor)),
+                        (existing, theNew) -> {
+                            existing.add(processor);
+                            return existing;
+                        }
+                );
+                continue;
+            }
+            chunkSet = processSet(processor, chunk, get, chunkSet);
+        }
+        if (ordered.size() > 0) {
+            for (int i = 1; i <= 4; i++) {
+                Set<IBatchProcessor> processors = ordered.get(i);
+                if (processors == null) {
                     continue;
                 }
-                chunkSet = processSet(processor, chunk, get, chunkSet);
-            }
-            if (ordered.size() > 0) {
-                for (int i = 1; i <= 4; i++) {
-                    Set<IBatchProcessor> processors = ordered.get(i);
-                    if (processors == null) {
-                        continue;
-                    }
-                    for (IBatchProcessor processor : processors) {
-                        chunkSet = processSet(processor, chunk, get, chunkSet);
-                        if (chunkSet == null) {
-                            return null;
-                        }
+                for (IBatchProcessor processor : processors) {
+                    chunkSet = processSet(processor, chunk, get, chunkSet);
+                    if (chunkSet == null) {
+                        return null;
                     }
                 }
             }
-            return chunkSet;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
         }
+        return chunkSet;
     }
 
     @Nullable
@@ -139,7 +141,13 @@ public class MultiBatchProcessor implements IBatchProcessor {
             }
             return CompletableFuture.completedFuture(set);
         } catch (Throwable e) {
-            e.printStackTrace();
+            if (e instanceof FaweException) {
+                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e);
+            } else if (e.getCause() instanceof FaweException) {
+                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause());
+            } else {
+                e.printStackTrace();
+            }
             return null;
         }
     }
@@ -212,6 +220,10 @@ public class MultiBatchProcessor implements IBatchProcessor {
             scope = Math.max(scope, processor.getScope().intValue());
         }
         return ProcessorScope.valueOf(0);
+    }
+
+    public void setFaweExceptionArray(final boolean[] faweExceptionReasonsUsed) {
+        this.faweExceptionReasonsUsed = faweExceptionReasonsUsed;
     }
 
 }

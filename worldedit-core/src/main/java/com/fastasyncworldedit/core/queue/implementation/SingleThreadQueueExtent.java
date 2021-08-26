@@ -43,6 +43,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * This queue is reusable {@link #init(Extent, IChunkCache, IChunkCache)} }
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implements IQueueExtent<IQueueChunk> {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -51,28 +52,24 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     // private static final ConcurrentLinkedQueue<IChunk> CHUNK_POOL = new ConcurrentLinkedQueue<>();
     // Chunks currently being queued / worked on
     private final Long2ObjectLinkedOpenHashMap<IQueueChunk> chunks = new Long2ObjectLinkedOpenHashMap<>();
-
+    private final ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
+    private final ReentrantLock getChunkLock = new ReentrantLock();
     private World world = null;
     private int minY = 0;
     private int maxY = 255;
-
     private IChunkCache<IChunkGet> cacheGet;
     private IChunkCache<IChunkSet> cacheSet;
     private boolean initialized;
-
     private Thread currentThread;
-    private final ConcurrentLinkedQueue<Future> submissions = new ConcurrentLinkedQueue<>();
     // Last access pointers
     private IQueueChunk lastChunk;
     private long lastPair = Long.MAX_VALUE;
-
     private boolean enabledQueue = true;
-
     private boolean fastmode = false;
+    private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
 
-    private final ReentrantLock getChunkLock = new ReentrantLock();
-
-    public SingleThreadQueueExtent() {}
+    public SingleThreadQueueExtent() {
+    }
 
     /**
      * New instance given inclusive world height bounds.
@@ -114,13 +111,13 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     }
 
     @Override
-    public void setFastMode(boolean fastmode) {
-        this.fastmode = fastmode;
+    public boolean isFastMode() {
+        return fastmode;
     }
 
     @Override
-    public boolean isFastMode() {
-        return fastmode;
+    public void setFastMode(boolean fastmode) {
+        this.fastmode = fastmode;
     }
 
     @Override
@@ -131,6 +128,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     @Override
     public int getMaxY() {
         return maxY;
+    }
+
+    public void setFaweExceptionArray(final boolean[] faweExceptionReasonsUsed) {
+        this.faweExceptionReasonsUsed = faweExceptionReasonsUsed;
     }
 
     /**
@@ -372,41 +373,11 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         if (aggressive) {
             if (targetSize == 0) {
                 while (!submissions.isEmpty()) {
-                    Future future = submissions.poll();
-                    try {
-                        while (future != null) {
-                            future = (Future) future.get();
-                        }
-                    } catch (FaweException messageOnly) {
-                        LOGGER.warn(messageOnly.getMessage());
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof FaweException) {
-                            LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
-                        } else {
-                            e.printStackTrace();
-                        }
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    iterateSubmissions();
                 }
             }
             for (int i = 0; i < overflow; i++) {
-                Future first = submissions.poll();
-                try {
-                    while (first != null) {
-                        first = (Future) first.get();
-                    }
-                } catch (FaweException messageOnly) {
-                    LOGGER.warn(messageOnly.getMessage());
-                } catch (ExecutionException e) {
-                    if (e.getCause() instanceof FaweException) {
-                        LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
-                    } else {
-                        e.printStackTrace();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                iterateSubmissions();
             }
         } else {
             for (int i = 0; i < overflow; i++) {
@@ -416,19 +387,14 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                         Future after = null;
                         try {
                             after = (Future) next.get();
-                        } catch (FaweException messageOnly) {
-                            LOGGER.warn(messageOnly.getMessage());
-                        } catch (ExecutionException e) {
+                        } catch (FaweException e) {
+                            Fawe.handleFaweException(faweExceptionReasonsUsed, e);
+                        } catch (ExecutionException | InterruptedException e) {
                             if (e.getCause() instanceof FaweException) {
-                                LOGGER.warn(e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage());
+                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause());
                             } else {
                                 e.printStackTrace();
                             }
-                            LOGGER.error(
-                                    "Please report this error on our issue tracker: https://github.com/IntellectualSites/FastAsyncWorldEdit/issues");
-                            e.getCause().printStackTrace();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
                         } finally {
                             /*
                              * If the execution failed, namely next.get() threw an exception,
@@ -442,6 +408,23 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     }
                 }
                 submissions.poll();
+            }
+        }
+    }
+
+    private void iterateSubmissions() {
+        Future first = submissions.poll();
+        try {
+            while (first != null) {
+                first = (Future) first.get();
+            }
+        } catch (FaweException e) {
+            Fawe.handleFaweException(faweExceptionReasonsUsed, e);
+        } catch (ExecutionException | InterruptedException e) {
+            if (e.getCause() instanceof FaweException) {
+                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause());
+            } else {
+                e.printStackTrace();
             }
         }
     }

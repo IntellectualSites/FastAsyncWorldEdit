@@ -60,11 +60,7 @@ public class CatenaryBrush implements Brush, ResettableTool {
         }
         List<BlockVector3> nodes = Arrays.asList(pos1, vertex, pos2);
         vertex = null;
-        try {
-            editSession.drawSpline(pattern, nodes, 0, 0, 0, 10, size, !shell);
-        } catch (WorldEditException e) {
-            e.printStackTrace();
-        }
+        editSession.drawSpline(pattern, nodes, 0, 0, 0, 10, size, !shell);
         player.print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
         if (!select) {
             pos1 = null;

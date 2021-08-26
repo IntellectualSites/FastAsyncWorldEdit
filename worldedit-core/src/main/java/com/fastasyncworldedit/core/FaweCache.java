@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweBlockBagException;
 import com.fastasyncworldedit.core.internal.exception.FaweChunkLoadException;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.internal.exception.FaweException.Type;
 import com.fastasyncworldedit.core.math.BitArray;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
@@ -32,6 +33,7 @@ import com.sk89q.jnbt.LongTag;
 import com.sk89q.jnbt.ShortTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
@@ -134,18 +136,39 @@ public enum FaweCache implements Trimable {
      */
     public static final FaweChunkLoadException CHUNK = new FaweChunkLoadException();
     public static final FaweBlockBagException BLOCK_BAG = new FaweBlockBagException();
-    public static final FaweException MANUAL = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.manual"));
-    public static final FaweException NO_REGION = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.no.region"));
+    public static final FaweException MANUAL = new FaweException(
+            Caption.of("fawe.cancel.worldedit.cancel.reason.manual"),
+            Type.MANUAL
+    );
+    public static final FaweException NO_REGION = new FaweException(
+            Caption.of("fawe.cancel.worldedit.cancel.reason.no.region"),
+            Type.NO_REGION
+    );
     public static final FaweException OUTSIDE_REGION = new FaweException(Caption.of(
-            "fawe.cancel.worldedit.cancel.reason.outside.region"));
-    public static final FaweException MAX_CHECKS = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.checks"));
-    public static final FaweException MAX_CHANGES = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.changes"));
-    public static final FaweException LOW_MEMORY = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.low.memory"));
+            "fawe.cancel.worldedit.cancel.reason.outside.region"),
+            Type.OUTSIDE_REGION);
+    public static final FaweException MAX_CHECKS = new FaweException(
+            Caption.of("fawe.cancel.worldedit.cancel.reason.max" + ".checks"),
+            Type.MAX_CHECKS
+    );
+    public static final FaweException MAX_CHANGES = new FaweException(
+            Caption.of("fawe.cancel.worldedit.cancel.reason.max" + ".changes"),
+            Type.MAX_CHANGES
+    );
+    public static final FaweException LOW_MEMORY = new FaweException(
+            Caption.of("fawe.cancel.worldedit.cancel.reason.low" + ".memory"),
+            Type.LOW_MEMORY
+    );
     public static final FaweException MAX_ENTITIES = new FaweException(Caption.of(
-            "fawe.cancel.worldedit.cancel.reason.max.entities"));
-    public static final FaweException MAX_TILES = new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.tiles"));
+            "fawe.cancel.worldedit.cancel.reason.max.entities"),
+            Type.MAX_ENTITIES);
+    public static final FaweException MAX_TILES = new FaweException(Caption.of(
+            "fawe.cancel.worldedit.cancel.reason.max.tiles",
+            Type.MAX_TILES
+    ));
     public static final FaweException MAX_ITERATIONS = new FaweException(Caption.of(
-            "fawe.cancel.worldedit.cancel.reason.max.iterations"));
+            "fawe.cancel.worldedit.cancel.reason.max.iterations"),
+            Type.MAX_ITERATIONS);
 
     /*
     thread cache
@@ -539,28 +562,53 @@ public enum FaweCache implements Trimable {
                 Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.CallerRunsPolicy()
         ) {
-            protected void afterExecute(Runnable r, Throwable t) {
-                try {
-                    super.afterExecute(r, t);
-                    if (t == null && r instanceof Future<?>) {
-                        try {
-                            Future<?> future = (Future<?>) r;
-                            if (future.isDone()) {
-                                future.get();
-                            }
-                        } catch (CancellationException ce) {
-                            t = ce;
-                        } catch (ExecutionException ee) {
-                            t = ee.getCause();
-                        } catch (InterruptedException ie) {
-                            Thread.currentThread().interrupt();
+
+            private final boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
+            private int lastException = Integer.MIN_VALUE;
+            private int count = 0;
+
+            protected synchronized void afterExecute(Runnable r, Throwable t) {
+                super.afterExecute(r, t);
+                if (t == null && r instanceof Future<?>) {
+                    try {
+                        Future<?> future = (Future<?>) r;
+                        if (future.isDone()) {
+                            future.get();
+                        }
+                    } catch (CancellationException ce) {
+                        t = ce;
+                    } catch (ExecutionException ee) {
+                        t = ee.getCause();
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
+                if (t != null) {
+                    if (t instanceof FaweException) {
+                        handleFaweException((FaweException) t);
+                    } else if (t.getCause() instanceof FaweException) {
+                        handleFaweException((FaweException) t.getCause());
+                    } else {
+                        int hash = t.getMessage().hashCode();
+                        if (hash != lastException) {
+                            lastException = hash;
+                            t.printStackTrace();
+                            count = 0;
+                        } else if (count < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                            LOGGER.warn(t.getMessage());
+                            count++;
                         }
                     }
-                    if (t != null) {
-                        t.printStackTrace();
-                    }
-                } catch (Throwable e) {
+                }
+            }
+
+            private void handleFaweException(FaweException e) {
+                FaweException.Type type = e.getType();
+                if (e.getType() == FaweException.Type.OTHER) {
                     e.printStackTrace();
+                } else if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    LOGGER.warn("FaweException: " + e.getMessage());
                 }
             }
         };

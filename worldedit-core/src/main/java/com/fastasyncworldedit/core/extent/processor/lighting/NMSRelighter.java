@@ -864,25 +864,21 @@ public class NMSRelighter implements Relighter {
         if (isEmpty()) {
             return;
         }
-        try {
-            if (sky) {
-                fixSkyLighting();
-            } else {
-                synchronized (this) {
-                    Map<Long, RelightSkyEntry> map = getSkyMap();
-                    Iterator<Map.Entry<Long, RelightSkyEntry>> iter = map.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        Map.Entry<Long, RelightSkyEntry> entry = iter.next();
-                        chunksToSend.put(entry.getKey(), entry.getValue().bitmask);
-                        iter.remove();
-                    }
+        if (sky) {
+            fixSkyLighting();
+        } else {
+            synchronized (this) {
+                Map<Long, RelightSkyEntry> map = getSkyMap();
+                Iterator<Map.Entry<Long, RelightSkyEntry>> iter = map.entrySet().iterator();
+                while (iter.hasNext()) {
+                    Map.Entry<Long, RelightSkyEntry> entry = iter.next();
+                    chunksToSend.put(entry.getKey(), entry.getValue().bitmask);
+                    iter.remove();
                 }
             }
-            fixBlockLighting();
-            sendChunks();
-        } catch (Throwable e) {
-            e.printStackTrace();
         }
+        fixBlockLighting();
+        sendChunks();
     }
 
     public void fixBlockLighting() {
@@ -930,11 +926,7 @@ public class NMSRelighter implements Relighter {
     }
 
     public void flush() {
-        try {
-            close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        close();
     }
 
     public synchronized void sendChunks() {

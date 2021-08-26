@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core;
 
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.CachedTextureUtil;
 import com.fastasyncworldedit.core.util.CleanTextureUtil;
@@ -344,6 +345,28 @@ public class Fawe {
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();
+    }
+
+    public static void handleFaweException(boolean[] faweExceptionReasonsUsed, FaweException e) {
+        FaweException.Type type = e.getType();
+        switch (type) {
+            case OTHER:
+            case LOW_MEMORY:
+                LOGGER.warn("FaweException: " + e.getMessage());
+            case MAX_TILES:
+            case NO_REGION:
+            case MAX_CHECKS:
+            case MAX_CHANGES:
+            case MAX_ENTITIES:
+            case MAX_ITERATIONS:
+            case OUTSIDE_REGION:
+                throw e;
+            default:
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    LOGGER.warn("FaweException: " + e.getMessage());
+                }
+        }
     }
 
 }
