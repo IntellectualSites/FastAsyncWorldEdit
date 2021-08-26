@@ -351,8 +351,14 @@ public class Fawe {
         FaweException.Type type = e.getType();
         switch (type) {
             case OTHER:
-            case LOW_MEMORY:
                 LOGGER.warn("FaweException: " + e.getMessage());
+                throw e;
+            case LOW_MEMORY:
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    LOGGER.warn("FaweException: " + e.getMessage());
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    throw e;
+                }
             case MAX_TILES:
             case NO_REGION:
             case MAX_CHECKS:
@@ -360,7 +366,12 @@ public class Fawe {
             case MAX_ENTITIES:
             case MAX_ITERATIONS:
             case OUTSIDE_REGION:
-                throw e;
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    throw e;
+                } else {
+                    return;
+                }
             default:
                 if (!faweExceptionReasonsUsed[type.ordinal()]) {
                     faweExceptionReasonsUsed[type.ordinal()] = true;
