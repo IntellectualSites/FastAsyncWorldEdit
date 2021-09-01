@@ -273,10 +273,9 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         }
         try {
             Operations.completeLegacy(copy);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } finally {
+            editSession.close(); // Make sure editsession is always closed
         }
-        editSession.flushQueue();
         return editSession;
     }
 
