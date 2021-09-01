@@ -66,6 +66,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private long lastPair = Long.MAX_VALUE;
     private boolean enabledQueue = true;
     private boolean fastmode = false;
+    // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
+    // not very important)
     private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     private int lastException = Integer.MIN_VALUE;
     private int exceptionCount = 0;
@@ -398,17 +400,17 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                         try {
                             after = (Future) next.get();
                         } catch (FaweException e) {
-                            Fawe.handleFaweException(faweExceptionReasonsUsed, e);
+                            Fawe.handleFaweException(faweExceptionReasonsUsed, e, LOGGER);
                         } catch (ExecutionException | InterruptedException e) {
                             if (e.getCause() instanceof FaweException) {
-                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause());
+                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause(), LOGGER);
                             } else {
                                 String message = e.getMessage();
                                 int hash = message.hashCode();
                                 if (lastException != hash) {
                                     lastException = hash;
                                     exceptionCount = 0;
-                                    e.printStackTrace();
+                                    LOGGER.catching(e);
                                 } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
                                     exceptionCount++;
                                     LOGGER.warn(message);
@@ -438,17 +440,17 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                 first = (Future) first.get();
             }
         } catch (FaweException e) {
-            Fawe.handleFaweException(faweExceptionReasonsUsed, e);
+            Fawe.handleFaweException(faweExceptionReasonsUsed, e, LOGGER);
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof FaweException) {
-                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause());
+                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause(), LOGGER);
             } else {
                 String message = e.getMessage();
                 int hash = message.hashCode();
                 if (lastException != hash) {
                     lastException = hash;
                     exceptionCount = 0;
-                    e.printStackTrace();
+                    LOGGER.catching(e);
                 } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
                     exceptionCount++;
                     LOGGER.warn(message);

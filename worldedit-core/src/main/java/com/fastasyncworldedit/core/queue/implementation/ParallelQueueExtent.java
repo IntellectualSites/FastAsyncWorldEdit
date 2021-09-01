@@ -51,6 +51,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     private final QueueHandler handler;
     private final BatchProcessorHolder processor;
     private final BatchProcessorHolder postProcessor;
+    // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
+    // not very important)
     private final boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     private int changes;
     private final boolean fastmode;
@@ -139,9 +141,9 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
                             queue.flush();
                         } catch (Throwable t) {
                             if (t instanceof FaweException) {
-                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t);
+                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t, LOGGER);
                             } else if (t.getCause() instanceof FaweException) {
-                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t.getCause());
+                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t.getCause(), LOGGER);
                             } else {
                                 throw t;
                             }
@@ -153,7 +155,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
                     if (lastException != hash) {
                         lastException = hash;
                         exceptionCount = 0;
-                        e.printStackTrace();
+                        LOGGER.catching(e);
                     } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
                         exceptionCount++;
                         LOGGER.warn(message);

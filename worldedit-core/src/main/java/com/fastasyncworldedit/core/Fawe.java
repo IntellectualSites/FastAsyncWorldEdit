@@ -351,20 +351,24 @@ public class Fawe {
      * Non-api. Handles an input FAWE exception if not already handled, given the input boolean array.
      * Looks at the {@link FaweException.Type} and decides what to do (rethrows if we want to attempt to show the error to the
      * player, outputs to console where necessary).
-     *
-     * @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
+     *  @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
      *                                 FaweException.Type.values().length}
      * @param e                        {@link FaweException} to handle
+     * @param logger                   {@link Logger} of the calling class
      */
-    public static void handleFaweException(boolean[] faweExceptionReasonsUsed, FaweException e) {
+    public static void handleFaweException(
+            boolean[] faweExceptionReasonsUsed,
+            FaweException e,
+            final Logger logger
+    ) {
         FaweException.Type type = e.getType();
         switch (type) {
             case OTHER:
-                LOGGER.warn("FaweException: " + e.getMessage());
+                logger.catching(e);
                 throw e;
             case LOW_MEMORY:
                 if (!faweExceptionReasonsUsed[type.ordinal()]) {
-                    LOGGER.warn("FaweException: " + e.getMessage());
+                    logger.warn("FaweException: " + e.getMessage());
                     faweExceptionReasonsUsed[type.ordinal()] = true;
                     throw e;
                 }
@@ -384,7 +388,7 @@ public class Fawe {
             default:
                 if (!faweExceptionReasonsUsed[type.ordinal()]) {
                     faweExceptionReasonsUsed[type.ordinal()] = true;
-                    LOGGER.warn("FaweException: " + e.getMessage());
+                    logger.warn("FaweException: " + e.getMessage());
                 }
         }
     }

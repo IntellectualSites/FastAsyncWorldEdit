@@ -560,6 +560,8 @@ public enum FaweCache implements Trimable {
                 new ThreadPoolExecutor.CallerRunsPolicy()
         ) {
 
+            // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
+            // not very important)
             private final boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
             private int lastException = Integer.MIN_VALUE;
             private int count = 0;
@@ -589,7 +591,7 @@ public enum FaweCache implements Trimable {
                         int hash = throwable.getMessage().hashCode();
                         if (hash != lastException) {
                             lastException = hash;
-                            throwable.printStackTrace();
+                            LOGGER.catching(throwable);
                             count = 0;
                         } else if (count < Settings.IMP.QUEUE.PARALLEL_THREADS) {
                             LOGGER.warn(throwable.getMessage());
@@ -602,7 +604,7 @@ public enum FaweCache implements Trimable {
             private void handleFaweException(FaweException e) {
                 FaweException.Type type = e.getType();
                 if (e.getType() == FaweException.Type.OTHER) {
-                    e.printStackTrace();
+                    LOGGER.catching(e);
                 } else if (!faweExceptionReasonsUsed[type.ordinal()]) {
                     faweExceptionReasonsUsed[type.ordinal()] = true;
                     LOGGER.warn("FaweException: " + e.getMessage());
