@@ -1,6 +1,9 @@
 package com.fastasyncworldedit.core.extent.processor;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
@@ -9,6 +12,8 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -26,9 +31,16 @@ import java.util.function.Supplier;
 
 public class MultiBatchProcessor implements IBatchProcessor {
 
-    private IBatchProcessor[] processors;
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     private final LoadingCache<Class<?>, Map<Long, Filter>> classToThreadIdToFilter =
             FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
+    // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
+    // not very important)
+    private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
+    private IBatchProcessor[] processors;
+    private int lastException = Integer.MIN_VALUE;
+    private int exceptionCount = 0;
 
     public MultiBatchProcessor(IBatchProcessor... processors) {
         this.processors = processors;
@@ -72,41 +84,36 @@ public class MultiBatchProcessor implements IBatchProcessor {
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         Map<Integer, Set<IBatchProcessor>> ordered = new HashMap<>();
-        try {
-            IChunkSet chunkSet = set;
-            for (IBatchProcessor processor : processors) {
-                if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
-                    ordered.merge(
-                            processor.getScope().intValue(),
-                            new HashSet<>(Collections.singleton(processor)),
-                            (existing, theNew) -> {
-                                existing.add(processor);
-                                return existing;
-                            }
-                    );
+        IChunkSet chunkSet = set;
+        for (IBatchProcessor processor : processors) {
+            if (processor.getScope() != ProcessorScope.ADDING_BLOCKS) {
+                ordered.merge(
+                        processor.getScope().intValue(),
+                        new HashSet<>(Collections.singleton(processor)),
+                        (existing, theNew) -> {
+                            existing.add(processor);
+                            return existing;
+                        }
+                );
+                continue;
+            }
+            chunkSet = processSet(processor, chunk, get, chunkSet);
+        }
+        if (ordered.size() > 0) {
+            for (int i = 1; i <= 4; i++) {
+                Set<IBatchProcessor> processors = ordered.get(i);
+                if (processors == null) {
                     continue;
                 }
-                chunkSet = processSet(processor, chunk, get, chunkSet);
-            }
-            if (ordered.size() > 0) {
-                for (int i = 1; i <= 4; i++) {
-                    Set<IBatchProcessor> processors = ordered.get(i);
-                    if (processors == null) {
-                        continue;
-                    }
-                    for (IBatchProcessor processor : processors) {
-                        chunkSet = processSet(processor, chunk, get, chunkSet);
-                        if (chunkSet == null) {
-                            return null;
-                        }
+                for (IBatchProcessor processor : processors) {
+                    chunkSet = processSet(processor, chunk, get, chunkSet);
+                    if (chunkSet == null) {
+                        return null;
                     }
                 }
             }
-            return chunkSet;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
         }
+        return chunkSet;
     }
 
     @Nullable
@@ -139,7 +146,22 @@ public class MultiBatchProcessor implements IBatchProcessor {
             }
             return CompletableFuture.completedFuture(set);
         } catch (Throwable e) {
-            e.printStackTrace();
+            if (e instanceof FaweException) {
+                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e, LOGGER);
+            } else if (e.getCause() instanceof FaweException) {
+                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause(), LOGGER);
+            } else {
+                String message = e.getMessage();
+                int hash = message.hashCode();
+                if (lastException != hash) {
+                    lastException = hash;
+                    exceptionCount = 0;
+                    LOGGER.catching(e);
+                } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                    exceptionCount++;
+                    LOGGER.warn(message);
+                }
+            }
             return null;
         }
     }
@@ -212,6 +234,18 @@ public class MultiBatchProcessor implements IBatchProcessor {
             scope = Math.max(scope, processor.getScope().intValue());
         }
         return ProcessorScope.valueOf(0);
+    }
+
+    /**
+     * Sets the cached boolean array of length {@code FaweException.Type.values().length} that determines if a thrown
+     * {@link FaweException} of type {@link FaweException.Type} should be output to console, rethrown to attempt to be visible
+     * to the player, etc. Allows the same array to be used as widely as possible across the edit to avoid spam to console.
+     *
+     * @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
+     *                                 FaweException.Type.values().length}
+     */
+    public void setFaweExceptionArray(final boolean[] faweExceptionReasonsUsed) {
+        this.faweExceptionReasonsUsed = faweExceptionReasonsUsed;
     }
 
 }

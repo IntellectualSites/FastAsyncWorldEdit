@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core;
 
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.CachedTextureUtil;
 import com.fastasyncworldedit.core.util.CleanTextureUtil;
@@ -344,6 +345,52 @@ public class Fawe {
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();
+    }
+
+    /**
+     * Non-api. Handles an input FAWE exception if not already handled, given the input boolean array.
+     * Looks at the {@link FaweException.Type} and decides what to do (rethrows if we want to attempt to show the error to the
+     * player, outputs to console where necessary).
+     *  @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
+     *                                 FaweException.Type.values().length}
+     * @param e                        {@link FaweException} to handle
+     * @param logger                   {@link Logger} of the calling class
+     */
+    public static void handleFaweException(
+            boolean[] faweExceptionReasonsUsed,
+            FaweException e,
+            final Logger logger
+    ) {
+        FaweException.Type type = e.getType();
+        switch (type) {
+            case OTHER:
+                logger.catching(e);
+                throw e;
+            case LOW_MEMORY:
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    logger.warn("FaweException: " + e.getMessage());
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    throw e;
+                }
+            case MAX_TILES:
+            case NO_REGION:
+            case MAX_CHECKS:
+            case MAX_CHANGES:
+            case MAX_ENTITIES:
+            case MAX_ITERATIONS:
+            case OUTSIDE_REGION:
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    throw e;
+                } else {
+                    return;
+                }
+            default:
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    logger.warn("FaweException: " + e.getMessage());
+                }
+        }
     }
 
 }

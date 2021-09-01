@@ -59,33 +59,28 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
 
     public int getHeight(Extent extent, int x, int y, int z) {
         //        return extent.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
-        try {
-            int rx = x - cacheBotX + 16;
-            int rz = z - cacheBotZ + 16;
-            int index;
-            if (((rx & 0xFF) != rx || (rz & 0xFF) != rz)) {
-                cacheBotX = x - 16;
-                cacheBotZ = z - 16;
-                rx = x - cacheBotX + 16;
-                rz = z - cacheBotZ + 16;
-                index = rx + (rz << 8);
-                if (cacheHeights == null) {
-                    cacheHeights = new byte[65536];
-                } else {
-                    Arrays.fill(cacheHeights, (byte) 0);
-                }
+        int rx = x - cacheBotX + 16;
+        int rz = z - cacheBotZ + 16;
+        int index;
+        if (((rx & 0xFF) != rx || (rz & 0xFF) != rz)) {
+            cacheBotX = x - 16;
+            cacheBotZ = z - 16;
+            rx = x - cacheBotX + 16;
+            rz = z - cacheBotZ + 16;
+            index = rx + (rz << 8);
+            if (cacheHeights == null) {
+                cacheHeights = new byte[65536];
             } else {
-                index = rx + (rz << 8);
+                Arrays.fill(cacheHeights, (byte) 0);
             }
-            int result = cacheHeights[index] & 0xFF;
-            if (y > result) {
-                cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
-            }
-            return result;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
+        } else {
+            index = rx + (rz << 8);
         }
+        int result = cacheHeights[index] & 0xFF;
+        if (y > result) {
+            cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
+        }
+        return result;
     }
 
     protected boolean testSlope(Extent extent, int x, int y, int z) {

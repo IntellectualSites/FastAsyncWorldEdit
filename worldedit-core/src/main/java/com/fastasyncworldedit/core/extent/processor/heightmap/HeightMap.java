@@ -10,6 +10,7 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ThreadLocalRandom;
 
 public interface HeightMap {
@@ -60,7 +61,7 @@ public interface HeightMap {
                         .getConstructors()[0].newInstance(5, 1));
                 int diameter = 2 * size + 1;
                 data[1] = filter.filter(data[1], diameter, diameter);
-            } catch (Throwable e) {
+            } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
                 e.printStackTrace();
             }
         }

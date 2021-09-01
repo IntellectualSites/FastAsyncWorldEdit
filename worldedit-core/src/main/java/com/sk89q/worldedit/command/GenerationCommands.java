@@ -601,18 +601,13 @@ public class GenerationCommands {
         int[] count = new int[1];
         final BufferedImage finalImage = image;
         RegionVisitor visitor = new RegionVisitor(region, pos -> {
-            try {
-                int x = pos.getBlockX() - pos1.getBlockX();
-                int z = pos.getBlockZ() - pos1.getBlockZ();
-                int color = finalImage.getRGB(x, z);
-                BlockType block = tu.getNearestBlock(color);
-                count[0]++;
-                if (block != null) {
-                    return editSession.setBlock(pos, block.getDefaultState());
-                }
-                return false;
-            } catch (Throwable e) {
-                e.printStackTrace();
+            int x = pos.getBlockX() - pos1.getBlockX();
+            int z = pos.getBlockZ() - pos1.getBlockZ();
+            int color = finalImage.getRGB(x, z);
+            BlockType block = tu.getNearestBlock(color);
+            count[0]++;
+            if (block != null) {
+                return editSession.setBlock(pos, block.getDefaultState());
             }
             return false;
         }, editSession);

@@ -78,11 +78,7 @@ public class SurfaceSpline implements Brush {
             }
             if (radius == 0) {
                 BlockVector3 set = mutable.setComponents(tipx, tipy, tipz);
-                try {
-                    pattern.apply(editSession, set, set);
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
-                }
+                pattern.apply(editSession, set, set);
             } else {
                 vset.add(tipx, tipy, tipz);
             }
