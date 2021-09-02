@@ -481,7 +481,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             if (nbt != null) {
                 result = blockStates.size() > 0 ? state.toBaseBlock(nbt) : new BlanketBaseBlock(state, nbt);
             } else {
-                result = state.toBaseBlock();
+                result = blockStates.size() > 0 ? new BaseBlock(state) : state.toBaseBlock();
             }
             return validate(context, result);
             //FAWE end
