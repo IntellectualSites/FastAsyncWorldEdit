@@ -31,29 +31,31 @@ public abstract class CharBlocks implements IBlocks {
     };
     protected final Section empty = new Section() {
         @Override
-        public synchronized char[] get(CharBlocks blocks, int layer) {
+        public char[] get(CharBlocks blocks, int layer) {
             // Defaults to aggressive as it should only be avoided where we know we've reset a chunk during an edit
             return get(blocks, layer, true);
         }
 
         @Override
-        public synchronized char[] get(CharBlocks blocks, int layer, boolean aggressive) {
-            char[] arr = blocks.blocks[layer];
-            if (arr == null) {
-                arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
+        public char[] get(CharBlocks blocks, int layer, boolean aggressive) {
+            synchronized (this) {
+                char[] arr = blocks.blocks[layer];
                 if (arr == null) {
-                    throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                    arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
+                    if (arr == null) {
+                        throw new IllegalStateException("Array cannot be null: " + blocks.getClass());
+                    }
+                } else {
+                    blocks.blocks[layer] = blocks.update(layer, arr, aggressive);
+                    if (blocks.blocks[layer] == null) {
+                        throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                    }
                 }
-            } else {
-                blocks.blocks[layer] = blocks.update(layer, arr, aggressive);
-                if (blocks.blocks[layer] == null) {
-                    throw new IllegalStateException("Array cannot be null (update): " + blocks.getClass());
+                if (blocks.blocks[layer] != null) {
+                    blocks.sections[layer] = FULL;
                 }
+                return arr;
             }
-            if (blocks.blocks[layer] != null) {
-                blocks.sections[layer] = FULL;
-            }
-            return arr;
         }
 
         @Override
