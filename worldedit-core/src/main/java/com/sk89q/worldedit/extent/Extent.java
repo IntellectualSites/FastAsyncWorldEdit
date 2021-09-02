@@ -646,6 +646,7 @@ public interface Extent extends InputExtent, OutputExtent {
             child.cancel();
         }
         addProcessor(nullExtent);
+        addPostProcessor(nullExtent);
         return true;
     }
 
