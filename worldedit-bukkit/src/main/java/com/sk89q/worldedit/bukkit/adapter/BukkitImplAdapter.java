@@ -258,6 +258,17 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
         throw new UnsupportedOperationException("This adapter does not support regeneration.");
     }
 
+    /**
+     * Clears the contents of a Clearable block.
+     *
+     * @param world The world
+     * @param pt The location
+     * @return If a block was cleared
+     */
+    default boolean clearContainerBlockContents(World world, BlockVector3 pt) {
+        throw new UnsupportedOperationException("This adapter does not support clearing block contents.");
+    }
+
     //FAWE start
     default BlockMaterial getMaterial(BlockType blockType) {
         return getMaterial(blockType.getDefaultState());
