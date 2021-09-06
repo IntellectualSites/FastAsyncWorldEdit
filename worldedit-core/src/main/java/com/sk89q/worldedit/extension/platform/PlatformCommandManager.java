@@ -874,7 +874,9 @@ public final class PlatformCommandManager {
     private void handleUnknownException(Actor actor, Throwable t) {
         actor.print(Caption.of("worldedit.command.error.report"));
         actor.print(TextComponent.of(t.getClass().getName() + ": " + t.getMessage()));
-        LOGGER.error("An unexpected error while handling a WorldEdit command", t);
+        //FAWE start - Exchange name
+        LOGGER.error("An unexpected error while handling a FastAsyncWorldEdit command", t);
+        //FAWE end
     }
 
     @Subscribe
