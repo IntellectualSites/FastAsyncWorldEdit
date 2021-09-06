@@ -9,7 +9,7 @@ gson = "2.8.0"
 paper = "1.17.1-R0.1-SNAPSHOT"
 
 # Plugins
-vault = "1.7"
+vault = "1.7.1"
 dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.5"
 mapmanager = "1.8.0-SNAPSHOT"
