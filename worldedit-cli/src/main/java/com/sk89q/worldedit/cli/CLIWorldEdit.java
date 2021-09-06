@@ -176,7 +176,9 @@ public class CLIWorldEdit {
 
     public void onInitialized() {
         // Setup working directory
-        workingDir = Paths.get("worldedit");
+        //FAWE start - setup Fawe directory
+        workingDir = Paths.get("fastasyncworldedit");
+        //FAWE end
         if (!Files.exists(workingDir)) {
             try {
                 Files.createDirectory(workingDir);
@@ -187,7 +189,9 @@ public class CLIWorldEdit {
 
         this.commandSender = new CLICommandSender(this, LOGGER);
         this.platform = new CLIPlatform(this);
-        LOGGER.info("WorldEdit CLI (version " + getInternalVersion() + ") is loaded");
+        //FAWE start - identify as Fawe
+        LOGGER.info("FastAsyncWorldEdit CLI (version " + getInternalVersion() + ") is loaded");
+        //FAWE end
     }
 
     public void onStarted() {
