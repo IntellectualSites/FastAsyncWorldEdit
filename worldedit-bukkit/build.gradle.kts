@@ -104,6 +104,7 @@ dependencies {
     api(libs.sparsebitset) { isTransitive = false }
     api(libs.parallelgzip) { isTransitive = false }
     compileOnly(libs.adventure)
+    compileOnlyApi(libs.checkerqual)
 
     // Tests
     testImplementation(libs.mockito)
@@ -159,7 +160,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.incendo.serverlib:ServerLib:2.2.1"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            include(dependency("com.intellectualsites.paster:Paster:1.1.0"))
+            include(dependency("com.intellectualsites.paster:Paster:1.1.1"))
         }
         relocate("com.github.luben", "com.fastasyncworldedit.core.zstd") {
             include(dependency("com.github.luben:zstd-jni:1.5.0-4"))
@@ -171,7 +172,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.lz4:lz4-java:1.8.0"))
         }
         relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
-            include(dependency("net.kyori:adventure-nbt:4.8.1"))
+            include(dependency("net.kyori:adventure-nbt:4.9.0"))
         }
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
             include(dependency("com.zaxxer:SparseBitSet:1.2"))
