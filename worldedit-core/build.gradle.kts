@@ -37,7 +37,6 @@ dependencies {
 
     // Plugins
     compileOnly(libs.redprotect)
-    api(libs.plotsquaredV4) { isTransitive = false }
     api(libs.plotsquaredV6Core) { isTransitive = false }
 
     // ensure this is on the classpath for the AP

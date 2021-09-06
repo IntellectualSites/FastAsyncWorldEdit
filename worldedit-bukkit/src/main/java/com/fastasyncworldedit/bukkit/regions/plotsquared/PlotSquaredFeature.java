@@ -13,17 +13,14 @@ import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.flag.implementations.DoneFlag;
 import com.plotsquared.core.plot.flag.implementations.NoWorldeditFlag;
-import com.plotsquared.core.util.PlayerManager;
 import com.plotsquared.core.util.WEManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.world.World;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Locale;
@@ -33,11 +30,8 @@ import java.util.stream.Collectors;
 
 public class PlotSquaredFeature extends FaweMaskManager {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-
     public PlotSquaredFeature() {
         super("PlotSquared");
-        LOGGER.debug("Optimizing PlotSquared");
         if (Settings.FAWE_Components.FAWE_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
@@ -59,10 +53,15 @@ public class PlotSquaredFeature extends FaweMaskManager {
         */
     }
 
-    public static String getName(UUID uuid) {
-        return PlayerManager.getName(uuid);
-    }
-
+    /**
+     * Whether the player is allowed to use FAWE on a PlotSquared plot.
+     *
+     * @param player the {@link Player}
+     * @param plot   the {@link Plot}
+     * @param type   the {@link MaskType}
+     * @return {@code true} if the player is the plot owner, trusted, has the permission fawe.plotsquared.member
+     *         or fawe.plotsquared.admin and the NoWorldeditFlag is not set; otherwise {@code false}
+     */
     public boolean isAllowed(Player player, Plot plot, MaskType type) {
         if (plot == null) {
             return false;
