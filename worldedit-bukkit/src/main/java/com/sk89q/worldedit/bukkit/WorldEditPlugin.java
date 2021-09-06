@@ -59,6 +59,7 @@ import org.apache.logging.log4j.Logger;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.Tag;
 import org.bukkit.block.Biome;
 import org.bukkit.command.BlockCommandSender;
@@ -234,16 +235,17 @@ public class WorldEditPlugin extends JavaPlugin {
         // datapacks aren't loaded until just before the world is, and bukkit has no event for this
         // so the earliest we can do this is in WorldInit
         setupTags();
+        setupBiomes(); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
+        // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
 
     @SuppressWarnings({"deprecation", "unchecked"})
     private void initializeRegistries() {
-        // Biome
-        for (Biome biome : Biome.values()) {
-            String lowerCaseBiomeName = biome.name().toLowerCase(Locale.ROOT);
-            BiomeType.REGISTRY.register("minecraft:" + lowerCaseBiomeName, new BiomeType("minecraft:" + lowerCaseBiomeName));
-        }
+        // FAWE start - move Biomes to their own method. Initialize biomes twice to allow for the registry to be present for
+        // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
+        setupBiomes();
+        // FAWE end
         /*
 
         // Block & Item
@@ -304,6 +306,33 @@ public class WorldEditPlugin extends JavaPlugin {
                     "The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
         }
     }
+ 
+    // FAWE start
+    private void setupBiomes() {
+        if (this.adapter.value().isPresent()) {
+            // Biomes are stored globally in the server. Registries are not kept per-world in Minecraft.
+            // The WorldServer get-registries method simply delegates to the MinecraftServer method.
+            for (final NamespacedKey biome : ((BukkitImplAdapter<?>) adapter.value().get()).getRegisteredBiomes()) {
+                if (BiomeType.REGISTRY.get(biome.toString()) == null) { // only register once
+                    BiomeType.REGISTRY.register(biome.toString(), new BiomeType(biome.toString()));
+                }
+            }
+        } else {
+            LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
+            for (Biome biome : Biome.values()) {
+                // Custom is bad
+                if (biome.name().equals("CUSTOM")) {
+                    continue;
+                }
+                String lowerCaseBiome = biome.getKey().toString().toLowerCase(Locale.ROOT);
+                // only register once
+                if (BiomeType.REGISTRY.get(lowerCaseBiome) == null) {
+                    BiomeType.REGISTRY.register(lowerCaseBiome, new BiomeType(lowerCaseBiome));
+                }
+            }
+        }
+    }
+    // FAWE end
 
     private void loadAdapter() {
         WorldEdit worldEdit = WorldEdit.getInstance();

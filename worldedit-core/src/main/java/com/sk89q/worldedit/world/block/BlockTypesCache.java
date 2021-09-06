@@ -37,16 +37,16 @@ public class BlockTypesCache {
      */
     protected static final class Settings {
 
-        protected final int internalId;
-        protected final BlockState defaultState;
-        protected final AbstractProperty<?>[] propertiesMapArr;
-        protected final AbstractProperty<?>[] propertiesArr;
-        protected final List<AbstractProperty<?>> propertiesList;
-        protected final Map<String, AbstractProperty<?>> propertiesMap;
-        protected final Set<AbstractProperty<?>> propertiesSet;
-        protected final BlockMaterial blockMaterial;
-        protected final int permutations;
-        protected int[] stateOrdinals;
+        final int internalId;
+        final BlockState defaultState;
+        final AbstractProperty<?>[] propertiesMapArr;
+        final AbstractProperty<?>[] propertiesArr;
+        final List<AbstractProperty<?>> propertiesList;
+        final Map<String, AbstractProperty<?>> propertiesMap;
+        final Set<AbstractProperty<?>> propertiesSet;
+        final BlockMaterial blockMaterial;
+        final int permutations;
+        int[] stateOrdinals;
 
         Settings(BlockType type, String id, int internalId, List<BlockState> states) {
             this.internalId = internalId;

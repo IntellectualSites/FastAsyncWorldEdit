@@ -479,10 +479,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             nbt = state.getNbtData();
             BaseBlock result;
             if (nbt != null) {
-                WorldEdit.logger.info(blockStates.size());
                 result = blockStates.size() > 0 ? state.toBaseBlock(nbt) : new BlanketBaseBlock(state, nbt);
             } else {
-                result = state.toBaseBlock();
+                result = blockStates.size() > 0 ? new BaseBlock(state) : state.toBaseBlock();
             }
             return validate(context, result);
             //FAWE end

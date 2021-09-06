@@ -24,7 +24,8 @@ public class BlendBall implements Brush {
 
         int[] frequency = new int[BlockTypes.size()];
 
-        int maxY = editSession.getMaximumPoint().getBlockY();
+        int maxY = editSession.getMaxY();
+        int minY = editSession.getMinY();
 
         for (int x = -outsetSize; x <= outsetSize; x++) {
             int x0 = x + tx;
@@ -43,7 +44,7 @@ public class BlendBall implements Brush {
                     for (int ox = -1; ox <= 1; ox++) {
                         for (int oz = -1; oz <= 1; oz++) {
                             for (int oy = -1; oy <= 1; oy++) {
-                                if (oy + y0 < 0 || oy + y0 > maxY) {
+                                if (oy + y0 < minY || oy + y0 > maxY) {
                                     continue;
                                 }
                                 BlockState state = editSession.getBlock(x0 + ox, y0 + oy, z0 + oz);

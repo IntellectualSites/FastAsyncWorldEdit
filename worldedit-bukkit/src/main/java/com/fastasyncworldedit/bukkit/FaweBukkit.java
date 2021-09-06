@@ -27,8 +27,10 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.fastasyncworldedit.core.util.image.ImageViewer;
 import com.plotsquared.core.PlotSquared;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitPlayer;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.datapack.Datapack;
@@ -54,11 +56,12 @@ public class FaweBukkit implements IFawe, Listener {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Plugin plugin;
-    private ItemUtil itemUtil;
-
-    private boolean listeningImages;
     private final boolean chunksStretched;
     private final FAWEPlatformAdapterImpl platformAdapter;
+    private ItemUtil itemUtil;
+    private boolean listeningImages;
+    private Preloader preloader;
+    private volatile boolean keepUnloaded;
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
@@ -130,7 +133,6 @@ public class FaweBukkit implements IFawe, Listener {
         return plugin.getDataFolder();
     }
 
-
     public ItemUtil getItemUtil() {
         ItemUtil tmp = itemUtil;
         if (tmp == null) {
@@ -161,7 +163,8 @@ public class FaweBukkit implements IFawe, Listener {
                     .append("  • Soft Dependencies: ").append(p.getDescription().getSoftDepend()).append("\n")
                     .append("  • Provides: ").append(p.getDescription().getProvides()).append("\n");
         }
-        if (PaperLib.isPaper()) {
+        int dataVersion = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion();
+        if (dataVersion >= 2586 && PaperLib.isPaper()) {
             Collection<Datapack> datapacks = Bukkit.getServer().getDatapackManager().getEnabledPacks();
             msg.append("Enabled Datapacks (").append(datapacks.size()).append("):\n");
             for (Datapack dp : datapacks) {
@@ -236,8 +239,6 @@ public class FaweBukkit implements IFawe, Listener {
         return managers;
     }
 
-    private volatile boolean keepUnloaded;
-
     @EventHandler(priority = EventPriority.MONITOR)
     public void onWorldLoad(WorldLoadEvent event) {
         if (keepUnloaded) {
@@ -278,9 +279,12 @@ public class FaweBukkit implements IFawe, Listener {
     }
 
     @Override
-    public Preloader getPreloader() {
+    public Preloader getPreloader(boolean initialise) {
         if (PaperLib.isPaper()) {
-            return new AsyncPreloader();
+            if (preloader == null && initialise) {
+                return preloader = new AsyncPreloader();
+            }
+            return preloader;
         }
         return null;
     }

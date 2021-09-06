@@ -19,8 +19,10 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
+import com.fastasyncworldedit.core.extent.NullExtent;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
@@ -41,7 +43,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Range;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -160,6 +161,26 @@ public class AbstractDelegateExtent implements Extent {
         }
     }
 
+    @Override
+    public boolean cancel() {
+        ExtentTraverser<Extent> traverser = new ExtentTraverser<>(this);
+
+        NullExtent nullExtent = new NullExtent(getExtent(), FaweCache.MANUAL);
+
+        ExtentTraverser<Extent> next = traverser.next();
+        if (next != null) {
+            Extent child = next.get();
+            if (child instanceof NullExtent) {
+                return true;
+            }
+            traverser.setNext(nullExtent);
+            child.cancel();
+        }
+        addProcessor(nullExtent);
+        addPostProcessor(nullExtent);
+        return true;
+    }
+
     //FAWE start
     @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
@@ -200,6 +221,11 @@ public class AbstractDelegateExtent implements Extent {
     @Override
     public int getMaxY() {
         return extent.getMaxY();
+    }
+
+    @Override
+    public int getMinY() {
+        return extent.getMinY();
     }
 
     @Override
@@ -317,7 +343,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(
-            int x, @Range(from = 0, to = 255) int y,
+            int x, int y,
             int z, T block
     ) throws WorldEditException {
         return extent.setBlock(x, y, z, block);

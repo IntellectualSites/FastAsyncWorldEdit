@@ -511,22 +511,22 @@ public class BlockTransformExtent extends ResettableExtent {
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        return transformBlock(super.getBlock(position), false);
+        return transformBlock(super.getBlock(position), false).toImmutableState();
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return transformBlock(super.getBlock(x, y, z), false);
+        return transformBlock(super.getBlock(x, y, z), false).toImmutableState();
     }
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        return transformBlock(super.getFullBlock(position), false);
+        return transformBlock(super.getFullBlock(position), false).toBaseBlock();
     }
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        return transformBlock(super.getFullBlock(x, y, z), false);
+        return transformBlock(super.getFullBlock(x, y, z), false).toBaseBlock();
     }
 
     @Override

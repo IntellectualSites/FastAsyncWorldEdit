@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.regions;
 
-import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.math.BlockVectorSet;
@@ -745,7 +744,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
         if (bx >= minX && tx <= maxX && bz >= minZ && tz <= maxZ) {
             // contains all X/Z
-            if (minY <= 0 && maxY >= 255) {
+            if (minY <= set.getMinSectionIndex() << 4 && maxY >= (set.getMaxSectionIndex() << 4) + 15) {
                 return set;
             }
             trimY(set, minY, maxY);
@@ -753,7 +752,9 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             return set;
         }
         if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
-            trimY(set, minY, maxY);
+            if (minY > set.getMinSectionIndex() << 4 || maxY < (set.getMaxSectionIndex() << 4) + 15) {
+                trimY(set, minY, maxY);
+            }
             final int lowerX = Math.max(0, minX - bx);
             final int upperX = Math.min(15, 15 + maxX - tx);
 
@@ -766,12 +767,12 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimX = lowerX != 0 || upperX != 15;
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
-            for (int layer = 0; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+            for (int layer = get.getMinSectionIndex(); layer < get.getMaxSectionIndex(); layer++) {
                 if (set.hasSection(layer)) {
                     char[] arr = set.load(layer);
                     if (trimX || trimZ) {
                         int indexY = 0;
-                        for (int y = getWorldMinY(); y < 16; y++, indexY += getWorldMaxY()) {
+                        for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
                             int index;
                             if (trimZ) {
                                 index = indexY;

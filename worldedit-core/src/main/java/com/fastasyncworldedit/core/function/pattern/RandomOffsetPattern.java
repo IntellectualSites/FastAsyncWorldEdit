@@ -7,6 +7,7 @@ import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.SplittableRandom;
 
@@ -32,8 +33,8 @@ public class RandomOffsetPattern extends AbstractPattern {
      * @param dx      offset x
      * @param dy      offset y
      * @param dz      offset z
-     * @param minY    min applicable y (inclusive
-     * @param maxY    max applicable y (inclusive
+     * @param minY    min applicable y (inclusive)
+     * @param maxY    max applicable y (inclusive)
      */
     public RandomOffsetPattern(Pattern pattern, int dx, int dy, int dz, int minY, int maxY) {
         this.pattern = pattern;
@@ -54,6 +55,9 @@ public class RandomOffsetPattern extends AbstractPattern {
         mutable.mutX((position.getX() + r.nextInt(dx2) - dx));
         mutable.mutY((position.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((position.getZ() + r.nextInt(dz2) - dz));
+        if (mutable.getY() < minY || mutable.getY() > maxY) {
+            return BlockTypes.AIR.getDefaultState().toBaseBlock();
+        }
         return pattern.applyBlock(mutable);
     }
 
@@ -62,7 +66,7 @@ public class RandomOffsetPattern extends AbstractPattern {
         mutable.mutX((set.getX() + r.nextInt(dx2) - dx));
         mutable.mutY((set.getY() + r.nextInt(dy2) - dy));
         mutable.mutZ((set.getZ() + r.nextInt(dz2) - dz));
-        if (mutable.getY() < minY || mutable.getY() > maxY) {
+        if (mutable.getY() < extent.getMinY() || mutable.getY() > extent.getMaxY()) {
             return false;
         }
         return pattern.apply(extent, get, mutable);

@@ -79,6 +79,7 @@ import com.sk89q.worldedit.command.tool.brush.HollowCylinderBrush;
 import com.sk89q.worldedit.command.tool.brush.HollowSphereBrush;
 import com.sk89q.worldedit.command.tool.brush.OperationFactoryBrush;
 import com.sk89q.worldedit.command.tool.brush.SmoothBrush;
+import com.sk89q.worldedit.command.tool.brush.SnowSmoothBrush;
 import com.sk89q.worldedit.command.tool.brush.SphereBrush;
 import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
@@ -457,6 +458,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.stencil")
     public void stencilBrush(
+            Player player,
             LocalSession session, InjectedValueAccess context,
             @Arg(desc = "Pattern")
                     Pattern fill,
@@ -478,13 +480,15 @@ public class BrushCommands {
         worldEdit.checkMaxBrushRadius(radius);
         InputStream stream = getHeightmapStream(image);
         HeightBrush brush;
+        int minY = player.getWorld().getMinY();
+        int maxY = player.getWorld().getMaxY();
         try {
             brush = new StencilBrush(stream, rotation, yscale, onlyWhite,
                     "#clipboard".equalsIgnoreCase(image)
-                            ? session.getClipboard().getClipboard() : null
+                            ? session.getClipboard().getClipboard() : null, minY, maxY
             );
         } catch (EmptyClipboardException ignored) {
-            brush = new StencilBrush(stream, rotation, yscale, onlyWhite, null);
+            brush = new StencilBrush(stream, rotation, yscale, onlyWhite, null, minY, maxY);
         }
         if (randomRotate) {
             brush.setRandomRotate(true);
@@ -710,6 +714,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.height")
     public void heightBrush(
+            Player player,
             LocalSession session,
             @Arg(desc = "Expression", def = "5")
                     Expression radius,
@@ -728,7 +733,7 @@ public class BrushCommands {
                     boolean dontSmooth, InjectedValueAccess context
     )
             throws WorldEditException, FileNotFoundException {
-        terrainBrush(session, radius, image, rotation, yscale, false, randomRotate, layers,
+        terrainBrush(player, session, radius, image, rotation, yscale, false, randomRotate, layers,
                 !dontSmooth, ScalableHeightMap.Shape.CONE, context
         );
     }
@@ -741,6 +746,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.height")
     public void cliffBrush(
+            Player player,
             LocalSession session,
             @Arg(desc = "Expression", def = "5")
                     Expression radius,
@@ -760,7 +766,7 @@ public class BrushCommands {
                     boolean dontSmooth, InjectedValueAccess context
     )
             throws WorldEditException, FileNotFoundException {
-        terrainBrush(session, radius, image, rotation, yscale, true, randomRotate, layers,
+        terrainBrush(player, session, radius, image, rotation, yscale, true, randomRotate, layers,
                 !dontSmooth, ScalableHeightMap.Shape.CYLINDER, context
         );
     }
@@ -775,6 +781,7 @@ public class BrushCommands {
     )
     @CommandPermissions("worldedit.brush.height")
     public void flattenBrush(
+            Player player,
             LocalSession session,
             @Arg(desc = "Expression", def = "5")
                     Expression radius,
@@ -794,12 +801,13 @@ public class BrushCommands {
                     boolean dontSmooth, InjectedValueAccess context
     )
             throws WorldEditException, FileNotFoundException {
-        terrainBrush(session, radius, image, rotation, yscale, true, randomRotate, layers,
+        terrainBrush(player, session, radius, image, rotation, yscale, true, randomRotate, layers,
                 !dontSmooth, ScalableHeightMap.Shape.CONE, context
         );
     }
 
     private void terrainBrush(
+            Player player,
             LocalSession session,
             Expression radius,
             String image,
@@ -816,23 +824,25 @@ public class BrushCommands {
         worldEdit.checkMaxBrushRadius(radius);
         InputStream stream = getHeightmapStream(image);
         HeightBrush brush;
+        int minY = player.getWorld().getMinY();
+        int maxY = player.getWorld().getMaxY();
         if (flat) {
             try {
                 brush = new FlattenBrush(stream, rotation, yscale, layers, smooth,
                         "#clipboard".equalsIgnoreCase(image)
-                                ? session.getClipboard().getClipboard() : null, shape
+                                ? session.getClipboard().getClipboard() : null, shape, minY, maxY
                 );
             } catch (EmptyClipboardException ignored) {
-                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth, null, shape);
+                brush = new FlattenBrush(stream, rotation, yscale, layers, smooth, null, shape, minY, maxY);
             }
         } else {
             try {
                 brush = new HeightBrush(stream, rotation, yscale, layers, smooth,
                         "#clipboard".equalsIgnoreCase(image)
-                                ? session.getClipboard().getClipboard() : null
+                                ? session.getClipboard().getClipboard() : null, minY, maxY
                 );
             } catch (EmptyClipboardException ignored) {
-                brush = new HeightBrush(stream, rotation, yscale, layers, smooth, null);
+                brush = new HeightBrush(stream, rotation, yscale, layers, smooth, null, minY, maxY);
             }
         }
         if (randomRotate) {
@@ -1283,20 +1293,65 @@ public class BrushCommands {
     @CommandPermissions("worldedit.brush.smooth")
     public void smoothBrush(
             Player player, LocalSession session,
+            //FAWE start - Expression > double
             @Arg(desc = "The radius to sample for softening", def = "2")
                     Expression radius,
+            //FAWE end
             @Arg(desc = "The number of iterations to perform", def = "4")
                     int iterations,
             @Arg(desc = "The mask of blocks to use for the heightmap", def = "")
-                    Mask maskOpt,
+                    Mask mask,
             InjectedValueAccess context
     ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
 
+        //FAWE start
         FaweLimit limit = Settings.IMP.getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        //FAWE end
 
-        set(context, new SmoothBrush(iterations, maskOpt)).setSize(radius);
+        set(context, new SmoothBrush(iterations, mask)).setSize(radius);
+        player.print(Caption.of(
+                "worldedit.brush.smooth.equip",
+                radius,
+                iterations,
+                Caption.of("worldedit.brush.smooth." + (mask == null ? "no" : "") + "filter")
+        ));
+    }
+
+    @Command(
+            name = "snowsmooth",
+            desc = "Choose the snow terrain softener brush",
+            descFooter = "Example: '/brush snowsmooth 5 1 -l 3'"
+    )
+    @CommandPermissions("worldedit.brush.snowsmooth")
+    public void snowSmoothBrush(
+            Player player, LocalSession session,
+            //FAWE start - Expression > double, default iteration number 1 is much better.
+            @Arg(desc = "The radius to sample for softening", def = "2")
+                    Expression radius,
+            @Arg(desc = "The number of iterations to perform", def = "1")
+                    int iterations,
+            //FAWE end
+            @ArgFlag(name = 'l', desc = "The number of snow blocks under snow", def = "1")
+                    int snowBlockCount,
+            @ArgFlag(name = 'm', desc = "The mask of blocks to use for the heightmap")
+                    Mask mask, InjectedValueAccess context
+    ) throws WorldEditException {
+        worldEdit.checkMaxBrushRadius(radius);
+
+        //FAWE start
+        FaweLimit limit = Settings.IMP.getLimit(player);
+        iterations = Math.min(limit.MAX_ITERATIONS, iterations);
+        //FAWE end
+
+        set(context, new SnowSmoothBrush(iterations, mask)).setSize(radius);
+        player.print(Caption.of(
+                "worldedit.brush.smooth.equip",
+                radius,
+                iterations,
+                Caption.of("worldedit.brush.smooth." + (mask == null ? "no" : "") + "filter")
+        ));
     }
 
     @Command(

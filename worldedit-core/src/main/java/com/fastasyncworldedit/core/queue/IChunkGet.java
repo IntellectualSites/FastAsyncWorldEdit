@@ -48,19 +48,43 @@ public interface IChunkGet extends IBlocks, Trimable, InputExtent, ITileInput {
 
     CompoundTag getEntity(UUID uuid);
 
-    void setCreateCopy(boolean createCopy);
-
     boolean isCreateCopy();
+
+    void setCreateCopy(boolean createCopy);
 
     @Nullable
     default IChunkGet getCopy() {
         return null;
     }
 
-    void setLightingToGet(char[][] lighting);
+    /**
+     * Flush the block lighting array (section*blocks) to the chunk GET between the given section indices. Negative allowed.
+     *
+     * @param lighting          lighting array
+     * @param startSectionIndex lowest section index
+     * @param endSectionIndex   highest section index
+     */
+    void setLightingToGet(char[][] lighting, int startSectionIndex, int endSectionIndex);
 
-    void setSkyLightingToGet(char[][] lighting);
+    /**
+     * Flush the sky lighting array (section*blocks) to the chunk GET between the given section indices. Negative allowed.
+     *
+     * @param lighting          sky lighting array
+     * @param startSectionIndex lowest section index
+     * @param endSectionIndex   highest section index
+     */
+    void setSkyLightingToGet(char[][] lighting, int startSectionIndex, int endSectionIndex);
 
     void setHeightmapToGet(HeightMapType type, int[] data);
+
+    /**
+     * Max y value for the chunk's world (inclusive)
+     */
+    int getMaxY();
+
+    /**
+     * Min y value for the chunk's world (inclusive)
+     */
+    int getMinY();
 
 }

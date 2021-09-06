@@ -211,6 +211,13 @@ public class LocalSession implements TextureHolder {
         if (defaultSelector != null) {
             this.selector = defaultSelector.createSelector();
         }
+        //FAWE start
+        if (worldOverride != null) {
+            this.selector.setWorld(worldOverride);
+        } else {
+            this.selector.setWorld(currentWorld);
+        }
+        //FAWE end
     }
 
     //FAWE start
@@ -569,7 +576,10 @@ public class LocalSession implements TextureHolder {
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
         //FAWE start - use our logic
-        World world = ((Player) actor).getWorldForEditing();
+        World world = (actor instanceof Player) ? ((Player) actor).getWorldForEditing() : getWorldOverride();
+        if (world == null) {
+            throw new MissingWorldException();
+        }
         loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() < history.size()) {
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
@@ -610,21 +620,26 @@ public class LocalSession implements TextureHolder {
     //FAWE start - use our logic
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        World world = ((Player) actor).getWorldForEditing();
+        World world = (actor instanceof Player) ? ((Player) actor).getWorldForEditing() : getWorldOverride();
+        if (world == null) {
+            throw new MissingWorldException();
+        }
         loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
             historyNegativeIndex--;
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = new EditSessionBuilder(world)
-                    .allowedRegionsEverywhere()
+            EditSessionBuilder builder = new EditSessionBuilder(world)
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
                     .limitUnprocessed((Player) actor)
                     .player((Player) actor)
-                    .blockBag(getBlockBag((Player) actor))
-                    .build()) {
+                    .blockBag(getBlockBag((Player) actor));
+            if (!actor.getLimit().RESTRICT_HISTORY_TO_REGIONS) {
+                builder.allowedRegionsEverywhere();
+            }
+            try (EditSession newEditSession = builder.build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
                 return newEditSession;
             }
@@ -1056,10 +1071,26 @@ public class LocalSession implements TextureHolder {
      */
     @Nullable
     @Deprecated
-    public Tool getTool(ItemType item) {
+    //FAWE start - refresh wand item if permissions change
+    public Tool getTool(ItemType item, Player player) {
+        Tool tool;
         synchronized (this.tools) {
-            return tools.get(item.getInternalId());
+            tool = tools.get(item.getInternalId());
         }
+        if (tool == SelectionWand.INSTANCE && !SelectionWand.INSTANCE.canUse(player)) {
+            tools.remove(wandItem.getInternalId());
+            loadDefaults(player, true); // Permissions have changed so redo the player's current tools.
+            return null;
+        }
+        if (tool != null) {
+            return tool;
+        } else if (item.getInternalId() == wandItem.getInternalId() && SelectionWand.INSTANCE.canUse(player)) {
+            loadDefaults(player, true); // Permissions have changed so redo the player's current tools.
+            return SelectionWand.INSTANCE;
+        } else {
+            return null;
+        }
+        //FAWE end
     }
 
     //FAWE start
@@ -1083,7 +1114,7 @@ public class LocalSession implements TextureHolder {
                 return tool;
             }
         }
-        return getTool(item.getType());
+        return getTool(item.getType(), player);
     }
 
     public void loadDefaults(Actor actor, boolean force) {

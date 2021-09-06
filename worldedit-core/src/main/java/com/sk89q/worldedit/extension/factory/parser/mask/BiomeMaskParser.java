@@ -20,7 +20,10 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -33,12 +36,18 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class BiomeMaskParser extends InputParser<Mask> {
+//FAWE start - aliased
+public class BiomeMaskParser extends InputParser<Mask> implements AliasedParser {
+
+    private final List<String> aliases = ImmutableList.of("$");
+    //FAWE end
 
     public BiomeMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -70,8 +79,22 @@ public class BiomeMaskParser extends InputParser<Mask> {
             return null;
         }
 
+        //FAWE start - richer parsing
+        if (input.charAt(1) == '[') {
+            int end = input.lastIndexOf(']');
+            if (end == -1) {
+                return null;
+            }
+            input = input.substring(2, end);
+        } else {
+            input = input.substring(1);
+        }
+        //FAWE end
+
         Set<BiomeType> biomes = new HashSet<>();
-        for (String biomeName : Splitter.on(",").split(input.substring(1))) {
+        //FAWE start - richer parsing
+        for (String biomeName : Splitter.on(",").split(input)) {
+            //FAWE end
             BiomeType biome = BiomeType.REGISTRY.get(biomeName);
             if (biome == null) {
                 throw new NoMatchException(Caption.of("worldedit.error.unknown-biome", TextComponent.of(biomeName)));
@@ -81,5 +104,12 @@ public class BiomeMaskParser extends InputParser<Mask> {
 
         return new BiomeMask(context.requireExtent(), biomes);
     }
+
+    //FAWE start - aliased
+    @Override
+    public List<String> getMatchedAliases() {
+        return aliases;
+    }
+    //FAWE end
 
 }

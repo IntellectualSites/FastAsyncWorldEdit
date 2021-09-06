@@ -1,6 +1,19 @@
 {
   "extends": [
-    "config:base"
+    "config:base",
+    ":disableDependencyDashboard"
   ],
-  "ignoreDeps": ["guava", "rhino-runtime", "mockito-core", "antlr4", "antlr4-runtime", "paranamer", "fastutil", "auto-value-annotations", "auto-value"]
+  "ignoreDeps": [
+    "guava",
+    "rhino-runtime",
+    "mockito-core",
+    "antlr4",
+    "antlr4-runtime",
+    "paranamer",
+    "fastutil",
+    "auto-value-annotations",
+    "auto-value",
+    "gson",
+    "fabric-api"
+  ]
 }

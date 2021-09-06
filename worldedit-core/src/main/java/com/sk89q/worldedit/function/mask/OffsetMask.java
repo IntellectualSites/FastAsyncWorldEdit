@@ -31,6 +31,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class OffsetMask extends AbstractMask {
 
+    //FAWE start - ignore resultant position outside world height range
+    private final int minY;
+    private final int maxY;
+    //FAWE end
     private Mask mask;
     private BlockVector3 offset;
 
@@ -39,12 +43,30 @@ public class OffsetMask extends AbstractMask {
      *
      * @param mask   the mask
      * @param offset the offset
+     * @deprecated use {@link OffsetMask#OffsetMask(Mask, BlockVector3, int, int)}
      */
+    @Deprecated
     public OffsetMask(Mask mask, BlockVector3 offset) {
+        this(mask, offset, 0, 255);
+    }
+
+    /**
+     * Create a new instance.
+     *
+     * @param mask   the mask
+     * @param offset the offset
+     * @param minY   minimum allowable y value to be set. Inclusive.
+     * @param maxY   maximum allowable y value to be set. Inclusive.
+     */
+    //FAWE start - ignore resultant position outside world height range
+    public OffsetMask(Mask mask, BlockVector3 offset, int minY, int maxY) {
         checkNotNull(mask);
         checkNotNull(offset);
         this.mask = mask;
         this.offset = offset;
+        this.minY = minY;
+        this.maxY = maxY;
+        //FAWE end
     }
 
     /**
@@ -87,11 +109,13 @@ public class OffsetMask extends AbstractMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
+        //FAWE start - ignore resultant position outside world height range
         BlockVector3 testPos = vector.add(offset);
-        if (testPos.getBlockY() < 0 || testPos.getBlockY() > 255) {
+        if (testPos.getBlockY() < minY || testPos.getBlockY() > maxY) {
             return false;
         }
-        return getMask().test(vector.add(offset));
+        return getMask().test(testPos);
+        //FAWE end
     }
 
     @Nullable
@@ -108,7 +132,7 @@ public class OffsetMask extends AbstractMask {
     //FAWE start
     @Override
     public Mask copy() {
-        return new OffsetMask(mask.copy(), offset.toImmutable());
+        return new OffsetMask(mask.copy(), offset.toImmutable(), minY, maxY);
     }
     //FAWE end
 

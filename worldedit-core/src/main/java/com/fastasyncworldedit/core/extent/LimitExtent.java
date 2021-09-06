@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.extent.processor;
+package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.filter.block.ExtentFilterBlock;
@@ -119,92 +119,92 @@ public class LimitExtent extends AbstractDelegateExtent {
 
     @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(maxY - minY + 1);
         try {
             return super.getHighestTerrainBlock(x, z, minY, maxY);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
     @Override
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, Mask filter) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(maxY - minY + 1);
         try {
             return super.getHighestTerrainBlock(x, z, minY, maxY, filter);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
     @Override
     public int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(maxY - minY + 1);
         try {
             return super.getNearestSurfaceLayer(x, z, y, minY, maxY);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(maxY - minY + 1);
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(maxY - minY + 1);
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(maxY - minY + 1);
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
     @Override
     public int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(maxY - minY + 1);
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 
@@ -219,14 +219,14 @@ public class LimitExtent extends AbstractDelegateExtent {
             int failedMax,
             boolean ignoreAir
     ) {
-        limit.THROW_MAX_CHECKS(FaweCache.IMP.WORLD_HEIGHT);
+        limit.THROW_MAX_CHECKS(maxY - minY + 1);
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
         } catch (FaweException e) {
             if (!limit.MAX_FAILS()) {
                 throw e;
             }
-            return 0;
+            return minY;
         }
     }
 

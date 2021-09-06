@@ -388,7 +388,7 @@ public class BrushTool
                 final int x = loc.getBlockX();
                 final int z = loc.getBlockZ();
                 int y;
-                for (y = height; y > 0; y--) {
+                for (y = height; y > editSession.getMinY(); y--) {
                     BlockType block = editSession.getBlockType(x, y, z);
                     if (block.getMaterial().isMovementBlocker()) {
                         break;

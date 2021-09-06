@@ -25,10 +25,10 @@ public class MaskedTargetBlock extends TargetBlock {
             if (!mask.test(current.toBlockPoint())) {
                 if (searchForLastBlock) {
                     lastBlock = current;
-                    if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
+                    if (lastBlock.getBlockY() <= world.getMinY() || lastBlock.getBlockY() >= world.getMaxY()) {
                         searchForLastBlock = false;
                     }
-                } else if (current.getBlockY() <= 0) {
+                } else if (current.getBlockY() <= world.getMinY()) {
                     break;
                 }
             } else {

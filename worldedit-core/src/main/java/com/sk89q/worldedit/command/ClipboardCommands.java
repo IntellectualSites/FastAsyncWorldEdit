@@ -45,6 +45,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
@@ -112,6 +113,7 @@ public class ClipboardCommands {
             desc = "Copy the selection to the clipboard"
     )
     @CommandPermissions("worldedit.clipboard.copy")
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void copy(
             Actor actor, LocalSession session, EditSession editSession,
@@ -191,7 +193,7 @@ public class ClipboardCommands {
                 .getZ() + 1));
         FaweLimit limit = actor.getLimit();
         if (volume >= limit.MAX_CHECKS) {
-            throw new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.max.checks"));
+            throw FaweCache.MAX_CHECKS;
         }
         session.setClipboard(null);
         ReadOnlyClipboard lazyClipboard = ReadOnlyClipboard.of(region, !skipEntities, copyBiomes);
@@ -242,6 +244,7 @@ public class ClipboardCommands {
     )
     @CommandPermissions("worldedit.clipboard.cut")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void cut(
             Actor actor, LocalSession session, EditSession editSession,
@@ -555,7 +558,7 @@ public class ClipboardCommands {
         PasteEvent event = new PasteEvent(player, clipboard, uri, editSession, to);
         WorldEdit.getInstance().getEventBus().post(event);
         if (event.isCancelled()) {
-            throw new FaweException(Caption.of("fawe.cancel.worldedit.cancel.reason.manual"));
+            throw FaweCache.MANUAL;
         }
     }
     //FAWE end

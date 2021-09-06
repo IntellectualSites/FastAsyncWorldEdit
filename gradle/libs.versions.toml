@@ -9,7 +9,7 @@ gson = "2.8.0"
 paper = "1.17.1-R0.1-SNAPSHOT"
 
 # Plugins
-vault = "1.7"
+vault = "1.7.1"
 dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.5"
 mapmanager = "1.8.0-SNAPSHOT"
@@ -17,9 +17,9 @@ griefprevention = "16.17.1"
 griefdefender = "920a610"
 mcore = "7.0.1"
 residence = "4.5._13.1"
-towny = "0.97.0.19"
+towny = "0.97.1.7"
 protocollib = "4.7.0"
-plotsquaredV6 = "6.0.8-SNAPSHOT"
+plotsquaredV6 = "6.0.10-SNAPSHOT"
 plotsquaredV4 = "4.514"
 redprotect = "1.9.6"
 
@@ -28,10 +28,10 @@ flow-math = "1.0.3"
 paperlib = "1.0.6"
 bstats = "2.2.1"
 serverlib = "2.2.1"
-paster = "1.0.1-SNAPSHOT"
+paster = "1.1.1"
 sparsebitset = "1.2"
 parallelgzip = "1.0.5"
-adventure = "4.8.1"
+adventure = "4.9.0"
 truezip = "6.8.4"
 auto-value = "1.7.4"
 findbugs = "3.0.2"
@@ -45,14 +45,17 @@ jchronic = "0.2.4a"
 lz4-java = "1.8.0"
 lz4-stream = "1.0.0"
 ## Internal
-minimessage-text = "4.1.0-SNAPSHOT"
-adapter-text = "3.0.6"
+adventure-text-minimessage = "4.1.0-SNAPSHOT"
+text-adapter = "3.0.6"
 text = "3.0.4"
 piston = "0.5.7"
 
 # Tests
-mockito = "3.11.2"
-checker-qual = "3.16.0"
+mockito = "3.12.4"
+checker-qual = "3.18.0"
+
+# Gradle plugins
+pluginyml = "0.5.0"
 
 [libraries]
 # Minecraft expectations
@@ -109,8 +112,8 @@ lz4JavaStream = { group = "net.jpountz", name = "lz4-java-stream", version.ref =
 
 # Internal
 ## Text
-adventureTextAdapter = { group = "net.kyori", name = "text-adapter-bukkit", version.ref = "adapter-text" }
-adventureMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "minimessage-text" }
+adventureTextAdapterBukkit = { group = "net.kyori", name = "text-adapter-bukkit", version.ref = "text-adapter" }
+adventureTextMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure-text-minimessage" }
 adventureTextApi = { group = "net.kyori", name = "text-api", version.ref = "text" }
 adventureTextSerializerGson = { group = "net.kyori", name = "text-serializer-gson", version.ref = "text" }
 adventureTextSerializerLegacy = { group = "net.kyori", name = "text-serializer-legacy", version.ref = "text" }
@@ -126,3 +129,6 @@ pistonRuntime = { group = "org.enginehub.piston.core-ap", name = "runtime", vers
 mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
 checkerqual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checker-qual" }
 log4jCore = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
+
+[plugins]
+pluginyml = { id = "net.minecrell.plugin-yml.bukkit", version.ref = "pluginyml" }

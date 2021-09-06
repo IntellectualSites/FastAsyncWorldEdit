@@ -78,11 +78,11 @@ public class OreGen implements Resource {
             double d12o2 = d12 * ONE_2;
 
             int minX = MathMan.floorZero(d7 - d11o2);
-            int minY = Math.max(1, MathMan.floorZero(d8 - d12o2));
+            int minY = Math.max(this.minY + 1, MathMan.floorZero(d8 - d12o2));
             int minZ = MathMan.floorZero(d9 - d11o2);
 
             int maxX = MathMan.floorZero(d7 + d11o2);
-            int maxY = Math.min(255, MathMan.floorZero(d8 + d12o2));
+            int maxY = Math.min(this.maxY, MathMan.floorZero(d8 + d12o2));
             int maxZ = MathMan.floorZero(d9 + d11o2);
 
             double id11o2 = 1.0 / (d11o2);

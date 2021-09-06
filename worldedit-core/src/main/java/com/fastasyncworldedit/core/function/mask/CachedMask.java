@@ -57,9 +57,10 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
             return result;
         } catch (UnsupportedOperationException ignored) {
             boolean result = getMask().test(mutable.setComponents(x, y, z));
-            if (y < 0 || y > 255) {
-                return result;
-            }
+            // Assume that the mask won't be given y outside the world range
+            // if (y < 0 || y > 255) {
+            //    return result;
+            //}
             resetCache();
             cache_checked.setOffset(x, z);
             cache_results.setOffset(x, z);

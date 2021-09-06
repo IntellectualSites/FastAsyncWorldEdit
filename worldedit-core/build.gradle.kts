@@ -51,7 +51,7 @@ dependencies {
     implementation(libs.rhino)
     compileOnly(libs.adventure)
     compileOnlyApi(libs.adventureNbt)
-    compileOnlyApi(libs.adventureMiniMessage)
+    compileOnlyApi(libs.adventureTextMiniMessage)
     implementation(libs.zstd)
     api(libs.paster)
     compileOnly(libs.lz4Java) { isTransitive = false }

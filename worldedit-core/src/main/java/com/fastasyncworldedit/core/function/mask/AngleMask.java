@@ -18,6 +18,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
     protected final boolean overlay;
     protected final boolean checkFirst;
     protected final int maxY;
+    protected final int minY;
     protected final int distance;
 
     public AngleMask(Extent extent, double min, double max, boolean overlay, int distance) {
@@ -26,7 +27,8 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         this.min = min;
         this.max = max;
         this.checkFirst = max >= (Math.tan(90 * (Math.PI / 180)));
-        this.maxY = extent.getMaximumPoint().getBlockY();
+        this.maxY = extent.getMaxY();
+        this.minY = extent.getMinY();
         this.overlay = overlay;
         this.distance = distance;
     }
@@ -57,33 +59,28 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
 
     public int getHeight(Extent extent, int x, int y, int z) {
         //        return extent.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
-        try {
-            int rx = x - cacheBotX + 16;
-            int rz = z - cacheBotZ + 16;
-            int index;
-            if (((rx & 0xFF) != rx || (rz & 0xFF) != rz)) {
-                cacheBotX = x - 16;
-                cacheBotZ = z - 16;
-                rx = x - cacheBotX + 16;
-                rz = z - cacheBotZ + 16;
-                index = rx + (rz << 8);
-                if (cacheHeights == null) {
-                    cacheHeights = new byte[65536];
-                } else {
-                    Arrays.fill(cacheHeights, (byte) 0);
-                }
+        int rx = x - cacheBotX + 16;
+        int rz = z - cacheBotZ + 16;
+        int index;
+        if (((rx & 0xFF) != rx || (rz & 0xFF) != rz)) {
+            cacheBotX = x - 16;
+            cacheBotZ = z - 16;
+            rx = x - cacheBotX + 16;
+            rz = z - cacheBotZ + 16;
+            index = rx + (rz << 8);
+            if (cacheHeights == null) {
+                cacheHeights = new byte[65536];
             } else {
-                index = rx + (rz << 8);
+                Arrays.fill(cacheHeights, (byte) 0);
             }
-            int result = cacheHeights[index] & 0xFF;
-            if (y > result) {
-                cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, 0, maxY));
-            }
-            return result;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
+        } else {
+            index = rx + (rz << 8);
         }
+        int result = cacheHeights[index] & 0xFF;
+        if (y > result) {
+            cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
+        }
+        return result;
     }
 
     protected boolean testSlope(Extent extent, int x, int y, int z) {
@@ -141,10 +138,10 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         if (!mask.test(x, y, z - 1)) {
             return true;
         }
-        if (y < 255 && !mask.test(x, y + 1, z)) {
+        if (y < maxY && !mask.test(x, y + 1, z)) {
             return true;
         }
-        return y > 0 && !mask.test(x, y - 1, z);
+        return y > minY && !mask.test(x, y - 1, z);
     }
 
     @Override
@@ -164,7 +161,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
             return false;
         }
         if (overlay) {
-            if (y < 255 && !adjacentAir(vector)) {
+            if (y < maxY && !adjacentAir(vector)) {
                 return lastValue = false;
             }
         }

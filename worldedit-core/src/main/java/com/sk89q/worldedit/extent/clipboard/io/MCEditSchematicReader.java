@@ -203,6 +203,13 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             int z = t.getInt("z");
             int index = y * width * length + z * width + x;
 
+            //FAWE start - tile entity safety - perhaps caused by the old issue with tile entities created in the wrong
+            // position in schematics?
+            if (index >= blocks.length) {
+                LOGGER.warn("Skipping corrupt tile entity at position " + x + " " + y + " " + z + " in schematic.");
+                continue;
+            }
+
             BlockState block = getBlockState(blocks[index], blockData[index]);
             BlockState newBlock = block;
             if (newBlock != null) {

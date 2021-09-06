@@ -37,13 +37,14 @@ public class SurfaceSpline implements Brush {
     public void build(EditSession editSession, BlockVector3 pos, Pattern pattern, double radius) throws
             MaxChangedBlocksException {
         int maxY = editSession.getMaxY();
+        int minY = editSession.getMinY();
         if (path.isEmpty() || !pos.equals(path.get(path.size() - 1))) {
             int max = editSession.getNearestSurfaceTerrainBlock(
                     pos.getBlockX(),
                     pos.getBlockZ(),
                     pos.getBlockY(),
-                    0,
-                    editSession.getMaxY()
+                    minY,
+                    maxY
             );
             if (max == -1) {
                 return;
@@ -71,17 +72,13 @@ public class SurfaceSpline implements Brush {
             final int tipx = MathMan.roundInt(tipv.getX());
             final int tipz = (int) tipv.getZ();
             int tipy = MathMan.roundInt(tipv.getY());
-            tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, 0, maxY);
+            tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, minY, maxY);
             if (tipy == -1) {
                 continue;
             }
             if (radius == 0) {
                 BlockVector3 set = mutable.setComponents(tipx, tipy, tipz);
-                try {
-                    pattern.apply(editSession, set, set);
-                } catch (WorldEditException e) {
-                    e.printStackTrace();
-                }
+                pattern.apply(editSession, set, set);
             } else {
                 vset.add(tipx, tipy, tipz);
             }

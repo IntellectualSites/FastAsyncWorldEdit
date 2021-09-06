@@ -273,10 +273,9 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         }
         try {
             Operations.completeLegacy(copy);
-        } catch (MaxChangedBlocksException e) {
-            e.printStackTrace();
+        } finally {
+            editSession.close(); // Make sure editsession is always closed
         }
-        editSession.flushQueue();
         return editSession;
     }
 
@@ -347,7 +346,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                 continue;
             }
-            if (pos.getY() < 0) {
+            if (pos.getY() < extent.getMinY()) {
                 throw new RuntimeException("Y-Position cannot be less than 0!");
             }
             extent.setBlock(xx, yy, zz, block);

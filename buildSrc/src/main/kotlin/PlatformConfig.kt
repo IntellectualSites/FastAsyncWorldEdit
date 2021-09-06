@@ -1,15 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.api.attributes.java.TargetJvmVersion
-import org.gradle.api.plugins.JavaPluginConvention
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.kotlin.dsl.apply
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByName
@@ -57,10 +54,10 @@ fun Project.applyPlatformAndCoreConfiguration() {
         "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.7.2")
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.7.2")
-        "testImplementation"("org.mockito:mockito-core:3.11.2")
-        "testImplementation"("org.mockito:mockito-junit-jupiter:3.11.2")
+        "testImplementation"("org.mockito:mockito-core:3.12.4")
+        "testImplementation"("org.mockito:mockito-junit-jupiter:3.12.4")
         "testImplementation"("net.bytebuddy:byte-buddy:1.11.9")
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:3.11.2")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:3.12.4")
     }
 
     // Java 8 turns on doclint which we fail
@@ -73,6 +70,17 @@ fun Project.applyPlatformAndCoreConfiguration() {
                 "implNote:a:Implementation Note:"
             )
             options.encoding = "UTF-8"
+            links(
+                    "https://javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.2/",
+                    "https://jd.adventure.kyori.net/api/4.9.0/",
+                    "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/2.14.1/",
+                    "https://javadoc.io/doc/com.google.guava/guava/21.0/",
+                    "https://www.antlr.org/api/Java/",
+                    "https://docs.enginehub.org/javadoc/org.enginehub.piston/core/0.5.7/",
+                    "https://docs.enginehub.org/javadoc/org.enginehub.piston/default-impl/0.5.7/",
+                    "https://papermc.io/javadocs/paper/1.17/",
+                    "https://ci.athion.net/job/FastAsyncWorldEdit-1.17-Core-Javadocs/javadoc/" // needed for other module linking
+            )
         }
     }
 

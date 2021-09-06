@@ -6,6 +6,8 @@
  * @see com.sk89q.worldedit.command.util.annotation.ConfirmHandler
  * @see com.sk89q.worldedit.command.util.annotation.Link
  * @see com.sk89q.worldedit.command.util.annotation.PatternList
+ * @see com.sk89q.worldedit.command.util.annotation.Preload
+ * @see com.sk89q.worldedit.command.util.annotation.PreloadHandler
  * @see com.sk89q.worldedit.command.util.annotation.Step
  * @see com.sk89q.worldedit.command.util.annotation.Time
  */

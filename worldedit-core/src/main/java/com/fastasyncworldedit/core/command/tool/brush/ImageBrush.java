@@ -102,7 +102,7 @@ public class ImageBrush implements Brush {
                         colorFunction,
                         editSession,
                         session.getTextureUtil()
-                ), vector -> true, Integer.MAX_VALUE);
+                ), vector -> true, Integer.MAX_VALUE, editSession.getMinY(), editSession.getMaxY());
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         visitor.visit(center);
         Operations.completeBlindly(visitor);
