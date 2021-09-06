@@ -51,7 +51,7 @@ text = "3.0.4"
 piston = "0.5.7"
 
 # Tests
-mockito = "3.11.2"
+mockito = "3.12.4"
 checker-qual = "3.18.0"
 
 # Gradle plugins
