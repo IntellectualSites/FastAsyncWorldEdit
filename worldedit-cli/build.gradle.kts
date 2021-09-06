@@ -32,11 +32,13 @@ dependencies {
     implementation(libs.log4jCore
     )
     implementation("commons-cli:commons-cli:1.4")
+    api(libs.parallelgzip) { isTransitive = false }
 }
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include { true }
+        relocate("org.anarres", "com.fastasyncworldedit.core.internal.io")
     }
     archiveFileName.set(moduleIdentifier)
     minimize {
