@@ -159,7 +159,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.incendo.serverlib:ServerLib:2.2.1"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            include(dependency("com.intellectualsites.paster:Paster:1.1.0"))
+            include(dependency("com.intellectualsites.paster:Paster:1.1.1"))
         }
         relocate("com.github.luben", "com.fastasyncworldedit.core.zstd") {
             include(dependency("com.github.luben:zstd-jni:1.5.0-4"))
