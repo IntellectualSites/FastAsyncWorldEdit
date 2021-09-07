@@ -11,7 +11,13 @@ project.description = "CLI"
 applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
-addJarManifest(WorldEditKind.Standalone("com.sk89q.worldedit.cli.CLIWorldEdit"))
+addJarManifest(
+        WorldEditKind.Standalone("com.sk89q.worldedit.cli.CLIWorldEdit"),
+        extraAttributes = mapOf(
+                // We don't have any multi-release stuff, but Log4J does.
+                "Multi-Release" to "true",
+        ),
+)
 
 dependencies {
     // Modules
