@@ -72,7 +72,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
             options.encoding = "UTF-8"
             links(
                     "https://javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.2/",
-                    "https://jd.adventure.kyori.net/api/4.9.0/",
+                    "https://jd.adventure.kyori.net/api/4.9.1/",
                     "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/2.14.1/",
                     "https://javadoc.io/doc/com.google.guava/guava/21.0/",
                     "https://www.antlr.org/api/Java/",

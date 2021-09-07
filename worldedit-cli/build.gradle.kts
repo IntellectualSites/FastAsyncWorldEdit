@@ -39,12 +39,16 @@ dependencies {
     )
     implementation("commons-cli:commons-cli:1.4")
     api(libs.parallelgzip) { isTransitive = false }
+    api(libs.lz4Java)
+    api(libs.lz4JavaStream) { isTransitive = false }
 }
 
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         include { true }
         relocate("org.anarres", "com.fastasyncworldedit.core.internal.io")
+        relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz")
+        relocate("org.lz4", "com.fastasyncworldedit.core.lz4")
     }
     archiveFileName.set(moduleIdentifier)
     minimize {
