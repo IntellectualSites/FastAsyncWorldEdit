@@ -384,9 +384,9 @@ public final class PlatformCommandManager {
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
             cmd.addPart(SubCommandPart.builder(
-                    Caption.of("worldedit.argument.action"),
-                    TextComponent.of("Sub-command to run.")
-            )
+                            Caption.of("worldedit.argument.action"),
+                            TextComponent.of("Sub-command to run.")
+                    )
                     .withCommands(subCommands)
                     .required()
                     .build());
@@ -419,9 +419,9 @@ public final class PlatformCommandManager {
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
             cmd.addPart(SubCommandPart.builder(
-                    Caption.of("worldedit.argument.action"),
-                    TextComponent.of("Sub-command to run.")
-            )
+                            Caption.of("worldedit.argument.action"),
+                            TextComponent.of("Sub-command to run.")
+                    )
                     .withCommands(subCommands)
                     .required()
                     .build());

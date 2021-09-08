@@ -11,7 +11,7 @@ applyPlatformAndCoreConfiguration()
 
 dependencies {
     constraints {
-        implementation( "org.yaml:snakeyaml") {
+        implementation("org.yaml:snakeyaml") {
             version { strictly("1.28") }
             because("Bukkit provides SnakeYaml")
         }

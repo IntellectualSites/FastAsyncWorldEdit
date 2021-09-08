@@ -138,8 +138,10 @@ public interface HeightMap {
                     double raiseScaled = diff * (raisePow * sizePowInv);
                     double raiseScaledAbs = Math.abs(raiseScaled);
                     int random =
-                            ThreadLocalRandom.current().nextInt(maxY + 1 - minY) - minY < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(
-                            raiseScaledAbs)) * (maxY + 1 - minY)) ? (diff > 0 ? 1 : -1) : 0;
+                            ThreadLocalRandom
+                                    .current()
+                                    .nextInt(maxY + 1 - minY) - minY < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(
+                                    raiseScaledAbs)) * (maxY + 1 - minY)) ? (diff > 0 ? 1 : -1) : 0;
                     int raiseScaledInt = (int) raiseScaled + random;
                     newData[index] = height + raiseScaledInt;
                 }
@@ -181,8 +183,10 @@ public interface HeightMap {
                     }
                     raise = (yscale * raise);
                     int random =
-                            ThreadLocalRandom.current().nextInt(maxY + 1 - minY) - minY < (int) ((raise - (int) raise) * (maxY - minY + 1))
-                            ? 1 : 0;
+                            ThreadLocalRandom
+                                    .current()
+                                    .nextInt(maxY + 1 - minY) - minY < (int) ((raise - (int) raise) * (maxY - minY + 1))
+                                    ? 1 : 0;
                     int newHeight = height + (int) raise + random;
                     newData[index] = newHeight;
                 }

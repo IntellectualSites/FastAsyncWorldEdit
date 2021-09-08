@@ -235,6 +235,7 @@ public final class SuggestionHelper {
     }
 
     //FAWE start
+
     /**
      * Returns a stream of suggestions for booleans.
      *

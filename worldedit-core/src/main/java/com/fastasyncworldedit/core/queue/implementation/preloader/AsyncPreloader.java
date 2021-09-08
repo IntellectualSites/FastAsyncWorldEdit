@@ -75,7 +75,10 @@ public class AsyncPreloader implements Preloader, Runnable {
             }
             synchronized (existing) { // Ensure key & value are mutated together
                 existing.setKey(world);
-                existing.setValue(ImmutableSet.copyOf(Iterables.limit(region.getChunks(), Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT)));
+                existing.setValue(ImmutableSet.copyOf(Iterables.limit(
+                        region.getChunks(),
+                        Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT
+                )));
             }
             synchronized (update) {
                 update.notify();

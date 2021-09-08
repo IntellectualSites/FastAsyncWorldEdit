@@ -221,6 +221,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     void simulateBlockMine(BlockVector3 position);
 
     //FAWE start
+
     /**
      * Return items that may drop by destroying this block.
      *

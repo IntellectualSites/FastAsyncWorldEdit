@@ -151,7 +151,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             if (type == null) {
                 String input = key.toString();
                 throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(
-                        BlockTypesCache.values)
+                                BlockTypesCache.values)
                         .filter(b -> StringMan.blockStateMatches(input, b.getId()))
                         .map(BlockType::getId)
                         .sorted(StringMan.blockStateComparator(input))
@@ -464,4 +464,5 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
 
         return equalsFuzzy((BlockState) obj);
     }
+
 }

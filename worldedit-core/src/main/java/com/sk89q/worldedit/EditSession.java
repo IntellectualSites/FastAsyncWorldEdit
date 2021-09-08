@@ -1999,7 +1999,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         // There are boundaries that the routine needs to stay in
         Mask mask = new MaskIntersection(
-                    new BoundedHeightMask(minY, Math.min(origin.getBlockY(), maxY)),
+                new BoundedHeightMask(minY, Math.min(origin.getBlockY(), maxY)),
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 blockMask
         );

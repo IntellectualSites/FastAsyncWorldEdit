@@ -113,12 +113,12 @@ public final class Functions {
 
         // Special cases: we accept varargs for these
         map.put("min", lookup.findStatic(Doubles.class, "min",
-                methodType(double.class, double[].class)
-        )
+                        methodType(double.class, double[].class)
+                )
                 .asVarargsCollector(double[].class));
         map.put("max", lookup.findStatic(Doubles.class, "max",
-                methodType(double.class, double[].class)
-        )
+                        methodType(double.class, double[].class)
+                )
                 .asVarargsCollector(double[].class));
     }
 
@@ -171,38 +171,38 @@ public final class Functions {
             MethodHandles.Lookup lookup
     ) throws NoSuchMethodException, IllegalAccessException {
         map.put("megabuf", lookup.findSpecial(Functions.class, "megabuf",
-                methodType(double.class, double.class), Functions.class
-        )
+                        methodType(double.class, double.class), Functions.class
+                )
                 .bindTo(this));
         map.put("megabuf", lookup.findSpecial(Functions.class, "megabuf",
-                methodType(double.class, double.class, double.class), Functions.class
-        )
+                        methodType(double.class, double.class, double.class), Functions.class
+                )
                 .bindTo(this));
         map.put("closest", lookup.findSpecial(Functions.class, "closest",
-                methodType(double.class, double.class, double.class, double.class, double.class,
-                        double.class, double.class
-                ), Functions.class
-        )
+                        methodType(double.class, double.class, double.class, double.class, double.class,
+                                double.class, double.class
+                        ), Functions.class
+                )
                 .bindTo(this));
 
         // rely on expression field
         map.put("query", lookup.findSpecial(Functions.class, "query",
-                methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
-                        LocalSlot.class
-                ), Functions.class
-        )
+                        methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
+                                LocalSlot.class
+                        ), Functions.class
+                )
                 .bindTo(this));
         map.put("queryAbs", lookup.findSpecial(Functions.class, "queryAbs",
-                methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
-                        LocalSlot.class
-                ), Functions.class
-        )
+                        methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
+                                LocalSlot.class
+                        ), Functions.class
+                )
                 .bindTo(this));
         map.put("queryRel", lookup.findSpecial(Functions.class, "queryRel",
-                methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
-                        LocalSlot.class
-                ), Functions.class
-        )
+                        methodType(double.class, double.class, double.class, double.class, LocalSlot.class,
+                                LocalSlot.class
+                        ), Functions.class
+                )
                 .bindTo(this));
     }
 

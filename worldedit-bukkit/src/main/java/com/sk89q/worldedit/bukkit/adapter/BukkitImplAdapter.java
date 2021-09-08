@@ -262,7 +262,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * Clears the contents of a Clearable block.
      *
      * @param world The world
-     * @param pt The location
+     * @param pt    The location
      * @return If a block was cleared
      */
     default boolean clearContainerBlockContents(World world, BlockVector3 pt) {

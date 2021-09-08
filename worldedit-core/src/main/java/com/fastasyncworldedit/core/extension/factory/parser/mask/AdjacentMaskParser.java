@@ -5,13 +5,9 @@ import com.fastasyncworldedit.core.function.mask.AdjacentAnyMask;
 import com.fastasyncworldedit.core.function.mask.AdjacentMask;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
-import com.sk89q.worldedit.extension.platform.Locatable;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
-import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nonnull;
 import java.util.stream.Stream;

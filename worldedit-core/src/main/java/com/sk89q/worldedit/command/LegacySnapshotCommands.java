@@ -147,8 +147,8 @@ class LegacySnapshotCommands {
 
             if (snapshot == null) {
                 actor.print(Caption.of(
-                        "worldedit.snapshot.none-before",
-                        TextComponent.of(dateFormat.withZone(session.getTimeZone()).format(date))
+                                "worldedit.snapshot.none-before",
+                                TextComponent.of(dateFormat.withZone(session.getTimeZone()).format(date))
                         )
                 );
             } else {
@@ -167,8 +167,8 @@ class LegacySnapshotCommands {
             Snapshot snapshot = config.snapshotRepo.getSnapshotAfter(date, world.getName());
             if (snapshot == null) {
                 actor.print(Caption.of(
-                        "worldedit.snapshot.none-after",
-                        TextComponent.of(dateFormat.withZone(session.getTimeZone()).format(date))
+                                "worldedit.snapshot.none-after",
+                                TextComponent.of(dateFormat.withZone(session.getTimeZone()).format(date))
                         )
                 );
             } else {

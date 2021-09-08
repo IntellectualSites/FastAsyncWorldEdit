@@ -114,6 +114,7 @@ public abstract class BreadthFirstSearch implements Operation {
     }
 
     //FAWE start - int depth, min/max y, preloading
+
     /**
      * Create a new instance.
      *
@@ -290,7 +291,8 @@ public abstract class BreadthFirstSearch implements Operation {
             if (singleQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
                 int cx = Integer.MIN_VALUE;
                 int cz = Integer.MIN_VALUE;
-                outer: for (BlockVector3 from : queue) {
+                outer:
+                for (BlockVector3 from : queue) {
                     for (BlockVector3 direction : dirs) {
                         if (loadCount > Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT) {
                             break outer;

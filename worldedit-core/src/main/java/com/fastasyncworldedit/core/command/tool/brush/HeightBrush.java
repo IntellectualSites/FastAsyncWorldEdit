@@ -27,8 +27,10 @@ public class HeightBrush implements Brush {
     public final boolean layers;
     public final boolean smooth;
 
-    public HeightBrush(InputStream stream, int rotation, double yscale, boolean layers, boolean smooth, Clipboard clipboard,
-                       int minY, int maxY) {
+    public HeightBrush(
+            InputStream stream, int rotation, double yscale, boolean layers, boolean smooth, Clipboard clipboard,
+            int minY, int maxY
+    ) {
         this(stream, rotation, yscale, layers, smooth, clipboard, ScalableHeightMap.Shape.CONE, minY, maxY);
     }
 

@@ -20,9 +20,9 @@ public class RandomOffsetTransform extends ResettableExtent {
      * New instance
      *
      * @param parent extent to set to
-     * @param dx range of x values to choose from (0 -> x)
-     * @param dy range of y values to choose from (0 -> y)
-     * @param dz range of z values to choose from (0 -> z)
+     * @param dx     range of x values to choose from (0 -> x)
+     * @param dy     range of y values to choose from (0 -> y)
+     * @param dz     range of z values to choose from (0 -> z)
      */
     public RandomOffsetTransform(Extent parent, int dx, int dy, int dz) {
         super(parent);

@@ -36,7 +36,7 @@ public class MethodEventHandler extends EventHandler {
      * Create a new event handler.
      *
      * @param priority the priority
-     * @param method the method
+     * @param method   the method
      */
     public MethodEventHandler(Priority priority, Object object, Method method) {
         super(priority);
@@ -83,4 +83,5 @@ public class MethodEventHandler extends EventHandler {
         result = 31 * result + method.hashCode();
         return result;
     }
+
 }

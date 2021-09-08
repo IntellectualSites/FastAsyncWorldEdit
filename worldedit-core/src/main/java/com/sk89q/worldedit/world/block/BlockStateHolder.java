@@ -101,6 +101,7 @@ public interface BlockStateHolder<B extends BlockStateHolder<B>> extends TileEnt
     <V> V getState(Property<V> property);
 
     //FAWE start
+
     /**
      * Returns a BlockStateHolder with the given state and value applied.
      *

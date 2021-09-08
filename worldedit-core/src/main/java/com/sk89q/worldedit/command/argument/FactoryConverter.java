@@ -60,6 +60,7 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
     private final String description;
     @Nullable
     private final Consumer<ParserContext> contextTweaker;
+
     private FactoryConverter(
             WorldEdit worldEdit,
             Function<WorldEdit, AbstractFactory<T>> factoryExtractor,

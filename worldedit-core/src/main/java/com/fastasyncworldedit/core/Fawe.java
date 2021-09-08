@@ -351,7 +351,8 @@ public class Fawe {
      * Non-api. Handles an input FAWE exception if not already handled, given the input boolean array.
      * Looks at the {@link FaweException.Type} and decides what to do (rethrows if we want to attempt to show the error to the
      * player, outputs to console where necessary).
-     *  @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
+     *
+     * @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
      *                                 FaweException.Type.values().length}
      * @param e                        {@link FaweException} to handle
      * @param logger                   {@link Logger} of the calling class

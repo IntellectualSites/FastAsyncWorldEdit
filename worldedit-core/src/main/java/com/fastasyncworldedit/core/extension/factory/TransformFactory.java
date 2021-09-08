@@ -1,12 +1,12 @@
 package com.fastasyncworldedit.core.extension.factory;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.extension.factory.parser.transform.RichTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.Linear3DTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.LinearTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.OffsetTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.PatternTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.RandomTransformParser;
+import com.fastasyncworldedit.core.extension.factory.parser.transform.RichTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.RotateTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.ScaleTransformParser;
 import com.fastasyncworldedit.core.extension.factory.parser.transform.SpreadTransformParser;
@@ -93,7 +93,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
      * Parses a transform without considering parsing through the {@link RichTransformParser}, therefore not accepting
      * "richer" parsing where & and , are used. Exists to prevent stack overflows.
      *
-     * @param input input string
+     * @param input   input string
      * @param context input context
      * @return parsed result
      * @throws InputParseException if no result found

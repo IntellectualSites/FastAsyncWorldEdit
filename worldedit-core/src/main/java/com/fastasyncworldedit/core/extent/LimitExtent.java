@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.extent;
 
-import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.filter.block.ExtentFilterBlock;
 import com.fastasyncworldedit.core.function.generator.GenBase;
 import com.fastasyncworldedit.core.function.generator.Resource;

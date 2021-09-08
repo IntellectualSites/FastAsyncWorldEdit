@@ -75,9 +75,9 @@ public class ExpandCommands {
             command.condition(new PermissionCondition(ImmutableSet.of("worldedit.selection.expand")));
 
             command.addPart(SubCommandPart.builder(
-                    Caption.of("vert"),
-                    TextComponent.of("Vertical expansion sub-command")
-            )
+                            Caption.of("vert"),
+                            TextComponent.of("Vertical expansion sub-command")
+                    )
                     .withCommands(ImmutableSet.of(createVertCommand(commandManager)))
                     .optional()
                     .build());

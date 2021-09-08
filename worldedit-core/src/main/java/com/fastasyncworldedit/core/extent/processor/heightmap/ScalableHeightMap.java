@@ -92,7 +92,7 @@ public class ScalableHeightMap implements HeightMap {
                     highestY = y + 1;
                 }
             }
-            int pointHeight = Math.min(clipMaxY, ((maxY - minY + 1 ) * (highestY - clipMinY)) / clipHeight);
+            int pointHeight = Math.min(clipMaxY, ((maxY - minY + 1) * (highestY - clipMinY)) / clipHeight);
             int x = xx - clipMinX;
             int z = zz - clipMinZ;
             heightArray[x][z] = (byte) pointHeight;

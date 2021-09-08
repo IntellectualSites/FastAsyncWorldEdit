@@ -53,17 +53,17 @@ public final class RegistryConverter<V extends Keyed> implements ArgumentConvert
     @SuppressWarnings("unchecked")
     public static void register(CommandManager commandManager) {
         ImmutableList.of(
-                BlockType.class,
-                BlockCategory.class,
-                ItemType.class,
-                ItemCategory.class,
-                BiomeType.class,
-                EntityType.class,
-                FluidType.class,
-                FluidCategory.class,
-                GameMode.class,
-                WeatherType.class
-        )
+                        BlockType.class,
+                        BlockCategory.class,
+                        ItemType.class,
+                        ItemCategory.class,
+                        BiomeType.class,
+                        EntityType.class,
+                        FluidType.class,
+                        FluidCategory.class,
+                        GameMode.class,
+                        WeatherType.class
+                )
                 .stream()
                 .map(c -> (Class<Keyed>) c)
                 .forEach(registryType ->

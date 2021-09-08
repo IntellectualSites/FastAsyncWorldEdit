@@ -141,9 +141,11 @@ public enum FaweCache implements Trimable {
             Caption.of("fawe.cancel.worldedit.cancel.reason.no.region"),
             Type.NO_REGION
     );
-    public static final FaweException OUTSIDE_REGION = new FaweException(Caption.of(
-            "fawe.cancel.worldedit.cancel.reason.outside.region"),
-            Type.OUTSIDE_REGION);
+    public static final FaweException OUTSIDE_REGION = new FaweException(
+            Caption.of(
+                    "fawe.cancel.worldedit.cancel.reason.outside.region"),
+            Type.OUTSIDE_REGION
+    );
     public static final FaweException MAX_CHECKS = new FaweException(
             Caption.of("fawe.cancel.worldedit.cancel.reason.max" + ".checks"),
             Type.MAX_CHECKS
@@ -156,16 +158,20 @@ public enum FaweCache implements Trimable {
             Caption.of("fawe.cancel.worldedit.cancel.reason.low" + ".memory"),
             Type.LOW_MEMORY
     );
-    public static final FaweException MAX_ENTITIES = new FaweException(Caption.of(
-            "fawe.cancel.worldedit.cancel.reason.max.entities"),
-            Type.MAX_ENTITIES);
+    public static final FaweException MAX_ENTITIES = new FaweException(
+            Caption.of(
+                    "fawe.cancel.worldedit.cancel.reason.max.entities"),
+            Type.MAX_ENTITIES
+    );
     public static final FaweException MAX_TILES = new FaweException(Caption.of(
             "fawe.cancel.worldedit.cancel.reason.max.tiles",
             Type.MAX_TILES
     ));
-    public static final FaweException MAX_ITERATIONS = new FaweException(Caption.of(
-            "fawe.cancel.worldedit.cancel.reason.max.iterations"),
-            Type.MAX_ITERATIONS);
+    public static final FaweException MAX_ITERATIONS = new FaweException(
+            Caption.of(
+                    "fawe.cancel.worldedit.cancel.reason.max.iterations"),
+            Type.MAX_ITERATIONS
+    );
 
     /*
     thread cache

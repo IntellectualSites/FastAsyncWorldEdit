@@ -472,7 +472,8 @@ public class MainUtil {
      * @param z   New Z coordinate
      * @return New tag
      */
-    @Nonnull public static CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
+    @Nonnull
+    public static CompoundTag setPosition(@Nonnull CompoundTag tag, int x, int y, int z) {
         Map<String, Tag> value = new HashMap<>(tag.getValue());
         value.put("x", new IntTag(x));
         value.put("y", new IntTag(y));
@@ -487,7 +488,8 @@ public class MainUtil {
      * @param entity Entity
      * @return New tag
      */
-    @Nonnull public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
+    @Nonnull
+    public static CompoundTag setEntityInfo(@Nonnull CompoundTag tag, @Nonnull Entity entity) {
         Map<String, Tag> map = new HashMap<>(tag.getValue());
         map.put("Id", new StringTag(entity.getState().getType().getId()));
         ListTag pos = (ListTag) map.get("Pos");

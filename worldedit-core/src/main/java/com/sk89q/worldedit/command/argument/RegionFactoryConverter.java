@@ -34,12 +34,12 @@ public class RegionFactoryConverter {
         commandManager.registerConverter(
                 Key.of(RegionFactory.class),
                 MultiKeyConverter.builder(
-                        ImmutableSetMultimap.<RegionFactory, String>builder()
-                                .put(new CuboidRegionFactory(), "cuboid")
-                                .put(new SphereRegionFactory(), "sphere")
-                                .putAll(new CylinderRegionFactory(1), "cyl", "cylinder")
-                                .build()
-                )
+                                ImmutableSetMultimap.<RegionFactory, String>builder()
+                                        .put(new CuboidRegionFactory(), "cuboid")
+                                        .put(new SphereRegionFactory(), "sphere")
+                                        .putAll(new CylinderRegionFactory(1), "cyl", "cylinder")
+                                        .build()
+                        )
                         .errorMessage(arg -> "Not a known region type: " + arg)
                         .build()
         );

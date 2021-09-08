@@ -122,9 +122,9 @@ public class ToolCommands {
                 .collect(Collectors.toSet());
         commandManager.register("tool", command -> {
             command.addPart(SubCommandPart.builder(
-                    Caption.of("tool"),
-                    TextComponent.of("The tool to bind")
-            )
+                            Caption.of("tool"),
+                            TextComponent.of("The tool to bind")
+                    )
                     .withCommands(nonGlobalCommands)
                     .required()
                     .build());

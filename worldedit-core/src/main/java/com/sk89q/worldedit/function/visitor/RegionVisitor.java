@@ -35,6 +35,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+
 import java.util.Iterator;
 
 /**
@@ -42,7 +43,8 @@ import java.util.Iterator;
  *
  * @deprecated - FAWE deprecation: Let the queue iterate, not the region function which lacks any kind of optimizations / parallelism
  */
-@Deprecated public class RegionVisitor implements Operation {
+@Deprecated
+public class RegionVisitor implements Operation {
 
     public final Iterable<? extends BlockVector3> iterable;
     //FAWE start - allow chunk preloading
@@ -55,7 +57,8 @@ import java.util.Iterator;
     /**
      * @deprecated Use other constructors which will preload chunks during iteration
      */
-    @Deprecated public RegionVisitor(Region region, RegionFunction function) {
+    @Deprecated
+    public RegionVisitor(Region region, RegionFunction function) {
         this(region, function, null);
     }
 
@@ -87,7 +90,8 @@ import java.util.Iterator;
         return affected;
     }
 
-    @Override public Operation resume(RunContext run) throws WorldEditException {
+    @Override
+    public Operation resume(RunContext run) throws WorldEditException {
         //FAWE start > allow chunk preloading
         if (singleQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
             /*
@@ -196,10 +200,12 @@ import java.util.Iterator;
     }
     //FAWE end
 
-    @Override public void cancel() {
+    @Override
+    public void cancel() {
     }
 
-    @Override public Iterable<Component> getStatusMessages() {
+    @Override
+    public Iterable<Component> getStatusMessages() {
         return ImmutableList.of(Caption.of("worldedit.operation.affected.block", TextComponent.of(getAffected())));
     }
 

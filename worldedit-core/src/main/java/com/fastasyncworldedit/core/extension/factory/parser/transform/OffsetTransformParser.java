@@ -1,8 +1,8 @@
 package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
 import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
-import com.fastasyncworldedit.core.extent.transform.OffsetTransform;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.transform.OffsetTransform;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;

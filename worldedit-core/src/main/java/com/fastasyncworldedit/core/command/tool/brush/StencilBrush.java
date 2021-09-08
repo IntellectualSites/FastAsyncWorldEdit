@@ -21,8 +21,10 @@ public class StencilBrush extends HeightBrush {
 
     private final boolean onlyWhite;
 
-    public StencilBrush(InputStream stream, int rotation, double yscale, boolean onlyWhite, Clipboard clipboard, int minY,
-                        int maxY) {
+    public StencilBrush(
+            InputStream stream, int rotation, double yscale, boolean onlyWhite, Clipboard clipboard, int minY,
+            int maxY
+    ) {
         super(stream, rotation, yscale, false, true, clipboard, minY, maxY);
         this.onlyWhite = onlyWhite;
     }

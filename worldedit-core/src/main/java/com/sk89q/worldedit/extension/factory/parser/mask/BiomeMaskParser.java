@@ -21,7 +21,6 @@ package com.sk89q.worldedit.extension.factory.parser.mask;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
-import com.fastasyncworldedit.core.util.StringMan;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
@@ -36,7 +35,6 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.biome.BiomeType;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

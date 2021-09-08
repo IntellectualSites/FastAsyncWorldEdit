@@ -53,7 +53,8 @@ public class ScatterBrush implements Brush {
         final int distance = Math.min((int) size, this.distance);
 
         RecursiveVisitor visitor = new RecursiveVisitor(new MaskIntersection(radius, surface), function -> true,
-                Integer.MAX_VALUE, editSession.getMinY(), editSession.getMaxY());
+                Integer.MAX_VALUE, editSession.getMinY(), editSession.getMaxY()
+        );
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         Operations.completeBlindly(visitor);

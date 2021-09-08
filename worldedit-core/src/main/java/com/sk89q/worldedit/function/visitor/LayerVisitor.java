@@ -19,8 +19,6 @@
 
 package com.sk89q.worldedit.function.visitor;
 
-import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
@@ -34,8 +32,6 @@ import com.sk89q.worldedit.function.operation.RunContext;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.FlatRegion;
-
-import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -61,6 +57,7 @@ public class LayerVisitor implements Operation {
 
 
     //FAWE start - chunk preloading
+
     /**
      * Create a new visitor.
      *

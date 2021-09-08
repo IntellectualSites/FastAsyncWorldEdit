@@ -41,7 +41,8 @@ public class LayerBrush implements Brush {
         final RadiusMask radius = new RadiusMask(0, (int) size);
         visitor = new RecursiveVisitor(new MaskIntersection(adjacent, solid, radius), funcion -> true, Integer.MAX_VALUE,
                 editSession.getMinY(),
-                editSession.getMaxY());
+                editSession.getMaxY()
+        );
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));
         Operations.completeBlindly(visitor);

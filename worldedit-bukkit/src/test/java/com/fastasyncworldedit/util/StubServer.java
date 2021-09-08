@@ -68,27 +68,32 @@ import java.util.logging.Logger;
 public class StubServer implements Server {
 
     @Override
-    public @NotNull String getName() {
+    public @NotNull
+    String getName() {
         return null;
     }
 
     @Override
-    public @NotNull String getVersion() {
+    public @NotNull
+    String getVersion() {
         return "STUB";
     }
 
     @Override
-    public @NotNull String getBukkitVersion() {
+    public @NotNull
+    String getBukkitVersion() {
         return null;
     }
 
     @Override
-    public @NotNull String getMinecraftVersion() {
+    public @NotNull
+    String getMinecraftVersion() {
         return null;
     }
 
     @Override
-    public @NotNull Collection<? extends Player> getOnlinePlayers() {
+    public @NotNull
+    Collection<? extends Player> getOnlinePlayers() {
         return null;
     }
 
@@ -113,12 +118,14 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull String getIp() {
+    public @NotNull
+    String getIp() {
         return null;
     }
 
     @Override
-    public @NotNull String getWorldType() {
+    public @NotNull
+    String getWorldType() {
         return null;
     }
 
@@ -163,7 +170,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Set<OfflinePlayer> getWhitelistedPlayers() {
+    public @NotNull
+    Set<OfflinePlayer> getWhitelistedPlayers() {
         return null;
     }
 
@@ -182,12 +190,14 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull String getUpdateFolder() {
+    public @NotNull
+    String getUpdateFolder() {
         return null;
     }
 
     @Override
-    public @NotNull File getUpdateFolderFile() {
+    public @NotNull
+    File getUpdateFolderFile() {
         return null;
     }
 
@@ -222,52 +232,62 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @Nullable Player getPlayer(@NotNull String s) {
+    public @Nullable
+    Player getPlayer(@NotNull String s) {
         return null;
     }
 
     @Override
-    public @Nullable Player getPlayerExact(@NotNull String s) {
+    public @Nullable
+    Player getPlayerExact(@NotNull String s) {
         return null;
     }
 
     @Override
-    public @NotNull List<Player> matchPlayer(@NotNull String s) {
+    public @NotNull
+    List<Player> matchPlayer(@NotNull String s) {
         return null;
     }
 
     @Override
-    public @Nullable Player getPlayer(@NotNull UUID uuid) {
+    public @Nullable
+    Player getPlayer(@NotNull UUID uuid) {
         return null;
     }
 
     @Override
-    public @Nullable UUID getPlayerUniqueId(@NotNull String s) {
+    public @Nullable
+    UUID getPlayerUniqueId(@NotNull String s) {
         return null;
     }
 
     @Override
-    public @NotNull PluginManager getPluginManager() {
+    public @NotNull
+    PluginManager getPluginManager() {
         return null;
     }
 
     @Override
-    public @NotNull BukkitScheduler getScheduler() {
+    public @NotNull
+    BukkitScheduler getScheduler() {
         return null;
     }
 
     @Override
-    public @NotNull ServicesManager getServicesManager() {
+    public @NotNull
+    ServicesManager getServicesManager() {
         return null;
     }
 
     @Override
-    public @NotNull List<World> getWorlds() {
+    public @NotNull
+    List<World> getWorlds() {
         return null;
     }
 
     @Override
-    public @Nullable World createWorld(@NotNull WorldCreator worldCreator) {
+    public @Nullable
+    World createWorld(@NotNull WorldCreator worldCreator) {
         return null;
     }
 
@@ -282,17 +302,20 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @Nullable World getWorld(@NotNull String s) {
+    public @Nullable
+    World getWorld(@NotNull String s) {
         return null;
     }
 
     @Override
-    public @Nullable World getWorld(@NotNull UUID uuid) {
+    public @Nullable
+    World getWorld(@NotNull UUID uuid) {
         return null;
     }
 
     @Override
-    public @Nullable World getWorld(@NotNull NamespacedKey namespacedKey) {
+    public @Nullable
+    World getWorld(@NotNull NamespacedKey namespacedKey) {
         return null;
     }
 
@@ -301,17 +324,20 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @Nullable MapView getMap(int i) {
+    public @Nullable
+    MapView getMap(int i) {
         return null;
     }
 
     @Override
-    public @NotNull MapView createMap(@NotNull World world) {
+    public @NotNull
+    MapView createMap(@NotNull World world) {
         return null;
     }
 
     @Override
-    public @NotNull ItemStack createExplorerMap(
+    public @NotNull
+    ItemStack createExplorerMap(
             @NotNull World world,
             @NotNull Location location,
             @NotNull StructureType structureType
@@ -320,7 +346,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull ItemStack createExplorerMap(
+    public @NotNull
+    ItemStack createExplorerMap(
             @NotNull World world,
             @NotNull Location location,
             @NotNull StructureType structureType,
@@ -341,12 +368,14 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Logger getLogger() {
+    public @NotNull
+    Logger getLogger() {
         return Logger.getLogger("StubServer");
     }
 
     @Override
-    public @Nullable PluginCommand getPluginCommand(@NotNull String s) {
+    public @Nullable
+    PluginCommand getPluginCommand(@NotNull String s) {
         return null;
     }
 
@@ -366,22 +395,26 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull List<Recipe> getRecipesFor(@NotNull ItemStack itemStack) {
+    public @NotNull
+    List<Recipe> getRecipesFor(@NotNull ItemStack itemStack) {
         return null;
     }
 
     @Override
-    public @Nullable Recipe getRecipe(@NotNull NamespacedKey namespacedKey) {
+    public @Nullable
+    Recipe getRecipe(@NotNull NamespacedKey namespacedKey) {
         return null;
     }
 
     @Override
-    public @Nullable Recipe getCraftingRecipe(final @NotNull ItemStack[] itemStacks, @NotNull final World world) {
+    public @Nullable
+    Recipe getCraftingRecipe(final @NotNull ItemStack[] itemStacks, @NotNull final World world) {
         return null;
     }
 
     @Override
-    public @NotNull ItemStack craftItem(
+    public @NotNull
+    ItemStack craftItem(
             final @NotNull ItemStack[] itemStacks,
             @NotNull final World world,
             @NotNull final Player player
@@ -390,7 +423,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Iterator<Recipe> recipeIterator() {
+    public @NotNull
+    Iterator<Recipe> recipeIterator() {
         return null;
     }
 
@@ -410,7 +444,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Map<String, String[]> getCommandAliases() {
+    public @NotNull
+    Map<String, String[]> getCommandAliases() {
         return null;
     }
 
@@ -469,22 +504,26 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @NotNull OfflinePlayer getOfflinePlayer(@NotNull String s) {
+    public @NotNull
+    OfflinePlayer getOfflinePlayer(@NotNull String s) {
         return null;
     }
 
     @Override
-    public @Nullable OfflinePlayer getOfflinePlayerIfCached(@NotNull String s) {
+    public @Nullable
+    OfflinePlayer getOfflinePlayerIfCached(@NotNull String s) {
         return null;
     }
 
     @Override
-    public @NotNull OfflinePlayer getOfflinePlayer(@NotNull UUID uuid) {
+    public @NotNull
+    OfflinePlayer getOfflinePlayer(@NotNull UUID uuid) {
         return null;
     }
 
     @Override
-    public @NotNull Set<String> getIPBans() {
+    public @NotNull
+    Set<String> getIPBans() {
         return null;
     }
 
@@ -499,22 +538,26 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Set<OfflinePlayer> getBannedPlayers() {
+    public @NotNull
+    Set<OfflinePlayer> getBannedPlayers() {
         return null;
     }
 
     @Override
-    public @NotNull BanList getBanList(BanList.@NotNull Type type) {
+    public @NotNull
+    BanList getBanList(BanList.@NotNull Type type) {
         return null;
     }
 
     @Override
-    public @NotNull Set<OfflinePlayer> getOperators() {
+    public @NotNull
+    Set<OfflinePlayer> getOperators() {
         return null;
     }
 
     @Override
-    public @NotNull GameMode getDefaultGameMode() {
+    public @NotNull
+    GameMode getDefaultGameMode() {
         return null;
     }
 
@@ -524,37 +567,44 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull ConsoleCommandSender getConsoleSender() {
+    public @NotNull
+    ConsoleCommandSender getConsoleSender() {
         return null;
     }
 
     @Override
-    public @NotNull File getWorldContainer() {
+    public @NotNull
+    File getWorldContainer() {
         return null;
     }
 
     @Override
-    public @NotNull OfflinePlayer[] getOfflinePlayers() {
+    public @NotNull
+    OfflinePlayer[] getOfflinePlayers() {
         return new OfflinePlayer[0];
     }
 
     @Override
-    public @NotNull Messenger getMessenger() {
+    public @NotNull
+    Messenger getMessenger() {
         return null;
     }
 
     @Override
-    public @NotNull HelpMap getHelpMap() {
+    public @NotNull
+    HelpMap getHelpMap() {
         return null;
     }
 
     @Override
-    public @NotNull Inventory createInventory(@Nullable InventoryHolder inventoryHolder, @NotNull InventoryType inventoryType) {
+    public @NotNull
+    Inventory createInventory(@Nullable InventoryHolder inventoryHolder, @NotNull InventoryType inventoryType) {
         return null;
     }
 
     @Override
-    public @NotNull Inventory createInventory(
+    public @NotNull
+    Inventory createInventory(
             @Nullable InventoryHolder inventoryHolder,
             @NotNull InventoryType inventoryType,
             @NotNull Component component
@@ -569,7 +619,8 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @NotNull Inventory createInventory(
+    public @NotNull
+    Inventory createInventory(
             @Nullable InventoryHolder inventoryHolder,
             @NotNull InventoryType inventoryType,
             @NotNull String s
@@ -578,12 +629,14 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Inventory createInventory(@Nullable InventoryHolder inventoryHolder, int i) throws IllegalArgumentException {
+    public @NotNull
+    Inventory createInventory(@Nullable InventoryHolder inventoryHolder, int i) throws IllegalArgumentException {
         return null;
     }
 
     @Override
-    public @NotNull Inventory createInventory(
+    public @NotNull
+    Inventory createInventory(
             @Nullable InventoryHolder inventoryHolder,
             int i,
             @NotNull Component component
@@ -598,13 +651,15 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @NotNull Inventory createInventory(@Nullable InventoryHolder inventoryHolder, int i, @NotNull String s) throws
+    public @NotNull
+    Inventory createInventory(@Nullable InventoryHolder inventoryHolder, int i, @NotNull String s) throws
             IllegalArgumentException {
         return null;
     }
 
     @Override
-    public @NotNull Merchant createMerchant(@Nullable Component component) {
+    public @NotNull
+    Merchant createMerchant(@Nullable Component component) {
         return null;
     }
 
@@ -613,7 +668,8 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @NotNull Merchant createMerchant(@Nullable String s) {
+    public @NotNull
+    Merchant createMerchant(@Nullable String s) {
         return null;
     }
 
@@ -648,7 +704,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Component motd() {
+    public @NotNull
+    Component motd() {
         return null;
     }
 
@@ -656,12 +713,14 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @NotNull String getMotd() {
+    public @NotNull
+    String getMotd() {
         return null;
     }
 
     @Override
-    public @Nullable Component shutdownMessage() {
+    public @Nullable
+    Component shutdownMessage() {
         return null;
     }
 
@@ -669,7 +728,8 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @Nullable String getShutdownMessage() {
+    public @Nullable
+    String getShutdownMessage() {
         return null;
     }
 
@@ -679,27 +739,32 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull ItemFactory getItemFactory() {
+    public @NotNull
+    ItemFactory getItemFactory() {
         return null;
     }
 
     @Override
-    public @NotNull ScoreboardManager getScoreboardManager() {
+    public @NotNull
+    ScoreboardManager getScoreboardManager() {
         return null;
     }
 
     @Override
-    public @Nullable CachedServerIcon getServerIcon() {
+    public @Nullable
+    CachedServerIcon getServerIcon() {
         return null;
     }
 
     @Override
-    public @NotNull CachedServerIcon loadServerIcon(@NotNull File file) throws IllegalArgumentException, Exception {
+    public @NotNull
+    CachedServerIcon loadServerIcon(@NotNull File file) throws IllegalArgumentException, Exception {
         return null;
     }
 
     @Override
-    public @NotNull CachedServerIcon loadServerIcon(@NotNull BufferedImage bufferedImage) throws IllegalArgumentException,
+    public @NotNull
+    CachedServerIcon loadServerIcon(@NotNull BufferedImage bufferedImage) throws IllegalArgumentException,
             Exception {
         return null;
     }
@@ -725,7 +790,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull BossBar createBossBar(
+    public @NotNull
+    BossBar createBossBar(
             @Nullable String s,
             @NotNull BarColor barColor,
             @NotNull BarStyle barStyle,
@@ -735,7 +801,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull KeyedBossBar createBossBar(
+    public @NotNull
+    KeyedBossBar createBossBar(
             @NotNull NamespacedKey namespacedKey,
             @Nullable String s,
             @NotNull BarColor barColor,
@@ -746,12 +813,14 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Iterator<KeyedBossBar> getBossBars() {
+    public @NotNull
+    Iterator<KeyedBossBar> getBossBars() {
         return null;
     }
 
     @Override
-    public @Nullable KeyedBossBar getBossBar(@NotNull NamespacedKey namespacedKey) {
+    public @Nullable
+    KeyedBossBar getBossBar(@NotNull NamespacedKey namespacedKey) {
         return null;
     }
 
@@ -761,17 +830,20 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @Nullable Entity getEntity(@NotNull UUID uuid) {
+    public @Nullable
+    Entity getEntity(@NotNull UUID uuid) {
         return null;
     }
 
     @Override
-    public @NotNull double[] getTPS() {
+    public @NotNull
+    double[] getTPS() {
         return new double[0];
     }
 
     @Override
-    public @NotNull long[] getTickTimes() {
+    public @NotNull
+    long[] getTickTimes() {
         return new long[0];
     }
 
@@ -781,37 +853,44 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull CommandMap getCommandMap() {
+    public @NotNull
+    CommandMap getCommandMap() {
         return null;
     }
 
     @Override
-    public @Nullable Advancement getAdvancement(@NotNull NamespacedKey namespacedKey) {
+    public @Nullable
+    Advancement getAdvancement(@NotNull NamespacedKey namespacedKey) {
         return null;
     }
 
     @Override
-    public @NotNull Iterator<Advancement> advancementIterator() {
+    public @NotNull
+    Iterator<Advancement> advancementIterator() {
         return null;
     }
 
     @Override
-    public @NotNull BlockData createBlockData(@NotNull Material material) {
+    public @NotNull
+    BlockData createBlockData(@NotNull Material material) {
         return null;
     }
 
     @Override
-    public @NotNull BlockData createBlockData(@NotNull Material material, @Nullable Consumer<BlockData> consumer) {
+    public @NotNull
+    BlockData createBlockData(@NotNull Material material, @Nullable Consumer<BlockData> consumer) {
         return null;
     }
 
     @Override
-    public @NotNull BlockData createBlockData(@NotNull String s) throws IllegalArgumentException {
+    public @NotNull
+    BlockData createBlockData(@NotNull String s) throws IllegalArgumentException {
         return null;
     }
 
     @Override
-    public @NotNull BlockData createBlockData(@Nullable Material material, @Nullable String s) throws IllegalArgumentException {
+    public @NotNull
+    BlockData createBlockData(@Nullable Material material, @Nullable String s) throws IllegalArgumentException {
         return null;
     }
 
@@ -821,17 +900,20 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull <T extends Keyed> Iterable<Tag<T>> getTags(@NotNull String s, @NotNull Class<T> aClass) {
+    public @NotNull
+    <T extends Keyed> Iterable<Tag<T>> getTags(@NotNull String s, @NotNull Class<T> aClass) {
         return null;
     }
 
     @Override
-    public @Nullable LootTable getLootTable(@NotNull NamespacedKey namespacedKey) {
+    public @Nullable
+    LootTable getLootTable(@NotNull NamespacedKey namespacedKey) {
         return null;
     }
 
     @Override
-    public @NotNull List<Entity> selectEntities(@NotNull CommandSender commandSender, @NotNull String s) throws
+    public @NotNull
+    List<Entity> selectEntities(@NotNull CommandSender commandSender, @NotNull String s) throws
             IllegalArgumentException {
         return null;
     }
@@ -840,12 +922,14 @@ public class StubServer implements Server {
      * @deprecated
      */
     @Override
-    public @NotNull UnsafeValues getUnsafe() {
+    public @NotNull
+    UnsafeValues getUnsafe() {
         return null;
     }
 
     @Override
-    public @NotNull Spigot spigot() {
+    public @NotNull
+    Spigot spigot() {
         return null;
     }
 
@@ -865,22 +949,26 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull String getPermissionMessage() {
+    public @NotNull
+    String getPermissionMessage() {
         return null;
     }
 
     @Override
-    public @NotNull PlayerProfile createProfile(@NotNull UUID uuid) {
+    public @NotNull
+    PlayerProfile createProfile(@NotNull UUID uuid) {
         return null;
     }
 
     @Override
-    public @NotNull PlayerProfile createProfile(@NotNull String s) {
+    public @NotNull
+    PlayerProfile createProfile(@NotNull String s) {
         return null;
     }
 
     @Override
-    public @NotNull PlayerProfile createProfile(@Nullable UUID uuid, @Nullable String s) {
+    public @NotNull
+    PlayerProfile createProfile(@Nullable UUID uuid, @Nullable String s) {
         return null;
     }
 
@@ -895,17 +983,20 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull MobGoals getMobGoals() {
+    public @NotNull
+    MobGoals getMobGoals() {
         return null;
     }
 
     @Override
-    public @NotNull DatapackManager getDatapackManager() {
+    public @NotNull
+    DatapackManager getDatapackManager() {
         return null;
     }
 
     @Override
-    public @NotNull Iterable<? extends Audience> audiences() {
+    public @NotNull
+    Iterable<? extends Audience> audiences() {
         return null;
     }
 
@@ -915,7 +1006,8 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull Set<String> getListeningPluginChannels() {
+    public @NotNull
+    Set<String> getListeningPluginChannels() {
         return null;
     }
 

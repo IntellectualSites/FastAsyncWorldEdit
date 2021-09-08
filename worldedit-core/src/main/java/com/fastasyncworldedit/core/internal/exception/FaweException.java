@@ -48,6 +48,7 @@ public class FaweException extends RuntimeException {
 
     /**
      * Get the {@link FaweException.Type}
+     *
      * @return the {@link FaweException.Type}
      */
     public Type getType() {

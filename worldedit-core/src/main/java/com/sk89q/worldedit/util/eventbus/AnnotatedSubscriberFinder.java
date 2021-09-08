@@ -68,7 +68,12 @@ class AnnotatedSubscriberFinder implements SubscriberFindingStrategy {
                         throw new IllegalArgumentException("Method " + method + " failed to unreflect.", e);
                     }
 
-                    EventHandler handler = new MethodHandleEventHandler(annotation.priority(), listener, handle, method.getName());
+                    EventHandler handler = new MethodHandleEventHandler(
+                            annotation.priority(),
+                            listener,
+                            handle,
+                            method.getName()
+                    );
                     methodsInListener.put(eventType, handler);
                 }
             }

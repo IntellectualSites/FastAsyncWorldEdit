@@ -46,6 +46,7 @@ public class RecursiveVisitor extends BreadthFirstSearch {
     }
 
     //FAWE start - int depth, min/max y
+
     /**
      * Create a new recursive visitor.
      *
@@ -60,6 +61,7 @@ public class RecursiveVisitor extends BreadthFirstSearch {
     }
 
     //FAWE start - int depth, min/max y
+
     /**
      * Create a new recursive visitor.
      *

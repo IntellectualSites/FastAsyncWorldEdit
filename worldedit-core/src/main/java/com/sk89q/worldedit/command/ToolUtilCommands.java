@@ -367,11 +367,13 @@ public class ToolUtilCommands {
             desc = "Set the brush transform"
     )
     @CommandPermissions({"worldedit.brush.options.transform", "worldedit.transform.brush"})
-    public void transform(Player player, LocalSession session, EditSession editSession,
-                          @Arg(desc = "The transform", def = "") ResettableExtent transform,
-                          @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
-                                  boolean offHand,
-                          Arguments arguments) throws WorldEditException {
+    public void transform(
+            Player player, LocalSession session, EditSession editSession,
+            @Arg(desc = "The transform", def = "") ResettableExtent transform,
+            @Switch(name = 'h', desc = "Whether the offhand should be considered or not")
+                    boolean offHand,
+            Arguments arguments
+    ) throws WorldEditException {
         BrushTool tool = session.getBrushTool(player, false);
         if (tool == null) {
             player.print(Caption.of("fawe.worldedit.brush.brush.none"));

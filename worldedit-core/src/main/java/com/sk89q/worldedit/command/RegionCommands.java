@@ -320,10 +320,10 @@ public class RegionCommands {
     ) throws WorldEditException {
         if (from == null) {
             from = new ExistingBlockMask(editSession);
-        //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow
+            //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow
         } else if (from instanceof AbstractExtentMask) {
             ((AbstractExtentMask) from).setExtent(editSession);
-        //FAWE end
+            //FAWE end
         }
         if (from instanceof AbstractExtentMask) {
             ((AbstractExtentMask) from).setExtent(editSession);

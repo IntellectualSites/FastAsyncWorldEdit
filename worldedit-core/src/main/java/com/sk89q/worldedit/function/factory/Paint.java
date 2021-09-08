@@ -71,7 +71,13 @@ public class Paint implements Contextual<Operation> {
         Region region = firstNonNull(context.getRegion(), this.region);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(destination), function.createFromContext(context));
         //FAWE start - provide extent for preloading
-        LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground, destination);
+        LayerVisitor visitor = new LayerVisitor(
+                asFlatRegion(region),
+                minimumBlockY(region),
+                maximumBlockY(region),
+                ground,
+                destination
+        );
         //FAWE end
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         return visitor;

@@ -32,10 +32,10 @@ public class MethodHandleEventHandler extends EventHandler {
     /**
      * Create a new event handler that uses MethodHandles to dispatch.
      *
-     * @param priority the priority
-     * @param object The object to invoke it on
+     * @param priority     the priority
+     * @param object       The object to invoke it on
      * @param methodHandle The handle to invoke
-     * @param methodName The name of the method (for equality checks)
+     * @param methodName   The name of the method (for equality checks)
      */
     protected MethodHandleEventHandler(Priority priority, Object object, MethodHandle methodHandle, String methodName) {
         super(priority);
@@ -79,4 +79,5 @@ public class MethodHandleEventHandler extends EventHandler {
 
         return Objects.equals(object, that.object);
     }
+
 }

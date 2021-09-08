@@ -2,7 +2,6 @@ package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;

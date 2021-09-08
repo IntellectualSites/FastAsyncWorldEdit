@@ -49,6 +49,7 @@ public class FlatRegionVisitor implements Operation {
     private int affected = 0;
 
     //FAWE start - chunk preloading
+
     /**
      * Create a new visitor.
      *

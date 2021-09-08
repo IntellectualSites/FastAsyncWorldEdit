@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.extent.clipboard.io.schematic;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;

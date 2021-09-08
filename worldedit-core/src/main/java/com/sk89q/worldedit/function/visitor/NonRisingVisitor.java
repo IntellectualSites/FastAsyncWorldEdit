@@ -44,6 +44,7 @@ public class NonRisingVisitor extends RecursiveVisitor {
     }
 
     //FAWE start - int depth, preloading, min/max y
+
     /**
      * Create a new recursive visitor.
      *

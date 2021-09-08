@@ -88,7 +88,8 @@ public class FloodFillTool implements BlockTool {
                 Mask mask = initialType.toMask(editSession);
                 BlockReplace function = new BlockReplace(editSession, pattern);
                 RecursiveVisitor visitor = new RecursiveVisitor(mask, function, range, editSession.getMinY(),
-                        editSession.getMaxY(), editSession);
+                        editSession.getMaxY(), editSession
+                );
                 visitor.visit(origin);
                 Operations.completeLegacy(visitor);
                 //FAWE end

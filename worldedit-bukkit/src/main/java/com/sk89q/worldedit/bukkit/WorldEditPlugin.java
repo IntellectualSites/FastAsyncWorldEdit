@@ -306,7 +306,7 @@ public class WorldEditPlugin extends JavaPlugin {
                     "The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
         }
     }
- 
+
     // FAWE start
     private void setupBiomes() {
         if (this.adapter.value().isPresent()) {

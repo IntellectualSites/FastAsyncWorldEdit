@@ -51,7 +51,6 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 import org.enginehub.piston.annotation.Command;
@@ -637,11 +636,14 @@ public class GenerationCommands {
             ((AbstractExtentMask) mask).setExtent(editSession);
         }
         checkCommandArgument(minY >= editSession.getMinY(), Caption.of("fawe.error.outside-range-lower", "miny",
-                editSession.getMinY()));
+                editSession.getMinY()
+        ));
         checkCommandArgument(maxY <= editSession.getMaxY(), Caption.of("fawe.error.outside-range-upper", "maxy",
-                editSession.getMaxY()));
+                editSession.getMaxY()
+        ));
         checkCommandArgument(minY < maxY, Caption.of("fawe.error.argument-size-mismatch", "miny",
-                "maxy"));
+                "maxy"
+        ));
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }

@@ -28,7 +28,6 @@ import com.fastasyncworldedit.core.function.block.CombinedBlockCopy;
 import com.fastasyncworldedit.core.function.block.SimpleBlockCopy;
 import com.fastasyncworldedit.core.function.visitor.IntersectRegionFunction;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
-import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.google.common.collect.ImmutableList;
