@@ -177,7 +177,7 @@ public class FaweDelegateSchematicHandler {
             public void run(OutputStream output) {
                 if (weTag instanceof CompressedSchematicTag) {
                     Clipboard clipboard = ((CompressedSchematicTag) weTag).getSource();
-                    BuiltInClipboardFormat.SPONGE_SCHEMATIC.write(output, clipboard);
+                    BuiltInClipboardFormat.FAST.write(output, clipboard);
                 }
                 try {
                     try (ParallelGZIPOutputStream gzip = new ParallelGZIPOutputStream(output)) {
