@@ -108,23 +108,24 @@ public class RegionVisitor implements Operation {
             int lastLeadChunkX = Integer.MIN_VALUE;
             int lastLeadChunkZ = Integer.MIN_VALUE;
             int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT;
-            try {
-                for (; ; ) {
-                    BlockVector3 pt = trailIter.next();
-                    apply(pt);
-                    int cx = pt.getBlockX() >> 4;
-                    int cz = pt.getBlockZ() >> 4;
-                    if (cx != lastTrailChunkX || cz != lastTrailChunkZ) {
-                        lastTrailChunkX = cx;
-                        lastTrailChunkZ = cz;
-                        int amount;
-                        if (lastLeadChunkX == Integer.MIN_VALUE) {
-                            lastLeadChunkX = cx;
-                            lastLeadChunkZ = cz;
-                            amount = loadingTarget;
-                        } else {
-                            amount = 1;
-                        }
+            while (trailIter.hasNext()) {
+                BlockVector3 pt = trailIter.next();
+                apply(pt);
+                int cx = pt.getBlockX() >> 4;
+                int cz = pt.getBlockZ() >> 4;
+                if (cx != lastTrailChunkX || cz != lastTrailChunkZ) {
+                    lastTrailChunkX = cx;
+                    lastTrailChunkZ = cz;
+                    int amount;
+                    if (lastLeadChunkX == Integer.MIN_VALUE) {
+                        lastLeadChunkX = cx;
+                        lastLeadChunkZ = cz;
+                        amount = loadingTarget;
+                    } else {
+                        amount = 1;
+                    }
+                    try {
+                        lead:
                         for (int count = 0; count < amount; ) {
                             BlockVector3 v = leadIter.next();
                             int vcx = v.getBlockX() >> 4;
@@ -136,51 +137,26 @@ public class RegionVisitor implements Operation {
                                 count++;
                             }
                             // Skip the next 15 blocks
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
-                            leadIter.next();
+                            for (int i = 0; i < 16; i++) {
+                                if (!leadIter.hasNext()) {
+                                    break lead;
+                                }
+                                leadIter.next();
+                            }
                         }
+                    } catch (FaweException e) {
+                        // Likely to be a low memory or cancellation exception.
+                        throw new RuntimeException(e);
+                    } catch (Throwable ignored) {
+                        // Ignore as it is likely not something too important, and we can continue with the operation
+                    }
+                }
+                for (int i = 0; i < 16; i++) {
+                    if (!trailIter.hasNext()) {
+                        return null;
                     }
                     apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                    apply(trailIter.next());
                 }
-            } catch (FaweException e) {
-                throw new RuntimeException(e);
-            } catch (Throwable ignore) {
-            }
-            try {
-                for (; ; ) {
-                    apply(trailIter.next());
-                    apply(trailIter.next());
-                }
-            } catch (FaweException e) {
-                throw new RuntimeException(e);
-            } catch (Throwable ignore) {
             }
         } else {
             for (BlockVector3 pt : region) {
@@ -188,7 +164,6 @@ public class RegionVisitor implements Operation {
             }
         }
         //FAWE end
-
         return null;
     }
 
