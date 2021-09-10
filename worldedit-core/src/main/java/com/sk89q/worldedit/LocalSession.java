@@ -838,6 +838,17 @@ public class LocalSession implements TextureHolder {
         }
         setClipboard(multi);
     }
+
+    /**
+     * Ensure the player's clipboard is closed. (will only do something with clipboard-on-disk)
+     */
+    public void closeClipboard() {
+        synchronized (clipboardLock) {
+            if (this.clipboard != null) {
+                this.clipboard.close();
+            }
+        }
+    }
     //FAWE end
 
     /**
