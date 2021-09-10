@@ -52,6 +52,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -106,13 +107,13 @@ public class BlockTransformExtent extends ResettableExtent {
             WEST, PropertyKey.WEST
     );
 
+    private static final EnumSet<Direction> NESW = EnumSet.range(NORTH, WEST);
+    private final int[] ALL = new int[0];
     private Transform transform;
-
     private Transform transformInverse;
     private int[] BLOCK_ROTATION_BITMASK;
     private int[][] BLOCK_TRANSFORM;
     private int[][] BLOCK_TRANSFORM_INVERSE;
-    private final int[] ALL = new int[0];
 
     public BlockTransformExtent(Extent parent) {
         this(parent, new AffineTransform());
@@ -420,22 +421,15 @@ public class BlockTransformExtent extends ResettableExtent {
         // Rotate North, East, South, West
         if (type.hasProperty(PropertyKey.NORTH) && type.hasProperty(PropertyKey.EAST) && type.hasProperty(PropertyKey.SOUTH) && type
                 .hasProperty(PropertyKey.WEST)) {
-            Direction newNorth = findClosest(transform.apply(NORTH.toVector()), Flag.CARDINAL);
-            Direction newEast = findClosest(transform.apply(EAST.toVector()), Flag.CARDINAL);
-            Direction newSouth = findClosest(transform.apply(SOUTH.toVector()), Flag.CARDINAL);
-            Direction newWest = findClosest(transform.apply(WEST.toVector()), Flag.CARDINAL);
 
             BlockState tmp = state;
-
-            Object northState = tmp.getState(PropertyKey.NORTH);
-            Object eastState = tmp.getState(PropertyKey.EAST);
-            Object southState = tmp.getState(PropertyKey.SOUTH);
-            Object westState = tmp.getState(PropertyKey.WEST);
-
-            tmp = tmp.with(directionMap.get(newNorth), northState);
-            tmp = tmp.with(directionMap.get(newEast), eastState);
-            tmp = tmp.with(directionMap.get(newSouth), southState);
-            tmp = tmp.with(directionMap.get(newWest), westState);
+            for (Direction direction : NESW) {
+                Direction newDir = findClosest(transform.apply(direction.toVector()), Flag.CARDINAL);
+                if (newDir != null) {
+                    Object dirState = tmp.getState(directionMap.get(direction));
+                    tmp = tmp.with(directionMap.get(newDir), dirState);
+                }
+            }
 
             newMaskedId = tmp.getInternalId();
         }
