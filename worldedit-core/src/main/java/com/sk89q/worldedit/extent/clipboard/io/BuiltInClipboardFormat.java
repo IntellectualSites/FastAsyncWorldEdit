@@ -51,7 +51,7 @@ import java.util.zip.GZIPOutputStream;
 public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     //FAWE start - register fast clipboard io
-    FAST("fast", "fawe", "schem") {
+    FAST("fast", "fawe", "sponge", "schem") {
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
@@ -125,7 +125,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
      * Avoid using with any large schematics/clipboards for reading/writing.
      */
     @Deprecated
-    SPONGE_SCHEMATIC("sponge", "slow", "safe") {
+    SPONGE_SCHEMATIC("slow", "safe") {
         @Override
         public String getPrimaryFileExtension() {
             return "schem";
