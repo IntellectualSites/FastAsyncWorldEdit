@@ -68,7 +68,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reads schematic files using the Sponge Schematic Specification.
+ *
+ * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
+ * {@link com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader}.
+ * Avoid reading large schematics with this reader.
  */
+@Deprecated
 public class SpongeSchematicReader extends NBTSchematicReader {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
