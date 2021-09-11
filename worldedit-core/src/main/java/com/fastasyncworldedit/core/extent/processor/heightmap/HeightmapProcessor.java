@@ -55,8 +55,7 @@ public class HeightmapProcessor implements IBatchProcessor {
         int skip = 0;
         int allSkipped = (1 << TYPES.length) - 1; // lowest types.length bits are set
         layer:
-        //int layer = maxY >> 4; layer >= minY >> 4; layer--
-        for (int layer = set.getMaxSectionPosition(); layer >= set.getMinSectionPosition() >> 4; layer--) {
+        for (int layer = maxY >> 4; layer >= minY >> 4; layer--) {
             boolean hasSectionSet = set.hasSection(layer);
             boolean hasSectionGet = get.hasSection(layer);
             if (!(hasSectionSet || hasSectionGet)) {
