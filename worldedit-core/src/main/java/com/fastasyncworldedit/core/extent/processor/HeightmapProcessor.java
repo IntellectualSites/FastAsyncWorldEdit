@@ -11,6 +11,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -18,7 +19,9 @@ import java.util.concurrent.Future;
 public class HeightmapProcessor implements IBatchProcessor {
 
     private static final HeightMapType[] TYPES = HeightMapType.values();
-    private static final boolean[] COMPLETE = new boolean[256];
+    private static final int BLOCKS_PER_Y_SHIFT = 8; // log2(256)
+    private static final int BLOCKS_PER_Y = 256;
+    private static final boolean[] COMPLETE = new boolean[BLOCKS_PER_Y];
     private static final char[] AIR_LAYER = new char[4096];
 
     static {
@@ -29,8 +32,8 @@ public class HeightmapProcessor implements IBatchProcessor {
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         // each heightmap gets one 16*16 array
-        int[][] heightmaps = new int[TYPES.length][256];
-        boolean[][] updated = new boolean[TYPES.length][256];
+        int[][] heightmaps = new int[TYPES.length][BLOCKS_PER_Y];
+        boolean[][] updated = new boolean[TYPES.length][BLOCKS_PER_Y];
         int skip = 0;
         int allSkipped = (1 << TYPES.length) - 1; // lowest types.length bits are set
         layer:
@@ -50,10 +53,10 @@ public class HeightmapProcessor implements IBatchProcessor {
             char[] getSection = null;
             for (int y = 15; y >= 0; y--) {
                 // We don't need to actually iterate over x and z as we're both reading and writing an index
-                for (int j = 0; j < 256; j++) {
+                for (int j = 0; j < BLOCKS_PER_Y; j++) {
                     char ordinal = 0;
                     if (hasSectionSet) {
-                        ordinal = setSection[y * j];
+                        ordinal = setSection[index(y, j)];
                     }
                     if (ordinal == 0) {
                         if (!hasSectionGet) {
@@ -73,7 +76,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                                 continue;
                             }
                         }
-                        ordinal = getSection[y * j];
+                        ordinal = getSection[index(y, j)];
                     }
                     // fast skip if block isn't relevant for any height map (air or empty)
                     if (ordinal < 4) {
@@ -91,7 +94,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                         // ignore if that position was already set
                         if (!updated[i][j] && type.includes(block)) {
                             // mc requires + 1, heightmaps are normalized internally
-                            heightmaps[i][j] = (layer << 4) + y + 1;
+                            heightmaps[i][j] = ((layer - set.getMinSectionIndex()) << 4) + y + 1;
                             updated[i][j] = true; // mark as updated
                         }
                     }
@@ -112,6 +115,10 @@ public class HeightmapProcessor implements IBatchProcessor {
             set.setHeightMap(TYPES[i], heightmaps[i]);
         }
         return set;
+    }
+
+    private static int index(int y, int offset) {
+        return (y << BLOCKS_PER_Y_SHIFT) + offset;
     }
 
     @Override
