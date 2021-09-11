@@ -20,12 +20,27 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     private int offsetX;
     private int offsetZ;
 
+    /**
+     * New LocalBlockVectorSet that will set the offset x and z to the first value given
+     */
     public LocalBlockVectorSet() {
         offsetX = offsetZ = Integer.MAX_VALUE;
         this.set = new SparseBitSet();
     }
 
-    public LocalBlockVectorSet(int x, int z, SparseBitSet set) {
+    /**
+     * New LocalBlockVectorSet with a given offset
+     *
+     * @param x x offset
+     * @param z z offset
+     */
+    public LocalBlockVectorSet(int x, int z) {
+        this.offsetX = x;
+        this.offsetZ = z;
+        this.set = new SparseBitSet();
+    }
+
+    private LocalBlockVectorSet(int x, int z, SparseBitSet set) {
         this.offsetX = x;
         this.offsetZ = z;
         this.set = set;
@@ -41,6 +56,14 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return set.isEmpty();
     }
 
+    /**
+     * If the set contains a position
+     *
+     * @param x x position
+     * @param y y position
+     * @param z z position
+     * @return if the set contains the position
+     */
     public boolean contains(int x, int y, int z) {
         // take 128 to fit -256<y<255
         return set.get(MathMan.tripleSearchCoords(x - offsetX, y - 128, z - offsetZ));
@@ -60,6 +83,15 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return new LocalBlockVectorSet(offsetX, offsetZ, set.clone());
     }
 
+    /**
+     * If a radius is contained by the set
+     *
+     * @param x      x radius center
+     * @param y      y radius center
+     * @param z      z radius center
+     * @param radius
+     * @return if radius is contained by the set
+     */
     public boolean containsRadius(int x, int y, int z, int radius) {
         if (radius <= 0) {
             return contains(x, y, z);
@@ -94,11 +126,12 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return false;
     }
 
-    public void addOffset(int x, int z) {
-        this.offsetX += x;
-        this.offsetZ += z;
-    }
-
+    /**
+     * Set the offset applied to values when storing and reading to keep the values within -1024 to 1023
+     *
+     * @param x x offset
+     * @param z z offset
+     */
     public void setOffset(int x, int z) {
         this.offsetX = x;
         this.offsetZ = z;
@@ -198,6 +231,14 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return array;
     }
 
+    /**
+     * If a position is contained by the bounds of the set
+     *
+     * @param x x position
+     * @param y y position
+     * @param z z position
+     * @return true if position is contained by the bounds of the set
+     */
     public boolean canAdd(int x, int y, int z) {
         if (offsetX == Integer.MAX_VALUE) {
             return false;
@@ -210,6 +251,14 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return y >= -128 && y <= 383;
     }
 
+    /**
+     * Add a position to the set if not present
+     *
+     * @param x x position
+     * @param y y position
+     * @param z z position
+     * @return true if not already present
+     */
     public boolean add(int x, int y, int z) {
         if (offsetX == Integer.MAX_VALUE) {
             offsetX = x;
@@ -233,6 +282,12 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         }
     }
 
+    /**
+     * Add a position to the set if not present
+     *
+     * @param vector position
+     * @return true if not already present
+     */
     @Override
     public boolean add(BlockVector3 vector) {
         return add(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
@@ -252,6 +307,14 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return MathMan.tripleSearchCoords(x - offsetX, y - 128, z - offsetZ);
     }
 
+    /**
+     * Remove a position from the set.
+     *
+     * @param x x positition
+     * @param y y positition
+     * @param z z positition
+     * @return true if value was present.
+     */
     public boolean remove(int x, int y, int z) {
         int relX = x - offsetX;
         int relZ = z - offsetZ;
@@ -329,6 +392,11 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         return result;
     }
 
+    /**
+     * Visit each point contained in the set
+     *
+     * @param visitor visitor to use
+     */
     public void forEach(BlockVectorSetVisitor visitor) {
         int size = size();
         int index = -1;
