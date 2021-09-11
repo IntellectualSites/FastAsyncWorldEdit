@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.extent.processor.heightmap;
+package com.fastasyncworldedit.core.math.heightmap;
 
 import com.fastasyncworldedit.core.math.MutableVector3;
 import com.sk89q.worldedit.math.BlockVector3;

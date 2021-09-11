@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.extent.processor.heightmap;
+package com.fastasyncworldedit.core.math.heightmap;
 
 public class FlatScalableHeightMap extends ScalableHeightMap {
 

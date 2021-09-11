@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.extent.processor.heightmap;
+package com.fastasyncworldedit.core.math.heightmap;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;

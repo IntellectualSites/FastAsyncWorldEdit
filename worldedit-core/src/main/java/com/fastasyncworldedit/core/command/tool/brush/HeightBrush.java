@@ -1,9 +1,9 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMap;
-import com.fastasyncworldedit.core.extent.processor.heightmap.RotatableHeightMap;
-import com.fastasyncworldedit.core.extent.processor.heightmap.ScalableHeightMap;
+import com.fastasyncworldedit.core.math.heightmap.HeightMap;
+import com.fastasyncworldedit.core.math.heightmap.RotatableHeightMap;
+import com.fastasyncworldedit.core.math.heightmap.ScalableHeightMap;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
