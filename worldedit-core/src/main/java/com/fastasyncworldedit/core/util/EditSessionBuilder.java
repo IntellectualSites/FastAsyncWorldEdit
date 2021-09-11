@@ -424,7 +424,7 @@ public class EditSessionBuilder {
             } else {
                 relighter = NullRelighter.INSTANCE;
             }
-            extent.addProcessor(new HeightmapProcessor());
+            extent.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
             } else if (limit != null && !limit.isUnlimited()) {

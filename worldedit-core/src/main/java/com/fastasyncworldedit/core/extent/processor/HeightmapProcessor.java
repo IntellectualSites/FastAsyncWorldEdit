@@ -11,7 +11,6 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -20,13 +19,32 @@ public class HeightmapProcessor implements IBatchProcessor {
 
     private static final HeightMapType[] TYPES = HeightMapType.values();
     private static final int BLOCKS_PER_Y_SHIFT = 8; // log2(256)
-    private static final int BLOCKS_PER_Y = 256;
+    private static final int BLOCKS_PER_Y = 256; // 16 x 16
     private static final boolean[] COMPLETE = new boolean[BLOCKS_PER_Y];
     private static final char[] AIR_LAYER = new char[4096];
 
     static {
         Arrays.fill(COMPLETE, true);
         Arrays.fill(AIR_LAYER, (char) 1);
+    }
+
+    private final int minY;
+    private final int maxY;
+
+    /**
+     * New HeightmapProcessor instance that will create heightmaps between the given heights (inclusive). If no applicable
+     * block is found before the minimum Y, 0 is used.
+     *
+     * @param minY minimum Y to consider
+     * @param maxY maximum Y to consider
+     */
+    public HeightmapProcessor(int minY, int maxY) {
+        this.minY = minY;
+        this.maxY = maxY;
+    }
+
+    private static int index(int y, int offset) {
+        return (y << BLOCKS_PER_Y_SHIFT) + offset;
     }
 
     @Override
@@ -37,6 +55,7 @@ public class HeightmapProcessor implements IBatchProcessor {
         int skip = 0;
         int allSkipped = (1 << TYPES.length) - 1; // lowest types.length bits are set
         layer:
+        //int layer = maxY >> 4; layer >= minY >> 4; layer--
         for (int layer = set.getMaxSectionPosition(); layer >= set.getMinSectionPosition() >> 4; layer--) {
             boolean hasSectionSet = set.hasSection(layer);
             boolean hasSectionGet = get.hasSection(layer);
@@ -93,7 +112,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                         HeightMapType type = TYPES[i];
                         // ignore if that position was already set
                         if (!updated[i][j] && type.includes(block)) {
-                            // mc requires + 1, heightmaps are normalized internally
+                            // mc requires + 1, heightmaps are normalized internally, thus we need to "zero" them.
                             heightmaps[i][j] = ((layer - get.getMinSectionPosition()) << 4) + y + 1;
                             updated[i][j] = true; // mark as updated
                         }
@@ -115,10 +134,6 @@ public class HeightmapProcessor implements IBatchProcessor {
             set.setHeightMap(TYPES[i], heightmaps[i]);
         }
         return set;
-    }
-
-    private static int index(int y, int offset) {
-        return (y << BLOCKS_PER_Y_SHIFT) + offset;
     }
 
     @Override
