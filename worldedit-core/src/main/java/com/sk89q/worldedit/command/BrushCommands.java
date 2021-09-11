@@ -1113,7 +1113,7 @@ public class BrushCommands {
                     Expression radius
     ) throws WorldEditException {
         setOperationBasedBrush(player, localSession, radius,
-                new Deform("y-=1"), shape, "worldedit.brush.raise"
+                new Deform("y-=1", Deform.Mode.RAW_COORD), shape, "worldedit.brush.raise"
         );
     }
 
@@ -1130,7 +1130,7 @@ public class BrushCommands {
                     Expression radius
     ) throws WorldEditException {
         setOperationBasedBrush(player, localSession, radius,
-                new Deform("y+=1"), shape, "worldedit.brush.lower"
+                new Deform("y+=1", Deform.Mode.RAW_COORD), shape, "worldedit.brush.lower"
         );
     }
 
