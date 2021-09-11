@@ -209,12 +209,12 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Override
-    public int getMaxSectionIndex() {
+    public int getMaxSectionPosition() {
         return 0;
     }
 
     @Override
-    public int getMinSectionIndex() {
+    public int getMinSectionPosition() {
         return 0;
     }
 

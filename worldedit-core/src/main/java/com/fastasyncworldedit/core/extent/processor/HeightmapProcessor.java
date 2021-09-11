@@ -37,7 +37,7 @@ public class HeightmapProcessor implements IBatchProcessor {
         int skip = 0;
         int allSkipped = (1 << TYPES.length) - 1; // lowest types.length bits are set
         layer:
-        for (int layer = set.getMaxSectionIndex(); layer >= set.getMinSectionIndex(); layer--) {
+        for (int layer = set.getMaxSectionPosition(); layer >= set.getMinSectionPosition() >> 4; layer--) {
             boolean hasSectionSet = set.hasSection(layer);
             boolean hasSectionGet = get.hasSection(layer);
             if (!(hasSectionSet || hasSectionGet)) {
@@ -94,7 +94,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                         // ignore if that position was already set
                         if (!updated[i][j] && type.includes(block)) {
                             // mc requires + 1, heightmaps are normalized internally
-                            heightmaps[i][j] = ((layer - set.getMinSectionIndex()) << 4) + y + 1;
+                            heightmaps[i][j] = ((layer - get.getMinSectionPosition()) << 4) + y + 1;
                             updated[i][j] = true; // mark as updated
                         }
                     }

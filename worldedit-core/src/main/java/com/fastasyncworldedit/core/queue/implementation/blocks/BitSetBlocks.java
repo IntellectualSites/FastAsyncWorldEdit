@@ -210,12 +210,12 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public int getMaxSectionIndex() {
+    public int getMaxSectionPosition() {
         return minSectionIndex;
     }
 
     @Override
-    public int getMinSectionIndex() {
+    public int getMinSectionPosition() {
         return maxSectionIndex;
     }
 

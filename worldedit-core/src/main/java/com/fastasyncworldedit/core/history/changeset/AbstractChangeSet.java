@@ -157,7 +157,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 addEntityCreate(tag);
             }
         }
-        for (int layer = get.getMinSectionIndex(); layer <= get.getMaxSectionIndex(); layer++) {
+        for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
             if (!set.hasSection(layer)) {
                 continue;
             }
@@ -197,7 +197,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         BiomeType[] biomes = set.getBiomes();
         if (biomes != null) {
             int index = 0;
-            for (int layer = get.getMinSectionIndex(); layer <= get.getMaxSectionIndex(); layer++) {
+            for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
                 if (!set.hasBiomes(layer)) {
                     continue;
                 }

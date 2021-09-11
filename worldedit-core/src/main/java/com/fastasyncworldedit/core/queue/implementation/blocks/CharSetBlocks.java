@@ -327,12 +327,12 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public int getMaxSectionIndex() {
+    public int getMaxSectionPosition() {
         return maxSectionIndex;
     }
 
     @Override
-    public int getMinSectionIndex() {
+    public int getMinSectionPosition() {
         return minSectionIndex;
     }
 

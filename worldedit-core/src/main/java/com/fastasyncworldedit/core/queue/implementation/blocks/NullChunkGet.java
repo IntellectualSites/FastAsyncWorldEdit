@@ -100,12 +100,12 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public int getMaxSectionIndex() {
+    public int getMaxSectionPosition() {
         return 0;
     }
 
     @Override
-    public int getMinSectionIndex() {
+    public int getMinSectionPosition() {
         return 0;
     }
 
