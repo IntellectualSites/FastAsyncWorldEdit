@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.extent.clipboard;
 
-import com.fastasyncworldedit.core.math.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.Entity;

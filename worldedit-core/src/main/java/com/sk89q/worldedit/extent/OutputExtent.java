@@ -19,7 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
-import com.fastasyncworldedit.core.math.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;

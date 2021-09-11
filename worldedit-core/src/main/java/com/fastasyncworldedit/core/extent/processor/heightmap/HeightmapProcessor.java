@@ -1,7 +1,7 @@
-package com.fastasyncworldedit.core.extent.processor;
+package com.fastasyncworldedit.core.extent.processor.heightmap;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.math.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
