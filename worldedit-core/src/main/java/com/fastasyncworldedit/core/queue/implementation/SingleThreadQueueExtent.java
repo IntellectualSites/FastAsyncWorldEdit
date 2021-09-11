@@ -305,8 +305,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             if (chunk != null) {
                 lastPair = pair;
                 lastChunk = chunk;
-            }
-            if (chunk != null) {
                 return chunk;
             }
             final int size = chunks.size();

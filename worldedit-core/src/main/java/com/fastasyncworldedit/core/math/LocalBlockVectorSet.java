@@ -17,8 +17,8 @@ import java.util.Set;
 public class LocalBlockVectorSet implements Set<BlockVector3> {
 
     private final SparseBitSet set;
-    private int offsetX;
-    private int offsetZ;
+    private volatile int offsetX;
+    private volatile int offsetZ;
 
     public LocalBlockVectorSet() {
         offsetX = offsetZ = Integer.MAX_VALUE;
@@ -211,7 +211,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     }
 
     public boolean add(int x, int y, int z) {
-        if (offsetX == Integer.MAX_VALUE) {
+        if (offsetX == Integer.MAX_VALUE || offsetZ == Integer.MAX_VALUE) {
             offsetX = x;
             offsetZ = z;
         }
