@@ -13,8 +13,8 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
     /**
      * New instance given the min/max section indices
      */
-    public CharGetBlocks(final int minSectionIndex, final int maxSectionIndex) {
-        super(minSectionIndex, maxSectionIndex);
+    public CharGetBlocks(final int minSectionPosition, final int maxSectionPosition) {
+        super(minSectionPosition, maxSectionPosition);
     }
 
     @Override
@@ -43,7 +43,7 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
 
     @Override
     public synchronized boolean trim(boolean aggressive, int layer) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         sections[layer] = empty;
         blocks[layer] = null;
         return true;

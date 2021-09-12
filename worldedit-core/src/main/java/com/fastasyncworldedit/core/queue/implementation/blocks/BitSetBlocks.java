@@ -20,21 +20,21 @@ public class BitSetBlocks implements IChunkSet {
 
     private final MemBlockSet.RowZ row;
     private final BlockState blockState;
-    private final int minSectionIndex;
-    private final int maxSectionIndex;
+    private final int minSectionPosition;
+    private final int maxSectionPosition;
     private final int layers;
 
-    public BitSetBlocks(BlockState blockState, int minSectionIndex, int maxSectionIndex) {
-        this.row = new MemBlockSet.RowZ(minSectionIndex, maxSectionIndex);
+    public BitSetBlocks(BlockState blockState, int minSectionPosition, int maxSectionPosition) {
+        this.row = new MemBlockSet.RowZ(minSectionPosition, maxSectionPosition);
         this.blockState = blockState;
-        this.minSectionIndex = minSectionIndex;
-        this.maxSectionIndex = maxSectionIndex;
-        this.layers = maxSectionIndex - minSectionIndex + 1;
+        this.minSectionPosition = minSectionPosition;
+        this.maxSectionPosition = maxSectionPosition;
+        this.layers = maxSectionPosition - minSectionPosition + 1;
     }
 
     @Override
     public boolean hasSection(int layer) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         return row.rows[layer] != MemBlockSet.NULL_ROW_Y;
     }
 
@@ -46,21 +46,21 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
-        y -= minSectionIndex << 4;
-        row.set(null, x, y, z, minSectionIndex, maxSectionIndex);
+        y -= minSectionPosition << 4;
+        row.set(null, x, y, z, minSectionPosition, maxSectionPosition);
         return true;
     }
 
     @Override
     public void setBlocks(int layer, char[] data) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         row.reset(layer);
         int by = layer << 4;
         for (int y = 0, index = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++, index++) {
                     if (data[index] != 0) {
-                        row.set(null, x, by + y, z, minSectionIndex, maxSectionIndex);
+                        row.set(null, x, by + y, z, minSectionPosition, maxSectionPosition);
                     }
                 }
             }
@@ -123,7 +123,7 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public char[] load(int layer) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         char[] arr = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         MemBlockSet.IRow nullRowY = row.getRow(layer);
         if (nullRowY instanceof MemBlockSet.RowY) {
@@ -211,12 +211,12 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public int getMaxSectionPosition() {
-        return minSectionIndex;
+        return minSectionPosition;
     }
 
     @Override
     public int getMinSectionPosition() {
-        return maxSectionIndex;
+        return maxSectionPosition;
     }
 
     @Override

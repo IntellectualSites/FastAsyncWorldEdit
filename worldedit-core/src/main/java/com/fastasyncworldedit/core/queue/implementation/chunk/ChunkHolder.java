@@ -165,12 +165,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public void setLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
+    public void setLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
         delegate.setLightingToGet(this, lighting);
     }
 
     @Override
-    public void setSkyLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
+    public void setSkyLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
         delegate.setSkyLightingToGet(this, lighting);
     }
 

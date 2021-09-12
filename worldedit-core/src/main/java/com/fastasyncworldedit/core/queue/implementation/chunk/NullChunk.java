@@ -187,11 +187,11 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Override
-    public void setLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
+    public void setLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
     }
 
     @Override
-    public void setSkyLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
+    public void setSkyLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
     }
 
     @Override
