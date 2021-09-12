@@ -12,6 +12,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +32,25 @@ public interface IBlocks extends Trimable {
      */
     boolean hasSection(int layer);
 
+    /**
+     * Obtain the specified chunk section stored as an array of ordinals. Uses normal minecraft chunk-section position indices
+     * (length 4096). Operations synchronises on the section and will load the section into memory if not present. For chunk
+     * GET operations, this will load the data from the world. For chunk SET, this will create a new empty array.
+     *
+     * @param layer chunk section layer (may be negative)
+     * @return char array of ordinals of the chunk section
+     */
     char[] load(int layer);
+
+    /**
+     * Obtain the specified chunk section stored as an array of ordinals if present or null. Uses normal minecraft chunk-section
+     * position indices (length 4096). Does not synchronise to the section layer as it will not attempt to load into memory.
+     *
+     * @param layer chunk section layer (may be negative)
+     * @return char array of ordinals of the chunk section if present
+     */
+    @Nullable
+    char[] loadIfPresent(int layer);
 
     BlockState getBlock(int x, int y, int z);
 

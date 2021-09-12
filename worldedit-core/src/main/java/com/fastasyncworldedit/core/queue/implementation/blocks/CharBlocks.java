@@ -145,6 +145,16 @@ public abstract class CharBlocks implements IBlocks {
         }
     }
 
+    @Nullable
+    @Override
+    public char[] loadIfPresent(int layer) {
+        if (layer < minSectionPosition || layer > minSectionPosition) {
+            return null;
+        }
+        layer -= minSectionPosition;
+        return sections[layer].isFull() ? blocks[layer] : null;
+    }
+
     @Override
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypesCache.states[get(x, y, z)];

@@ -37,6 +37,7 @@ import javax.annotation.Nonnull;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -769,7 +770,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
             for (int layer = get.getMinSectionPosition(); layer < get.getMaxSectionPosition(); layer++) {
                 if (set.hasSection(layer)) {
-                    char[] arr = set.load(layer);
+                    char[] arr = Objects.requireNonNull(set.loadIfPresent(layer)); // This shouldn't be null if above is true
                     if (trimX || trimZ) {
                         int indexY = 0;
                         for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
