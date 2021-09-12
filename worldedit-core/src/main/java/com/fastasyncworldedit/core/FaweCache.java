@@ -559,7 +559,7 @@ public enum FaweCache implements Trimable {
      */
     public ThreadPoolExecutor newBlockingExecutor() {
         int nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
-        ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads);
+        ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads, true);
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS, queue,
                 Executors.defaultThreadFactory(),
