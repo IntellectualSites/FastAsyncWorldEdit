@@ -41,36 +41,27 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     /**
      * Initialize the queue (for reusability)
      *
-     * @param extent
-     * @param get
-     * @param set
+     * @param extent extent to use
+     * @param get cache of chunk GET
+     * @param set cache of chunk SET
      */
     void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set);
 
     /**
      * Get the cached get object. This is faster than getting the object using NMS and allows for
      * wrapping.
-     *
-     * @param chunkX
-     * @param chunkZ
-     * @return
      */
     IChunkGet getCachedGet(@Range(from = 0, to = 15) int chunkX, @Range(from = 0, to = 15) int chunkZ);
 
     /**
      * Get the cached chunk set object.
-     *
-     * @param chunkX
-     * @param chunkZ
-     * @return
      */
     IChunkSet getCachedSet(@Range(from = 0, to = 15) int chunkX, @Range(from = 0, to = 15) int chunkZ);
 
     /**
      * Submit the chunk so that it's changes are applied to the world
      *
-     * @param chunk
-     * @return result
+     * @return Future
      */
     <V extends Future<V>> V submit(T chunk);
 

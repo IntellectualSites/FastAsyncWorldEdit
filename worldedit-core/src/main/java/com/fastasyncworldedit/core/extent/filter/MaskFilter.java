@@ -31,7 +31,7 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
     @Override
     public void applyBlock(FilterBlock block) {
         if (mask instanceof AbstractExtentMask) {
-            if (((AbstractExtentMask) mask).test(block, block)) {
+            if (((AbstractExtentMask) mask).test(block.getExtent(), block)) {
                 getParent().applyBlock(block);
                 this.changes.incrementAndGet();
             }
