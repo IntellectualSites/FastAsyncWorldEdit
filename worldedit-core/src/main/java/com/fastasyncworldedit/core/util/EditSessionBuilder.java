@@ -12,7 +12,7 @@ import com.fastasyncworldedit.core.extent.NullExtent;
 import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.extent.SlowExtent;
 import com.fastasyncworldedit.core.extent.StripNBTExtent;
-import com.fastasyncworldedit.core.extent.processor.HeightmapProcessor;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightmapProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightProcessor;
@@ -424,7 +424,7 @@ public class EditSessionBuilder {
             } else {
                 relighter = NullRelighter.INSTANCE;
             }
-            extent.addProcessor(new HeightmapProcessor(world));
+            extent.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
             } else if (limit != null && !limit.isUnlimited()) {

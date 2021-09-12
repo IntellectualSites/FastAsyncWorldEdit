@@ -33,6 +33,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -157,7 +158,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 addEntityCreate(tag);
             }
         }
-        for (int layer = get.getMinSectionIndex(); layer <= get.getMaxSectionIndex(); layer++) {
+        for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
             if (!set.hasSection(layer)) {
                 continue;
             }
@@ -170,7 +171,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
             }
             char[] blocksSet;
-            System.arraycopy(set.load(layer), 0, (blocksSet = new char[4096]), 0, 4096);
+            // loadIfPresent shouldn't be null if set.hasSection(layer) is true
+            System.arraycopy(Objects.requireNonNull(set.loadIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
 
             // Account for negative layers
             int by = layer << 4;
@@ -197,7 +199,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         BiomeType[] biomes = set.getBiomes();
         if (biomes != null) {
             int index = 0;
-            for (int layer = get.getMinSectionIndex(); layer <= get.getMaxSectionIndex(); layer++) {
+            for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
                 if (!set.hasBiomes(layer)) {
                     continue;
                 }

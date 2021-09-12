@@ -140,36 +140,40 @@ public class ClipboardCommands {
         session.setClipboard(null);
 
         Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
+        try {
+            clipboard.setOrigin(centerClipboard ? region.getCenter().toBlockPoint() : session.getPlacementPosition(actor));
+            ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
+            copy.setCopyingEntities(copyEntities);
+            copy.setCopyingBiomes(copyBiomes);
 
-        clipboard.setOrigin(centerClipboard ? region.getCenter().toBlockPoint() : session.getPlacementPosition(actor));
-        ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
-        copy.setCopyingEntities(copyEntities);
-        copy.setCopyingBiomes(copyBiomes);
+            Mask sourceMask = editSession.getSourceMask();
+            Region[] regions = editSession.getAllowedRegions();
+            Region allowedRegion;
+            if (regions == null || regions.length == 0) {
+                allowedRegion = new NullRegion();
+            } else {
+                allowedRegion = new RegionIntersection(regions);
+            }
+            final Mask firstSourceMask = mask != null ? mask : sourceMask;
+            final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
+            if (finalMask != Masks.alwaysTrue()) {
+                copy.setSourceMask(finalMask);
+            }
+            if (sourceMask != null) {
+                editSession.setSourceMask(null);
+                new MaskTraverser(sourceMask).reset(editSession);
+                editSession.setSourceMask(null);
+            }
 
-        Mask sourceMask = editSession.getSourceMask();
-        Region[] regions = editSession.getAllowedRegions();
-        Region allowedRegion;
-        if (regions == null || regions.length == 0) {
-            allowedRegion = new NullRegion();
-        } else {
-            allowedRegion = new RegionIntersection(regions);
+            Operations.completeLegacy(copy);
+            saveDiskClipboard(clipboard);
+            session.setClipboard(new ClipboardHolder(clipboard));
+
+            copy.getStatusMessages().forEach(actor::print);
+        } catch (Throwable e) {
+            clipboard.close();
+            throw e;
         }
-        final Mask firstSourceMask = mask != null ? mask : sourceMask;
-        final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
-        if (finalMask != Masks.alwaysTrue()) {
-            copy.setSourceMask(finalMask);
-        }
-        if (sourceMask != null) {
-            editSession.setSourceMask(null);
-            new MaskTraverser(sourceMask).reset(editSession);
-            editSession.setSourceMask(null);
-        }
-
-        Operations.completeLegacy(copy);
-        saveDiskClipboard(clipboard);
-        session.setClipboard(new ClipboardHolder(clipboard));
-
-        copy.getStatusMessages().forEach(actor::print);
         //FAWE end
     }
 
@@ -273,38 +277,43 @@ public class ClipboardCommands {
         session.setClipboard(null);
 
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
-        clipboard.setOrigin(session.getPlacementPosition(actor));
-        ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
-        copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
-        copy.setCopyingEntities(copyEntities);
-        copy.setRemovingEntities(true);
-        copy.setCopyingBiomes(copyBiomes);
-        Mask sourceMask = editSession.getSourceMask();
-        Region[] regions = editSession.getAllowedRegions();
-        Region allowedRegion;
-        if (regions == null || regions.length == 0) {
-            allowedRegion = new NullRegion();
-        } else {
-            allowedRegion = new RegionIntersection(regions);
-        }
-        final Mask firstSourceMask = mask != null ? mask : sourceMask;
-        final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
-        if (finalMask != Masks.alwaysTrue()) {
-            copy.setSourceMask(finalMask);
-        }
-        if (sourceMask != null) {
-            editSession.setSourceMask(null);
-            new MaskTraverser(sourceMask).reset(editSession);
-            editSession.setSourceMask(null);
-        }
-        Operations.completeLegacy(copy);
-        saveDiskClipboard(clipboard);
-        session.setClipboard(new ClipboardHolder(clipboard));
+        try {
+            clipboard.setOrigin(session.getPlacementPosition(actor));
+            ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
+            copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
+            copy.setCopyingEntities(copyEntities);
+            copy.setRemovingEntities(true);
+            copy.setCopyingBiomes(copyBiomes);
+            Mask sourceMask = editSession.getSourceMask();
+            Region[] regions = editSession.getAllowedRegions();
+            Region allowedRegion;
+            if (regions == null || regions.length == 0) {
+                allowedRegion = new NullRegion();
+            } else {
+                allowedRegion = new RegionIntersection(regions);
+            }
+            final Mask firstSourceMask = mask != null ? mask : sourceMask;
+            final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
+            if (finalMask != Masks.alwaysTrue()) {
+                copy.setSourceMask(finalMask);
+            }
+            if (sourceMask != null) {
+                editSession.setSourceMask(null);
+                new MaskTraverser(sourceMask).reset(editSession);
+                editSession.setSourceMask(null);
+            }
+            Operations.completeLegacy(copy);
+            saveDiskClipboard(clipboard);
+            session.setClipboard(new ClipboardHolder(clipboard));
 
-        if (!actor.hasPermission("fawe.tips")) {
-            actor.print(Caption.of("fawe.tips.tip.lazycut"));
+            if (!actor.hasPermission("fawe.tips")) {
+                actor.print(Caption.of("fawe.tips.tip.lazycut"));
+            }
+            copy.getStatusMessages().forEach(actor::print);
+        } catch (Throwable e) {
+            clipboard.close();
+            throw e;
         }
-        copy.getStatusMessages().forEach(actor::print);
         //FAWE end
     }
 

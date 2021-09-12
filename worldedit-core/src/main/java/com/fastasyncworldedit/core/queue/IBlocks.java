@@ -12,6 +12,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +32,25 @@ public interface IBlocks extends Trimable {
      */
     boolean hasSection(int layer);
 
+    /**
+     * Obtain the specified chunk section stored as an array of ordinals. Uses normal minecraft chunk-section position indices
+     * (length 4096). Operations synchronises on the section and will load the section into memory if not present. For chunk
+     * GET operations, this will load the data from the world. For chunk SET, this will create a new empty array.
+     *
+     * @param layer chunk section layer (may be negative)
+     * @return char array of ordinals of the chunk section
+     */
     char[] load(int layer);
+
+    /**
+     * Obtain the specified chunk section stored as an array of ordinals if present or null. Uses normal minecraft chunk-section
+     * position indices (length 4096). Does not synchronise to the section layer as it will not attempt to load into memory.
+     *
+     * @param layer chunk section layer (may be negative)
+     * @return char array of ordinals of the chunk section if present
+     */
+    @Nullable
+    char[] loadIfPresent(int layer);
 
     BlockState getBlock(int x, int y, int z);
 
@@ -44,7 +63,7 @@ public interface IBlocks extends Trimable {
     BiomeType getBiomeType(int x, int y, int z);
 
     default int getBitMask() {
-        return IntStream.range(getMinSectionIndex(), getMaxSectionIndex() + 1).filter(this::hasSection)
+        return IntStream.range(getMinSectionPosition(), getMaxSectionPosition() + 1).filter(this::hasSection)
                 .map(layer -> (1 << layer)).sum();
     }
 
@@ -55,19 +74,23 @@ public interface IBlocks extends Trimable {
     IBlocks reset();
 
     /**
-     * Get the number of stores sections
+     * Get the number of stored sections
      */
     int getSectionCount();
 
     /**
-     * Max ChunkSection array index
+     * Get the highest layer position stored in the internal chunk. For 1.16 and below, always returns 15. For 1.17 and above, may
+     * not return a value correct to the world if this is a {@link IChunkSet} instance, which defaults to 15. For extended
+     * height worlds, this will only return over 15 if blocks are stored outside the default range.
      */
-    int getMaxSectionIndex();
+    int getMaxSectionPosition();
 
     /**
-     * Min ChunkSection array index
+     * Get the lowest layer position stored in the internal chunk. For 1.16 and below, always returns 0. For 1.17 and above, may
+     * not return a value correct to the world if this is a {@link IChunkSet} instance, which defaults to 0. For extended
+     * height worlds, this will only return under 0 if blocks are stored outside the default range.
      */
-    int getMinSectionIndex();
+    int getMinSectionPosition();
 
     default byte[] toByteArray(boolean full, boolean stretched) {
         return toByteArray(null, getBitMask(), full, stretched);

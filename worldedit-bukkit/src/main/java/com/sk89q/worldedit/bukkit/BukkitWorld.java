@@ -297,9 +297,10 @@ public class BukkitWorld extends AbstractWorld {
             if (treeTypeMapping.get(type) == null) {
                 LOGGER.error("No TreeType mapping for TreeGenerator.TreeType." + type);
                 //FAWE start
-                LOGGER.warn("Your FAWE version is newer than " + Bukkit.getVersion() +
+                LOGGER.info("The above message is displayed because your FAWE version is newer than " + Bukkit.getVersion() +
                         " and contains features of future minecraft versions which do not exist in "
-                        + Bukkit.getVersion() + ", hence the tree type " + type + " is not available.");
+                        + Bukkit.getVersion() + ", hence the tree type " + type + " is not available. This is not an error. " +
+                        "This version will work on your version of Minecraft. This is an informative message only");
                 //FAWE end
             }
         }

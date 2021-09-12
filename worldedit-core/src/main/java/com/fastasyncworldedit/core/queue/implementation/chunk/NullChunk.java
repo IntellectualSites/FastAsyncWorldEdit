@@ -173,6 +173,12 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Nullable
+    @Override
+    public char[] loadIfPresent(final int layer) {
+        return null;
+    }
+
+    @Nullable
     public CompoundTag getEntity(@Nonnull UUID uuid) {
         return null;
     }
@@ -187,11 +193,11 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Override
-    public void setLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
+    public void setLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
     }
 
     @Override
-    public void setSkyLightingToGet(char[][] lighting, int minSectionIndex, int maxSectionIndex) {
+    public void setSkyLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
     }
 
     @Override
@@ -209,12 +215,12 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Override
-    public int getMaxSectionIndex() {
+    public int getMaxSectionPosition() {
         return 0;
     }
 
     @Override
-    public int getMinSectionIndex() {
+    public int getMinSectionPosition() {
         return 0;
     }
 

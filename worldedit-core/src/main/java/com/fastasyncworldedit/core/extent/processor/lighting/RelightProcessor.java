@@ -30,10 +30,10 @@ public class RelightProcessor implements IBatchProcessor {
         } else if (Settings.IMP.LIGHTING.MODE == 1) {
             byte[] fix = new byte[get.getSectionCount()];
             boolean relight = false;
-            for (int i = get.getMaxSectionIndex(); i >= get.getMinSectionIndex(); i--) {
+            for (int i = get.getMaxSectionPosition(); i >= get.getMinSectionPosition(); i--) {
                 if (!set.hasSection(i)) {
                     // Array index cannot be < 0 so "add" the min
-                    fix[i - get.getMinSectionIndex()] = Relighter.SkipReason.AIR;
+                    fix[i - get.getMinSectionPosition()] = Relighter.SkipReason.AIR;
                     continue;
                 }
                 relight = true;

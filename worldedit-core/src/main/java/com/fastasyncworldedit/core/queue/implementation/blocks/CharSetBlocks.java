@@ -60,10 +60,10 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        if (biomes == null || (y >> 4) < minSectionIndex || (y >> 4) > maxSectionIndex) {
+        if (biomes == null || (y >> 4) < minSectionPosition || (y >> 4) > maxSectionPosition) {
             return null;
         }
-        y -= minSectionIndex << 4;
+        y -= minSectionPosition << 4;
         return biomes[(y >> 2) << 4 | (z >> 2) << 2 | x >> 2];
     }
 
@@ -95,7 +95,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         updateSectionIndexRange(y >> 4);
-        y -= minSectionIndex << 4;
+        y -= minSectionPosition << 4;
         if (biomes == null) {
             biomes = new BiomeType[64 * sectionCount];
         }
@@ -114,7 +114,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public void setBlocks(int layer, char[] data) {
         updateSectionIndexRange(layer);
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         this.blocks[layer] = data;
         this.sections[layer] = data == null ? empty : FULL;
     }
@@ -141,7 +141,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (light == null) {
             light = new char[sectionCount][];
         }
-        final int layer = (y >> 4) - minSectionIndex;
+        final int layer = (y >> 4) - minSectionPosition;
         if (light[layer] == null) {
             char[] c = new char[4096];
             Arrays.fill(c, (char) 16);
@@ -157,7 +157,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (skyLight == null) {
             skyLight = new char[sectionCount][];
         }
-        final int layer = (y >> 4) - minSectionIndex;
+        final int layer = (y >> 4) - minSectionPosition;
         if (skyLight[layer] == null) {
             char[] c = new char[4096];
             Arrays.fill(c, (char) 16);
@@ -181,7 +181,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (light == null) {
             light = new char[sectionCount][];
         }
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         light[layer] = toSet;
     }
 
@@ -191,7 +191,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (skyLight == null) {
             skyLight = new char[sectionCount][];
         }
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         skyLight[layer] = toSet;
     }
 
@@ -208,7 +208,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public void removeSectionLighting(int layer, boolean sky) {
         updateSectionIndexRange(layer);
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         if (light == null) {
             light = new char[sectionCount][];
         }
@@ -230,7 +230,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public void setFullBright(int layer) {
         updateSectionIndexRange(layer);
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         if (light == null) {
             light = new char[sectionCount][];
         }
@@ -293,7 +293,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (biomes != null || light != null || skyLight != null) {
             return false;
         }
-        return IntStream.range(minSectionIndex, maxSectionIndex + 1).noneMatch(this::hasSection);
+        return IntStream.range(minSectionPosition, maxSectionPosition + 1).noneMatch(this::hasSection);
     }
 
     @Override
@@ -308,7 +308,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public boolean hasBiomes(int layer) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         if (layer < 0 || layer >= sections.length) {
             return false;
         }
@@ -327,22 +327,22 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public int getMaxSectionIndex() {
-        return maxSectionIndex;
+    public int getMaxSectionPosition() {
+        return maxSectionPosition;
     }
 
     @Override
-    public int getMinSectionIndex() {
-        return minSectionIndex;
+    public int getMinSectionPosition() {
+        return minSectionPosition;
     }
 
     // Checks and updates the various section arrays against the new layer index
     private void updateSectionIndexRange(int layer) {
-        if (layer >= minSectionIndex && layer <= maxSectionIndex) {
+        if (layer >= minSectionPosition && layer <= maxSectionPosition) {
             return;
         }
-        if (layer < minSectionIndex) {
-            int diff = minSectionIndex - layer;
+        if (layer < minSectionPosition) {
+            int diff = minSectionPosition - layer;
             sectionCount += diff;
             char[][] tmpBlocks = new char[sectionCount][];
             Section[] tmpSections = new Section[sectionCount];
@@ -353,7 +353,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             }
             blocks = tmpBlocks;
             sections = tmpSections;
-            minSectionIndex = layer;
+            minSectionPosition = layer;
             if (biomes != null) {
                 BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
                 System.arraycopy(biomes, 0, tmpBiomes, 64 * diff, biomes.length);
@@ -370,7 +370,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 skyLight = tmplight;
             }
         } else {
-            int diff = layer - maxSectionIndex;
+            int diff = layer - maxSectionPosition;
             sectionCount += diff;
             char[][] tmpBlocks = new char[sectionCount][];
             Section[] tmpSections = new Section[sectionCount];
@@ -381,7 +381,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             }
             blocks = tmpBlocks;
             sections = tmpSections;
-            maxSectionIndex = layer;
+            maxSectionPosition = layer;
             if (biomes != null) {
                 BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
                 System.arraycopy(biomes, 0, tmpBiomes, 0, biomes.length);

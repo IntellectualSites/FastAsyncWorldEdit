@@ -201,7 +201,7 @@ public class MathMan {
      */
     public static int tripleSearchCoords(int x, int y, int z) {
         if (x > 1023 || x < -1024 || y > 255 || y < -256 || z > 1023 || z < -1024) {
-            throw new IndexOutOfBoundsException(String.format("Check range on x=%s, y=%s and z=%s!", x, y, z));
+            throw new UnsupportedOperationException(String.format("Check range on x=%s, y=%s and z=%s!", x, y, z));
         }
         int b1 = Math.abs(y) & 0xff;
         int b3 = x & 0xff;
