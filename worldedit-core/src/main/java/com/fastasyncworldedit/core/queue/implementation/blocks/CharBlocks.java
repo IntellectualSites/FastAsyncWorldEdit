@@ -8,6 +8,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
+
 public abstract class CharBlocks implements IBlocks {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -65,17 +67,17 @@ public abstract class CharBlocks implements IBlocks {
     };
     public char[][] blocks;
     public Section[] sections;
-    protected int minSectionIndex;
-    protected int maxSectionIndex;
+    protected int minSectionPosition;
+    protected int maxSectionPosition;
     protected int sectionCount;
 
     /**
      * New instance given initial min/max section indices. Can be negative.
      */
-    public CharBlocks(int minSectionIndex, int maxSectionIndex) {
-        this.minSectionIndex = minSectionIndex;
-        this.maxSectionIndex = maxSectionIndex;
-        this.sectionCount = maxSectionIndex - minSectionIndex + 1;
+    public CharBlocks(int minSectionPosition, int maxSectionPosition) {
+        this.minSectionPosition = minSectionPosition;
+        this.maxSectionPosition = maxSectionPosition;
+        this.sectionCount = maxSectionPosition - minSectionPosition + 1;
         blocks = new char[sectionCount][];
         sections = new Section[sectionCount];
         for (int i = 0; i < sectionCount; i++) {
@@ -116,7 +118,7 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     public synchronized void reset(int layer) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         sections[layer] = empty;
     }
 
@@ -133,13 +135,13 @@ public abstract class CharBlocks implements IBlocks {
     // Not synchronized as any subsequent methods called from this class will be, or the section shouldn't appear as loaded anyway.
     @Override
     public boolean hasSection(int layer) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         return layer >= 0 && layer < sections.length && sections[layer].isFull();
     }
 
     @Override
     public char[] load(int layer) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         synchronized (sections[layer]) {
             return sections[layer].get(this, layer);
         }
@@ -163,7 +165,7 @@ public abstract class CharBlocks implements IBlocks {
     public char get(int x, int y, int z) {
         int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
-        if (layer > maxSectionIndex || layer < minSectionIndex) {
+        if (layer > maxSectionPosition || layer < minSectionPosition) {
             return 0;
         }
         return get(layer, index);
@@ -187,13 +189,13 @@ public abstract class CharBlocks implements IBlocks {
      */
 
     public final char get(int layer, int index) {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         return sections[layer].get(this, layer, index);
     }
 
     public synchronized final void set(int layer, int index, char value) throws
             ArrayIndexOutOfBoundsException {
-        layer -= minSectionIndex;
+        layer -= minSectionPosition;
         sections[layer].set(this, layer, index, value);
     }
 
