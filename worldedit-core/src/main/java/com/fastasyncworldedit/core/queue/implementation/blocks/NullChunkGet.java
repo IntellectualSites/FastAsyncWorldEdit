@@ -127,6 +127,12 @@ public final class NullChunkGet implements IChunkGet {
         return FaweCache.IMP.EMPTY_CHAR_4096;
     }
 
+    @Nullable
+    @Override
+    public char[] loadIfPresent(final int layer) {
+        return null;
+    }
+
     public boolean hasSection(int layer) {
         return false;
     }

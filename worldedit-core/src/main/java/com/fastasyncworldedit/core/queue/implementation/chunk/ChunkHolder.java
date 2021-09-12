@@ -121,6 +121,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return getOrCreateGet().load(layer);
     }
 
+    @Nullable
+    @Override
+    public char[] loadIfPresent(final int layer) {
+        return getOrCreateGet().loadIfPresent(layer);
+    }
+
     @Override
     public boolean isFastMode() {
         return fastmode;

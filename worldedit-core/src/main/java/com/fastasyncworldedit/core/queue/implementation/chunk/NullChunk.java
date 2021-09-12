@@ -173,6 +173,12 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Nullable
+    @Override
+    public char[] loadIfPresent(final int layer) {
+        return null;
+    }
+
+    @Nullable
     public CompoundTag getEntity(@Nonnull UUID uuid) {
         return null;
     }
