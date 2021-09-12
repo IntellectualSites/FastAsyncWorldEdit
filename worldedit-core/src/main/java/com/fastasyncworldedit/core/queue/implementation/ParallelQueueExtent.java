@@ -17,7 +17,6 @@ import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.queue.IQueueWrapper;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
@@ -43,7 +42,7 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.IntStream;
 
-public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrapper {
+public class ParallelQueueExtent extends PassthroughExtent {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -54,8 +53,8 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
     // not very important)
     private final boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
-    private int changes;
     private final boolean fastmode;
+    private int changes;
     private int lastException = Integer.MIN_VALUE;
     private int exceptionCount = 0;
 
@@ -90,15 +89,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     }
 
     private IQueueExtent<IQueueChunk> getNewQueue() {
-        return wrapQueue(handler.getQueue(this.world, this.processor, this.postProcessor));
-    }
-
-    @Override
-    public IQueueExtent<IQueueChunk> wrapQueue(IQueueExtent<IQueueChunk> queue) {
-        // TODO wrap
-        queue.setProcessor(this.processor);
-        queue.setPostProcessor(this.postProcessor);
-        return queue;
+        return handler.getQueue(world, this.processor, this.postProcessor);
     }
 
     @Override
