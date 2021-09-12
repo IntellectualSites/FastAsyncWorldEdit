@@ -53,7 +53,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Writes schematic files using the Sponge schematic format.
+ *
+ * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
+ * {@link com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter}.
+ * Avoid using large clipboards to create schematics with this writer.
  */
+@Deprecated
 public class SpongeSchematicWriter implements ClipboardWriter {
 
     private static final int CURRENT_VERSION = 2;
