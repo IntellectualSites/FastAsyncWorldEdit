@@ -146,7 +146,7 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         int z = vector.getBlockZ();
 
         if ((lastX == (lastX = x) & lastZ == (lastZ = z))) {
-            int height = getHeight(extent, x, y, z);
+            int height = getHeight(getExtent(), x, y, z);
             if (y <= height) {
                 return overlay ? (lastValue && y == height) : lastValue;
             }
@@ -154,15 +154,15 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
 
         MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
 
-        if (!mask.test(extent, mutable)) {
+        if (!mask.test(getExtent(), mutable)) {
             return false;
         }
         if (overlay) {
-            if (y < maxY && !adjacentAir(extent, mutable)) {
+            if (y < maxY && !adjacentAir(getExtent(), mutable)) {
                 return lastValue = false;
             }
         }
-        return testSlope(extent, x, y, z);
+        return testSlope(getExtent(), x, y, z);
     }
 
     @Override
