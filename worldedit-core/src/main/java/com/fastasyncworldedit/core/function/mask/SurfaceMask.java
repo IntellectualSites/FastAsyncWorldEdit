@@ -21,7 +21,7 @@ public class SurfaceMask extends AdjacentAnyMask {
 
     @Override
     public boolean test(BlockVector3 v) {
-        return !getParentMask().test(v.getBlockX(), v.getBlockY(), v.getBlockZ()) && super.test(v);
+        return !getParentMask().test(v) && super.test(v);
     }
 
     @Override
