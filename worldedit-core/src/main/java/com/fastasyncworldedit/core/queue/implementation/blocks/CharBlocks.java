@@ -102,12 +102,14 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
-    public synchronized boolean trim(boolean aggressive, int layer) {
+    public boolean trim(boolean aggressive, int layer) {
         boolean result = true;
-        if (!sections[layer].isFull() && blocks[layer] != null) {
-            blocks[layer] = null;
-        } else {
-            result = false;
+        synchronized (sectionLocks[layer]) {
+            if (!sections[layer].isFull() && blocks[layer] != null) {
+                blocks[layer] = null;
+            } else {
+                result = false;
+            }
         }
         return result;
     }
@@ -120,12 +122,14 @@ public abstract class CharBlocks implements IBlocks {
         return null;
     }
 
-    public synchronized void reset(int layer) {
+    public void reset(int layer) {
         layer -= minSectionPosition;
-        sections[layer] = empty;
+        synchronized (sectionLocks[layer]) {
+            sections[layer] = empty;
+        }
     }
 
-    public synchronized char[] update(int layer, char[] data, boolean aggressive) {
+    public char[] update(int layer, char[] data, boolean aggressive) {
         if (data == null) {
             return new char[4096];
         }
@@ -211,7 +215,7 @@ public abstract class CharBlocks implements IBlocks {
         return sections[layer].get(this, layer, index);
     }
 
-    public synchronized final void set(int layer, int index, char value) throws
+    public final void set(int layer, int index, char value) throws
             ArrayIndexOutOfBoundsException {
         layer -= minSectionPosition;
         sections[layer].set(this, layer, index, value);
@@ -234,7 +238,7 @@ public abstract class CharBlocks implements IBlocks {
             return section[index];
         }
 
-        public final void set(CharBlocks blocks, int layer, int index, char value) {
+        public final synchronized void set(CharBlocks blocks, int layer, int index, char value) {
             get(blocks, layer)[index] = value;
         }
 
