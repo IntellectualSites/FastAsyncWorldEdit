@@ -40,7 +40,7 @@ public abstract class CharBlocks implements IBlocks {
 
         @Override
         public char[] get(CharBlocks blocks, int layer, boolean aggressive) {
-            synchronized (this) {
+            synchronized (blocks.sectionLocks[layer]) {
                 char[] arr = blocks.blocks[layer];
                 if (arr == null) {
                     arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
@@ -67,6 +67,7 @@ public abstract class CharBlocks implements IBlocks {
     };
     public char[][] blocks;
     public Section[] sections;
+    public Object[] sectionLocks;
     protected int minSectionPosition;
     protected int maxSectionPosition;
     protected int sectionCount;
@@ -80,8 +81,10 @@ public abstract class CharBlocks implements IBlocks {
         this.sectionCount = maxSectionPosition - minSectionPosition + 1;
         blocks = new char[sectionCount][];
         sections = new Section[sectionCount];
+        sectionLocks = new Object[sectionCount];
         for (int i = 0; i < sectionCount; i++) {
             sections[i] = empty;
+            sectionLocks[i] = new Object();
         }
     }
 
@@ -142,7 +145,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public char[] load(int layer) {
         layer -= minSectionPosition;
-        synchronized (sections[layer]) {
+        synchronized (sectionLocks[layer]) {
             return sections[layer].get(this, layer);
         }
     }

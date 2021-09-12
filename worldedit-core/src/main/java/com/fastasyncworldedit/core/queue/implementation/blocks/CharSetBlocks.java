@@ -331,13 +331,17 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             sectionCount += diff;
             char[][] tmpBlocks = new char[sectionCount][];
             Section[] tmpSections = new Section[sectionCount];
+            Object[] tmpSectionLocks = new Object[sectionCount];
             System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
             System.arraycopy(sections, 0, tmpSections, diff, sections.length);
+            System.arraycopy(sectionLocks, 0, tmpSectionLocks, diff, sections.length);
             for (int i = 0; i < diff; i++) {
                 tmpSections[i] = empty;
+                tmpSectionLocks[i] = new Object();
             }
             blocks = tmpBlocks;
             sections = tmpSections;
+            sectionLocks = tmpSectionLocks;
             minSectionPosition = layer;
             if (biomes != null) {
                 BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
@@ -359,13 +363,17 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             sectionCount += diff;
             char[][] tmpBlocks = new char[sectionCount][];
             Section[] tmpSections = new Section[sectionCount];
+            Object[] tmpSectionLocks = new Object[sectionCount];
             System.arraycopy(blocks, 0, tmpBlocks, 0, blocks.length);
             System.arraycopy(sections, 0, tmpSections, 0, sections.length);
+            System.arraycopy(sectionLocks, 0, tmpSectionLocks, 0, sections.length);
             for (int i = sectionCount - diff; i < sectionCount; i++) {
                 tmpSections[i] = empty;
+                tmpSectionLocks[i] = new Object();
             }
             blocks = tmpBlocks;
             sections = tmpSections;
+            sectionLocks = tmpSectionLocks;
             maxSectionPosition = layer;
             if (biomes != null) {
                 BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
