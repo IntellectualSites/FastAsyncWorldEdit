@@ -321,21 +321,6 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         return super.load(layer);
     }
 
-    @Override
-    public int getSectionCount() {
-        return sectionCount;
-    }
-
-    @Override
-    public int getMaxSectionPosition() {
-        return maxSectionPosition;
-    }
-
-    @Override
-    public int getMinSectionPosition() {
-        return minSectionPosition;
-    }
-
     // Checks and updates the various section arrays against the new layer index
     private void updateSectionIndexRange(int layer) {
         if (layer >= minSectionPosition && layer <= maxSectionPosition) {

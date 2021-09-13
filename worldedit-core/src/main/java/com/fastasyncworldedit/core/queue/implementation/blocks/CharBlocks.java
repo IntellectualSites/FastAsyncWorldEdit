@@ -158,6 +158,21 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
+    public int getSectionCount() {
+        return sectionCount;
+    }
+
+    @Override
+    public int getMaxSectionPosition() {
+        return maxSectionPosition;
+    }
+
+    @Override
+    public int getMinSectionPosition() {
+        return minSectionPosition;
+    }
+
+    @Override
     public BlockState getBlock(int x, int y, int z) {
         return BlockTypesCache.states[get(x, y, z)];
     }

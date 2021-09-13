@@ -55,9 +55,4 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
         return null;
     }
 
-    @Override
-    public int getSectionCount() {
-        return sectionCount;
-    }
-
 }
