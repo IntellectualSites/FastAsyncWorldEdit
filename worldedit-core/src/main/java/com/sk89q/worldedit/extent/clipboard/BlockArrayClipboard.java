@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent.clipboard;
 
+import com.fastasyncworldedit.core.extent.clipboard.SimpleClipboard;
 import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.OffsetBlockVector3;
@@ -49,7 +50,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Stores block data as a multi-dimensional array of {@link BlockState}s and
- * other data as lists or maps.
+ * other data as lists or maps. Clipboard may need to be flushed before use
+ * if using clipboard-on-disk.
  */
 public class BlockArrayClipboard implements Clipboard {
 
@@ -58,30 +60,71 @@ public class BlockArrayClipboard implements Clipboard {
     private final BlockVector3 origin;
     private final Clipboard parent;
 
+    /**
+     * Create a new instance. Creates a parent clipboard based on the clipboard settings in settings.yml, with a randomly
+     * generated {@link UUID} ID.
+     * Depending on settings, parent will be on of:
+     * {@link com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard}
+     * {@link com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard}
+     * {@link com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard}
+     * <p>
+     * If using clipboard-on-disk, the clipboard should be flushed {@link Clipboard#flush()} before use.
+     *
+     * @param region the bounding region
+     */
     public BlockArrayClipboard(Region region) {
         this(region, UUID.randomUUID());
     }
 
-    public BlockArrayClipboard(Clipboard clipboard, BlockVector3 offset) {
-        this.parent = clipboard;
-        Region shifted = clipboard.getRegion().clone();
+    /**
+     * Create a new instance, storage-backed by the given clipboard. Clipboard must be of one of the following types:
+     * {@link com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard}
+     * {@link com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard}
+     * {@link com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard}
+     * <p>
+     * Do not use this constructor if you do not know what you are doing. See
+     * {@link BlockArrayClipboard#BlockArrayClipboard(Region)} or {@link BlockArrayClipboard#BlockArrayClipboard(Region, UUID)}
+     *
+     * @param parent storage clipboard
+     * @param offset offset of clipboard region from origin
+     */
+    public BlockArrayClipboard(SimpleClipboard parent, BlockVector3 offset) {
+        this.parent = parent;
+        Region shifted = parent.getRegion().clone();
         shifted.shift(offset);
         this.region = shifted;
         this.origin = shifted.getMinimumPoint();
     }
 
     /**
-     * Create a new instance.
+     * Create a new instance. Creates a parent clipboard based on the clipboard settings in settings.yml.
+     * Depending on settings, parent will be on of:
+     * {@link com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard}
+     * {@link com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard}
+     * {@link com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard}
+     * <p>
+     * If using clipboard-on-disk, the clipboard should be flushed ({@link Clipboard#flush()}) before use.
      *
-     * <p>The origin will be placed at the region's lowest minimum point.</p>
-     *
-     * @param region the bounding region
+     * @param region      the bounding region
+     * @param clipboardId clipboard ID
      */
     public BlockArrayClipboard(Region region, UUID clipboardId) {
-        this(region, Clipboard.create(region, clipboardId));
+        this(region, (SimpleClipboard) Clipboard.create(region, clipboardId));
     }
 
-    public BlockArrayClipboard(Region region, Clipboard parent) {
+    /**
+     * Create a new instance, storage-backed by the given clipboard. Clipboard must be of one of the following types:
+     * {@link com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard}
+     * {@link com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard}
+     * {@link com.fastasyncworldedit.core.extent.clipboard.CPUOptimizedClipboard}
+     * <p>
+     * Do not use this constructor if you do not know what you are doing. See
+     * {@link BlockArrayClipboard#BlockArrayClipboard(Region)} or {@link BlockArrayClipboard#BlockArrayClipboard(Region, UUID)}
+     *
+     * @param region the bounding region
+     * @param parent storage clipboard
+     */
+    public BlockArrayClipboard(Region region, SimpleClipboard parent) {
         checkNotNull(parent);
         checkNotNull(region);
         this.parent = parent;
