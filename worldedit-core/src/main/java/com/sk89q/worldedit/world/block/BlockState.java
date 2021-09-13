@@ -185,7 +185,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         if (defaultState != null) {
             stateId = defaultState.getInternalId();
         } else {
-            stateId = type.getInternalId();
+            stateId = type.getDefaultState().getInternalId();
         }
         int length = state.length();
         AbstractProperty property = null;
