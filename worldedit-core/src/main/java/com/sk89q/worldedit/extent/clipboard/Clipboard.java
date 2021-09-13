@@ -186,10 +186,17 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         return apply(region, filter);
     }
 
+    /**
+     * Close the clipboard. May not allow further reading of the clipboard if saved on disk.
+     */
     @Override
     default void close() {
     }
 
+    /**
+     * Flush the clipboard if appropriate. Only does something if using clipboard-on-disk. Blocking method and ensures all data
+     * is saved to disk for any further operation with the clipboard.
+     */
     @Override
     default void flush() {
     }
