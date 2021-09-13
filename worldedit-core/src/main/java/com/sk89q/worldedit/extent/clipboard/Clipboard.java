@@ -52,6 +52,7 @@ import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -63,7 +64,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Specifies an object that implements something suitable as a "clipboard."
  */
-public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
+//FAWE start - Iterable, closeable and flushable
+public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Flushable {
+    //FAWE end
 
     //FAWE start
     static Clipboard create(Region region) {
@@ -185,6 +188,10 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
 
     @Override
     default void close() {
+    }
+
+    @Override
+    default void flush() {
     }
 
     /**

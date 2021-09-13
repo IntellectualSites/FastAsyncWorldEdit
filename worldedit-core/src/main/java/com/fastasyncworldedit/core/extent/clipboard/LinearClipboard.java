@@ -49,9 +49,6 @@ public abstract class LinearClipboard extends SimpleClipboard {
 
     public abstract Collection<CompoundTag> getTileEntities();
 
-    public void flush() {
-    }
-
     @Override
     protected void finalize() {
         close();

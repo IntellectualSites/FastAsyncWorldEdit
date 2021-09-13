@@ -323,6 +323,11 @@ public class BlockArrayClipboard implements Clipboard {
         this.parent.close();
     }
 
+    @Override
+    public void flush() {
+        this.parent.flush();
+    }
+
     //FAWE start
 
     /**
