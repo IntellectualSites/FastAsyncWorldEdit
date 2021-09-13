@@ -9,7 +9,15 @@ import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
-import org.gradle.kotlin.dsl.*
+import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByName
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.withType
 
 fun Project.applyPlatformAndCoreConfiguration() {
     applyCommonConfiguration()
@@ -128,7 +136,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
                 version = version
 
                 pom {
-                    name.set(project.name + " " + project.version)
+                    name.set("${rootProject.name}-${project.description}" + " " + project.version)
                     description.set("Blazingly fast Minecraft world manipulation for artists, builders and everyone else.")
                     url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
 
