@@ -10,6 +10,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -37,7 +38,6 @@ public class BitSetBlocks implements IChunkSet {
         layer -= minSectionPosition;
         return row.rows[layer] != MemBlockSet.NULL_ROW_Y;
     }
-
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
@@ -151,6 +151,13 @@ public class BitSetBlocks implements IChunkSet {
             }
         }
         return arr;
+    }
+
+    // No need to do anything different
+    @Nullable
+    @Override
+    public char[] loadIfPresent(final int layer) {
+        return load(layer);
     }
 
     @Override

@@ -44,10 +44,14 @@ public interface IBatchProcessor {
         for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
-                    char[] arr = set.load(layer);
-                    int index = (minY & 15) << 8;
-                    for (int i = 0; i < index; i++) {
-                        arr[i] = 0;
+                    char[] arr = set.loadIfPresent(layer);
+                    if (arr != null) {
+                        int index = (minY & 15) << 8;
+                        for (int i = 0; i < index; i++) {
+                            arr[i] = 0;
+                        }
+                    } else {
+                        arr = new char[4096];
                     }
                     set.setBlocks(layer, arr);
                 } else {
@@ -59,10 +63,14 @@ public interface IBatchProcessor {
         for (int layer = maxLayer; layer < set.getMaxSectionPosition(); layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
-                    char[] arr = set.load(layer);
-                    int index = ((maxY + 1) & 15) << 8;
-                    for (int i = index; i < arr.length; i++) {
-                        arr[i] = 0;
+                    char[] arr = set.loadIfPresent(layer);
+                    if (arr != null) {
+                        int index = ((maxY + 1) & 15) << 8;
+                        for (int i = index; i < arr.length; i++) {
+                            arr[i] = 0;
+                        }
+                    } else {
+                        arr = new char[4096];
                     }
                     set.setBlocks(layer, arr);
                 } else {
