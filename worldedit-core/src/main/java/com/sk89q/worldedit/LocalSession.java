@@ -840,12 +840,16 @@ public class LocalSession implements TextureHolder {
     }
 
     /**
-     * Ensure the player's clipboard is closed. (will only do something with clipboard-on-disk)
+     * Ensure the player's clipboard is flushed. (will only do something with clipboard-on-disk)
      */
-    public void closeClipboard() {
+    public void flushClipboard() {
         synchronized (clipboardLock) {
             if (this.clipboard != null) {
-                this.clipboard.close();
+                try {
+                    this.clipboard.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

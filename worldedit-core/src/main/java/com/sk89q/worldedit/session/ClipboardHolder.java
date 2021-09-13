@@ -24,6 +24,9 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 
+import java.io.Closeable;
+import java.io.Flushable;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,7 +35,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Holds the clipboard and the current transform on the clipboard.
  */
-public class ClipboardHolder {
+//FAWE start - closeable and flushable
+public class ClipboardHolder implements Closeable, Flushable {
 
     private Clipboard clipboard;
     private Transform transform = new Identity();
@@ -118,6 +122,7 @@ public class ClipboardHolder {
         return new PasteBuilder(this, targetExtent);
     }
 
+    @Override
     public void close() {
         if (clipboard != null) {
             clipboard.close();
@@ -125,5 +130,11 @@ public class ClipboardHolder {
         clipboard = null;
     }
 
+    @Override
+    public void flush() throws IOException {
+        if (clipboard != null) {
+            clipboard.flush();
+        }
+    }
 
 }
