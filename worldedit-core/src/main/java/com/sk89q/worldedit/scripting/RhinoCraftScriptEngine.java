@@ -36,13 +36,13 @@ public class RhinoCraftScriptEngine implements CraftScriptEngine {
     private int timeLimit;
 
     @Override
-    public void setTimeLimit(int milliseconds) {
-        timeLimit = milliseconds;
+    public int getTimeLimit() {
+        return timeLimit;
     }
 
     @Override
-    public int getTimeLimit() {
-        return timeLimit;
+    public void setTimeLimit(int milliseconds) {
+        timeLimit = milliseconds;
     }
 
     @Override
@@ -50,7 +50,6 @@ public class RhinoCraftScriptEngine implements CraftScriptEngine {
             throws Throwable {
         RhinoContextFactory factory = new RhinoContextFactory(timeLimit);
         Context cx = factory.enterContext();
-        cx.setClassShutter(new MinecraftHidingClassShutter());
         ScriptableObject scriptable = new ImporterTopLevel(cx);
         Scriptable scope = cx.initStandardObjects(scriptable);
 
