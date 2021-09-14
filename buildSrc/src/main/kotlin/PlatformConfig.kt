@@ -2,6 +2,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.bundling.Jar
@@ -17,6 +18,7 @@ import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
 
 fun Project.applyPlatformAndCoreConfiguration() {
@@ -89,36 +91,13 @@ fun Project.applyPlatformAndCoreConfiguration() {
         }
     }
 
-    tasks.register<Jar>("javadocJar") {
-        dependsOn("javadoc")
-        archiveClassifier.set(null as String?)
-        archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-javadoc.${archiveExtension.getOrElse("jar")}")
-        from(tasks.getByName<Javadoc>("javadoc").destinationDir)
+    configure<JavaPluginExtension> {
+        disableAutoTargetJvm()
+        withJavadocJar()
     }
 
-    tasks.named("assemble").configure {
-        dependsOn("javadocJar")
-    }
-
-    artifacts {
-        add("archives", tasks.named("jar"))
-        add("archives", tasks.named("javadocJar"))
-    }
-
-    if (name == "worldedit-core" || name == "worldedit-bukkit") {
-        tasks.register<Jar>("sourcesJar") {
-            dependsOn("classes")
-            archiveClassifier.set(null as String?)
-            archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-sources.${archiveExtension.getOrElse("jar")}")
-            from(sourceSets["main"].allSource)
-        }
-
-        artifacts {
-            add("archives", tasks.named("sourcesJar"))
-        }
-        tasks.named("assemble").configure {
-            dependsOn("sourcesJar")
-        }
+    if (name in setOf("worldedit-core", "worldedit-bukkit", "worldedit-cli")) {
+        the<JavaPluginExtension>().withSourcesJar()
     }
 
     val javaComponent = components["java"] as AdhocComponentWithVariants
