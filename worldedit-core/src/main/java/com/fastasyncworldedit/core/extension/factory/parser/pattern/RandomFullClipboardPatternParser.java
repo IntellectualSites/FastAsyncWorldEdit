@@ -66,16 +66,16 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
                 default:
                     Actor player = context.requireActor();
                     MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(player,
-                            arguments[0], ClipboardFormats.findByAlias("fast"), true
+                            arguments[0], ClipboardFormats.findByAlias("fast"), false
                     );
                     if (multi == null) {
                         multi = ClipboardFormats.loadAllFromInput(player,
-                                arguments[0], ClipboardFormats.findByAlias("sponge"), true
+                                arguments[0], ClipboardFormats.findByAlias("mcedit"), false
                         );
                     }
                     if (multi == null) {
                         multi = ClipboardFormats.loadAllFromInput(player,
-                                arguments[0], ClipboardFormats.findByAlias("mcedit"), true
+                                arguments[0], ClipboardFormats.findByAlias("sponge"), false
                         );
                     }
                     if (multi == null) {
