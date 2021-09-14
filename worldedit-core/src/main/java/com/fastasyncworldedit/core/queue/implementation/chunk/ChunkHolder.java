@@ -886,7 +886,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
+    public synchronized void filterBlocks(Filter filter, ChunkFilterBlock block, @Nullable Region region, boolean full) {
         final IChunkGet get = getOrCreateGet();
         final IChunkSet set = getOrCreateSet();
         set.setFastMode(fastmode);
