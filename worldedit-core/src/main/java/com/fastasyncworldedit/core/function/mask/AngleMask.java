@@ -9,7 +9,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.Arrays;
 
-public class AngleMask extends SolidBlockMask implements ResettableMask {
+public class AngleMask extends AbstractExtentMask implements ResettableMask {
 
     protected static double ADJACENT_MOD = 0.5;
     protected static double DIAGONAL_MOD = 1 / Math.sqrt(8);
@@ -141,12 +141,30 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
 
     @Override
     public boolean test(BlockVector3 vector) {
+
+        if (!mask.test(vector)) {
+            return false;
+        }
+        int y = vector.getBlockY();
+        if (overlay) {
+            MutableBlockVector3 mutable = new MutableBlockVector3(vector);
+            if (y < maxY && !adjacentAir(null, mutable)) {
+                return false;
+            }
+        }
+        int x = vector.getBlockX();
+        int z = vector.getBlockZ();
+        return testSlope(getExtent(), x, y, z);
+    }
+
+    @Override
+    public boolean test(final Extent extent, final BlockVector3 vector) {
         int x = vector.getBlockX();
         int y = vector.getBlockY();
         int z = vector.getBlockZ();
 
         if ((lastX == (lastX = x) & lastZ == (lastZ = z))) {
-            int height = getHeight(getExtent(), x, y, z);
+            int height = getHeight(extent, x, y, z);
             if (y <= height) {
                 return overlay ? (lastValue && y == height) : lastValue;
             }
@@ -154,15 +172,15 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
 
         MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
 
-        if (!mask.test(getExtent(), mutable)) {
+        if (!mask.test(extent, mutable)) {
             return false;
         }
         if (overlay) {
-            if (y < maxY && !adjacentAir(getExtent(), mutable)) {
+            if (y < maxY && !adjacentAir(extent, mutable)) {
                 return lastValue = false;
             }
         }
-        return testSlope(getExtent(), x, y, z);
+        return testSlope(extent, x, y, z);
     }
 
     @Override
