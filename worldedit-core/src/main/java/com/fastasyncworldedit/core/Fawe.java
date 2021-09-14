@@ -253,6 +253,7 @@ public class Fawe {
         } catch (Throwable e) {
             LOGGER.error("Failed to load config.", e);
         }
+        Settings.IMP.QUEUE.TARGET_SIZE = Math.max(Settings.IMP.QUEUE.TARGET_SIZE, Settings.IMP.QUEUE.PARALLEL_THREADS);
     }
 
 
