@@ -11,9 +11,11 @@
     "antlr4-runtime",
     "paranamer",
     "fastutil",
+    "it.unimi.dsi:fastutil",  
     "auto-value-annotations",
     "auto-value",
     "gson",
-    "fabric-api"
+    "fabric-api",
+    "net.fabricmc.fabric-api:fabric-api"  
   ]
 }
