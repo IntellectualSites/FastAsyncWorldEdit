@@ -40,7 +40,7 @@ public abstract class CharBlocks implements IBlocks {
 
         @Override
         public char[] get(CharBlocks blocks, int layer, boolean aggressive) {
-            synchronized (this) {
+            synchronized (blocks.sectionLocks[layer]) {
                 char[] arr = blocks.blocks[layer];
                 if (arr == null) {
                     arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
@@ -67,6 +67,7 @@ public abstract class CharBlocks implements IBlocks {
     };
     public char[][] blocks;
     public Section[] sections;
+    public Object[] sectionLocks;
     protected int minSectionPosition;
     protected int maxSectionPosition;
     protected int sectionCount;
@@ -80,8 +81,10 @@ public abstract class CharBlocks implements IBlocks {
         this.sectionCount = maxSectionPosition - minSectionPosition + 1;
         blocks = new char[sectionCount][];
         sections = new Section[sectionCount];
+        sectionLocks = new Object[sectionCount];
         for (int i = 0; i < sectionCount; i++) {
             sections[i] = empty;
+            sectionLocks[i] = new Object();
         }
     }
 
@@ -99,12 +102,14 @@ public abstract class CharBlocks implements IBlocks {
     }
 
     @Override
-    public synchronized boolean trim(boolean aggressive, int layer) {
+    public boolean trim(boolean aggressive, int layer) {
         boolean result = true;
-        if (!sections[layer].isFull() && blocks[layer] != null) {
-            blocks[layer] = null;
-        } else {
-            result = false;
+        synchronized (sectionLocks[layer]) {
+            if (!sections[layer].isFull() && blocks[layer] != null) {
+                blocks[layer] = null;
+            } else {
+                result = false;
+            }
         }
         return result;
     }
@@ -117,12 +122,14 @@ public abstract class CharBlocks implements IBlocks {
         return null;
     }
 
-    public synchronized void reset(int layer) {
+    public void reset(int layer) {
         layer -= minSectionPosition;
-        sections[layer] = empty;
+        synchronized (sectionLocks[layer]) {
+            sections[layer] = empty;
+        }
     }
 
-    public synchronized char[] update(int layer, char[] data, boolean aggressive) {
+    public char[] update(int layer, char[] data, boolean aggressive) {
         if (data == null) {
             return new char[4096];
         }
@@ -142,7 +149,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public char[] load(int layer) {
         layer -= minSectionPosition;
-        synchronized (sections[layer]) {
+        synchronized (sectionLocks[layer]) {
             return sections[layer].get(this, layer);
         }
     }
@@ -208,7 +215,7 @@ public abstract class CharBlocks implements IBlocks {
         return sections[layer].get(this, layer, index);
     }
 
-    public synchronized final void set(int layer, int index, char value) throws
+    public final void set(int layer, int index, char value) throws
             ArrayIndexOutOfBoundsException {
         layer -= minSectionPosition;
         sections[layer].set(this, layer, index, value);
@@ -231,7 +238,7 @@ public abstract class CharBlocks implements IBlocks {
             return section[index];
         }
 
-        public final void set(CharBlocks blocks, int layer, int index, char value) {
+        public final synchronized void set(CharBlocks blocks, int layer, int index, char value) {
             get(blocks, layer)[index] = value;
         }
 
