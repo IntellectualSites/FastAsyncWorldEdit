@@ -27,7 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -52,11 +52,10 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     //runtime
     protected final Map<ChunkStatus, Concurrency> chunkStati = new LinkedHashMap<>();
-    protected boolean generateConcurrent = true;
-    protected long seed;
-
     private final Long2ObjectLinkedOpenHashMap<ProtoChunk> protoChunks = new Long2ObjectLinkedOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap<>();
+    protected boolean generateConcurrent = true;
+    protected long seed;
     private ExecutorService executor;
     private SingleThreadQueueExtent source;
 
@@ -73,6 +72,15 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         this.region = region;
         this.target = target;
         this.options = options;
+    }
+
+    private static Random getChunkRandom(long worldseed, int x, int z) {
+        Random random = new Random();
+        random.setSeed(worldseed);
+        long xRand = random.nextLong() / 2L * 2L + 1L;
+        long zRand = random.nextLong() / 2L * 2L + 1L;
+        random.setSeed((long) x * xRand + (long) z * zRand ^ worldseed);
+        return random;
     }
 
     /**
@@ -145,7 +153,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             executor = Executors.newFixedThreadPool(Settings.IMP.QUEUE.PARALLEL_THREADS);
         } // else using sequential chunk generation, concurrent not supported
 
-        //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)? 
+        //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
         //for now it is working well and fast, if we are bored in the future we could do the research (a lot of it) to reduce the border radius
 
         //generate chunk coords lists with a certain radius
@@ -154,7 +162,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             if (radius == -1) { //ignore ChunkStatus.EMPTY
                 return;
             }
-            int border = 16 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk features to generate at the border of the region
+            int border = 10 - radius; //9 = 8 + 1, 8: max border radius used in chunk stages, 1: need 1 extra chunk for chunk
+            // features to generate at the border of the region
             chunkCoordsForRadius.put(radius, getChunkCoordsRegen(region, border));
         });
 
@@ -185,7 +194,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             worldlimits.put(radius, map);
         });
 
-        //run generation tasks exluding FULL chunk status
+        //run generation tasks excluding FULL chunk status
         for (Map.Entry<ChunkStatus, Concurrency> entry : chunkStati.entrySet()) {
             ChunkStatus chunkStatus = entry.getKey();
             int radius = chunkStatus.requiredNeigborChunkRadius0();
@@ -194,18 +203,18 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             if (this.generateConcurrent && entry.getValue() == Concurrency.RADIUS) {
                 SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, radius);
                 for (ConcurrentTasks<SequentialTasks<Long>> para : tasks) {
-                    List scheduled = new ArrayList<>(tasks.size());
+                    List<Runnable> scheduled = new ArrayList<>(tasks.size());
                     for (SequentialTasks<Long> row : para) {
-                        scheduled.add((Callable) () -> {
+                        scheduled.add(() -> {
                             for (Long xz : row) {
                                 chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
                             }
-                            return null;
                         });
                     }
                     try {
-                        List<Future> futures = executor.invokeAll(scheduled);
-                        for (Future future : futures) {
+                        List<Future<?>> futures = new ArrayList<>();
+                        scheduled.forEach(task -> futures.add(executor.submit(task)));
+                        for (Future<?> future : futures) {
                             future.get();
                         }
                     } catch (Exception e) {
@@ -214,16 +223,16 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                 }
             } else if (this.generateConcurrent && entry.getValue() == Concurrency.FULL) {
                 // every chunk can be processed individually
-                List scheduled = new ArrayList(coords.size());
+                List<Runnable> scheduled = new ArrayList<>(coords.size());
                 for (long xz : coords) {
-                    scheduled.add((Callable) () -> {
+                    scheduled.add(() -> {
                         chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
-                        return null;
                     });
                 }
                 try {
-                    List<Future> futures = executor.invokeAll(scheduled);
-                    for (Future future : futures) {
+                    List<Future<?>> futures = new ArrayList<>();
+                    scheduled.forEach(task -> futures.add(executor.submit(task)));
+                    for (Future<?> future : futures) {
                         future.get();
                     }
                 } catch (Exception e) {
@@ -318,12 +327,12 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
      */
     protected abstract boolean initNewWorld() throws Exception;
 
+    //functions to implement by sub class - regenate related
+
     /**
      * Implement the cleanup of all the mess that is created during the regeneration process (initNewWorld() and generate()).This function must not throw any exceptions.
      */
     protected abstract void cleanup();
-
-    //functions to implement by sub class - regenate related
 
     /**
      * Implement the initialization of a {@code ProtoChunk} here.
@@ -391,8 +400,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         return adjustedRegion.getChunks().stream()
                 .map(c -> BlockVector2.at(c.getX(), c.getZ()))
                 .sorted(Comparator
-                        .<BlockVector2>comparingInt(c -> c.getZ())
-                        .thenComparingInt(c -> c.getX())) //needed for RegionLimitedWorldAccess
+                        .comparingInt(BlockVector2::getZ)
+                        .thenComparingInt(BlockVector2::getX)) //needed for RegionLimitedWorldAccess
                 .map(c -> MathMan.pairInt(c.getX(), c.getZ()))
                 .collect(Collectors.toList());
     }
@@ -401,7 +410,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
      * Creates a list of chunkcoord rows that may be executed concurrently
      *
      * @param allcoords                   the coords that should be sorted into rows, must be sorted by z and x
-     * @param requiredNeighborChunkRadius the radius of neighbor chunks that may not be written to conccurently (ChunkStatus.requiredNeighborRadius)
+     * @param requiredNeighborChunkRadius the radius of neighbor chunks that may not be written to concurrently (ChunkStatus
+     *                                    .requiredNeighborRadius)
      * @return a list of chunkcoords rows that may be executed concurrently
      */
     private SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> getChunkStatusTaskRows(
@@ -470,16 +480,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         return tasks;
     }
 
-    private static Random getChunkRandom(long worldseed, int x, int z) {
-        Random random = new Random();
-        random.setSeed(worldseed);
-        long xRand = random.nextLong() / 2L * 2L + 1L;
-        long zRand = random.nextLong() / 2L * 2L + 1L;
-        random.setSeed((long) x * xRand + (long) z * zRand ^ worldseed);
-        return random;
-    }
-
     //classes
+
+    public enum Concurrency {
+        FULL,
+        RADIUS,
+        NONE
+    }
 
     /**
      * This class is used to wrap the ChunkStatus of the current Minecraft implementation and as the implementation to execute a chunk generation step.
@@ -513,11 +520,11 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
          * @param accessibleChunks a list of chunks that will be used during the execution of the wrapped {@code ChunkStatus}.
          *                         This list is order in the correct order required by the {@code ChunkStatus}, unless Mojang suddenly decides to do things differently.
          */
-        public abstract void processChunk(Long xz, List<IChunkAccess> accessibleChunks);
+        public abstract CompletableFuture<?> processChunk(Long xz, List<IChunkAccess> accessibleChunks);
 
         void processChunkSave(Long xz, List<IChunkAccess> accessibleChunks) {
             try {
-                processChunk(xz, accessibleChunks);
+                processChunk(xz, accessibleChunks).get();
             } catch (Exception e) {
                 LOGGER.error(
                         "Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz),
@@ -526,12 +533,6 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             }
         }
 
-    }
-
-    public enum Concurrency {
-        FULL,
-        RADIUS,
-        NONE
     }
 
     public static class SequentialTasks<T> extends Tasks<T> {
