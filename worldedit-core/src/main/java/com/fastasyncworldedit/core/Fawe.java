@@ -268,15 +268,16 @@ public class Fawe {
          *  - LocalSession supports VirtualPlayers and undo on disk
          */
         if (!Settings.IMP.EXPERIMENTAL.DISABLE_NATIVES) {
+            // A higher amount is currently not supported by ZSTD / ZSTD JNI
+            if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.IMP.HISTORY.COMPRESSION_LEVEL > 6) {
+                Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
+                Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
+            }
             try {
                 Native.load();
             } catch (Throwable e) {
-                if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.IMP.HISTORY.COMPRESSION_LEVEL > 6) {
-                    Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
-                    Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
-                    LOGGER.error("ZSTD Compression Binding Not Found.\n"
-                            + "FAWE will still work but compression won't work as well.\n", e);
-                }
+                LOGGER.error("ZSTD compression binding not found.\n"
+                        + "FAWE will still work but compression won't work as well.\n", e);
             }
             try {
                 net.jpountz.util.Native.load();
