@@ -196,7 +196,6 @@ public class FaweDelegateRegionManager {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 World pos3World = BukkitAdapter.adapt(getWorld(swapPos.getWorldName()));
-                WorldEdit.getInstance().newEditSession(pos1World);
                 EditSession sessionA = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
                         .fastmode(true)

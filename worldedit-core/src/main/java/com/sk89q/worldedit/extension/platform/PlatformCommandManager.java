@@ -797,9 +797,8 @@ public final class PlatformCommandManager {
 
             if (editSessionOpt.isPresent()) {
                 EditSession editSession = editSessionOpt.get();
-                editSession.flushQueue();
-                session.remember(editSession);
                 editSession.close();
+                session.remember(editSession);
 
                 long time = System.currentTimeMillis() - start;
                 double timeS = (time / 1000.0);

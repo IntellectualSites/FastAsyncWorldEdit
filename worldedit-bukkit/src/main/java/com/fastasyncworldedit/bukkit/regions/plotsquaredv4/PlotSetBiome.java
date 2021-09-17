@@ -83,7 +83,8 @@ public class PlotSetBiome extends Command {
             }
             plot.addRunning();
             TaskManager.IMP.async(() -> {
-                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().worldname)))
+                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(Bukkit.getWorld(
+                                plot.getArea().worldname)))
                         .autoQueue(false)
                         .checkMemory(false)
                         .allowedRegionsEverywhere()

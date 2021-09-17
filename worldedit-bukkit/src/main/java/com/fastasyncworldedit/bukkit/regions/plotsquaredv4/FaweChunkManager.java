@@ -64,8 +64,6 @@ public class FaweChunkManager extends ChunkManager {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
-                WorldEdit.getInstance().getEditSessionFactory().getEditSession(
-                        pos1World, -1);
                 EditSession sessionA = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
                         .fastmode(true)

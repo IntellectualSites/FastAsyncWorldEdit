@@ -137,7 +137,6 @@ import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.collection.BlockMap;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -229,10 +228,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     protected final World world;
     private final @Nullable
     Actor actor;
-    private AbstractChangeSet changeSet;
     //FAWE start
     private final FaweLimit originalLimit;
     private final FaweLimit limit;
+    private AbstractChangeSet changeSet;
     private boolean history;
 
     private final MutableBlockVector3 mutableBlockVector3 = new MutableBlockVector3();
@@ -284,6 +283,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param world     the world
      * @param maxBlocks the maximum number of blocks that can be changed, or -1 to use no limit
      * @param blockBag  an optional {@link BlockBag} to use, otherwise null
+     * @param event     the event to call with the extent
      */
     //FAWE start - EditSessionEvent
     public EditSession(
@@ -317,6 +317,27 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             this.tracingExtents = null;
         }
+
+        this.allowedRegions = builder.getAllowedRegions() != null ? builder.getAllowedRegions().clone() : null;
+    }
+
+    @Deprecated
+    public EditSession(com.fastasyncworldedit.core.util.EditSessionBuilder builder) {
+        super(builder.compile().getExtent());
+        this.world = builder.getWorld();
+        this.bypassHistory = builder.getBypassHistory();
+        this.bypassAll = builder.getBypassAll();
+        this.originalLimit = builder.getLimit();
+        this.limit = builder.getLimit().copy();
+        this.actor = builder.getPlayer();
+        this.changeSet = builder.getChangeTask();
+        this.minY = world.getMinY();
+        this.maxY = world.getMaxY();
+        this.blockBag = builder.getBlockBag();
+        this.history = changeSet != null;
+        this.relighter = builder.getRelighter();
+        this.wnaMode = builder.isWNAMode();
+        this.tracingExtents = null;
 
         this.allowedRegions = builder.getAllowedRegions() != null ? builder.getAllowedRegions().clone() : null;
     }
@@ -392,8 +413,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     /**
      * Get the Actor or null.
      *
-     * @return the player
+     * @return the actor
      */
+    @Nullable
     public Actor getActor() {
         return actor;
     }
@@ -1010,8 +1032,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param stage    the level
      * @return whether the block changed
      * @throws WorldEditException thrown on a set error
+     * @deprecated Deprecated as may perform differently in FAWE.
      */
-    @Deprecated //TODO Explain Deprecation
+    @Deprecated
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, Stage stage) throws
             WorldEditException {
         //FAWE start - accumulate changes
@@ -1041,8 +1064,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param position the position to set the block at
      * @param block    the block
      * @return whether the block changed
+     * @deprecated Deprecated as may perform differently in FAWE.
      */
-    @Deprecated //TODO Explain Deprecation
+    @Deprecated
     public <B extends BlockStateHolder<B>> boolean rawSetBlock(BlockVector3 position, B block) {
         if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
@@ -1080,7 +1104,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
-    @Deprecated //TODO Explain Deprecation
+    @Deprecated
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws MaxChangedBlocksException {
         if (position.getBlockY() < this.minY || position.getBlockY() > this.maxY) {
             return false;
@@ -1255,7 +1279,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     @Override
     public void close() {
-        internalFlushSession();
+        flushQueue();
         dumpTracingInformation();
     }
 
@@ -1266,7 +1290,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         List<TracingExtent> tracingExtents = getActiveTracingExtents();
         assert actor != null;
         if (tracingExtents.isEmpty()) {
-            actor.printError(TranslatableComponent.of("worldedit.trace.no-tracing-extents"));
+            actor.printError(TextComponent.of("worldedit.trace.no-tracing-extents"));
             return;
         }
         // find the common stacks
@@ -1289,13 +1313,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         stackToPosition.forEach((stack, position) -> {
             // stack can never be empty, something has to have touched the position
             TracingExtent failure = stack.get(0);
-            actor.printDebug(TranslatableComponent.builder("worldedit.trace.action-failed")
-                    .args(
-                            TextComponent.of(failure.getFailedActions().get(position).toString()),
-                            TextComponent.of(position.toString()),
-                            TextComponent.of(failure.getExtent().getClass().getName())
-                    )
-                    .build());
+            actor.printDebug(Caption.of(
+                    "worldedit.trace.action-failed",
+                    failure.getFailedActions().get(position).toString(),
+                    position.toString(),
+                    failure.getExtent().getClass().getName()
+            ));
         });
     }
 
@@ -1316,10 +1339,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Finish off the queue.
      */
     public void flushQueue() {
-        internalFlushSession();
-    }
-
-    private void internalFlushSession() {
         Operations.completeBlindly(commit());
         // Check fails
         FaweLimit used = getLimitUsed();
@@ -1829,7 +1848,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Stack a cuboid region.
      *
      * @param region       the region to stack
-     * @param offset       how far to move the contents each stack
+     * @param offset       how far to move the contents each stack. Is directional.
      * @param count        the number of times to stack
      * @param copyEntities true to copy entities
      * @param copyBiomes   true to copy biomes
@@ -1872,7 +1891,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Move the blocks in a region a certain direction.
      *
      * @param region       the region to move
-     * @param offset       the offset
+     * @param offset       the offset. Is directional.
      * @param multiplier   the number to multiply the offset by
      * @param copyAir      true to copy air blocks
      * @param moveEntities true to move entities
@@ -1903,7 +1922,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Move the blocks in a region a certain direction.
      *
      * @param region       the region to move
-     * @param offset       the offset
+     * @param offset       the offset. Is directional.
      * @param multiplier   the number to multiply the offset by
      * @param moveEntities true to move entities
      * @param copyBiomes   true to copy biomes (source biome is unchanged)

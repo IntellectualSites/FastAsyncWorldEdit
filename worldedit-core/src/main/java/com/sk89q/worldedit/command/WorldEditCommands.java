@@ -40,7 +40,6 @@ import com.sk89q.worldedit.extension.platform.PlatformManager;
 import com.sk89q.worldedit.util.formatting.component.MessageBox;
 import com.sk89q.worldedit.util.formatting.component.TextComponentProducer;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -198,7 +197,7 @@ public class WorldEditCommands {
         if (hookMode != null) {
             newMode = hookMode == HookMode.ACTIVE;
             if (newMode == previousMode) {
-                actor.printError(TranslatableComponent.of(previousMode
+                actor.printError(Caption.of(previousMode
                         ? "worldedit.trace.active.already"
                         : "worldedit.trace.inactive.already"));
                 return;
@@ -207,7 +206,7 @@ public class WorldEditCommands {
             newMode = !previousMode;
         }
         session.setTracingActions(newMode);
-        actor.printInfo(TranslatableComponent.of(newMode ? "worldedit.trace.active" : "worldedit.trace.inactive"));
+        actor.printInfo(Caption.of(newMode ? "worldedit.trace.active" : "worldedit.trace.inactive"));
     }
 
     @Command(
