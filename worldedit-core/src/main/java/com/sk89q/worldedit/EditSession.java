@@ -296,7 +296,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this(eventBus, world, null, null, null, null, true, null, null, null, blockBag, event);
     }
 
-    public EditSession(EditSessionBuilder builder) {
+    EditSession(EditSessionBuilder builder) {
         super(builder.compile().getExtent());
         this.world = builder.getWorld();
         this.bypassHistory = builder.getBypassHistory();

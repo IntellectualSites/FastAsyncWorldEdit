@@ -74,7 +74,7 @@ import java.util.UUID;
 /**
  * A builder-style factory for {@link EditSession EditSessions}.
  */
-public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.EditSessionBuilder {
+public final class EditSessionBuilder {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -97,6 +97,7 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
     public Extent extent;
     public boolean compiled;
     public boolean wrapped;
+
     private @Nullable World world;
     private int maxBlocks = -1;
     @Nullable
@@ -106,7 +107,6 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
     private boolean tracing;
 
     EditSessionBuilder(EventBus eventBus) {
-        super(null); //TODO - REMOVE THIS
         this.eventBus = eventBus;
     }
 
@@ -119,6 +119,11 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
     public EditSessionBuilder world(@Nullable World world) {
         this.world = world;
         return setDirty();
+    }
+
+    @Nullable
+    public World getWorld() {
+        return world;
     }
 
     public int getMaxBlocks() {
@@ -479,7 +484,7 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
         return allowedRegions;
     }
 
-    public com.fastasyncworldedit.core.util.EditSessionBuilder forceWNA() {
+    public EditSessionBuilder forceWNA() {
         this.wnaMode = true;
         return setDirty();
     }
