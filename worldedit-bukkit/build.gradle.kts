@@ -147,6 +147,9 @@ tasks.named<ShadowJar>("shadowJar") {
         // If it turns out not to be true for Spigot/Paper, our only two official platforms, this can be uncommented.
         // include(dependency("org.apache.logging.log4j:log4j-api"))
         include(dependency("org.antlr:antlr4-runtime"))
+        // ZSTD does not work if relocated. https://github.com/luben/zstd-jni/issues/189 Use not latest as it can be difficult
+        // to obtain latest ZSTD lib
+        include(dependency("com.github.luben:zstd-jni:1.4.8-1"))
         relocate("org.bstats", "com.sk89q.worldedit.bstats") {
             include(dependency("org.bstats:"))
         }
@@ -161,9 +164,6 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.1.1"))
-        }
-        relocate("com.github.luben", "com.fastasyncworldedit.core.zstd") {
-            include(dependency("com.github.luben:zstd-jni:1.5.0-4"))
         }
         relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz") {
             include(dependency("net.jpountz:lz4-java-stream:1.0.0"))
