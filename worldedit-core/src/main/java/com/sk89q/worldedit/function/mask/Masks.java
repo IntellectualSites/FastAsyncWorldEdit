@@ -61,6 +61,8 @@ public final class Masks {
         return ALWAYS_TRUE;
     }
 
+    //FAWE start
+
     /**
      * Negate the given mask.
      *
@@ -70,6 +72,7 @@ public final class Masks {
     public static Mask negate(final Mask mask) {
         return mask.inverse();
     }
+    //FAWE end
 
     /**
      * Negate the given mask.
@@ -82,20 +85,12 @@ public final class Masks {
             return ALWAYS_FALSE;
         } else if (mask instanceof AlwaysFalse) {
             return ALWAYS_TRUE;
+        } else if (mask instanceof NegatedMask2D) {
+            return ((NegatedMask2D) mask).mask;
         }
 
         checkNotNull(mask);
-        return new AbstractMask2D() {
-            @Override
-            public boolean test(BlockVector2 vector) {
-                return !mask.test(vector);
-            }
-
-            @Override
-            public Mask2D copy2D() {
-                return Masks.negate(mask.copy2D());
-            }
-        };
+        return new NegatedMask2D(mask);
     }
 
     /**
@@ -211,6 +206,62 @@ public final class Masks {
         @Override
         public Mask2D copy2D() {
             return new AlwaysFalse();
+        }
+        //FAWE end
+
+    }
+
+    //FAWE start - protected > private
+    protected static class NegatedMask implements Mask {
+
+        //FAWE end
+        protected final Mask mask;
+
+        private NegatedMask(Mask mask) {
+            this.mask = mask;
+        }
+
+        @Override
+        public boolean test(BlockVector3 vector) {
+            return !mask.test(vector);
+        }
+
+        @Nullable
+        @Override
+        public Mask2D toMask2D() {
+            Mask2D mask2D = mask.toMask2D();
+            if (mask2D == null) {
+                return null;
+            }
+            return negate(mask2D);
+        }
+
+        //FAWE start
+        @Override
+        public Mask copy() {
+            return Masks.negate(mask.copy());
+        }
+        //FAWE end
+
+    }
+
+    private static class NegatedMask2D implements Mask2D {
+
+        private final Mask2D mask;
+
+        private NegatedMask2D(Mask2D mask) {
+            this.mask = mask;
+        }
+
+        @Override
+        public boolean test(BlockVector2 vector) {
+            return !mask.test(vector);
+        }
+
+        //FAWE start
+        @Override
+        public Mask2D copy2D() {
+            return Masks.negate(mask.copy2D());
         }
         //FAWE end
 

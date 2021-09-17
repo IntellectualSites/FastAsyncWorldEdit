@@ -19,23 +19,34 @@ public class DirectionalVisitor extends RecursiveVisitor {
     private final BlockVector3 origin;
     private final BlockVector3 dirVec;
 
-    public DirectionalVisitor(Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction) {
-        this(mask, function, origin, direction, Integer.MAX_VALUE);
-    }
-
-    public DirectionalVisitor(Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction, int distance) {
-        super(mask, function, distance);
+    /**
+     * New visitor. Only visits in the given direction
+     *
+     * @param mask      block mask
+     * @param function  function to apply
+     * @param origin    start position
+     * @param direction allowable direction to visit between
+     * @param distance  max number of iterations
+     * @param minY      min visitable y value. Inclusive.
+     * @param maxY      max visitable y value. Inclusive.
+     */
+    public DirectionalVisitor(
+            Mask mask, RegionFunction function, BlockVector3 origin, BlockVector3 direction, int distance,
+            int minY, int maxY
+    ) {
+        super(mask, function, distance, minY, maxY);
         checkNotNull(mask);
         this.origin = origin;
         this.dirVec = direction;
 
+
         setDirections(
-                BlockVector3.at(1, 0, 0),
-                BlockVector3.at(-1, 0, 0),
-                BlockVector3.at(0, 0, 1),
-                BlockVector3.at(0, 0, -1),
-                BlockVector3.at(0, -1, 0),
-                BlockVector3.at(0, 1, 0)
+                BlockVector3.UNIT_MINUS_X,
+                BlockVector3.UNIT_X,
+                BlockVector3.UNIT_MINUS_Y,
+                BlockVector3.UNIT_Y,
+                BlockVector3.UNIT_MINUS_Z,
+                BlockVector3.UNIT_Z
         );
     }
 

@@ -78,15 +78,35 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public void setLightingToGet(char[][] lighting) {
+    public void setLightingToGet(char[][] lighting, int startSectionIndex, int endSectionIndex) {
     }
 
     @Override
-    public void setSkyLightingToGet(char[][] lighting) {
+    public void setSkyLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
     }
 
     @Override
     public void setHeightmapToGet(HeightMapType type, int[] data) {
+    }
+
+    @Override
+    public int getMaxY() {
+        return 0;
+    }
+
+    @Override
+    public int getMinY() {
+        return 0;
+    }
+
+    @Override
+    public int getMaxSectionPosition() {
+        return 0;
+    }
+
+    @Override
+    public int getMinSectionPosition() {
+        return 0;
     }
 
     public boolean trim(boolean aggressive) {
@@ -105,6 +125,12 @@ public final class NullChunkGet implements IChunkGet {
     @Nonnull
     public char[] load(int layer) {
         return FaweCache.IMP.EMPTY_CHAR_4096;
+    }
+
+    @Nullable
+    @Override
+    public char[] loadIfPresent(final int layer) {
+        return null;
     }
 
     public boolean hasSection(int layer) {
@@ -127,6 +153,11 @@ public final class NullChunkGet implements IChunkGet {
     @Nullable
     public IBlocks reset() {
         return null;
+    }
+
+    @Override
+    public int getSectionCount() {
+        return 0;
     }
 
     private NullChunkGet() {

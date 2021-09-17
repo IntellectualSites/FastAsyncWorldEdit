@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.extension.factory.parser.mask;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -33,10 +35,15 @@ import com.sk89q.worldedit.regions.shape.WorldEditExpressionEnvironment;
 import com.sk89q.worldedit.session.SessionOwner;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
+import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.stream.Stream;
 
-public class ExpressionMaskParser extends InputParser<Mask> {
+//FAWE start - aliased
+public class ExpressionMaskParser extends InputParser<Mask> implements AliasedParser {
+
+    private final List<String> aliases = ImmutableList.of("=");
+    //FAWE end
 
     public ExpressionMaskParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -56,8 +63,22 @@ public class ExpressionMaskParser extends InputParser<Mask> {
             return null;
         }
 
+        //FAWE start - richer parsing
+        if (input.charAt(1) == '[') {
+            int end = input.lastIndexOf(']');
+            if (end == -1) {
+                return null;
+            }
+            input = input.substring(2, end);
+        } else {
+            input = input.substring(1);
+        }
+        //FAWE end
+
         try {
-            Expression exp = Expression.compile(input.substring(1), "x", "y", "z");
+            //FAWE start - richer parsing
+            Expression exp = Expression.compile(input, "x", "y", "z");
+            //FAWE end
             WorldEditExpressionEnvironment env = new WorldEditExpressionEnvironment(
                     context.requireExtent(), Vector3.ONE, Vector3.ZERO);
             exp.setEnvironment(env);
@@ -74,5 +95,12 @@ public class ExpressionMaskParser extends InputParser<Mask> {
             ));
         }
     }
+
+    //FAWE start - aliased
+    @Override
+    public List<String> getMatchedAliases() {
+        return aliases;
+    }
+    //FAWE end
 
 }

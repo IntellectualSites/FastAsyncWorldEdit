@@ -1893,7 +1893,7 @@ public final class BlockTypes {
         }
 
         throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(
-                BlockTypesCache.values)
+                        BlockTypesCache.values)
                 .filter(b -> StringMan.blockStateMatches(inputLower, b.getId()))
                 .map(BlockType::getId)
                 .sorted(StringMan.blockStateComparator(inputLower))

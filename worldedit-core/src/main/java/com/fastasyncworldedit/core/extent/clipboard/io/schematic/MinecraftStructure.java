@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.extent.clipboard.io.schematic;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
@@ -167,7 +166,6 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
         }
         Map<String, Object> structure = FaweCache.IMP.asMap("version", 1, "author", owner);
         // ignored: version / owner
-        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
         Int2ObjectArrayMap<Integer> indexes = new Int2ObjectArrayMap<>();
         // Size
         structure.put("size", Arrays.asList(width, height, length));

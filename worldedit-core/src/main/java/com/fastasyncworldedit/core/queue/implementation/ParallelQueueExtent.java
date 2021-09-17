@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.queue.implementation;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.NullExtent;
@@ -10,11 +11,12 @@ import com.fastasyncworldedit.core.extent.filter.DistrFilter;
 import com.fastasyncworldedit.core.extent.filter.LinkedFilter;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.BatchProcessorHolder;
+import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.queue.IQueueWrapper;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.BlockMask;
@@ -22,6 +24,7 @@ import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.pattern.BlockPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -31,6 +34,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Iterator;
 import java.util.List;
@@ -38,21 +42,34 @@ import java.util.Set;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.IntStream;
 
-public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrapper {
+public class ParallelQueueExtent extends PassthroughExtent {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final World world;
     private final QueueHandler handler;
     private final BatchProcessorHolder processor;
     private final BatchProcessorHolder postProcessor;
-    private int changes;
+    // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
+    // not very important)
+    private final boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
     private final boolean fastmode;
+    private int changes;
+    private int lastException = Integer.MIN_VALUE;
+    private int exceptionCount = 0;
 
     public ParallelQueueExtent(QueueHandler handler, World world, boolean fastmode) {
         super(handler.getQueue(world, new BatchProcessorHolder(), new BatchProcessorHolder()));
         this.world = world;
         this.handler = handler;
         this.processor = (BatchProcessorHolder) getExtent().getProcessor();
+        if (this.processor.getProcessor() instanceof MultiBatchProcessor) {
+            ((MultiBatchProcessor) this.processor.getProcessor()).setFaweExceptionArray(faweExceptionReasonsUsed);
+        }
         this.postProcessor = (BatchProcessorHolder) getExtent().getPostProcessor();
+        if (this.postProcessor.getProcessor() instanceof MultiBatchProcessor) {
+            ((MultiBatchProcessor) this.postProcessor.getProcessor()).setFaweExceptionArray(faweExceptionReasonsUsed);
+        }
         this.fastmode = fastmode;
     }
 
@@ -72,15 +89,7 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
     }
 
     private IQueueExtent<IQueueChunk> getNewQueue() {
-        return wrapQueue(handler.getQueue(this.world, this.processor, this.postProcessor));
-    }
-
-    @Override
-    public IQueueExtent<IQueueChunk> wrapQueue(IQueueExtent<IQueueChunk> queue) {
-        // TODO wrap
-        queue.setProcessor(this.processor);
-        queue.setPostProcessor(this.postProcessor);
-        return queue;
+        return handler.getQueue(world, this.processor, this.postProcessor);
     }
 
     @Override
@@ -99,29 +108,49 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
                 try {
                     final Filter newFilter = filter.fork();
                     // Create a chunk that we will reuse/reset for each operation
-                    final IQueueExtent<IQueueChunk> queue = getNewQueue();
+                    final SingleThreadQueueExtent queue = (SingleThreadQueueExtent) getNewQueue();
                     queue.setFastMode(fastmode);
+                    queue.setFaweExceptionArray(faweExceptionReasonsUsed);
                     synchronized (queue) {
-                        ChunkFilterBlock block = null;
+                        try {
+                            ChunkFilterBlock block = null;
 
-                        while (true) {
-                            // Get the next chunk posWeakChunk
-                            final int chunkX;
-                            final int chunkZ;
-                            synchronized (chunksIter) {
-                                if (!chunksIter.hasNext()) {
-                                    break;
+                            while (true) {
+                                // Get the next chunk posWeakChunk
+                                final int chunkX;
+                                final int chunkZ;
+                                synchronized (chunksIter) {
+                                    if (!chunksIter.hasNext()) {
+                                        break;
+                                    }
+                                    final BlockVector2 pos = chunksIter.next();
+                                    chunkX = pos.getX();
+                                    chunkZ = pos.getZ();
                                 }
-                                final BlockVector2 pos = chunksIter.next();
-                                chunkX = pos.getX();
-                                chunkZ = pos.getZ();
+                                block = queue.apply(block, newFilter, region, chunkX, chunkZ, full);
                             }
-                            block = queue.apply(block, newFilter, region, chunkX, chunkZ, full);
+                            queue.flush();
+                        } catch (Throwable t) {
+                            if (t instanceof FaweException) {
+                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t, LOGGER);
+                            } else if (t.getCause() instanceof FaweException) {
+                                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) t.getCause(), LOGGER);
+                            } else {
+                                throw t;
+                            }
                         }
-                        queue.flush();
                     }
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    String message = e.getMessage();
+                    int hash = message.hashCode();
+                    if (lastException != hash) {
+                        lastException = hash;
+                        exceptionCount = 0;
+                        LOGGER.catching(e);
+                    } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                        exceptionCount++;
+                        LOGGER.warn(message);
+                    }
                 }
             })).toArray(ForkJoinTask[]::new);
             // Join filters
@@ -147,9 +176,9 @@ public class ParallelQueueExtent extends PassthroughExtent implements IQueueWrap
 
     @Override
     public <B extends BlockStateHolder<B>> int setBlocks(Region region, B block) throws MaxChangedBlocksException {
-        return this.changes = apply(region, new BlockMaskBuilder().add(block).build(this).toFilter(new CountFilter()))
-                .getParent()
-                .getTotal();
+        Mask mask = new BlockMaskBuilder().add(block).build(this).inverse();
+        return this.changes = apply(region, mask.toFilter(block), mask.replacesAir())
+                .getBlocksApplied();
     }
 
     @Override

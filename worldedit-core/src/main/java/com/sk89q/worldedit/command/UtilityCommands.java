@@ -413,8 +413,10 @@ public class UtilityCommands {
     ) throws WorldEditException {
         size = Math.max(1, size);
         we.checkMaxRadius(size);
-        height = height != null ? Math.min((world.getMaxY() + 1), height + 1) : (world.getMaxY() + 1);
 
+        height = height != null
+                ? Math.min((world.getMaxY() - world.getMinY() + 1), height + 1)
+                : (world.getMaxY() - world.getMinY() + 1);
         int affected = editSession.removeAbove(session.getPlacementPosition(actor), size, height);
         actor.print(Caption.of("worldedit.removeabove.removed", TextComponent.of(affected)));
         return affected;
@@ -436,8 +438,10 @@ public class UtilityCommands {
     ) throws WorldEditException {
         size = Math.max(1, size);
         we.checkMaxRadius(size);
-        height = height != null ? Math.min((world.getMaxY() + 1), height + 1) : (world.getMaxY() + 1);
 
+        height = height != null
+                ? Math.min((world.getMaxY() - world.getMinY() + 1), height + 1)
+                : (world.getMaxY() - world.getMinY() + 1);
         int affected = editSession.removeBelow(session.getPlacementPosition(actor), size, height);
         actor.print(Caption.of("worldedit.removebelow.removed", TextComponent.of(affected)));
         return affected;

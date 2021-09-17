@@ -14,6 +14,7 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 
@@ -101,6 +102,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         nbttFile = new File(folder, index + ".nbtt");
         entfFile = new File(folder, index + ".entf");
         enttFile = new File(folder, index + ".entt");
+        //Switch file ending due to new (sort-of) format. (Added e for Extended height)
         bdFile = new File(folder, index + ".bd");
         bioFile = new File(folder, index + ".bio");
     }
@@ -133,8 +135,14 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     public void undo(Player player, Region[] regions) {
+        try {
+            close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
         EditSession session = toEditSession(player, regions);
-        session.undo(session);
+        session.setBlocks(this, ChangeSetExecutor.Type.UNDO);
         deleteFiles();
     }
 
@@ -143,12 +151,18 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     }
 
     public void redo(Player player, Region[] regions) {
+        try {
+            close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
         EditSession session = toEditSession(player, regions);
-        session.redo(session);
+        session.setBlocks(this, ChangeSetExecutor.Type.REDO);
     }
 
     public void redo(Player player) {
-        undo(player, null);
+        redo(player, null);
     }
 
     public UUID getUUID() {
@@ -417,6 +431,8 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             try (FileInputStream fis = new FileInputStream(bdFile)) {
                 final FaweInputStream gis = MainUtil.getCompressedIS(fis);
                 // skip mode
+                gis.skipFully(1);
+                // skip version
                 gis.skipFully(1);
                 // origin
                 ox = ((gis.read() << 24) + (gis.read() << 16) + (gis.read() << 8) + gis.read());

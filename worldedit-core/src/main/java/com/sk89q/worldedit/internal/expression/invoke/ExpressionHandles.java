@@ -116,8 +116,8 @@ class ExpressionHandles {
                     methodType(boolean.class, double.class)
             ));
             CALL_BINARY_OP = lookup.findVirtual(DoubleBinaryOperator.class, "applyAsDouble",
-                    methodType(double.class, double.class, double.class)
-            )
+                            methodType(double.class, double.class, double.class)
+                    )
                     .asType(methodType(Double.class, DoubleBinaryOperator.class, double.class, double.class));
             NEW_LS_CONSTANT = lookup.findConstructor(
                     LocalSlot.Constant.class,

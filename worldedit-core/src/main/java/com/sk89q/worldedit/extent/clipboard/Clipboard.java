@@ -29,7 +29,6 @@ import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EditSessionBuilder;
-import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
@@ -54,6 +53,7 @@ import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -65,7 +65,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Specifies an object that implements something suitable as a "clipboard."
  */
-public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
+//FAWE start - Iterable, closeable and flushable
+public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Flushable {
+    //FAWE end
 
     //FAWE start
     static Clipboard create(Region region) {
@@ -185,8 +187,19 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         return apply(region, filter);
     }
 
+    /**
+     * Close the clipboard. May not allow further reading of the clipboard if saved on disk.
+     */
     @Override
     default void close() {
+    }
+
+    /**
+     * Flush the clipboard if appropriate. Only does something if using clipboard-on-disk. Blocking method and ensures all data
+     * is saved to disk for any further operation with the clipboard.
+     */
+    @Override
+    default void flush() {
     }
 
     /**
@@ -274,10 +287,9 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
         }
         try {
             Operations.completeLegacy(copy);
-        } catch (MaxChangedBlocksException e) {
-            e.printStackTrace();
+        } finally {
+            editSession.close(); // Make sure editsession is always closed
         }
-        editSession.flushQueue();
         return editSession;
     }
 
@@ -343,12 +355,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable {
             int yy = pos.getY() + rely;
             int zz = pos.getZ() + relz;
             if (pasteBiomes) {
-                extent.setBiome(xx, yy, zz, Clipboard.this.getBiome(BlockVector3.at(pos.getX(), pos.getY(), pos.getZ())));
+                extent.setBiome(xx, yy, zz, Clipboard.this.getBiome(pos));
             }
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                 continue;
             }
-            if (pos.getY() < 0) {
+            if (pos.getY() < extent.getMinY()) {
                 throw new RuntimeException("Y-Position cannot be less than 0!");
             }
             extent.setBlock(xx, yy, zz, block);

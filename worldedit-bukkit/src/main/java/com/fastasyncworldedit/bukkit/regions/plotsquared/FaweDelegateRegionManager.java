@@ -262,7 +262,7 @@ public class FaweDelegateRegionManager {
                         .autoQueue(false)
                         .build();
                 FlatRegionFunction replace = new BiomeReplace(editSession, biome);
-                FlatRegionVisitor visitor = new FlatRegionVisitor(region, replace);
+                FlatRegionVisitor visitor = new FlatRegionVisitor(region, replace, editSession);
                 try {
                     Operations.completeLegacy(visitor);
                     editSession.flushQueue();

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.internal.command.exception;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.DisallowedItemException;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -196,5 +197,12 @@ public class WorldEditExceptionConverter extends ExceptionConverterHelper {
     public void convert(UsageException e) throws CommandException {
         throw e;
     }
+
+    //FAWE start
+    @ExceptionMatch
+    public void convert(FaweException e) throws CommandException {
+        throw newCommandException(e.getComponent(), e);
+    }
+    //FAWE end
 
 }

@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.queue;
 
-import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
@@ -42,13 +41,17 @@ public interface IBatchProcessor {
      */
     default boolean trimY(IChunkSet set, int minY, int maxY) {
         int minLayer = (minY - 1) >> 4;
-        for (int layer = 0; layer <= minLayer; layer++) {
+        for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
-                    char[] arr = set.load(layer);
-                    int index = (minY & 15) << 8;
-                    for (int i = 0; i < index; i++) {
-                        arr[i] = 0;
+                    char[] arr = set.loadIfPresent(layer);
+                    if (arr != null) {
+                        int index = (minY & 15) << 8;
+                        for (int i = 0; i < index; i++) {
+                            arr[i] = 0;
+                        }
+                    } else {
+                        arr = new char[4096];
                     }
                     set.setBlocks(layer, arr);
                 } else {
@@ -57,13 +60,17 @@ public interface IBatchProcessor {
             }
         }
         int maxLayer = (maxY + 1) >> 4;
-        for (int layer = maxLayer; layer < FaweCache.IMP.CHUNK_LAYERS; layer++) {
+        for (int layer = maxLayer; layer < set.getMaxSectionPosition(); layer++) {
             if (set.hasSection(layer)) {
                 if (layer == minLayer) {
-                    char[] arr = set.load(layer);
-                    int index = ((maxY + 1) & 15) << 8;
-                    for (int i = index; i < arr.length; i++) {
-                        arr[i] = 0;
+                    char[] arr = set.loadIfPresent(layer);
+                    if (arr != null) {
+                        int index = ((maxY + 1) & 15) << 8;
+                        for (int i = index; i < arr.length; i++) {
+                            arr[i] = 0;
+                        }
+                    } else {
+                        arr = new char[4096];
                     }
                     set.setBlocks(layer, arr);
                 } else {
@@ -74,10 +81,8 @@ public interface IBatchProcessor {
         try {
             int layer = (minY - 15) >> 4;
             while (layer < (maxY + 15) >> 4) {
-                if (layer > -1) {
-                    if (set.hasSection(layer)) {
-                        return true;
-                    }
+                if (set.hasSection(layer)) {
+                    return true;
                 }
                 layer++;
             }

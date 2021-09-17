@@ -25,13 +25,13 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.FaweRegionExtent;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
+import com.fastasyncworldedit.core.extent.LimitExtent;
 import com.fastasyncworldedit.core.extent.MultiRegionExtent;
 import com.fastasyncworldedit.core.extent.NullExtent;
 import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.extent.SlowExtent;
 import com.fastasyncworldedit.core.extent.StripNBTExtent;
-import com.fastasyncworldedit.core.extent.processor.HeightmapProcessor;
-import com.fastasyncworldedit.core.extent.processor.LimitExtent;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightmapProcessor;
 import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightProcessor;
@@ -446,7 +446,7 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
             } else {
                 relighter = NullRelighter.INSTANCE;
             }
-            extent.addProcessor(new HeightmapProcessor(getWorld()));
+            extent.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
             } else if (limit != null && !limit.isUnlimited()) {

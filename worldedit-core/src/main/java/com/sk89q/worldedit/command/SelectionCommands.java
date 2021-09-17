@@ -124,9 +124,9 @@ public class SelectionCommands {
         Location pos;
         //FAWE start - clamp
         if (coordinates != null) {
-            pos = new Location(world, coordinates.toVector3().clampY(0, world.getMaxY()));
+            pos = new Location(world, coordinates.toVector3().clampY(world.getMinY(), world.getMaxY()));
         } else if (actor instanceof Locatable) {
-            pos = ((Locatable) actor).getBlockLocation().clampY(0, world.getMaxY());
+            pos = ((Locatable) actor).getBlockLocation().clampY(world.getMinY(), world.getMaxY());
             //FAWE end
         } else {
             actor.print(Caption.of("worldedit.pos.console-require-coords"));
@@ -157,9 +157,9 @@ public class SelectionCommands {
         Location pos;
         if (coordinates != null) {
             //FAWE start - clamp
-            pos = new Location(world, coordinates.toVector3().clampY(0, world.getMaxY()));
+            pos = new Location(world, coordinates.toVector3().clampY(world.getMinY(), world.getMaxY()));
         } else if (actor instanceof Locatable) {
-            pos = ((Locatable) actor).getBlockLocation().clampY(0, world.getMaxY());
+            pos = ((Locatable) actor).getBlockLocation().clampY(world.getMinY(), world.getMaxY());
             //Fawe end
         } else {
             actor.print(Caption.of("worldedit.pos.console-require-coords"));
@@ -258,7 +258,7 @@ public class SelectionCommands {
                     .clampY(minChunkY, maxChunkY);
 
             min = minChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS);
-            max = maxChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS).add(15, world.getMaxY(), 15);
+            max = maxChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS).add(15, 255, 15);
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected-multiple",
@@ -286,7 +286,7 @@ public class SelectionCommands {
             }
 
             min = minChunk.shl(CHUNK_SHIFTS, CHUNK_SHIFTS_Y, CHUNK_SHIFTS);
-            max = min.add(15, world.getMaxY(), 15);
+            max = min.add(15, 255, 15);
 
             actor.print(Caption.of(
                     "worldedit.chunk.selected",

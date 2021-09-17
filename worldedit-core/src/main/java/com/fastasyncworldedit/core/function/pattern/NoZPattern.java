@@ -11,12 +11,16 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 public class NoZPattern extends AbstractPattern {
 
     private final Pattern pattern;
+    private final MutableBlockVector3 mutable = new MutableBlockVector3();
 
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param pattern pattern to apply
+     */
     public NoZPattern(Pattern pattern) {
         this.pattern = pattern;
     }
-
-    private final transient MutableBlockVector3 mutable = new MutableBlockVector3();
 
     @Override
     public BaseBlock applyBlock(BlockVector3 pos) {

@@ -151,7 +151,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             if (type == null) {
                 String input = key.toString();
                 throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(
-                        BlockTypesCache.values)
+                                BlockTypesCache.values)
                         .filter(b -> StringMan.blockStateMatches(input, b.getId()))
                         .map(BlockType::getId)
                         .sorted(StringMan.blockStateComparator(input))
@@ -185,7 +185,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         if (defaultState != null) {
             stateId = defaultState.getInternalId();
         } else {
-            stateId = type.getInternalId();
+            stateId = type.getDefaultState().getInternalId();
         }
         int length = state.length();
         AbstractProperty property = null;
@@ -248,11 +248,6 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     @Override
     public BlockState withPropertyId(int propertyId) {
         return getBlockType().withPropertyId(propertyId);
-    }
-
-    @Override
-    public BlockType getBlockType() {
-        return this.blockType;
     }
 
     @Override
@@ -338,15 +333,23 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         }
         return newState;
     }
+    //FAWE end
 
     @Override
     public Map<Property<?>, Object> getStates() {
+        //FAWE end
         BlockType type = this.getBlockType();
         // Lazily initialize the map
         Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
+        //noinspection RedundantCast - This is required for compilation, etc.
         return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
+        //FAWE end
     }
-    //FAWE end
+
+    @Override
+    public BlockType getBlockType() {
+        return this.blockType;
+    }
 
     @Override
     public boolean equalsFuzzy(BlockStateHolder<?> o) {
@@ -357,10 +360,12 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             // Added a reference equality check for speediness
             return true;
         }
+        //FAWE start
         if (o.getClass() == BlockState.class) {
             return o.getOrdinal() == this.getOrdinal();
         }
         return o.equalsFuzzy(this);
+        //FAWE end
     }
 
     @Override
@@ -432,20 +437,6 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     }
 
     @Override
-    public String toString() {
-        return getAsString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof BlockState)) {
-            return false;
-        }
-
-        return equalsFuzzy((BlockState) obj);
-    }
-
-    @Override
     public int hashCode() {
         return getOrdinal();
     }
@@ -459,4 +450,19 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         return compoundInput.get(this, input, x, y, z);
     }
     //FAWE end
+
+    @Override
+    public String toString() {
+        return getAsString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BlockState)) {
+            return false;
+        }
+
+        return equalsFuzzy((BlockState) obj);
+    }
+
 }

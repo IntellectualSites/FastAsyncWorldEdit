@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent.clipboard.io;
 
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.clipboard.LinearClipboard;
+import com.fastasyncworldedit.core.extent.clipboard.SimpleClipboard;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FastByteArraysInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
@@ -155,7 +156,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         metadata.add("FAWEVersion").withInt((i, v) -> faweWritten = v);
 
         StreamDelegate worldEditSection = metadata.add("WorldEdit");
-        worldEditSection.withValue((ValueReader<String>) (index, v) -> isWorldEdit = true);
+        worldEditSection.withValue((ValueReader<Object>) (index, v) -> isWorldEdit = true);
 
 
         StreamDelegate paletteDelegate = schematic.add("Palette");
@@ -397,8 +398,8 @@ public class FastSchematicReader extends NBTSchematicReader {
         }
         clipboard.setOrigin(origin);
 
-        if (!min.equals(BlockVector3.ZERO)) {
-            clipboard = new BlockArrayClipboard(clipboard, min);
+        if (clipboard instanceof SimpleClipboard && !min.equals(BlockVector3.ZERO)) {
+            clipboard = new BlockArrayClipboard((SimpleClipboard) clipboard, min);
         }
 
         return clipboard;

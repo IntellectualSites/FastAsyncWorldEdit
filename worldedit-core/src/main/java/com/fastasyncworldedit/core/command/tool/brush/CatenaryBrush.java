@@ -4,7 +4,6 @@ import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
-import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
@@ -65,12 +64,8 @@ public class CatenaryBrush implements Brush, ResettableTool {
         }
         List<BlockVector3> nodes = Arrays.asList(pos1, vertex, pos2);
         vertex = null;
-        try {
-            editSession.drawSpline(pattern, nodes, 0, 0, 0, 10, size, !shell);
-        } catch (WorldEditException e) {
-            e.printStackTrace();
-        }
-        actor.print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
+        editSession.drawSpline(pattern, nodes, 0, 0, 0, 10, size, !shell);
+        player.print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
         if (!select) {
             pos1 = null;
             return;

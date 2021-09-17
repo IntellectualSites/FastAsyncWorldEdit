@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.command.util.annotation.Time;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extension.input.InputParseException;
@@ -96,6 +97,17 @@ public class ConsumeBindings extends Bindings {
         double length = radius.length();
         Confirm.Processor.RADIUS.check(actor, context, length);
         return radius;
+    }
+
+    @Binding
+    @Preload(Preload.PreloadCheck.PRELOAD)
+    public void checkPreload(Actor actor, InjectedValueAccess context) {
+        Preload.PreloadCheck.PRELOAD.preload(actor, context);
+    }
+
+    @Binding
+    @Preload(Preload.PreloadCheck.NEVER)
+    public void neverPreload(Actor actor, InjectedValueAccess context) {
     }
 
     @Binding

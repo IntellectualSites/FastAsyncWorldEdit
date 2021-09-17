@@ -62,9 +62,6 @@ dependencies {
         isTransitive = false
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
-    compileOnly(libs.spigot) {
-        because("Remove if #1208 has been addressed")
-    }
 
     // Logging
     implementation(libs.log4j)
@@ -107,6 +104,7 @@ dependencies {
     api(libs.sparsebitset) { isTransitive = false }
     api(libs.parallelgzip) { isTransitive = false }
     compileOnly(libs.adventure)
+    compileOnlyApi(libs.checkerqual)
 
     // Tests
     testImplementation(libs.mockito)
@@ -149,6 +147,9 @@ tasks.named<ShadowJar>("shadowJar") {
         // If it turns out not to be true for Spigot/Paper, our only two official platforms, this can be uncommented.
         // include(dependency("org.apache.logging.log4j:log4j-api"))
         include(dependency("org.antlr:antlr4-runtime"))
+        // ZSTD does not work if relocated. https://github.com/luben/zstd-jni/issues/189 Use not latest as it can be difficult
+        // to obtain latest ZSTD lib
+        include(dependency("com.github.luben:zstd-jni:1.4.8-1"))
         relocate("org.bstats", "com.sk89q.worldedit.bstats") {
             include(dependency("org.bstats:"))
         }
@@ -159,13 +160,10 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            include(dependency("org.incendo.serverlib:ServerLib:2.2.1"))
+            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.0"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            include(dependency("com.intellectualsites.paster:Paster:1.0.1-SNAPSHOT"))
-        }
-        relocate("com.github.luben", "com.fastasyncworldedit.core.zstd") {
-            include(dependency("com.github.luben:zstd-jni:1.5.0-4"))
+            include(dependency("com.intellectualsites.paster:Paster:1.1.1"))
         }
         relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz") {
             include(dependency("net.jpountz:lz4-java-stream:1.0.0"))
@@ -174,7 +172,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.lz4:lz4-java:1.8.0"))
         }
         relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
-            include(dependency("net.kyori:adventure-nbt:4.8.1"))
+            include(dependency("net.kyori:adventure-nbt:4.9.1"))
         }
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
             include(dependency("com.zaxxer:SparseBitSet:1.2"))

@@ -34,6 +34,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class NoiseFilter extends AbstractMask {
 
+    //FAWE start - mutable
+    private MutableVector3 mutable;
+    //FAWE end
     private NoiseGenerator noiseGenerator;
     private double density;
 
@@ -65,6 +68,9 @@ public class NoiseFilter extends AbstractMask {
     public void setNoiseGenerator(NoiseGenerator noiseGenerator) {
         checkNotNull(noiseGenerator);
         this.noiseGenerator = noiseGenerator;
+        //FAWE start - mutable
+        this.mutable = new MutableVector3();
+        //FAWE end
     }
 
     /**
@@ -83,11 +89,16 @@ public class NoiseFilter extends AbstractMask {
         checkArgument(density >= 0, "density must be >= 0");
         checkArgument(density <= 1, "density must be <= 1");
         this.density = density;
+        //FAWE start - mutable
+        this.mutable = new MutableVector3();
+        //FAWE end
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return noiseGenerator.noise(MutableVector3.get(vector.getX(), vector.getY(), vector.getZ())) <= density;
+        //FAWE start - mutable
+        return noiseGenerator.noise(mutable.setComponents(vector.getX(), vector.getZ(), vector.getZ())) <= density;
+        //FAWE end
     }
 
     @Nullable

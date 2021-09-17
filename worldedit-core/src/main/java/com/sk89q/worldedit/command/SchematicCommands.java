@@ -187,7 +187,11 @@ public class SchematicCommands {
             desc = "Remove a clipboard from your multi-clipboard"
     )
     @CommandPermissions({"worldedit.clipboard.clear", "worldedit.schematic.clear"})
-    public void unload(Player player, LocalSession session, String fileName) throws WorldEditException {
+    public void unload(
+            Player player, LocalSession session,
+            @Arg(desc = "File name, requires extension.")
+                    String fileName
+    ) throws WorldEditException {
         URI uri;
         if (fileName.startsWith("file:/") || fileName.startsWith("http://") || fileName.startsWith("https://")) {
             uri = URI.create(fileName);
@@ -225,7 +229,8 @@ public class SchematicCommands {
             desc = "Move your loaded schematic"
     )
     @CommandPermissions({"worldedit.schematic.move", "worldedit.schematic.move.other"})
-    public void move(Player player, LocalSession session, String directory) throws WorldEditException, IOException {
+    public void move(Player player, LocalSession session, @Arg(desc = "Directory.") String directory) throws WorldEditException,
+            IOException {
         LocalConfiguration config = worldEdit.getConfiguration();
         File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
         File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS ? new File(working, player.getUniqueId().toString()) : working;

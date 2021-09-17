@@ -30,11 +30,11 @@ public class BooleanConverter {
         commandManager.registerConverter(
                 Key.of(Boolean.class),
                 MultiKeyConverter.builder(
-                        ImmutableSetMultimap.<Boolean, String>builder()
-                                .putAll(false, "off", "f", "false", "n", "no")
-                                .putAll(true, "on", "t", "true", "y", "yes")
-                                .build()
-                )
+                                ImmutableSetMultimap.<Boolean, String>builder()
+                                        .putAll(false, "off", "f", "false", "n", "no")
+                                        .putAll(true, "on", "t", "true", "y", "yes")
+                                        .build()
+                        )
                         .errorMessage(arg -> "Not a boolean value: " + arg)
                         .build()
         );

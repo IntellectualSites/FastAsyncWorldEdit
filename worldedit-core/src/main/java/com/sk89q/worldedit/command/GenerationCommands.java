@@ -33,6 +33,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
@@ -50,7 +51,6 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator.TreeType;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
 import org.enginehub.piston.annotation.Command;
@@ -103,10 +103,42 @@ public class GenerationCommands {
             @Radii(2)
                     List<Double> radii,
             @Arg(desc = "The height of the cylinder", def = "1")
-                    int height
+                    int height,
+            //FAWE start - hcyl thickness
+            @Arg(desc = "Thickness of the cyclinder. 0 creates a normal //hcyl.", def = "0")
+                    double thickness
     ) throws WorldEditException {
-        return cyl(actor, session, editSession, pattern, radii, height, true);
+        final double radiusX;
+        final double radiusZ;
+        switch (radii.size()) {
+            case 1:
+                radiusX = radiusZ = Math.max(1, radii.get(0));
+                break;
+
+            case 2:
+                radiusX = Math.max(1, radii.get(0));
+                radiusZ = Math.max(1, radii.get(1));
+                break;
+
+            default:
+                actor.print(Caption.of("worldedit.cyl.invalid-radius"));
+                return 0;
+        }
+        worldEdit.checkMaxRadius(radiusX);
+        worldEdit.checkMaxRadius(radiusZ);
+        worldEdit.checkMaxRadius(height);
+
+        if (thickness > radiusX || thickness > radiusZ) {
+            actor.print(Caption.of("worldedit.hcyl.thickness-too-large"));
+            return 0;
+        }
+
+        BlockVector3 pos = session.getPlacementPosition(actor);
+        int affected = editSession.makeCylinder(pos, pattern, radiusX, radiusZ, height, thickness, false);
+        actor.print(Caption.of("worldedit.cyl.created", TextComponent.of(affected)));
+        return affected;
     }
+    //FAWE end
 
     @Command(
             name = "/cyl",
@@ -241,9 +273,6 @@ public class GenerationCommands {
             @Arg(desc = "The density of the forest, between 0 and 100", def = "5")
                     double density
     ) throws WorldEditException {
-        //FAWE start
-        actor.print(TextComponent.of("Warning: This brush is currently not undo-able due to a Spigot bug!").color(TextColor.RED));
-        //FAWE end
         checkCommandArgument(0 <= density && density <= 100, "Density must be between 0 and 100");
         worldEdit.checkMaxRadius(size);
         density /= 100;
@@ -406,6 +435,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int generateBiome(
             Actor actor, LocalSession session, EditSession editSession,
@@ -482,6 +512,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.caves")
     @Logging(PLACEMENT)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void caves(
             Actor actor, LocalSession session, EditSession editSession, @Selection Region region,
@@ -519,6 +550,7 @@ public class GenerationCommands {
     )
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void ores(
             Actor actor,
@@ -568,18 +600,13 @@ public class GenerationCommands {
         int[] count = new int[1];
         final BufferedImage finalImage = image;
         RegionVisitor visitor = new RegionVisitor(region, pos -> {
-            try {
-                int x = pos.getBlockX() - pos1.getBlockX();
-                int z = pos.getBlockZ() - pos1.getBlockZ();
-                int color = finalImage.getRGB(x, z);
-                BlockType block = tu.getNearestBlock(color);
-                count[0]++;
-                if (block != null) {
-                    return editSession.setBlock(pos, block.getDefaultState());
-                }
-                return false;
-            } catch (Throwable e) {
-                e.printStackTrace();
+            int x = pos.getBlockX() - pos1.getBlockX();
+            int z = pos.getBlockZ() - pos1.getBlockZ();
+            int color = finalImage.getRGB(x, z);
+            BlockType block = tu.getNearestBlock(color);
+            count[0]++;
+            if (block != null) {
+                return editSession.setBlock(pos, block.getDefaultState());
             }
             return false;
         }, editSession);
@@ -590,6 +617,7 @@ public class GenerationCommands {
     @Command(name = "/ore", desc = "Generates ores")
     @CommandPermissions("worldedit.generation.ore")
     @Logging(PLACEMENT)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void ore(
             Actor actor,
@@ -601,12 +629,21 @@ public class GenerationCommands {
             @Arg(desc = "Ore vein size") @Range(from = 0, to = Integer.MAX_VALUE) int size,
             @Arg(desc = "Ore vein frequency (number of times to attempt to place ore)", def = "10") @Range(from = 0, to = Integer.MAX_VALUE) int freq,
             @Arg(desc = "Ore vein rarity (% chance each attempt is placed)", def = "100") @Range(from = 0, to = 100) int rarity,
-            @Arg(desc = "Ore vein min y", def = "0") @Range(from = 0, to = 255) int minY,
-            @Arg(desc = "Ore vein max y", def = "63") @Range(from = 0, to = 255) int maxY
+            @Arg(desc = "Ore vein min y", def = "0") int minY,
+            @Arg(desc = "Ore vein max y", def = "63") int maxY
     ) throws WorldEditException {
         if (mask instanceof AbstractExtentMask) {
             ((AbstractExtentMask) mask).setExtent(editSession);
         }
+        checkCommandArgument(minY >= editSession.getMinY(), Caption.of("fawe.error.outside-range-lower", "miny",
+                editSession.getMinY()
+        ));
+        checkCommandArgument(maxY <= editSession.getMaxY(), Caption.of("fawe.error.outside-range-upper", "maxy",
+                editSession.getMaxY()
+        ));
+        checkCommandArgument(minY < maxY, Caption.of("fawe.error.argument-size-mismatch", "miny",
+                "maxy"
+        ));
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }

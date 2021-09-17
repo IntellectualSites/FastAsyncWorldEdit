@@ -227,7 +227,8 @@ public class Settings extends Config {
                 "7 = 1 x high, 1 x medium, 1 x fast",
                 "8 = 1 x high, 1 x medium, 2 x fast",
                 "9 = 1 x high, 1 x medium, 3 x fast (best compression)",
-                "NOTE: If using disk, do some compression (3+) as smaller files save faster"
+                "NOTE: If using disk, do some compression (3+) as smaller files save faster",
+                " - levels over 6 require ZSTD 1.4.8+ to be installed to the system"
         })
         public int COMPRESSION_LEVEL = 3;
         @Comment({
@@ -293,7 +294,8 @@ public class Settings extends Config {
                 " - FAWE will start placing before all calculations are finished",
                 " - A larger value will use slightly less CPU time",
                 " - A smaller value will reduce memory usage",
-                " - A value too small may break some operations (deform?)"
+                " - A value too small may break some operations (deform?)",
+                " - Values smaller than the configurated parallel threads are not accepted"
 
         })
         public int TARGET_SIZE = 64;
@@ -319,9 +321,13 @@ public class Settings extends Config {
                 "Loading the right amount of chunks beforehand can speed up operations",
                 " - Low values may result in FAWE waiting on requests to the main thread",
                 " - Higher values use more memory and isn't noticeably faster",
+                " - A good (relatively) safe way to set this is",
+                " - Use 32 x GB of RAM / number of players expected to be using WE at the same time",
+                " - Paper and derivatives only. (requires delay-chunk-unloads-by to be set)."
         })
-        //TODO Find out where this was used and why the usage was removed
-        public int PRELOAD_CHUNKS = 100000;
+        // Renamed from PRELOAD_CHUNK because it was set to 100000... something that lots of servers will now have which is
+        // wayyy too much...
+        public int PRELOAD_CHUNK_COUNT = 128;
 
         @Comment({
                 "If pooling is enabled (reduces GC, higher memory usage)",
@@ -382,11 +388,6 @@ public class Settings extends Config {
                 "Allows brushes to be persistent (default: true)",
         })
         public boolean PERSISTENT_BRUSHES = true;
-
-        @Comment({
-                "Disable using native libraries",
-        })
-        public boolean DISABLE_NATIVES = false;
 
         @Comment({
                 "[SAFE] Keep entities that are positioned in non-air blocks when editing an area",
@@ -454,7 +455,7 @@ public class Settings extends Config {
                 "Don't bug console when these plugins slow down WorldEdit operations",
                 " - You'll see a message in console if you need to change this option"
         })
-        public List<String> ALLOWED_PLUGINS = new ArrayList<>();
+        public List<String> ALLOWED_PLUGINS = new ArrayList<>(Collections.singleton(("ExamplePlugin")));
         @Comment("Should debug messages be sent when third party extents are used?")
         public boolean DEBUG = true;
 
@@ -495,7 +496,8 @@ public class Settings extends Config {
                 " - TODO: Buffered random access with compression is not implemented on disk yet",
                 " - 0 = No compression",
                 " - 1 = Fast compression",
-                " - 2-17 = Slower compression"
+                " - 2-17 = Slower compression",
+                " - levels over 6 require ZSTD 1.4.8+ to be installed to the system"
         })
         public int COMPRESSION_LEVEL = 1;
         @Comment("Number of days to keep history on disk before deleting it")

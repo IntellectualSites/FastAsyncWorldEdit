@@ -11,7 +11,6 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
-import org.jetbrains.annotations.Range;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,6 +44,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     private int bitMask = -1;
 
     private CharSetBlocks() {
+        // Expand as we go
+        super(0, 15);
     }
 
     @Override
@@ -59,9 +60,10 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        if (biomes == null) {
+        if (biomes == null || (y >> 4) < minSectionPosition || (y >> 4) > maxSectionPosition) {
             return null;
         }
+        y -= minSectionPosition << 4;
         return biomes[(y >> 2) << 4 | (z >> 2) << 2 | x >> 2];
     }
 
@@ -92,15 +94,18 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        updateSectionIndexRange(y >> 4);
+        y -= minSectionPosition << 4;
         if (biomes == null) {
-            biomes = new BiomeType[1024];
+            biomes = new BiomeType[64 * sectionCount];
         }
         biomes[(y >> 2) << 4 | (z >> 2) << 2 | x >> 2] = biome;
         return true;
     }
 
     @Override
-    public <T extends BlockStateHolder<T>> boolean setBlock(int x, @Range(from = 0, to = 255) int y, int z, T holder) {
+    public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
+        updateSectionIndexRange(y >> 4);
         set(x, y, z, holder.getOrdinalChar());
         holder.applyTileEntity(this, x, y, z);
         return true;
@@ -108,6 +113,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void setBlocks(int layer, char[] data) {
+        updateSectionIndexRange(layer);
+        layer -= minSectionPosition;
         this.blocks[layer] = data;
         this.sections[layer] = data == null ? empty : FULL;
     }
@@ -123,38 +130,41 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (tiles == null) {
             tiles = new BlockVector3ChunkMap<>();
         }
+        updateSectionIndexRange(y >> 4);
         tiles.put(x, y, z, tile);
         return true;
     }
 
     @Override
     public void setBlockLight(int x, int y, int z, int value) {
+        updateSectionIndexRange(y >> 4);
         if (light == null) {
-            light = new char[16][];
+            light = new char[sectionCount][];
         }
-        final int layer = y >> 4;
+        final int layer = (y >> 4) - minSectionPosition;
         if (light[layer] == null) {
             char[] c = new char[4096];
             Arrays.fill(c, (char) 16);
             light[layer] = c;
         }
         final int index = (y & 15) << 8 | (z & 15) << 4 | (x & 15);
-        light[y >> 4][index] = (char) value;
+        light[layer][index] = (char) value;
     }
 
     @Override
     public void setSkyLight(int x, int y, int z, int value) {
+        updateSectionIndexRange(y >> 4);
         if (skyLight == null) {
-            skyLight = new char[16][];
+            skyLight = new char[sectionCount][];
         }
-        final int layer = y >> 4;
+        final int layer = (y >> 4) - minSectionPosition;
         if (skyLight[layer] == null) {
             char[] c = new char[4096];
             Arrays.fill(c, (char) 16);
             skyLight[layer] = c;
         }
         final int index = (y & 15) << 8 | (z & 15) << 4 | (x & 15);
-        skyLight[y >> 4][index] = (char) value;
+        skyLight[layer][index] = (char) value;
     }
 
     @Override
@@ -167,17 +177,21 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void setLightLayer(int layer, char[] toSet) {
+        updateSectionIndexRange(layer);
         if (light == null) {
-            light = new char[16][];
+            light = new char[sectionCount][];
         }
+        layer -= minSectionPosition;
         light[layer] = toSet;
     }
 
     @Override
     public void setSkyLightLayer(int layer, char[] toSet) {
+        updateSectionIndexRange(layer);
         if (skyLight == null) {
-            skyLight = new char[16][];
+            skyLight = new char[sectionCount][];
         }
+        layer -= minSectionPosition;
         skyLight[layer] = toSet;
     }
 
@@ -193,8 +207,10 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void removeSectionLighting(int layer, boolean sky) {
+        updateSectionIndexRange(layer);
+        layer -= minSectionPosition;
         if (light == null) {
-            light = new char[16][];
+            light = new char[sectionCount][];
         }
         if (light[layer] == null) {
             light[layer] = new char[4096];
@@ -202,7 +218,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         Arrays.fill(light[layer], (char) 0);
         if (sky) {
             if (skyLight == null) {
-                skyLight = new char[16][];
+                skyLight = new char[sectionCount][];
             }
             if (skyLight[layer] == null) {
                 skyLight[layer] = new char[4096];
@@ -213,14 +229,16 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public void setFullBright(int layer) {
+        updateSectionIndexRange(layer);
+        layer -= minSectionPosition;
         if (light == null) {
-            light = new char[16][];
+            light = new char[sectionCount][];
         }
         if (light[layer] == null) {
             light[layer] = new char[4096];
         }
         if (skyLight == null) {
-            skyLight = new char[16][];
+            skyLight = new char[sectionCount][];
         }
         if (skyLight[layer] == null) {
             skyLight[layer] = new char[4096];
@@ -275,7 +293,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (biomes != null || light != null || skyLight != null) {
             return false;
         }
-        return IntStream.range(0, 16).noneMatch(this::hasSection);
+        return IntStream.range(minSectionPosition, maxSectionPosition + 1).noneMatch(this::hasSection);
     }
 
     @Override
@@ -286,6 +304,93 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         entityRemoves = null;
         super.reset();
         return null;
+    }
+
+    @Override
+    public boolean hasBiomes(int layer) {
+        layer -= minSectionPosition;
+        if (layer < 0 || layer >= sections.length) {
+            return false;
+        }
+        return biomes != null;
+    }
+
+    @Override
+    public char[] load(final int layer) {
+        updateSectionIndexRange(layer);
+        return super.load(layer);
+    }
+
+    // Checks and updates the various section arrays against the new layer index
+    private void updateSectionIndexRange(int layer) {
+        if (layer >= minSectionPosition && layer <= maxSectionPosition) {
+            return;
+        }
+        if (layer < minSectionPosition) {
+            int diff = minSectionPosition - layer;
+            sectionCount += diff;
+            char[][] tmpBlocks = new char[sectionCount][];
+            Section[] tmpSections = new Section[sectionCount];
+            Object[] tmpSectionLocks = new Object[sectionCount];
+            System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
+            System.arraycopy(sections, 0, tmpSections, diff, sections.length);
+            System.arraycopy(sectionLocks, 0, tmpSectionLocks, diff, sections.length);
+            for (int i = 0; i < diff; i++) {
+                tmpSections[i] = empty;
+                tmpSectionLocks[i] = new Object();
+            }
+            blocks = tmpBlocks;
+            sections = tmpSections;
+            sectionLocks = tmpSectionLocks;
+            minSectionPosition = layer;
+            if (biomes != null) {
+                BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
+                System.arraycopy(biomes, 0, tmpBiomes, 64 * diff, biomes.length);
+                biomes = tmpBiomes;
+            }
+            if (light != null) {
+                char[][] tmplight = new char[sectionCount][];
+                System.arraycopy(light, 0, tmplight, diff, light.length);
+                light = tmplight;
+            }
+            if (skyLight != null) {
+                char[][] tmplight = new char[sectionCount][];
+                System.arraycopy(skyLight, 0, tmplight, diff, skyLight.length);
+                skyLight = tmplight;
+            }
+        } else {
+            int diff = layer - maxSectionPosition;
+            sectionCount += diff;
+            char[][] tmpBlocks = new char[sectionCount][];
+            Section[] tmpSections = new Section[sectionCount];
+            Object[] tmpSectionLocks = new Object[sectionCount];
+            System.arraycopy(blocks, 0, tmpBlocks, 0, blocks.length);
+            System.arraycopy(sections, 0, tmpSections, 0, sections.length);
+            System.arraycopy(sectionLocks, 0, tmpSectionLocks, 0, sections.length);
+            for (int i = sectionCount - diff; i < sectionCount; i++) {
+                tmpSections[i] = empty;
+                tmpSectionLocks[i] = new Object();
+            }
+            blocks = tmpBlocks;
+            sections = tmpSections;
+            sectionLocks = tmpSectionLocks;
+            maxSectionPosition = layer;
+            if (biomes != null) {
+                BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
+                System.arraycopy(biomes, 0, tmpBiomes, 0, biomes.length);
+                biomes = tmpBiomes;
+            }
+            if (light != null) {
+                char[][] tmplight = new char[sectionCount][];
+                System.arraycopy(light, 0, tmplight, 0, light.length);
+                light = tmplight;
+            }
+            if (skyLight != null) {
+                char[][] tmplight = new char[sectionCount][];
+                System.arraycopy(skyLight, 0, tmplight, 0, skyLight.length);
+                skyLight = tmplight;
+            }
+        }
     }
 
 }

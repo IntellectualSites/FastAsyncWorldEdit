@@ -11,7 +11,7 @@ applyPlatformAndCoreConfiguration()
 
 dependencies {
     constraints {
-        implementation( "org.yaml:snakeyaml") {
+        implementation("org.yaml:snakeyaml") {
             version { strictly("1.28") }
             because("Bukkit provides SnakeYaml")
         }
@@ -51,7 +51,7 @@ dependencies {
     implementation(libs.rhino)
     compileOnly(libs.adventure)
     compileOnlyApi(libs.adventureNbt)
-    compileOnlyApi(libs.adventureMiniMessage)
+    compileOnlyApi(libs.adventureTextMiniMessage)
     implementation(libs.zstd)
     api(libs.paster)
     compileOnly(libs.lz4Java) { isTransitive = false }
@@ -65,6 +65,7 @@ dependencies {
     // Tests
     testRuntimeOnly(libs.log4jCore)
     testImplementation(libs.adventureNbt)
+    testImplementation(libs.parallelgzip)
 }
 
 tasks.named<Test>("test") {

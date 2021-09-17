@@ -291,10 +291,10 @@ Other Permissions
     }
 
     private fun String.makeRstSafe(lineJoiner: String) = trim()
-        .replace("\"", "\\\"").replace("\n", "\n" + "    ".repeat(2))
-        .lineSequence()
-        .map { line -> line.ifBlank { "" } }
-        .joinToString(separator = lineJoiner)
+            .replace("\"", "\\\"").replace("\n", "\n" + "    ".repeat(2))
+            .lineSequence()
+            .map { line -> line.ifBlank { "" } }
+            .joinToString(separator = lineJoiner)
 
     private fun linkSafe(text: String) = text.replace(" ", "-")
 

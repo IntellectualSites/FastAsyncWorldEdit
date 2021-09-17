@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
-import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMap;
-import com.fastasyncworldedit.core.extent.processor.heightmap.ScalableHeightMap;
+import com.fastasyncworldedit.core.math.heightmap.HeightMap;
+import com.fastasyncworldedit.core.math.heightmap.ScalableHeightMap;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -21,9 +21,11 @@ public class FlattenBrush extends HeightBrush {
             boolean layers,
             boolean smooth,
             Clipboard clipboard,
-            ScalableHeightMap.Shape shape
+            ScalableHeightMap.Shape shape,
+            int minY,
+            int maxY
     ) {
-        super(stream, rotation, yscale, layers, smooth, clipboard, shape);
+        super(stream, rotation, yscale, layers, smooth, clipboard, shape, minY, maxY);
     }
 
     @Override

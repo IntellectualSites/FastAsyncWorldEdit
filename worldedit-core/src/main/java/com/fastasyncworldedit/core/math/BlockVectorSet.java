@@ -44,14 +44,14 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
             int newSize = count + size;
             if (newSize > index) {
                 int localIndex = index - count;
-                BlockVector3 pos = set.getIndex(localIndex);
+                MutableBlockVector3 pos = set.getIndex(localIndex);
                 if (pos != null) {
                     int pair = entry.getIntKey();
                     int cx = MathMan.unpairX(pair);
                     int cz = MathMan.unpairY(pair);
-                    pos = pos.mutX((cx << 11) + pos.getBlockX());
-                    pos = pos.mutZ((cz << 11) + pos.getBlockZ());
-                    return pos;
+                    pos.mutX((cx << 11) + pos.getBlockX());
+                    pos.mutZ((cz << 11) + pos.getBlockZ());
+                    return pos.toImmutable();
                 }
             }
             count += newSize;
@@ -91,7 +91,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
         if (!entries.hasNext()) {
             return Collections.emptyIterator();
         }
-        return new Iterator<BlockVector3>() {
+        return new Iterator<>() {
             Int2ObjectMap.Entry<LocalBlockVectorSet> entry = entries.next();
             Iterator<BlockVector3> entryIter = entry.getValue().iterator();
             final MutableBlockVector3 mutable = new MutableBlockVector3();

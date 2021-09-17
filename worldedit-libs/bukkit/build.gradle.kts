@@ -9,5 +9,5 @@ repositories {
 }
 
 dependencies {
-    "shade"(libs.adventureTextAdapter)
+    "shade"(libs.adventureTextAdapterBukkit)
 }

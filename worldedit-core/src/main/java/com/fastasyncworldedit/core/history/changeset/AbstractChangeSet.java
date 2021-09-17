@@ -34,6 +34,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
@@ -158,7 +159,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 addEntityCreate(tag);
             }
         }
-        for (int layer = 0; layer < 16; layer++) {
+        for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
             if (!set.hasSection(layer)) {
                 continue;
             }
@@ -171,8 +172,10 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
             }
             char[] blocksSet;
-            System.arraycopy(set.load(layer), 0, (blocksSet = new char[4096]), 0, 4096);
+            // loadIfPresent shouldn't be null if set.hasSection(layer) is true
+            System.arraycopy(Objects.requireNonNull(set.loadIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
 
+            // Account for negative layers
             int by = layer << 4;
             for (int y = 0, index = 0; y < 16; y++) {
                 int yy = y + by;
@@ -196,14 +199,21 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
         BiomeType[] biomes = set.getBiomes();
         if (biomes != null) {
-            for (int y = 0, index = 0; y < 64; y++) {
-                for (int z = 0; z < 4; z++) {
-                    for (int x = 0; x < 4; x++, index++) {
-                        BiomeType newBiome = biomes[index];
-                        if (newBiome != null) {
-                            BiomeType oldBiome = get.getBiomeType(x, y, z);
-                            if (oldBiome != newBiome) {
-                                addBiomeChange(bx + (x << 2), y << 2, bz + (z << 2), oldBiome, newBiome);
+            int index = 0;
+            for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
+                if (!set.hasBiomes(layer)) {
+                    continue;
+                }
+                int yy = layer << 4;
+                for (int y = 0; y < 4; y++) {
+                    for (int z = 0; z < 4; z++) {
+                        for (int x = 0; x < 4; x++, index++) {
+                            BiomeType newBiome = biomes[index];
+                            if (newBiome != null) {
+                                BiomeType oldBiome = get.getBiomeType(x, y, z);
+                                if (oldBiome != newBiome) {
+                                    addBiomeChange(bx + (x << 2), yy + (y << 2), bz + (z << 2), oldBiome, newBiome);
+                                }
                             }
                         }
                     }
@@ -342,11 +352,17 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         return addWriteTask(writeTask, Fawe.isMainThread());
     }
 
-    public Future<?> addWriteTask(Runnable writeTask, boolean completeNow) {
+    public Future<?> addWriteTask(final Runnable writeTask, final boolean completeNow) {
         AbstractChangeSet.this.waitingCombined.incrementAndGet();
         Runnable wrappedTask = () -> {
             try {
                 writeTask.run();
+            } catch (Throwable t) {
+                if (completeNow) {
+                    throw t;
+                } else {
+                    t.printStackTrace();
+                }
             } finally {
                 if (AbstractChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
                     synchronized (AbstractChangeSet.this.waitingAsync) {

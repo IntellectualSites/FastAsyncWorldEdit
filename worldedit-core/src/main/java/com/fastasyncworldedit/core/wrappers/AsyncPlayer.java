@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.wrappers;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.EditSession;
@@ -85,19 +85,21 @@ public class AsyncPlayer extends PlayerProxy {
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
         Location pos = getBlockLocation();
         int x = pos.getBlockX();
-        int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 2);
+        int initialY = Math.max(getWorld().getMinY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() + 2);
         int z = pos.getBlockZ();
         Extent world = getLocation().getExtent();
 
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+
         // No free space above
-        if (!world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isAir()) {
+        if (!world.getBlock(mutable.setComponents(x, y, z)).getBlockType().getMaterial().isAir()) {
             return false;
         }
 
         while (y <= world.getMaximumPoint().getY()) {
             // Found a ceiling!
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+            if (world.getBlock(mutable.mutY(y)).getBlockType().getMaterial()
                     .isMovementBlocker()) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
                 floatAt(x, platformY + 1, z, alwaysGlass);
@@ -119,14 +121,16 @@ public class AsyncPlayer extends PlayerProxy {
     public boolean ascendUpwards(int distance, boolean alwaysGlass) {
         final Location pos = getBlockLocation();
         final int x = pos.getBlockX();
-        final int initialY = Math.max(0, pos.getBlockY());
-        int y = Math.max(0, pos.getBlockY() + 1);
+        final int initialY = Math.max(getWorld().getMinY(), pos.getBlockY());
+        int y = Math.max(getWorld().getMinY(), pos.getBlockY() + 1);
         final int z = pos.getBlockZ();
         final int maxY = Math.min(getWorld().getMaxY() + 1, initialY + distance);
         final Extent world = getLocation().getExtent();
 
-        while (y <= world.getMaximumPoint().getY() + 2) {
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial()
+        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
+
+        while (y <= world.getMaxY() + 2) {
+            if (world.getBlock(mutable.mutY(y)).getBlockType().getMaterial()
                     .isMovementBlocker()) {
                 break; // Hit something
             } else if (y > maxY + 1) {
@@ -148,7 +152,8 @@ public class AsyncPlayer extends PlayerProxy {
             RuntimeException caught = null;
             try {
                 EditSession edit =
-                    WorldEdit.getInstance().newEditSessionBuilder().world(WorldWrapper.unwrap(getWorld())).actor(unwrap(getBasePlayer())).build();
+                        WorldEdit.getInstance().newEditSessionBuilder().world(WorldWrapper.unwrap(getWorld())).actor(unwrap(
+                                getBasePlayer())).build();
                 edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
                 edit.flushQueue();
                 LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);
@@ -212,9 +217,11 @@ public class AsyncPlayer extends PlayerProxy {
             int freeToFind = 2;
             boolean inFree = false;
 
+            MutableBlockVector3 mutable = new MutableBlockVector3();
+
             while ((block = hitBlox.getNextBlock()) != null) {
                 boolean free = !world.getBlock(
-                        BlockVector3.at(block.getBlockX(), block.getBlockY(), block.getBlockZ()))
+                                mutable.setComponents(block.getBlockX(), block.getBlockY(), block.getBlockZ()))
                         .getBlockType().getMaterial().isMovementBlocker();
 
                 if (firstBlock) {

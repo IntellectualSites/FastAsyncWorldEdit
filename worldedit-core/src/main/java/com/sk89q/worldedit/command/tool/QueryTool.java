@@ -77,7 +77,7 @@ public class QueryTool implements BlockTool {
         }
 
         builder.append(TextComponent.of(" (" + world.getBlockLightLevel(blockPoint) + "/"
-                + world.getBlockLightLevel(blockPoint.add(0, 1, 0)) + ")", TextColor.WHITE)
+                        + world.getBlockLightLevel(blockPoint.add(0, 1, 0)) + ")", TextColor.WHITE)
                 .hoverEvent(HoverEvent.of(HoverEvent.Action.SHOW_TEXT, Caption.of("worldedit.tool.info.light.hover"))));
 
         player.print(builder.build());

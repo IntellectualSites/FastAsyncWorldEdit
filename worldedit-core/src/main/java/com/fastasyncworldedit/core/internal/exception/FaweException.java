@@ -13,13 +13,28 @@ public class FaweException extends RuntimeException {
     public static final FaweException _disableQueue = new FaweException("disableQueue");
 
     private final Component message;
+    private final Type type;
 
+    /**
+     * New instance. Defaults to {@link FaweException.Type#OTHER}.
+     */
     public FaweException(String reason) {
         this(TextComponent.of(reason));
     }
 
+    /**
+     * New instance. Defaults to {@link FaweException.Type#OTHER}.
+     */
     public FaweException(Component reason) {
+        this(reason, Type.OTHER);
+    }
+
+    /**
+     * New instance of a given {@link FaweException.Type}
+     */
+    public FaweException(Component reason, Type type) {
         this.message = reason;
+        this.type = type;
     }
 
     @Override
@@ -29,6 +44,15 @@ public class FaweException extends RuntimeException {
 
     public Component getComponent() {
         return message;
+    }
+
+    /**
+     * Get the {@link FaweException.Type}
+     *
+     * @return the {@link FaweException.Type}
+     */
+    public Type getType() {
+        return type;
     }
 
     public static FaweException get(Throwable e) {
@@ -50,6 +74,21 @@ public class FaweException extends RuntimeException {
     @Override
     public Throwable fillInStackTrace() {
         return this;
+    }
+
+    public enum Type {
+        MANUAL,
+        NO_REGION,
+        OUTSIDE_REGION,
+        MAX_CHECKS,
+        MAX_CHANGES,
+        LOW_MEMORY,
+        MAX_ENTITIES,
+        MAX_TILES,
+        MAX_ITERATIONS,
+        BLOCK_BAG,
+        CHUNK,
+        OTHER
     }
 
 }

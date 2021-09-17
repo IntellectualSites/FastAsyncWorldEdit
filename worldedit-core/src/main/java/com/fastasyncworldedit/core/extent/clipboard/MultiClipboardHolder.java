@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.extent.clipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -180,6 +181,17 @@ public class MultiClipboardHolder extends URIClipboardHolder {
         cached = null;
         for (ClipboardHolder holder : holders) {
             holder.close();
+        }
+    }
+
+    @Override
+    public void flush() {
+        for (ClipboardHolder holder : holders) {
+            try {
+                holder.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

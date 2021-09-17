@@ -1,20 +1,22 @@
 package com.fastasyncworldedit.core.function.mask;
 
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
-import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 
+import javax.annotation.Nullable;
+
 public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
-    private transient MutableBlockVector3 mutable = new MutableBlockVector3();
+    private final boolean hasExtent;
     private transient LocalBlockVectorSet cache_checked = new LocalBlockVectorSet();
     private transient LocalBlockVectorSet cache_results = new LocalBlockVectorSet();
 
     public CachedMask(Mask mask) {
         super(mask);
-        cache_checked.setOffset(Integer.MIN_VALUE, Integer.MIN_VALUE);
-        cache_results.setOffset(Integer.MIN_VALUE, Integer.MIN_VALUE);
+        hasExtent = mask instanceof AbstractExtentMask;
     }
 
     public static CachedMask cache(Mask mask) {
@@ -26,7 +28,6 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
     @Override
     public void reset() {
-        mutable = new MutableBlockVector3();
         cache_checked = new LocalBlockVectorSet();
         cache_results = new LocalBlockVectorSet();
         resetCache();
@@ -35,34 +36,55 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
     private void resetCache() {
         cache_checked.clear();
         cache_results.clear();
-        cache_checked.setOffset(Integer.MIN_VALUE, Integer.MIN_VALUE);
-        cache_results.setOffset(Integer.MIN_VALUE, Integer.MIN_VALUE);
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
-        return test(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());
-    }
-
-    public boolean test(int x, int y, int z) {
+        int x = vector.getX();
+        int y = vector.getY();
+        int z = vector.getZ();
         try {
             boolean check = cache_checked.add(x, y, z);
             if (!check) {
                 return cache_results.contains(x, y, z);
             }
-            boolean result = getMask().test(mutable.setComponents(x, y, z));
+            boolean result = getMask().test(vector);
             if (result) {
                 cache_results.add(x, y, z);
             }
             return result;
         } catch (UnsupportedOperationException ignored) {
-            boolean result = getMask().test(mutable.setComponents(x, y, z));
-            if (y < 0 || y > 255) {
-                return result;
-            }
+            boolean result = getMask().test(vector);
             resetCache();
-            cache_checked.setOffset(x, z);
-            cache_results.setOffset(x, z);
+            cache_checked.add(x, y, z);
+            if (result) {
+                cache_results.add(x, y, z);
+            }
+            return result;
+        }
+    }
+
+    public boolean test(@Nullable Extent extent, BlockVector3 vector) {
+        if (!hasExtent || !(extent instanceof AbstractExtentMask)) {
+            return test(vector);
+        }
+        int x = vector.getX();
+        int y = vector.getY();
+        int z = vector.getZ();
+        AbstractExtentMask mask = (AbstractExtentMask) getMask();
+        try {
+            boolean check = cache_checked.add(x, y, z);
+            if (!check) {
+                return cache_results.contains(x, y, z);
+            }
+            boolean result = mask.test(extent, vector);
+            if (result) {
+                cache_results.add(x, y, z);
+            }
+            return result;
+        } catch (UnsupportedOperationException ignored) {
+            boolean result = mask.test(extent, vector);
+            resetCache();
             cache_checked.add(x, y, z);
             if (result) {
                 cache_results.add(x, y, z);

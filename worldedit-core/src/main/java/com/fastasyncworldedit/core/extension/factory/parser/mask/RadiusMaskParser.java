@@ -20,14 +20,14 @@ public class RadiusMaskParser extends RichParser<Mask> {
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index) {
         if (index == 0 || index == 1) {
-            return SuggestionHelper.suggestPositiveDoubles(argumentInput);
+            return SuggestionHelper.suggestPositiveIntegers(argumentInput);
         }
         return Stream.empty();
     }
 
     @Override
     protected Mask parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
-        if (arguments.length < 2) {
+        if (arguments.length != 2) {
             return null;
         }
         int min = Integer.parseInt(arguments[0]);

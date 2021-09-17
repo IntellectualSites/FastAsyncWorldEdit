@@ -21,8 +21,10 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.util.WorldUnloadedException;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.sk89q.jnbt.CompoundTag;
@@ -60,19 +62,20 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.Entity;
-import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -135,9 +138,10 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities(Region region) {
-        World world = getWorld();
+        //FAWE start - allow async entity retrieval
+        List<Entity> ents = WorldEditPlugin.getInstance().getBukkitImplAdapter().getEntities(getWorld());
+        //FAWE end
 
-        List<Entity> ents = world.getEntities();
         List<com.sk89q.worldedit.entity.Entity> entities = new ArrayList<>();
         for (Entity ent : ents) {
             if (region.contains(BukkitAdapter.asBlockVector(ent.getLocation()))) {
@@ -150,7 +154,9 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities() {
         List<com.sk89q.worldedit.entity.Entity> list = new ArrayList<>();
-        for (Entity entity : getWorld().getEntities()) {
+        //FAWE start - allow async entity retrieval
+        for (Entity entity : WorldEditPlugin.getInstance().getBukkitImplAdapter().getEntities(getWorld())) {
+            //FAWE end
             list.add(BukkitAdapter.adapt(entity));
         }
         return list;
@@ -230,43 +236,24 @@ public class BukkitWorld extends AbstractWorld {
             } else {
                 throw new UnsupportedOperationException("Missing BukkitImplAdapter for this version.");
             }
+        } catch (FaweException e) {
+            throw e;
         } catch (Exception e) {
             LOGGER.warn("Regeneration via adapter failed.", e);
             return false;
         }
     }
 
-    /**
-     * Gets the single block inventory for a potentially double chest.
-     * Handles people who have an old version of Bukkit.
-     * This should be replaced with {@link org.bukkit.block.Chest#getBlockInventory()}
-     * in a few months (now = March 2012) // note from future dev - lol
-     *
-     * @param chest The chest to get a single block inventory for
-     * @return The chest's inventory
-     */
-    private Inventory getBlockInventory(Chest chest) {
-        try {
-            return chest.getBlockInventory();
-        } catch (Throwable t) {
-            if (chest.getInventory() instanceof DoubleChestInventory) {
-                DoubleChestInventory inven = (DoubleChestInventory) chest.getInventory();
-                if (inven.getLeftSide().getHolder().equals(chest)) {
-                    return inven.getLeftSide();
-                } else if (inven.getRightSide().getHolder().equals(chest)) {
-                    return inven.getRightSide();
-                } else {
-                    return inven;
-                }
-            } else {
-                return chest.getInventory();
-            }
-        }
-    }
-
     @Override
     public boolean clearContainerBlockContents(BlockVector3 pt) {
         checkNotNull(pt);
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            try {
+                return adapter.clearContainerBlockContents(getWorld(), pt);
+            } catch (Exception ignored) {
+            }
+        }
         if (!getBlock(pt).getBlockType().getMaterial().hasContainer()) {
             return false;
         }
@@ -280,7 +267,7 @@ public class BukkitWorld extends AbstractWorld {
         InventoryHolder chest = (InventoryHolder) state;
         Inventory inven = chest.getInventory();
         if (chest instanceof Chest) {
-            inven = getBlockInventory((Chest) chest);
+            inven = ((Chest) chest).getBlockInventory();
         }
         inven.clear();
         return true;
@@ -313,9 +300,10 @@ public class BukkitWorld extends AbstractWorld {
             if (treeTypeMapping.get(type) == null) {
                 LOGGER.error("No TreeType mapping for TreeGenerator.TreeType." + type);
                 //FAWE start
-                LOGGER.warn("Your FAWE version is newer than " + Bukkit.getVersion() +
+                LOGGER.info("The above message is displayed because your FAWE version is newer than " + Bukkit.getVersion() +
                         " and contains features of future minecraft versions which do not exist in "
-                        + Bukkit.getVersion() + ", hence the tree type " + type + " is not available.");
+                        + Bukkit.getVersion() + ", hence the tree type " + type + " is not available. This is not an error. " +
+                        "This version will work on your version of Minecraft. This is an informative message only");
                 //FAWE end
             }
         }
@@ -327,14 +315,11 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
-        World world = getWorld();
-        TreeType bukkitType = toBukkitTreeType(type);
-        if (bukkitType == TreeType.CHORUS_PLANT) {
-            pt = pt.add(0, 1, 0); // bukkit skips the feature gen which does this offset normally, so we have to add it back
-        }
-        return type != null && world.generateTree(BukkitAdapter.adapt(world, pt), bukkitType,
-                new EditSessionBlockChangeDelegate(editSession)
-        );
+        //FAWE start - allow tree commands to be undone and obey region restrictions
+        return TaskManager.IMP.sync(() -> WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt,
+                getWorld()
+        ));
+        //FAWE end
     }
 
     @Override
@@ -351,7 +336,7 @@ public class BukkitWorld extends AbstractWorld {
         int Z = pt.getBlockZ() >> 4;
         if (Fawe.isMainThread()) {
             world.getChunkAt(X, Z);
-        } else {
+        } else if (PaperLib.isPaper()) {
             PaperLib.getChunkAtAsync(world, X, Z, true);
         }
         //FAWE end
@@ -469,6 +454,14 @@ public class BukkitWorld extends AbstractWorld {
     public void simulateBlockMine(BlockVector3 pt) {
         getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
     }
+
+    //FAWE start
+    @Override
+    public Collection<BaseItemStack> getBlockDrops(BlockVector3 position) {
+        return getWorld().getBlockAt(position.getBlockX(), position.getBlockY(), position.getBlockZ()).getDrops().stream()
+                .map(BukkitAdapter::adapt).collect(Collectors.toList());
+    }
+    //FAWE end
 
     @Override
     public boolean canPlaceAt(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState blockState) {

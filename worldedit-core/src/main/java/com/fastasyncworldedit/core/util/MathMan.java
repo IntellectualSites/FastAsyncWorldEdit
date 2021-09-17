@@ -152,52 +152,65 @@ public class MathMan {
     }
 
     public static long tripleWorldCoord(int x, int y, int z) {
-        return y + (((long) x & 0x3FFFFFF) << 8) + (((long) z & 0x3FFFFFF) << 34);
+        return ((y + 256) & 0xffff) + (((long) x & 0xffffff) << 16) + (((long) z & 0xffffff) << 40);
     }
 
     public static long untripleWorldCoordX(long triple) {
-        return (((triple >> 8) & 0x3FFFFFF) << 38) >> 38;
+        return (((triple >> 16) & 0xffffff) << 38) >> 38;
     }
 
     public static long untripleWorldCoordY(long triple) {
-        return triple & 0xFF;
+        return (triple & 0xffff) - 256;
     }
 
     public static long untripleWorldCoordZ(long triple) {
-        return (((triple >> 34) & 0x3FFFFFF) << 38) >> 38;
+        return (((triple >> 40) & 0xffffff) << 38) >> 38;
     }
 
-    public static short tripleBlockCoord(int x, int y, int z) {
-        return (short) ((x & 15) << 12 | (z & 15) << 8 | y);
+    public static int tripleBlockCoord(int x, int y, int z) {
+        // account for the fact y can be negative now. Assume it won't be less than -256
+        y += 256;
+        return ((x & 15) << 16 | (z & 15) << 12 | y);
     }
 
     public static char tripleBlockCoordChar(int x, int y, int z) {
-        return (char) ((x & 15) << 12 | (z & 15) << 8 | y);
+        return (char) ((x & 15) << 16 | (z & 15) << 12 | y);
     }
 
     public static int untripleBlockCoordX(int triple) {
-        return (triple >> 12) & 0xF;
+        return (triple >> 16) & 0xF;
     }
 
     public static int untripleBlockCoordY(int triple) {
-        return (triple & 0xFF);
+        return (triple & 0x1ff) - 256;
     }
 
     public static int untripleBlockCoordZ(int triple) {
-        return (triple >> 8) & 0xF;
+        return (triple >> 12) & 0xF;
     }
 
+    /**
+     * Obtain an integer representation of 3 ints, x, y and z. y is represented by the right-most 9 bits and can
+     * be within the range -256 to 255 (inclusive). x and z are represented by 11 bits each and can be within the range
+     * -1024 to 1023 (inclusive).
+     *
+     * @param x x value
+     * @param y y value
+     * @param z z value
+     * @return integer representation of x y z
+     */
     public static int tripleSearchCoords(int x, int y, int z) {
-        byte b1 = (byte) y;
-        byte b3 = (byte) (x);
-        byte b4 = (byte) (z);
-        int x16 = (x >> 8) & 0x7;
-        int z16 = (z >> 8) & 0x7;
-        byte b2 = MathMan.pair8(x16, z16);
-        return ((b1 & 0xFF)
-                + ((b2 & 0x7F) << 8)
-                + ((b3 & 0xFF) << 15)
-                + ((b4 & 0xFF) << 23));
+        if (x > 1023 || x < -1024 || y > 255 || y < -256 || z > 1023 || z < -1024) {
+            throw new UnsupportedOperationException(String.format("Check range on x=%s, y=%s and z=%s!", x, y, z));
+        }
+        int b1 = Math.abs(y) & 0xff;
+        int b3 = x & 0xff;
+        int b4 = z & 0xff;
+        int x16 = (((x >> 8) & 0x3) | (x < 0 ? 0x4 : 0x00));
+        int z16 = (((z >> 8) & 0x3) | (z < 0 ? 0x4 : 0x00));
+        int y16 = (y < 0 ? 0x1 : 0x00);
+        int b2 = ((x16 + (z16 << 3) + (y16 << 6)));
+        return (((b1) | (b2 << 8)) | (b3 << 15)) | (b4 << 23);
     }
 
     public static int pairSearchCoords(int x, int y) {
@@ -352,8 +365,18 @@ public class MathMan {
         if (str.charAt(0) == '-') {
             if (length == 1) {
                 return false;
+                //VERY basic check for >< int min/max value without spending time trying to parse the int
+            } else if (length > 11) {
+                return false;
+            } else if (length == 11 && (str.charAt(0) > '2' || str.charAt(0) < '0') && (str.charAt(1) > '1' || str.charAt(1) < '0')) {
+                return false;
             }
             i = 1;
+            //VERY basic check for >< int min/max value without spending time trying to parse the int
+        } else if (length > 10) {
+            return false;
+        } else if (length == 10 && (str.charAt(0) > '2' || str.charAt(0) < '0') && (str.charAt(1) > '1' || str.charAt(1) < '0')) {
+            return false;
         }
         for (; i < length; i++) {
             char c = str.charAt(i);

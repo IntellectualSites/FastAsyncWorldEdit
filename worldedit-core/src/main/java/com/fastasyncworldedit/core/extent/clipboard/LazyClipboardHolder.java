@@ -61,4 +61,11 @@ public class LazyClipboardHolder extends URIClipboardHolder {
         clipboard = null;
     }
 
+    @Override
+    public synchronized void flush() {
+        if (clipboard instanceof BlockArrayClipboard) {
+            clipboard.flush();
+        }
+    }
+
 }

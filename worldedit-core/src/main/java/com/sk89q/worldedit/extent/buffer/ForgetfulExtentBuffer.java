@@ -157,8 +157,9 @@ public class ForgetfulExtentBuffer extends AbstractDelegateExtent implements Pat
             max = max.getMaximum(BlockVector3.at(x, y, z));
         }
 
-        if (mask.test(BlockVector3.at(x, y, z))) {
-            biomeBuffer.put(BlockVector3.at(x, y, z), biome);
+        BlockVector3 pos = BlockVector3.at(x, y, z);
+        if (mask.test(pos)) {
+            biomeBuffer.put(pos, biome);
             return true;
         } else {
             return getExtent().setBiome(x, y, z, biome);

@@ -42,7 +42,7 @@ public class SplatterBrush extends ScatterBrush {
         SurfaceMask surface = new SurfaceMask(editSession);
 
         RecursiveVisitor visitor = new RecursiveVisitor(new SplatterBrushMask(editSession, position, size2, surface, placed),
-                vector -> editSession.setBlock(vector, finalPattern), recursion
+                vector -> editSession.setBlock(vector, finalPattern), recursion, editSession.getMinY(), editSession.getMaxY()
         );
         visitor.setMaxBranch(2);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));

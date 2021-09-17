@@ -32,6 +32,7 @@ import com.sk89q.worldedit.command.util.CommandPermissions;
 import com.sk89q.worldedit.command.util.CommandPermissionsConditionGenerator;
 import com.sk89q.worldedit.command.util.Logging;
 import com.sk89q.worldedit.command.util.annotation.Confirm;
+import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.GroundFunction;
@@ -54,6 +55,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.convolution.GaussianKernel;
 import com.sk89q.worldedit.math.convolution.HeightMap;
 import com.sk89q.worldedit.math.convolution.HeightMapFilter;
+import com.sk89q.worldedit.math.convolution.SnowHeightMap;
 import com.sk89q.worldedit.math.noise.RandomNoise;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -105,6 +107,7 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
     @Confirm(Confirm.Processor.REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     public int set(
             Actor actor, EditSession editSession,
             @Selection Region region,
@@ -125,6 +128,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.set")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     public void air(Actor actor, EditSession editSession, @Selection Region region) throws WorldEditException {
         set(actor, editSession, region, BlockTypes.AIR);
     }
@@ -305,6 +309,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.replace")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int replace(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -315,10 +320,10 @@ public class RegionCommands {
     ) throws WorldEditException {
         if (from == null) {
             from = new ExistingBlockMask(editSession);
-        //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow
+            //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow
         } else if (from instanceof AbstractExtentMask) {
             ((AbstractExtentMask) from).setExtent(editSession);
-        //FAWE end
+            //FAWE end
         }
         if (from instanceof AbstractExtentMask) {
             ((AbstractExtentMask) from).setExtent(editSession);
@@ -351,6 +356,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.overlay")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void lay(
             Player player,
@@ -358,17 +364,23 @@ public class RegionCommands {
             @Selection Region region,
             @Arg(name = "pattern", desc = "The pattern of blocks to lay") Pattern patternArg
     ) throws WorldEditException {
-        BlockVector3 max = region.getMaximumPoint();
-        int maxY = max.getBlockY();
+        //FAWE start - world min/maxY
+        int maxY = region.getMaximumY();
+        int minY = region.getMinimumY();
+        //FAWE end
         Iterable<BlockVector2> flat = Regions.asFlatRegion(region).asFlatRegion();
         Iterator<BlockVector2> iter = flat.iterator();
-        int y = 0;
+        //FAWE start - world min/maxY
+        int y = minY;
+        //FAWE end
         int affected = 0;
         while (iter.hasNext()) {
             BlockVector2 pos = iter.next();
             int x = pos.getBlockX();
             int z = pos.getBlockZ();
-            y = editSession.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
+            //FAWE start - world min/maxY
+            y = editSession.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
+            //FAWE end
             editSession.setBlock(x, y, z, patternArg);
             affected++;
         }
@@ -429,6 +441,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.faces")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int faces(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -447,15 +460,14 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.smooth")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int smooth(
             Actor actor, EditSession editSession, @Selection Region region,
             @Arg(desc = "# of iterations to perform", def = "1")
                     int iterations,
             @Arg(desc = "The mask of blocks to use as the height map", def = "")
-                    Mask mask,
-            @Switch(name = 's', desc = "The flag makes it only consider snow")
-                    boolean snow
+                    Mask mask
     ) throws WorldEditException {
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
         if (mask instanceof AbstractExtentMask) {
@@ -472,7 +484,7 @@ public class RegionCommands {
         }
         int affected;
         try {
-            HeightMap heightMap = new HeightMap(editSession, region, mask, snow);
+            HeightMap heightMap = new HeightMap(editSession, region, mask);
             HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
             affected = heightMap.applyFilter(filter, iterations);
             actor.print(Caption.of("worldedit.smooth.changed", TextComponent.of(affected)));
@@ -514,6 +526,31 @@ public class RegionCommands {
         }
     }
 
+    @Command(
+            name = "/snowsmooth",
+            desc = "Smooth the elevation in the selection with snow layers",
+            descFooter = "Example: '//snowsmooth 1 -m snow_block,snow' would only smooth snow terrain."
+    )
+    @CommandPermissions("worldedit.region.snowsmooth")
+    @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
+    @Confirm(Confirm.Processor.REGION)
+    public int snowSmooth(
+            Actor actor, EditSession editSession, @Selection Region region,
+            @Arg(desc = "# of iterations to perform", def = "1")
+                    int iterations,
+            @ArgFlag(name = 'l', desc = "Set the amount of snow blocks under the snow", def = "1")
+                    int snowBlockCount,
+            @ArgFlag(name = 'm', desc = "The mask of blocks to use as the height map")
+                    Mask mask
+    ) throws WorldEditException {
+        SnowHeightMap heightMap = new SnowHeightMap(editSession, region, mask);
+        HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
+        float[] changed = heightMap.applyFilter(filter, iterations);
+        int affected = heightMap.applyChanges(changed, snowBlockCount);
+        actor.printInfo(Caption.of("worldedit.snowsmooth.changed", TextComponent.of(affected)));
+        return affected;
+    }
 
     @Command(
             name = "/move",
@@ -522,6 +559,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.move")
     @Logging(ORIENTATION_REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int move(
             Actor actor, World world, EditSession editSession, LocalSession session,
@@ -586,6 +624,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.fall")
     @Logging(ORIENTATION_REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void fall(
             Player player, EditSession editSession, LocalSession session,
@@ -604,6 +643,7 @@ public class RegionCommands {
             desc = "Repeat the contents of the selection"
     )
     @CommandPermissions("worldedit.region.stack")
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Logging(ORIENTATION_REGION)
     public int stack(
             Actor actor, World world, EditSession editSession, LocalSession session,
@@ -713,6 +753,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int deform(
             Actor actor, LocalSession session, EditSession editSession,
@@ -788,6 +829,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int hollow(
             Actor actor, EditSession editSession,
@@ -823,6 +865,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.forest")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int forest(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -843,6 +886,7 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.region.flora")
     @Logging(REGION)
+    @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public int flora(
             Actor actor, EditSession editSession, @Selection Region region,
@@ -853,7 +897,9 @@ public class RegionCommands {
         density = density / 100;
         FloraGenerator generator = new FloraGenerator(editSession);
         GroundFunction ground = new GroundFunction(new ExistingBlockMask(editSession), generator);
+        //FAWE start - provide extent for preloading
         LayerVisitor visitor = new LayerVisitor(asFlatRegion(region), minimumBlockY(region), maximumBlockY(region), ground);
+        //FAWE end
         visitor.setMask(new NoiseFilter2D(new RandomNoise(), density));
         Operations.completeLegacy(visitor);
 

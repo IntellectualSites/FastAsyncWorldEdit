@@ -2,16 +2,17 @@ package com.fastasyncworldedit.core.function.mask;
 
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import java.util.Arrays;
 
-public class AngleMask extends SolidBlockMask implements ResettableMask {
+public class AngleMask extends AbstractExtentMask implements ResettableMask {
 
-    public static double ADJACENT_MOD = 0.5;
-    public static double DIAGONAL_MOD = 1 / Math.sqrt(8);
+    protected static double ADJACENT_MOD = 0.5;
+    protected static double DIAGONAL_MOD = 1 / Math.sqrt(8);
 
     protected final CachedMask mask;
     protected final double max;
@@ -19,9 +20,15 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
     protected final boolean overlay;
     protected final boolean checkFirst;
     protected final int maxY;
+    protected final int minY;
     protected final int distance;
-
-    protected transient MutableBlockVector3 mutable = new MutableBlockVector3();
+    protected transient int cacheBotX = Integer.MIN_VALUE;
+    protected transient int cacheBotZ = Integer.MIN_VALUE;
+    protected transient byte[] cacheHeights;
+    protected transient int lastY;
+    protected transient int lastX = Integer.MIN_VALUE;
+    protected transient int lastZ = Integer.MIN_VALUE;
+    protected transient boolean lastValue;
 
     public AngleMask(Extent extent, double min, double max, boolean overlay, int distance) {
         super(extent);
@@ -29,70 +36,51 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         this.min = min;
         this.max = max;
         this.checkFirst = max >= (Math.tan(90 * (Math.PI / 180)));
-        this.maxY = extent.getMaximumPoint().getBlockY();
+        this.maxY = extent.getMaxY();
+        this.minY = extent.getMinY();
         this.overlay = overlay;
         this.distance = distance;
     }
 
     @Override
     public void reset() {
-        mutable = new MutableBlockVector3();
         cacheBotX = Integer.MIN_VALUE;
         cacheBotZ = Integer.MIN_VALUE;
         lastX = Integer.MIN_VALUE;
         lastY = Integer.MIN_VALUE;
+        lastZ = Integer.MIN_VALUE;
         if (cacheHeights != null) {
             Arrays.fill(cacheHeights, (byte) 0);
         }
     }
 
-    protected transient int cacheCenZ;
-    protected transient int cacheBotX = Integer.MIN_VALUE;
-    protected transient int cacheBotZ = Integer.MIN_VALUE;
-    protected transient int cacheCenterZ;
-
-    protected transient byte[] cacheHeights;
-
-    protected transient int lastY;
-    protected transient int lastX = Integer.MIN_VALUE;
-    protected transient int lastZ = Integer.MIN_VALUE;
-    protected transient boolean foundY;
-    protected transient boolean lastValue;
-
-    public int getHeight(Extent extent, int x, int y, int z) {
-        //        return extent.getNearestSurfaceTerrainBlock(x, z, y, 0, maxY);
-        try {
-            int rx = x - cacheBotX + 16;
-            int rz = z - cacheBotZ + 16;
-            int index;
-            if (((rx & 0xFF) != rx || (rz & 0xFF) != rz)) {
-                cacheBotX = x - 16;
-                cacheBotZ = z - 16;
-                rx = x - cacheBotX + 16;
-                rz = z - cacheBotZ + 16;
-                index = rx + (rz << 8);
-                if (cacheHeights == null) {
-                    cacheHeights = new byte[65536];
-                } else {
-                    Arrays.fill(cacheHeights, (byte) 0);
-                }
+    protected int getHeight(Extent extent, int x, int y, int z) {
+        int rx = x - cacheBotX + 16;
+        int rz = z - cacheBotZ + 16;
+        int index;
+        if (((rx & 0xFF) != rx || (rz & 0xFF) != rz)) {
+            cacheBotX = x - 16;
+            cacheBotZ = z - 16;
+            rx = x - cacheBotX + 16;
+            rz = z - cacheBotZ + 16;
+            index = rx + (rz << 8);
+            if (cacheHeights == null) {
+                cacheHeights = new byte[65536];
             } else {
-                index = rx + (rz << 8);
+                Arrays.fill(cacheHeights, (byte) 0);
             }
-            int result = cacheHeights[index] & 0xFF;
-            if (y > result) {
-                cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, 0, maxY));
-            }
-            return result;
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
+        } else {
+            index = rx + (rz << 8);
         }
+        int result = cacheHeights[index] & 0xFF;
+        if (y > result) {
+            cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
+        }
+        return result;
     }
 
     protected boolean testSlope(Extent extent, int x, int y, int z) {
         double slope;
-        boolean aboveMin;
         lastY = y;
         slope =
                 Math.abs(getHeight(extent, x + distance, y, z) - getHeight(extent, x - distance, y, z))
@@ -129,50 +117,70 @@ public class AngleMask extends SolidBlockMask implements ResettableMask {
         }
     }
 
-    public boolean adjacentAir(BlockVector3 v) {
-        int x = v.getBlockX();
-        int y = v.getBlockY();
-        int z = v.getBlockZ();
-        if (!mask.test(x + 1, y, z)) {
+    private boolean adjacentAir(Extent extent, MutableBlockVector3 mutable) {
+        int x = mutable.getBlockX();
+        int y = mutable.getBlockY();
+        int z = mutable.getBlockZ();
+        if (!mask.test(extent, mutable.setComponents(x + 1, y, z))) {
             return true;
         }
-        if (!mask.test(x - 1, y, z)) {
+        if (!mask.test(extent, mutable.setComponents(x - 1, y, z))) {
             return true;
         }
-        if (!mask.test(x, y, z + 1)) {
+        if (!mask.test(extent, mutable.setComponents(x, y, z + 1))) {
             return true;
         }
-        if (!mask.test(x, y, z - 1)) {
+        if (!mask.test(extent, mutable.setComponents(x, y, z - 1))) {
             return true;
         }
-        if (y < 255 && !mask.test(x, y + 1, z)) {
+        if (y != maxY && !mask.test(extent, mutable.setComponents(x, y + 1, z))) {
             return true;
         }
-        return y > 0 && !mask.test(x, y - 1, z);
+        return y != minY && !mask.test(extent, mutable.setComponents(x, y - 1, z));
     }
 
     @Override
     public boolean test(BlockVector3 vector) {
+
+        if (!mask.test(vector)) {
+            return false;
+        }
+        int y = vector.getBlockY();
+        if (overlay) {
+            MutableBlockVector3 mutable = new MutableBlockVector3(vector);
+            if (y < maxY && !adjacentAir(null, mutable)) {
+                return false;
+            }
+        }
+        int x = vector.getBlockX();
+        int z = vector.getBlockZ();
+        return testSlope(getExtent(), x, y, z);
+    }
+
+    @Override
+    public boolean test(final Extent extent, final BlockVector3 vector) {
         int x = vector.getBlockX();
         int y = vector.getBlockY();
         int z = vector.getBlockZ();
 
         if ((lastX == (lastX = x) & lastZ == (lastZ = z))) {
-            int height = getHeight(getExtent(), x, y, z);
+            int height = getHeight(extent, x, y, z);
             if (y <= height) {
                 return overlay ? (lastValue && y == height) : lastValue;
             }
         }
 
-        if (!mask.test(x, y, z)) {
+        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
+
+        if (!mask.test(extent, mutable)) {
             return false;
         }
         if (overlay) {
-            if (y < 255 && !adjacentAir(vector)) {
+            if (y < maxY && !adjacentAir(extent, mutable)) {
                 return lastValue = false;
             }
         }
-        return testSlope(getExtent(), x, y, z);
+        return testSlope(extent, x, y, z);
     }
 
     @Override

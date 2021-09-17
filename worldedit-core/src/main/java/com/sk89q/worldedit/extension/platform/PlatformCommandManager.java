@@ -106,6 +106,7 @@ import com.sk89q.worldedit.command.util.PermissionCondition;
 import com.sk89q.worldedit.command.util.PrintCommandHelp;
 import com.sk89q.worldedit.command.util.SubCommandPermissionCondition;
 import com.sk89q.worldedit.command.util.annotation.ConfirmHandler;
+import com.sk89q.worldedit.command.util.annotation.PreloadHandler;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.Event;
@@ -219,7 +220,10 @@ public final class PlatformCommandManager {
                 ImmutableList.of(
                         new CommandLoggingHandler(worldEdit, COMMAND_LOG),
                         new MethodInjector(),
-                        new ConfirmHandler()
+                        //FAWE start
+                        new ConfirmHandler(),
+                        new PreloadHandler()
+                        //FAWE end
 
                 ));
         // setup separate from main constructor
@@ -380,9 +384,9 @@ public final class PlatformCommandManager {
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
             cmd.addPart(SubCommandPart.builder(
-                    Caption.of("worldedit.argument.action"),
-                    TextComponent.of("Sub-command to run.")
-            )
+                            Caption.of("worldedit.argument.action"),
+                            TextComponent.of("Sub-command to run.")
+                    )
                     .withCommands(subCommands)
                     .required()
                     .build());
@@ -415,9 +419,9 @@ public final class PlatformCommandManager {
 
             final List<Command> subCommands = manager.getAllCommands().collect(Collectors.toList());
             cmd.addPart(SubCommandPart.builder(
-                    Caption.of("worldedit.argument.action"),
-                    TextComponent.of("Sub-command to run.")
-            )
+                            Caption.of("worldedit.argument.action"),
+                            TextComponent.of("Sub-command to run.")
+                    )
                     .withCommands(subCommands)
                     .required()
                     .build());
@@ -770,19 +774,18 @@ public final class PlatformCommandManager {
             }
             actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {
+            handleUnknownException(actor, e.getCause());
+        } catch (CommandException e) {
             if (e.getCause() instanceof FaweException) {
                 actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", ((FaweException) e.getCause()).getComponent()));
             } else {
-                handleUnknownException(actor, e.getCause());
-            }
-        } catch (CommandException e) {
-            Component msg = e.getRichMessage();
-            if (msg != TextComponent.empty()) {
-                actor.print(TextComponent.builder("")
-                        .append(e.getRichMessage())
-                        .build());
-                List<String> argList = parseArgs(event.getArguments()).map(Substring::getSubstring).collect(Collectors.toList());
-                printUsage(actor, argList);
+                Component msg = e.getRichMessage();
+                if (msg != TextComponent.empty()) {
+                    List<String> argList = parseArgs(event.getArguments())
+                            .map(Substring::getSubstring)
+                            .collect(Collectors.toList());
+                    printUsage(actor, argList);
+                }
             }
         } catch (Throwable t) {
             handleUnknownException(actor, t);
@@ -840,8 +843,8 @@ public final class PlatformCommandManager {
     }
     //FAWE end
 
-    //FAWE start - Event & suggestions
-    private MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event, boolean isSuggestions) {
+    //FAWE start - Event & suggestions, make method public
+    public MemoizingValueAccess initializeInjectedValues(Arguments arguments, Actor actor, Event event, boolean isSuggestions) {
         //FAWE end
         InjectedValueStore store = MapBackedValueStore.create();
         store.injectValue(Key.of(Actor.class), ValueProvider.constant(actor));
@@ -872,7 +875,9 @@ public final class PlatformCommandManager {
     private void handleUnknownException(Actor actor, Throwable t) {
         actor.print(Caption.of("worldedit.command.error.report"));
         actor.print(TextComponent.of(t.getClass().getName() + ": " + t.getMessage()));
-        LOGGER.error("An unexpected error while handling a WorldEdit command", t);
+        //FAWE start - Exchange name
+        LOGGER.error("An unexpected error while handling a FastAsyncWorldEdit command", t);
+        //FAWE end
     }
 
     @Subscribe

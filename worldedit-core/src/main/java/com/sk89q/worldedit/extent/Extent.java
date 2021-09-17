@@ -200,9 +200,16 @@ public interface Extent extends InputExtent, OutputExtent {
          - TODO: actually optimize these
      */
 
+    /**
+     * Returns the highest solid 'terrain' block.
+     *
+     * @param x    the X coordinate
+     * @param z    the Z coordinate
+     * @param minY minimal height
+     * @param maxY maximal height
+     * @return height of highest block found or 'minY'
+     */
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY) {
-        maxY = Math.min(maxY, Math.max(0, maxY));
-        minY = Math.max(0, minY);
         for (int y = maxY; y >= minY; --y) {
             BlockState block = getBlock(x, y, z);
             if (block.getBlockType().getMaterial().isMovementBlocker()) {
@@ -212,17 +219,42 @@ public interface Extent extends InputExtent, OutputExtent {
         return minY;
     }
 
+    /**
+     * Returns the highest solid 'terrain' block.
+     *
+     * @param x      the X coordinate
+     * @param z      the Z coordinate
+     * @param minY   minimal height
+     * @param maxY   maximal height
+     * @param filter a mask of blocks to consider, or null to consider any solid (movement-blocking) block
+     * @return height of highest block found or 'minY'
+     */
     default int getHighestTerrainBlock(final int x, final int z, int minY, int maxY, Mask filter) {
-        maxY = Math.min(maxY, Math.max(0, maxY));
-        minY = Math.max(0, minY);
+        maxY = Math.min(maxY, getMaxY());
+        minY = Math.max(getMinY(), minY);
+
+        MutableBlockVector3 mutable = new MutableBlockVector3();
+
         for (int y = maxY; y >= minY; --y) {
-            if (filter.test(MutableBlockVector3.get(x, y, z))) {
+            if (filter.test(mutable.setComponents(x, y, z))) {
                 return y;
             }
         }
         return minY;
     }
 
+    /**
+     * Returns the nearest surface layer (up/down from start)
+     * <p>
+     * TODO: Someone understand this..?
+     *
+     * @param x    x to search from
+     * @param z    y to search from
+     * @param y    z to search from
+     * @param minY min y to search (inclusive)
+     * @param maxY max y to search (inclusive)
+     * @return nearest surface layer
+     */
     default int getNearestSurfaceLayer(int x, int z, int y, int minY, int maxY) {
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
@@ -252,7 +284,7 @@ public interface Extent extends InputExtent, OutputExtent {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
                     block = getBlock(x, layer, z);
                     if (block.getBlockType().getMaterial().isMovementBlocker() == state) {
-                        return ((layer + offset) << 4) + 0;
+                        return (layer + offset) << 4;
                     }
                     data1 = PropertyGroup.LEVEL.get(block);
                 }
@@ -269,45 +301,48 @@ public interface Extent extends InputExtent, OutputExtent {
         return (state ? minY : maxY) << 4;
     }
 
-    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
-        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY, ignoreAir);
-    }
-
-    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
-        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY);
-    }
-
-    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
-        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, true);
-    }
-
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc) where the block conforms to a given mask. Searches in the x,z column given.
+     *
+     * @param x         column x
+     * @param z         column z
+     * @param y         start y
+     * @param minY      minimum y height to consider. Inclusive.
+     * @param maxY      maximum y height to consider. Inclusive.
+     * @param failedMin if nothing found, the minimum y value to return if returning min
+     * @param failedMax if nothing found, the maximum y value to return if returning max
+     * @param mask      mask to test blocks against
+     * @return The y value of the nearest terrain block
+     */
     default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax, Mask mask) {
         y = Math.max(minY, Math.min(maxY, y));
         int clearanceAbove = maxY - y;
         int clearanceBelow = y - minY;
         int clearance = Math.min(clearanceAbove, clearanceBelow);
-        boolean state = !mask.test(MutableBlockVector3.get(x, y, z));
+        BlockVector3 pos = MutableBlockVector3.get(x, y, z);
+        boolean state = !mask.test(pos);
         int offset = state ? 0 : 1;
         for (int d = 0; d <= clearance; d++) {
             int y1 = y + d;
-            if (mask.test(MutableBlockVector3.get(x, y1, z)) != state) {
+            if (mask.test(pos.mutY(y1)) != state) {
                 return y1 - offset;
             }
             int y2 = y - d;
-            if (mask.test(MutableBlockVector3.get(x, y2, z)) != state) {
+            if (mask.test(pos.mutY(y2)) != state) {
                 return y2 + offset;
             }
         }
         if (clearanceAbove != clearanceBelow) {
             if (clearanceAbove < clearanceBelow) {
                 for (int layer = y - clearance - 1; layer >= minY; layer--) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) {
+                    if (mask.test(pos.mutY(layer)) != state) {
                         return layer + offset;
                     }
                 }
             } else {
                 for (int layer = y + clearance + 1; layer <= maxY; layer++) {
-                    if (mask.test(MutableBlockVector3.get(x, layer, z)) != state) {
+                    if (mask.test(pos.mutY(layer)) != state) {
                         return layer - offset;
                     }
                 }
@@ -316,6 +351,68 @@ public interface Extent extends InputExtent, OutputExtent {
         return state ? failedMin : failedMax;
     }
 
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc). Searches in the x,z column given.
+     *
+     * @param x         column x
+     * @param z         column z
+     * @param y         start y
+     * @param minY      minimum y height to consider. Inclusive.
+     * @param maxY      maximum y height to consider. Inclusive.
+     * @param ignoreAir if air at the final value if no block found should be considered for return, else return -1
+     * @return The y value of the nearest terrain block
+     */
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, boolean ignoreAir) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY, ignoreAir);
+    }
+
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc). Searches in the x,z column given.
+     *
+     * @param x    column x
+     * @param z    column z
+     * @param y    start y
+     * @param minY minimum y height to consider. Inclusive.
+     * @param maxY maximum y height to consider. Inclusive.
+     * @return The y value of the nearest terrain block
+     */
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, minY, maxY);
+    }
+
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc). Searches in the x,z column given.
+     *
+     * @param x         column x
+     * @param z         column z
+     * @param y         start y
+     * @param minY      minimum y height to consider. Inclusive.
+     * @param maxY      maximum y height to consider. Inclusive.
+     * @param failedMin if nothing found, the minimum y value to return if returning min
+     * @param failedMax if nothing found, the maximum y value to return if returning max
+     * @return The y value of the nearest terrain block
+     */
+    default int getNearestSurfaceTerrainBlock(int x, int z, int y, int minY, int maxY, int failedMin, int failedMax) {
+        return getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, true);
+    }
+
+    /**
+     * Gets y value for the nearest block that is considered the surface of the terrain (cave roof/floor, mountain surface,
+     * etc). Searches in the x,z column given.
+     *
+     * @param x         column x
+     * @param z         column z
+     * @param y         start y
+     * @param minY      minimum y height to consider. Inclusive.
+     * @param maxY      maximum y height to consider. Inclusive.
+     * @param failedMin if nothing found, the minimum y value to return if returning min
+     * @param failedMax if nothing found, the maximum y value to return if returning max
+     * @param ignoreAir if air at the final value if no block found should be considered for return, else return -1
+     * @return The y value of the nearest terrain block
+     */
     default int getNearestSurfaceTerrainBlock(
             int x,
             int z,
@@ -363,7 +460,7 @@ public interface Extent extends InputExtent, OutputExtent {
             }
         }
         int result = state ? failedMin : failedMax;
-        if (result > 0 && !ignoreAir) {
+        if (result > minY && !ignoreAir) {
             block = getBlock(x, result, z);
             return block.getBlockType().getMaterial().isAir() ? -1 : result;
         }
@@ -399,10 +496,32 @@ public interface Extent extends InputExtent, OutputExtent {
         }
     }
 
+    /**
+     * Returns true if the extent contains the given position
+     *
+     * @param pt position
+     * @return if position is contained
+     */
     default boolean contains(BlockVector3 pt) {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
         return pt.containedWithin(min, max);
+    }
+
+    /**
+     * Returns true if the extent contains the given position
+     *
+     * @param x position x
+     * @param y position y
+     * @param z position z
+     * @return if position is contained
+     */
+    default boolean contains(int x, int y, int z) {
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+        return min.getX() <= x && max.getX() >= x
+                && min.getY() <= y && max.getY() >= y
+                && min.getZ() <= z && max.getZ() >= z;
     }
 
     default void addOre(
@@ -418,12 +537,13 @@ public interface Extent extends InputExtent, OutputExtent {
         spawnResource(region, new OreGen(this, mask, material, size, minY, maxY), rarity, frequency);
     }
 
+    //TODO: probably update these for 1.18 etc.
     default void addOres(Region region, Mask mask) throws WorldEditException {
-        addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, 0, 255);
-        addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, 0, 255);
-        addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, 0, 79);
-        addOre(region, mask, BlockTypes.DIORITE.getDefaultState(), 33, 10, 100, 0, 79);
-        addOre(region, mask, BlockTypes.GRANITE.getDefaultState(), 33, 10, 100, 0, 79);
+        addOre(region, mask, BlockTypes.DIRT.getDefaultState(), 33, 10, 100, getMinY(), getMaxY());
+        addOre(region, mask, BlockTypes.GRAVEL.getDefaultState(), 33, 8, 100, getMinY(), getMaxY());
+        addOre(region, mask, BlockTypes.ANDESITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
+        addOre(region, mask, BlockTypes.DIORITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
+        addOre(region, mask, BlockTypes.GRANITE.getDefaultState(), 33, 10, 100, getMinY(), 79);
         addOre(region, mask, BlockTypes.COAL_ORE.getDefaultState(), 17, 20, 100, 0, 127);
         addOre(region, mask, BlockTypes.IRON_ORE.getDefaultState(), 9, 20, 100, 0, 63);
         addOre(region, mask, BlockTypes.GOLD_ORE.getDefaultState(), 9, 2, 100, 0, 31);
@@ -526,15 +646,16 @@ public interface Extent extends InputExtent, OutputExtent {
             child.cancel();
         }
         addProcessor(nullExtent);
+        addPostProcessor(nullExtent);
         return true;
     }
 
     default int getMinY() {
-        return 0;
+        return getMinimumPoint().getY();
     }
 
     default int getMaxY() {
-        return 255;
+        return getMaximumPoint().getY();
     }
 
     /**
@@ -742,7 +863,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default Extent addPostProcessor(IBatchProcessor processor) {
-        if (processor.getScope() == ProcessorScope.READING_SET_BLOCKS) {
+        if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
             throw new IllegalArgumentException("You cannot alter blocks in a PostProcessor");
         }
         return processor.construct(this);

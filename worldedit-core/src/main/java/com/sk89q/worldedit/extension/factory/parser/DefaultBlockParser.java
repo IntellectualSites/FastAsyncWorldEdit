@@ -354,6 +354,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     throw new InputParseException(Caption.of("worldedit.error.incomplete-region"));
                 }
                 state = world.getBlock(primaryPosition);
+                nbt = state.getNbtData();
                 //FAWE start
             } else if (typeString.matches("slot[0-9]+")) {
                 int slot = Integer.parseInt(typeString.substring(4)) - 1;
@@ -383,9 +384,6 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 if (state == null) {
                     throw new NoMatchException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)));
                 }
-            }
-            if (nbt == null) {
-                nbt = state.getNbtData();
             }
             //FAWE end
 
@@ -477,7 +475,16 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
             return validate(context, new SkullBlock(state, type.replace(" ", "_"))); // valid MC usernames
         } else {
-            return validate(context, state.toBaseBlock());
+            //FAWE start
+            nbt = state.getNbtData();
+            BaseBlock result;
+            if (nbt != null) {
+                result = blockStates.size() > 0 ? state.toBaseBlock(nbt) : new BlanketBaseBlock(state, nbt);
+            } else {
+                result = blockStates.size() > 0 ? new BaseBlock(state) : state.toBaseBlock();
+            }
+            return validate(context, result);
+            //FAWE end
         }
     }
 

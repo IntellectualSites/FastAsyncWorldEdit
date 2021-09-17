@@ -43,7 +43,7 @@ public class AdjacentMaskParser extends RichParser<Mask> {
             max = min;
         }
         if (max >= 8 && min == 1) {
-            return new AdjacentAnyMask(subMask);
+            return new AdjacentAnyMask(subMask, context.getMinY(), context.getMaxY());
         }
         return new AdjacentMask(subMask, min, max);
     }

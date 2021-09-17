@@ -173,7 +173,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         byte free = 0;
 
-        BlockVector3 mutablePos = MutableBlockVector3.ZERO;
+        BlockVector3 mutablePos = new MutableBlockVector3();
         while (y <= maxY) {
             if (!world.getBlock(mutablePos.setComponents(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
                 ++free;
@@ -209,9 +209,14 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         int yLessSearchHeight = y - WorldEdit.getInstance().getConfiguration().defaultVerticalHeight;
         int minY = Math.min(worldMinY, yLessSearchHeight) + 2;
 
+        //FAWE start - mutable
+        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
+        //FAWE end
+
         while (y >= minY) {
-            final BlockVector3 pos = BlockVector3.at(x, y, z);
-            final BlockState id = world.getBlock(pos);
+            //FAWE start - mutable
+            final BlockState id = world.getBlock(mutable.mutY(y));
+            //FAWE end
             if (id.getBlockType().getMaterial().isMovementBlocker()
                     && trySetPosition(Vector3.at(x + 0.5, y + 1, z + 0.5))) {
                 return;
@@ -263,8 +268,14 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         int yPlusSearchHeight = y + WorldEdit.getInstance().getConfiguration().defaultVerticalHeight;
         int maxY = Math.min(world.getMaxY(), yPlusSearchHeight) + 2;
 
+        //FAWE start - mutable
+        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
+        //FAWE end
+
         while (y <= maxY) {
-            if (isLocationGoodForStanding(BlockVector3.at(x, y, z))
+            //FAWE start - mutable
+            if (isLocationGoodForStanding(mutable.mutY(y))
+                    //FAWE end
                     && trySetPosition(Vector3.at(x + 0.5, y, z + 0.5))) {
                 return true;
             }
@@ -285,8 +296,14 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         int yLessSearchHeight = y - WorldEdit.getInstance().getConfiguration().defaultVerticalHeight;
         int minY = Math.min(world.getMinY() + 1, yLessSearchHeight);
 
+        //FAWE start - mutable
+        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
+        //FAWE end
+
         while (y >= minY) {
-            if (isLocationGoodForStanding(BlockVector3.at(x, y, z))
+            //FAWE start - mutable
+            if (isLocationGoodForStanding(mutable.mutY(y))
+                    //FAWE end
                     && trySetPosition(Vector3.at(x + 0.5, y, z + 0.5))) {
                 return true;
             }
@@ -311,8 +328,12 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         int y = Math.max(world.getMinY(), pos.getBlockY() + 2);
         int z = pos.getBlockZ();
 
+        //FAWE start - mutable
+        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
+
         // No free space above
-        if (!world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isAir()) {
+        if (!world.getBlock(mutable).getBlockType().getMaterial().isAir()) {
+            //FAWE end
             return false;
         }
 
@@ -321,7 +342,9 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
         while (y <= maxY) {
             // Found a ceiling!
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            //FAWE start - mutable
+            if (world.getBlock(mutable.mutY(y)).getBlockType().getMaterial().isMovementBlocker()) {
+                //FAWE end
                 int platformY = Math.max(initialY, y - 3 - clearance);
                 if (platformY < initialY) { // if ==, they already have the given clearance, if <, clearance is too large
                     return false;
@@ -353,8 +376,14 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         final int z = pos.getBlockZ();
         final int maxY = Math.min(world.getMaxY() + 1, initialY + distance);
 
+        //FAWE start - mutable
+        MutableBlockVector3 mutable = new MutableBlockVector3(x, y, z);
+        //FAWE end
+
         while (y <= world.getMaxY() + 2) {
-            if (world.getBlock(BlockVector3.at(x, y, z)).getBlockType().getMaterial().isMovementBlocker()) {
+            //FAWE start - mutable
+            if (world.getBlock(mutable.mutY(y)).getBlockType().getMaterial().isMovementBlocker()) {
+                //FAWE end
                 break; // Hit something
             } else if (y > maxY + 1) {
                 break;

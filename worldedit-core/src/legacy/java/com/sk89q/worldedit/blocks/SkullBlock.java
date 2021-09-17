@@ -33,7 +33,7 @@ import java.util.Map;
  * A skull block.
  *
  * @deprecated WorldEdit does not handle interpreting NBT,
- *     deprecated for removal without replacement
+ *         deprecated for removal without replacement
  */
 @Deprecated(forRemoval = true)
 public class SkullBlock extends BaseBlock {
@@ -42,6 +42,7 @@ public class SkullBlock extends BaseBlock {
 
     /**
      * Construct the skull block with a default type of skelton.
+     *
      * @param state BlockState to set
      */
     public SkullBlock(BlockState state) {
@@ -52,8 +53,9 @@ public class SkullBlock extends BaseBlock {
     /**
      * Construct the skull block with a given rotation and owner.
      * The type is assumed to be player unless owner is null or empty.
+     *
      * @param blockState BlockState to set
-     * @param owner name of player
+     * @param owner      name of player
      */
     public SkullBlock(BlockState blockState, String owner) {
         super(blockState);
@@ -62,6 +64,7 @@ public class SkullBlock extends BaseBlock {
 
     /**
      * Set the skull's owner. Automatically sets type to player if not empty or null.
+     *
      * @param owner player name to set the skull to
      */
     public void setOwner(String owner) {
@@ -78,6 +81,7 @@ public class SkullBlock extends BaseBlock {
 
     /**
      * Get the skull's owner. Returns null if unset.
+     *
      * @return player name or null
      */
     public String getOwner() {
@@ -123,4 +127,5 @@ public class SkullBlock extends BaseBlock {
             setOwner(((CompoundTag) t).getValue().get("Name").getValue().toString());
         }
     }
+
 }

@@ -258,17 +258,24 @@ public class FaweAPI {
         RegionWrapper bounds = new RegionWrapper(
                 origin.getBlockX() - radius,
                 origin.getBlockX() + radius,
+                extent.getMinY(),
+                extent.getMaxY(),
                 origin.getBlockZ() - radius,
                 origin.getBlockZ() + radius
         );
-        RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minZ - 64, bounds.maxZ + 512);
+        RegionWrapper boundsPlus = new RegionWrapper(bounds.minX - 64, bounds.maxX + 512, bounds.minY, bounds.maxY,
+                bounds.minZ - 64,
+                bounds.maxZ + 512
+        );
         HashSet<RegionWrapper> regionSet = Sets.<RegionWrapper>newHashSet(bounds);
         ArrayList<DiskStorageHistory> result = new ArrayList<>();
         for (File file : files) {
             UUID uuid = UUID.fromString(file.getParentFile().getName());
             DiskStorageHistory dsh = new DiskStorageHistory(world, uuid, Integer.parseInt(file.getName().split("\\.")[0]));
             SimpleChangeSetSummary summary = dsh.summarize(boundsPlus, shallow);
-            RegionWrapper region = new RegionWrapper(summary.minX, summary.maxX, summary.minZ, summary.maxZ);
+            RegionWrapper region = new RegionWrapper(summary.minX, summary.maxX, extent.getMinY(), extent.getMaxY(), summary.minZ,
+                    summary.maxZ
+            );
             boolean encompassed = false;
             boolean isIn = false;
             for (RegionWrapper allowed : regionSet) {

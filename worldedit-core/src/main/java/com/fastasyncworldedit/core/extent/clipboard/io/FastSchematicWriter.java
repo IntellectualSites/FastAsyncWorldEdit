@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntArrayTag;
@@ -278,12 +279,12 @@ public class FastSchematicWriter implements ClipboardWriter {
         BlockVector3 min = clipboard.getMinimumPoint();
         int width = clipboard.getRegion().getWidth();
         int length = clipboard.getRegion().getLength();
+        MutableBlockVector3 mutable = new MutableBlockVector3();
         for (int z = 0, i = 0; z < length; z++) {
             int z0 = min.getBlockZ() + z;
             for (int x = 0; x < width; x++, i++) {
                 int x0 = min.getBlockX() + x;
-                BlockVector3 pt = BlockVector3.at(x0, min.getBlockY(), z0);
-                BiomeType biome = clipboard.getBiome(pt);
+                BiomeType biome = clipboard.getBiome(mutable.setComponents(x0, min.getY(), z0));
                 task.applyInt(i, biome.getInternalId());
             }
         }

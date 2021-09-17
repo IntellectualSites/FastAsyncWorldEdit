@@ -39,6 +39,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -93,6 +94,11 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public int getMaxY() {
         return parent.getMaxY();
+    }
+
+    @Override
+    public int getMinY() {
+        return parent.getMinY();
     }
 
     @Override
@@ -239,6 +245,13 @@ public class WorldWrapper extends AbstractWorld {
             }
         });
     }
+
+    //FAWE start
+    @Override
+    public Collection<BaseItemStack> getBlockDrops(final BlockVector3 position) {
+        return TaskManager.IMP.sync(() -> parent.getBlockDrops(position));
+    }
+    //FAWE end
 
     @Override
     public boolean regenerate(Region region, EditSession session) {

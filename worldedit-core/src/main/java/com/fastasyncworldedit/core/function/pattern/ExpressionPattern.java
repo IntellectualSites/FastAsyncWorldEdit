@@ -54,9 +54,6 @@ public class ExpressionPattern extends AbstractPattern {
         } catch (EvaluationException e) {
             e.printStackTrace();
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
         }
     }
 

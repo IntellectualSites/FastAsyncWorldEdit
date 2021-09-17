@@ -30,6 +30,9 @@ import com.sk89q.worldedit.util.formatting.component.InvalidComponentException;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.enginehub.piston.Command;
 import org.enginehub.piston.CommandManager;
+import org.enginehub.piston.inject.InjectedValueStore;
+import org.enginehub.piston.inject.Key;
+import org.enginehub.piston.inject.MapBackedValueStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +50,9 @@ import static java.util.stream.Collectors.toList;
  */
 // Stored in a separate class to prevent import conflicts, and because it's aliased via /we help.
 public class PrintCommandHelp {
+
+    private PrintCommandHelp() {
+    }
 
     private static Command detectCommand(CommandManager manager, String command) {
         Optional<Command> mapping;
@@ -140,8 +146,12 @@ public class PrintCommandHelp {
             int page, Stream<Command> commandStream, Actor actor,
             List<Command> commandList, String helpRootCommand
     ) throws InvalidComponentException {
+        InjectedValueStore store = MapBackedValueStore.create();
+        store.injectValue(Key.of(Actor.class), context ->
+                Optional.of(actor));
         // Get a list of aliases
         List<Command> commands = commandStream
+                .filter(command -> command.getCondition().satisfied(store))
                 .sorted(byCleanName())
                 .collect(toList());
 
@@ -164,9 +174,6 @@ public class PrintCommandHelp {
         }
 
         actor.print(box.create(page));
-    }
-
-    private PrintCommandHelp() {
     }
 
 }

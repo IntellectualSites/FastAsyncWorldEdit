@@ -25,7 +25,7 @@ public class SurfaceSphereBrush implements Brush {
         final RadiusMask radius = new RadiusMask(0, (int) size);
         RecursiveVisitor visitor = new RecursiveVisitor(
                 new MaskIntersection(surface, radius),
-                vector -> editSession.setBlock(vector, pattern)
+                vector -> editSession.setBlock(vector, pattern), Integer.MAX_VALUE, editSession.getMinY(), editSession.getMaxY()
         );
         visitor.visit(position);
         visitor.setDirections(Arrays.asList(BreadthFirstSearch.DIAGONAL_DIRECTIONS));

@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command.argument;
 
+import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.extent.SupplyingExtent;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
@@ -54,6 +55,24 @@ import java.util.function.Function;
 
 public class FactoryConverter<T> implements ArgumentConverter<T> {
 
+    private final WorldEdit worldEdit;
+    private final Function<WorldEdit, AbstractFactory<T>> factoryExtractor;
+    private final String description;
+    @Nullable
+    private final Consumer<ParserContext> contextTweaker;
+
+    private FactoryConverter(
+            WorldEdit worldEdit,
+            Function<WorldEdit, AbstractFactory<T>> factoryExtractor,
+            String description,
+            @Nullable Consumer<ParserContext> contextTweaker
+    ) {
+        this.worldEdit = worldEdit;
+        this.factoryExtractor = factoryExtractor;
+        this.description = description;
+        this.contextTweaker = contextTweaker;
+    }
+
     public static void register(WorldEdit worldEdit, CommandManager commandManager) {
         commandManager.registerConverter(
                 Key.of(Pattern.class),
@@ -66,6 +85,10 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
         commandManager.registerConverter(
                 Key.of(BaseItem.class),
                 new FactoryConverter<>(worldEdit, WorldEdit::getItemFactory, "item", null)
+        );
+        commandManager.registerConverter(
+                Key.of(ResettableExtent.class),
+                new FactoryConverter<>(worldEdit, WorldEdit::getTransformFactory, "transform", null)
         );
 
         commandManager.registerConverter(
@@ -88,24 +111,6 @@ public class FactoryConverter<T> implements ArgumentConverter<T> {
                         }
                 )
         );
-    }
-
-    private final WorldEdit worldEdit;
-    private final Function<WorldEdit, AbstractFactory<T>> factoryExtractor;
-    private final String description;
-    @Nullable
-    private final Consumer<ParserContext> contextTweaker;
-
-    private FactoryConverter(
-            WorldEdit worldEdit,
-            Function<WorldEdit, AbstractFactory<T>> factoryExtractor,
-            String description,
-            @Nullable Consumer<ParserContext> contextTweaker
-    ) {
-        this.worldEdit = worldEdit;
-        this.factoryExtractor = factoryExtractor;
-        this.description = description;
-        this.contextTweaker = contextTweaker;
     }
 
     @Override

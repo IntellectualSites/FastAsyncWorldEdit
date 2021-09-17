@@ -43,7 +43,7 @@ public class RichOffsetMaskParser extends RichParser<Mask> {
         int y = Integer.parseInt(arguments[1]);
         int z = Integer.parseInt(arguments[2]);
         Mask submask = worldEdit.getMaskFactory().parseFromInput(arguments[3], context);
-        return new OffsetMask(submask, BlockVector3.at(x, y, z));
+        return new OffsetMask(submask, BlockVector3.at(x, y, z), context.getMinY(), context.getMaxY());
     }
 
 }

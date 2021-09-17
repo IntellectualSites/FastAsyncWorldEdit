@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.extension.factory.parser.pattern;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extension.factory.parser.AliasedParser;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -32,10 +34,15 @@ import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.session.ClipboardHolder;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.stream.Stream;
 
-public class ClipboardPatternParser extends InputParser<Pattern> {
+public class ClipboardPatternParser extends InputParser<Pattern> implements AliasedParser {
+
+    //FAWE start - aliased
+    private final List<String> aliases = ImmutableList.of("#clipboard", "#clipboard@");
+    //FAWE end
 
     public ClipboardPatternParser(WorldEdit worldEdit) {
         super(worldEdit);
@@ -86,9 +93,9 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
                 throw new InputParseException(Caption.of("worldedit.error.parser.clipboard.missing-coordinates"));
             }
             offset = BlockVector3.at(
-                    Integer.valueOf(offsetSplit[0]),
-                    Integer.valueOf(offsetSplit[1]),
-                    Integer.valueOf(offsetSplit[2])
+                    Integer.parseInt(offsetSplit[0]),
+                    Integer.parseInt(offsetSplit[1]),
+                    Integer.parseInt(offsetSplit[2])
             );
         }
 
@@ -104,5 +111,12 @@ public class ClipboardPatternParser extends InputParser<Pattern> {
             throw new InputParseException(Caption.of("worldedit.error.missing-session"));
         }
     }
+
+    //FAWE start - aliased
+    @Override
+    public List<String> getMatchedAliases() {
+        return aliases;
+    }
+    //FAWE end
 
 }

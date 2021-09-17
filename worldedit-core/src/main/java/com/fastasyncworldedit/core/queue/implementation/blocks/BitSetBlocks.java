@@ -10,6 +10,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -20,17 +21,23 @@ public class BitSetBlocks implements IChunkSet {
 
     private final MemBlockSet.RowZ row;
     private final BlockState blockState;
+    private final int minSectionPosition;
+    private final int maxSectionPosition;
+    private final int layers;
 
-    public BitSetBlocks(BlockState blockState) {
-        this.row = new MemBlockSet.RowZ();
+    public BitSetBlocks(BlockState blockState, int minSectionPosition, int maxSectionPosition) {
+        this.row = new MemBlockSet.RowZ(minSectionPosition, maxSectionPosition);
         this.blockState = blockState;
+        this.minSectionPosition = minSectionPosition;
+        this.maxSectionPosition = maxSectionPosition;
+        this.layers = maxSectionPosition - minSectionPosition + 1;
     }
 
     @Override
     public boolean hasSection(int layer) {
+        layer -= minSectionPosition;
         return row.rows[layer] != MemBlockSet.NULL_ROW_Y;
     }
-
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
@@ -39,19 +46,21 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder) {
-        row.set(null, x, y, z);
+        y -= minSectionPosition << 4;
+        row.set(null, x, y, z, minSectionPosition, maxSectionPosition);
         return true;
     }
 
     @Override
     public void setBlocks(int layer, char[] data) {
+        layer -= minSectionPosition;
         row.reset(layer);
         int by = layer << 4;
         for (int y = 0, index = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++, index++) {
                     if (data[index] != 0) {
-                        row.set(null, x, by + y, z);
+                        row.set(null, x, by + y, z, minSectionPosition, maxSectionPosition);
                     }
                 }
             }
@@ -114,6 +123,7 @@ public class BitSetBlocks implements IChunkSet {
 
     @Override
     public char[] load(int layer) {
+        layer -= minSectionPosition;
         char[] arr = FaweCache.IMP.SECTION_BITS_TO_CHAR.get();
         MemBlockSet.IRow nullRowY = row.getRow(layer);
         if (nullRowY instanceof MemBlockSet.RowY) {
@@ -141,6 +151,13 @@ public class BitSetBlocks implements IChunkSet {
             }
         }
         return arr;
+    }
+
+    // No need to do anything different
+    @Nullable
+    @Override
+    public char[] loadIfPresent(final int layer) {
+        return load(layer);
     }
 
     @Override
@@ -187,6 +204,26 @@ public class BitSetBlocks implements IChunkSet {
     public IChunkSet reset() {
         row.reset();
         return this;
+    }
+
+    @Override
+    public boolean hasBiomes(final int layer) {
+        return false;
+    }
+
+    @Override
+    public int getSectionCount() {
+        return layers;
+    }
+
+    @Override
+    public int getMaxSectionPosition() {
+        return minSectionPosition;
+    }
+
+    @Override
+    public int getMinSectionPosition() {
+        return maxSectionPosition;
     }
 
     @Override

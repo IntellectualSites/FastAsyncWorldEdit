@@ -1,6 +1,22 @@
 {
   "extends": [
-    "config:base"
+    "config:base",
+    ":disableDependencyDashboard"
   ],
-  "ignoreDeps": ["guava", "rhino-runtime", "mockito-core", "antlr4", "antlr4-runtime", "paranamer", "fastutil", "auto-value-annotations", "auto-value"]
+  "ignoreDeps": [
+    "guava",
+    "rhino-runtime",
+    "mockito-core",
+    "antlr4",
+    "antlr4-runtime",
+    "paranamer",
+    "fastutil",
+    "it.unimi.dsi:fastutil",  
+    "auto-value-annotations",
+    "auto-value",
+    "gson",
+    "net.fabricmc:fabric-loader",
+    "net.fabricmc.fabric-api:fabric-api",
+    "com.github.luben:zstd-jni"  
+  ]
 }

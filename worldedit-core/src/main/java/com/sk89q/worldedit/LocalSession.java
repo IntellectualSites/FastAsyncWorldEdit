@@ -211,6 +211,13 @@ public class LocalSession implements TextureHolder {
         if (defaultSelector != null) {
             this.selector = defaultSelector.createSelector();
         }
+        //FAWE start
+        if (worldOverride != null) {
+            this.selector.setWorld(worldOverride);
+        } else {
+            this.selector.setWorld(currentWorld);
+        }
+        //FAWE end
     }
 
     //FAWE start
@@ -569,19 +576,26 @@ public class LocalSession implements TextureHolder {
     public EditSession undo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
         //FAWE start - use our logic
-        World world = ((Player) actor).getWorldForEditing();
+        World world = (actor instanceof Player) ? ((Player) actor).getWorldForEditing() : getWorldOverride();
+        if (world == null) {
+            throw new MissingWorldException();
+        }
         loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() < history.size()) {
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
-                .allowedRegionsEverywhere()
+            EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed((Player) actor)
-                .actor((Player)actor)
-                .blockBag(getBlockBag((Player)actor))
-                .build()) {
+                    .limitUnprocessed(actor)
+                    .actor(actor);
+            if (actor instanceof Player) {
+                builder = builder.blockBag(getBlockBag((Player) actor));
+            }
+            if (!actor.getLimit().RESTRICT_HISTORY_TO_REGIONS) {
+                builder = builder.allowedRegionsEverywhere();
+            }
+            try (EditSession newEditSession = builder.build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.UNDO);
                 setDirty();
                 historyNegativeIndex++;
@@ -608,21 +622,28 @@ public class LocalSession implements TextureHolder {
     //FAWE start - use our logic
     public EditSession redo(@Nullable BlockBag newBlockBag, Actor actor) {
         checkNotNull(actor);
-        World world = ((Player) actor).getWorldForEditing();
+        World world = (actor instanceof Player) ? ((Player) actor).getWorldForEditing() : getWorldOverride();
+        if (world == null) {
+            throw new MissingWorldException();
+        }
         loadSessionHistoryFromDisk(actor.getUniqueId(), world);
         if (getHistoryNegativeIndex() > 0) {
             setDirty();
             historyNegativeIndex--;
             ChangeSet changeSet = getChangeSet(history.get(getHistoryIndex()));
-            try (EditSession newEditSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
-                    .allowedRegionsEverywhere()
+            EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                     .checkMemory(false)
                     .changeSetNull()
                     .fastmode(false)
-                    .limitUnprocessed((Player) actor)
-                    .actor((Player)actor)
-                    .blockBag(getBlockBag((Player) actor))
-                    .build()) {
+                    .limitUnprocessed(actor)
+                    .actor(actor);
+            if (actor instanceof Player) {
+                    builder = builder.blockBag(getBlockBag((Player) actor));
+            }
+            if (!actor.getLimit().RESTRICT_HISTORY_TO_REGIONS) {
+                builder = builder.allowedRegionsEverywhere();
+            }
+            try (EditSession newEditSession = builder.build()) {
                 newEditSession.setBlocks(changeSet, ChangeSetExecutor.Type.REDO);
                 return newEditSession;
             }
@@ -828,6 +849,21 @@ public class LocalSession implements TextureHolder {
             }
         }
         setClipboard(multi);
+    }
+
+    /**
+     * Ensure the player's clipboard is flushed. (will only do something with clipboard-on-disk)
+     */
+    public void flushClipboard() {
+        synchronized (clipboardLock) {
+            if (this.clipboard != null) {
+                try {
+                    this.clipboard.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
     //FAWE end
 
@@ -1062,10 +1098,26 @@ public class LocalSession implements TextureHolder {
      */
     @Nullable
     @Deprecated
-    public Tool getTool(ItemType item) {
+    //FAWE start - refresh wand item if permissions change
+    public Tool getTool(ItemType item, Player player) {
+        Tool tool;
         synchronized (this.tools) {
-            return tools.get(item.getInternalId());
+            tool = tools.get(item.getInternalId());
         }
+        if (tool == SelectionWand.INSTANCE && !SelectionWand.INSTANCE.canUse(player)) {
+            tools.remove(wandItem.getInternalId());
+            loadDefaults(player, true); // Permissions have changed so redo the player's current tools.
+            return null;
+        }
+        if (tool != null) {
+            return tool;
+        } else if (item.getInternalId() == wandItem.getInternalId() && SelectionWand.INSTANCE.canUse(player)) {
+            loadDefaults(player, true); // Permissions have changed so redo the player's current tools.
+            return SelectionWand.INSTANCE;
+        } else {
+            return null;
+        }
+        //FAWE end
     }
 
     //FAWE start
@@ -1089,7 +1141,7 @@ public class LocalSession implements TextureHolder {
                 return tool;
             }
         }
-        return getTool(item.getType());
+        return getTool(item.getType(), player);
     }
 
     public void loadDefaults(Actor actor, boolean force) {
@@ -1557,7 +1609,7 @@ public class LocalSession implements TextureHolder {
         EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world);
         if (actor.isPlayer() && actor instanceof Player) {
             BlockBag blockBag = getBlockBag((Player) actor);
-            builder.actor((Player) actor);
+            builder.actor(actor);
             builder.blockBag(blockBag);
         }
         builder.command(command);
