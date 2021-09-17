@@ -99,8 +99,10 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
     public boolean wrapped;
     private @Nullable World world;
     private int maxBlocks = -1;
-    @Nullable private Actor actor;
-    @Nullable private BlockBag blockBag;
+    @Nullable
+    private Actor actor;
+    @Nullable
+    private BlockBag blockBag;
     private boolean tracing;
 
     EditSessionBuilder(EventBus eventBus) {
@@ -215,6 +217,7 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
         this.event = event;
         return setDirty();
     }
+
     public EditSessionBuilder limit(@Nullable FaweLimit limit) {
         this.limit = limit;
         return setDirty();
@@ -481,7 +484,12 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
         return setDirty();
     }
 
-    public Extent wrapExtent(final Extent extent, final EventBus eventBus, EditSessionEvent event, final EditSession.Stage stage) {
+    public Extent wrapExtent(
+            final Extent extent,
+            final EventBus eventBus,
+            EditSessionEvent event,
+            final EditSession.Stage stage
+    ) {
         event = event.clone(stage);
         event.setExtent(extent);
         eventBus.post(event);
@@ -502,16 +510,25 @@ public final class EditSessionBuilder extends com.fastasyncworldedit.core.util.E
             }
             if (Settings.IMP.EXTENT.DEBUG) {
                 if (event.getActor() != null) {
-                    event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn.getClass().getName()));
-                    event.getActor().printDebug(TextComponent.of(" - For area restrictions and block logging, it is recommended to use the FaweAPI"));
-                    event.getActor().printDebug(TextComponent.of(" - To allow " + toReturn.getClass().getName() + ", add it to the FAWE `allowed-plugins` list in config.yml"));
-                    event.getActor().printDebug(TextComponent.of(" - If you are unsure which plugin tries to use the extent, you can find some additional information below:"));
+                    event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn
+                            .getClass()
+                            .getName()));
+                    event.getActor().printDebug(TextComponent.of(
+                            " - For area restrictions and block logging, it is recommended to use the FaweAPI"));
+                    event.getActor().printDebug(TextComponent.of(" - To allow " + toReturn
+                            .getClass()
+                            .getName() + ", add it to the FAWE `allowed-plugins` list in config.yml"));
+                    event.getActor().printDebug(TextComponent.of(
+                            " - If you are unsure which plugin tries to use the extent, you can find some additional information below:"));
                     event.getActor().printDebug(TextComponent.of(" - " + toReturn.getClass().getClassLoader()));
                 } else {
                     LOGGER.debug("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
                     LOGGER.debug(" - For area restrictions and block logging, it is recommended to use the FaweAPI");
-                    LOGGER.debug(" - To allow " + toReturn.getClass().getName() + ", add it to the FAWE `allowed-plugins` list in config.yml");
-                    LOGGER.debug(" - If you are unsure which plugin tries to use the extent, you can find some additional information below:");
+                    LOGGER.debug(" - To allow " + toReturn
+                            .getClass()
+                            .getName() + ", add it to the FAWE `allowed-plugins` list in config.yml");
+                    LOGGER.debug(
+                            " - If you are unsure which plugin tries to use the extent, you can find some additional information below:");
                     LOGGER.debug(" - " + toReturn.getClass().getClassLoader());
                 }
             }

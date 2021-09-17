@@ -255,8 +255,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public EditSession toEditSession(Player player, Region[] regions) {
         EditSessionBuilder builder =
-            WorldEdit.getInstance().newEditSessionBuilder().world(getWorld()).actor(player).autoQueue(false).fastmode(false)
-                     .checkMemory(false).changeSet(this).limitUnlimited();
+                WorldEdit.getInstance().newEditSessionBuilder().world(getWorld()).actor(player).autoQueue(false).fastmode(false)
+                        .checkMemory(false).changeSet(this).limitUnlimited();
         if (regions != null) {
             builder.allowedRegions(regions);
         } else {

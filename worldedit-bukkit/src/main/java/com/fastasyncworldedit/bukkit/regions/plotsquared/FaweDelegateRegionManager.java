@@ -56,8 +56,9 @@ public class FaweDelegateRegionManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
-                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull()
-                                .autoQueue(false).build();
+                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).fastmode(
+                                true).limitUnlimited().changeSetNull()
+                        .autoQueue(false).build();
                 for (CuboidRegion region : regions) {
                     region.setPos1(region.getPos1().withY(minY));
                     region.setPos2(region.getPos2().withY(maxY));
@@ -254,7 +255,10 @@ public class FaweDelegateRegionManager {
         region.expand(BlockVector3.at(-extendBiome, 0, -extendBiome));
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
-                EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(getWorld(world)))
+                EditSession editSession = WorldEdit
+                        .getInstance()
+                        .newEditSessionBuilder()
+                        .world(BukkitAdapter.adapt(getWorld(world)))
                         .checkMemory(false)
                         .fastmode(true)
                         .limitUnlimited()

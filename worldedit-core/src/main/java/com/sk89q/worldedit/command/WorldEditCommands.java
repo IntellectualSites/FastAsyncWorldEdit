@@ -185,18 +185,22 @@ public class WorldEditCommands {
     //FAWE end
 
     @Command(
-        name = "trace",
-        desc = "Toggles trace hook"
+            name = "trace",
+            desc = "Toggles trace hook"
     )
-    void trace(Actor actor, LocalSession session,
-               @Arg(desc = "The mode to set the trace hook to", def = "")
-                   HookMode hookMode) {
+    void trace(
+            Actor actor, LocalSession session,
+            @Arg(desc = "The mode to set the trace hook to", def = "")
+                    HookMode hookMode
+    ) {
         boolean previousMode = session.isTracingActions();
         boolean newMode;
         if (hookMode != null) {
             newMode = hookMode == HookMode.ACTIVE;
             if (newMode == previousMode) {
-                actor.printError(TranslatableComponent.of(previousMode ? "worldedit.trace.active.already" : "worldedit.trace.inactive.already"));
+                actor.printError(TranslatableComponent.of(previousMode
+                        ? "worldedit.trace.active.already"
+                        : "worldedit.trace.inactive.already"));
                 return;
             }
         } else {

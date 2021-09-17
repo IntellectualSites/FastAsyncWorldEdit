@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
-import com.fastasyncworldedit.core.math.heightmap.HeightMap;
 import com.fastasyncworldedit.core.function.mask.StencilBrushMask;
+import com.fastasyncworldedit.core.math.heightmap.HeightMap;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;

@@ -12,7 +12,7 @@ public class EditSessionBuilder {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private World world;
+    private final World world;
 
     /**
      * An EditSession builder<br>

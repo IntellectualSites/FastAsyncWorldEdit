@@ -115,7 +115,7 @@ public class Caption {
     @Nonnull
     public static TranslatableComponent of(@Nonnull final String key, final Object... args) {
         List<Component> components = Arrays.stream(args)
-                .map(arg -> arg instanceof Component ? (Component) arg : TextComponent.of(Objects.toString(arg)))
+                .map(arg -> arg instanceof Component ? arg : TextComponent.of(Objects.toString(arg)))
                 .collect(Collectors.toList());
         return TranslatableComponent.of(key, components);
     }

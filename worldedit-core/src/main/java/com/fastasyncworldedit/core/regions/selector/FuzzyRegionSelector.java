@@ -32,11 +32,11 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
 
     public FuzzyRegionSelector(Player player, @Nullable World world, Mask mask) {
         super(WorldEdit.getInstance().newEditSessionBuilder().world(world)
-                       .actor(player)
-                       .changeSetNull()
-                       .checkMemory(false)
-                       .autoQueue(false)
-                       .build());
+                .actor(player)
+                .changeSetNull()
+                .checkMemory(false)
+                .autoQueue(false)
+                .build());
         this.player = player;
         this.region = new FuzzyRegion(world, getExtent(), mask);
         this.positions = new ArrayList<>();

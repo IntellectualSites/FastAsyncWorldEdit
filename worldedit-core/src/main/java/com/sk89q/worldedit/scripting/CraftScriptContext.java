@@ -69,10 +69,10 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      */
     public EditSession remember() {
         EditSession editSession = controller.newEditSessionBuilder()
-            .locatableActor(player)
-            .maxBlocks(session.getBlockChangeLimit())
-            .blockBag(session.getBlockBag(player))
-            .build(
+                .locatableActor(player)
+                .maxBlocks(session.getBlockChangeLimit())
+                .blockBag(session.getBlockBag(player))
+                .build(
                 );
         Request.request().setEditSession(editSession);
         editSession.enableStandardMode();

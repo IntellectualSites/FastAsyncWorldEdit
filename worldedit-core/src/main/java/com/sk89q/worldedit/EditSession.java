@@ -65,8 +65,8 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.MaskingExtent;
-import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.TracingExtent;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.extent.inventory.BlockBagExtent;
 import com.sk89q.worldedit.extent.world.SurvivalModeExtent;
@@ -227,7 +227,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
     @SuppressWarnings("ProtectedField")
     protected final World world;
-    private final @Nullable Actor actor;
+    private final @Nullable
+    Actor actor;
     private AbstractChangeSet changeSet;
     //FAWE start
     private final FaweLimit originalLimit;
@@ -252,7 +253,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final boolean wnaMode;
     @Nullable
     private final Region[] allowedRegions;
-    private @Nullable List<TracingExtent> tracingExtents = null;
+    private @Nullable
+    List<TracingExtent> tracingExtents = null;
 
     @Deprecated
     public EditSession(
@@ -386,6 +388,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     //FAWE Start
+
     /**
      * Get the Actor or null.
      *
@@ -433,8 +436,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             return List.of();
         }
         return tracingExtents.stream()
-            .filter(TracingExtent::isActive)
-            .collect(Collectors.toList());
+                .filter(TracingExtent::isActive)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -1278,7 +1281,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                     .filter(it -> it.getTouchedLocations().contains(loc))
                     .collect(Collectors.toList());
             boolean anyFailed = stack.stream()
-                .anyMatch(it -> it.getFailedActions().containsKey(loc));
+                    .anyMatch(it -> it.getFailedActions().containsKey(loc));
             if (anyFailed && stacks.add(stack)) {
                 stackToPosition.put(stack, loc);
             }
@@ -1287,12 +1290,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             // stack can never be empty, something has to have touched the position
             TracingExtent failure = stack.get(0);
             actor.printDebug(TranslatableComponent.builder("worldedit.trace.action-failed")
-                                                  .args(
-                    TextComponent.of(failure.getFailedActions().get(position).toString()),
-                    TextComponent.of(position.toString()),
-                    TextComponent.of(failure.getExtent().getClass().getName())
-                )
-                                                  .build());
+                    .args(
+                            TextComponent.of(failure.getFailedActions().get(position).toString()),
+                            TextComponent.of(position.toString()),
+                            TextComponent.of(failure.getExtent().getClass().getName())
+                    )
+                    .build());
         });
     }
 
@@ -1826,7 +1829,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Stack a cuboid region.
      *
      * @param region       the region to stack
-     * @param offset how far to move the contents each stack
+     * @param offset       how far to move the contents each stack
      * @param count        the number of times to stack
      * @param copyEntities true to copy entities
      * @param copyBiomes   true to copy biomes
@@ -1869,8 +1872,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Move the blocks in a region a certain direction.
      *
      * @param region       the region to move
-     * @param offset the offset
-     * @param multiplier the number to multiply the offset by
+     * @param offset       the offset
+     * @param multiplier   the number to multiply the offset by
      * @param copyAir      true to copy air blocks
      * @param moveEntities true to move entities
      * @param copyBiomes   true to copy biomes
@@ -1900,8 +1903,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Move the blocks in a region a certain direction.
      *
      * @param region       the region to move
-     * @param offset the offset
-     * @param multiplier the number to multiply the offset by
+     * @param offset       the offset
+     * @param multiplier   the number to multiply the offset by
      * @param moveEntities true to move entities
      * @param copyBiomes   true to copy biomes (source biome is unchanged)
      * @param mask         source mask for the operation (only matching blocks are moved)
@@ -3039,8 +3042,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * The Expression class is subject to change. Expressions should be provided via the string overload.
      * </p>
      */
-    public int deformRegion(final Region region, final Vector3 zero, final Vector3 unit, final Expression expression,
-                            final int timeout) throws ExpressionException, MaxChangedBlocksException {
+    public int deformRegion(
+            final Region region, final Vector3 zero, final Vector3 unit, final Expression expression,
+            final int timeout
+    ) throws ExpressionException, MaxChangedBlocksException {
         final Variable x = expression.getSlots().getVariable("x")
                 .orElseThrow(IllegalStateException::new);
         final Variable y = expression.getSlots().getVariable("y")

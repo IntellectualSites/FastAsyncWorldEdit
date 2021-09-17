@@ -56,11 +56,11 @@ public class LocationConverter implements ArgumentConverter<Location> {
 
         ConversionResult<World> world = worldConverter.convert(split2[0], injectedValueAccess);
         if (!world.isSuccessful()) {
-            return (FailedConversion) world;
+            return world;
         }
         ConversionResult<BlockVector3> vector = vectorConverter.convert(split2[1], injectedValueAccess);
         if (!vector.isSuccessful()) {
-            return (FailedConversion) vector;
+            return vector;
         }
 
         Location location = new Location(world.get().iterator().next(), vector.get().iterator().next().toVector3());

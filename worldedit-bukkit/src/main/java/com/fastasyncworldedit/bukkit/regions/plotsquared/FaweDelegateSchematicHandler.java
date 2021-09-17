@@ -108,8 +108,16 @@ public class FaweDelegateSchematicHandler {
             final BlockVector3 to = BlockVector3
                     .at(region.getMinimumPoint().getX() + xOffset, y_offset_actual, region.getMinimumPoint().getZ() + zOffset);
 
-            try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(FaweAPI.getWorld(plot.getWorldName())).checkMemory(false)
-                                                    .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+            try (EditSession editSession = WorldEdit
+                    .getInstance()
+                    .newEditSessionBuilder()
+                    .world(FaweAPI.getWorld(plot.getWorldName()))
+                    .checkMemory(false)
+                    .fastmode(true)
+                    .limitUnlimited()
+                    .changeSetNull()
+                    .autoQueue(false)
+                    .build()) {
                 final Clipboard clipboard = schematic.getClipboard();
                 clipboard.paste(editSession, to, true, false, true);
                 if (whenDone != null) {

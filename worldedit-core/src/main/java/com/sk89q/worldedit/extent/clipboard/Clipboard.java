@@ -254,7 +254,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
             editSession = (EditSession) world;
         } else {
             EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world).autoQueue(true)
-                                                  .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
+                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
             if (allowUndo) {
                 editSession = builder.build();
             } else {

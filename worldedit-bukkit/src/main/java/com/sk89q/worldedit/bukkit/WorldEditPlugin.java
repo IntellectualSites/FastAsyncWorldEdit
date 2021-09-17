@@ -466,10 +466,10 @@ public class WorldEditPlugin extends JavaPlugin {
         BlockBag blockBag = session.getBlockBag(wePlayer);
 
         EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder()
-            .locatableActor(wePlayer)
-            .maxBlocks(session.getBlockChangeLimit())
-            .blockBag(blockBag)
-            .build();
+                .locatableActor(wePlayer)
+                .maxBlocks(session.getBlockChangeLimit())
+                .blockBag(blockBag)
+                .build();
         editSession.enableStandardMode();
 
         return editSession;

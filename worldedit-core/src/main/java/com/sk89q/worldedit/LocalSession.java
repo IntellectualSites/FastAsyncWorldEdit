@@ -638,7 +638,7 @@ public class LocalSession implements TextureHolder {
                     .limitUnprocessed(actor)
                     .actor(actor);
             if (actor instanceof Player) {
-                    builder = builder.blockBag(getBlockBag((Player) actor));
+                builder = builder.blockBag(getBlockBag((Player) actor));
             }
             if (!actor.getLimit().RESTRICT_HISTORY_TO_REGIONS) {
                 builder = builder.allowedRegionsEverywhere();

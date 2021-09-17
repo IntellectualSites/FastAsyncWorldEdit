@@ -24,8 +24,6 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.world.World;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * Creates new {@link EditSession}s. To get an instance of this factory,
  * use {@link WorldEdit#getEditSessionFactory()}.
@@ -35,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * the creation of {@link EditSession}s.</p>
  *
  * @deprecated Using the ever-extending factory methods is deprecated. Replace with {@link EditSessionBuilder},
- *     which in most cases will be as simple as calling {@code builder.world(world).build()}.
+ *         which in most cases will be as simple as calling {@code builder.world(world).build()}.
  */
 @Deprecated
 public class EditSessionFactory {
@@ -165,12 +163,12 @@ public class EditSessionFactory {
         @Override
         public EditSession getEditSession(World world, int maxBlocks, BlockBag blockBag, Actor actor) {
             return WorldEdit.getInstance().newEditSessionBuilder()
-                .world(world)
-                .maxBlocks(maxBlocks)
+                    .world(world)
+                    .maxBlocks(maxBlocks)
 
-                .blockBag(blockBag)
-                .actor(actor)
-                .build();
+                    .blockBag(blockBag)
+                    .actor(actor)
+                    .build();
         }
 
     }
