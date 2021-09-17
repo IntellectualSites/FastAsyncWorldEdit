@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.function.mask.ImageBrushMask;
 import com.fastasyncworldedit.core.function.mask.SurfaceMask;
 import com.fastasyncworldedit.core.util.TextureUtil;
@@ -89,7 +90,7 @@ public class ImageBrush implements Brush {
 
         Actor actor = editSession.getActor();
         if (!(actor instanceof Player)) {
-            return; //todo throw error
+            throw FaweCache.PLAYER_ONLY;
         }
         Player player = (Player) actor;
         Location loc = player.getLocation();

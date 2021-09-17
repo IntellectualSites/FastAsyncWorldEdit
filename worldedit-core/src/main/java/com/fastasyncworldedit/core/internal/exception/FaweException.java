@@ -88,6 +88,8 @@ public class FaweException extends RuntimeException {
         MAX_ITERATIONS,
         BLOCK_BAG,
         CHUNK,
+        PLAYER_ONLY,
+        ACTOR_REQUIRED,
         OTHER
     }
 

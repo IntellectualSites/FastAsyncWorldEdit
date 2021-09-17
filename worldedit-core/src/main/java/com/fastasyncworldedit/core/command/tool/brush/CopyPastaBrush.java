@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.clipboard.ResizableClipboardBuilder;
@@ -53,11 +54,8 @@ public class CopyPastaBrush implements Brush, ResettableTool {
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
             MaxChangedBlocksException {
         Actor actor = editSession.getActor();
-        if (actor == null) {
-            return;
-        }
         if (!(actor instanceof Player)) {
-            return; //todo throw error
+            throw FaweCache.PLAYER_ONLY;
         }
         Player player = (Player) actor;
         ClipboardHolder clipboard = session.getExistingClipboard();

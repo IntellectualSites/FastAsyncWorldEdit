@@ -172,6 +172,16 @@ public enum FaweCache implements Trimable {
                     "fawe.cancel.worldedit.cancel.reason.max.iterations"),
             Type.MAX_ITERATIONS
     );
+    public static final FaweException PLAYER_ONLY = new FaweException(
+            Caption.of(
+                    "fawe.cancel.worldedit.cancel.reason.player-only"),
+            Type.PLAYER_ONLY
+    );
+    public static final FaweException ACTOR_REQUIRED = new FaweException(
+            Caption.of(
+                    "fawe.cancel.worldedit.cancel.reason.actor-required"),
+            Type.ACTOR_REQUIRED
+    );
 
     /*
     thread cache

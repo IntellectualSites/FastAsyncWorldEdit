@@ -66,11 +66,10 @@ public class FaweAPI {
      * @return A new EditSessionBuilder
      * @deprecated See {@link WorldEdit#newEditSessionBuilder()}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static EditSessionBuilder getEditSessionBuilder(World world) {
         return new EditSessionBuilder(world);
     }
-
 
     /**
      * The TaskManager has some useful methods for doing things asynchronously.

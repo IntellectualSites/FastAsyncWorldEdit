@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.wrappers.AsyncPlayer;
 import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
@@ -43,7 +44,7 @@ public class CommandBrush implements Brush {
 
         Actor actor = editSession.getActor();
         if (!(actor instanceof Player)) {
-            return; //todo throw error
+            throw FaweCache.PLAYER_ONLY;
         }
         Player player = (Player) actor;
         //Use max world height to allow full coverage of the world height

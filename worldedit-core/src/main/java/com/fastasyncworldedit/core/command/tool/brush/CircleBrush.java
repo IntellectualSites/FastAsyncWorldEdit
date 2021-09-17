@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -23,14 +24,12 @@ public class CircleBrush implements Brush {
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
             MaxChangedBlocksException {
         Actor actor = editSession.getActor();
-        if (actor == null) {
-            return;
+        if (!(actor instanceof Player)) {
+            throw FaweCache.PLAYER_ONLY;
         }
-        if (actor instanceof Player) {
-            Player player = (Player) actor;
-            Vector3 normal = position.toVector3().subtract(player.getLocation());
-            editSession.makeCircle(position, pattern, size, size, size, filled, normal);
-        }
+        Player player = (Player) actor;
+        Vector3 normal = position.toVector3().subtract(player.getLocation());
+        editSession.makeCircle(position, pattern, size, size, size, filled, normal);
     }
 
     private Vector3 any90Rotate(Vector3 normal) {

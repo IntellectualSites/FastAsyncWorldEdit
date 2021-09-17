@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.function.mask.StencilBrushMask;
 import com.fastasyncworldedit.core.math.heightmap.HeightMap;
 import com.sk89q.worldedit.EditSession;
@@ -50,8 +51,8 @@ public class StencilBrush extends HeightBrush {
         final SolidBlockMask solid = new SolidBlockMask(editSession);
 
         Actor actor = editSession.getActor();
-        if (actor != null && !(actor instanceof Player)) {
-            throw new RuntimeException(); //TODO add message here.
+        if (!(actor instanceof Player)) {
+            throw FaweCache.PLAYER_ONLY;
         }
         Player player = (Player) actor;
         Location loc = player.getLocation();

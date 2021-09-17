@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.EditSession;
@@ -40,7 +41,7 @@ public class ScatterCommand extends ScatterBrush {
 
         Actor actor = editSession.getActor();
         if (!(actor instanceof Player)) {
-            return; //todo throw error
+            throw FaweCache.PLAYER_ONLY;
         }
         Player player = (Player) actor;
         player.setSelection(selector);

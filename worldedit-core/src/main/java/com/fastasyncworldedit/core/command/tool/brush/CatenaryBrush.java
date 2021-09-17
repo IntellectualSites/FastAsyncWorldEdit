@@ -1,7 +1,9 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
@@ -37,11 +39,8 @@ public class CatenaryBrush implements Brush, ResettableTool {
     public void build(EditSession editSession, BlockVector3 pos2, final Pattern pattern, double size) throws
             MaxChangedBlocksException {
         Actor actor = editSession.getActor();
-        if (actor == null) {
-            return; //todo throw error
-        }
         if (!(actor instanceof Player)) {
-            return; //todo throw error
+            throw FaweCache.PLAYER_ONLY;
         }
         Player player = (Player) actor;
         if (pos1 == null || pos2.equals(pos1)) {
