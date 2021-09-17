@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.util.WorldUnloadedException;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -235,6 +236,8 @@ public class BukkitWorld extends AbstractWorld {
             } else {
                 throw new UnsupportedOperationException("Missing BukkitImplAdapter for this version.");
             }
+        } catch (FaweException e) {
+            throw e;
         } catch (Exception e) {
             LOGGER.warn("Regeneration via adapter failed.", e);
             return false;
