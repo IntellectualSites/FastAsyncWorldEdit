@@ -586,7 +586,7 @@ public class LocalSession implements TextureHolder {
             EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                     .checkMemory(false)
                     .changeSetNull()
-                    .fastmode(false)
+                    .fastMode(false)
                     .limitUnprocessed(actor)
                     .actor(actor);
             if (actor instanceof Player) {
@@ -634,7 +634,7 @@ public class LocalSession implements TextureHolder {
             EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                     .checkMemory(false)
                     .changeSetNull()
-                    .fastmode(false)
+                    .fastMode(false)
                     .limitUnprocessed(actor)
                     .actor(actor);
             if (actor instanceof Player) {
@@ -1613,7 +1613,7 @@ public class LocalSession implements TextureHolder {
             builder.blockBag(blockBag);
         }
         builder.command(command);
-        builder.fastmode(!this.sideEffectSet.doesApplyAny());
+        builder.fastMode(!this.sideEffectSet.doesApplyAny());
 
         editSession = builder.build();
 

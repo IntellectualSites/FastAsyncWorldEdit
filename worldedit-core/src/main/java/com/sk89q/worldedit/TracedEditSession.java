@@ -27,7 +27,7 @@ import com.sk89q.worldedit.world.World;
 import javax.annotation.Nullable;
 
 /**
- * Internal use only.
+ * Internal use only. Unused for now, but present in case upstream make it API.
  */
 class TracedEditSession extends EditSession {
 

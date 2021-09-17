@@ -83,7 +83,7 @@ public final class EditSessionBuilder {
     private AbstractChangeSet changeSet;
     private Region[] allowedRegions;
     private Boolean autoQueue;
-    private Boolean fastmode;
+    private Boolean fastMode;
     private Boolean checkMemory;
     private Boolean combineStages;
     private EditSessionEvent event;
@@ -213,7 +213,10 @@ public final class EditSessionBuilder {
         return new EditSession(this);
     }
 
-    public EditSessionBuilder setDirty() {
+    /**
+     * Set builder as changed and requiring (re-)compilation
+     */
+    private EditSessionBuilder setDirty() {
         compiled = false;
         return this;
     }
@@ -291,8 +294,8 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
-    public EditSessionBuilder fastmode(@Nullable Boolean fastmode) {
-        this.fastmode = fastmode;
+    public EditSessionBuilder fastMode(@Nullable Boolean fastMode) {
+        this.fastMode = fastMode;
         return setDirty();
     }
 
@@ -334,15 +337,15 @@ public final class EditSessionBuilder {
         if (autoQueue == null) {
             autoQueue = true;
         }
-        if (fastmode == null) {
+        if (fastMode == null) {
             if (actor == null) {
-                fastmode = !Settings.IMP.HISTORY.ENABLE_FOR_CONSOLE;
+                fastMode = !Settings.IMP.HISTORY.ENABLE_FOR_CONSOLE;
             } else {
-                fastmode = actor.getSession().hasFastMode();
+                fastMode = actor.getSession().hasFastMode();
             }
         }
         if (checkMemory == null) {
-            checkMemory = actor != null && !this.fastmode;
+            checkMemory = actor != null && !this.fastMode;
         }
         if (checkMemory) {
             if (MemUtil.isMemoryLimitedSlow()) {
@@ -359,14 +362,14 @@ public final class EditSessionBuilder {
         if (extent == null) {
             IQueueExtent<IQueueChunk> queue = null;
             World unwrapped = WorldWrapper.unwrap(world);
-            boolean placeChunks = this.fastmode || this.limit.FAST_PLACEMENT;
+            boolean placeChunks = this.fastMode || this.limit.FAST_PLACEMENT;
 
             if (placeChunks && (wnaMode == null || !wnaMode)) {
                 wnaMode = false;
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
                 } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
-                    ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, fastmode);
+                    ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, fastMode);
                     queue = parallel.getExtent();
                     extent = parallel;
                 } else {
@@ -387,7 +390,7 @@ public final class EditSessionBuilder {
             }
             extent = this.bypassAll = wrapExtent(extent, eventBus, event, EditSession.Stage.BEFORE_CHANGE);
             this.bypassHistory = this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER);
-            if (!this.fastmode || changeSet != null) {
+            if (!this.fastMode || changeSet != null) {
                 if (changeSet == null) {
                     if (Settings.IMP.HISTORY.USE_DISK) {
                         UUID uuid = actor == null ? Identifiable.CONSOLE : actor.getUniqueId();
@@ -489,7 +492,32 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
-    public Extent wrapExtent(
+    public boolean isWrapped() {
+        return wrapped;
+    }
+
+    public Extent getBypassHistory() {
+        return bypassHistory;
+    }
+
+    public Extent getBypassAll() {
+        return bypassAll;
+    }
+
+    @NotNull
+    public FaweLimit getLimit() {
+        return limit;
+    }
+
+    public AbstractChangeSet getChangeTask() {
+        return changeTask;
+    }
+
+    public Extent getExtent() {
+        return extent != null ? extent : world;
+    }
+
+    private Extent wrapExtent(
             final Extent extent,
             final EventBus eventBus,
             EditSessionEvent event,
@@ -539,31 +567,6 @@ public final class EditSessionBuilder {
             }
         }
         return extent;
-    }
-
-    public boolean isWrapped() {
-        return wrapped;
-    }
-
-    public Extent getBypassHistory() {
-        return bypassHistory;
-    }
-
-    public Extent getBypassAll() {
-        return bypassAll;
-    }
-
-    @NotNull
-    public FaweLimit getLimit() {
-        return limit;
-    }
-
-    public AbstractChangeSet getChangeTask() {
-        return changeTask;
-    }
-
-    public Extent getExtent() {
-        return extent != null ? extent : world;
     }
 
 }

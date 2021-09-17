@@ -66,7 +66,7 @@ public class FaweSchematicHandler extends SchematicHandler {
             );
             final EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(adaptedWorld)
                     .checkMemory(false)
-                    .fastmode(true)
+                    .fastMode(true)
                     .limitUnlimited()
                     .changeSetNull()
                     .autoQueue(false)

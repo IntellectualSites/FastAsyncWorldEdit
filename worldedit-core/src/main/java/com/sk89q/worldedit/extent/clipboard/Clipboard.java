@@ -258,7 +258,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
             if (allowUndo) {
                 editSession = builder.build();
             } else {
-                editSession = builder.changeSetNull().fastmode(true).build();
+                editSession = builder.changeSetNull().fastMode(true).build();
             }
         }
         Extent extent = this;

@@ -113,7 +113,7 @@ public class FaweDelegateSchematicHandler {
                     .newEditSessionBuilder()
                     .world(FaweAPI.getWorld(plot.getWorldName()))
                     .checkMemory(false)
-                    .fastmode(true)
+                    .fastMode(true)
                     .limitUnlimited()
                     .changeSetNull()
                     .autoQueue(false)

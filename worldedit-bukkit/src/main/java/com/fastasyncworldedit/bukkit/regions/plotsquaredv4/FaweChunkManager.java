@@ -66,14 +66,14 @@ public class FaweChunkManager extends ChunkManager {
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
                 EditSession sessionA = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
                         .build();
                 EditSession sessionB = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
@@ -112,14 +112,14 @@ public class FaweChunkManager extends ChunkManager {
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
                 EditSession from = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
                         .build();
                 EditSession to = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
@@ -152,7 +152,7 @@ public class FaweChunkManager extends ChunkManager {
             synchronized (FaweChunkManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World).checkMemory(false)
-                        .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+                        .fastMode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
                     CuboidRegion region = new CuboidRegion(
                             BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
                             BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())

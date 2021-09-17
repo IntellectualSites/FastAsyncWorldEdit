@@ -56,7 +56,7 @@ public class FaweDelegateRegionManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
-                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).fastmode(
+                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).fastMode(
                                 true).limitUnlimited().changeSetNull()
                         .autoQueue(false).build();
                 for (CuboidRegion region : regions) {
@@ -97,7 +97,7 @@ public class FaweDelegateRegionManager {
                 World world = BukkitAdapter.adapt(getWorld(hybridPlotWorld.getWorldName()));
                 EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
@@ -146,7 +146,7 @@ public class FaweDelegateRegionManager {
                     EditSession scheditsession = !Settings.Schematics.PASTE_ON_TOP ? editSession :
                             WorldEdit.getInstance().newEditSessionBuilder().world(world)
                                     .checkMemory(false)
-                                    .fastmode(true)
+                                    .fastMode(true)
                                     .limitUnlimited()
                                     .changeSetNull()
                                     .autoQueue(false)
@@ -198,14 +198,14 @@ public class FaweDelegateRegionManager {
                 World pos3World = BukkitAdapter.adapt(getWorld(swapPos.getWorldName()));
                 EditSession sessionA = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
                         .build();
                 EditSession sessionB = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
@@ -259,7 +259,7 @@ public class FaweDelegateRegionManager {
                         .newEditSessionBuilder()
                         .world(BukkitAdapter.adapt(getWorld(world)))
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
@@ -289,14 +289,14 @@ public class FaweDelegateRegionManager {
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorldName()));
                 EditSession from = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
                         .build();
                 EditSession to = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)
@@ -336,7 +336,7 @@ public class FaweDelegateRegionManager {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .autoQueue(false)

@@ -255,7 +255,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Nullable
     private final Region[] allowedRegions;
 
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public EditSession(
             @Nonnull EventBus bus, World world, @Nullable Player actor,
             @Nullable FaweLimit limit, @Nullable AbstractChangeSet changeSet,
@@ -268,7 +268,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 .changeSet(changeSet)
                 .allowedRegions(allowedRegions)
                 .autoQueue(autoQueue)
-                .fastmode(fastmode)
+                .fastMode(fastmode)
                 .checkMemory(checkMemory)
                 .combineStages(combineStages)
                 .blockBag(blockBag)
@@ -286,6 +286,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @param event     the event to call with the extent
      */
     //FAWE start - EditSessionEvent
+    @Deprecated(forRemoval = true)
     public EditSession(
             @Nonnull EventBus eventBus,
             World world,
@@ -321,7 +322,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.allowedRegions = builder.getAllowedRegions() != null ? builder.getAllowedRegions().clone() : null;
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public EditSession(com.fastasyncworldedit.core.util.EditSessionBuilder builder) {
         super(builder.compile().getExtent());
         this.world = builder.getWorld();
@@ -431,21 +432,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return output;
     }
 
-    private Extent wrapExtent(Extent extent, EventBus eventBus, EditSessionEvent event, Stage stage) {
-        // NB: the event does its own tracing
-        event = event.clone(stage);
-        event.setExtent(extent);
-        boolean tracing = tracingExtents != null;
-        event.setTracing(tracing);
-        eventBus.post(event);
-        if (tracing) {
-            tracingExtents.addAll(event.getTracingExtents());
-        }
-        return event.getExtent();
-    }
-
     // pkg private for TracedEditSession only, may later become public API
     boolean commitRequired() {
+        //FAWE start
         return false;
     }
     //FAWE end

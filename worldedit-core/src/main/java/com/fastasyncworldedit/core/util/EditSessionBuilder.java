@@ -51,8 +51,6 @@ import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
-//TODO Migrate all logic to com.sk89q.worldedit.EditSessionBuilder
 @Deprecated(forRemoval = true)
 public class EditSessionBuilder {
 
