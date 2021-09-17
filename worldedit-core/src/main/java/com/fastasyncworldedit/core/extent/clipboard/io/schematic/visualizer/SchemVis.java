@@ -129,7 +129,7 @@
 //                            URI uri = file.toURI();
 //                            ClipboardFormat format = ClipboardFormats.findByFile(file);
 //                            format.hold(player, uri, new FileInputStream(file));
-//                            player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded", filename));
+//                            player.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
 //                            session.setVirtualWorld(null);
 //                            return;
 //                        }
@@ -157,7 +157,7 @@
 //                                        session.setClipboard(null);
 //                                    }
 //                                    select.put(clicked, false);
-//                                    player.print(TranslatableComponent.of("fawe.worldedit.clipboard.clipboard.cleared"))
+//                                    player.print(Caption.of("fawe.worldedit.clipboard.clipboard.cleared"))
 //                                }
 //                            } else {
 //                                // Add it
@@ -165,7 +165,7 @@
 //                                MultiClipboardHolder multi = new MultiClipboardHolder(URI.create(""), new LazyClipboardHolder(uri, source, format, null));
 //                                session.addClipboard(multi);
 //                                select.put(clicked, true);
-//                                player.print(TranslatableComponent.of("fawe.worldedit.schematic.schematic.loaded", file.getName()));
+//                                player.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", file.getName()));
 //                            }
 //                        }
 //                        // Resend relevant chunks

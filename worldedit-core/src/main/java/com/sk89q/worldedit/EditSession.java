@@ -246,14 +246,14 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     private final int maxY;
     //FAWE end
     private final List<WatchdogTickingExtent> watchdogExtents = new ArrayList<>(2);
+    @Nullable
+    private final List<TracingExtent> tracingExtents;
 
     //FAWE start
     private final Relighter relighter;
     private final boolean wnaMode;
     @Nullable
     private final Region[] allowedRegions;
-    private @Nullable
-    List<TracingExtent> tracingExtents = null;
 
     @Deprecated
     public EditSession(

@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.extension.factory.parser.transform;
 
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.extent.transform.OffsetTransform;
@@ -9,7 +10,6 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
@@ -38,7 +38,7 @@ public class OffsetTransformParser extends RichParser<ResettableExtent> {
     @Override
     protected ResettableExtent parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 3 && arguments.length != 4) {
-            throw new InputParseException(TranslatableComponent.of(
+            throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",
                     TextComponent.of("#offset[x][y][z]")
             ));
