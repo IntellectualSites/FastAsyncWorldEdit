@@ -51,7 +51,7 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
     @Nonnull
     private Function<String, Stream<? extends String>> extractArguments(String input) {
         return prefix -> {
-            if (input.length() > prefix.length() && prefix.startsWith(input + "[")) {
+            if (input.length() > prefix.length() && input.startsWith(prefix + "[")) {
                 // input already contains argument(s) -> extract them
                 String[] strings = extractArguments(input.substring(prefix.length()), false);
                 // rebuild the argument string without the last argument
