@@ -720,13 +720,13 @@ public class BrushCommands {
             LocalSession session,
             @Arg(desc = "Expression", def = "5")
                     Expression radius,
+            @Arg(desc = "double", def = "1")
+                    double yscale,
             @Arg(desc = "String", def = "")
                     String image,
             @Arg(def = "0", desc = "rotation")
             @Range(from = 0, to = 360)
                     int rotation,
-            @Arg(desc = "double", def = "1")
-                    double yscale,
             @Switch(name = 'r', desc = "Random off-axis rotation")
                     boolean randomRotate,
             @Switch(name = 'l', desc = "Work on snow layers")
