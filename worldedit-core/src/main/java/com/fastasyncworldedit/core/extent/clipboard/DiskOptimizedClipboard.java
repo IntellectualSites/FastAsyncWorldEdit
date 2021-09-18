@@ -54,10 +54,12 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private static final int HEADER_SIZE = 14;
+    private static final byte VERSION = 1;
 
     private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
+    private final byte version;
+    private final byte HEADER_SIZE;
 
     private RandomAccessFile braf;
     private MappedByteBuffer byteBuffer;
@@ -74,6 +76,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                         Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"
                 )
         );
+        setOffset(region.getMinimumPoint());
     }
 
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
@@ -88,6 +91,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     public DiskOptimizedClipboard(BlockVector3 dimensions, File file) {
         super(dimensions);
+        HEADER_SIZE = 20;
         if (HEADER_SIZE + ((long) getVolume() << 1) >= Integer.MAX_VALUE) {
             throw new IllegalArgumentException(
                     "Dimensions too large for this clipboard format. Use //lazycopy for large selections.");
@@ -115,6 +119,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             braf.setLength(fileLength);
             init();
             // write getLength() etc
+            byteBuffer.put(0, (version = VERSION));
             byteBuffer.putChar(2, (char) getWidth());
             byteBuffer.putChar(4, (char) getHeight());
             byteBuffer.putChar(6, (char) getLength());
@@ -131,7 +136,10 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private static BlockVector3 readSize(File file) {
         try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
-            is.skipBytes(2);
+            byte version = is.readByte();
+            if (version > VERSION) {
+                throw new UnsupportedOperationException("Unsupported clipboard-on-disk version: " + version);
+            }
             return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
         } catch (IOException e) {
             e.printStackTrace();
@@ -147,6 +155,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
             init();
+            version = byteBuffer.get(0);
+            HEADER_SIZE = (byte) (version > 0 ? 20 : 14);
             if (braf.length() - HEADER_SIZE == ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)) {
                 hasBiomes = true;
             }
@@ -262,11 +272,17 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                     BlockVector3.at(0, 0, 0),
                     BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1)
             );
-            int ox = byteBuffer.getShort(8);
-            int oy = byteBuffer.getShort(10);
-            int oz = byteBuffer.getShort(12);
+            int originX = byteBuffer.getShort(8);
+            int originY = byteBuffer.getShort(10);
+            int originZ = byteBuffer.getShort(12);
+            if (version > 0) {
+                int offsetX = byteBuffer.getShort(14);
+                int offsetY = byteBuffer.getShort(16);
+                int offsetZ = byteBuffer.getShort(18);
+                region.shift(BlockVector3.at(offsetX, offsetY, offsetZ));
+            }
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, this);
-            clipboard.setOrigin(BlockVector3.at(ox, oy, oz));
+            clipboard.setOrigin(BlockVector3.at(originX, originY, originZ));
             return clipboard;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -281,6 +297,27 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             byteBuffer.putShort(8, (short) offset.getBlockX());
             byteBuffer.putShort(10, (short) offset.getBlockY());
             byteBuffer.putShort(12, (short) offset.getBlockZ());
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public BlockVector3 getOrigin() {
+        int ox = byteBuffer.getShort(8);
+        int oy = byteBuffer.getShort(10);
+        int oz = byteBuffer.getShort(12);
+        return BlockVector3.at(ox, oy, oz);
+    }
+
+    private void setOffset(BlockVector3 offset) {
+        if (version == 0) {
+            return;
+        }
+        try {
+            byteBuffer.putShort(14, (short) offset.getBlockX());
+            byteBuffer.putShort(16, (short) offset.getBlockY());
+            byteBuffer.putShort(18, (short) offset.getBlockZ());
         } catch (Throwable e) {
             e.printStackTrace();
         }

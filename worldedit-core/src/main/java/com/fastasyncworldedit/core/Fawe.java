@@ -125,7 +125,7 @@ public class Fawe {
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
-                WEManager.IMP.managers.addAll(Fawe.this.implementation.getMaskManagers());
+                WEManager.IMP.addManagers(Fawe.this.implementation.getMaskManagers());
             } catch (Throwable ignored) {
             }
         }, 0);

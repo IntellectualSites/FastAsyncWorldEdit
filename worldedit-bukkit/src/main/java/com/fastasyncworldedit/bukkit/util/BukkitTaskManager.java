@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.bukkit.util;
 
 import com.fastasyncworldedit.core.util.TaskManager;
-import org.apache.commons.lang.mutable.MutableInt;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -24,8 +23,6 @@ public class BukkitTaskManager extends TaskManager {
     public int repeatAsync(@Nonnull final Runnable runnable, final int interval) {
         return this.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(this.plugin, runnable, interval, interval);
     }
-
-    public MutableInt index = new MutableInt(0);
 
     @Override
     public void async(@Nonnull final Runnable runnable) {

@@ -795,7 +795,8 @@ public final class PlatformCommandManager {
             }
             Optional<EditSession> editSessionOpt = context.injectedValue(Key.of(EditSession.class));
 
-            if (editSessionOpt.isPresent()) {
+            // Require null CommandEvent#getSession as it means the editsession is being handled somewhere else.
+            if (editSessionOpt.isPresent() && event.getSession() == null) {
                 EditSession editSession = editSessionOpt.get();
                 editSession.close();
                 session.remember(editSession);
@@ -866,6 +867,14 @@ public final class PlatformCommandManager {
         store.injectValue(Key.of(boolean.class), context -> Optional.of(isSuggestions));
         store.injectValue(Key.of(InjectedValueStore.class), ValueProvider.constant(store));
         store.injectValue(Key.of(Event.class), ValueProvider.constant(event));
+        //FAWE start - allow giving editsessions
+        if (event instanceof CommandEvent) {
+            EditSession session = ((CommandEvent) event).getSession();
+            if (session != null) {
+                store.injectValue(Key.of(EditSession.class), context -> Optional.of(session));
+            }
+        }
+        //FAWE end
         return MemoizingValueAccess.wrap(
                 MergedValueAccess.of(store, globalInjectedValues)
         );

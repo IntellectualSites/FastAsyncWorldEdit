@@ -413,7 +413,7 @@ public class BrushCommands {
             InjectedValueAccess context,
             @Arg(desc = "Pattern")
                     Pattern fill,
-            @Arg(desc = "radius", def = "10")
+            @Arg(desc = "radii to multiply x,y,z by", def = "10")
                     Vector3 radius,
             @Arg(name = "roundness", desc = "roundness", def = "100")
                     double sphericity,
@@ -694,13 +694,15 @@ public class BrushCommands {
             @Arg(desc = "double", def = "1")
                     double distance,
             @Arg(desc = "List of comma-separated commands")
-                    List<String> commandStr
+                    List<String> commandStr,
+            @Switch(name = 'p', desc = "Show any printed output")
+                    boolean print
     )
             throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         set(
                 context,
-                new ScatterCommand((int) points, (int) distance, StringMan.join(commandStr, " ")),
+                new ScatterCommand((int) points, (int) distance, StringMan.join(commandStr, " "), print),
                 "worldedit.brush.scattercommand"
         )
                 .setSize(radius);
@@ -720,13 +722,13 @@ public class BrushCommands {
             LocalSession session,
             @Arg(desc = "Expression", def = "5")
                     Expression radius,
+            @Arg(desc = "double", def = "1")
+                    double yscale,
             @Arg(desc = "String", def = "")
                     String image,
             @Arg(def = "0", desc = "rotation")
             @Range(from = 0, to = 360)
                     int rotation,
-            @Arg(desc = "double", def = "1")
-                    double yscale,
             @Switch(name = 'r', desc = "Random off-axis rotation")
                     boolean randomRotate,
             @Switch(name = 'l', desc = "Work on snow layers")

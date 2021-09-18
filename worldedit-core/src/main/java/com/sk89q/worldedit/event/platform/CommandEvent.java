@@ -19,9 +19,12 @@
 
 package com.sk89q.worldedit.event.platform;
 
+import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.event.AbstractCancellable;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
+
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -32,6 +35,10 @@ public class CommandEvent extends AbstractCancellable {
 
     private final Actor actor;
     private final String arguments;
+    //FAWE start
+    @Nullable
+    private final EditSession session;
+    //FAWE end
 
     /**
      * Create a new instance.
@@ -45,7 +52,31 @@ public class CommandEvent extends AbstractCancellable {
 
         this.actor = actor;
         this.arguments = arguments;
+        //FAWE start
+        this.session = null;
     }
+
+    /**
+     * Create a new instance.
+     *
+     * @param actor       the player
+     * @param arguments   the arguments
+     * @param editSession the editsession
+     */
+    public CommandEvent(Actor actor, String arguments, @Nullable EditSession editSession) {
+        checkNotNull(actor);
+        checkNotNull(arguments);
+
+        this.actor = actor;
+        this.arguments = arguments;
+        this.session = editSession;
+    }
+
+    @Nullable
+    public EditSession getSession() {
+        return session;
+    }
+    //FAWE end
 
     /**
      * Get the actor that issued the command.

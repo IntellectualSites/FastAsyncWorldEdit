@@ -207,6 +207,51 @@ public class PlayerProxy extends AbstractPlayerActor {
     }
 
     @Override
+    public void findFreePosition(final Location searchPos) {
+        basePlayer.findFreePosition(searchPos);
+    }
+
+    @Override
+    public void setOnGround(final Location searchPos) {
+        basePlayer.setOnGround(searchPos);
+    }
+
+    @Override
+    public void findFreePosition() {
+        basePlayer.findFreePosition();
+    }
+
+    @Override
+    public boolean ascendLevel() {
+        return basePlayer.ascendLevel();
+    }
+
+    @Override
+    public boolean descendLevel() {
+        return basePlayer.descendLevel();
+    }
+
+    @Override
+    public boolean ascendToCeiling(final int clearance) {
+        return basePlayer.ascendToCeiling(clearance);
+    }
+
+    @Override
+    public boolean ascendToCeiling(final int clearance, final boolean alwaysGlass) {
+        return basePlayer.ascendToCeiling(clearance, alwaysGlass);
+    }
+
+    @Override
+    public boolean ascendUpwards(final int distance) {
+        return basePlayer.ascendUpwards(distance);
+    }
+
+    @Override
+    public boolean ascendUpwards(final int distance, final boolean alwaysGlass) {
+        return basePlayer.ascendUpwards(distance, alwaysGlass);
+    }
+
+    @Override
     public void floatAt(int x, int y, int z, boolean alwaysGlass) {
         basePlayer.floatAt(x, y, z, alwaysGlass);
     }

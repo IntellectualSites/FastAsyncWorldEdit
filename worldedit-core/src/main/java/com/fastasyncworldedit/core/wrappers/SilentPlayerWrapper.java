@@ -21,7 +21,6 @@ public class SilentPlayerWrapper extends AsyncPlayer {
 
     @Override
     public void print(Component component) {
-        super.print(component);
     }
 
     @Override

@@ -31,6 +31,7 @@ public class PNGWriter implements ClipboardWriter {
 
     @Override
     public void write(Clipboard clipboard) throws IOException {
+        clipboard.flush();
         Region region = clipboard.getRegion();
         int width = region.getWidth();
         int height = region.getHeight();

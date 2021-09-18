@@ -115,6 +115,14 @@ public class Settings extends Config {
                 " - OWNER = Players who own the region"
         })
         public String MODE = "MEMBER";
+        @Comment({
+                "List of plugin mask managers that should be exclusive. Exclusive managers are not ",
+                "checked for edit restrictions if another manager already allowed an edit, and further ",
+                "managers are not checked if an exclusive manager allows an edit.",
+                " - May be useful to add PlotSquared if using both P2 and WorldGuard on a server",
+                " - Some custom-implementations in other plugins may override this setting"
+        })
+        public List<String> EXCLUSIVE_MANAGERS = new ArrayList<>(Collections.singleton(("ExamplePlugin")));
 
     }
 

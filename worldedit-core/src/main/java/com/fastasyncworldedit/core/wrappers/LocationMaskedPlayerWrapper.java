@@ -24,6 +24,14 @@ public class LocationMaskedPlayerWrapper extends AsyncPlayer {
         return position;
     }
 
+    @Override
+    public void setPosition(final Vector3 pos) {
+        if (allowTeleport) {
+            super.setPosition(pos);
+            update();
+        }
+    }
+
     private void update() {
         this.position = super.getLocation();
     }

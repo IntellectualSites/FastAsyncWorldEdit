@@ -72,6 +72,7 @@ public class FastSchematicWriter implements ClipboardWriter {
 
     @Override
     public void write(Clipboard clipboard) throws IOException {
+        clipboard.flush();
         // For now always write the latest version. Maybe provide support for earlier if more appear.
         write2(clipboard);
     }

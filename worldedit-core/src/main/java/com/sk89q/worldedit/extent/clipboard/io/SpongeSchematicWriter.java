@@ -78,6 +78,10 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
     @Override
     public void write(Clipboard clipboard) throws IOException {
+        //FAWE start - ensure clipboard is flushed in case of using clipboard-on-disk. Maintains allowing of the same code
+        // between upstream and FAWE
+        clipboard.flush();
+        //FAWE end
         // For now always write the latest version. Maybe provide support for earlier if more appear.
         outputStream.writeNamedTag("Schematic", new CompoundTag(write2(clipboard)));
     }
