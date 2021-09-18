@@ -694,13 +694,15 @@ public class BrushCommands {
             @Arg(desc = "double", def = "1")
                     double distance,
             @Arg(desc = "List of comma-separated commands")
-                    List<String> commandStr
+                    List<String> commandStr,
+            @Switch(name = 'p', desc = "Show any printed output")
+                    boolean print
     )
             throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         set(
                 context,
-                new ScatterCommand((int) points, (int) distance, StringMan.join(commandStr, " ")),
+                new ScatterCommand((int) points, (int) distance, StringMan.join(commandStr, " "), print),
                 "worldedit.brush.scattercommand"
         )
                 .setSize(radius);
