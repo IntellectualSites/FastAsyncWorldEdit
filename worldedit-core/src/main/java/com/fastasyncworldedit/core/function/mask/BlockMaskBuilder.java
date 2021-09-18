@@ -30,6 +30,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -45,11 +51,16 @@ public class BlockMaskBuilder {
     private static final Operator NOT = (a, b) -> a != b;
 
     private static final long[] ALL = new long[0];
+    private final long[][] bitSets;
+    private boolean[] ordinals;
+    private boolean optimizedStates = true;
 
-    private interface Operator {
+    public BlockMaskBuilder() {
+        this(new long[BlockTypes.size()][]);
+    }
 
-        boolean test(int left, int right);
-
+    protected BlockMaskBuilder(long[][] bitSets) {
+        this.bitSets = bitSets;
     }
 
     private boolean filterRegex(BlockType blockType, PropertyKey key, String regex) {
@@ -106,157 +117,174 @@ public class BlockMaskBuilder {
         return result;
     }
 
-    public BlockMaskBuilder addRegex(String input) throws InputParseException {
-        if (input.charAt(input.length() - 1) == ']') {
-            int propStart = StringMan.findMatchingBracket(input, input.length() - 1);
-            if (propStart == -1) {
-                return this;
-            }
+    public BlockMaskBuilder addRegex(final String input) throws InputParseException {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<?> fut = executor.submit(() -> {
+            if (input.charAt(input.length() - 1) == ']') {
+                int propStart = StringMan.findMatchingBracket(input, input.length() - 1);
+                if (propStart == -1) {
+                    return;
+                }
 
-            MutableCharSequence charSequence = MutableCharSequence.getTemporal();
-            charSequence.setString(input);
-            charSequence.setSubstring(0, propStart);
+                MutableCharSequence charSequence = MutableCharSequence.getTemporal();
+                charSequence.setString(input);
+                charSequence.setSubstring(0, propStart);
 
-            BlockType type = null;
-            List<BlockType> blockTypeList = null;
-            if (StringMan.isAlphanumericUnd(charSequence)) {
-                type = BlockTypes.parse(charSequence.toString());
-                add(type);
-            } else {
-                String regex = charSequence.toString();
-                blockTypeList = new ArrayList<>();
-                for (BlockType myType : BlockTypesCache.values) {
-                    if (myType.getId().matches(regex)) {
-                        blockTypeList.add(myType);
-                        add(myType);
+                BlockType type = null;
+                List<BlockType> blockTypeList = null;
+                if (StringMan.isAlphanumericUnd(charSequence)) {
+                    type = BlockTypes.parse(charSequence.toString());
+                    add(type);
+                } else {
+                    String regex = charSequence.toString();
+                    blockTypeList = new ArrayList<>();
+                    for (BlockType myType : BlockTypesCache.values) {
+                        if (myType.getId().matches(regex)) {
+                            blockTypeList.add(myType);
+                            add(myType);
+                        }
+                    }
+                    if (blockTypeList.isEmpty()) {
+                        throw new InputParseException(Caption.of("fawe.error.no-block-found", TextComponent.of(input)));
+                    }
+                    if (blockTypeList.size() == 1) {
+                        type = blockTypeList.get(0);
                     }
                 }
-                if (blockTypeList.isEmpty()) {
-                    throw new InputParseException(Caption.of("fawe.error.no-block-found", TextComponent.of(input)));
-                }
-                if (blockTypeList.size() == 1) {
-                    type = blockTypeList.get(0);
-                }
-            }
-            // Empty string
-            charSequence.setSubstring(0, 0);
+                // Empty string
+                charSequence.setSubstring(0, 0);
 
-            PropertyKey key = null;
-            int length = input.length();
-            int last = propStart + 1;
-            Operator operator = null;
-            for (int i = last; i < length; i++) {
-                char c = input.charAt(i);
-                switch (c) {
-                    case '[':
-                    case '{':
-                    case '(':
-                        int next = StringMan.findMatchingBracket(input, i);
-                        if (next != -1) {
-                            i = next;
-                        }
-                        break;
-                    case ']':
-                    case ',': {
-                        charSequence.setSubstring(last, i);
-                        if (key == null && PropertyKey.getByName(charSequence) == null) {
-                            suggest(input, charSequence.toString(), type != null ? Collections.singleton(type) : blockTypeList);
-                        }
-                        if (operator == null) {
-                            throw new SuggestInputParseException(
-                                    "No operator for " + input,
-                                    "",
-                                    () -> Arrays.asList("=", "~", "!", "<", ">", "<=", ">=")
-                            );
-                        }
-                        boolean filtered = false;
-                        if (type != null) {
-                            filtered = filterRegexOrOperator(type, key, operator, charSequence);
-                        } else {
-                            for (BlockType myType : blockTypeList) {
-                                filtered |= filterRegexOrOperator(myType, key, operator, charSequence);
+                PropertyKey key = null;
+                int length = input.length();
+                int last = propStart + 1;
+                Operator operator = null;
+                for (int i = last; i < length; i++) {
+                    char c = input.charAt(i);
+                    switch (c) {
+                        case '[':
+                        case '{':
+                        case '(':
+                            int next = StringMan.findMatchingBracket(input, i);
+                            if (next != -1) {
+                                i = next;
                             }
-                        }
-                        if (!filtered) {
-                            String value = charSequence.toString();
-                            final PropertyKey fKey = key;
-                            Collection<BlockType> types = type != null ? Collections.singleton(type) : blockTypeList;
-                            throw new SuggestInputParseException("No value for " + input, input, () -> {
-                                HashSet<String> values = new HashSet<>();
-                                types.stream().filter(t -> t.hasProperty(fKey)).forEach(t -> {
-                                    Property<Object> p = t.getProperty(fKey);
-                                    for (int j = 0; j < p.getValues().size(); j++) {
-                                        if (has(t, p, j)) {
-                                            String o = p.getValues().get(j).toString();
-                                            if (o.startsWith(value)) {
-                                                values.add(o);
-                                            }
-                                        }
-                                    }
-                                });
-                                return new ArrayList<>(values);
-                            });
-                        }
-                        // Reset state
-                        key = null;
-                        operator = null;
-                        last = i + 1;
-                        break;
-                    }
-                    case '~':
-                    case '!':
-                    case '=':
-                    case '<':
-                    case '>': {
-                        charSequence.setSubstring(last, i);
-                        boolean extra = input.charAt(i + 1) == '=';
-                        if (extra) {
-                            i++;
-                        }
-                        switch (c) {
-                            case '~':
-                                operator = EQUAL_OR_NULL;
-                                break;
-                            case '!':
-                                operator = NOT;
-                                break;
-                            case '=':
-                                operator = EQUAL;
-                                break;
-                            case '<':
-                                operator = extra ? LESS_EQUAL : LESS;
-                                break;
-                            case '>':
-                                operator = extra ? GREATER_EQUAL : GREATER;
-                                break;
-                        }
-                        if (charSequence.length() > 0 || key == null) {
-                            key = PropertyKey.getByName(charSequence);
-                            if (key == null) {
+                            break;
+                        case ']':
+                        case ',': {
+                            charSequence.setSubstring(last, i);
+                            if (key == null && PropertyKey.getByName(charSequence) == null) {
                                 suggest(
                                         input,
                                         charSequence.toString(),
                                         type != null ? Collections.singleton(type) : blockTypeList
                                 );
                             }
+                            if (operator == null) {
+                                throw new SuggestInputParseException(
+                                        "No operator for " + input,
+                                        "",
+                                        () -> Arrays.asList("=", "~", "!", "<", ">", "<=", ">=")
+                                );
+                            }
+                            boolean filtered = false;
+                            if (type != null) {
+                                filtered = filterRegexOrOperator(type, key, operator, charSequence);
+                            } else {
+                                for (BlockType myType : blockTypeList) {
+                                    filtered |= filterRegexOrOperator(myType, key, operator, charSequence);
+                                }
+                            }
+                            if (!filtered) {
+                                String value = charSequence.toString();
+                                final PropertyKey fKey = key;
+                                Collection<BlockType> types = type != null ? Collections.singleton(type) : blockTypeList;
+                                throw new SuggestInputParseException("No value for " + input, input, () -> {
+                                    HashSet<String> values = new HashSet<>();
+                                    types.stream().filter(t -> t.hasProperty(fKey)).forEach(t -> {
+                                        Property<Object> p = t.getProperty(fKey);
+                                        for (int j = 0; j < p.getValues().size(); j++) {
+                                            if (has(t, p, j)) {
+                                                String o = p.getValues().get(j).toString();
+                                                if (o.startsWith(value)) {
+                                                    values.add(o);
+                                                }
+                                            }
+                                        }
+                                    });
+                                    return new ArrayList<>(values);
+                                });
+                            }
+                            // Reset state
+                            key = null;
+                            operator = null;
+                            last = i + 1;
+                            break;
                         }
-                        last = i + 1;
-                        break;
+                        case '~':
+                        case '!':
+                        case '=':
+                        case '<':
+                        case '>': {
+                            charSequence.setSubstring(last, i);
+                            boolean extra = input.charAt(i + 1) == '=';
+                            if (extra) {
+                                i++;
+                            }
+                            switch (c) {
+                                case '~':
+                                    operator = EQUAL_OR_NULL;
+                                    break;
+                                case '!':
+                                    operator = NOT;
+                                    break;
+                                case '=':
+                                    operator = EQUAL;
+                                    break;
+                                case '<':
+                                    operator = extra ? LESS_EQUAL : LESS;
+                                    break;
+                                case '>':
+                                    operator = extra ? GREATER_EQUAL : GREATER;
+                                    break;
+                            }
+                            if (charSequence.length() > 0 || key == null) {
+                                key = PropertyKey.getByName(charSequence);
+                                if (key == null) {
+                                    suggest(
+                                            input,
+                                            charSequence.toString(),
+                                            type != null ? Collections.singleton(type) : blockTypeList
+                                    );
+                                }
+                            }
+                            last = i + 1;
+                            break;
+                        }
+                        default:
+                            break;
                     }
-                    default:
-                        break;
                 }
-            }
-        } else {
-            if (StringMan.isAlphanumericUnd(input)) {
-                add(BlockTypes.parse(input));
             } else {
-                for (BlockType myType : BlockTypesCache.values) {
-                    if (myType.getId().matches(input)) {
-                        add(myType);
+                if (StringMan.isAlphanumericUnd(input)) {
+                    add(BlockTypes.parse(input));
+                } else {
+                    for (BlockType myType : BlockTypesCache.values) {
+                        if (myType.getId().matches(input)) {
+                            add(myType);
+                        }
                     }
                 }
             }
+        });
+        try {
+            fut.get(5L, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException e) {
+            if (e.getCause() instanceof InputParseException) {
+                throw (InputParseException) e.getCause();
+            }
+        } catch (InterruptedException | TimeoutException ignored) {
+        } finally {
+            executor.shutdown();
         }
         return this;
     }
@@ -282,23 +310,8 @@ public class BlockMaskBuilder {
         });
     }
 
-    ///// end internal /////
-
-    private final long[][] bitSets;
-    private boolean[] ordinals;
-
-    private boolean optimizedStates = true;
-
     public boolean isEmpty() {
         return Arrays.stream(bitSets).noneMatch(Objects::nonNull);
-    }
-
-    public BlockMaskBuilder() {
-        this(new long[BlockTypes.size()][]);
-    }
-
-    protected BlockMaskBuilder(long[][] bitSets) {
-        this.bitSets = bitSets;
     }
 
     public BlockMaskBuilder addAll() {
@@ -658,6 +671,12 @@ public class BlockMaskBuilder {
 
     public BlockMask build(Extent extent) {
         return new BlockMask(extent, getOrdinals());
+    }
+
+    private interface Operator {
+
+        boolean test(int left, int right);
+
     }
 
 }
