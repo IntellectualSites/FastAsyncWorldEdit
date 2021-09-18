@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.function.generator.CavesGen;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.sk89q.worldedit.EditSession;
@@ -646,6 +647,47 @@ public class GenerationCommands {
         ));
         editSession.addOre(region, mask, material, size, freq, rarity, minY, maxY);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
+    }
+
+    @Command(
+            name = "/blob",
+            aliases = {"/rock"},
+            desc = "Creates a distorted sphere"
+    )
+    @Logging(PLACEMENT)
+    @CommandPermissions("worldedit.generation.blob")
+    public int blobBrush(
+            Actor actor, LocalSession session, EditSession editSession,
+            @Arg(desc = "Pattern")
+                    Pattern pattern,
+            @Arg(desc = "size", def = "5")
+                    double size,
+            @Arg(desc = "radius", def = "5")
+                    Vector3 radius,
+            @Arg(name = "roundness", desc = "roundness", def = "100")
+                    double sphericity,
+            @Arg(desc = "double", def = "30")
+                    double frequency,
+            @Arg(desc = "double", def = "50")
+                    double amplitude
+    ) throws WorldEditException {
+        double max = MathMan.max(radius.getX(), radius.getY(), radius.getZ());
+        worldEdit.checkMaxRadius(max);
+        BlockVector3 pos = session.getPlacementPosition(actor);
+        int affected = editSession.makeBlob(
+                pos,
+                pattern,
+                size,
+                frequency / 100,
+                amplitude / 100,
+                radius.divide(max),
+                sphericity / 100
+        );
+        if (actor instanceof Player) {
+            ((Player) actor).findFreePosition();
+        }
+        actor.print(Caption.of("worldedit.sphere.created", TextComponent.of(affected)));
+        return affected;
     }
     //FAWE end
 

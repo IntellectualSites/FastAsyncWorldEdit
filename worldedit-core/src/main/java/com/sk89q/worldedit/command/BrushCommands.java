@@ -413,7 +413,7 @@ public class BrushCommands {
             InjectedValueAccess context,
             @Arg(desc = "Pattern")
                     Pattern fill,
-            @Arg(desc = "radius", def = "10")
+            @Arg(desc = "radii to multiply x,y,z by", def = "10")
                     Vector3 radius,
             @Arg(name = "roundness", desc = "roundness", def = "100")
                     double sphericity,

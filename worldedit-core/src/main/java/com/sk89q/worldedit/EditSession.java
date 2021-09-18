@@ -48,6 +48,8 @@ import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.math.MutableVector3;
+import com.fastasyncworldedit.core.math.random.SimplexNoise;
 import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
@@ -157,6 +159,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -3662,6 +3665,109 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         WorldCopyClipboard faweClipboard = new WorldCopyClipboard(() -> this, region);
         faweClipboard.setOrigin(region.getMinimumPoint());
         return faweClipboard;
+    }
+
+    /**
+     * Makes a distorted sphere.
+     *
+     * @param position   Center of blob
+     * @param pattern    pattern to use
+     * @param size       overall size of the blob
+     * @param frequency  distortion amount (0 to 1)
+     * @param amplitude  distortion amplitude (0 to 1)
+     * @param radius     radii to multiply x/y/z by
+     * @param sphericity how spherical to make the blob. 1 = very spherical, 0 = not
+     * @return changes
+     */
+    public int makeBlob(
+            BlockVector3 position, Pattern pattern, double size, double frequency, double amplitude, Vector3 radius,
+            double sphericity
+    ) {
+        double seedX = ThreadLocalRandom.current().nextDouble();
+        double seedY = ThreadLocalRandom.current().nextDouble();
+        double seedZ = ThreadLocalRandom.current().nextDouble();
+
+        int px = position.getBlockX();
+        int py = position.getBlockY();
+        int pz = position.getBlockZ();
+
+        double distort = frequency / size;
+
+        double modX = 1d / radius.getX();
+        double modY = 1d / radius.getY();
+        double modZ = 1d / radius.getZ();
+        int r = (int) size;
+        int radiusSqr = (int) (size * size);
+        int sizeInt = (int) size * 2;
+
+        if (sphericity == 1) {
+            for (int x = -sizeInt; x <= sizeInt; x++) {
+                double nx = seedX + x * distort;
+                double d1 = x * x * modX;
+                for (int y = -sizeInt; y <= sizeInt; y++) {
+                    double d2 = d1 + y * y * modY;
+                    double ny = seedY + y * distort;
+                    for (int z = -sizeInt; z <= sizeInt; z++) {
+                        double nz = seedZ + z * distort;
+                        double distance = d2 + z * z * modZ;
+                        double noise = amplitude * SimplexNoise.noise(nx, ny, nz);
+                        if (distance + distance * noise < radiusSqr) {
+                            setBlock(px + x, py + y, pz + z, pattern);
+                        }
+                    }
+                }
+            }
+        } else {
+            AffineTransform transform = new AffineTransform()
+                    .rotateX(ThreadLocalRandom.current().nextInt(360))
+                    .rotateY(ThreadLocalRandom.current().nextInt(360))
+                    .rotateZ(ThreadLocalRandom.current().nextInt(360));
+
+            double manScaleX = 1.25 + seedX * 0.5;
+            double manScaleY = 1.25 + seedY * 0.5;
+            double manScaleZ = 1.25 + seedZ * 0.5;
+
+            MutableVector3 mutable = new MutableVector3();
+            double roughness = 1 - sphericity;
+            for (int xr = -sizeInt; xr <= sizeInt; xr++) {
+                for (int yr = -sizeInt; yr <= sizeInt; yr++) {
+                    for (int zr = -sizeInt; zr <= sizeInt; zr++) {
+                        // pt == mutable as it's a MutableVector3
+                        // so it must be set each time
+                        mutable.mutX(xr);
+                        mutable.mutY(yr);
+                        mutable.mutZ(zr);
+                        Vector3 pt = transform.apply(mutable);
+                        int x = MathMan.roundInt(pt.getX());
+                        int y = MathMan.roundInt(pt.getY());
+                        int z = MathMan.roundInt(pt.getZ());
+
+                        double xScaled = Math.abs(x) * modX;
+                        double yScaled = Math.abs(y) * modY;
+                        double zScaled = Math.abs(z) * modZ;
+                        double manDist = xScaled + yScaled + zScaled;
+                        double distSqr = x * x * modX + z * z * modZ + y * y * modY;
+
+                        double distance = Math.sqrt(distSqr) * sphericity + MathMan.max(
+                                manDist,
+                                xScaled * manScaleX,
+                                yScaled * manScaleY,
+                                zScaled * manScaleZ
+                        ) * roughness;
+
+                        double noise = amplitude * SimplexNoise.noise(
+                                seedX + x * distort,
+                                seedZ + z * distort,
+                                seedZ + z * distort
+                        );
+                        if (distance + distance * noise < r) {
+                            setBlock(px + xr, py + yr, pz + zr, pattern);
+                        }
+                    }
+                }
+            }
+        }
+        return changes;
     }
     //FAWE end
 }
