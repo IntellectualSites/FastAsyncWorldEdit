@@ -116,7 +116,6 @@ public class FaweDelegateSchematicHandler {
                     .fastMode(true)
                     .limitUnlimited()
                     .changeSetNull()
-                    .autoQueue(false)
                     .build()) {
                 final Clipboard clipboard = schematic.getClipboard();
                 clipboard.paste(editSession, to, true, false, true);

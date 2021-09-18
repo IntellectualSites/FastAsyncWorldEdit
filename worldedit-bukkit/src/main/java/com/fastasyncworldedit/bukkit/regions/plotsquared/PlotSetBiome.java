@@ -91,9 +91,17 @@ public class PlotSetBiome extends Command {
             plot.addRunning();
             TaskManager.IMP.async(() -> {
                 EditSession session =
-                    WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().getWorldName())))
-                                .autoQueue(false).checkMemory(false).allowedRegionsEverywhere()
-                        .actor(BukkitAdapter.adapt(Bukkit.getPlayer(player.getUUID()))).limitUnlimited().build();
+                        WorldEdit
+                                .getInstance()
+                                .newEditSessionBuilder()
+                                .world(BukkitAdapter.adapt(Bukkit.getWorld(plot
+                                        .getArea()
+                                        .getWorldName())))
+                                .checkMemory(false)
+                                .allowedRegionsEverywhere()
+                                .actor(BukkitAdapter.adapt(Bukkit.getPlayer(player.getUUID())))
+                                .limitUnlimited()
+                                .build();
                 long seed = ThreadLocalRandom.current().nextLong();
                 for (CuboidRegion region : regions) {
                     session.regenerate(region, biome, seed);

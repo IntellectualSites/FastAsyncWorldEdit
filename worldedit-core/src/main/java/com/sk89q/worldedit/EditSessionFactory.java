@@ -165,7 +165,6 @@ public class EditSessionFactory {
             return WorldEdit.getInstance().newEditSessionBuilder()
                     .world(world)
                     .maxBlocks(maxBlocks)
-
                     .blockBag(blockBag)
                     .actor(actor)
                     .build();

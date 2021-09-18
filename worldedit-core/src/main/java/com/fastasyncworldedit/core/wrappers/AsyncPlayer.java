@@ -151,9 +151,8 @@ public class AsyncPlayer extends PlayerProxy {
         if (alwaysGlass || !isAllowedToFly()) {
             RuntimeException caught = null;
             try {
-                EditSession edit =
-                        WorldEdit.getInstance().newEditSessionBuilder().world(WorldWrapper.unwrap(getWorld())).actor(unwrap(
-                                getBasePlayer())).build();
+                EditSession edit = WorldEdit.getInstance().newEditSessionBuilder().world(WorldWrapper.unwrap(getWorld())).actor(
+                        unwrap(getBasePlayer())).build();
                 edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
                 edit.flushQueue();
                 LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);

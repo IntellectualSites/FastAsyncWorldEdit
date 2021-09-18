@@ -289,8 +289,11 @@ public final class EditSessionBuilder {
         return allowedRegions(new Region[]{RegionWrapper.GLOBAL()});
     }
 
+    /**
+     * Does nothing as of 1.13 new queueing system
+     */
+    @Deprecated(forRemoval = true)
     public EditSessionBuilder autoQueue(@Nullable Boolean autoQueue) {
-        this.autoQueue = autoQueue;
         return setDirty();
     }
 
@@ -333,9 +336,6 @@ public final class EditSessionBuilder {
             } else {
                 limit = actor.getLimit();
             }
-        }
-        if (autoQueue == null) {
-            autoQueue = true;
         }
         if (fastMode == null) {
             if (actor == null) {

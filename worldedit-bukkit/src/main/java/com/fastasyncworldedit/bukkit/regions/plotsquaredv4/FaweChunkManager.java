@@ -69,14 +69,12 @@ public class FaweChunkManager extends ChunkManager {
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 EditSession sessionB = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 CuboidRegion regionA = new CuboidRegion(
                         BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
@@ -115,14 +113,12 @@ public class FaweChunkManager extends ChunkManager {
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 EditSession to = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 CuboidRegion region = new CuboidRegion(
                         BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
@@ -151,8 +147,15 @@ public class FaweChunkManager extends ChunkManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweChunkManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
-                try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World).checkMemory(false)
-                        .fastMode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+                try (EditSession editSession = WorldEdit
+                        .getInstance()
+                        .newEditSessionBuilder()
+                        .world(pos1World)
+                        .checkMemory(false)
+                        .fastMode(true)
+                        .limitUnlimited()
+                        .changeSetNull()
+                        .build()) {
                     CuboidRegion region = new CuboidRegion(
                             BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
                             BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())

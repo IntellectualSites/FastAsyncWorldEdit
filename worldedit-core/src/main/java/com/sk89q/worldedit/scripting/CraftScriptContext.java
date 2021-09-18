@@ -72,8 +72,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
                 .locatableActor(player)
                 .maxBlocks(session.getBlockChangeLimit())
                 .blockBag(session.getBlockBag(player))
-                .build(
-                );
+                .build();
         Request.request().setEditSession(editSession);
         editSession.enableStandardMode();
         editSessions.add(editSession);

@@ -35,7 +35,6 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
                 .actor(player)
                 .changeSetNull()
                 .checkMemory(false)
-                .autoQueue(false)
                 .build());
         this.player = player;
         this.region = new FuzzyRegion(world, getExtent(), mask);
@@ -55,7 +54,6 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
                 .actor(player)
                 .changeSetNull()
                 .checkMemory(false)
-                .autoQueue(true)
                 .build();
         new ExtentTraverser(this).setNext(extent);
         this.region.setWorld(world);

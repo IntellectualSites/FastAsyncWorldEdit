@@ -69,7 +69,6 @@ public class FaweSchematicHandler extends SchematicHandler {
                     .fastMode(true)
                     .limitUnlimited()
                     .changeSetNull()
-                    .autoQueue(false)
                     .build();
 
             ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region, false, true);

@@ -56,9 +56,8 @@ public class FaweDelegateRegionManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
-                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).fastMode(
-                                true).limitUnlimited().changeSetNull()
-                        .autoQueue(false).build();
+                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).
+                        fastMode(true).limitUnlimited().changeSetNull().build();
                 for (CuboidRegion region : regions) {
                     region.setPos1(region.getPos1().withY(minY));
                     region.setPos2(region.getPos2().withY(maxY));
@@ -100,7 +99,6 @@ public class FaweDelegateRegionManager {
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
 
                 if (!hybridPlotWorld.PLOT_SCHEMATIC || !Settings.Schematics.PASTE_ON_TOP) {
@@ -149,7 +147,6 @@ public class FaweDelegateRegionManager {
                                     .fastMode(true)
                                     .limitUnlimited()
                                     .changeSetNull()
-                                    .autoQueue(false)
                                     .build();
                     File schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schem");
                     if (!schematicFile.exists()) {
@@ -201,14 +198,12 @@ public class FaweDelegateRegionManager {
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 EditSession sessionB = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 CuboidRegion regionA = new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3());
                 CuboidRegion regionB = new CuboidRegion(
@@ -262,7 +257,6 @@ public class FaweDelegateRegionManager {
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 FlatRegionFunction replace = new BiomeReplace(editSession, biome);
                 FlatRegionVisitor visitor = new FlatRegionVisitor(region, replace, editSession);
@@ -292,14 +286,12 @@ public class FaweDelegateRegionManager {
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 EditSession to = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 CuboidRegion region = new CuboidRegion(
                         BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
@@ -339,7 +331,6 @@ public class FaweDelegateRegionManager {
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build()) {
                     CuboidRegion region = new CuboidRegion(
                             BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),

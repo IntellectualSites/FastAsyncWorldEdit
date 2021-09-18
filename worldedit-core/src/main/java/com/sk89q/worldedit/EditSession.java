@@ -270,7 +270,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 .limit(limit)
                 .changeSet(changeSet)
                 .allowedRegions(allowedRegions)
-                .autoQueue(autoQueue)
                 .fastMode(fastmode)
                 .checkMemory(checkMemory)
                 .combineStages(combineStages)
