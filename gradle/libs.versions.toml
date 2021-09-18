@@ -11,7 +11,7 @@ paper = "1.17.1-R0.1-SNAPSHOT"
 # Plugins
 vault = "1.7.1"
 dummypermscompat = "1.10"
-worldguard-bukkit = "7.0.5"
+worldguard-bukkit = "7.0.6"
 mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "16.17.1"
 griefdefender = "920a610"
