@@ -65,9 +65,9 @@ import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -82,7 +82,6 @@ public final class EditSessionBuilder {
     private FaweLimit limit;
     private AbstractChangeSet changeSet;
     private Region[] allowedRegions;
-    private Boolean autoQueue;
     private Boolean fastMode;
     private Boolean checkMemory;
     private Boolean combineStages;
@@ -98,7 +97,8 @@ public final class EditSessionBuilder {
     private boolean compiled;
     private boolean wrapped;
 
-    private @Nullable World world;
+    private @Nullable
+    World world;
     private int maxBlocks = -1;
     @Nullable
     private Actor actor;
@@ -121,11 +121,17 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
+    /**
+     * Get the world to be edited if present or null
+     */
     @Nullable
     public World getWorld() {
         return world;
     }
 
+    /**
+     * Get the maximum number of block changes allowed
+     */
     public int getMaxBlocks() {
         return maxBlocks;
     }
@@ -141,8 +147,9 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
-    //TODO: Actor may need to be changed to player unless major refactoring can be done. -Matt
-
+    /**
+     * Get the actor associated with the edit if present or null
+     */
     @Nullable
     public Actor getActor() {
         return actor;
@@ -159,6 +166,10 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
+    /**
+     *
+     * Get the {@link BlockBag} associated with the edit if present or null
+     */
     @Nullable
     public BlockBag getBlockBag() {
         return blockBag;
@@ -194,7 +205,9 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
-    // Extended methods
+    /**
+     * Set the actor to one with a location/extent associated. Sets both the actor and the world.
+     */
     public <A extends Actor & Locatable> EditSessionBuilder locatableActor(A locatable) {
         Extent extent = locatable.getExtent();
         Preconditions.checkArgument(extent instanceof World, "%s is not located in a World", locatable);
@@ -207,9 +220,10 @@ public final class EditSessionBuilder {
      * @return the new EditSession
      */
     public EditSession build() {
+        // TracedEditSession does nothing at the moment.
         //if (WorldEdit.getInstance().getConfiguration().traceUnflushedSessions) {
-        //    return new TracedEditSession(eventBus, world, maxBlocks, blockBag, actor, tracing);
-        //} TODO - check if needed and if so, optimize
+        //    return new TracedEditSession(this);
+        //}
         return new EditSession(this);
     }
 
@@ -221,42 +235,69 @@ public final class EditSessionBuilder {
         return this;
     }
 
+    /**
+     * Set the {@link EditSessionEvent} instance to be used for firing at different stages of preparation
+     */
     public EditSessionBuilder event(@Nullable EditSessionEvent event) {
         this.event = event;
         return setDirty();
     }
 
+    /**
+     * Set the limit(s) for the edit to use
+     */
     public EditSessionBuilder limit(@Nullable FaweLimit limit) {
         this.limit = limit;
         return setDirty();
     }
 
+    /**
+     * Set the edit to be able to edit everywhere, and for any number of blocks
+     */
     public EditSessionBuilder limitUnlimited() {
         return limit(FaweLimit.MAX.copy());
     }
 
-    public EditSessionBuilder limitUnprocessed(@NotNull Actor player) {
+    /**
+     * Unlimited in regions/block changes, but uses the given {@link Actor}'s inventory mode.
+     */
+    public EditSessionBuilder limitUnprocessed(@Nonnull Actor player) {
         limitUnlimited();
         FaweLimit tmp = player.getLimit();
         limit.INVENTORY_MODE = tmp.INVENTORY_MODE;
         return setDirty();
     }
 
+    /**
+     * Set the changeset to be used for history
+     */
     public EditSessionBuilder changeSet(@Nullable AbstractChangeSet changeSet) {
         this.changeSet = changeSet;
         return setDirty();
     }
 
+    /**
+     * Do not process any history
+     */
     public EditSessionBuilder changeSetNull() {
         return changeSet(new NullChangeSet(world));
     }
 
+    /**
+     * Set the command used that created this edit. Used in {@link RollbackOptimizedHistory}
+     */
     public EditSessionBuilder command(String command) {
         this.command = command;
         return this;
     }
 
-    public EditSessionBuilder changeSet(boolean disk, @Nullable UUID uuid, int compression) {
+    /**
+     * Create a new changeset to be used for the edit's history.
+     *
+     * @param disk If disk should be used for history storage
+     * @param uuid UUID to be used for the history or null if unneeded.
+     */
+    public EditSessionBuilder changeSet(boolean disk, @Nullable UUID uuid) {
         if (disk) {
             if (Settings.IMP.HISTORY.USE_DATABASE) {
                 this.changeSet = new RollbackOptimizedHistory(world, uuid);
@@ -269,22 +310,37 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
+    /**
+     * Set the regions the edit is allowed to operate in. Set to null for the regions to be calculated based on the actor if
+     * present
+     */
     public EditSessionBuilder allowedRegions(@Nullable Region[] allowedRegions) {
         this.allowedRegions = allowedRegions;
         return setDirty();
     }
 
+    /**
+     * Set the regions the edit is allowed to operate in. Set to null for the regions to be calculated based on the actor if
+     * present
+     */
     @Deprecated
     public EditSessionBuilder allowedRegions(@Nullable RegionWrapper[] allowedRegions) {
         this.allowedRegions = allowedRegions;
         return setDirty();
     }
 
+    /**
+     * Set the region the edit is allowed to operate in. Set to null for the regions to be calculated based on the actor if
+     * present
+     */
     public EditSessionBuilder allowedRegions(@Nullable RegionWrapper allowedRegion) {
         this.allowedRegions = allowedRegion == null ? null : allowedRegion.toArray();
         return setDirty();
     }
 
+    /**
+     * Set the edit to be allowed to edit everywhere
+     */
     public EditSessionBuilder allowedRegionsEverywhere() {
         return allowedRegions(new Region[]{RegionWrapper.GLOBAL()});
     }
@@ -297,26 +353,44 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
+    /**
+     * Set fast mode. Use null to set to actor's fast mode setting. Also set to true by default if history for console disabled
+     */
     public EditSessionBuilder fastMode(@Nullable Boolean fastMode) {
         this.fastMode = fastMode;
         return setDirty();
     }
 
+    /**
+     * Set the {@link RelightMode}
+     */
     public EditSessionBuilder relightMode(@Nullable RelightMode relightMode) {
         this.relightMode = relightMode;
         return setDirty();
     }
 
+    /**
+     * Override if memory usage should be checked during editsession compilation. By default, checks memory if fastmode is not
+     * enabled and actor is not null.
+     */
     public EditSessionBuilder checkMemory(@Nullable Boolean checkMemory) {
         this.checkMemory = checkMemory;
         return setDirty();
     }
 
+    /**
+     * Record history with dispatching:,
+     * - Much faster as it avoids duplicate block checks,
+     * - Slightly worse compression since dispatch order is different.
+     */
     public EditSessionBuilder combineStages(@Nullable Boolean combineStages) {
         this.combineStages = combineStages;
         return setDirty();
     }
 
+    /**
+     * Compile the builder to the settings given. Prepares history, limits, lighting, etc.
+     */
     public EditSessionBuilder compile() {
         if (compiled) {
             return this;
@@ -474,49 +548,84 @@ public final class EditSessionBuilder {
         return this;
     }
 
+    /**
+     * Get the relight engine to be used
+     */
     public Relighter getRelighter() {
         return relighter;
     }
 
+    /**
+     * If the edit will force using WNA
+     */
     public boolean isWNAMode() {
         return wnaMode;
     }
 
+    /**
+     * get the allowed regions associated with the edit's restricttions
+     */
     @Nullable
     public Region[] getAllowedRegions() {
         return allowedRegions;
     }
 
+    /**
+     * Force WNA to be used instead of FAWE's queue system. Will use more memory, be slower, and more likely to cause issues.
+     */
     public EditSessionBuilder forceWNA() {
         this.wnaMode = true;
         return setDirty();
     }
 
+    /**
+     * If an {@link EditSessionEvent} has been fired yet
+     */
     public boolean isWrapped() {
         return wrapped;
     }
 
+    /**
+     * Get the base extent that blocks are set to, bypassing any restrictions, limits and history. All extents up to and including
+     * {@link com.sk89q.worldedit.EditSession.Stage#BEFORE_REORDER}
+     */
     public Extent getBypassHistory() {
         return bypassHistory;
     }
 
+    /**
+     * Get the base extent that blocks are set to, bypassing any restrictions, limits and history. All extents up to and including
+     * {@link com.sk89q.worldedit.EditSession.Stage#BEFORE_CHANGE}
+     */
     public Extent getBypassAll() {
         return bypassAll;
     }
 
-    @NotNull
+    /**
+     * Get the edit's limits
+     */
+    @Nonnull
     public FaweLimit getLimit() {
         return limit;
     }
 
+    /**
+     * Get the change set that will be used for history
+     */
     public AbstractChangeSet getChangeTask() {
         return changeTask;
     }
 
+    /**
+     * Get the ultimate resultant extent
+     */
     public Extent getExtent() {
         return extent != null ? extent : world;
     }
 
+    /**
+     * Fire an {@link EditSessionEvent}. Fired after each stage of preparation, allows other plugins to add/alter extents.
+     */
     private Extent wrapExtent(
             final Extent extent,
             final EventBus eventBus,

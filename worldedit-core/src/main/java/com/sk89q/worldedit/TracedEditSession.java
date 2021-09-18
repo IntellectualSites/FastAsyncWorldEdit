@@ -31,6 +31,9 @@ import javax.annotation.Nullable;
  */
 class TracedEditSession extends EditSession {
 
+    //FAWE start - does not work with FAWE's ways of doing things...
+    @Deprecated
+    //FAWE end
     TracedEditSession(
             EventBus eventBus, @Nullable World world, int maxBlocks, @Nullable BlockBag blockBag,
             @Nullable Actor actor,
@@ -42,6 +45,10 @@ class TracedEditSession extends EditSession {
                 .blockBag(blockBag)
                 .actor(actor)
                 .tracing(tracing));
+    }
+
+    TracedEditSession(EditSessionBuilder builder) {
+        super(builder);
     }
 
     private final Throwable stacktrace = new Throwable("Creation trace.");
