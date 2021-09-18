@@ -139,7 +139,7 @@ public class FaweAPI {
      * @return Set of FaweMaskManager
      */
     public static Set<FaweMaskManager> getMaskManagers() {
-        return new HashSet<>(WEManager.IMP.managers);
+        return new HashSet<>(WEManager.IMP.getManagers());
     }
 
     /**
@@ -176,7 +176,7 @@ public class FaweAPI {
     }
 
     public static void addMaskManager(FaweMaskManager maskMan) {
-        WEManager.IMP.managers.add(maskMan);
+        WEManager.IMP.addManager(maskMan);
     }
 
     /**

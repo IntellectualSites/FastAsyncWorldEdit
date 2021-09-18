@@ -304,10 +304,10 @@ public class FaweBukkit implements IFawe, Listener {
             return;
         }
         if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
-            WEManager.IMP.managers.add(new com.fastasyncworldedit.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
+            WEManager.IMP.addManager(new com.fastasyncworldedit.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
         } else if (PlotSquared.get().getVersion().version[0] == 6) {
-            WEManager.IMP.managers.add(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
+            WEManager.IMP.addManager(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
         } else {
             LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");

@@ -124,20 +124,12 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
             final BlockVector3 pos1;
             final BlockVector3 pos2;
             if (myregion.getId().equals("__global__")) {
-                pos1 = BlockVector3.at(Integer.MIN_VALUE, 0, Integer.MIN_VALUE);
-                pos2 = BlockVector3.at(Integer.MAX_VALUE, 255, Integer.MAX_VALUE);
+                pos1 = BlockVector3.at(Integer.MIN_VALUE, wePlayer.getWorld().getMinY(), Integer.MIN_VALUE);
+                pos2 = BlockVector3.at(Integer.MAX_VALUE, wePlayer.getWorld().getMaxY(), Integer.MAX_VALUE);
             } else {
                 if (myregion instanceof ProtectedCuboidRegion) {
-                    pos1 = BlockVector3.at(
-                            myregion.getMinimumPoint().getBlockX(),
-                            myregion.getMinimumPoint().getBlockY(),
-                            myregion.getMinimumPoint().getBlockZ()
-                    );
-                    pos2 = BlockVector3.at(
-                            myregion.getMaximumPoint().getBlockX(),
-                            myregion.getMaximumPoint().getBlockY(),
-                            myregion.getMaximumPoint().getBlockZ()
-                    );
+                    pos1 = myregion.getMinimumPoint();
+                    pos2 = myregion.getMaximumPoint();
                 } else {
                     return new FaweMask(adapt(myregion)) {
                         @Override

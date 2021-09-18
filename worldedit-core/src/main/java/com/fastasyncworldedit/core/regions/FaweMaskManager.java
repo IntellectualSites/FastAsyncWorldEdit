@@ -8,20 +8,6 @@ import java.util.Locale;
 
 public abstract class FaweMaskManager {
 
-    public enum MaskType {
-        OWNER,
-        MEMBER;
-
-        public static MaskType getDefaultMaskType() {
-            try {
-                return MaskType
-                        .valueOf(Settings.IMP.REGION_RESTRICTIONS_OPTIONS.MODE.toUpperCase(Locale.ROOT));
-            } catch (Exception ignored) {
-                return MEMBER;
-            }
-        }
-    }
-
     private final String key;
 
     public FaweMaskManager(final String plugin) {
@@ -54,7 +40,21 @@ public abstract class FaweMaskManager {
     }
 
     public boolean isExclusive() {
-        return false;
+        return Settings.IMP.REGION_RESTRICTIONS_OPTIONS.EXCLUSIVE_MANAGERS.contains(this.key);
+    }
+
+    public enum MaskType {
+        OWNER,
+        MEMBER;
+
+        public static MaskType getDefaultMaskType() {
+            try {
+                return MaskType
+                        .valueOf(Settings.IMP.REGION_RESTRICTIONS_OPTIONS.MODE.toUpperCase(Locale.ROOT));
+            } catch (Exception ignored) {
+                return MEMBER;
+            }
+        }
     }
 
 }
