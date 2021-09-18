@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.command.tool.brush;
 
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
@@ -41,7 +42,10 @@ public class ScatterCommand extends ScatterBrush {
         player.setSelection(selector);
         List<String> cmds = StringMan.split(replaced, ';');
         for (String cmd : cmds) {
-            CommandEvent event = new CommandEvent(player, cmd);
+            CommandEvent event = new CommandEvent(
+                    new LocationMaskedPlayerWrapper(player, player.getLocation().setPosition(position.toVector3()), false),
+                    cmd
+            );
             PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
     }
