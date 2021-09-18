@@ -59,7 +59,6 @@ dependencies {
     // Platform expectations
     api(libs.paper) {
         exclude("junit", "junit")
-        isTransitive = false
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
