@@ -350,7 +350,7 @@ public final class EditSessionBuilder {
      */
     @Deprecated(forRemoval = true)
     public EditSessionBuilder autoQueue(@Nullable Boolean autoQueue) {
-        return setDirty();
+        return this;
     }
 
     /**
@@ -473,6 +473,8 @@ public final class EditSessionBuilder {
                         } else {
                             changeSet = new DiskStorageHistory(world, uuid);
                         }
+//                    } else if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0) {
+//                        changeSet = new CPUOptimizedChangeSet(world);
                     } else {
                         if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0) {
                             //TODO add CPUOptimizedChangeSet
@@ -496,6 +498,9 @@ public final class EditSessionBuilder {
                         this.extent = extent.enableHistory(changeSet);
                     } else {
                         this.extent = new HistoryExtent(extent, changeSet);
+//                        if (this.blockBag != null) {
+//                            this.extent = new BlockBagExtent(this.extent, blockBag, limit.INVENTORY_MODE == 1);
+//                        }
                     }
                 }
             }
@@ -541,8 +546,11 @@ public final class EditSessionBuilder {
                 this.extent = regionExtent;
             }
             if (this.limit != null && this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
-                //TODO add batch processor for strip nbt
-                this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+                if (placeChunks) {
+                    extent.addProcessor(new StripNBTExtent(this.extent, this.limit.STRIP_NBT));
+                } else {
+                    this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+                }
             }
             this.extent = wrapExtent(this.extent, eventBus, event, EditSession.Stage.BEFORE_HISTORY);
         }
