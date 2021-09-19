@@ -52,7 +52,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -107,7 +106,6 @@ public class BlockTransformExtent extends ResettableExtent {
             WEST, PropertyKey.WEST
     );
 
-    private static final EnumSet<Direction> NESW = EnumSet.range(NORTH, WEST);
     private final int[] ALL = new int[0];
     private Transform transform;
     private Transform transformInverse;
@@ -423,10 +421,10 @@ public class BlockTransformExtent extends ResettableExtent {
                 .hasProperty(PropertyKey.WEST)) {
 
             BlockState tmp = state;
-            for (Direction direction : NESW) {
-                Direction newDir = findClosest(transform.apply(direction.toVector()), Flag.CARDINAL);
+            for (Map.Entry<Direction, PropertyKey> entry : directionMap.entrySet()) {
+                Direction newDir = findClosest(transform.apply(entry.getKey().toVector()), Flag.CARDINAL);
                 if (newDir != null) {
-                    Object dirState = tmp.getState(directionMap.get(direction));
+                    Object dirState = state.getState(entry.getValue());
                     tmp = tmp.with(directionMap.get(newDir), dirState);
                 }
             }
