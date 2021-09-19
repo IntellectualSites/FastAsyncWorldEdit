@@ -1,17 +1,24 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Project
 import org.gradle.api.attributes.java.TargetJvmVersion
+import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
 import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.kotlin.dsl.apply
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
 
 fun Project.applyPlatformAndCoreConfiguration() {
@@ -84,35 +91,100 @@ fun Project.applyPlatformAndCoreConfiguration() {
         }
     }
 
-    tasks.register<Jar>("javadocJar") {
-        dependsOn("javadoc")
-        archiveClassifier.set(null as String?)
-        archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-javadoc.${archiveExtension.getOrElse("jar")}")
-        from(tasks.getByName<Javadoc>("javadoc").destinationDir)
+    configure<JavaPluginExtension> {
+        disableAutoTargetJvm()
+        withJavadocJar()
     }
 
-    tasks.named("assemble").configure {
-        dependsOn("javadocJar")
+    if (name in setOf("worldedit-core", "worldedit-bukkit", "worldedit-cli")) {
+        the<JavaPluginExtension>().withSourcesJar()
     }
 
-    artifacts {
-        add("archives", tasks.named("jar"))
-        add("archives", tasks.named("javadocJar"))
+    val javaComponent = components["java"] as AdhocComponentWithVariants
+    javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
+        skip()
     }
 
-    if (name == "worldedit-core" || name == "worldedit-bukkit") {
-        tasks.register<Jar>("sourcesJar") {
-            dependsOn("classes")
-            archiveClassifier.set(null as String?)
-            archiveFileName.set("${rootProject.name}-${project.description}-${project.version}-sources.${archiveExtension.getOrElse("jar")}")
-            from(sourceSets["main"].allSource)
+    configure<PublishingExtension> {
+        publications {
+            register<MavenPublication>("maven") {
+                from(javaComponent)
+
+                group = "com.fastasyncworldedit"
+                artifactId = "${rootProject.name}-${project.description}"
+                version = version
+
+                pom {
+                    name.set("${rootProject.name}-${project.description}" + " " + project.version)
+                    description.set("Blazingly fast Minecraft world manipulation for artists, builders and everyone else.")
+                    url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
+
+                    licenses {
+                        license {
+                            name.set("GNU General Public License, Version 3.0")
+                            url.set("https://www.gnu.org/licenses/gpl-3.0.html")
+                            distribution.set("repo")
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id.set("NotMyFault")
+                            name.set("NotMyFault")
+                            email.set("contact@notmyfault.dev")
+                            organization.set("IntellectualSites")
+                        }
+                        developer {
+                            id.set("SirYwell")
+                            name.set("Hannes Greule")
+                            organization.set("IntellectualSites")
+                        }
+                        developer {
+                            id.set("dordsor21")
+                            name.set("dordsor21")
+                            organization.set("IntellectualSites")
+                        }
+                    }
+
+                    scm {
+                        url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
+                        connection.set("scm:https://IntellectualSites@github.com/IntellectualSites/FastAsyncWorldEdit.git")
+                        developerConnection.set("scm:git://github.com/IntellectualSites/FastAsyncWorldEdit.git")
+                    }
+
+                    issueManagement{
+                        system.set("GitHub")
+                        url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit/issues")
+                    }
+                }
+            }
         }
 
-        artifacts {
-            add("archives", tasks.named("sourcesJar"))
-        }
-        tasks.named("assemble").configure {
-            dependsOn("sourcesJar")
+        repositories {
+            mavenLocal()
+            val nexusUsername: String? by project
+            val nexusPassword: String? by project
+            if (nexusUsername != null && nexusPassword != null) {
+                maven {
+                    val releasesRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/releases/"
+                    val snapshotRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/snapshots/"
+                    /* Commenting this out for now - Fawe currently does not user semver or any sort of versioning that
+                    differentiates between snapshots and releases, API & (past) deployment wise, this will come with a next major release.
+                    url = uri(
+                            if (version.toString().endsWith("-SNAPSHOT")) snapshotRepositoryUrl
+                            else releasesRepositoryUrl
+                    )
+                     */
+                    url = uri(releasesRepositoryUrl)
+
+                    credentials {
+                        username = nexusUsername
+                        password = nexusPassword
+                    }
+                }
+            } else {
+                logger.warn("No nexus repository is added; nexusUsername or nexusPassword is null.")
+            }
         }
     }
 
