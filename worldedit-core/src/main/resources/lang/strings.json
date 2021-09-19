@@ -161,6 +161,8 @@
 	"fawe.cancel.worldedit.cancel.reason.outside.level": "Outside world",
 	"fawe.cancel.worldedit.cancel.reason.outside.region": "Outside allowed region (bypass with /wea, or disable `region-restrictions` in config.yml)",
 	"fawe.cancel.worldedit.cancel.reason.no.region": "No allowed region (bypass with /wea, or disable `region-restrictions` in config.yml)",
+	"fawe.cancel.worldedit.cancel.reason.player-only": "This operation requires a player, and cannot be executed from console, or without an actor.",
+	"fawe.cancel.worldedit.cancel.reason.actor-required": "This operation requires an actor.",
 	"fawe.cancel.worldedit.failed.load.chunk": "Skipped loading chunk: {0};{1}. Try increasing chunk-wait.",
 
 	"fawe.navigation.no.block": "No block in sight! (or too far)",
@@ -528,6 +530,13 @@
     "worldedit.timezone.current": "The current time in that timezone is: {0}",
     "worldedit.version.version": "FAWE version:\n - Date {0}\n - Commit {1}\n - Build {2}\n - Platform {3}",
     "worldedit.version.bukkit.unsupported-adapter": "This FAWE version does not fully support your version of Bukkit. Block entities (e.g. chests) will be empty, block properties (e.g. rotation) will be missing, and other things may not work.\nUpdate FAWE and your server software to restore this functionality:\n{0}",
+
+    "worldedit.trace.no-tracing-extents":  "Trace: No extent was used.",
+    "worldedit.trace.action-failed":  "Trace: Action(s) {0} at {1} discarded by extent {2}",
+    "worldedit.trace.active.already": "Trace mode already active.",
+    "worldedit.trace.inactive.already": "Trace mode already inactive.",
+    "worldedit.trace.active": "Trace mode now active.",
+    "worldedit.trace.inactive": "Trace mode now inactive.",
 
     "worldedit.command.time-elapsed": "{0}s elapsed (history: {1} changed; {2} blocks/sec).",
     "worldedit.command.permissions": "You are not permitted to do that. Are you in the right mode?",

@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.sweep;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.EditSession;
@@ -8,6 +9,7 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -44,19 +46,18 @@ public class SweepBrush implements Brush, ResettableTool {
 
         boolean newPos = !position.equals(this.position);
         this.position = position;
-        Player player = editSession.getPlayer();
-        if (player == null) {
-            //TODO Insert Error Message here or modify EditSession to not require a player.
-            return;
+        Actor actor = editSession.getActor();
+        if (!(actor instanceof Player)) {
+            throw FaweCache.ACTOR_REQUIRED;
         }
         if (newPos) {
-            player.print(Caption.of("fawe.worldedit.brush.spline.primary.2"));
+            actor.print(Caption.of("fawe.worldedit.brush.spline.primary.2"));
             positions.add(position);
             return;
         }
 
         if (positions.size() < 2) {
-            player.print(Caption.of("fawe.worldedit.brush.brush.spline.secondary.error"));
+            actor.print(Caption.of("fawe.worldedit.brush.brush.spline.secondary.error"));
             return;
         }
 
@@ -70,7 +71,7 @@ public class SweepBrush implements Brush, ResettableTool {
         }).collect(Collectors.toList());
         interpol.setNodes(nodes);
 
-        LocalSession session = player.getSession();
+        LocalSession session = actor.getSession();
         ClipboardHolder holder = session.getExistingClipboard();
         if (holder == null) {
             throw new RuntimeException(new EmptyClipboardException());
@@ -108,7 +109,7 @@ public class SweepBrush implements Brush, ResettableTool {
                 break;
             }
         }
-        player.print(Caption.of("fawe.worldedit.brush.spline.secondary"));
+        actor.print(Caption.of("fawe.worldedit.brush.spline.secondary"));
         reset();
     }
 

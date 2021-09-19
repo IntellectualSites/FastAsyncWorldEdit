@@ -798,7 +798,7 @@ public final class PlatformCommandManager {
             // Require null CommandEvent#getSession as it means the editsession is being handled somewhere else.
             if (editSessionOpt.isPresent() && event.getSession() == null) {
                 EditSession editSession = editSessionOpt.get();
-                editSession.flushQueue();
+                editSession.close();
                 session.remember(editSession);
 
                 long time = System.currentTimeMillis() - start;

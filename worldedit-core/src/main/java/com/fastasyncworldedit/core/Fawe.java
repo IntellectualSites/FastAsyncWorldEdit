@@ -194,6 +194,8 @@ public class Fawe {
             case OTHER:
                 logger.catching(e);
                 throw e;
+            case PLAYER_ONLY:
+            case ACTOR_REQUIRED:
             case LOW_MEMORY:
                 if (!faweExceptionReasonsUsed[type.ordinal()]) {
                     logger.warn("FaweException: " + e.getMessage());

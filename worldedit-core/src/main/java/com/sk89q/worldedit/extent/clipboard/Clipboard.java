@@ -26,9 +26,10 @@ import com.fastasyncworldedit.core.extent.clipboard.MemoryOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.queue.Filter;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.EditSessionBuilder;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
@@ -75,8 +76,12 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
                 region.getWorld(),
                 "World cannot be null (use the other constructor for the region)"
         );
-        EditSession session = new EditSessionBuilder(region.getWorld()).allowedRegionsEverywhere()
-                .autoQueue(false).build();
+        EditSession session = WorldEdit
+                .getInstance()
+                .newEditSessionBuilder()
+                .world(region.getWorld())
+                .allowedRegionsEverywhere()
+                .build();
         return ReadOnlyClipboard.of(session, region);
     }
 
@@ -252,12 +257,17 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         if (world instanceof EditSession) {
             editSession = (EditSession) world;
         } else {
-            EditSessionBuilder builder = new EditSessionBuilder(world).autoQueue(true)
-                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited();
+            EditSessionBuilder builder = WorldEdit
+                    .getInstance()
+                    .newEditSessionBuilder()
+                    .world(world)
+                    .checkMemory(false)
+                    .allowedRegionsEverywhere()
+                    .limitUnlimited();
             if (allowUndo) {
                 editSession = builder.build();
             } else {
-                editSession = builder.changeSetNull().fastmode(true).build();
+                editSession = builder.changeSetNull().fastMode(true).build();
             }
         }
         Extent extent = this;
@@ -297,8 +307,14 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
             @Nullable Transform transform
     ) {
         if (extent instanceof World) {
-            EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
-                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
+            EditSessionBuilder builder = WorldEdit
+                    .getInstance()
+                    .newEditSessionBuilder()
+                    .world((World) extent)
+                    .checkMemory(false)
+                    .allowedRegionsEverywhere()
+                    .limitUnlimited()
+                    .changeSetNull();
             extent = builder.build();
         }
 
@@ -334,8 +350,14 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
 
     default void paste(Extent extent, BlockVector3 to, boolean pasteAir, boolean pasteEntities, boolean pasteBiomes) {
         if (extent instanceof World) {
-            EditSessionBuilder builder = new EditSessionBuilder((World) extent).autoQueue(true)
-                    .checkMemory(false).allowedRegionsEverywhere().limitUnlimited().changeSetNull();
+            EditSessionBuilder builder = WorldEdit
+                    .getInstance()
+                    .newEditSessionBuilder()
+                    .world((World) extent)
+                    .checkMemory(false)
+                    .allowedRegionsEverywhere()
+                    .limitUnlimited()
+                    .changeSetNull();
             extent = builder.build();
         }
 

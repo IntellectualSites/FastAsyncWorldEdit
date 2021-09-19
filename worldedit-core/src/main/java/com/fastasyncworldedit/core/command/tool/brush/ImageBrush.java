@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.function.mask.ImageBrushMask;
 import com.fastasyncworldedit.core.function.mask.SurfaceMask;
 import com.fastasyncworldedit.core.util.TextureUtil;
@@ -8,6 +9,8 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -85,7 +88,12 @@ public class ImageBrush implements Brush {
 
         double scale = Math.max(width, height) / sizeDouble;
 
-        Location loc = editSession.getPlayer().getLocation();
+        Actor actor = editSession.getActor();
+        if (!(actor instanceof Player)) {
+            throw FaweCache.PLAYER_ONLY;
+        }
+        Player player = (Player) actor;
+        Location loc = player.getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX((pitch - 90) % 360).inverse();

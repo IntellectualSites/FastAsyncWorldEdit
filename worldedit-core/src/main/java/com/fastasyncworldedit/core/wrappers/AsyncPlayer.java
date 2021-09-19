@@ -2,11 +2,11 @@ package com.fastasyncworldedit.core.wrappers;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.PlayerProxy;
 import com.sk89q.worldedit.extent.Extent;
@@ -151,8 +151,8 @@ public class AsyncPlayer extends PlayerProxy {
         if (alwaysGlass || !isAllowedToFly()) {
             RuntimeException caught = null;
             try {
-                EditSession edit =
-                        new EditSessionBuilder(WorldWrapper.unwrap(getWorld())).player(unwrap(getBasePlayer())).build();
+                EditSession edit = WorldEdit.getInstance().newEditSessionBuilder().world(WorldWrapper.unwrap(getWorld())).actor(
+                        unwrap(getBasePlayer())).build();
                 edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
                 edit.flushQueue();
                 LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);

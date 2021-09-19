@@ -64,9 +64,9 @@ public class FaweAPI {
      * Offers a lot of options for building an EditSession.
      *
      * @return A new EditSessionBuilder
-     * @see EditSessionBuilder
+     * @deprecated See {@link WorldEdit#newEditSessionBuilder()}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static EditSessionBuilder getEditSessionBuilder(World world) {
         return new EditSessionBuilder(world);
     }

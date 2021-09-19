@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.object.Location;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
@@ -65,21 +64,17 @@ public class FaweChunkManager extends ChunkManager {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
-                WorldEdit.getInstance().getEditSessionFactory().getEditSession(
-                        pos1World, -1);
-                EditSession sessionA = new EditSessionBuilder(pos1World)
+                EditSession sessionA = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
-                EditSession sessionB = new EditSessionBuilder(pos3World)
+                EditSession sessionB = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 CuboidRegion regionA = new CuboidRegion(
                         BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
@@ -113,19 +108,17 @@ public class FaweChunkManager extends ChunkManager {
             synchronized (FaweChunkManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorld()));
-                EditSession from = new EditSessionBuilder(pos1World)
+                EditSession from = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
-                EditSession to = new EditSessionBuilder(pos3World)
+                EditSession to = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 CuboidRegion region = new CuboidRegion(
                         BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
@@ -154,8 +147,15 @@ public class FaweChunkManager extends ChunkManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweChunkManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorld()));
-                try (EditSession editSession = new EditSessionBuilder(pos1World).checkMemory(false)
-                        .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+                try (EditSession editSession = WorldEdit
+                        .getInstance()
+                        .newEditSessionBuilder()
+                        .world(pos1World)
+                        .checkMemory(false)
+                        .fastMode(true)
+                        .limitUnlimited()
+                        .changeSetNull()
+                        .build()) {
                     CuboidRegion region = new CuboidRegion(
                             BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
                             BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())

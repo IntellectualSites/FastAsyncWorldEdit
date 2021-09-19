@@ -49,7 +49,9 @@ public class SurfaceSpline implements Brush {
                 return;
             }
             path.add(BlockVector3.at(pos.getBlockX(), max, pos.getBlockZ()));
-            editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.spline.primary.2"));
+            if (editSession.getActor() != null) {
+                editSession.getActor().print(Caption.of("fawe.worldedit.brush.spline.primary.2"));
+            }
             return;
         }
         final List<Node> nodes = new ArrayList<>(path.size());
@@ -105,7 +107,9 @@ public class SurfaceSpline implements Brush {
             editSession.setBlocks(newSet, pattern);
             path.clear();
         }
-        editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.spline.secondary"));
+        if (editSession.getActor() != null) {
+            editSession.getActor().print(Caption.of("fawe.worldedit.brush.spline.secondary"));
+        }
     }
 
 }
