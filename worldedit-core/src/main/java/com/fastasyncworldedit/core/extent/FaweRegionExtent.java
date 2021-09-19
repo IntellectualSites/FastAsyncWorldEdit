@@ -54,7 +54,6 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     }
 
     @Override
-
     public Extent construct(Extent child) {
         if (getExtent() != child) {
             new ExtentTraverser<Extent>(this).setNext(child);

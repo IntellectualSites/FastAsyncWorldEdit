@@ -62,7 +62,6 @@ public class EditSessionBuilder {
     private FaweLimit limit;
     private AbstractChangeSet changeSet;
     private Region[] allowedRegions;
-    private Boolean autoQueue;
     private Boolean fastmode;
     private Boolean checkMemory;
     private Boolean combineStages;
@@ -89,7 +88,6 @@ public class EditSessionBuilder {
      * limit: Block/Entity/Action limit (defaults to unlimited)<br>
      * changeSet: Stores changes (defaults to config.yml value)<br>
      * allowedRegions: Allowed editable regions (defaults to player's allowed regions, or everywhere)<br>
-     * autoQueue: Changes can occur before flushQueue() (defaults true)<br>
      * fastmode: bypasses history (defaults to player fastmode or config.yml console history)<br>
      * checkMemory: If low memory checks are enabled (defaults to player's fastmode or true)<br>
      * combineStages: If history is combined with dispatching
@@ -176,9 +174,9 @@ public class EditSessionBuilder {
         return allowedRegions(new Region[]{RegionWrapper.GLOBAL()});
     }
 
+    @Deprecated
     public EditSessionBuilder autoQueue(@Nullable Boolean autoQueue) {
-        this.autoQueue = autoQueue;
-        return setDirty();
+        return this;
     }
 
     public EditSessionBuilder fastmode(@Nullable Boolean fastmode) {
@@ -298,9 +296,6 @@ public class EditSessionBuilder {
                 limit = player.getLimit();
             }
         }
-        if (autoQueue == null) {
-            autoQueue = true;
-        }
         if (fastmode == null) {
             if (player == null) {
                 fastmode = !Settings.IMP.HISTORY.ENABLE_FOR_CONSOLE;
@@ -343,7 +338,6 @@ public class EditSessionBuilder {
                 wnaMode = true;
                 extent = world;
             }
-            Extent root = extent;
             if (combineStages == null) {
                 combineStages =
                         // If it's enabled in the settings
@@ -423,6 +417,7 @@ public class EditSessionBuilder {
                     extent.addProcessor(new RelightProcessor(relighter));
                 }
                 extent.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
+            } else {
                 relighter = NullRelighter.INSTANCE;
             }
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
