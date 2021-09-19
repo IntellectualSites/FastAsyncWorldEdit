@@ -19,18 +19,36 @@
 
 package com.sk89q.worldedit;
 
-import com.sk89q.worldedit.event.extent.EditSessionEvent;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
+
 /**
- * Internal use only.
+ * Internal use only. Unused for now, but present in case upstream make it API.
  */
 class TracedEditSession extends EditSession {
 
-    TracedEditSession(EventBus eventBus, World world, int maxBlocks, BlockBag blockBag, EditSessionEvent event) {
-        super(eventBus, world, maxBlocks, blockBag, event);
+    //FAWE start - does not work with FAWE's ways of doing things...
+    @Deprecated
+    //FAWE end
+    TracedEditSession(
+            EventBus eventBus, @Nullable World world, int maxBlocks, @Nullable BlockBag blockBag,
+            @Nullable Actor actor,
+            boolean tracing
+    ) {
+        super(new EditSessionBuilder(eventBus)
+                .world(world)
+                .maxBlocks(maxBlocks)
+                .blockBag(blockBag)
+                .actor(actor)
+                .tracing(tracing));
+    }
+
+    TracedEditSession(EditSessionBuilder builder) {
+        super(builder);
     }
 
     private final Throwable stacktrace = new Throwable("Creation trace.");

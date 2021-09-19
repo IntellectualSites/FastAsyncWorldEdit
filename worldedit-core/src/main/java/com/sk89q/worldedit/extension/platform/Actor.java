@@ -25,7 +25,6 @@ import com.fastasyncworldedit.core.entity.MapMetadatable;
 import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.util.task.InterruptableCondition;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.session.SessionOwner;
 import com.sk89q.worldedit.session.request.Request;
@@ -250,8 +249,8 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
         for (Request request : Request.getAll()) {
             EditSession editSession = request.getEditSession();
             if (editSession != null) {
-                Player player = editSession.getPlayer();
-                if (equals(player)) {
+                Actor actor = editSession.getActor();
+                if (equals(actor)) {
                     editSession.cancel();
                     cancelled++;
                 }

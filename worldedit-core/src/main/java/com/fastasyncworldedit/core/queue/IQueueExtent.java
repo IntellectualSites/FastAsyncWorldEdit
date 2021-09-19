@@ -42,8 +42,8 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      * Initialize the queue (for reusability)
      *
      * @param extent extent to use
-     * @param get cache of chunk GET
-     * @param set cache of chunk SET
+     * @param get    cache of chunk GET
+     * @param set    cache of chunk SET
      */
     void init(Extent extent, IChunkCache<IChunkGet> get, IChunkCache<IChunkSet> set);
 

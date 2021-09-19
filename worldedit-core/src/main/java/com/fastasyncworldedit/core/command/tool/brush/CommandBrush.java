@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.wrappers.AsyncPlayer;
 import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
@@ -9,6 +10,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.event.platform.CommandEvent;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -40,7 +42,11 @@ public class CommandBrush implements Brush {
                 .replace("{world}", editSession.getWorld().getName())
                 .replace("{size}", Integer.toString(radius));
 
-        Player player = editSession.getPlayer();
+        Actor actor = editSession.getActor();
+        if (!(actor instanceof Player)) {
+            throw FaweCache.PLAYER_ONLY;
+        }
+        Player player = (Player) actor;
         //Use max world height to allow full coverage of the world height
         Location face = player.getBlockTraceFace(editSession.getWorld().getMaxY(), true);
         if (face == null) {

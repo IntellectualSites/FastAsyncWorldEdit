@@ -121,8 +121,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
 
     /**
      * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
-     * {@link BuiltInClipboardFormat#FAST}.
-     * Avoid using with any large schematics/clipboards for reading/writing.
+     *         {@link BuiltInClipboardFormat#FAST}.
+     *         Avoid using with any large schematics/clipboards for reading/writing.
      */
     @Deprecated
     SPONGE_SCHEMATIC("slow", "safe") {

@@ -24,7 +24,6 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.event.extent.PasteEvent;
-import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
@@ -122,7 +121,8 @@ public class ClipboardCommands {
             @Switch(name = 'b', desc = "Also copy biomes")
                     boolean copyBiomes,
             //FAWE start
-            @Switch(name = 'c', desc = "Set the origin of the clipboard to the center of the copied region")
+            @Switch(name = 'c', desc = "Set the origin of the clipboard to the center of the region, at the region's lowest " +
+                    "y-level.")
                     boolean centerClipboard,
             @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "")
                     Mask mask
@@ -140,7 +140,8 @@ public class ClipboardCommands {
         session.setClipboard(null);
 
         Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
-        clipboard.setOrigin(centerClipboard ? region.getCenter().toBlockPoint() : session.getPlacementPosition(actor));
+        clipboard.setOrigin(centerClipboard ? region.getCenter().toBlockPoint().withY(region.getMinimumY()) :
+                session.getPlacementPosition(actor));
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setCopyingEntities(copyEntities);
         copy.setCopyingBiomes(copyBiomes);

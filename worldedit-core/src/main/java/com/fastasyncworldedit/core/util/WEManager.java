@@ -19,17 +19,34 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
 public class WEManager {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-
     public static final WEManager IMP = new WEManager();
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
 
-    public final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
+    public ArrayDeque<FaweMaskManager> getManagers() {
+        return managers;
+    }
+
+    public void addManager(FaweMaskManager manager) {
+        if (manager.isExclusive()) {
+            managers.addFirst(manager);
+        } else {
+            managers.add(manager);
+        }
+    }
+
+    public void addManagers(Collection<FaweMaskManager> managers) {
+        for (FaweMaskManager manager : managers) {
+            addManager(manager);
+        }
+    }
 
     public void cancelEditSafe(AbstractDelegateExtent parent, FaweException reason) throws FaweException {
         LOGGER.warn("CancelEditSafe was hit. Please ignore this message.");
@@ -102,7 +119,6 @@ public class WEManager {
                 masks.clear();
             }
         }
-        Set<FaweMask> tmpMasks = new HashSet<>();
         for (FaweMaskManager manager : managers) {
             if (player.hasPermission("fawe." + manager.getKey())) {
                 try {

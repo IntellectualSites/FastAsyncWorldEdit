@@ -55,8 +55,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Writes schematic files using the Sponge schematic format.
  *
  * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
- * {@link com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter}.
- * Avoid using large clipboards to create schematics with this writer.
+ *         {@link com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter}.
+ *         Avoid using large clipboards to create schematics with this writer.
  */
 @Deprecated
 public class SpongeSchematicWriter implements ClipboardWriter {
@@ -78,6 +78,10 @@ public class SpongeSchematicWriter implements ClipboardWriter {
 
     @Override
     public void write(Clipboard clipboard) throws IOException {
+        //FAWE start - ensure clipboard is flushed in case of using clipboard-on-disk. Maintains allowing of the same code
+        // between upstream and FAWE
+        clipboard.flush();
+        //FAWE end
         // For now always write the latest version. Maybe provide support for earlier if more appear.
         outputStream.writeNamedTag("Schematic", new CompoundTag(write2(clipboard)));
     }

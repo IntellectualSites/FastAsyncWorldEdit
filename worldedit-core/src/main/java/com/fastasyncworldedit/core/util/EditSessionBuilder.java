@@ -43,14 +43,15 @@ import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Locale;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@Deprecated(forRemoval = true)
 public class EditSessionBuilder {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -73,6 +74,12 @@ public class EditSessionBuilder {
     private RelightMode relightMode;
     private Relighter relighter;
     private Boolean wnaMode;
+    private AbstractChangeSet changeTask;
+    private Extent bypassHistory;
+    private Extent bypassAll;
+    private Extent extent;
+    private boolean compiled;
+    private boolean wrapped;
 
     /**
      * An EditSession builder<br>
@@ -89,7 +96,7 @@ public class EditSessionBuilder {
      *
      * @param world A world must be provided for all EditSession(s)
      */
-    public EditSessionBuilder(@Nonnull World world) {
+    public EditSessionBuilder(World world) {
         checkNotNull(world);
         this.world = world;
     }
@@ -271,13 +278,6 @@ public class EditSessionBuilder {
         return extent;
     }
 
-    private AbstractChangeSet changeTask;
-    private Extent bypassHistory;
-    private Extent bypassAll;
-    private Extent extent;
-    private boolean compiled;
-    private boolean wrapped;
-
     public EditSessionBuilder compile() {
         if (compiled) {
             return this;
@@ -326,9 +326,9 @@ public class EditSessionBuilder {
         if (extent == null) {
             IQueueExtent<IQueueChunk> queue = null;
             World unwrapped = WorldWrapper.unwrap(world);
-            boolean placeChunks = this.fastmode || this.limit.FAST_PLACEMENT;
+            boolean placeChunks = (this.fastmode || this.limit.FAST_PLACEMENT) && (wnaMode == null || !wnaMode);
 
-            if (placeChunks && (wnaMode == null || !wnaMode)) {
+            if (placeChunks) {
                 wnaMode = false;
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
@@ -413,18 +413,18 @@ public class EditSessionBuilder {
                 }
             } else {
                 allowedRegions = new Region[]{RegionWrapper.GLOBAL()};
-//                this.extent = new HeightBoundExtent(this.extent, this.limit, 0, world.getMaxY());
             }
             // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks
-            if (placeChunks && ((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.IMP.LIGHTING.MODE > 0))) {
-                relighter = WorldEdit.getInstance().getPlatformManager()
-                        .queryCapability(Capability.WORLD_EDITING)
-                        .getRelighterFactory().createRelighter(relightMode, world, queue);
-                extent.addProcessor(new RelightProcessor(relighter));
-            } else {
+            if (placeChunks) {
+                if (((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.IMP.LIGHTING.MODE > 0))) {
+                    relighter = WorldEdit.getInstance().getPlatformManager()
+                            .queryCapability(Capability.WORLD_EDITING)
+                            .getRelighterFactory().createRelighter(relightMode, world, queue);
+                    extent.addProcessor(new RelightProcessor(relighter));
+                }
+                extent.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
                 relighter = NullRelighter.INSTANCE;
             }
-            extent.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
                 this.extent = new LimitExtent(regionExtent, limit);
             } else if (limit != null && !limit.isUnlimited()) {
@@ -495,5 +495,6 @@ public class EditSessionBuilder {
     public Region[] getAllowedRegions() {
         return allowedRegions;
     }
+
 
 }

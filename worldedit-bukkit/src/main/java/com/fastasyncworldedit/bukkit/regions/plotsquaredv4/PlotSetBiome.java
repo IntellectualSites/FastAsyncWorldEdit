@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.github.intellectualsites.plotsquared.commands.Command;
 import com.github.intellectualsites.plotsquared.commands.CommandDeclaration;
@@ -84,11 +83,11 @@ public class PlotSetBiome extends Command {
             }
             plot.addRunning();
             TaskManager.IMP.async(() -> {
-                EditSession session = new EditSessionBuilder(BukkitAdapter.adapt(Bukkit.getWorld(plot.getArea().worldname)))
-                        .autoQueue(false)
+                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(BukkitAdapter.adapt(Bukkit.getWorld(
+                                plot.getArea().worldname)))
                         .checkMemory(false)
                         .allowedRegionsEverywhere()
-                        .player(BukkitAdapter.adapt(Bukkit.getPlayer(player.getUUID())))
+                        .actor(BukkitAdapter.adapt(Bukkit.getPlayer(player.getUUID())))
                         .limitUnlimited()
                         .build();
                 long seed = ThreadLocalRandom.current().nextLong();

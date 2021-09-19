@@ -2,7 +2,6 @@ package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.plotsquared.core.configuration.Settings;
 import com.plotsquared.core.generator.HybridPlotManager;
@@ -57,9 +56,8 @@ public class FaweDelegateRegionManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
-                EditSession session =
-                        new EditSessionBuilder(world).checkMemory(false).fastmode(true).limitUnlimited().changeSetNull()
-                                .autoQueue(false).build();
+                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).
+                        fastMode(true).limitUnlimited().changeSetNull().build();
                 for (CuboidRegion region : regions) {
                     region.setPos1(region.getPos1().withY(minY));
                     region.setPos2(region.getPos2().withY(maxY));
@@ -96,12 +94,11 @@ public class FaweDelegateRegionManager {
             synchronized (FaweDelegateRegionManager.class) {
                 final HybridPlotWorld hybridPlotWorld = ((HybridPlotManager) manager).getHybridPlotWorld();
                 World world = BukkitAdapter.adapt(getWorld(hybridPlotWorld.getWorldName()));
-                EditSession editSession = new EditSessionBuilder(world)
+                EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
 
                 if (!hybridPlotWorld.PLOT_SCHEMATIC || !Settings.Schematics.PASTE_ON_TOP) {
@@ -145,12 +142,11 @@ public class FaweDelegateRegionManager {
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {
                     // We cannot reuse the editsession
                     EditSession scheditsession = !Settings.Schematics.PASTE_ON_TOP ? editSession :
-                            new EditSessionBuilder(world)
+                            WorldEdit.getInstance().newEditSessionBuilder().world(world)
                                     .checkMemory(false)
-                                    .fastmode(true)
+                                    .fastMode(true)
                                     .limitUnlimited()
                                     .changeSetNull()
-                                    .autoQueue(false)
                                     .build();
                     File schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schem");
                     if (!schematicFile.exists()) {
@@ -197,20 +193,17 @@ public class FaweDelegateRegionManager {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 World pos3World = BukkitAdapter.adapt(getWorld(swapPos.getWorldName()));
-                WorldEdit.getInstance().getEditSessionFactory().getEditSession(pos1World, -1);
-                EditSession sessionA = new EditSessionBuilder(pos1World)
+                EditSession sessionA = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
-                EditSession sessionB = new EditSessionBuilder(pos3World)
+                EditSession sessionB = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 CuboidRegion regionA = new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3());
                 CuboidRegion regionB = new CuboidRegion(
@@ -256,12 +249,14 @@ public class FaweDelegateRegionManager {
         region.expand(BlockVector3.at(-extendBiome, 0, -extendBiome));
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
-                EditSession editSession = new EditSessionBuilder(BukkitAdapter.adapt(getWorld(world)))
+                EditSession editSession = WorldEdit
+                        .getInstance()
+                        .newEditSessionBuilder()
+                        .world(BukkitAdapter.adapt(getWorld(world)))
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 FlatRegionFunction replace = new BiomeReplace(editSession, biome);
                 FlatRegionVisitor visitor = new FlatRegionVisitor(region, replace, editSession);
@@ -286,19 +281,17 @@ public class FaweDelegateRegionManager {
             synchronized (FaweDelegateRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorldName()));
-                EditSession from = new EditSessionBuilder(pos1World)
+                EditSession from = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
-                EditSession to = new EditSessionBuilder(pos3World)
+                EditSession to = WorldEdit.getInstance().newEditSessionBuilder().world(pos3World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build();
                 CuboidRegion region = new CuboidRegion(
                         BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
@@ -333,12 +326,11 @@ public class FaweDelegateRegionManager {
         TaskManager.IMP.async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
-                try (EditSession editSession = new EditSessionBuilder(pos1World)
+                try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
                         .checkMemory(false)
-                        .fastmode(true)
+                        .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
-                        .autoQueue(false)
                         .build()) {
                     CuboidRegion region = new CuboidRegion(
                             BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),

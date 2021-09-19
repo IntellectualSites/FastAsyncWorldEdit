@@ -22,10 +22,7 @@ package com.sk89q.worldedit;
 import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
-import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.world.World;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Creates new {@link EditSession}s. To get an instance of this factory,
@@ -34,7 +31,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * <p>It is no longer possible to replace the instance of this in WorldEdit
  * with a custom one. Use {@link EditSessionEvent} to override
  * the creation of {@link EditSession}s.</p>
+ *
+ * @deprecated Using the ever-extending factory methods is deprecated. Replace with {@link EditSessionBuilder},
+ *         which in most cases will be as simple as calling {@code builder.world(world).build()}.
  */
+@Deprecated
 public class EditSessionFactory {
 
     /**
@@ -138,16 +139,10 @@ public class EditSessionFactory {
      */
     static final class EditSessionFactoryImpl extends EditSessionFactory {
 
-        private final EventBus eventBus;
-
         /**
          * Create a new factory.
-         *
-         * @param eventBus the event bus
          */
-        EditSessionFactoryImpl(EventBus eventBus) {
-            checkNotNull(eventBus);
-            this.eventBus = eventBus;
+        EditSessionFactoryImpl() {
         }
 
         @Override
@@ -167,16 +162,12 @@ public class EditSessionFactory {
 
         @Override
         public EditSession getEditSession(World world, int maxBlocks, BlockBag blockBag, Actor actor) {
-            if (WorldEdit.getInstance().getConfiguration().traceUnflushedSessions) {
-                return new TracedEditSession(
-                        eventBus,
-                        world,
-                        maxBlocks,
-                        blockBag,
-                        new EditSessionEvent(world, actor, maxBlocks, null)
-                );
-            }
-            return new EditSession(eventBus, world, maxBlocks, blockBag, new EditSessionEvent(world, actor, maxBlocks, null));
+            return WorldEdit.getInstance().newEditSessionBuilder()
+                    .world(world)
+                    .maxBlocks(maxBlocks)
+                    .blockBag(blockBag)
+                    .actor(actor)
+                    .build();
         }
 
     }

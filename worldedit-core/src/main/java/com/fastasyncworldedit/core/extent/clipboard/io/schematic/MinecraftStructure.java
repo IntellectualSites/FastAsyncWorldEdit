@@ -153,6 +153,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
 
     @Override
     public void write(Clipboard clipboard) throws IOException {
+        clipboard.flush();
         write(clipboard, "FAWE");
     }
 

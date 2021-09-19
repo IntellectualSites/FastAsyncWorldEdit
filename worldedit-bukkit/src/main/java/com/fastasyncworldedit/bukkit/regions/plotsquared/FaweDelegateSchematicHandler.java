@@ -7,7 +7,6 @@ import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicReader;
 import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
 import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
 import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.generator.ClassicPlotWorld;
@@ -23,6 +22,7 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.BuiltInClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.MCEditSchematicReader;
@@ -108,8 +108,15 @@ public class FaweDelegateSchematicHandler {
             final BlockVector3 to = BlockVector3
                     .at(region.getMinimumPoint().getX() + xOffset, y_offset_actual, region.getMinimumPoint().getZ() + zOffset);
 
-            try (EditSession editSession = new EditSessionBuilder(FaweAPI.getWorld(plot.getWorldName())).checkMemory(false)
-                    .fastmode(true).limitUnlimited().changeSetNull().autoQueue(false).build()) {
+            try (EditSession editSession = WorldEdit
+                    .getInstance()
+                    .newEditSessionBuilder()
+                    .world(FaweAPI.getWorld(plot.getWorldName()))
+                    .checkMemory(false)
+                    .fastMode(true)
+                    .limitUnlimited()
+                    .changeSetNull()
+                    .build()) {
                 final Clipboard clipboard = schematic.getClipboard();
                 clipboard.paste(editSession, to, true, false, true);
                 if (whenDone != null) {

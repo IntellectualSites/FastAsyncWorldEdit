@@ -1,9 +1,12 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
-import com.fastasyncworldedit.core.math.heightmap.HeightMap;
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.function.mask.StencilBrushMask;
+import com.fastasyncworldedit.core.math.heightmap.HeightMap;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -47,7 +50,12 @@ public class StencilBrush extends HeightBrush {
         int cutoff = onlyWhite ? maxY - minY : 0;
         final SolidBlockMask solid = new SolidBlockMask(editSession);
 
-        Location loc = editSession.getPlayer().getLocation();
+        Actor actor = editSession.getActor();
+        if (!(actor instanceof Player)) {
+            throw FaweCache.PLAYER_ONLY;
+        }
+        Player player = (Player) actor;
+        Location loc = player.getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();
         AffineTransform transform = new AffineTransform().rotateY((-yaw) % 360).rotateX(pitch - 90).inverse();

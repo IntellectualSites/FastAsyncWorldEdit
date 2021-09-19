@@ -65,6 +65,7 @@ public class ScatterBrush implements Brush {
             visited.add(position);
         }
         LocalBlockVectorSet placed = new LocalBlockVectorSet();
+        placed.setOffset(position.getX(), position.getZ());
         int maxFails = 1000;
         for (int i = 0; i < count; i++) {
             int index = ThreadLocalRandom.current().nextInt(length);

@@ -26,11 +26,11 @@ public class LineBrush implements Brush, ResettableTool {
             MaxChangedBlocksException {
         if (pos1 == null) {
             pos1 = position;
-            editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.primary", position));
+            editSession.getActor().print(Caption.of("fawe.worldedit.brush.brush.line.primary", position));
             return;
         }
         editSession.drawLine(pattern, pos1, position, size, !shell, flat);
-        editSession.getPlayer().print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
+        editSession.getActor().print(Caption.of("fawe.worldedit.brush.brush.line.secondary"));
         if (!select) {
             pos1 = null;
         } else {

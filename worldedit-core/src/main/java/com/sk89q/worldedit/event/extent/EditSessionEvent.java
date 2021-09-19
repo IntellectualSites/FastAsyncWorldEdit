@@ -69,8 +69,8 @@ public class EditSessionEvent extends Event implements Cancellable {
     private final Actor actor;
     private final int maxBlocks;
     private final Stage stage;
-    private Extent extent;
     private final List<TracingExtent> tracingExtents = new ArrayList<>();
+    private Extent extent;
     private boolean tracing;
     //FAWE start
     private boolean cancelled;

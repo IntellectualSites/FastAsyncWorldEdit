@@ -17,9 +17,9 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getPlugin
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import javax.inject.Inject
 
@@ -162,6 +162,81 @@ fun Project.applyLibrariesConfiguration() {
         publications {
             register<MavenPublication>("maven") {
                 from(libsComponent)
+
+                group = "com.fastasyncworldedit"
+                artifactId = "${rootProject.name}-Libs"
+                version = version
+
+                pom {
+                    name.set("${rootProject.name}-Libs" + " " + project.version)
+                    description.set("Blazingly fast Minecraft world manipulation for artists, builders and everyone else.")
+                    url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
+
+                    licenses {
+                        license {
+                            name.set("GNU General Public License, Version 3.0")
+                            url.set("https://www.gnu.org/licenses/gpl-3.0.html")
+                            distribution.set("repo")
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id.set("NotMyFault")
+                            name.set("NotMyFault")
+                            email.set("contact@notmyfault.dev")
+                            organization.set("IntellectualSites")
+                        }
+                        developer {
+                            id.set("SirYwell")
+                            name.set("Hannes Greule")
+                            organization.set("IntellectualSites")
+                        }
+                        developer {
+                            id.set("dordsor21")
+                            name.set("dordsor21")
+                            organization.set("IntellectualSites")
+                        }
+                    }
+
+                    scm {
+                        url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
+                        connection.set("scm:https://IntellectualSites@github.com/IntellectualSites/FastAsyncWorldEdit.git")
+                        developerConnection.set("scm:git://github.com/IntellectualSites/FastAsyncWorldEdit.git")
+                    }
+
+                    issueManagement {
+                        system.set("GitHub")
+                        url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit/issues")
+                    }
+                }
+            }
+        }
+
+        repositories {
+            mavenLocal()
+            val nexusUsername: String? by project
+            val nexusPassword: String? by project
+            if (nexusUsername != null && nexusPassword != null) {
+                maven {
+                    val releasesRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/releases/"
+                    val snapshotRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/snapshots/"
+                    /* Commenting this out for now - Fawe currently does not user semver or any sort of versioning that
+                    differentiates between snapshots and releases, API & (past) deployment wise, this will come with a next major release.
+                    url = uri(
+                            if (version.toString().endsWith("-SNAPSHOT")) snapshotRepositoryUrl
+                            else releasesRepositoryUrl
+                    )
+                     */
+                    url = uri(releasesRepositoryUrl)
+
+                    credentials {
+                        username = nexusUsername
+                        password = nexusPassword
+                    }
+                }
+            } else {
+                logger.warn("No nexus repository is added; nexusUsername or nexusPassword is null.")
             }
         }
     }

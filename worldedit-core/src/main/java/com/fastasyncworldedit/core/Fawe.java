@@ -12,9 +12,10 @@ import com.fastasyncworldedit.core.util.RandomTextureUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.WEManager;
-import com.github.luben.zstd.util.Native;
+import com.github.luben.zstd.Zstd;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import net.jpountz.lz4.LZ4Factory;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -81,44 +82,13 @@ public class Fawe {
      * The ticks-per-second timer.
      */
     private final FaweTimer timer;
-    private FaweVersion version;
-    private TextureUtil textures;
-
-
-    private QueueHandler queueHandler;
-
-    /**
-     * Get the implementation specific class.
-     */
-    @SuppressWarnings("unchecked")
-    public static <T extends IFawe> T imp() {
-        return instance != null ? (T) instance.implementation : null;
-    }
-
-    /**
-     * Get the implementation independent class.
-     */
-    public static Fawe get() {
-        return instance;
-    }
-
-    /**
-     * This method is not for public use. If you have to ask what it does then you shouldn't be using it.
-     */
-    public static void set(final IFawe implementation) throws InstanceAlreadyExistsException, IllegalArgumentException {
-        if (instance != null) {
-            throw new InstanceAlreadyExistsException("FAWE has already been initialized with: " + instance.implementation);
-        }
-        if (implementation == null) {
-            throw new IllegalArgumentException("Implementation may not be null.");
-        }
-        instance = new Fawe(implementation);
-    }
-
     /**
      * The platform specific implementation.
      */
     private final IFawe implementation;
+    private FaweVersion version;
+    private TextureUtil textures;
+    private QueueHandler queueHandler;
     private Thread thread;
 
     private Fawe(final IFawe implementation) {
@@ -155,12 +125,102 @@ public class Fawe {
         // Delayed worldedit setup
         TaskManager.IMP.later(() -> {
             try {
-                WEManager.IMP.managers.addAll(Fawe.this.implementation.getMaskManagers());
+                WEManager.IMP.addManagers(Fawe.this.implementation.getMaskManagers());
             } catch (Throwable ignored) {
             }
         }, 0);
 
         TaskManager.IMP.repeat(timer, 1);
+    }
+
+    /**
+     * Get the implementation specific class.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends IFawe> T imp() {
+        return instance != null ? (T) instance.implementation : null;
+    }
+
+    /**
+     * Get the implementation independent class.
+     */
+    public static Fawe get() {
+        return instance;
+    }
+
+    /**
+     * This method is not for public use. If you have to ask what it does then you shouldn't be using it.
+     */
+    public static void set(final IFawe implementation) throws InstanceAlreadyExistsException, IllegalArgumentException {
+        if (instance != null) {
+            throw new InstanceAlreadyExistsException("FAWE has already been initialized with: " + instance.implementation);
+        }
+        if (implementation == null) {
+            throw new IllegalArgumentException("Implementation may not be null.");
+        }
+        instance = new Fawe(implementation);
+    }
+
+    public static void setupInjector() {
+        // Check Base OS Arch for Mismatching Architectures
+        boolean x86OS = System.getProperty("sun.arch.data.model").contains("32");
+        boolean x86JVM = System.getProperty("os.arch").contains("32");
+        if (x86OS != x86JVM) {
+            LOGGER.info("You are running 32-bit Java on a 64-bit machine. Please upgrade to 64-bit Java.");
+        }
+    }
+
+    public static boolean isMainThread() {
+        return instance == null || instance.thread == Thread.currentThread();
+    }
+
+    /**
+     * Non-api. Handles an input FAWE exception if not already handled, given the input boolean array.
+     * Looks at the {@link FaweException.Type} and decides what to do (rethrows if we want to attempt to show the error to the
+     * player, outputs to console where necessary).
+     *
+     * @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
+     *                                 FaweException.Type.values().length}
+     * @param e                        {@link FaweException} to handle
+     * @param logger                   {@link Logger} of the calling class
+     */
+    public static void handleFaweException(
+            boolean[] faweExceptionReasonsUsed,
+            FaweException e,
+            final Logger logger
+    ) {
+        FaweException.Type type = e.getType();
+        switch (type) {
+            case OTHER:
+                logger.catching(e);
+                throw e;
+            case PLAYER_ONLY:
+            case ACTOR_REQUIRED:
+            case LOW_MEMORY:
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    logger.warn("FaweException: " + e.getMessage());
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    throw e;
+                }
+            case MAX_TILES:
+            case NO_REGION:
+            case MAX_CHECKS:
+            case MAX_CHANGES:
+            case MAX_ENTITIES:
+            case MAX_ITERATIONS:
+            case OUTSIDE_REGION:
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    throw e;
+                } else {
+                    return;
+                }
+            default:
+                if (!faweExceptionReasonsUsed[type.ordinal()]) {
+                    faweExceptionReasonsUsed[type.ordinal()] = true;
+                    logger.warn("FaweException: " + e.getMessage());
+                }
+        }
     }
 
     public void onDisable() {
@@ -254,45 +314,35 @@ public class Fawe {
             LOGGER.error("Failed to load config.", e);
         }
         Settings.IMP.QUEUE.TARGET_SIZE = Math.max(Settings.IMP.QUEUE.TARGET_SIZE, Settings.IMP.QUEUE.PARALLEL_THREADS);
-    }
-
-
-    public WorldEdit getWorldEdit() {
-        return WorldEdit.getInstance();
-    }
-
-    public static void setupInjector() {
-        /*
-         * Modify the sessions
-         *  - EditSession supports a custom queue, and a lot of optimizations
-         *  - LocalSession supports VirtualPlayers and undo on disk
-         */
-        if (!Settings.IMP.EXPERIMENTAL.DISABLE_NATIVES) {
-            // A higher amount is currently not supported by ZSTD / ZSTD JNI
+        try {
+            byte[] in = new byte[0];
+            byte[] compressed = LZ4Factory.fastestJavaInstance().fastCompressor().compress(in);
+            byte[] ob = new byte[100];
+            assert (LZ4Factory.fastestJavaInstance().fastDecompressor().decompress(ob, compressed) == 0);
+            LOGGER.info("LZ4 Compression Binding loaded successfully");
+        } catch (Throwable e) {
+            LOGGER.error("LZ4 Compression Binding Not Found.\n"
+                    + "FAWE will still work but compression will be slower.", e);
+        }
+        try {
+            byte[] in = new byte[0];
+            byte[] compressed = Zstd.compress(in);
+            byte[] ob = new byte[100];
+            assert (Zstd.decompress(ob, compressed) == 0);
+            LOGGER.info("ZSTD Compression Binding loaded successfully");
+        } catch (Throwable e) {
             if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.IMP.HISTORY.COMPRESSION_LEVEL > 6) {
                 Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
                 Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
-            }
-            try {
-                Native.load();
-            } catch (Throwable e) {
-                LOGGER.error("ZSTD compression binding not found.\n"
-                        + "FAWE will still work but compression won't work as well.\n", e);
-            }
-            try {
-                net.jpountz.util.Native.load();
-            } catch (Throwable e) {
-                LOGGER.error("LZ4 Compression Binding Not Found.\n"
-                        + "FAWE will still work but compression will be slower.\n", e);
+                LOGGER.error("ZSTD Compression Binding Not Found.\n"
+                        + "FAWE will still work but compression won't work as well.", e);
             }
         }
+        Settings.IMP.save(file);
+    }
 
-        // Check Base OS Arch for Mismatching Architectures
-        boolean x86OS = System.getProperty("sun.arch.data.model").contains("32");
-        boolean x86JVM = System.getProperty("os.arch").contains("32");
-        if (x86OS != x86JVM) {
-            LOGGER.info("You are running 32-bit Java on a 64-bit machine. Please upgrade to 64-bit Java.");
-        }
+    public WorldEdit getWorldEdit() {
+        return WorldEdit.getInstance();
     }
 
     private void setupMemoryListener() {
@@ -338,62 +388,11 @@ public class Fawe {
         return this.thread;
     }
 
-    public static boolean isMainThread() {
-        return instance == null || instance.thread == Thread.currentThread();
-    }
-
     /**
      * Sets the main thread to the current thread.
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();
-    }
-
-    /**
-     * Non-api. Handles an input FAWE exception if not already handled, given the input boolean array.
-     * Looks at the {@link FaweException.Type} and decides what to do (rethrows if we want to attempt to show the error to the
-     * player, outputs to console where necessary).
-     *
-     * @param faweExceptionReasonsUsed boolean array that should be cached where this method is called from of length {@code
-     *                                 FaweException.Type.values().length}
-     * @param e                        {@link FaweException} to handle
-     * @param logger                   {@link Logger} of the calling class
-     */
-    public static void handleFaweException(
-            boolean[] faweExceptionReasonsUsed,
-            FaweException e,
-            final Logger logger
-    ) {
-        FaweException.Type type = e.getType();
-        switch (type) {
-            case OTHER:
-                logger.catching(e);
-                throw e;
-            case LOW_MEMORY:
-                if (!faweExceptionReasonsUsed[type.ordinal()]) {
-                    logger.warn("FaweException: " + e.getMessage());
-                    faweExceptionReasonsUsed[type.ordinal()] = true;
-                    throw e;
-                }
-            case MAX_TILES:
-            case NO_REGION:
-            case MAX_CHECKS:
-            case MAX_CHANGES:
-            case MAX_ENTITIES:
-            case MAX_ITERATIONS:
-            case OUTSIDE_REGION:
-                if (!faweExceptionReasonsUsed[type.ordinal()]) {
-                    faweExceptionReasonsUsed[type.ordinal()] = true;
-                    throw e;
-                } else {
-                    return;
-                }
-            default:
-                if (!faweExceptionReasonsUsed[type.ordinal()]) {
-                    faweExceptionReasonsUsed[type.ordinal()] = true;
-                    logger.warn("FaweException: " + e.getMessage());
-                }
-        }
     }
 
 }

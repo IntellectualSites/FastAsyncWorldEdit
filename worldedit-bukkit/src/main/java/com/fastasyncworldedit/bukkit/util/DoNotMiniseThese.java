@@ -1,10 +1,10 @@
 package com.fastasyncworldedit.bukkit.util;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 
 /**
  * Class to prevent the above/below being removed from shaded/relocated dependencies via minimization

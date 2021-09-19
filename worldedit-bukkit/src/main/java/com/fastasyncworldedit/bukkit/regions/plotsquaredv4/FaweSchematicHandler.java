@@ -6,7 +6,6 @@ import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.io.FastSchematicWriter;
 import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
 import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.github.intellectualsites.plotsquared.plot.PlotSquared;
@@ -19,6 +18,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -64,12 +64,11 @@ public class FaweSchematicHandler extends SchematicHandler {
                     BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
                     BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())
             );
-            final EditSession editSession = new EditSessionBuilder(adaptedWorld)
+            final EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(adaptedWorld)
                     .checkMemory(false)
-                    .fastmode(true)
+                    .fastMode(true)
                     .limitUnlimited()
                     .changeSetNull()
-                    .autoQueue(false)
                     .build();
 
             ReadOnlyClipboard clipboard = ReadOnlyClipboard.of(editSession, region, false, true);

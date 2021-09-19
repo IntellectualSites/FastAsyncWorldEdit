@@ -1,11 +1,14 @@
 package com.fastasyncworldedit.core.command.tool.brush;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -35,19 +38,20 @@ public class CatenaryBrush implements Brush, ResettableTool {
     @Override
     public void build(EditSession editSession, BlockVector3 pos2, final Pattern pattern, double size) throws
             MaxChangedBlocksException {
-        Player player = editSession.getPlayer();
-        if (player == null) {
-            return; //todo throw error
+        Actor actor = editSession.getActor();
+        if (!(actor instanceof Player)) {
+            throw FaweCache.PLAYER_ONLY;
         }
+        Player player = (Player) actor;
         if (pos1 == null || pos2.equals(pos1)) {
             pos1 = pos2;
-            player.print(Caption.of("fawe.worldedit.brush.brush.line.primary", pos2));
+            actor.print(Caption.of("fawe.worldedit.brush.brush.line.primary", pos2));
             return;
         }
         if (this.vertex == null) {
             vertex = getVertex(pos1.toVector3(), pos2.toVector3(), slack);
             if (this.direction) {
-                player.print(Caption.of("fawe.worldedit.brush.brush.catenary.direction", 2));
+                actor.print(Caption.of("fawe.worldedit.brush.brush.catenary.direction", 2));
                 return;
             }
         } else if (this.direction) {

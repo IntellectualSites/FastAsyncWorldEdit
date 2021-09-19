@@ -248,7 +248,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         int maxSection = Math.min(get.getMaxSectionPosition(), getMaximumY() >> 4);
         block = block.initChunk(chunk.getX(), chunk.getZ());
         for (int layer = minSection; layer <= maxSection; layer++) {
-            if ((!full && !set.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
+            if ((!full && !get.hasSection(layer)) || !filter.appliesLayer(chunk, layer)) {
                 return;
             }
             block = block.initLayer(get, set, layer);

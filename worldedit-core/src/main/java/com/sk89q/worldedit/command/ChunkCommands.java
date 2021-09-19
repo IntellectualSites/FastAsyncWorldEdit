@@ -110,7 +110,7 @@ public class ChunkCommands {
         WorldEditAsyncCommandBuilder.createAndSendMessage(
                 actor,
                 () -> new ChunkListPaginationBox(region).create(page),
-                TranslatableComponent.of(
+                Caption.of(
                         "worldedit.listchunks.listfor",
                         TextComponent.of(actor.getName())
                 )

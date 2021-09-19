@@ -115,6 +115,14 @@ public class Settings extends Config {
                 " - OWNER = Players who own the region"
         })
         public String MODE = "MEMBER";
+        @Comment({
+                "List of plugin mask managers that should be exclusive. Exclusive managers are not ",
+                "checked for edit restrictions if another manager already allowed an edit, and further ",
+                "managers are not checked if an exclusive manager allows an edit.",
+                " - May be useful to add PlotSquared if using both P2 and WorldGuard on a server",
+                " - Some custom-implementations in other plugins may override this setting"
+        })
+        public List<String> EXCLUSIVE_MANAGERS = new ArrayList<>(Collections.singleton(("ExamplePlugin")));
 
     }
 
@@ -224,12 +232,11 @@ public class Settings extends Config {
                 "4 = 1 x medium, 1 x fast",
                 "5 = 1 x medium, 2 x fast",
                 "6 = 1 x medium, 3 x fast",
-                /* A higher value is currently not supported by ZSTD / ZSTD-JNI
                 "7 = 1 x high, 1 x medium, 1 x fast",
                 "8 = 1 x high, 1 x medium, 2 x fast",
                 "9 = 1 x high, 1 x medium, 3 x fast (best compression)",
-                "NOTE: If using disk, do some compression (3+) as smaller files save faster"
-                 */
+                "NOTE: If using disk, do some compression (3+) as smaller files save faster",
+                " - levels over 6 require ZSTD 1.4.8+ to be installed to the system"
         })
         public int COMPRESSION_LEVEL = 3;
         @Comment({
@@ -391,11 +398,6 @@ public class Settings extends Config {
         public boolean PERSISTENT_BRUSHES = true;
 
         @Comment({
-                "Disable using native libraries",
-        })
-        public boolean DISABLE_NATIVES = false;
-
-        @Comment({
                 "[SAFE] Keep entities that are positioned in non-air blocks when editing an area",
                 "Might cause client-side FPS lagg in some situations"
         })
@@ -502,7 +504,8 @@ public class Settings extends Config {
                 " - TODO: Buffered random access with compression is not implemented on disk yet",
                 " - 0 = No compression",
                 " - 1 = Fast compression",
-                " - 2-6 = Slower compression"
+                " - 2-17 = Slower compression",
+                " - levels over 6 require ZSTD 1.4.8+ to be installed to the system"
         })
         public int COMPRESSION_LEVEL = 1;
         @Comment("Number of days to keep history on disk before deleting it")

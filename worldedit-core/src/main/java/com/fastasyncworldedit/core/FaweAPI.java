@@ -64,9 +64,9 @@ public class FaweAPI {
      * Offers a lot of options for building an EditSession.
      *
      * @return A new EditSessionBuilder
-     * @see EditSessionBuilder
+     * @deprecated See {@link WorldEdit#newEditSessionBuilder()}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static EditSessionBuilder getEditSessionBuilder(World world) {
         return new EditSessionBuilder(world);
     }
@@ -139,7 +139,7 @@ public class FaweAPI {
      * @return Set of FaweMaskManager
      */
     public static Set<FaweMaskManager> getMaskManagers() {
-        return new HashSet<>(WEManager.IMP.managers);
+        return new HashSet<>(WEManager.IMP.getManagers());
     }
 
     /**
@@ -176,7 +176,7 @@ public class FaweAPI {
     }
 
     public static void addMaskManager(FaweMaskManager maskMan) {
-        WEManager.IMP.managers.add(maskMan);
+        WEManager.IMP.addManager(maskMan);
     }
 
     /**
