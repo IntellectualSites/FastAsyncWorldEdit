@@ -433,8 +433,11 @@ public class EditSessionBuilder {
                 this.extent = regionExtent;
             }
             if (this.limit != null && this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
-                //TODO add batch processor for strip nbt
-                this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+                if (placeChunks) {
+                    extent.addProcessor(new StripNBTExtent(this.extent, this.limit.STRIP_NBT));
+                } else {
+                    this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+                }
             }
             this.extent = wrapExtent(this.extent, eventBus, event, EditSession.Stage.BEFORE_HISTORY);
         }
