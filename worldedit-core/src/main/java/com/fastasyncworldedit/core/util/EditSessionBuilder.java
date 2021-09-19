@@ -326,7 +326,7 @@ public class EditSessionBuilder {
         if (extent == null) {
             IQueueExtent<IQueueChunk> queue = null;
             World unwrapped = WorldWrapper.unwrap(world);
-            boolean placeChunks = (this.fastMode || this.limit.FAST_PLACEMENT) && (wnaMode == null || !wnaMode);
+            boolean placeChunks = (this.fastmode || this.limit.FAST_PLACEMENT) && (wnaMode == null || !wnaMode);
 
             if (placeChunks) {
                 wnaMode = false;
