@@ -18,6 +18,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
@@ -34,6 +35,16 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index) {
         switch (index) {
+            case 0:
+                if (argumentInput.equals("#") || argumentInput.equals("#c")) {
+                    return Stream.of("#copy", "#clipboard");
+                } else if ("#copy".startsWith(argumentInput.toUpperCase(Locale.ROOT))) {
+                    return Stream.of("#copy");
+                } else if ("#clipboard".startsWith(argumentInput.toUpperCase(Locale.ROOT))) {
+                    return Stream.of("#clipboard");
+                } else {
+                    return Stream.empty();
+                }
             case 1:
             case 2:
                 return SuggestionHelper.suggestBoolean(argumentInput);
@@ -54,35 +65,32 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
             boolean rotate = arguments.length >= 2 && Boolean.getBoolean(arguments[1]);
             boolean flip = arguments.length == 3 && Boolean.getBoolean(arguments[2]);
             List<ClipboardHolder> clipboards;
-            switch (arguments[0].toLowerCase()) {
-                case "#copy":
-                case "#clipboard":
-                    ClipboardHolder clipboard = context.requireSession().getExistingClipboard();
-                    if (clipboard == null) {
-                        throw new InputParseException(Caption.of("fawe.error.parse.no-clipboard", getPrefix()));
-                    }
-                    clipboards = Collections.singletonList(clipboard);
-                    break;
-                default:
-                    Actor player = context.requireActor();
-                    MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(player,
-                            arguments[0], ClipboardFormats.findByAlias("fast"), false
+            if ("#copy".startsWith(arguments[0].toUpperCase(Locale.ROOT)) ||
+                    "#clipboard".startsWith(arguments[0].toUpperCase(Locale.ROOT))) {
+                ClipboardHolder clipboard = context.requireSession().getExistingClipboard();
+                if (clipboard == null) {
+                    throw new InputParseException(Caption.of("fawe.error.parse.no-clipboard", getPrefix()));
+                }
+                clipboards = Collections.singletonList(clipboard);
+            } else {
+                Actor player = context.requireActor();
+                MultiClipboardHolder multi = ClipboardFormats.loadAllFromInput(player,
+                        arguments[0], ClipboardFormats.findByAlias("fast"), false
+                );
+                if (multi == null) {
+                    multi = ClipboardFormats.loadAllFromInput(player,
+                            arguments[0], ClipboardFormats.findByAlias("mcedit"), false
                     );
-                    if (multi == null) {
-                        multi = ClipboardFormats.loadAllFromInput(player,
-                                arguments[0], ClipboardFormats.findByAlias("mcedit"), false
-                        );
-                    }
-                    if (multi == null) {
-                        multi = ClipboardFormats.loadAllFromInput(player,
-                                arguments[0], ClipboardFormats.findByAlias("sponge"), false
-                        );
-                    }
-                    if (multi == null) {
-                        throw new InputParseException(Caption.of("fawe.error.parse.no-clipboard-source", arguments[0]));
-                    }
-                    clipboards = multi.getHolders();
-                    break;
+                }
+                if (multi == null) {
+                    multi = ClipboardFormats.loadAllFromInput(player,
+                            arguments[0], ClipboardFormats.findByAlias("sponge"), false
+                    );
+                }
+                if (multi == null) {
+                    throw new InputParseException(Caption.of("fawe.error.parse.no-clipboard-source", arguments[0]));
+                }
+                clipboards = multi.getHolders();
             }
             return new RandomFullClipboardPattern(clipboards, rotate, flip);
         } catch (IOException e) {
