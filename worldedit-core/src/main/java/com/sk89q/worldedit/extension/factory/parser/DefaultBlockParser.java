@@ -214,7 +214,8 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
                     //FAWE start - disallowed states
                     if (checkState && disallowed.contains(parts[0].toLowerCase())) {
-                        continue;
+                        throw new DisallowedUsageException(Caption.of("fawe.error.limit.disallowed-property",
+                                TextComponent.of(parts[0])));
                     }
                     //FAWE end
 
