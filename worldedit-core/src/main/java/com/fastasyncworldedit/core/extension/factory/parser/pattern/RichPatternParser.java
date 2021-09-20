@@ -141,7 +141,7 @@ public class RichPatternParser extends FaweParser<Pattern> {
                     List<String> args = entry.getValue();
                     try {
                         pattern = worldEdit.getPatternFactory().parseWithoutRich(full, context);
-                    } catch (SuggestInputParseException rethrow) {
+                    } catch (InputParseException rethrow) {
                         throw rethrow;
                     } catch (Throwable e) {
                         throw SuggestInputParseException.of(e, full, () -> {
