@@ -200,7 +200,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                     if (property != null) {
                         int index = property.getIndexFor(charSequence);
                         if (index == -1) {
-                            throw SuggestInputParseException.of(charSequence.toString(), property.getValues());
+                            throw SuggestInputParseException.of(charSequence.toString(), (List<Object>) property.getValues());
                         }
                         stateId = property.modifyIndex(stateId, index);
                     } else {
