@@ -164,7 +164,7 @@ fun Project.applyLibrariesConfiguration() {
                 from(libsComponent)
 
                 group = "com.fastasyncworldedit"
-                artifactId = "${rootProject.name}-Libs"
+                artifactId = "FastAsyncWorldEdit-Libs-${project.name.capitalize()}"
                 version = version
 
                 pom {
