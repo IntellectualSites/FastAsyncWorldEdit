@@ -780,11 +780,13 @@ public final class PlatformCommandManager {
                 actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", ((FaweException) e.getCause()).getComponent()));
             } else {
                 Component msg = e.getRichMessage();
-                if (msg != TextComponent.empty()) {
+                if (msg == TextComponent.empty()) {
                     List<String> argList = parseArgs(event.getArguments())
                             .map(Substring::getSubstring)
                             .collect(Collectors.toList());
                     printUsage(actor, argList);
+                } else {
+                    actor.printError(msg);
                 }
             }
         } catch (Throwable t) {
