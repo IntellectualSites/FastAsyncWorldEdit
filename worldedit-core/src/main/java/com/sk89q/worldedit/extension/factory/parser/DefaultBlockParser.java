@@ -63,9 +63,12 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -178,6 +181,20 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     ) throws NoMatchException {
         Map<Property<?>, Object> blockStates = new HashMap<>();
 
+        Set<String> disallowed;
+        boolean checkState = false;
+        if (context.getActor() != null && !context.getActor().getLimit().isUnlimited()) {
+            disallowed = context
+                    .getActor()
+                    .getLimit().DISALLOWED_STATES
+                    .stream()
+                    .map(String::toLowerCase)
+                    .collect(Collectors.toSet());
+            checkState = !disallowed.isEmpty();
+        } else {
+            disallowed = Collections.emptySet();
+        }
+
         if (stateProperties.length > 0) { // Block data not yet detected
             // Parse the block data (optional)
             for (String parseableData : stateProperties) {
@@ -190,6 +207,10 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                                         TextComponent.of(parseableData)
                                 )
                         );
+                    }
+
+                    if (checkState && disallowed.contains(parts[0].toLowerCase())) {
+                        continue;
                     }
 
                     @SuppressWarnings("unchecked")

@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.DisallowedBlocksExtent;
 import com.fastasyncworldedit.core.extent.FaweRegionExtent;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.extent.LimitExtent;
@@ -549,6 +550,21 @@ public final class EditSessionBuilder {
                     extent.addProcessor(new StripNBTExtent(this.extent, this.limit.STRIP_NBT));
                 } else {
                     this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+                }
+            }
+            if (this.limit != null && !this.limit.isUnlimited()) {
+                boolean checkingBlocks = (this.limit.UNIVERSAL_DISALLOWED_BLOCKS && !WorldEdit
+                        .getInstance()
+                        .getConfiguration().disallowedBlocks.isEmpty());
+                if (checkingBlocks
+                        || (this.limit.DISALLOWED_STATES != null && !this.limit.DISALLOWED_STATES.isEmpty())) {
+                    if (placeChunks) {
+                        extent.addProcessor(new DisallowedBlocksExtent(this.extent, checkingBlocks,
+                                this.limit.DISALLOWED_STATES
+                        ));
+                    } else {
+                        this.extent = new DisallowedBlocksExtent(this.extent, checkingBlocks, this.limit.DISALLOWED_STATES);
+                    }
                 }
             }
             this.extent = wrapExtent(this.extent, eventBus, event, EditSession.Stage.BEFORE_HISTORY);

@@ -192,7 +192,17 @@ public class Settings extends Config {
                 "List of nbt tags to strip from blocks, e.g. Items",
         })
         public List<String> STRIP_NBT = new ArrayList<>();
-
+        @Comment({
+                "If the disallowed blocks listed in config-legacy.yml should be disallowed in all edits,",
+                "not just where blocks patterns are used.",
+                " - Can prevent blocks being pasted from clipboards, etc.",
+                " - If fast-placement is disabled, this may cause edits to be slower."
+        })
+        public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
+        @Comment({
+                "List of blocks to strip nbt from",
+        })
+        public List<String> DISALLOWED_STATES = new ArrayList<>();
     }
 
     public static class HISTORY {
@@ -399,7 +409,7 @@ public class Settings extends Config {
 
         @Comment({
                 "[SAFE] Keep entities that are positioned in non-air blocks when editing an area",
-                "Might cause client-side FPS lagg in some situations"
+                "Might cause client-side FPS lag in some situations"
         })
         public boolean KEEP_ENTITIES_IN_BLOCKS = false;
 
@@ -605,6 +615,20 @@ public class Settings extends Config {
                     limit.STRIP_NBT.retainAll(newLimit.STRIP_NBT);
                     if (limit.STRIP_NBT.isEmpty()) {
                         limit.STRIP_NBT = Collections.emptySet();
+                    }
+                }
+                limit.UNIVERSAL_DISALLOWED_BLOCKS &= newLimit.UNIVERSAL_DISALLOWED_BLOCKS;
+
+                if (limit.DISALLOWED_STATES == null) {
+                    limit.DISALLOWED_STATES = newLimit.DISALLOWED_STATES.isEmpty() ? Collections.emptySet() : new HashSet<>(
+                            newLimit.DISALLOWED_STATES);
+                } else if (limit.DISALLOWED_STATES.isEmpty() || newLimit.DISALLOWED_STATES.isEmpty()) {
+                    limit.DISALLOWED_STATES = Collections.emptySet();
+                } else {
+                    limit.DISALLOWED_STATES = new HashSet<>(limit.DISALLOWED_STATES);
+                    limit.DISALLOWED_STATES.retainAll(newLimit.DISALLOWED_STATES);
+                    if (limit.DISALLOWED_STATES.isEmpty()) {
+                        limit.DISALLOWED_STATES = Collections.emptySet();
                     }
                 }
             }
