@@ -450,7 +450,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
             if (actor != null && !actor.hasPermission("worldedit.anyblock")
-                    && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId())) {
+                    && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
                 throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(input)));
             }
         }

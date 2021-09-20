@@ -309,7 +309,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public <V> BlockState with(final PropertyKey property, final V value) {
         try {
             BlockType type = getBlockType();
-            int newState = ((AbstractProperty) type.getProperty(property)).modify(this.getInternalId(), value);
+            AbstractProperty abstractProperty = ((AbstractProperty) type.getProperty(property));
+            if (abstractProperty == null) {
+                return this;
+            }
+            int newState = abstractProperty.modify(this.getInternalId(), value);
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
