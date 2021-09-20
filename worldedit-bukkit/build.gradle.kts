@@ -51,7 +51,6 @@ dependencies {
     // Modules
     api(projects.worldeditCore)
     api(projects.worldeditLibs.bukkit)
-    implementation(":worldedit-adapters:")
 
     // Minecraft expectations
     implementation(libs.fastutil)
