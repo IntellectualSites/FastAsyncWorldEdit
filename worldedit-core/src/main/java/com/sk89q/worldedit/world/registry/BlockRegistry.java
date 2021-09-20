@@ -96,5 +96,12 @@ public interface BlockRegistry {
     default Collection<String> values() {
         return Collections.emptyList();
     }
+
+    /**
+     * Get an unmodifiable map of all block properties
+     *
+     * @return a map of states where the key is the property's ID
+     */
+    Map<String, ? extends Property<?>> getAllProperties();
     //FAWE end
 }

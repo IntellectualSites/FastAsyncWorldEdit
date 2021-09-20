@@ -80,4 +80,11 @@ public class BundledBlockRegistry implements BlockRegistry {
         return OptionalInt.empty();
     }
 
+    //FAWE start
+    @Override
+    public Map<String, ? extends Property<?>> getAllProperties() {
+        return Collections.emptyMap(); // Oof
+    }
+    //FAWE end
+
 }

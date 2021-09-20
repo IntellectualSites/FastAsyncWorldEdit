@@ -200,6 +200,7 @@ public class BlockTypesCache {
     public static final BlockType[] values;
     public static final BlockState[] states;
     public static final boolean[] ticking;
+    public static final Map<String, ? extends Property<?>> allProperties;
 
     protected static final Set<String> $NAMESPACES = new LinkedHashSet<>();
 
@@ -265,6 +266,14 @@ public class BlockTypesCache {
 
             states = stateList.toArray(new BlockState[stateList.size()]);
             ticking = Booleans.toArray(tickList);
+
+            allProperties = WorldEdit
+                    .getInstance()
+                    .getPlatformManager()
+                    .queryCapability(Capability.GAME_HOOKS)
+                    .getRegistries()
+                    .getBlockRegistry()
+                    .getAllProperties();
 
         } catch (Throwable e) {
             e.printStackTrace();

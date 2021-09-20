@@ -159,5 +159,14 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
         }
         return blocks;
     }
+
+    @Override
+    public Map<String, ? extends Property<?>> getAllProperties() {
+        BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
+        if (adapter != null) {
+            return adapter.getAllProperties();
+        }
+        return super.getAllProperties();
+    }
     //FAWE end
 }
