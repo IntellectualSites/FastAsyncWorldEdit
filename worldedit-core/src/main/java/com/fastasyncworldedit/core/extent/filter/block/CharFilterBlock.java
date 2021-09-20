@@ -31,6 +31,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
     private static final SetDelegate FULL = (block, value) -> block.setArr[block.index] = value;
     private static final SetDelegate NULL = (block, value) -> block.initSet().set(block, value);
 
+    private int maxLayer;
+    private int minLayer;
     private CharGetBlocks get;
     private IChunkSet set;
     private char[] getArr;
@@ -65,6 +67,8 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public final ChunkFilterBlock initLayer(IBlocks iget, IChunkSet iset, int layer) {
         this.get = (CharGetBlocks) iget;
+        minLayer = this.get.getMinSectionPosition();
+        maxLayer = this.get.getMaxSectionPosition();
         this.layer = layer;
         if (!iget.hasSection(layer)) {
             getArr = FaweCache.IMP.EMPTY_CHAR_4096;
@@ -327,7 +331,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (y > 0) {
             return states[getArr[index - 256]];
         }
-        if (layer > 0) {
+        if (layer > minLayer) {
             final int newLayer = layer - 1;
             final CharGetBlocks chunk = this.get;
             return states[chunk.sections[newLayer].get(chunk, newLayer, index + 3840)];
@@ -340,7 +344,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (y < 16) {
             return states[getArr[index + 256]];
         }
-        if (layer < 16) {
+        if (layer < maxLayer) {
             final int newLayer = layer + 1;
             final CharGetBlocks chunk = this.get;
             return states[chunk.sections[newLayer].get(chunk, newLayer, index - 3840)];
@@ -352,52 +356,12 @@ public class CharFilterBlock extends ChunkFilterBlock {
     public final BlockState getBlockRelativeY(int y) {
         final int newY = this.y + y;
         final int layerAdd = newY >> 4;
-        switch (layerAdd) {
-            case 0:
-                return states[getArr[this.index + (y << 8)]];
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 14:
-            case 15: {
-                final int newLayer = layer + layerAdd;
-                if (newLayer < 16) {
-                    final int index = this.index + ((y & 15) << 8);
-                    return states[get.sections[newLayer].get(get, newLayer, index)];
-                }
-                break;
-            }
-            case -1:
-            case -2:
-            case -3:
-            case -4:
-            case -5:
-            case -6:
-            case -7:
-            case -8:
-            case -9:
-            case -10:
-            case -11:
-            case -12:
-            case -13:
-            case -14:
-            case -15:
-                final int newLayer = layer + layerAdd;
-                if (newLayer >= 0) {
-                    final int index = this.index + ((y & 15) << 8);
-                    return states[get.sections[newLayer].get(get, newLayer, index)];
-                }
-                break;
+        if (layerAdd == 0) {
+            return states[getArr[this.index + (y << 8)]];
+        } else if ((layerAdd > 0 && layerAdd < (maxLayer - layer)) || (layerAdd < 0 && layerAdd < (minLayer - layer))) {
+            final int newLayer = layer + layerAdd;
+            final int index = this.index + ((y & 15) << 8);
+            return states[get.sections[newLayer].get(get, newLayer, index)];
         }
         return BlockTypes.__RESERVED__.getDefaultState();
     }

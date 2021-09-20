@@ -211,34 +211,33 @@ public abstract class CharBlocks implements IBlocks {
      */
 
     public final char get(int layer, int index) {
-        layer -= minSectionPosition;
-        return sections[layer].get(this, layer, index);
+        return sections[layer - minSectionPosition].get(this, layer, index);
     }
 
-    public final void set(int layer, int index, char value) throws
-            ArrayIndexOutOfBoundsException {
-        layer -= minSectionPosition;
-        sections[layer].set(this, layer, index, value);
+    public final void set(int layer, int index, char value) throws ArrayIndexOutOfBoundsException {
+        sections[layer - minSectionPosition].set(this, layer, index, value);
     }
 
     public abstract static class Section {
 
-        public abstract char[] get(CharBlocks blocks, int layer);
+        abstract char[] get(CharBlocks blocks, int layer);
 
-        public abstract char[] get(CharBlocks blocks, int layer, boolean aggressive);
+        abstract char[] get(CharBlocks blocks, int layer, boolean aggressive);
 
         public abstract boolean isFull();
 
         public final char get(CharBlocks blocks, int layer, int index) {
-            char[] section = get(blocks, layer);
+            int normalized = layer - blocks.minSectionPosition;
+            char[] section = get(blocks, normalized);
             if (section == null) {
                 blocks.reset(layer);
-                section = blocks.empty.get(blocks, layer, false);
+                section = blocks.empty.get(blocks, normalized, false);
             }
             return section[index];
         }
 
         public final synchronized void set(CharBlocks blocks, int layer, int index, char value) {
+            layer -= blocks.minSectionPosition;
             get(blocks, layer)[index] = value;
         }
 
