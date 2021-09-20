@@ -5,6 +5,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -202,7 +203,7 @@ public class Settings extends Config {
         @Comment({
                 "List of blocks to deny use of",
         })
-        public List<String> DISALLOWED_BLOCKS = new ArrayList<>();
+        public List<String> DISALLOWED_BLOCKS = Arrays.asList("minecraft:wheat", "minecraft:fire", "minecraft:redstone_wire");
         @Comment({
                 "List of block properties that cannot deviate from the default state, e.g. waterlogged.",
         })
