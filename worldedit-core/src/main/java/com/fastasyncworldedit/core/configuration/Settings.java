@@ -204,7 +204,7 @@ public class Settings extends Config {
         })
         public List<String> DISALLOWED_BLOCKS = new ArrayList<>();
         @Comment({
-                "List of blocks to strip nbt from",
+                "List of block properties that cannot deviate from the default state, e.g. waterlogged.",
         })
         public List<String> DISALLOWED_STATES = new ArrayList<>();
     }

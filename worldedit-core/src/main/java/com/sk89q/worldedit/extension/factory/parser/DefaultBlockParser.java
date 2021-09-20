@@ -182,6 +182,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
     ) throws NoMatchException {
         Map<Property<?>, Object> blockStates = new HashMap<>();
 
+        //FAWE start - disallowed states
         Set<String> disallowed;
         boolean checkState = false;
         if (context.getActor() != null && !context.getActor().getLimit().isUnlimited()) {
@@ -195,6 +196,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         } else {
             disallowed = Collections.emptySet();
         }
+        //FAWE end
 
         if (stateProperties.length > 0) { // Block data not yet detected
             // Parse the block data (optional)
@@ -210,9 +212,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         );
                     }
 
+                    //FAWE start - disallowed states
                     if (checkState && disallowed.contains(parts[0].toLowerCase())) {
                         continue;
                     }
+                    //FAWE end
 
                     @SuppressWarnings("unchecked")
                     Property<Object> propertyKey = (Property<Object>) type.getPropertyMap().get(parts[0]);
