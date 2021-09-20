@@ -25,6 +25,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 
 import java.util.HashSet;
 import java.util.List;
@@ -96,12 +97,20 @@ public class PlotSquaredFeature extends FaweMaskManager {
             return false;
         }
         UUID uid = player.getUniqueId();
-        return !Flags.NO_WORLDEDIT.isTrue(plot) && (plot.isOwner(uid)
-                || type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted()
-                .contains(DBFunc.EVERYONE)
-                || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE))
-                && player.hasPermission("fawe.plotsquared.member")) || player
-                .hasPermission("fawe.plotsquared.admin"));
+        return !Flags.NO_WORLDEDIT.isTrue(plot) && (plot.isOwner(uid) || player.hasPermission("fawe.plotsquared.admin"))
+                || (type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)
+                || (player.hasPermission("fawe.plotsquared.member")
+                && (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE))
+                && !plot.getOwners().isEmpty()
+                && plot.getOwners().stream().anyMatch(this::playerOnline))));
+    }
+
+    private boolean playerOnline(UUID uuid) {
+        if (uuid == null) {
+            return false;
+        }
+        org.bukkit.entity.Player player = Bukkit.getPlayer(uuid);
+        return player != null && player.isOnline();
     }
 
     @Override
