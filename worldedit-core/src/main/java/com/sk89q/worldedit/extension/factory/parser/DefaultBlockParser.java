@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.extent.DisallowedBlocksExtent;
 import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
 import com.fastasyncworldedit.core.jnbt.JSON2NBT;
 import com.fastasyncworldedit.core.jnbt.NBTException;
@@ -251,7 +252,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     }
 
                     blockStates.put(propertyKey, value);
-                } catch (NoMatchException e) {
+                } catch (NoMatchException | DisallowedUsageException e) {
                     throw e; // Pass-through
                 } catch (Exception e) {
                     throw new InputParseException(Caption.of(
