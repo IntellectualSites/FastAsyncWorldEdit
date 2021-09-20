@@ -39,13 +39,13 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
      * Create a new instance.
      *
      * @param extent         the extent
-     * @param checkingBlocks if the configured disallowed-blocks in config-legacy.yml should be removed
-     * @param blockedStates  blockstates to disallow
+     * @param blockedBlocks  block types to disallow
+     * @param blockedStates  block states/properties to disallow
      */
-    public DisallowedBlocksExtent(Extent extent, boolean checkingBlocks, Set<String> blockedStates) {
+    public DisallowedBlocksExtent(Extent extent, Set<String> blockedBlocks, Set<String> blockedStates) {
         super(extent);
-        if (checkingBlocks) {
-            blockedBlocks = WorldEdit.getInstance().getConfiguration().disallowedBlocks.stream()
+        if (blockedBlocks != null && !blockedBlocks.isEmpty()) {
+            this.blockedBlocks = WorldEdit.getInstance().getConfiguration().disallowedBlocks.stream()
                     .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
                     .collect(Collectors.toSet());
         }

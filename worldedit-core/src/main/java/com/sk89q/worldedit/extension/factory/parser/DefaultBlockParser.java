@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
 import com.fastasyncworldedit.core.jnbt.JSON2NBT;
 import com.fastasyncworldedit.core.jnbt.NBTException;
+import com.fastasyncworldedit.core.object.FaweLimit;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
@@ -449,10 +450,21 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
         if (context.isRestricted()) {
             Actor actor = context.requireActor();
-            if (actor != null && !actor.hasPermission("worldedit.anyblock")
-                    && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
-                throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(input)));
+            //FAWE start - per-limit disallowed blocks
+            if (actor != null) {
+                if (!actor.hasPermission("worldedit.anyblock")
+                        && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
+                    throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(input)));
+                }
+                FaweLimit limit = actor.getLimit();
+                if (!limit.isUnlimited()) {
+                    if (limit.DISALLOWED_BLOCKS.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
+                        throw new DisallowedUsageException(Caption.of("fawe.error.limit.disallowed-block",
+                                TextComponent.of(input)));
+                    }
+                }
             }
+            //FAWE end
         }
 
         if (nbt != null) {

@@ -200,6 +200,10 @@ public class Settings extends Config {
         })
         public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
         @Comment({
+                "List of blocks to deny use of",
+        })
+        public List<String> DISALLOWED_BLOCKS = new ArrayList<>();
+        @Comment({
                 "List of blocks to strip nbt from",
         })
         public List<String> DISALLOWED_STATES = new ArrayList<>();
@@ -618,6 +622,19 @@ public class Settings extends Config {
                     }
                 }
                 limit.UNIVERSAL_DISALLOWED_BLOCKS &= newLimit.UNIVERSAL_DISALLOWED_BLOCKS;
+
+                if (limit.DISALLOWED_BLOCKS == null) {
+                    limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : new HashSet<>(
+                            newLimit.DISALLOWED_BLOCKS);
+                } else if (limit.DISALLOWED_BLOCKS.isEmpty() || newLimit.DISALLOWED_BLOCKS.isEmpty()) {
+                    limit.DISALLOWED_BLOCKS = Collections.emptySet();
+                } else {
+                    limit.DISALLOWED_BLOCKS = new HashSet<>(limit.DISALLOWED_BLOCKS);
+                    limit.DISALLOWED_BLOCKS.retainAll(newLimit.DISALLOWED_BLOCKS);
+                    if (limit.DISALLOWED_BLOCKS.isEmpty()) {
+                        limit.DISALLOWED_BLOCKS = Collections.emptySet();
+                    }
+                }
 
                 if (limit.DISALLOWED_STATES == null) {
                     limit.DISALLOWED_STATES = newLimit.DISALLOWED_STATES.isEmpty() ? Collections.emptySet() : new HashSet<>(

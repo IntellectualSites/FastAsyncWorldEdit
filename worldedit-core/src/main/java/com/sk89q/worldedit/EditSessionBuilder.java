@@ -69,7 +69,9 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -553,17 +555,18 @@ public final class EditSessionBuilder {
                 }
             }
             if (this.limit != null && !this.limit.isUnlimited()) {
-                boolean checkingBlocks = (this.limit.UNIVERSAL_DISALLOWED_BLOCKS && !WorldEdit
-                        .getInstance()
-                        .getConfiguration().disallowedBlocks.isEmpty());
-                if (checkingBlocks
-                        || (this.limit.DISALLOWED_STATES != null && !this.limit.DISALLOWED_STATES.isEmpty())) {
+                Set<String> limitBlocks = new HashSet<>();
+                if ((getActor() == null || getActor().hasPermission("worldedit.anyblock") && this.limit.UNIVERSAL_DISALLOWED_BLOCKS)) {
+                    limitBlocks.addAll(WorldEdit.getInstance().getConfiguration().disallowedBlocks);
+                }
+                if (this.limit.DISALLOWED_BLOCKS != null && !this.limit.DISALLOWED_BLOCKS.isEmpty()) {
+                    limitBlocks.addAll(this.limit.DISALLOWED_BLOCKS);
+                }
+                if (!limitBlocks.isEmpty() || (this.limit.DISALLOWED_STATES != null && !this.limit.DISALLOWED_STATES.isEmpty())) {
                     if (placeChunks) {
-                        extent.addProcessor(new DisallowedBlocksExtent(this.extent, checkingBlocks,
-                                this.limit.DISALLOWED_STATES
-                        ));
+                        extent.addProcessor(new DisallowedBlocksExtent(this.extent, limitBlocks, this.limit.DISALLOWED_STATES));
                     } else {
-                        this.extent = new DisallowedBlocksExtent(this.extent, checkingBlocks, this.limit.DISALLOWED_STATES);
+                        this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, this.limit.DISALLOWED_STATES);
                     }
                 }
             }

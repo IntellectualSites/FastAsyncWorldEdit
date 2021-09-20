@@ -22,6 +22,7 @@ public class FaweLimit {
     public boolean RESTRICT_HISTORY_TO_REGIONS = true;
     public Set<String> STRIP_NBT = null;
     public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
+    public Set<String> DISALLOWED_BLOCKS = null;
     public Set<String> DISALLOWED_STATES = null;
 
     public static FaweLimit MAX;
@@ -115,6 +116,7 @@ public class FaweLimit {
         MAX.RESTRICT_HISTORY_TO_REGIONS = false;
         MAX.STRIP_NBT = null;
         MAX.UNIVERSAL_DISALLOWED_BLOCKS = false;
+        MAX.DISALLOWED_BLOCKS = null;
         MAX.DISALLOWED_STATES = null;
     }
 
@@ -240,6 +242,7 @@ public class FaweLimit {
                 && !RESTRICT_HISTORY_TO_REGIONS
                 && (STRIP_NBT == null || STRIP_NBT.isEmpty())
                 && !UNIVERSAL_DISALLOWED_BLOCKS
+                && (DISALLOWED_BLOCKS == null || DISALLOWED_BLOCKS.isEmpty())
                 && (DISALLOWED_STATES == null || DISALLOWED_STATES.isEmpty());
     }
 
@@ -259,6 +262,7 @@ public class FaweLimit {
         RESTRICT_HISTORY_TO_REGIONS = limit.RESTRICT_HISTORY_TO_REGIONS;
         STRIP_NBT = limit.STRIP_NBT;
         UNIVERSAL_DISALLOWED_BLOCKS = limit.UNIVERSAL_DISALLOWED_BLOCKS;
+        DISALLOWED_BLOCKS = limit.DISALLOWED_BLOCKS;
         DISALLOWED_STATES = limit.DISALLOWED_STATES;
     }
 
@@ -279,6 +283,7 @@ public class FaweLimit {
         limit.RESTRICT_HISTORY_TO_REGIONS = RESTRICT_HISTORY_TO_REGIONS;
         limit.STRIP_NBT = STRIP_NBT;
         limit.UNIVERSAL_DISALLOWED_BLOCKS = UNIVERSAL_DISALLOWED_BLOCKS;
+        limit.DISALLOWED_BLOCKS = DISALLOWED_BLOCKS;
         limit.DISALLOWED_STATES = DISALLOWED_STATES;
         return limit;
     }
