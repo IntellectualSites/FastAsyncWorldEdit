@@ -189,7 +189,7 @@ public class Settings extends Config {
         })
         public boolean RESTRICT_HISTORY_TO_REGIONS = true;
         @Comment({
-                "List of blocks to strip nbt from",
+                "List of nbt tags to strip from blocks, e.g. Items",
         })
         public List<String> STRIP_NBT = new ArrayList<>();
 
