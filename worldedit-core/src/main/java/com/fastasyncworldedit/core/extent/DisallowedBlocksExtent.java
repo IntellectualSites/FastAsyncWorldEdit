@@ -6,7 +6,6 @@ import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -19,7 +18,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
@@ -45,12 +43,12 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
     public DisallowedBlocksExtent(Extent extent, Set<String> blockedBlocks, Set<String> blockedStates) {
         super(extent);
         if (blockedBlocks != null && !blockedBlocks.isEmpty()) {
-            this.blockedBlocks = WorldEdit.getInstance().getConfiguration().disallowedBlocks.stream()
+            this.blockedBlocks = blockedBlocks.stream()
                     .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
                     .collect(Collectors.toSet());
         }
         if (blockedStates != null && !blockedStates.isEmpty()) {
-            this.blockedStates = new HashSet<>(blockedStates)
+            this.blockedStates = blockedStates
                     .stream()
                     .map(s -> BlockTypesCache.getAllProperties().get(s.toLowerCase(Locale.ROOT)))
                     .filter(Objects::nonNull)
