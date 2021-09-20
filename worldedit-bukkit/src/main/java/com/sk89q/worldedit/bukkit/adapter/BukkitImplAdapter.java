@@ -63,6 +63,7 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -332,6 +333,10 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     default RelighterFactory getRelighterFactory() {
         return new NMSRelighterFactory(); // TODO implement in adapters instead
+    }
+
+    default Map<String, ? extends Property<?>> getAllProperties() {
+        return Collections.emptyMap();
     }
     //FAWE end
 }
