@@ -41,7 +41,7 @@ public class FallingSphere implements Brush {
                 int startY = Math.max(minY, py - yRadius);
                 int endY = Math.min(maxY, py + yRadius);
 
-                int heightY = editSession.getHighestTerrainBlock(ax, az, startY, endY);
+                int heightY = editSession.getHighestTerrainBlock(ax, az, editSession.getMinY(), endY);
                 if (heightY < startY) {
                     int diff = startY - heightY;
                     startY -= diff;
