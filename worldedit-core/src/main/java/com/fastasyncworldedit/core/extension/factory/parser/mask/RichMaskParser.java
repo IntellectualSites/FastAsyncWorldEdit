@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Attempts to parse masks given rich inputs, allowing for & and ,. Also allows for nested masks
+ * Attempts to parse masks given rich inputs, allowing for &amp; and ,. Also allows for nested masks
  */
 public class RichMaskParser extends FaweParser<Mask> {
 

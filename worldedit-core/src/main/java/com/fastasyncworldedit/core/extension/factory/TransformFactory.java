@@ -91,7 +91,7 @@ public class TransformFactory extends AbstractFactory<ResettableExtent> {
 
     /**
      * Parses a transform without considering parsing through the {@link RichTransformParser}, therefore not accepting
-     * "richer" parsing where & and , are used. Exists to prevent stack overflows.
+     * "richer" parsing where &amp; and , are used. Exists to prevent stack overflows.
      *
      * @param input   input string
      * @param context input context

@@ -181,7 +181,7 @@ public final class PatternFactory extends AbstractFactory<Pattern> {
 
     /**
      * Parses a pattern without considering parsing through the {@link RichPatternParser}, therefore not accepting
-     * "richer" parsing where & and , are used. Exists to prevent stack overflows.
+     * "richer" parsing where &amp; and , are used. Exists to prevent stack overflows.
      *
      * @param input   input string
      * @param context input context

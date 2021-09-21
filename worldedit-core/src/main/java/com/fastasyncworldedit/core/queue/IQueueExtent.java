@@ -107,7 +107,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
 
     /**
      * Flush all changes to the world.
-     * @apiNote Best to call this async, so it doesn't hang the server.
+     * Best to call this async, so it doesn't hang the server.
      */
     @Override
     void flush();
@@ -126,9 +126,7 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
     int size();
 
     /**
-     * Returns <tt>true</tt> if this queue contains no elements.
-     *
-     * @return <tt>true</tt> if this queue contains no elements
+     * @return {@code true} if this queue contains no elements
      */
     boolean isEmpty();
 

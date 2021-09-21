@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Attempts to parse transforms given rich inputs, allowing for & and ,. Also allows for nested transforms
+ * Attempts to parse transforms given rich inputs, allowing for &amp; and ,. Also allows for nested transforms
  */
 public class RichTransformParser extends FaweParser<ResettableExtent> {
 

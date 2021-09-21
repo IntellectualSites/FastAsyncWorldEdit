@@ -21,7 +21,7 @@ public abstract class FaweParser<T> extends InputParser<T> implements AliasedPar
 
     /**
      * Parse an input into a list of {@link java.util.Map.Entry} of {@link ParseEntry} and a list of the given arguments, where
-     * arguments are given in square brackets, e.g. {@code #offset[2][10][2]}. Different entries may be separated by , or &
+     * arguments are given in square brackets, e.g. {@code #offset[2][10][2]}. Different entries may be separated by , or &amp;
      * (OR and AND respectively)
      *
      * @param toParse the string to parse
@@ -100,7 +100,7 @@ public abstract class FaweParser<T> extends InputParser<T> implements AliasedPar
         /**
          * Gives if the parsed entry was appended to the original input as an AND.
          *
-         * @return if appended to input with '&' rather than ','
+         * @return if appended to input with '&amp;' rather than ','
          */
         public boolean isAnd() {
             return and;

@@ -178,7 +178,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
 
     /**
      * Parses a mask without considering parsing through the {@link RichMaskParser}, therefore not accepting
-     * "richer" parsing where & and , are used. Exists to prevent stack overflows.
+     * "richer" parsing where &amp; and , are used. Exists to prevent stack overflows.
      *
      * @param input   input string
      * @param context input context

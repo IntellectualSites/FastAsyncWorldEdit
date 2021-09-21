@@ -160,7 +160,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     /**
      * Immediately terminate execution of the script, but without a failure message.
      *
-     * @implNote This exits by throwing an exception, which if caught will prevent
+     * This exits by throwing an exception, which if caught will prevent
      *     the script from exiting
      */
     public void exit() {

@@ -44,7 +44,7 @@ import static com.sk89q.worldedit.EditSession.Stage;
  * all changes made to the world. For example, the code below would wrap the
  * existing extent with a custom one, and the custom extent would receive
  * all method calls <strong>before</strong> the extent fetched from
- * {@link #getExtent()} would.</p>
+ * {@link #getExtent()} would.
  *
  * <pre>
  * event.setExtent(new MyExtent(event.getExtent())
@@ -61,7 +61,7 @@ import static com.sk89q.worldedit.EditSession.Stage;
  * custom {@link Extent} because that method bypasses history (and reorder).
  * It is thus recommended that loggers intercept at {@link Stage#BEFORE_CHANGE}
  * and block interceptors intercept at BOTH {@link Stage#BEFORE_CHANGE} and
- * {@link Stage#BEFORE_HISTORY}.</p>
+ * {@link Stage#BEFORE_HISTORY}.
  */
 public class EditSessionEvent extends Event implements Cancellable {
 

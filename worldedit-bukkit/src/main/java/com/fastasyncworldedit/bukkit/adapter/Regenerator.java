@@ -37,10 +37,10 @@ import java.util.stream.Collectors;
 /**
  * Represents an abstract regeneration handler.
  *
- * @param <IChunkAccess> the type of the {@Code IChunkAccess} of the current Minecraft implementation
- * @param <ProtoChunk>   the type of the {@Code ProtoChunk} of the current Minecraft implementation
- * @param <Chunk>        the type of the {@Code Chunk} of the current Minecraft implementation
- * @param <ChunkStatus>  the type of the {@Code ChunkStatusWrapper} wrapping the {@Code ChunkStatus} enum
+ * @param <IChunkAccess> the type of the {@code IChunkAccess} of the current Minecraft implementation
+ * @param <ProtoChunk>   the type of the {@code ProtoChunk} of the current Minecraft implementation
+ * @param <Chunk>        the type of the {@code Chunk} of the current Minecraft implementation
+ * @param <ChunkStatus>  the type of the {@code ChunkStatusWrapper} wrapping the {@code ChunkStatus} enum
  */
 public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess, Chunk extends IChunkAccess, ChunkStatus extends Regenerator.ChunkStatusWrapper<IChunkAccess>> {
 
