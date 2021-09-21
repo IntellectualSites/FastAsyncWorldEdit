@@ -45,7 +45,6 @@ public class HeightMap {
 
     //FAWE start
     private final boolean layers;
-    private boolean[] invalid;
     //FAWE end
     private final int[] data;
     private final int width;
@@ -89,7 +88,6 @@ public class HeightMap {
 
         // Store current heightmap data
         data = new int[width * height];
-        invalid = new boolean[data.length];
 
         //FAWE start
         if (layers) {
@@ -108,44 +106,13 @@ public class HeightMap {
         } else {
             // Store current heightmap data
             int index = 0;
-            int yTmp = session.getMaxY();
-            for (int z = 0; z < height; ++z) {
-                for (int x = 0; x < width; ++x, index++) {
-                    if (mask != null) {
-                        yTmp = session.getNearestSurfaceTerrainBlock(
-                                x + minX,
-                                z + minZ,
-                                yTmp,
-                                minY,
-                                maxY,
-                                Integer.MIN_VALUE,
-                                Integer.MAX_VALUE,
-                                mask
-                        );
+            for (int z = 0; z < height; z++) {
+                for (int x = 0; x < width; x++, index++) {
+                    if (mask == null) {
+                        data[index] = session.getHighestTerrainBlock(x + minX, z + minZ, minY, maxY);
                     } else {
-                        yTmp = session.getNearestSurfaceTerrainBlock(
-                                x + minX,
-                                z + minZ,
-                                yTmp,
-                                minY,
-                                maxY,
-                                Integer.MIN_VALUE,
-                                Integer.MAX_VALUE
-                        );
+                        data[index] = session.getHighestTerrainBlock(x + minX, z + minZ, minY, maxY, mask);
                     }
-                    switch (yTmp) {
-                        case Integer.MIN_VALUE:
-                            yTmp = minY;
-                            invalid[index] = true;
-                            break;
-                        case Integer.MAX_VALUE:
-                            yTmp = maxY;
-                            invalid[index] = true;
-                            break;
-                        default:
-                            break;
-                    }
-                    data[index] = yTmp;
                 }
             }
         }
@@ -209,9 +176,6 @@ public class HeightMap {
         for (int z = 0; z < height; ++z) {
             int zr = z + originZ;
             for (int x = 0; x < width; ++x) {
-                if (this.invalid != null && this.invalid[index]) {
-                    continue;
-                }
                 int curHeight = this.data[index];
 
                 //Clamp newHeight within the selection area
@@ -302,10 +266,6 @@ public class HeightMap {
         for (int z = 0; z < height; ++z) {
             int zr = z + originZ;
             for (int x = 0; x < width; ++x, index++) {
-                if (this.invalid != null && this.invalid[index]) {
-                    continue;
-                }
-
                 int curHeight = this.data[index];
 
                 // Clamp newHeight within the selection area
@@ -339,6 +299,20 @@ public class HeightMap {
                         ++blocksChanged;
                     }
                 } else if (curHeight > newHeight) {
+                    for (int setY = originY, getY = newHeight; setY >= newHeight; setY++, getY++) {
+                        BlockState get;
+                        if (getY >= session.getMinY() && getY <= session.getMaxY()) {
+                            get = session.getBlock(xr, getY, zr);
+                        } else {
+                            get = BlockTypes.AIR.getDefaultState();
+                        }
+                        if (get != BlockTypes.AIR.getDefaultState()) {
+                            tmpBlock = get;
+                        }
+                        session.setBlock(xr, setY, zr, tmpBlock);
+                        ++blocksChanged;
+                    }
+
                     // Set the top block of the column to be the same type
                     // (this could otherwise go wrong with rounding)
                     session.setBlock(xr, newHeight, zr, session.getBlock(xr, curHeight, zr));
