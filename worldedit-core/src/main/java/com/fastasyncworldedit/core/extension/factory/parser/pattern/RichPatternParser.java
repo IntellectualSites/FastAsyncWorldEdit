@@ -73,7 +73,7 @@ public class RichPatternParser extends FaweParser<Pattern> {
                     char char0 = command.charAt(0);
                     boolean charPattern = input.length() > 1 && input.charAt(1) != '[';
                     if (charPattern && input.charAt(0) == '=') {
-                        return parseFromInput(char0 + "[" + input.substring(1) + "]", context);
+                        pattern = parseFromInput(char0 + "[" + input.substring(1) + "]", context);
                     }
                     if (char0 == '#' && command.length() > 1 && command.charAt(1) != '#') {
                         throw new SuggestInputParseException(
