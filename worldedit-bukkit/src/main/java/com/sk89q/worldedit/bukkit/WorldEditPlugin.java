@@ -436,7 +436,8 @@ public class WorldEditPlugin extends JavaPlugin {
         // code of WorldEdit expects it
         String[] split = new String[args.length + 1];
         System.arraycopy(args, 0, split, 1, args.length);
-        split[0] = commandLabel;
+        split[0] = commandLabel.startsWith("fastasyncworldedit:") ? commandLabel.replace("fastasyncworldedit:", "") :
+                commandLabel;
 
         CommandEvent event = new CommandEvent(wrapCommandSender(sender), Joiner.on(" ").join(split));
         getWorldEdit().getEventBus().post(event);
