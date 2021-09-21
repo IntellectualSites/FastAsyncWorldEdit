@@ -27,6 +27,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
@@ -102,6 +103,6 @@ public interface BlockRegistry {
      *
      * @return a map of states where the key is the property's ID
      */
-    Map<String, ? extends Property<?>> getAllProperties();
+    Map<String, ? extends List<Property<?>>> getAllProperties();
     //FAWE end
 }

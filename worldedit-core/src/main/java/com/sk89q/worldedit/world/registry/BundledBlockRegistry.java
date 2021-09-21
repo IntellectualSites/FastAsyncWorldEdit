@@ -29,6 +29,7 @@ import com.sk89q.worldedit.world.block.BlockType;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
@@ -82,7 +83,7 @@ public class BundledBlockRegistry implements BlockRegistry {
 
     //FAWE start
     @Override
-    public Map<String, ? extends Property<?>> getAllProperties() {
+    public Map<String, ? extends List<Property<?>>> getAllProperties() {
         return Collections.emptyMap(); // Oof
     }
     //FAWE end

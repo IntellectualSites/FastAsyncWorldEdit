@@ -200,7 +200,7 @@ public class BlockTypesCache {
     public static final BlockType[] values;
     public static final BlockState[] states;
     public static final boolean[] ticking;
-    public static final Map<String, ? extends Property<?>> allProperties;
+    private static final Map<String, List<Property<?>>> allProperties = new HashMap<>();
 
     protected static final Set<String> $NAMESPACES = new LinkedHashSet<>();
 
@@ -267,14 +267,6 @@ public class BlockTypesCache {
             states = stateList.toArray(new BlockState[stateList.size()]);
             ticking = Booleans.toArray(tickList);
 
-            allProperties = WorldEdit
-                    .getInstance()
-                    .getPlatformManager()
-                    .queryCapability(Capability.GAME_HOOKS)
-                    .getRegistries()
-                    .getBlockRegistry()
-                    .getAllProperties();
-
         } catch (Throwable e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -294,6 +286,26 @@ public class BlockTypesCache {
         String nameSpace = typeName.substring(0, typeName.indexOf(':'));
         $NAMESPACES.add(nameSpace);
         return existing;
+    }
+
+    /**
+     * Get a list of all block properties available.
+     *
+     * @return map of string key against property of all block properties available
+     */
+    public static Map<String, List<Property<?>>> getAllProperties() {
+        synchronized (allProperties) {
+            if (allProperties.size() == 0) {
+                allProperties.putAll(WorldEdit
+                        .getInstance()
+                        .getPlatformManager()
+                        .queryCapability(Capability.GAME_HOOKS)
+                        .getRegistries()
+                        .getBlockRegistry()
+                        .getAllProperties());
+            }
+            return allProperties;
+        }
     }
 
 }

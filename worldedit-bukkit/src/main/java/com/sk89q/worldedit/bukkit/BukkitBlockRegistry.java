@@ -33,6 +33,7 @@ import org.bukkit.block.data.BlockData;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
 
@@ -161,7 +162,7 @@ public class BukkitBlockRegistry extends BundledBlockRegistry {
     }
 
     @Override
-    public Map<String, ? extends Property<?>> getAllProperties() {
+    public Map<String, ? extends List<Property<?>>> getAllProperties() {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.getAllProperties();
