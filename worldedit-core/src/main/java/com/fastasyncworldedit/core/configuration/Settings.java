@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class Settings extends Config {
 
@@ -631,7 +633,10 @@ public class Settings extends Config {
                     limit.DISALLOWED_BLOCKS = Collections.emptySet();
                 } else {
                     limit.DISALLOWED_BLOCKS = new HashSet<>(limit.DISALLOWED_BLOCKS);
-                    limit.DISALLOWED_BLOCKS.retainAll(newLimit.DISALLOWED_BLOCKS);
+                    limit.DISALLOWED_BLOCKS.retainAll(newLimit.DISALLOWED_BLOCKS
+                            .stream()
+                            .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
+                            .collect(Collectors.toSet()));
                     if (limit.DISALLOWED_BLOCKS.isEmpty()) {
                         limit.DISALLOWED_BLOCKS = Collections.emptySet();
                     }
