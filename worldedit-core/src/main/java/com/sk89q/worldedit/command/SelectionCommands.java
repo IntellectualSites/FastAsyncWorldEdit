@@ -736,8 +736,11 @@ public class SelectionCommands {
                 box.appendCommand("sphere", Caption.of("worldedit.select.sphere.description"), "//sel sphere");
                 box.appendCommand("cyl", Caption.of("worldedit.select.cyl.description"), "//sel cyl");
                 box.appendCommand("convex", Caption.of("worldedit.select.convex.description"), "//sel convex");
+                //FAWE start
                 box.appendCommand("polyhedral", Caption.of("fawe.selection.sel.polyhedral"), "//sel polyhedral");
                 box.appendCommand("fuzzy[=<mask>]", Caption.of("fawe.selection.sel.fuzzy-instruction"), "//sel fuzzy[=<mask>]");
+                box.setComponentsPerPage(box.getComponentsSize());
+                //FAWE end
 
                 actor.print(box.create(1));
                 return;
