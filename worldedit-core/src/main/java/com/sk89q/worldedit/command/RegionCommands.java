@@ -325,9 +325,6 @@ public class RegionCommands {
             ((AbstractExtentMask) from).setExtent(editSession);
             //FAWE end
         }
-        if (from instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) from).setExtent(editSession);
-        }
         int affected = editSession.replaceBlocks(region, from, to);
         actor.print(Caption.of("worldedit.replace.replaced", TextComponent.of(affected)));
         return affected;
