@@ -24,6 +24,7 @@ import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.function.mask.IdMask;
 import com.fastasyncworldedit.core.regions.selector.FuzzyRegionSelector;
 import com.fastasyncworldedit.core.regions.selector.PolyhedralRegionSelector;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.google.common.base.Strings;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -42,7 +43,6 @@ import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extension.platform.permission.ActorSelectorLimits;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.function.block.BlockDistributionCounter;
-import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
@@ -576,9 +576,7 @@ public class SelectionCommands {
                     Mask mask
     ) throws WorldEditException {
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
-        if (mask instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) mask).setExtent(editSession);
-        }
+        new MaskTraverser(mask).setNewExtent(editSession);
         //FAWE end
         int count = editSession.countBlocks(session.getSelection(world), mask);
         actor.print(Caption.of("worldedit.count.counted", TextComponent.of(count)));

@@ -24,6 +24,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.function.QuadFunction;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.fastasyncworldedit.core.util.task.DelegateConsumer;
@@ -49,7 +50,6 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.EntityFunction;
-import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -462,9 +462,7 @@ public class UtilityCommands {
                     int radius
     ) throws WorldEditException {
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
-        if (mask instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) mask).setExtent(editSession);
-        }
+        new MaskTraverser(mask).setNewExtent(editSession);
         //FAWE end
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);
@@ -491,9 +489,7 @@ public class UtilityCommands {
                     Pattern to
     ) throws WorldEditException {
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
-        if (from instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) from).setExtent(editSession);
-        }
+        new MaskTraverser(from).setNewExtent(editSession);
         //FAWE end
         radius = Math.max(1, radius);
         we.checkMaxRadius(radius);

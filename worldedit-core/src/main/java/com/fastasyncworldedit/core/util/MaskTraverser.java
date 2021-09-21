@@ -73,4 +73,57 @@ public class MaskTraverser {
         }
     }
 
+    public void setNewExtent(Extent newExtent) {
+        setNewExtent(mask, newExtent);
+    }
+
+    private void setNewExtent(Mask mask, Extent newExtent) {
+        if (mask == null) {
+            return;
+        }
+        Class<?> current = mask.getClass();
+        while (current.getSuperclass() != null) {
+            if (mask instanceof AbstractExtentMask) {
+                AbstractExtentMask mask1 = (AbstractExtentMask) mask;
+                mask1.setExtent(newExtent);
+            } else {
+                try {
+                    Field field = current.getDeclaredField("extent");
+                    field.setAccessible(true);
+                    field.set(mask, newExtent);
+                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                }
+            }
+            if (mask instanceof MaskIntersection) {
+                MaskIntersection mask1 = (MaskIntersection) mask;
+                try {
+                    Field field = mask1.getClass().getDeclaredField("masks");
+                    field.setAccessible(true);
+                    Collection<Mask> masks = (Collection<Mask>) field.get(mask);
+                    for (Mask next : masks) {
+                        setNewExtent(next, newExtent);
+                    }
+                } catch (NoSuchFieldException | IllegalAccessException ignored) {
+                }
+            }
+            try {
+                Field field = current.getDeclaredField("mask");
+                field.setAccessible(true);
+                Mask next = (Mask) field.get(mask);
+                setNewExtent(next, newExtent);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            }
+            try {
+                Field field = current.getDeclaredField("masks");
+                field.setAccessible(true);
+                Collection<Mask> masks = (Collection<Mask>) field.get(mask);
+                for (Mask next : masks) {
+                    setNewExtent(next, newExtent);
+                }
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            }
+            current = current.getSuperclass();
+        }
+    }
+
 }

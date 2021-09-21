@@ -24,6 +24,7 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
 import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalSession;
@@ -37,7 +38,6 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.GroundFunction;
 import com.sk89q.worldedit.function.generator.FloraGenerator;
-import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.MaskIntersection;
@@ -321,9 +321,8 @@ public class RegionCommands {
         if (from == null) {
             from = new ExistingBlockMask(editSession);
             //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow
-        } else if (from instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) from).setExtent(editSession);
-            //FAWE end
+        } else {
+            new MaskTraverser(from).setNewExtent(editSession);
         }
         int affected = editSession.replaceBlocks(region, from, to);
         actor.print(Caption.of("worldedit.replace.replaced", TextComponent.of(affected)));
@@ -467,9 +466,7 @@ public class RegionCommands {
                     Mask mask
     ) throws WorldEditException {
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
-        if (mask instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) mask).setExtent(editSession);
-        }
+        new MaskTraverser(mask).setNewExtent(editSession);
         //FAWE end
         BlockVector3 min = region.getMinimumPoint();
         BlockVector3 max = region.getMaximumPoint();
@@ -582,9 +579,7 @@ public class RegionCommands {
         checkCommandArgument(count >= 1, "Count must be >= 1");
 
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
-        if (mask instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) mask).setExtent(editSession);
-        }
+        new MaskTraverser(mask).setNewExtent(editSession);
         //FAWE end
         Mask combinedMask;
         if (ignoreAirBlocks) {
@@ -664,9 +659,7 @@ public class RegionCommands {
     ) throws WorldEditException {
 
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
-        if (mask instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) mask).setExtent(editSession);
-        }
+        new MaskTraverser(mask).setNewExtent(editSession);
         //FAWE end
         Mask combinedMask;
         if (ignoreAirBlocks) {
@@ -842,9 +835,7 @@ public class RegionCommands {
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
         Mask finalMask;
         if (mask != null) {
-            if (mask instanceof AbstractExtentMask) {
-                ((AbstractExtentMask) mask).setExtent(editSession);
-            }
+            new MaskTraverser(mask).setNewExtent(editSession);
             finalMask = mask;
         } else {
             finalMask = new SolidBlockMask(editSession);

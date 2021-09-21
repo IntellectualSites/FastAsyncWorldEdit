@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.function.generator.CavesGen;
 import com.fastasyncworldedit.core.util.MainUtil;
+import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
@@ -37,7 +38,6 @@ import com.sk89q.worldedit.command.util.annotation.Confirm;
 import com.sk89q.worldedit.command.util.annotation.Preload;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -560,9 +560,7 @@ public class GenerationCommands {
             @Selection Region region,
             @Arg(desc = "Mask") Mask mask
     ) throws WorldEditException {
-        if (mask instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) mask).setExtent(editSession);
-        }
+        new MaskTraverser(mask).setNewExtent(editSession);
         editSession.addOres(region, mask);
         actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", editSession.getBlockChangeCount()));
     }
@@ -633,9 +631,7 @@ public class GenerationCommands {
             @Arg(desc = "Ore vein min y", def = "0") int minY,
             @Arg(desc = "Ore vein max y", def = "63") int maxY
     ) throws WorldEditException {
-        if (mask instanceof AbstractExtentMask) {
-            ((AbstractExtentMask) mask).setExtent(editSession);
-        }
+        new MaskTraverser(mask).setNewExtent(editSession);
         checkCommandArgument(minY >= editSession.getMinY(), Caption.of("fawe.error.outside-range-lower", "miny",
                 editSession.getMinY()
         ));
