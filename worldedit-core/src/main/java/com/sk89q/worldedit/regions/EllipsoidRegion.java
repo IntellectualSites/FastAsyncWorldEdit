@@ -55,7 +55,7 @@ public class EllipsoidRegion extends AbstractRegion {
 
     //FAWE start
     private Vector3 radiusSqr;
-    private Vector3 inverseRadius;
+    private Vector3 inverseRadiusSqr;
     private int radiusLengthSqr;
     private boolean sphere;
     //FAWE end
@@ -200,7 +200,7 @@ public class EllipsoidRegion extends AbstractRegion {
         radiusSqr = radius.multiply(radius);
         radiusLengthSqr = (int) radiusSqr.getX();
         this.sphere = radius.getY() == radius.getX() && radius.getX() == radius.getZ();
-        inverseRadius = Vector3.ONE.divide(radius);
+        inverseRadiusSqr = Vector3.ONE.divide(radiusSqr);
         //FAWE end
     }
 
@@ -249,9 +249,9 @@ public class EllipsoidRegion extends AbstractRegion {
         if (sphere) {
             return cx2 + cy2 + cz2 <= radiusLengthSqr;
         }
-        double cxd = cx2 * inverseRadius.getX();
-        double cyd = cy2 * inverseRadius.getY();
-        double czd = cz2 * inverseRadius.getZ();
+        double cxd = cx2 * inverseRadiusSqr.getX();
+        double cyd = cy2 * inverseRadiusSqr.getY();
+        double czd = cz2 * inverseRadiusSqr.getZ();
         return cxd + cyd + czd <= 1;
     }
 
@@ -280,8 +280,8 @@ public class EllipsoidRegion extends AbstractRegion {
         if (cz2 > radiusSqr.getBlockZ()) {
             return false;
         }
-        double cxd = cx2 * inverseRadius.getX();
-        double czd = cz2 * inverseRadius.getZ();
+        double cxd = cx2 * inverseRadiusSqr.getX();
+        double czd = cz2 * inverseRadiusSqr.getZ();
         return cxd + czd <= 1;
     }
     //FAWE end
