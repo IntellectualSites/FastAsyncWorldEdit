@@ -50,7 +50,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
         if (blockedStates != null && !blockedStates.isEmpty()) {
             this.blockedStates = blockedStates
                     .stream()
-                    .map(s -> BlockTypesCache.getAllProperties().get(s.toLowerCase(Locale.ROOT)))
+                    .flatMap(s -> BlockTypesCache.getAllProperties().get(s.toLowerCase(Locale.ROOT)).stream())
                     .filter(Objects::nonNull)
                     .collect(Collectors.toUnmodifiableSet());
         }
