@@ -136,7 +136,6 @@ public class RichMaskParser extends FaweParser<Mask> {
                             case '!':
                                 input = input.substring(input.indexOf(char0) + 1);
                                 mask = parseFromInput(char0 + "[" + input + "]", context);
-                                return mask;
                         }
                     }
                     if (mask == null) {
