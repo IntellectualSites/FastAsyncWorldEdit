@@ -717,8 +717,7 @@ public class SelectionCommands {
             case FUZZY:
             case MAGIC:
                 Mask maskOpt = new IdMask(world);
-                //TODO Make FuzzyRegionSelector accept actors
-                newSelector = new FuzzyRegionSelector((Player) actor, world, maskOpt);
+                newSelector = new FuzzyRegionSelector(actor, world, maskOpt);
                 actor.print(Caption.of("fawe.selection.sel.fuzzy"));
                 actor.print(Caption.of("fawe.selection.sel.list"));
                 break;

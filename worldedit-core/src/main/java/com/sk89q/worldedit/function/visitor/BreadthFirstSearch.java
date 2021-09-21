@@ -210,7 +210,9 @@ public abstract class BreadthFirstSearch implements Operation {
      * Add the given location to the list of locations to visit, provided
      * that it has not been visited. The position passed to this method
      * will still be visited even if it fails
-     * {@link #isVisitable(BlockVector3, BlockVector3)}.
+     * {@link #isVisitable(BlockVector3, BlockVector3)} as
+     * {@link #isVisitable(BlockVector3, BlockVector3)} is never actually
+     * called.
      *
      * <p>This method should be used before the search begins, because if
      * the position <em>does</em> fail the test, and the search has already

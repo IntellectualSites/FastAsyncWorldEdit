@@ -47,13 +47,17 @@ public class FuzzyRegion extends AbstractRegion {
         return set.size();
     }
 
-    public void select(int x, int y, int z) {
+    /**
+     * Add to the selection from the given position.
+     */
+    public void select(BlockVector3 position) {
         RecursiveVisitor search = new RecursiveVisitor(mask, p -> {
             setMinMax(p.getBlockX(), p.getBlockY(), p.getBlockZ());
             return true;
-        }, 256, extent.getMinY(), extent.getMaxY());
+        }, 256, extent.getMinY(), extent.getMaxY(), extent);
         search.setVisited(set);
-        search.visit(BlockVector3.at(x, y, z));
+        mask.test(position);
+        search.visit(position);
         Operations.completeBlindly(search);
     }
 

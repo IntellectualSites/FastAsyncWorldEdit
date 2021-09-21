@@ -9,7 +9,6 @@ import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -26,17 +25,17 @@ import java.util.stream.IntStream;
 
 public class FuzzyRegionSelector extends PassthroughExtent implements RegionSelector {
 
-    private final Player player;
+    private final Actor actor;
     private FuzzyRegion region;
     private final ArrayList<BlockVector3> positions;
 
-    public FuzzyRegionSelector(Player player, @Nullable World world, Mask mask) {
+    public FuzzyRegionSelector(Actor actor, @Nullable World world, Mask mask) {
         super(WorldEdit.getInstance().newEditSessionBuilder().world(world)
-                .actor(player)
+                .actor(actor)
                 .changeSetNull()
                 .checkMemory(false)
                 .build());
-        this.player = player;
+        this.actor = actor;
         this.region = new FuzzyRegion(world, getExtent(), mask);
         this.positions = new ArrayList<>();
         new MaskTraverser(mask).reset(getExtent());
@@ -51,7 +50,7 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
     @Override
     public void setWorld(@Nullable World world) {
         EditSession extent = WorldEdit.getInstance().newEditSessionBuilder().world(world)
-                .actor(player)
+                .actor(actor)
                 .changeSetNull()
                 .checkMemory(false)
                 .build();
@@ -72,7 +71,7 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
         positions.clear();
         positions.add(position);
         this.region = new FuzzyRegion(getWorld(), getExtent(), getMask());
-        this.region.select(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        this.region.select(position);
         return true;
     }
 
@@ -80,18 +79,18 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
     public boolean selectSecondary(BlockVector3 position, SelectorLimits limits) {
         this.positions.add(position);
         new MaskTraverser(getMask()).reset(getExtent());
-        this.region.select(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+        this.region.select(position);
         return true;
     }
 
     @Override
     public void explainPrimarySelection(Actor actor, LocalSession session, BlockVector3 position) {
-        player.print(Caption.of("fawe.worldedit.selector.selector.fuzzy.pos1", position, "(" + region.getVolume() + ")"));
+        actor.print(Caption.of("fawe.worldedit.selector.selector.fuzzy.pos1", position, "(" + region.getVolume() + ")"));
     }
 
     @Override
     public void explainSecondarySelection(Actor actor, LocalSession session, BlockVector3 position) {
-        player.print(Caption.of("fawe.worldedit.selector.selector.fuzzy.pos2", position, "(" + region.getVolume() + ")"));
+        actor.print(Caption.of("fawe.worldedit.selector.selector.fuzzy.pos2", position, "(" + region.getVolume() + ")"));
     }
 
     @Override
