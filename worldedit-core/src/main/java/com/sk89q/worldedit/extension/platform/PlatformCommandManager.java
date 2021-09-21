@@ -766,18 +766,13 @@ public final class PlatformCommandManager {
             actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", e.getComponent()));
         } catch (UsageException e) {
             ImmutableList<Command> cmd = e.getCommands();
-            if (e.getRichMessage() == TextComponent.empty() && !cmd.isEmpty()) {
+            if (!cmd.isEmpty()) {
                 actor.print(Caption.of(
                         "fawe.error.command.syntax",
                         HelpGenerator.create(e.getCommandParseResult()).getFullHelp()
                 ));
-            } else {
-                actor.print(Caption.of(
-                        "fawe.error.command.syntax",
-                        HelpGenerator.create(e.getCommandParseResult()).getUsage()
-                ));
-                actor.printError(e.getRichMessage());
             }
+            actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {
             handleUnknownException(actor, e.getCause());
         } catch (CommandException e) {
