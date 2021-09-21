@@ -83,7 +83,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                     char char0 = command.charAt(0);
                     boolean charMask = input.length() > 1 && input.charAt(1) != '[';
                     if (charMask && input.charAt(0) == '=') {
-                        return parseFromInput(char0 + "[" + input.substring(1) + "]", context);
+                        mask = parseFromInput(char0 + "[" + input.substring(1) + "]", context);
                     }
                     if (char0 == '#') {
                         throw new SuggestInputParseException(
