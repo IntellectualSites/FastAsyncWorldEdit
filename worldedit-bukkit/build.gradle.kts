@@ -47,6 +47,12 @@ configurations.all {
     }
 }
 
+val localImplementation = configurations.create("localImplementation") {
+    description = "Dependencies used locally, but provided by the runtime Bukkit implementation"
+    isCanBeConsumed = false
+    isCanBeResolved = false
+}
+
 dependencies {
     // Modules
     api(projects.worldeditCore)
@@ -56,14 +62,14 @@ dependencies {
     implementation(libs.fastutil)
 
     // Platform expectations
-    api(libs.paper) {
+    compileOnly(libs.paper) {
         exclude("junit", "junit")
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
     // Logging
-    implementation(libs.log4j)
-    implementation(libs.log4jBom) {
+    localImplementation(libs.log4j)
+    localImplementation(libs.log4jBom) {
         because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
     }
 
@@ -78,17 +84,19 @@ dependencies {
         exclude("com.sk89q.worldedit.worldedit-libs", "bukkit")
         exclude("com.sk89q.worldedit.worldedit-libs", "core")
     }
-    implementation(libs.mapmanager) { isTransitive = false }
-    implementation(libs.griefprevention) { isTransitive = false }
-    implementation(libs.griefdefender) { isTransitive = false }
-    implementation(libs.mcore) { isTransitive = false }
-    implementation(libs.residence) { isTransitive = false }
+    compileOnly(libs.mapmanager) { isTransitive = false }
+    compileOnly(libs.griefprevention) { isTransitive = false }
+    compileOnly(libs.griefdefender) { isTransitive = false }
+    compileOnly(libs.mcore) { isTransitive = false }
+    compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
-    implementation(libs.protocollib) { isTransitive = false }
-    api(libs.plotsquaredV6Bukkit) { isTransitive = false }
+    compileOnly(libs.protocollib) { isTransitive = false }
+    compileOnly(libs.plotsquaredV6Bukkit) { isTransitive = false }
+    compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
+    compileOnly(libs.plotsquaredV4) { isTransitive = false }
 
     // Third party
-    implementation(libs.flowmath) {
+    compileOnly(libs.flowmath) {
         because("This dependency is needed by GriefDefender but not exposed transitively.")
         isTransitive = false
     }
@@ -98,7 +106,7 @@ dependencies {
     implementation(libs.serverlib)
     api(libs.paster)
     api(libs.lz4Java)
-    api(libs.lz4JavaStream) { isTransitive = false }
+    runtimeOnly(libs.lz4JavaStream) { isTransitive = false }
     api(libs.sparsebitset) { isTransitive = false }
     api(libs.parallelgzip) { isTransitive = false }
     compileOnly(libs.adventure)

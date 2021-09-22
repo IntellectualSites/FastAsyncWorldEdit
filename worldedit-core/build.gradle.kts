@@ -37,8 +37,8 @@ dependencies {
 
     // Plugins
     compileOnly(libs.redprotect)
-    api(libs.plotsquaredV4) { isTransitive = false }
-    api(libs.plotsquaredV6Core) { isTransitive = false }
+    compileOnly(libs.plotsquaredV4) { isTransitive = false }
+    compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
 
     // ensure this is on the classpath for the AP
     annotationProcessor(libs.guava)
@@ -46,7 +46,7 @@ dependencies {
     annotationProcessor(libs.autoValue)
 
     // Third party
-    implementation(libs.truezip)
+    compileOnly(libs.truezip)
     implementation(libs.findbugs)
     implementation(libs.rhino)
     compileOnly(libs.adventure)
