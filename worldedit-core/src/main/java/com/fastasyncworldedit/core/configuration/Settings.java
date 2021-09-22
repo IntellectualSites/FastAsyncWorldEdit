@@ -330,12 +330,12 @@ public class Settings extends Config {
                 " - Low values may result in FAWE waiting on requests to the main thread",
                 " - Higher values use more memory and isn't noticeably faster",
                 " - A good (relatively) safe way to set this is",
-                " - Use 32 x GB of RAM / number of players expected to be using WE at the same time",
+                " - Use 128 x GB of RAM / number of players expected to be using WE at the same time",
                 " - Paper and derivatives only. (requires delay-chunk-unloads-by to be set)."
         })
         // Renamed from PRELOAD_CHUNK because it was set to 100000... something that lots of servers will now have which is
         // wayyy too much...
-        public int PRELOAD_CHUNK_COUNT = 128;
+        public int PRELOAD_CHUNK_COUNT = 512;
 
         @Comment({
                 "If pooling is enabled (reduces GC, higher memory usage)",
