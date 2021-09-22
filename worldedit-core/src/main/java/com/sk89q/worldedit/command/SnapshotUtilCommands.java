@@ -71,9 +71,11 @@ public class SnapshotUtilCommands {
             @Arg(name = "snapshot", desc = "The snapshot to restore", def = "")
                     String snapshotName,
             //FAWE start - biome and entity restore
-            @Switch(name = 'b', desc = "If biomes should be restored")
+            @Switch(name = 'b', desc = "If biomes should be restored. If restoring from pre-1.15 to 1.15+, biomes may not be " +
+                    "exactly the same due to 3D biomes.")
                     boolean restoreBiomes,
-            @Switch(name = 'e', desc = "If entities should be restored")
+            @Switch(name = 'e', desc = "If entities should be restored. Will cause issues with duplicate entities if all " +
+                    "original entities were not removed.")
                     boolean restoreEntities
             //FAWE end
     ) throws WorldEditException, IOException {
