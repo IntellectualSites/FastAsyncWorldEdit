@@ -54,12 +54,12 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private static final byte VERSION = 1;
+    private static final int VERSION = 1;
 
     private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
-    private final byte version;
-    private final byte HEADER_SIZE;
+    private final int version;
+    private final int HEADER_SIZE;
 
     private RandomAccessFile braf;
     private MappedByteBuffer byteBuffer;
@@ -119,7 +119,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             braf.setLength(fileLength);
             init();
             // write getLength() etc
-            byteBuffer.put(0, (version = VERSION));
+            byteBuffer.putChar(0, (char) (version = VERSION));
             byteBuffer.putChar(2, (char) getWidth());
             byteBuffer.putChar(4, (char) getHeight());
             byteBuffer.putChar(6, (char) getLength());
@@ -155,8 +155,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
             init();
-            version = byteBuffer.get(0);
-            HEADER_SIZE = (byte) (version > 0 ? 20 : 14);
+            version = byteBuffer.getChar(0);
+            HEADER_SIZE = (version > 0 ? 20 : 14);
             if (braf.length() - HEADER_SIZE == ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)) {
                 hasBiomes = true;
             }
@@ -275,7 +275,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             int originX = byteBuffer.getShort(8);
             int originY = byteBuffer.getShort(10);
             int originZ = byteBuffer.getShort(12);
-            if (version > 0) {
+            if (version == 1) {
                 int offsetX = byteBuffer.getShort(14);
                 int offsetY = byteBuffer.getShort(16);
                 int offsetZ = byteBuffer.getShort(18);
