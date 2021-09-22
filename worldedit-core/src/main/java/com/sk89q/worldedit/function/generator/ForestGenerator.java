@@ -60,7 +60,7 @@ public class ForestGenerator implements RegionFunction {
             // we trick editsession history here in the first call
             editSession.setBlock(position, BlockTypes.AIR.getDefaultState());
             // and then trick the generator here by directly setting into the world
-            editSession.getWorld().setBlock(position, BlockTypes.AIR.getDefaultState());
+            editSession.setBlock(position, BlockTypes.AIR.getDefaultState());
             // so that now the generator can generate the tree
             boolean success = treeType.generate(editSession, position);
             if (!success) {
