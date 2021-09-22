@@ -45,28 +45,40 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
- * The chunk format for Minecraft 1.13 to 1.15
+ * The chunk format for Minecraft 1.17
  */
-public class AnvilChunk13 implements Chunk {
+public class AnvilChunk17 implements Chunk {
 
-    protected final CompoundBinaryTag rootTag;
-    private final BlockState[][] blocks;
-    protected BiomeType[] biomes;
+    private final CompoundBinaryTag rootTag;
+    private final Supplier<CompoundBinaryTag> entityTagSupplier;
+    private BiomeType[] biomes;
+    private BlockState[][] blocks;
     private Map<BlockVector3, CompoundBinaryTag> tileEntities;
     private List<BaseEntity> entities;
+    // initialise with default values
+    private int minSectionPosition = 0;
+    private int maxSectionPosition = 15;
+    private int sectionCount = 16;
 
     /**
      * Construct the chunk with a compound tag.
      *
      * @param tag the tag to read
      * @throws DataException on a data error
-     * @deprecated Use {@link #AnvilChunk13(CompoundBinaryTag)}
+     * @deprecated Use {@link #AnvilChunk17(CompoundBinaryTag, Supplier)}
      */
     @Deprecated
-    public AnvilChunk13(CompoundTag tag) throws DataException {
-        this(tag.asBinaryTag());
+    public AnvilChunk17(CompoundTag tag, Supplier<CompoundTag> entitiesTag) throws DataException {
+        this(tag.asBinaryTag(), () -> {
+            CompoundTag compoundTag = entitiesTag.get();
+            if (compoundTag == null) {
+                return null;
+            }
+            return compoundTag.asBinaryTag();
+        });
     }
 
     /**
@@ -75,10 +87,11 @@ public class AnvilChunk13 implements Chunk {
      * @param tag the tag to read
      * @throws DataException on a data error
      */
-    public AnvilChunk13(CompoundBinaryTag tag) throws DataException {
+    public AnvilChunk17(CompoundBinaryTag tag, Supplier<CompoundBinaryTag> entityTag) throws DataException {
         rootTag = tag;
+        entityTagSupplier = entityTag;
 
-        blocks = new BlockState[16][];
+        blocks = new BlockState[16][]; // initialise with default length
 
         ListBinaryTag sections = NbtUtils.getChildTag(rootTag, "Sections", BinaryTagTypes.LIST);
 
@@ -88,14 +101,12 @@ public class AnvilChunk13 implements Chunk {
             }
 
             CompoundBinaryTag sectionTag = (CompoundBinaryTag) rawSectionTag;
-            if (sectionTag.get("Y") == null) {
+            if (sectionTag.get("Y") == null || sectionTag.get("BlockStates") == null) {
                 continue; // Empty section.
             }
 
             int y = NbtUtils.getChildTag(sectionTag, "Y", BinaryTagTypes.BYTE).value();
-            if (y < 0 || y >= 16) {
-                continue;
-            }
+            updateSectionIndexRange(y);
 
             // parse palette
             ListBinaryTag paletteEntries = sectionTag.getList("Palette", BinaryTagTypes.COMPOUND);
@@ -132,45 +143,43 @@ public class AnvilChunk13 implements Chunk {
             // parse block states
             long[] blockStatesSerialized = NbtUtils.getChildTag(sectionTag, "BlockStates", BinaryTagTypes.LONG_ARRAY).value();
 
-            BlockState[] chunkSectionBlocks = new BlockState[16 * 16 * 16];
-            blocks[y] = chunkSectionBlocks;
+            BlockState[] chunkSectionBlocks = new BlockState[4096];
+            blocks[y - minSectionPosition] = chunkSectionBlocks;
 
             readBlockStates(palette, blockStatesSerialized, chunkSectionBlocks);
         }
     }
 
+    private void updateSectionIndexRange(int layer) {
+        if (layer >= minSectionPosition && layer <= maxSectionPosition) {
+            return;
+        }
+        if (layer < minSectionPosition) {
+            int diff = minSectionPosition - layer;
+            sectionCount += diff;
+            BlockState[][] tmpBlocks = new BlockState[sectionCount][];
+            System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
+            blocks = tmpBlocks;
+            minSectionPosition = layer;
+        } else {
+            int diff = layer - maxSectionPosition;
+            sectionCount += diff;
+            BlockState[][] tmpBlocks = new BlockState[sectionCount][];
+            System.arraycopy(blocks, 0, tmpBlocks, 0, blocks.length);
+            blocks = tmpBlocks;
+            maxSectionPosition = layer;
+        }
+    }
+
     protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws
             InvalidFormatException {
-        int paletteBits = 4;
-        while ((1 << paletteBits) < palette.length) {
-            ++paletteBits;
-        }
-        int paletteMask = (1 << paletteBits) - 1;
-
-        long currentSerializedValue = 0;
-        int nextSerializedItem = 0;
-        int remainingBits = 0;
+        PackedIntArrayReader reader = new PackedIntArrayReader(blockStatesSerialized);
         for (int blockPos = 0; blockPos < chunkSectionBlocks.length; blockPos++) {
-            int localBlockId;
-            if (remainingBits < paletteBits) {
-                int bitsNextLong = paletteBits - remainingBits;
-                localBlockId = (int) currentSerializedValue;
-                if (nextSerializedItem >= blockStatesSerialized.length) {
-                    throw new InvalidFormatException("Too short block state table");
-                }
-                currentSerializedValue = blockStatesSerialized[nextSerializedItem++];
-                localBlockId |= (currentSerializedValue & ((1 << bitsNextLong) - 1)) << remainingBits;
-                currentSerializedValue >>>= bitsNextLong;
-                remainingBits = 64 - bitsNextLong;
-            } else {
-                localBlockId = (int) (currentSerializedValue & paletteMask);
-                currentSerializedValue >>>= paletteBits;
-                remainingBits -= paletteBits;
+            int index = reader.get(blockPos);
+            if (index >= palette.length) {
+                throw new InvalidFormatException("Invalid block state table entry: " + index);
             }
-            if (localBlockId >= palette.length) {
-                throw new InvalidFormatException("Invalid block state table entry: " + localBlockId);
-            }
-            chunkSectionBlocks[blockPos] = palette[localBlockId];
+            chunkSectionBlocks[blockPos] = palette[index];
         }
     }
 
@@ -233,11 +242,11 @@ public class AnvilChunk13 implements Chunk {
         int section = y >> 4;
         int yIndex = y & 0x0F;
 
-        if (section < 0 || section >= blocks.length) {
+        if (section < minSectionPosition || section > maxSectionPosition) {
             throw new DataException("Chunk does not contain position " + position);
         }
 
-        BlockState[] sectionBlocks = blocks[section];
+        BlockState[] sectionBlocks = blocks[section - minSectionPosition];
         BlockState state = sectionBlocks != null ? sectionBlocks[(yIndex << 8) | (z << 4) | x] : BlockTypes.AIR.getDefaultState();
 
         CompoundBinaryTag tileEntity = getBlockTileEntity(position);
@@ -254,9 +263,21 @@ public class AnvilChunk13 implements Chunk {
         if (biomes == null) {
             populateBiomes();
         }
-        int rx = position.getX() & 15;
-        int rz = position.getZ() & 15;
-        return biomes[rz << 4 | rx];
+        int x = (position.getX() & 15) >> 2;
+        int y = (position.getY() - (minSectionPosition << 4)) >> 2; // normalize
+        int z = (position.getZ() & 15) >> 2;
+        return biomes[y << 4 | z << 2 | x];
+    }
+
+    private void populateBiomes() throws DataException {
+        biomes = new BiomeType[64 * blocks.length];
+        if (rootTag.get("Biomes") == null) {
+            return;
+        }
+        int[] stored = NbtUtils.getChildTag(rootTag, "Biomes", BinaryTagTypes.INT_ARRAY).value();
+        for (int i = 0; i < 1024; i++) {
+            biomes[i] = BiomeTypes.getLegacy(stored[i]);
+        }
     }
 
     @Override
@@ -272,10 +293,11 @@ public class AnvilChunk13 implements Chunk {
      */
     private void populateEntities() throws DataException {
         entities = new ArrayList<>();
-        if (rootTag.get("Entities") == null) {
+        CompoundBinaryTag entityTag;
+        if (entityTagSupplier == null || (entityTag = entityTagSupplier.get()) == null) {
             return;
         }
-        ListBinaryTag tags = NbtUtils.getChildTag(rootTag, "Entities", BinaryTagTypes.LIST);
+        ListBinaryTag tags = NbtUtils.getChildTag(entityTag, "Entities", BinaryTagTypes.LIST);
 
         for (BinaryTag tag : tags) {
             if (!(tag instanceof CompoundBinaryTag)) {
@@ -287,20 +309,6 @@ public class AnvilChunk13 implements Chunk {
             entities.add(new BaseEntity(EntityTypes.get(t.getString("id")), LazyReference.computed(t)));
         }
 
-    }
-
-    /**
-     * Used to load the biomes.
-     */
-    private void populateBiomes() throws DataException {
-        biomes = new BiomeType[256];
-        if (rootTag.get("Biomes") == null) {
-            return;
-        }
-        int[] stored = NbtUtils.getChildTag(rootTag, "Biomes", BinaryTagTypes.INT_ARRAY).value();
-        for (int i = 0; i < 256; i++) {
-            biomes[i] = BiomeTypes.getLegacy(stored[i]);
-        }
     }
 
 }

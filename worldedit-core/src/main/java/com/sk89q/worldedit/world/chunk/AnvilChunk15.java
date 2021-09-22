@@ -19,26 +19,29 @@
 
 package com.sk89q.worldedit.world.chunk;
 
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataException;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.storage.InvalidFormatException;
+import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 
 /**
- * The chunk format for Minecraft 1.16 and newer
+ * The chunk format for Minecraft 1.15 and newer
  */
-public class AnvilChunk16 extends AnvilChunk15 {
+public class AnvilChunk15 extends AnvilChunk13 {
 
     /**
      * Construct the chunk with a compound tag.
      *
      * @param tag the tag to read
      * @throws DataException on a data error
-     * @deprecated Use {@link #AnvilChunk16(CompoundBinaryTag)}
+     * @deprecated Use {@link #AnvilChunk15(CompoundBinaryTag)}
      */
     @Deprecated
-    public AnvilChunk16(CompoundTag tag) throws DataException {
+    public AnvilChunk15(CompoundTag tag) throws DataException {
         super(tag);
     }
 
@@ -48,20 +51,29 @@ public class AnvilChunk16 extends AnvilChunk15 {
      * @param tag the tag to read
      * @throws DataException on a data error
      */
-    public AnvilChunk16(CompoundBinaryTag tag) throws DataException {
+    public AnvilChunk15(CompoundBinaryTag tag) throws DataException {
         super(tag);
     }
 
     @Override
-    protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws
-            InvalidFormatException {
-        PackedIntArrayReader reader = new PackedIntArrayReader(blockStatesSerialized);
-        for (int blockPos = 0; blockPos < chunkSectionBlocks.length; blockPos++) {
-            int index = reader.get(blockPos);
-            if (index >= palette.length) {
-                throw new InvalidFormatException("Invalid block state table entry: " + index);
-            }
-            chunkSectionBlocks[blockPos] = palette[index];
+    public BiomeType getBiome(final BlockVector3 position) throws DataException {
+        if (biomes == null) {
+            populateBiomes();
+        }
+        int x = (position.getX() & 15) >> 2;
+        int y = position.getY() >> 2;
+        int z = (position.getZ() & 15) >> 2;
+        return biomes[y << 4 | z << 2 | x];
+    }
+
+    private void populateBiomes() throws DataException {
+        biomes = new BiomeType[1024];
+        if (rootTag.get("Biomes") == null) {
+            return;
+        }
+        int[] stored = NbtUtils.getChildTag(rootTag, "Biomes", BinaryTagTypes.INT_ARRAY).value();
+        for (int i = 0; i < 1024; i++) {
+            biomes[i] = BiomeTypes.getLegacy(stored[i]);
         }
     }
 

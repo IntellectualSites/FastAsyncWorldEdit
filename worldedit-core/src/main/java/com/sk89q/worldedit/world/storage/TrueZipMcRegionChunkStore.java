@@ -25,6 +25,7 @@ import com.sk89q.worldedit.world.DataException;
 import de.schlichtherle.util.zip.ZipEntry;
 import de.schlichtherle.util.zip.ZipFile;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,20 +74,16 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
         zip = new ZipFile(zipFile);
     }
 
-    /**
-     * Get the input stream for a chunk file.
-     *
-     * @param name      the name
-     * @param worldName the world name
-     * @return an input stream
-     * @throws IOException   if there is an error getting the chunk data
-     * @throws DataException if there is an error getting the chunk data
-     */
     @Override
     @SuppressWarnings("unchecked")
-    protected InputStream getInputStream(String name, String worldName) throws IOException, DataException {
+    protected InputStream getInputStream(String name, String worldName, @Nullable String folderOverride) throws IOException,
+            DataException {
         // Detect subfolder for the world's files
-        if (folder != null) {
+        if (folderOverride != null) {
+            if (!folderOverride.isEmpty()) {
+                name = folderOverride + "/" + name;
+            }
+        } else if (folder != null) {
             if (!folder.isEmpty()) {
                 name = folder + "/" + name;
             }

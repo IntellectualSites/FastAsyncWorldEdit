@@ -21,10 +21,15 @@ package com.sk89q.worldedit.world.snapshot.experimental;
 
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.ListBinaryTag;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.chunk.Chunk;
 import com.sk89q.worldedit.world.storage.ChunkStore;
@@ -44,6 +49,8 @@ public class SnapshotRestore {
     private final Map<BlockVector2, ArrayList<BlockVector3>> neededChunks = new LinkedHashMap<>();
     private final Snapshot snapshot;
     private final EditSession editSession;
+    private final boolean restoreBiomes;
+    private final boolean restoreEntities;
     private ArrayList<BlockVector2> missingChunks;
     private ArrayList<BlockVector2> errorChunks;
     private String lastErrorMessage;
@@ -56,8 +63,29 @@ public class SnapshotRestore {
      * @param region      The {@link Region} to restore to
      */
     public SnapshotRestore(Snapshot snapshot, EditSession editSession, Region region) {
+        this(snapshot, editSession, region, false, false);
+    }
+
+    /**
+     * Construct the snapshot restore operation.
+     *
+     * @param snapshot        The {@link Snapshot} to restore from
+     * @param editSession     The {@link EditSession} to restore to
+     * @param region          The {@link Region} to restore to
+     * @param restoreBiomes   If biomes should be restored
+     * @param restoreEntities If entities should be restored
+     */
+    public SnapshotRestore(
+            Snapshot snapshot,
+            EditSession editSession,
+            Region region,
+            boolean restoreBiomes,
+            boolean restoreEntities
+    ) {
         this.snapshot = snapshot;
         this.editSession = editSession;
+        this.restoreBiomes = restoreBiomes;
+        this.restoreEntities = restoreEntities;
 
         if (region instanceof CuboidRegion) {
             findNeededCuboidChunks(region);
@@ -148,6 +176,27 @@ public class SnapshotRestore {
                 for (BlockVector3 pos : entry.getValue()) {
                     try {
                         editSession.setBlock(pos, chunk.getBlock(pos));
+                        if (restoreBiomes && (pos.getX() & 3) == 0 && (pos.getY() & 3) == 0 && (pos.getZ() & 3) == 0) {
+                            editSession.setBiome(pos, chunk.getBiome(pos));
+                        }
+                    } catch (DataException e) {
+                        // this is a workaround: just ignore for now
+                    }
+                }
+                if (restoreEntities) {
+                    try {
+                        for (BaseEntity entity : chunk.getEntities()) {
+                            CompoundBinaryTag tag = entity.getNbtReference().getValue();
+                            ListBinaryTag pos = tag.getList("Pos", BinaryTagTypes.LIST);
+                            ListBinaryTag rotation = tag.getList("Rotation", BinaryTagTypes.LIST);
+                            double x = pos.getDouble(0);
+                            double y = pos.getDouble(1);
+                            double z = pos.getDouble(2);
+                            float yRot = rotation.getFloat(0);
+                            float xRot = rotation.getFloat(1);
+                            Location location = new Location(editSession.getWorld(), x, y, z, yRot, xRot);
+                            editSession.createEntity(location, entity);
+                        }
                     } catch (DataException e) {
                         // this is a workaround: just ignore for now
                     }

@@ -37,6 +37,7 @@ import com.sk89q.worldedit.world.snapshot.experimental.SnapshotRestore;
 import org.enginehub.piston.annotation.Command;
 import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
+import org.enginehub.piston.annotation.param.Switch;
 
 import java.io.IOException;
 import java.net.URI;
@@ -68,13 +69,17 @@ public class SnapshotUtilCommands {
     public void restore(
             Actor actor, World world, LocalSession session, EditSession editSession,
             @Arg(name = "snapshot", desc = "The snapshot to restore", def = "")
-                    String snapshotName
+                    String snapshotName,
+            @Switch(name = 'b', desc = "If biomes should be restored")
+                    boolean restoreBiomes,
+            @Switch(name = 'e', desc = "If entities should be restored")
+                    boolean restoreEntities
     ) throws WorldEditException, IOException {
         LocalConfiguration config = we.getConfiguration();
         checkSnapshotsConfigured(config);
 
         if (config.snapshotRepo != null) {
-            legacy.restore(actor, world, session, editSession, snapshotName);
+            legacy.restore(actor, world, session, editSession, snapshotName, restoreBiomes, restoreEntities);
             return;
         }
 
@@ -116,7 +121,7 @@ public class SnapshotUtilCommands {
 
         try {
             // Restore snapshot
-            SnapshotRestore restore = new SnapshotRestore(snapshot, editSession, region);
+            SnapshotRestore restore = new SnapshotRestore(snapshot, editSession, region, restoreBiomes, restoreEntities);
             //player.print(restore.getChunksAffected() + " chunk(s) will be loaded.");
 
             restore.restore();

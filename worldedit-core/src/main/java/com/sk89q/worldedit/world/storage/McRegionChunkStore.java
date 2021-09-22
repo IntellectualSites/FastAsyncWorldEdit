@@ -24,6 +24,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -45,7 +46,8 @@ public abstract class McRegionChunkStore extends ChunkStore {
         return "r." + (x >> 5) + "." + (z >> 5) + ".mca";
     }
 
-    protected McRegionReader getReader(BlockVector2 pos, String worldname) throws DataException, IOException {
+    protected McRegionReader getReader(BlockVector2 pos, String worldname, @Nullable String folderOverride) throws DataException,
+            IOException {
         String filename = getFilename(pos);
         if (curFilename != null) {
             if (curFilename.equals(filename)) {
@@ -57,7 +59,7 @@ public abstract class McRegionChunkStore extends ChunkStore {
                 }
             }
         }
-        InputStream stream = getInputStream(filename, worldname);
+        InputStream stream = getInputStream(filename, worldname, folderOverride);
         cachedReader = new McRegionReader(stream);
         //curFilename = filename;
         return cachedReader;
@@ -66,21 +68,36 @@ public abstract class McRegionChunkStore extends ChunkStore {
     @Override
     public CompoundTag getChunkTag(BlockVector2 position, World world) throws DataException, IOException {
         return ChunkStoreHelper.readCompoundTag(() -> {
-            McRegionReader reader = getReader(position, world.getName());
+            McRegionReader reader = getReader(position, world.getName(), null);
 
             return reader.getChunkInputStream(position);
         });
     }
 
+    @Override
+    public CompoundTag getEntitiesTag(BlockVector2 position, World world) {
+        try {
+            return ChunkStoreHelper.readCompoundTag(() -> {
+                McRegionReader reader = getReader(position, world.getName(), "entities");
+
+                return reader.getChunkInputStream(position);
+            });
+        } catch (DataException | IOException e) {
+            return null;
+        }
+    }
+
     /**
      * Get the input stream for a chunk file.
      *
-     * @param name      the name of the chunk file
-     * @param worldName the world name
+     * @param name           the name of the chunk file
+     * @param worldName      the world name
+     * @param folderOverride override folder to check. "entities" used for getting entities in 1.17+
      * @return an input stream
      * @throws IOException if there is an error getting the chunk data
      */
-    protected abstract InputStream getInputStream(String name, String worldName) throws IOException, DataException;
+    protected abstract InputStream getInputStream(String name, String worldName, @Nullable String folderOverride) throws
+            IOException, DataException;
 
     @Override
     public void close() throws IOException {

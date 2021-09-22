@@ -21,6 +21,7 @@ package com.sk89q.worldedit.world.storage;
 
 import com.sk89q.worldedit.world.DataException;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -43,10 +44,12 @@ public class FileMcRegionChunkStore extends McRegionChunkStore {
     }
 
     @Override
-    protected InputStream getInputStream(String name, String world) throws IOException, DataException {
+    protected InputStream getInputStream(String name, String world, @Nullable String folderOverride) throws IOException,
+            DataException {
         Pattern ext = Pattern.compile(".*\\.mc[ra]$"); // allow either file extension, both work the same
         File file = null;
-        File[] files = new File(path, "region").listFiles();
+        String folder = folderOverride != null && !folderOverride.isEmpty() ? folderOverride : "region";
+        File[] files = new File(path, folder).listFiles();
 
         if (files == null) {
             throw new FileNotFoundException();
@@ -56,7 +59,7 @@ public class FileMcRegionChunkStore extends McRegionChunkStore {
             String tempName = f.getName().replaceFirst("mcr$", "mca"); // matcher only does one at a time
             if (ext.matcher(f.getName()).matches() && name.equalsIgnoreCase(tempName)) {
                 // get full original path now
-                file = new File(path + File.separator + "region" + File.separator + f.getName());
+                file = new File(path + File.separator + folder + File.separator + f.getName());
                 break;
             }
         }

@@ -48,8 +48,13 @@ class LegacySnapshotUtilCommands {
     }
 
     void restore(
-            Actor actor, World world, LocalSession session, EditSession editSession,
-            String snapshotName
+            Actor actor,
+            World world,
+            LocalSession session,
+            EditSession editSession,
+            String snapshotName,
+            boolean restoreBiomes,
+            boolean restoreEntities
     ) throws WorldEditException {
         LocalConfiguration config = we.getConfiguration();
 
@@ -108,7 +113,7 @@ class LegacySnapshotUtilCommands {
 
         try {
             // Restore snapshot
-            SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region);
+            SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region, restoreBiomes, restoreEntities);
             //player.print(restore.getChunksAffected() + " chunk(s) will be loaded.");
 
             restore.restore();

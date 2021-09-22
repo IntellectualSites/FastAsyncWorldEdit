@@ -31,13 +31,16 @@ import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.chunk.AnvilChunk;
 import com.sk89q.worldedit.world.chunk.AnvilChunk13;
+import com.sk89q.worldedit.world.chunk.AnvilChunk15;
 import com.sk89q.worldedit.world.chunk.AnvilChunk16;
+import com.sk89q.worldedit.world.chunk.AnvilChunk17;
 import com.sk89q.worldedit.world.chunk.Chunk;
 import com.sk89q.worldedit.world.chunk.OldChunk;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class ChunkStoreHelper {
 
@@ -69,6 +72,19 @@ public class ChunkStoreHelper {
      * @throws DataException if the rootTag is not valid chunk data
      */
     public static Chunk getChunk(CompoundTag rootTag) throws DataException {
+        return getChunk(rootTag, () -> null);
+    }
+
+    /**
+     * Convert a chunk NBT tag into a {@link Chunk} implementation.
+     *
+     * @param rootTag     the root tag of the chunk
+     * @param entitiesTag supplier to provide entities tag. Only required for 1.17+ where entities are stored in a separate
+     *                    location
+     * @return a Chunk implementation
+     * @throws DataException if the rootTag is not valid chunk data
+     */
+    public static Chunk getChunk(CompoundTag rootTag, Supplier<CompoundTag> entitiesTag) throws DataException {
         Map<String, Tag> children = rootTag.getValue();
         CompoundTag tag = null;
 
@@ -112,8 +128,14 @@ public class ChunkStoreHelper {
                 dataVersion = currentDataVersion;
             }
         }
+        if (dataVersion >= Constants.DATA_VERSION_MC_1_17) {
+            return new AnvilChunk17(tag, entitiesTag);
+        }
         if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
             return new AnvilChunk16(tag);
+        }
+        if (dataVersion >= Constants.DATA_VERSION_MC_1_15) {
+            return new AnvilChunk15(tag);
         }
         if (dataVersion >= Constants.DATA_VERSION_MC_1_13) {
             return new AnvilChunk13(tag);
