@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquaredv4;
 
 import com.fastasyncworldedit.core.FaweAPI;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
@@ -97,12 +98,49 @@ public class PlotSquaredFeature extends FaweMaskManager {
             return false;
         }
         UUID uid = player.getUniqueId();
-        return !Flags.NO_WORLDEDIT.isTrue(plot) && (plot.isOwner(uid) || player.hasPermission("fawe.plotsquared.admin"))
-                || (type == MaskType.MEMBER && (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)
-                || (player.hasPermission("fawe.plotsquared.member")
-                && (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE))
-                && !plot.getOwners().isEmpty()
-                && plot.getOwners().stream().anyMatch(this::playerOnline))));
+        if (Flags.NO_WORLDEDIT.isTrue(plot)) {
+            player.print(Caption.of(
+                    "fawe.cancel.worldedit.cancel.reason.no.region.reason",
+                    Caption.of("fawe.cancel.worldedit.cancel.reason.no.region.plot.noworldeditflag")
+            ));
+            return false;
+        }
+        if (plot.isOwner(uid) || player.hasPermission("fawe.plotsquared.admin")) {
+            return true;
+        }
+        if (type != MaskType.MEMBER) {
+            player.print(Caption.of(
+                    "fawe.cancel.worldedit.cancel.reason.no.region.reason",
+                    Caption.of("fawe.cancel.worldedit.cancel.reason.no.region.plot.owner.only")
+            ));
+            return false;
+        }
+        if (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)) {
+            return true;
+        }
+        if (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) {
+            if (!player.hasPermission("fawe.plotsquared.member")) {
+                player.print(Caption.of(
+                        "fawe.cancel.worldedit.cancel.reason.no.region.reason",
+                        Caption.of("fawe.error.no-perm", "fawe.plotsquared.member")
+                ));
+                return false;
+            }
+            if (!plot.getOwners().isEmpty() && plot.getOwners().stream().anyMatch(this::playerOnline)) {
+                return true;
+            } else {
+                player.print(Caption.of(
+                        "fawe.cancel.worldedit.cancel.reason.no.region.reason",
+                        Caption.of("fawe.cancel.worldedit.cancel.reason.no.region.plot.owner.offline")
+                ));
+                return false;
+            }
+        }
+        player.print(Caption.of(
+                "fawe.cancel.worldedit.cancel.reason.no.region.reason",
+                Caption.of("fawe.cancel.worldedit.cancel.reason.no.region.not.added")
+        ));
+        return false;
     }
 
     private boolean playerOnline(UUID uuid) {
