@@ -3566,7 +3566,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 double scaledZ = (z - zero.getZ()) / unit.getZ();
 
                 try {
-                    if (expression.evaluate(timeout, scaledX, scaledY, scaledZ) <= 0) {
+                    if (expression.evaluate(new double[]{scaledX, scaledY, scaledZ}, timeout) <= 0) {
                         return null;
                     }
 

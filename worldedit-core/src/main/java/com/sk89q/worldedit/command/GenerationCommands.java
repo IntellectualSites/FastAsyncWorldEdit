@@ -443,7 +443,8 @@ public class GenerationCommands {
             @Selection Region region,
             @Arg(desc = "The biome type to set")
                     BiomeType target,
-            @Arg(desc = "Expression to test block placement locations and set biome type", variable = true)
+            @Arg(desc = "Expression to test block placement locations and set biome type. Requires x,y,z variables be present",
+                    variable = true)
                     List<String> expression,
             @Switch(name = 'h', desc = "Generate a hollow shape")
                     boolean hollow,
