@@ -235,7 +235,7 @@ public class WorldEditPlugin extends JavaPlugin {
         // datapacks aren't loaded until just before the world is, and bukkit has no event for this
         // so the earliest we can do this is in WorldInit
         setupTags();
-        setupBiomes(); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
+        setupBiomes(true); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
         // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
@@ -244,7 +244,7 @@ public class WorldEditPlugin extends JavaPlugin {
     private void initializeRegistries() {
         // FAWE start - move Biomes to their own method. Initialize biomes twice to allow for the registry to be present for
         // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
-        setupBiomes();
+        setupBiomes(false);
         // FAWE end
         /*
 
@@ -308,7 +308,7 @@ public class WorldEditPlugin extends JavaPlugin {
     }
 
     // FAWE start
-    private void setupBiomes() {
+    private void setupBiomes(boolean expectFail) {
         if (this.adapter.value().isPresent()) {
             // Biomes are stored globally in the server. Registries are not kept per-world in Minecraft.
             // The WorldServer get-registries method simply delegates to the MinecraftServer method.
@@ -318,7 +318,9 @@ public class WorldEditPlugin extends JavaPlugin {
                 }
             }
         } else {
-            LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
+            if (!expectFail) {
+                LOGGER.warn("Failed to load biomes via adapter (not present). Will load via bukkit");
+            }
             for (Biome biome : Biome.values()) {
                 // Custom is bad
                 if (biome.name().equals("CUSTOM")) {
