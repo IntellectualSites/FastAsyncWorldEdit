@@ -313,9 +313,12 @@ public class WorldEditPlugin extends JavaPlugin {
             // Biomes are stored globally in the server. Registries are not kept per-world in Minecraft.
             // The WorldServer get-registries method simply delegates to the MinecraftServer method.
             for (final NamespacedKey biome : ((BukkitImplAdapter<?>) adapter.value().get()).getRegisteredBiomes()) {
-                if (BiomeType.REGISTRY.get(biome.toString()) == null) { // only register once
-                    BiomeType.REGISTRY.register(biome.toString(), new BiomeType(biome.toString()));
+                BiomeType biomeType;
+                if ((biomeType = BiomeType.REGISTRY.get(biome.toString())) == null) { // only register once
+                    biomeType = new BiomeType(biome.toString());
+                    BiomeType.REGISTRY.register(biome.toString(), biomeType);
                 }
+                biomeType.setLegacyId(adapter.value().get().getInternalBiomeId(biomeType));
             }
         } else {
             if (!expectFail) {
