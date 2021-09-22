@@ -84,7 +84,9 @@ public class AnvilChunk17 implements Chunk {
     /**
      * Construct the chunk with a compound tag.
      *
-     * @param tag the tag to read
+     * @param tag       the tag to read
+     * @param entityTag supplier for the entity compound tag found in the entities folder mca files. Not accessed unless
+     *                  {@link #getEntities()} is called
      * @throws DataException on a data error
      */
     public AnvilChunk17(CompoundBinaryTag tag, Supplier<CompoundBinaryTag> entityTag) throws DataException {
@@ -228,9 +230,7 @@ public class AnvilChunk17 implements Chunk {
             populateTileEntities();
         }
 
-        CompoundBinaryTag values = tileEntities.get(position);
-
-        return values;
+        return tileEntities.get(position);
     }
 
     @Override

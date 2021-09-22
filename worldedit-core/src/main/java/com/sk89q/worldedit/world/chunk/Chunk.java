@@ -45,6 +45,7 @@ public interface Chunk {
      */
     BaseBlock getBlock(BlockVector3 position) throws DataException;
 
+    //FAWE start - biome and entity restore
     /**
      * Get a biome.
      *
@@ -63,5 +64,6 @@ public interface Chunk {
     default List<BaseEntity> getEntities() throws DataException {
         return Collections.emptyList();
     }
+    //FAWE end
 
 }

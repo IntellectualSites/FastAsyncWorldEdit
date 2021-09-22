@@ -70,16 +70,20 @@ public class SnapshotUtilCommands {
             Actor actor, World world, LocalSession session, EditSession editSession,
             @Arg(name = "snapshot", desc = "The snapshot to restore", def = "")
                     String snapshotName,
+            //FAWE start - biome and entity restore
             @Switch(name = 'b', desc = "If biomes should be restored")
                     boolean restoreBiomes,
             @Switch(name = 'e', desc = "If entities should be restored")
                     boolean restoreEntities
+            //FAWE end
     ) throws WorldEditException, IOException {
         LocalConfiguration config = we.getConfiguration();
         checkSnapshotsConfigured(config);
 
         if (config.snapshotRepo != null) {
+            //FAWE start - biome and entity restore
             legacy.restore(actor, world, session, editSession, snapshotName, restoreBiomes, restoreEntities);
+            //FAWE end
             return;
         }
 
@@ -121,8 +125,9 @@ public class SnapshotUtilCommands {
 
         try {
             // Restore snapshot
+            //FAWE start - biome and entity restore
             SnapshotRestore restore = new SnapshotRestore(snapshot, editSession, region, restoreBiomes, restoreEntities);
-            //player.print(restore.getChunksAffected() + " chunk(s) will be loaded.");
+            //FAWE end
 
             restore.restore();
 

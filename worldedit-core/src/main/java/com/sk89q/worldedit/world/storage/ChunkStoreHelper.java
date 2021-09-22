@@ -72,6 +72,7 @@ public class ChunkStoreHelper {
      * @throws DataException if the rootTag is not valid chunk data
      */
     public static Chunk getChunk(CompoundTag rootTag) throws DataException {
+        //FAWE start - biome and entity restore
         return getChunk(rootTag, () -> null);
     }
 
@@ -85,6 +86,7 @@ public class ChunkStoreHelper {
      * @throws DataException if the rootTag is not valid chunk data
      */
     public static Chunk getChunk(CompoundTag rootTag, Supplier<CompoundTag> entitiesTag) throws DataException {
+        //FAWE end
         Map<String, Tag> children = rootTag.getValue();
         CompoundTag tag = null;
 
@@ -128,15 +130,19 @@ public class ChunkStoreHelper {
                 dataVersion = currentDataVersion;
             }
         }
+        //FAWE start - biome and entity restore
         if (dataVersion >= Constants.DATA_VERSION_MC_1_17) {
             return new AnvilChunk17(tag, entitiesTag);
         }
+        //FAWE end
         if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
             return new AnvilChunk16(tag);
         }
+        //FAWE start - biome and entity restore
         if (dataVersion >= Constants.DATA_VERSION_MC_1_15) {
             return new AnvilChunk15(tag);
         }
+        //FAWE end
         if (dataVersion >= Constants.DATA_VERSION_MC_1_13) {
             return new AnvilChunk13(tag);
         }

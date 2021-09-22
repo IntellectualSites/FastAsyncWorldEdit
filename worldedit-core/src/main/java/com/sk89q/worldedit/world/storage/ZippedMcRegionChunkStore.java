@@ -74,6 +74,7 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
     }
 
     @Override
+    //FAWE start - biome and entity restore
     protected InputStream getInputStream(String name, String worldName, @Nullable String folderOverride) throws IOException,
             DataException {
         // Detect subfolder for the world's files
@@ -83,6 +84,7 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
             }
         } else if (folder != null) {
             if (!folder.isEmpty()) {
+                //FAWE end
                 name = folder + "/" + name;
             }
         } else {
@@ -99,7 +101,9 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
                             endIndex = entryName.lastIndexOf('\\');
                         }
                         folder = entryName.substring(0, endIndex);
+                        //FAWE start - biome and entity restore
                         if (folder.endsWith("poi") || folder.endsWith("entities")) {
+                            //FAWE end
                             continue;
                         }
                         name = folder + "/" + name;

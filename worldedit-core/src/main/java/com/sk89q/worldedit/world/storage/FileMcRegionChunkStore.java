@@ -43,6 +43,7 @@ public class FileMcRegionChunkStore extends McRegionChunkStore {
         this.path = path;
     }
 
+    //FAWE start - biome and entity restore
     @Override
     protected InputStream getInputStream(String name, String world, @Nullable String folderOverride) throws IOException,
             DataException {
@@ -50,6 +51,7 @@ public class FileMcRegionChunkStore extends McRegionChunkStore {
         File file = null;
         String folder = folderOverride != null && !folderOverride.isEmpty() ? folderOverride : "region";
         File[] files = new File(path, folder).listFiles();
+        //FAWE end
 
         if (files == null) {
             throw new FileNotFoundException();
@@ -59,7 +61,9 @@ public class FileMcRegionChunkStore extends McRegionChunkStore {
             String tempName = f.getName().replaceFirst("mcr$", "mca"); // matcher only does one at a time
             if (ext.matcher(f.getName()).matches() && name.equalsIgnoreCase(tempName)) {
                 // get full original path now
+                //FAWE start - biome and entity restore
                 file = new File(path + File.separator + folder + File.separator + f.getName());
+                //FAWE end
                 break;
             }
         }

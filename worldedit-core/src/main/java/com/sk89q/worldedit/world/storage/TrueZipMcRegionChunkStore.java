@@ -76,6 +76,7 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
 
     @Override
     @SuppressWarnings("unchecked")
+    //FAWE start - biome and entity restore
     protected InputStream getInputStream(String name, String worldName, @Nullable String folderOverride) throws IOException,
             DataException {
         // Detect subfolder for the world's files
@@ -84,6 +85,7 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
                 name = folderOverride + "/" + name;
             }
         } else if (folder != null) {
+            //FAWE end
             if (!folder.isEmpty()) {
                 name = folder + "/" + name;
             }

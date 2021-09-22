@@ -46,8 +46,10 @@ public abstract class McRegionChunkStore extends ChunkStore {
         return "r." + (x >> 5) + "." + (z >> 5) + ".mca";
     }
 
+    //FAWE start - biome and entity restore
     protected McRegionReader getReader(BlockVector2 pos, String worldname, @Nullable String folderOverride) throws DataException,
             IOException {
+        //FAWE end
         String filename = getFilename(pos);
         if (curFilename != null) {
             if (curFilename.equals(filename)) {
@@ -59,7 +61,9 @@ public abstract class McRegionChunkStore extends ChunkStore {
                 }
             }
         }
+        //FAWE start - biome and entity restore
         InputStream stream = getInputStream(filename, worldname, folderOverride);
+        //FAWE end
         cachedReader = new McRegionReader(stream);
         //curFilename = filename;
         return cachedReader;
@@ -74,6 +78,7 @@ public abstract class McRegionChunkStore extends ChunkStore {
         });
     }
 
+    //FAWE start - biome and entity restore
     @Override
     public CompoundTag getEntitiesTag(BlockVector2 position, World world) {
         try {
@@ -86,6 +91,7 @@ public abstract class McRegionChunkStore extends ChunkStore {
             return null;
         }
     }
+    //FAWE end
 
     /**
      * Get the input stream for a chunk file.
@@ -96,8 +102,10 @@ public abstract class McRegionChunkStore extends ChunkStore {
      * @return an input stream
      * @throws IOException if there is an error getting the chunk data
      */
+    //FAWE start - biome and entity restore
     protected abstract InputStream getInputStream(String name, String worldName, @Nullable String folderOverride) throws
             IOException, DataException;
+    //FAWE end
 
     @Override
     public void close() throws IOException {

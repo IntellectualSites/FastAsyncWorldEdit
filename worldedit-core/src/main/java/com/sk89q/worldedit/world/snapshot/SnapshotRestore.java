@@ -54,8 +54,10 @@ public class SnapshotRestore {
     //FAWE end
     private final ChunkStore chunkStore;
     private final EditSession editSession;
+    //FAWE start - biome and entity restore
     private final boolean restoreBiomes;
     private final boolean restoreEntities;
+    //FAWE end
     private ArrayList<BlockVector2> missingChunks;
     private ArrayList<BlockVector2> errorChunks;
     private String lastErrorMessage;
@@ -68,6 +70,7 @@ public class SnapshotRestore {
      * @param region      The {@link Region} to restore to
      */
     public SnapshotRestore(ChunkStore chunkStore, EditSession editSession, Region region) {
+        //FAWE start - biome and entity restore
         this(chunkStore, editSession, region, false, false);
     }
 
@@ -98,6 +101,7 @@ public class SnapshotRestore {
             findNeededChunks(region);
         }
     }
+    //FAWE end
 
     /**
      * Find needed chunks in the axis-aligned bounding box of the region.
@@ -180,13 +184,16 @@ public class SnapshotRestore {
                 for (BlockVector3 pos : entry.getValue()) {
                     try {
                         editSession.setBlock(pos, chunk.getBlock(pos));
+                        //FAWE start - biome and entity restore
                         if (restoreBiomes && (pos.getX() & 3) == 0 && (pos.getY() & 3) == 0 && (pos.getZ() & 3) == 0) {
                             editSession.setBiome(pos, chunk.getBiome(pos));
                         }
+                        //FAWE end
                     } catch (DataException e) {
                         // this is a workaround: just ignore for now
                     }
                 }
+                //FAWE start - biome and entity restore
                 if (restoreEntities) {
                     try {
                         for (BaseEntity entity : chunk.getEntities()) {
@@ -205,6 +212,7 @@ public class SnapshotRestore {
                         // this is a workaround: just ignore for now
                     }
                 }
+                //FAWE end
             } catch (MissingChunkException me) {
                 missingChunks.add(chunkPos);
             } catch (IOException | DataException me) {

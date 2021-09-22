@@ -53,9 +53,13 @@ public class AnvilChunk13 implements Chunk {
 
     protected final CompoundBinaryTag rootTag;
     private final BlockState[][] blocks;
+    //FAWE start - biome and entity restore
     protected BiomeType[] biomes;
+    //FAWE end
     private Map<BlockVector3, CompoundBinaryTag> tileEntities;
+    //FAWE start - biome and entity restore
     private List<BaseEntity> entities;
+    //FAWE end
 
     /**
      * Construct the chunk with a compound tag.
@@ -226,9 +230,11 @@ public class AnvilChunk13 implements Chunk {
 
     @Override
     public BaseBlock getBlock(BlockVector3 position) throws DataException {
+        //FAWE start - simplified
         int x = position.getX() & 15;
         int y = position.getY();
         int z = position.getZ() & 15;
+        //FAWE end
 
         int section = y >> 4;
         int yIndex = y & 0x0F;
@@ -248,6 +254,7 @@ public class AnvilChunk13 implements Chunk {
 
         return state.toBaseBlock();
     }
+    //FAWE start - biome and entity restore
 
     @Override
     public BiomeType getBiome(final BlockVector3 position) throws DataException {
@@ -302,5 +309,6 @@ public class AnvilChunk13 implements Chunk {
             biomes[i] = BiomeTypes.getLegacy(stored[i]);
         }
     }
+    //FAWE end
 
 }
