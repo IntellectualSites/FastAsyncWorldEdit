@@ -127,7 +127,7 @@ public class Settings extends Config {
         public String MODE = "MEMBER";
         @Comment({
                 "Allow region blacklists.",
-                " - Currently only implemented for WorldGuard ",
+                " - Currently only implemented for WorldGuard",
                 " - see region-restrictions-options.worldguard-region-blacklist"
         })
         public boolean ALLOW_BLACKLISTS = false;
