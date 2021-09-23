@@ -129,24 +129,6 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         }
     }
 
-    @Override
-    public URI getURI() {
-        return file.toURI();
-    }
-
-    private static BlockVector3 readSize(File file) {
-        try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
-            int version = is.readChar();
-            if (version > VERSION) {
-                throw new UnsupportedOperationException("Unsupported clipboard-on-disk version: " + version);
-            }
-            return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-    }
-
     public DiskOptimizedClipboard(File file) {
         super(readSize(file));
         nbtMap = new HashMap<>();
@@ -163,6 +145,24 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static BlockVector3 readSize(File file) {
+        try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
+            int version = is.readChar();
+            if (version > VERSION) {
+                throw new UnsupportedOperationException("Unsupported clipboard-on-disk version: " + version);
+            }
+            return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public URI getURI() {
+        return file.toURI();
     }
 
     public File getFile() {
@@ -291,6 +291,14 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     @Override
+    public BlockVector3 getOrigin() {
+        int ox = byteBuffer.getShort(8);
+        int oy = byteBuffer.getShort(10);
+        int oz = byteBuffer.getShort(12);
+        return BlockVector3.at(ox, oy, oz);
+    }
+
+    @Override
     public void setOrigin(BlockVector3 offset) {
         super.setOrigin(offset);
         try {
@@ -300,14 +308,6 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         } catch (Throwable e) {
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public BlockVector3 getOrigin() {
-        int ox = byteBuffer.getShort(8);
-        int oy = byteBuffer.getShort(10);
-        int oz = byteBuffer.getShort(12);
-        return BlockVector3.at(ox, oy, oz);
     }
 
     private void setOffset(BlockVector3 offset) {
