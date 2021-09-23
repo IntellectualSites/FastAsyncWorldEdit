@@ -34,61 +34,99 @@ public interface IBatchProcessor {
     Extent construct(Extent child);
 
     /**
-     * Utility method to trim a chunk based on min and max Y.
+     * Utility method to trim a chunk based on min and max Y (inclusive).
      *
+     * @param keepInsideRange if all blocks inside the range (inclusive) should be kept (default)
      * @return false if chunk is empty of blocks
      */
-    default boolean trimY(IChunkSet set, int minY, int maxY) {
+    default boolean trimY(IChunkSet set, int minY, int maxY, final boolean keepInsideRange) {
         int minLayer = (minY - 1) >> 4;
-        for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
-            if (set.hasSection(layer)) {
-                if (layer == minLayer) {
-                    char[] arr = set.loadIfPresent(layer);
-                    if (arr != null) {
-                        int index = (minY & 15) << 8;
-                        for (int i = 0; i < index; i++) {
-                            arr[i] = 0;
-                        }
-                    } else {
-                        arr = new char[4096];
-                    }
-                    set.setBlocks(layer, arr);
-                } else {
-                    set.setBlocks(layer, null);
-                }
-            }
-        }
         int maxLayer = (maxY + 1) >> 4;
-        for (int layer = maxLayer; layer < set.getMaxSectionPosition(); layer++) {
-            if (set.hasSection(layer)) {
-                if (layer == minLayer) {
-                    char[] arr = set.loadIfPresent(layer);
-                    if (arr != null) {
-                        int index = ((maxY + 1) & 15) << 8;
-                        for (int i = index; i < arr.length; i++) {
-                            arr[i] = 0;
-                        }
-                    } else {
-                        arr = new char[4096];
-                    }
-                    set.setBlocks(layer, arr);
-                } else {
-                    set.setBlocks(layer, null);
-                }
-            }
-        }
-        try {
-            int layer = (minY - 15) >> 4;
-            while (layer < (maxY + 15) >> 4) {
+        if (keepInsideRange) {
+            for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
                 if (set.hasSection(layer)) {
-                    return true;
+                    if (layer == minLayer) {
+                        char[] arr = set.loadIfPresent(layer);
+                        if (arr != null) {
+                            int index = (minY & 15) << 8;
+                            for (int i = 0; i < index; i++) {
+                                arr[i] = 0;
+                            }
+                        } else {
+                            arr = new char[4096];
+                        }
+                        set.setBlocks(layer, arr);
+                    } else {
+                        set.setBlocks(layer, null);
+                    }
                 }
-                layer++;
             }
-        } catch (ArrayIndexOutOfBoundsException exception) {
-            WorldEdit.logger.error("minY = {} , layer = {}", minY, ((minY - 15) >> 4), exception);
+            for (int layer = maxLayer; layer < set.getMaxSectionPosition(); layer++) {
+                if (set.hasSection(layer)) {
+                    if (layer == minLayer) {
+                        char[] arr = set.loadIfPresent(layer);
+                        if (arr != null) {
+                            int index = ((maxY + 1) & 15) << 8;
+                            for (int i = index; i < arr.length; i++) {
+                                arr[i] = 0;
+                            }
+                        } else {
+                            arr = new char[4096];
+                        }
+                        set.setBlocks(layer, arr);
+                    } else {
+                        set.setBlocks(layer, null);
+                    }
+                }
+            }
+            try {
+                int layer = (minY - 15) >> 4;
+                while (layer < (maxY + 15) >> 4) {
+                    if (set.hasSection(layer)) {
+                        return true;
+                    }
+                    layer++;
+                }
+            } catch (ArrayIndexOutOfBoundsException exception) {
+                WorldEdit.logger.error("IBatchProcessor: minY = {} , layer = {}", minY, ((minY - 15) >> 4), exception);
+            }
+            return false;
         }
-        return false;
+        int chunkMaxY = (set.getMaxSectionPosition() << 4) + 15;
+        int chunkMinY = set.getMinSectionPosition() << 4;
+        if (maxY >= chunkMaxY && minY <= chunkMinY) {
+            set.reset();
+            return false;
+        }
+        boolean hasBlocks = false;
+        for (int layer = set.getMinSectionPosition(); layer <= set.getMaxSectionPosition(); layer++) {
+            if (layer < minLayer || layer > maxLayer) {
+                hasBlocks |= set.hasSection(layer);
+                continue;
+            }
+            if (layer == minLayer) {
+                char[] arr = set.loadIfPresent(layer);
+                if (arr != null) {
+                    int index = (minY & 15) << 8;
+                    for (int i = index; i < 4096; i++) {
+                        arr[i] = 0;
+                    }
+                }
+                set.setBlocks(layer, arr);
+            } else if (layer == maxLayer) {
+                char[] arr = set.loadIfPresent(layer);
+                if (arr != null) {
+                    int index = ((maxY + 1) & 15) << 8;
+                    for (int i = 0; i < index; i++) {
+                        arr[i] = 0;
+                    }
+                }
+                set.setBlocks(layer, arr);
+            } else {
+                set.setBlocks(layer, null);
+            }
+        }
+        return hasBlocks;
     }
 
     /**

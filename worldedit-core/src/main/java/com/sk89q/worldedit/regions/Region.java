@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.regions;
 
+import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
@@ -366,6 +367,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         return tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ();
     }
 
+    @Override
     default IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         int bx = chunk.getX() << 4;
         int bz = chunk.getZ() << 4;
@@ -377,12 +379,10 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         if (tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ()) {
             // contains some
             boolean processExtra = false;
-            for (int layer = 0; layer < 16; layer++) {
+            for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
                 int by = layer << 4;
                 int ty = by + 15;
-                if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
-                    continue;
-                } else {
+                if (!containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
                     processExtra = true;
                     char[] arr = set.load(layer);
                     for (int y = 0, index = 0; y < 16; y++) {
@@ -399,6 +399,58 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             }
             if (processExtra) {
                 trimNBT(set, this::contains);
+            }
+            return set;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Process the chunk, with the option to process as if the region is a blacklisted region, and thus any contained blocks
+     * should be removed, rather than uncontained blocks being removed.
+     *
+     * @param asBlacklist If any blocks contained by the region should be removed
+     */
+    default IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set, boolean asBlacklist) {
+        if (!asBlacklist) {
+            return processSet(chunk, get, set);
+        }
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+
+        BlockVector3 min = getMinimumPoint();
+        BlockVector3 max = getMaximumPoint();
+        if (tx >= min.getX() && bx <= max.getX() && tz >= min.getZ() && bz <= max.getZ()) {
+            // contains some
+            boolean processExtra = false;
+            for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
+                int by = layer << 4;
+                int ty = by + 15;
+                if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
+                    set.setBlocks(layer, FaweCache.IMP.EMPTY_CHAR_4096);
+                    processExtra = true;
+                    continue;
+                }
+                char[] arr = set.load(layer);
+                for (int y = 0, index = 0; y < 16; y++) {
+                    for (int z = 0; z < 16; z++) {
+                        for (int x = 0; x < 16; x++, index++) {
+                            if (arr[index] != 0 && contains(x, y, z)) {
+                                arr[index] = 0;
+                                processExtra = true;
+                            }
+                        }
+                    }
+                }
+                if (processExtra) {
+                    set.setBlocks(layer, arr);
+                }
+            }
+            if (processExtra) {
+                trimNBT(set, bv3 -> !this.contains(bv3));
             }
             return set;
         } else {

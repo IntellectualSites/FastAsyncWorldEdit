@@ -84,7 +84,7 @@ public class ProvideBindings extends Bindings {
     }
 
     public Region[] regions(Player player, FaweMaskManager.MaskType type) {
-        Region[] regions = player.getCurrentRegions(type);
+        Region[] regions = player.getAllowedRegions(type);
         if (regions == null) {
             throw new IllegalArgumentException(Caption.toString(Caption.of("fawe.error.no.region")));
         }

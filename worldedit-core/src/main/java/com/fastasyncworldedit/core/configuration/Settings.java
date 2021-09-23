@@ -126,6 +126,12 @@ public class Settings extends Config {
         })
         public String MODE = "MEMBER";
         @Comment({
+                "Allow region blacklists.",
+                " - Currently only implemented for WorldGuard ",
+                " - see region-restrictions-options.worldguard-region-blacklist"
+        })
+        public boolean ALLOW_BLACKLISTS = false;
+        @Comment({
                 "List of plugin mask managers that should be exclusive. Exclusive managers are not ",
                 "checked for edit restrictions if another manager already allowed an edit, and further ",
                 "managers are not checked if an exclusive manager allows an edit.",
@@ -133,6 +139,16 @@ public class Settings extends Config {
                 " - Some custom-implementations in other plugins may override this setting"
         })
         public List<String> EXCLUSIVE_MANAGERS = new ArrayList<>(Collections.singleton(("ExamplePlugin")));
+        @Comment({
+                "If a worldguard-protected world should be considered as a region blacklist.",
+                " - This will create a blacklist of regions where an edit cannot operate.",
+                " - Useful for a \"freebuild\" worlds with few protected areas.",
+                " - May cause performance loss with large numbers of protected areas.",
+                " - Requires region-restrictions-options.allow-blacklists be true.",
+                " - Will still search for current allowed regions to limit the edit to.",
+                " - Any blacklist regions are likely to override any internal allowed regions."
+        })
+        public boolean WORLDGUARD_REGION_BLACKLIST = false;
 
     }
 

@@ -1,8 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions;
 
-import com.fastasyncworldedit.bukkit.filter.GriefPreventionFilter;
 import com.fastasyncworldedit.core.regions.FaweMask;
-import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -10,7 +8,6 @@ import com.sk89q.worldedit.regions.CuboidRegion;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -59,11 +56,6 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
             }
         }
         return null;
-    }
-
-    @Override
-    public RegionFilter getFilter(String world) {
-        return new GriefPreventionFilter(Bukkit.getWorld(world));
     }
 
 }

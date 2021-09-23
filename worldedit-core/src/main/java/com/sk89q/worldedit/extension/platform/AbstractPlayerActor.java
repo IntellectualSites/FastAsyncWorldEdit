@@ -483,27 +483,31 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     //FAWE start
-
-    /**
-     * Get the player's current allowed WorldEdit regions.
-     *
-     * @return an array of allowed regions
-     */
-    public Region[] getCurrentRegions() {
-        return getCurrentRegions(FaweMaskManager.MaskType.MEMBER);
+    @Override
+    public Region[] getAllowedRegions() {
+        return getAllowedRegions(FaweMaskManager.MaskType.getDefaultMaskType());
     }
 
-    public Region[] getCurrentRegions(FaweMaskManager.MaskType type) {
-        return WEManager.IMP.getMask(this, type);
+    @Override
+    public Region[] getAllowedRegions(FaweMaskManager.MaskType type) {
+        return WEManager.IMP.getMask(this, type, true);
     }
 
-    /**
-     * Get the largest region in the player's allowed WorldEdit region.
-     */
+    @Override
+    public Region[] getDisallowedRegions() {
+        return getDisallowedRegions(FaweMaskManager.MaskType.getDefaultMaskType());
+    }
+
+    @Override
+    public Region[] getDisallowedRegions(FaweMaskManager.MaskType type) {
+        return WEManager.IMP.getMask(this, type, false);
+    }
+
+    @Override
     public Region getLargestRegion() {
         long area = 0;
         Region max = null;
-        for (Region region : this.getCurrentRegions()) {
+        for (Region region : this.getAllowedRegions()) {
             final long tmp = region.getVolume();
             if (tmp > area) {
                 area = tmp;
@@ -513,6 +517,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         return max;
     }
 
+    @Override
     public void setSelection(Region region) {
         RegionSelector selector;
         if (region instanceof ConvexPolyhedralRegion) {

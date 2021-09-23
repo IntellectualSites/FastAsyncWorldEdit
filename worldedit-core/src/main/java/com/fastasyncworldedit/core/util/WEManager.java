@@ -61,19 +61,26 @@ public class WEManager {
         cancelEditSafe(parent, reason);
     }
 
-    @Deprecated
-    public Region[] getMask(Player player) {
-        return getMask(player, FaweMaskManager.MaskType.getDefaultMaskType());
-    }
-
     public boolean isIn(int x, int y, int z, Region region) {
         return region.contains(x, y, z);
     }
 
     /**
-     * Get a player's mask.
+     * Get a player's allowed WorldEdit region(s).
      */
-    public Region[] getMask(Player player, FaweMaskManager.MaskType type) {
+    public Region[] getMask(Player player) {
+        return getMask(player, FaweMaskManager.MaskType.getDefaultMaskType(), true);
+    }
+
+    /**
+     * Get a player's mask.
+     *
+     * @param player      Player to get mask of
+     * @param type        Mask type; whether to check if the player is an owner of a member of the regions
+     * @param isWhitelist If searching for whitelist or blacklist regions. True if whitelist
+     * @return array of allowed regions if whitelist, else of disallowed regions.
+     */
+    public Region[] getMask(Player player, FaweMaskManager.MaskType type, final boolean isWhitelist) {
         if (!Settings.IMP.REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
@@ -89,7 +96,7 @@ public class WEManager {
         Set<Region> regions = new HashSet<>();
 
 
-        if (masks == null) {
+        if (masks == null || !isWhitelist) {
             masks = new HashSet<>();
         } else {
             synchronized (masks) {
@@ -125,7 +132,7 @@ public class WEManager {
                     if (manager.isExclusive() && !masks.isEmpty()) {
                         continue;
                     }
-                    final FaweMask mask = manager.getMask(player, FaweMaskManager.MaskType.getDefaultMaskType());
+                    final FaweMask mask = manager.getMask(player, FaweMaskManager.MaskType.getDefaultMaskType(), isWhitelist);
                     if (mask != null) {
                         regions.add(mask.getRegion());
                         masks.add(mask);
@@ -140,9 +147,10 @@ public class WEManager {
                 player.printError(TextComponent.of("Missing permission " + "fawe." + manager.getKey()));
             }
         }
-        if (!masks.isEmpty()) {
+        regions.addAll(backupRegions);
+        if (!masks.isEmpty() && isWhitelist) {
             player.setMeta("lastMask", masks);
-        } else {
+        } else if (isWhitelist) {
             player.deleteMeta("lastMask");
         }
         return regions.toArray(new Region[0]);

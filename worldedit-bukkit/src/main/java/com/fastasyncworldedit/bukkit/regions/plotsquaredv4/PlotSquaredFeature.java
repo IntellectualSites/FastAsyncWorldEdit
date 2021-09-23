@@ -224,13 +224,4 @@ public class PlotSquaredFeature extends FaweMaskManager {
         };
     }
 
-    @Override
-    public RegionFilter getFilter(String world) {
-        PlotArea area = PlotSquared.get().getPlotArea(world, null);
-        if (area != null) {
-            return new PlotRegionFilter(area);
-        }
-        return null;
-    }
-
 }
