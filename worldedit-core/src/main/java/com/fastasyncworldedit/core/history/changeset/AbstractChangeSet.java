@@ -24,12 +24,14 @@ import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.history.change.EntityCreate;
 import com.sk89q.worldedit.history.change.EntityRemove;
 import com.sk89q.worldedit.history.changeset.ChangeSet;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -40,9 +42,9 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.apache.logging.log4j.LogManager.getLogger;
-
 public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final World world;
     protected AtomicInteger waitingCombined = new AtomicInteger(0);
@@ -285,7 +287,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         } else if (change.getClass() == EntityRemove.class) {
             add((EntityRemove) change);
         } else {
-            getLogger(AbstractChangeSet.class).debug("Unknown change: " + change.getClass());
+            LOGGER.debug("Unknown change: " + change.getClass());
         }
     }
 

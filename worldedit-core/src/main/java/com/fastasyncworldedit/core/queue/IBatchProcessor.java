@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 
@@ -12,8 +13,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Function;
-
-import static org.apache.logging.log4j.LogManager.getLogger;
 
 public interface IBatchProcessor {
 
@@ -87,7 +86,7 @@ public interface IBatchProcessor {
                 layer++;
             }
         } catch (ArrayIndexOutOfBoundsException exception) {
-            getLogger(IBatchProcessor.class).error("minY = {} , layer = {}", minY, ((minY - 15) >> 4), exception);
+            WorldEdit.logger.error("minY = {} , layer = {}", minY, ((minY - 15) >> 4), exception);
         }
         return false;
     }

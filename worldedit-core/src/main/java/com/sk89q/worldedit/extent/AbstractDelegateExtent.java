@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.logging.log4j.LogManager.getLogger;
 
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
@@ -214,7 +213,7 @@ public class AbstractDelegateExtent implements Extent {
             Extent next = ((AbstractDelegateExtent) extent).getExtent();
             new ExtentTraverser(this).setNext(next);
         } else {
-            getLogger(AbstractDelegateExtent.class).debug("Cannot disable queue");
+            LOGGER.debug("Cannot disable queue");
         }
     }
 
