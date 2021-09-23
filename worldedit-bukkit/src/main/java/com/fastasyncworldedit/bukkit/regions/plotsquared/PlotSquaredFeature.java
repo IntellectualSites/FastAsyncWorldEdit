@@ -4,9 +4,6 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
-import com.fastasyncworldedit.core.regions.filter.RegionFilter;
-import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
-import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.command.MainCommand;
 import com.plotsquared.core.configuration.Settings;
 import com.plotsquared.core.database.DBFunc;
@@ -61,10 +58,6 @@ public class PlotSquaredFeature extends FaweMaskManager {
             log.debug("You need to update PlotSquared to access the CFI and REPLACEALL commands");
         }
         */
-    }
-
-    public static String getName(UUID uuid) {
-        return UUIDHandler.getName(uuid);
     }
 
     public boolean isAllowed(Player player, Plot plot, MaskType type) {
