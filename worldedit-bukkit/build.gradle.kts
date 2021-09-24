@@ -100,12 +100,12 @@ dependencies {
         because("This dependency is needed by GriefDefender but not exposed transitively.")
         isTransitive = false
     }
-    implementation(libs.paperlib)
-    implementation(libs.bstatsBukkit)
-    implementation(libs.bstatsBase)
+    implementation(libs.paperlib) { isTransitive = false }
+    implementation(libs.bstatsBukkit) { isTransitive = false }
+    implementation(libs.bstatsBase) { isTransitive = false }
     implementation(libs.serverlib)
-    api(libs.paster)
-    api(libs.lz4Java)
+    api(libs.paster) { isTransitive = false }
+    api(libs.lz4Java) { isTransitive = false }
     runtimeOnly(libs.lz4JavaStream) { isTransitive = false }
     api(libs.sparsebitset) { isTransitive = false }
     api(libs.parallelgzip) { isTransitive = false }

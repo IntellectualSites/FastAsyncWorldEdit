@@ -36,7 +36,7 @@ dependencies {
     }
 
     // Plugins
-    compileOnly(libs.redprotect)
+    compileOnly(libs.redprotect) { isTransitive = false }
     compileOnly(libs.plotsquaredV4) { isTransitive = false }
     compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
 
@@ -52,12 +52,12 @@ dependencies {
     compileOnly(libs.adventure)
     compileOnlyApi(libs.adventureNbt)
     compileOnlyApi(libs.adventureTextMiniMessage)
-    implementation(libs.zstd)
+    implementation(libs.zstd) { isTransitive = false }
     api(libs.paster)
     compileOnly(libs.lz4Java) { isTransitive = false }
-    compileOnly(libs.lz4JavaStream)
+    compileOnly(libs.lz4JavaStream) { isTransitive = false }
     compileOnly(libs.sparsebitset)
-    compileOnly(libs.parallelgzip)
+    compileOnly(libs.parallelgzip) { isTransitive = false }
     antlr(libs.antlr4)
     implementation(libs.antlr4Runtime)
     implementation(libs.jsonSimple) { isTransitive = false }
