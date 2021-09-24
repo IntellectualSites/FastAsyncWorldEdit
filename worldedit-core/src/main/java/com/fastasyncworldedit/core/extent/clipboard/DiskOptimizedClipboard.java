@@ -150,9 +150,15 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     private static BlockVector3 readSize(File file) {
         try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
             int version = is.readChar();
-            if (version > VERSION) {
-                throw new UnsupportedOperationException("Unsupported clipboard-on-disk version: " + version);
+            int x;
+            if (version != 1) {
+                x = version;
+            } else {
+                x = is.readChar();
             }
+//            if (version > VERSION) {
+//                throw new UnsupportedOperationException("Unsupported clipboard-on-disk version: " + version);
+//            }
             return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
         } catch (IOException e) {
             e.printStackTrace();
