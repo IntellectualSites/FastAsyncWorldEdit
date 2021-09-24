@@ -258,6 +258,15 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 values.put("x", new IntTag(pt.getBlockX()));
                 values.put("y", new IntTag(pt.getBlockY()));
                 values.put("z", new IntTag(pt.getBlockZ()));
+                //FAWE start - support old, corrupt schematics
+                Tag id = values.get("Id");
+                if (id == null) {
+                    id = values.get("id");
+                }
+                if (id == null) {
+                    continue;
+                }
+                //FAWE end
                 values.put("id", values.get("Id"));
                 values.remove("Id");
                 values.remove("Pos");

@@ -71,7 +71,6 @@ public class FastSchematicReader extends NBTSchematicReader {
 
     private List<Map<String, Object>> tiles;
     private List<Map<String, Object>> entities;
-
     private int width;
     private int height;
     private int length;
@@ -339,6 +338,10 @@ public class FastSchematicReader extends NBTSchematicReader {
                     values.put("y", new IntTag(y));
                     values.put("z", new IntTag(z));
                     values.put("id", id);
+                } else if (values.get("id") != null) {
+                    values.put("x", new IntTag(x));
+                    values.put("y", new IntTag(y));
+                    values.put("z", new IntTag(z));
                 }
                 values.remove("Id");
                 values.remove("Pos");
