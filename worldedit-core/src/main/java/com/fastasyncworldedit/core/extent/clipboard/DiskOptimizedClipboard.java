@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismatchException;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.fastasyncworldedit.core.math.IntTriple;
 import com.fastasyncworldedit.core.util.MainUtil;
@@ -55,11 +56,10 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final int VERSION = 1;
+    private static final int HEADER_SIZE = 22;
 
     private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
-    private final int version;
-    private final int HEADER_SIZE;
 
     private RandomAccessFile braf;
     private MappedByteBuffer byteBuffer;
@@ -77,6 +77,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                 )
         );
         setOffset(region.getMinimumPoint());
+        setOrigin(region.getMinimumPoint());
     }
 
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
@@ -90,8 +91,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     public DiskOptimizedClipboard(BlockVector3 dimensions, File file) {
-        super(dimensions);
-        HEADER_SIZE = 20;
+        super(dimensions, BlockVector3.ZERO);
         if (HEADER_SIZE + ((long) getVolume() << 1) >= Integer.MAX_VALUE) {
             throw new IllegalArgumentException(
                     "Dimensions too large for this clipboard format. Use //lazycopy for large selections.");
@@ -119,29 +119,27 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             braf.setLength(fileLength);
             init();
             // write getLength() etc
-            byteBuffer.putChar(0, (char) (version = VERSION));
-            byteBuffer.putChar(2, (char) getWidth());
-            byteBuffer.putChar(4, (char) getHeight());
-            byteBuffer.putChar(6, (char) getLength());
+            byteBuffer.putChar(2, (char) (VERSION));
+            byteBuffer.putChar(4, (char) getWidth());
+            byteBuffer.putChar(6, (char) getHeight());
+            byteBuffer.putChar(8, (char) getLength());
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
     public DiskOptimizedClipboard(File file) {
-        super(readSize(file));
+        super(readSize(file), BlockVector3.ZERO);
         nbtMap = new HashMap<>();
         try {
             this.file = file;
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
             init();
-            version = byteBuffer.getChar(0);
-            HEADER_SIZE = (version > 0 ? 20 : 14);
             if (braf.length() - HEADER_SIZE == ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)) {
                 hasBiomes = true;
             }
+            getOffset();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -149,16 +147,11 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     private static BlockVector3 readSize(File file) {
         try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
+            is.skipBytes(2);
             int version = is.readChar();
-            int x;
-            if (version != 1) {
-                x = version;
-            } else {
-                x = is.readChar();
+            if (version != VERSION) {
+                throw new FaweClipboardVersionMismatchException();
             }
-//            if (version > VERSION) {
-//                throw new UnsupportedOperationException("Unsupported clipboard-on-disk version: " + version);
-//            }
             return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
         } catch (IOException e) {
             e.printStackTrace();
@@ -178,6 +171,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     private void init() throws IOException {
         if (this.fileChannel == null) {
             this.fileChannel = braf.getChannel();
+            this.fileChannel.lock();
             this.byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, file.length());
         }
     }
@@ -257,7 +251,6 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -278,17 +271,12 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
                     BlockVector3.at(0, 0, 0),
                     BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1)
             );
-            int originX = byteBuffer.getShort(8);
-            int originY = byteBuffer.getShort(10);
-            int originZ = byteBuffer.getShort(12);
-            if (version == 1) {
-                int offsetX = byteBuffer.getShort(14);
-                int offsetY = byteBuffer.getShort(16);
-                int offsetZ = byteBuffer.getShort(18);
-                region.shift(BlockVector3.at(offsetX, offsetY, offsetZ));
-            }
+            int offsetX = byteBuffer.getShort(16);
+            int offsetY = byteBuffer.getShort(18);
+            int offsetZ = byteBuffer.getShort(20);
+            region.shift(BlockVector3.at(offsetX, offsetY, offsetZ));
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, this);
-            clipboard.setOrigin(BlockVector3.at(originX, originY, originZ));
+            clipboard.setOrigin(getOrigin());
             return clipboard;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -298,9 +286,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public BlockVector3 getOrigin() {
-        int ox = byteBuffer.getShort(8);
-        int oy = byteBuffer.getShort(10);
-        int oz = byteBuffer.getShort(12);
+        int ox = byteBuffer.getShort(10);
+        int oy = byteBuffer.getShort(12);
+        int oz = byteBuffer.getShort(14);
         return BlockVector3.at(ox, oy, oz);
     }
 
@@ -308,25 +296,31 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     public void setOrigin(BlockVector3 offset) {
         super.setOrigin(offset);
         try {
-            byteBuffer.putShort(8, (short) offset.getBlockX());
-            byteBuffer.putShort(10, (short) offset.getBlockY());
-            byteBuffer.putShort(12, (short) offset.getBlockZ());
+            byteBuffer.putShort(10, (short) offset.getBlockX());
+            byteBuffer.putShort(12, (short) offset.getBlockY());
+            byteBuffer.putShort(14, (short) offset.getBlockZ());
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
-    private void setOffset(BlockVector3 offset) {
-        if (version == 0) {
-            return;
-        }
+    @Override
+    protected void setOffset(BlockVector3 offset) {
+        super.setOffset(offset);
         try {
-            byteBuffer.putShort(14, (short) offset.getBlockX());
-            byteBuffer.putShort(16, (short) offset.getBlockY());
-            byteBuffer.putShort(18, (short) offset.getBlockZ());
+            byteBuffer.putShort(16, (short) offset.getBlockX());
+            byteBuffer.putShort(18, (short) offset.getBlockY());
+            byteBuffer.putShort(20, (short) offset.getBlockZ());
         } catch (Throwable e) {
             e.printStackTrace();
         }
+    }
+
+    private void getOffset() {
+        int x = byteBuffer.getShort(16);
+        int y = byteBuffer.getShort(18);
+        int z = byteBuffer.getShort(20);
+        super.setOffset(BlockVector3.at(x, y, z));
     }
 
     @Override

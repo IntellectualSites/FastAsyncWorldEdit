@@ -144,6 +144,10 @@
     "fawe.error.parse.unknown-transform": "Unknown transform: {0}, See: {1}",
     "fawe.error.parse.no-clipboard": "To use {0}, please first copy something to your clipboard",
     "fawe.error.parse.no-clipboard-source": "No clipboards found at given source: {0}",
+    "fawe.error.clipboard.invalid": "====== INVALID CLIPBOARD ======",
+    "fawe.error.clipboard.invalid.info": "File: {0} (len: {1})",
+    "fawe.error.clipboard.load.failure": "Could not load clipboard. Possible that the clipboard is still being written to from another server?!",
+    "fawe.error.clipboard.on.disk.version.mismatch": "Clipboard version mismatch. Please delete your clipboards folder and restart the server.",
 
     "fawe.cancel.worldedit.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.worldedit.cancel.reason.confirm": "Use //confirm to execute {0}",

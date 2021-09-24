@@ -25,8 +25,8 @@ public abstract class LinearClipboard extends SimpleClipboard {
 
     protected final HashSet<ClipboardEntity> entities = new HashSet<>();
 
-    public LinearClipboard(BlockVector3 dimensions) {
-        super(dimensions);
+    public LinearClipboard(BlockVector3 dimensions, BlockVector3 offset) {
+        super(dimensions, offset);
     }
 
     // We shouldn't expose methods that directly reference the index as people cannot be trusted to use it properly.

@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
+import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismatchException;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.worldedit.EmptyClipboardException;
@@ -46,7 +47,6 @@ import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
@@ -353,8 +353,6 @@ public interface Player extends Entity, Actor {
 
     Region getLargestRegion();
 
-    void setSelection(Region region);
-
     /**
      * Get the player's selection region. If the selection is defined in
      * a different world, the {@code IncompleteRegionException}
@@ -366,6 +364,8 @@ public interface Player extends Entity, Actor {
     default Region getSelection() throws IncompleteRegionException {
         return getSession().getSelection(getWorld());
     }
+
+    void setSelection(Region region);
 
     /**
      * Set the player's WorldEdit selection.
@@ -391,7 +391,9 @@ public interface Player extends Entity, Actor {
      */
     default void unregister() {
         cancel(true);
-        getSession().flushClipboard();
+        if (Settings.IMP.CLIPBOARD.DELETE_ON_LOGOUT || Settings.IMP.CLIPBOARD.USE_DISK) {
+            getSession().setClipboard(null);
+        }
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
             getSession().clearHistory();
         }
@@ -421,18 +423,21 @@ public interface Player extends Entity, Actor {
                 ClipboardHolder holder = new ClipboardHolder(clip);
                 getSession().setClipboard(holder);
             }
-        } catch (Exception event) {
-            printError(TextComponent.of("====== INVALID CLIPBOARD ======"));
-            event.printStackTrace();
+        } catch (FaweClipboardVersionMismatchException e) {
+            printError(Caption.of("fawe.error.clipboard.on.disk.version.mismatch"));
+        } catch (RuntimeException e) {
+            printError(Caption.of("fawe.error.clipboard.invalid"));
+            e.printStackTrace();
+            print(Caption.of("fawe.error.stacktrace"));
+            print(Caption.of("fawe.error.clipboard.load.failure"));
+            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
+            print(Caption.of("fawe.error.stacktrace"));
+        } catch (Exception e) {
+            printError(Caption.of("fawe.error.clipboard.invalid"));
+            e.printStackTrace();
             print(Caption.of("fawe.error.stacktrace"));
             print(Caption.of("fawe.error.no-failure"));
-            print(Caption.of(
-                    "File: ",
-                    TextComponent.of(file.getName()),
-                    TextComponent.of(" (len:"),
-                    TextComponent.of(file.length()),
-                    TextComponent.of(")")
-            ));
+            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
             print(Caption.of("fawe.error.stacktrace"));
         }
     }

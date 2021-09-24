@@ -10,10 +10,11 @@ public abstract class SimpleClipboard implements Clipboard {
     private final BlockVector3 size;
     private final int area;
     private final int volume;
+    private BlockVector3 offset;
     private BlockVector3 origin;
-
-    SimpleClipboard(BlockVector3 dimensions) {
+    SimpleClipboard(BlockVector3 dimensions, BlockVector3 offset) {
         this.size = dimensions;
+        this.offset = offset;
         long longVolume = (long) getWidth() * (long) getHeight() * (long) getLength();
         if (longVolume >= Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Dimensions are too large for this clipboard format.");
@@ -24,17 +25,21 @@ public abstract class SimpleClipboard implements Clipboard {
     }
 
     SimpleClipboard(Region region) {
-        this(region.getDimensions());
+        this(region.getDimensions(), region.getMinimumPoint());
     }
 
-    @Override
-    public void setOrigin(BlockVector3 offset) {
-        this.origin = offset;
+    protected void setOffset(final BlockVector3 offset) {
+        this.offset = offset;
     }
 
     @Override
     public BlockVector3 getOrigin() {
         return origin;
+    }
+
+    @Override
+    public void setOrigin(BlockVector3 origin) {
+        this.origin = origin.subtract(offset);
     }
 
     @Override

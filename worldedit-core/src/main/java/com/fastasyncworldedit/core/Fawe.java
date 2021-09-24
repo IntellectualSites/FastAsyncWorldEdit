@@ -209,6 +209,7 @@ public class Fawe {
             case MAX_ENTITIES:
             case MAX_ITERATIONS:
             case OUTSIDE_REGION:
+            case CLIPBOARD:
                 if (!faweExceptionReasonsUsed[type.ordinal()]) {
                     faweExceptionReasonsUsed[type.ordinal()] = true;
                     throw e;

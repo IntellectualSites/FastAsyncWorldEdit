@@ -34,7 +34,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
 
 
     public CPUOptimizedClipboard(Region region) {
-        super(region.getDimensions());
+        super(region.getDimensions(), region.getMinimumPoint());
         this.states = new char[getVolume()];
         nbtMapLoc = new HashMap<>();
         nbtMapIndex = new HashMap<>();

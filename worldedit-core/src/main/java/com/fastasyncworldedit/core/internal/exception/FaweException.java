@@ -90,6 +90,7 @@ public class FaweException extends RuntimeException {
         CHUNK,
         PLAYER_ONLY,
         ACTOR_REQUIRED,
+        CLIPBOARD,
         OTHER
     }
 

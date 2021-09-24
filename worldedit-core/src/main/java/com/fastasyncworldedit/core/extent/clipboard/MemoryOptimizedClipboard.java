@@ -58,7 +58,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     }
 
     public MemoryOptimizedClipboard(Region region, int compressionLevel) {
-        super(region.getDimensions());
+        super(region.getDimensions(), region.getMinimumPoint());
         states = new byte[1 + (getVolume() >> BLOCK_SHIFT)][];
         nbtMap = new HashMap<>();
         this.compressionLevel = compressionLevel;
