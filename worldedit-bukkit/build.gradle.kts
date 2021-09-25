@@ -100,13 +100,12 @@ dependencies {
         because("This dependency is needed by GriefDefender but not exposed transitively.")
         isTransitive = false
     }
-    implementation(libs.paperlib) { isTransitive = false }
+    implementation(libs.paperlib)
     implementation(libs.bstatsBukkit) { isTransitive = false }
     implementation(libs.bstatsBase) { isTransitive = false }
     implementation(libs.serverlib)
     api(libs.paster) { isTransitive = false }
     api(libs.lz4Java) { isTransitive = false }
-    runtimeOnly(libs.lz4JavaStream) { isTransitive = false }
     api(libs.sparsebitset) { isTransitive = false }
     api(libs.parallelgzip) { isTransitive = false }
     compileOnly(libs.adventure)
@@ -170,9 +169,6 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.1.1"))
-        }
-        relocate("net.jpountz", "com.fastasyncworldedit.core.jpountz") {
-            include(dependency("net.jpountz:lz4-java-stream:1.0.0"))
         }
         relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
             include(dependency("org.lz4:lz4-java:1.8.0"))

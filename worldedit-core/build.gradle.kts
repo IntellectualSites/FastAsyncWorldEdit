@@ -55,7 +55,6 @@ dependencies {
     implementation(libs.zstd) { isTransitive = false }
     api(libs.paster)
     compileOnly(libs.lz4Java) { isTransitive = false }
-    compileOnly(libs.lz4JavaStream) { isTransitive = false }
     compileOnly(libs.sparsebitset)
     compileOnly(libs.parallelgzip) { isTransitive = false }
     antlr(libs.antlr4)

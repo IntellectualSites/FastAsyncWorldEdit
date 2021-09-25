@@ -31,7 +31,6 @@ import net.jpountz.lz4.LZ4BlockOutputStream;
 import net.jpountz.lz4.LZ4Compressor;
 import net.jpountz.lz4.LZ4Factory;
 import net.jpountz.lz4.LZ4FastDecompressor;
-import net.jpountz.lz4.LZ4InputStream;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -360,12 +359,8 @@ public class MainUtil {
         if (mode == 0) {
             return new FaweInputStream(is);
         }
-        boolean legacy;
         if (mode >= 10) {
-            legacy = false;
             mode = -mode + 10;
-        } else {
-            legacy = true;
         }
         if (mode == 0) {
             return new FaweInputStream(is);
@@ -380,11 +375,7 @@ public class MainUtil {
         }
         amountAbs = (1 + ((amountAbs - 1) % 3)) + (amountAbs > 3 ? 1 : 0);
         for (int i = 0; i < amountAbs; i++) {
-            if (legacy) {
-                is = new LZ4InputStream(is);
-            } else {
-                is = new LZ4BlockInputStream(is);
-            }
+            is = new LZ4BlockInputStream(is);
         }
         return new FaweInputStream(new FastBufferedInputStream(is));
     }

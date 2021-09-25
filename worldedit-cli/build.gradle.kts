@@ -40,7 +40,6 @@ dependencies {
     implementation("commons-cli:commons-cli:1.4")
     api(libs.parallelgzip) { isTransitive = false }
     api(libs.lz4Java)
-    api(libs.lz4JavaStream) { isTransitive = false }
 }
 
 tasks.named<ShadowJar>("shadowJar") {
