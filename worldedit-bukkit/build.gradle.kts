@@ -43,7 +43,7 @@ repositories {
 
 configurations.all {
     resolutionStrategy {
-        force("com.google.guava:guava:21.0")
+        force("com.google.guava:guava:31.0-jre")
     }
 }
 
