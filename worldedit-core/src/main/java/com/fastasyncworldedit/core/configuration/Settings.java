@@ -102,7 +102,7 @@ public class Settings extends Config {
         })
         public String CLIPBOARD = "clipboard";
         @Comment("Each player has his or her own sub directory for schematics")
-        public boolean PER_PLAYER_SCHEMATICS = true;
+        public boolean PER_PLAYER_SCHEMATICS = false;
 
     }
 
