@@ -51,6 +51,9 @@ import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * @deprecated Being replaced by {@link com.sk89q.worldedit.EditSessionBuilder}. See https://worldedit.enginehub.org/en/latest/api/concepts/edit-sessions/
+ */
 @Deprecated(forRemoval = true)
 public class EditSessionBuilder {
 
