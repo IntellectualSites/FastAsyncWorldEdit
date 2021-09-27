@@ -24,6 +24,7 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.event.extent.PasteEvent;
+import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
@@ -609,6 +610,24 @@ public class ClipboardCommands {
     )
     @CommandPermissions("worldedit.clipboard.clear")
     public void clearClipboard(Actor actor, LocalSession session) throws WorldEditException {
+        //FAWE start - delete DOC
+        ClipboardHolder holder = session.getExistingClipboard();
+        if (holder == null) {
+            return;
+        }
+        for (Clipboard clipboard : holder.getClipboards()) {
+            DiskOptimizedClipboard doc;
+            if (clipboard instanceof DiskOptimizedClipboard) {
+                doc = (DiskOptimizedClipboard) clipboard;
+            } else if (clipboard instanceof BlockArrayClipboard && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard) {
+                doc = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+            } else {
+                continue;
+            }
+            doc.close(); // Ensure closed before deletion
+            doc.getFile().delete();
+        }
+        //FAWE end
         session.setClipboard(null);
         actor.print(Caption.of("worldedit.clearclipboard.cleared"));
     }

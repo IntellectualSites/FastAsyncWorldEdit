@@ -511,8 +511,7 @@ public class Settings extends Config {
         @Comment("Number of days to keep history on disk before deleting it")
         public int DELETE_AFTER_DAYS = 1;
         @Comment({
-                "If a players clipboard should be removed from memory upon player logout,",
-                " - Will not delete clipboards on disk"
+                "If a player's clipboard should be deleted upon logout"
         })
         public boolean DELETE_ON_LOGOUT = false;
 

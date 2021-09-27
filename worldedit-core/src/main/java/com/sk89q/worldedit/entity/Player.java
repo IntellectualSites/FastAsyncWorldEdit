@@ -33,6 +33,7 @@ import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -387,15 +388,32 @@ public interface Player extends Entity, Actor {
     }
 
     /**
-     * Unregister this player, deleting all data stored during the logon session.
+     * Unregister this player, deleting all data stored during the login session.
      */
     default void unregister() {
         cancel(true);
-        if (Settings.IMP.CLIPBOARD.DELETE_ON_LOGOUT || Settings.IMP.CLIPBOARD.USE_DISK) {
-            getSession().setClipboard(null);
+        LocalSession session = getSession();
+        if (Settings.IMP.CLIPBOARD.USE_DISK && Settings.IMP.CLIPBOARD.DELETE_ON_LOGOUT) {
+            ClipboardHolder holder = session.getExistingClipboard();
+            if (holder != null) {
+                for (Clipboard clipboard : holder.getClipboards()) {
+                    DiskOptimizedClipboard doc;
+                    if (clipboard instanceof DiskOptimizedClipboard) {
+                        doc = (DiskOptimizedClipboard) clipboard;
+                    } else if (clipboard instanceof BlockArrayClipboard && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard) {
+                        doc = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+                    } else {
+                        continue;
+                    }
+                    doc.close(); // Ensure closed before deletion
+                    doc.getFile().delete();
+                }
+            }
+        } else if (Settings.IMP.CLIPBOARD.DELETE_ON_LOGOUT || Settings.IMP.CLIPBOARD.USE_DISK) {
+            session.setClipboard(null);
         }
         if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
-            getSession().clearHistory();
+            session.clearHistory();
         }
     }
 
