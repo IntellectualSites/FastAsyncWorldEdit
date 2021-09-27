@@ -2035,12 +2035,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         //FAWE start - liquidmask
         Mask liquidMask;
         if (plants) {
-            liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER,
+            liquidMask = new BlockTypeMask(this, BlockTypes.LAVA, BlockTypes.WATER, BlockTypes.BUBBLE_COLUMN,
                     BlockTypes.KELP_PLANT, BlockTypes.KELP, BlockTypes.SEAGRASS, BlockTypes.TALL_SEAGRASS
             );
         } else {
             liquidMask = new BlockMaskBuilder()
-                    .addTypes(BlockTypes.WATER, BlockTypes.LAVA)
+                    .addTypes(BlockTypes.WATER, BlockTypes.LAVA, BlockTypes.BUBBLE_COLUMN)
                     .build(this);
         }
         //FAWE end
