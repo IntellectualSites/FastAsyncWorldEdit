@@ -153,8 +153,10 @@ public class SchematicCommands {
                     String formatName,
             @Arg(desc = "File name.")
                     String filename,
-            @Switch(name = 'r', desc = "Apply random rotation")
-                    boolean randomRotate
+            @Switch(name = 'o', desc = "Overwrite/replace existing clipboard(s)")
+                    boolean overwrite
+//            @Switch(name = 'r', desc = "Apply random rotation") <- not implemented below.
+//                    boolean randomRotate
     ) throws FilenameException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
@@ -164,7 +166,11 @@ public class SchematicCommands {
         try {
             MultiClipboardHolder all = ClipboardFormats.loadAllFromInput(player, filename, null, true);
             if (all != null) {
-                session.addClipboard(all);
+                if (overwrite) {
+                    session.setClipboard(all);
+                } else {
+                    session.addClipboard(all);
+                }
                 player.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
             }
         } catch (IOException e) {
