@@ -391,7 +391,7 @@
     "worldedit.schematic.unload": "Unload",
     "worldedit.schematic.delete": "delete",
     "worldedit.schematic.visualize": "visualize",
-    "worldedit.schematic.clipboard": "Add to clipboard",
+    "worldedit.schematic.clipboard": "Add to (multi-)clipboard",
     "worldedit.schematic.unknown-filename": "Unknown filename: {0}",
     "worldedit.schematic.file-not-exist": "File could not be read or it does not exist: {0}",
     "worldedit.schematic.already-exists": "That schematic already exists!",
