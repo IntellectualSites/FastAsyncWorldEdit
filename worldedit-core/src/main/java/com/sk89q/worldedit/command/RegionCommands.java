@@ -140,10 +140,10 @@ public class RegionCommands {
     @CommandPermissions("worldedit.region.test")
     @Logging(REGION)
     public void test(
-            Player player, EditSession editSession,
+            Actor actor, EditSession editSession,
             @Arg(desc = "test") double testValue
     ) throws WorldEditException {
-        player.print(TextComponent.of(testValue));
+        actor.print(TextComponent.of(testValue));
     }
 
     @Command(
@@ -151,19 +151,9 @@ public class RegionCommands {
             desc = "Get the light at a position"
     )
     @CommandPermissions("worldedit.light.fix")
-    public void fixLighting(Player player) throws WorldEditException {
-        final Location loc = player.getLocation();
-        Region selection = player.getSelection();
-        if (selection == null) {
-            final int cx = loc.getBlockX() >> 4;
-            final int cz = loc.getBlockZ() >> 4;
-            selection = new CuboidRegion(
-                    BlockVector3.at(cx - 8, 0, cz - 8).multiply(16),
-                    BlockVector3.at(cx + 8, 0, cz + 8).multiply(16)
-            );
-        }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection, null, RelightMode.ALL);
-        player.print(Caption.of("fawe.info.lighting.propagate.selection", count));
+    public void fixLighting(Actor actor, LocalSession session, @Selection Region selection) throws WorldEditException {
+        int count = FaweAPI.fixLighting(session.getSelectionWorld(), selection, null, RelightMode.ALL);
+        actor.print(Caption.of("fawe.info.lighting.propagate.selection", count));
     }
 
     //    @Command(
@@ -184,18 +174,9 @@ public class RegionCommands {
             desc = "Removing lighting in a selection"
     )
     @CommandPermissions("worldedit.light.remove")
-    public void removeLighting(Player player) {
-        Region selection = player.getSelection();
-        if (selection == null) {
-            final int cx = player.getLocation().getBlockX() >> 4;
-            final int cz = player.getLocation().getBlockZ() >> 4;
-            selection = new CuboidRegion(
-                    BlockVector3.at(cx - 8, 0, cz - 8).multiply(16),
-                    BlockVector3.at(cx + 8, 0, cz + 8).multiply(16)
-            );
-        }
-        int count = FaweAPI.fixLighting(player.getWorld(), selection, null, RelightMode.NONE);
-        player.print(Caption.of("fawe.info.updated.lighting.selection", count));
+    public void removeLighting(Actor actor, LocalSession session, @Selection Region selection) {
+        int count = FaweAPI.fixLighting(session.getSelectionWorld(), selection, null, RelightMode.NONE);
+        actor.print(Caption.of("fawe.info.updated.lighting.selection", count));
     }
 
     @Command(
@@ -224,8 +205,8 @@ public class RegionCommands {
             desc = "Set block lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
-    public void setlighting(Player player, EditSession editSession, @Selection Region region) {
-        player.print(Caption.of("fawe.info.temporarily-not-working"));
+    public void setlighting(Actor actor, EditSession editSession, @Selection Region region) {
+        actor.print(Caption.of("fawe.info.temporarily-not-working"));
     }
 
     @Command(
@@ -233,8 +214,8 @@ public class RegionCommands {
             desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
-    public void setskylighting(Player player, @Selection Region region) {
-        player.print(Caption.of("fawe.info.temporarily-not-working"));
+    public void setskylighting(Actor actor, @Selection Region region) {
+        actor.print(Caption.of("fawe.info.temporarily-not-working"));
     }
 
     @Command(
@@ -355,7 +336,7 @@ public class RegionCommands {
     @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void lay(
-            Player player,
+            Actor actor,
             EditSession editSession,
             @Selection Region region,
             @Arg(name = "pattern", desc = "The pattern of blocks to lay") Pattern patternArg
@@ -380,7 +361,7 @@ public class RegionCommands {
             editSession.setBlock(x, y, z, patternArg);
             affected++;
         }
-        player.print(Caption.of("fawe.worldedit.visitor.visitor.block", affected));
+        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", affected));
     }
 
     @Command(
@@ -619,7 +600,7 @@ public class RegionCommands {
     @Preload(Preload.PreloadCheck.PRELOAD)
     @Confirm(Confirm.Processor.REGION)
     public void fall(
-            Player player, EditSession editSession, LocalSession session,
+            Actor actor, EditSession editSession,
             @Selection Region region,
             @Arg(desc = "BlockStateHolder", def = "air")
                     BlockStateHolder replace,
@@ -627,7 +608,7 @@ public class RegionCommands {
                     boolean notFullHeight
     ) throws WorldEditException {
         int affected = editSession.fall(region, !notFullHeight, replace);
-        player.print(Caption.of("fawe.worldedit.visitor.visitor.block", affected));
+        actor.print(Caption.of("fawe.worldedit.visitor.visitor.block", affected));
     }
 
     @Command(

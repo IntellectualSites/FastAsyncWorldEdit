@@ -460,7 +460,7 @@ public class GeneralCommands {
     )
     @CommandPermissions("worldedit.global-texture")
     public void gtexture(
-            Player player,
+            Actor actor,
             World worldArg,
             LocalSession session,
             EditSession editSession,
@@ -470,7 +470,7 @@ public class GeneralCommands {
         // TODO NOT IMPLEMENTED convert this to an ArgumentConverter
         if (arguments.isEmpty()) {
             session.setTextureUtil(null);
-            player.print(Caption.of("fawe.worldedit.general.texture.disabled"));
+            actor.print(Caption.of("fawe.worldedit.general.texture.disabled"));
         } else {
             String arg = arguments.get(0);
             String argLower = arg.toLowerCase(Locale.ROOT);
@@ -503,7 +503,7 @@ public class GeneralCommands {
                     util = Fawe.get().getTextureUtil();
                 } else {
                     ParserContext parserContext = new ParserContext();
-                    parserContext.setActor(player);
+                    parserContext.setActor(actor);
                     parserContext.setWorld(worldArg);
                     parserContext.setSession(session);
                     parserContext.setExtent(editSession);
@@ -523,7 +523,7 @@ public class GeneralCommands {
                 util = new CachedTextureUtil(util);
             }
             session.setTextureUtil(util);
-            player.print(Caption.of("fawe.worldedit.general.texture.set", StringMan.join(arguments, " ")));
+            actor.print(Caption.of("fawe.worldedit.general.texture.set", StringMan.join(arguments, " ")));
         }
     }
 
@@ -535,16 +535,16 @@ public class GeneralCommands {
     )
     @CommandPermissions({"worldedit.global-mask", "worldedit.mask.global"})
     public void gsmask(
-            Player player,
+            Actor actor,
             LocalSession session,
             EditSession editSession,
             @Arg(desc = "The mask to set", def = "") Mask maskOpt
     ) throws WorldEditException {
         session.setSourceMask(maskOpt);
         if (maskOpt == null) {
-            player.print(Caption.of("fawe.worldedit.general.source.mask.disabled"));
+            actor.print(Caption.of("fawe.worldedit.general.source.mask.disabled"));
         } else {
-            player.print(Caption.of("fawe.worldedit.general.source.mask"));
+            actor.print(Caption.of("fawe.worldedit.general.source.mask"));
         }
     }
 
@@ -555,16 +555,16 @@ public class GeneralCommands {
     )
     @CommandPermissions({"worldedit.global-transform", "worldedit.transform.global"})
     public void gtransform(
-            Player player,
+            Actor actor,
             EditSession editSession,
             LocalSession session,
             @Arg(desc = "The transform to set", def = "") ResettableExtent transform
     ) throws WorldEditException {
         session.setTransform(transform);
         if (transform == null) {
-            player.print(Caption.of("fawe.worldedit.general.transform.disabled"));
+            actor.print(Caption.of("fawe.worldedit.general.transform.disabled"));
         } else {
-            player.print(Caption.of("fawe.worldedit.general.transform"));
+            actor.print(Caption.of("fawe.worldedit.general.transform"));
         }
     }
 
@@ -574,11 +574,11 @@ public class GeneralCommands {
             desc = "Toggle FAWE tips"
     )
     @CommandPermissions("fawe.tips")
-    public void tips(Player player, LocalSession session) throws WorldEditException {
-        if (player.togglePermission("fawe.tips")) {
-            player.print(Caption.of("fawe.info.worldedit.toggle.tips.on"));
+    public void tips(Actor actor, LocalSession session) throws WorldEditException {
+        if (actor.togglePermission("fawe.tips")) {
+            actor.print(Caption.of("fawe.info.worldedit.toggle.tips.on"));
         } else {
-            player.print(Caption.of("fawe.info.worldedit.toggle.tips.off"));
+            actor.print(Caption.of("fawe.info.worldedit.toggle.tips.off"));
         }
     }
 

@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.history.changeset;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
 import com.sk89q.worldedit.history.change.Change;
@@ -84,13 +85,13 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     }
 
     @Override
-    public EditSession toEditSession(Player player) {
-        return parent.toEditSession(player);
+    public EditSession toEditSession(Actor actor) {
+        return parent.toEditSession(actor);
     }
 
     @Override
-    public EditSession toEditSession(Player player, Region[] regions) {
-        return parent.toEditSession(player, regions);
+    public EditSession toEditSession(Actor actor, Region[] regions) {
+        return parent.toEditSession(actor, regions);
     }
 
     @Override

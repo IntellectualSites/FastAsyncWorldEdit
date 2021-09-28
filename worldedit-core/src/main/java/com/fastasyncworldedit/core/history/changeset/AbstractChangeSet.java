@@ -16,7 +16,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EditSessionBuilder;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.history.change.BlockChange;
@@ -251,12 +251,12 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     public abstract Iterator<Change> getIterator(boolean redo);
 
-    public EditSession toEditSession(Player player) {
-        return toEditSession(player, null);
+    public EditSession toEditSession(Actor actor) {
+        return toEditSession(actor, null);
     }
 
-    public EditSession toEditSession(Player player, Region[] regions) {
-        EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(getWorld()).actor(player).
+    public EditSession toEditSession(Actor actor, Region[] regions) {
+        EditSessionBuilder builder = WorldEdit.getInstance().newEditSessionBuilder().world(getWorld()).actor(actor).
                 fastMode(false).checkMemory(false).changeSet(this).limitUnlimited();
         if (regions != null) {
             builder.allowedRegions(regions);

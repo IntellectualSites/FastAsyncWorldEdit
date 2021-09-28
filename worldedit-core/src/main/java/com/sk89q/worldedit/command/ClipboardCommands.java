@@ -328,17 +328,17 @@ public class ClipboardCommands {
     @Deprecated
     @CommandPermissions({"worldedit.clipboard.download"})
     public void download(
-            final Player player,
+            final Actor actor,
             final LocalSession session,
             @Arg(name = "format", desc = "String", def = "fast") final String formatName
     ) throws WorldEditException {
         final ClipboardFormat format = ClipboardFormats.findByAlias(formatName);
         if (format == null) {
-            player.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format", formatName));
+            actor.print(Caption.of("fawe.worldedit.clipboard.clipboard.invalid.format", formatName));
             return;
         }
 
-        player.print(Caption.of("fawe.web.generating.link", formatName));
+        actor.print(Caption.of("fawe.web.generating.link", formatName));
         ClipboardHolder holder = session.getClipboard();
 
         URL url;
@@ -388,7 +388,7 @@ public class ClipboardCommands {
             // If we have a transform, bake it into the copy
             if (!transform.isIdentity()) {
                 final FlattenedClipboardTransform result = FlattenedClipboardTransform.transform(clipboard, transform);
-                target = new BlockArrayClipboard(result.getTransformedRegion(), player.getUniqueId());
+                target = new BlockArrayClipboard(result.getTransformedRegion(), actor.getUniqueId());
                 target.setOrigin(clipboard.getOrigin());
                 Operations.completeLegacy(result.copyTo(target));
             } else {
@@ -407,17 +407,17 @@ public class ClipboardCommands {
                 }
             } else {
                 if (Settings.IMP.WEB.URL.isEmpty()) {
-                    player.print(Caption.of("fawe.error.setting.disable", "web.url"));
+                    actor.print(Caption.of("fawe.error.setting.disable", "web.url"));
                     return;
                 }
                 url = FaweAPI.upload(target, format);
             }
         }
         if (url == null) {
-            player.print(Caption.of("fawe.web.generating.link.failed"));
+            actor.print(Caption.of("fawe.web.generating.link.failed"));
         } else {
             String urlText = url.toString();
-            player.print(Caption.of("fawe.web.download.link", urlText).clickEvent(ClickEvent.openUrl(urlText)));
+            actor.print(Caption.of("fawe.web.download.link", urlText).clickEvent(ClickEvent.openUrl(urlText)));
         }
     }
 

@@ -46,15 +46,15 @@ public class ProvideBindings extends Bindings {
     }
 
     @Binding
-    public LocalSession getLocalSession(Player player) {
-        return getWorldEdit().getSessionManager().get(player);
+    public LocalSession getLocalSession(Actor actor) {
+        return getWorldEdit().getSessionManager().get(actor);
     }
 
     @Binding
-    public EditSession editSession(LocalSession localSession, Player player, InjectedValueAccess context) {
+    public EditSession editSession(LocalSession localSession, Actor actor, InjectedValueAccess context) {
         Arguments arguments = context.injectedValue(Key.of(Arguments.class)).orElse(null);
         String command = arguments == null ? null : arguments.get();
-        EditSession editSession = localSession.createEditSession(player, command);
+        EditSession editSession = localSession.createEditSession(actor, command);
         editSession.enableStandardMode();
         Request.request().setEditSession(editSession);
         return editSession;
@@ -62,8 +62,8 @@ public class ProvideBindings extends Bindings {
 
     @Selection
     @Binding
-    public Region selection(LocalSession localSession, Player player) {
-        return localSession.getSelection(player.getWorld());
+    public Region selection(LocalSession localSession) {
+        return localSession.getSelection();
     }
 
     @Binding
@@ -124,8 +124,7 @@ public class ProvideBindings extends Bindings {
         if (extent != null) {
             return extent;
         }
-        Player plr = getPlayer(actor);
-        EditSession editSession = editSession(getLocalSession(plr), plr, access);
+        EditSession editSession = editSession(getLocalSession(actor), actor, access);
         if (access instanceof InjectedValueStore) {
             InjectedValueStore store = (InjectedValueStore) access;
             store.injectValue(Key.of(EditSession.class), ValueProvider.constant(editSession));

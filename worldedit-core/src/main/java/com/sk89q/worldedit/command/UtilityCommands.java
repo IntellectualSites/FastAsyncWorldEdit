@@ -119,7 +119,7 @@ public class UtilityCommands {
             desc = "Generate or run a macro"
     )
     @CommandPermissions("worldedit.macro")
-    public void macro(Player player, LocalSession session, String name, String argument) throws IOException {
+    public void macro(Actor actor, LocalSession session, String name, String argument) throws IOException {
 
     }
 
@@ -130,11 +130,11 @@ public class UtilityCommands {
     )
     @CommandPermissions("fawe.admin")
     public void heightmapInterface(
-            Player player,
+            Actor actor,
             @Arg(name = "min", desc = "int", def = "100") int min,
             @Arg(name = "max", desc = "int", def = "200") int max
     ) throws IOException {
-        player.print(TextComponent.of("Please wait while we generate the minified heightmaps."));
+        actor.print(TextComponent.of("Please wait while we generate the minified heightmaps."));
         File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
 
         File webSrc = new File(Fawe.imp().getDirectory(), "web" + File.separator + "heightmap");
@@ -170,7 +170,7 @@ public class UtilityCommands {
                         RenderingHints.VALUE_INTERPOLATION_BILINEAR,
                         true
                 );
-                player.print(TextComponent.of(String.format("Writing %s", name)));
+                actor.print(TextComponent.of(String.format("Writing %s", name)));
                 File minFile = new File(minImages, name);
                 File maxFile = new File(maxImages, name);
                 minFile.getParentFile().mkdirs();
@@ -195,9 +195,9 @@ public class UtilityCommands {
         config.append("// The local source for the image (used in commands)\n");
         config.append("var src_local = \"file://\";\n");
         File configFile = new File(webSrc, "config.js");
-        player.print(TextComponent.of(String.format("Writing %s", configFile)));
+        actor.print(TextComponent.of(String.format("Writing %s", configFile)));
         Files.write(configFile.toPath(), config.toString().getBytes());
-        player.print(TextComponent.of("Done! See: `FastAsyncWorldEdit/web/heightmap`"));
+        actor.print(TextComponent.of("Done! See: `FastAsyncWorldEdit/web/heightmap`"));
     }
 
     @Command(
@@ -206,9 +206,9 @@ public class UtilityCommands {
             desc = "Cancel your current command"
     )
     @CommandPermissions(value = "fawe.cancel", queued = false)
-    public void cancel(Player player) {
-        int cancelled = player.cancel(false);
-        player.print(Caption.of("fawe.cancel.worldedit.cancel.count", cancelled));
+    public void cancel(Actor actor) {
+        int cancelled = actor.cancel(false);
+        actor.print(Caption.of("fawe.cancel.worldedit.cancel.count", cancelled));
     }
 
     @Command(
@@ -825,9 +825,9 @@ public class UtilityCommands {
             desc = "Confirm a command"
     )
     @CommandPermissions(value = "fawe.confirm", queued = false)
-    public void confirm(Player player) throws WorldEditException {
-        if (!player.confirm()) {
-            player.print(Caption.of("fawe.worldedit.utility.nothing.confirmed"));
+    public void confirm(Actor actor) throws WorldEditException {
+        if (!actor.confirm()) {
+            actor.print(Caption.of("fawe.worldedit.utility.nothing.confirmed"));
         }
     }
 
