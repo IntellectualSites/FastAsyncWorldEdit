@@ -83,7 +83,9 @@ public class BukkitPlayer extends AbstractPlayerActor {
      * This constructs a new {@link BukkitPlayer} for the given {@link Player}.
      *
      * @param player The corresponding {@link Player} or null if you need a null WorldEdit player for some reason.
+     * @deprecated Players are cached by the plugin. Should use {@link WorldEditPlugin#wrapPlayer(Player)}
      */
+    @Deprecated
     public BukkitPlayer(@Nullable Player player) {
         super(player != null ? getExistingMap(WorldEditPlugin.getInstance(), player) : new ConcurrentHashMap<>());
         this.plugin = WorldEditPlugin.getInstance();
@@ -97,14 +99,19 @@ public class BukkitPlayer extends AbstractPlayerActor {
      *
      * @param plugin The running instance of {@link WorldEditPlugin}
      * @param player The corresponding {@link Player} or null if you need a null WorldEdit player for some reason.
+     * @deprecated Players are cached by the plugin. Should use {@link WorldEditPlugin#wrapPlayer(Player)}
      */
+    @Deprecated
     public BukkitPlayer(@Nonnull WorldEditPlugin plugin, @Nullable Player player) {
         this.plugin = plugin;
         this.player = player;
         //FAWE start
         this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
         if (player != null && Settings.IMP.CLIPBOARD.USE_DISK) {
-            loadClipboardFromDisk();
+            BukkitPlayer cached = WorldEditPlugin.getInstance().getCachedPlayer(player);
+            if (cached == null) {
+                loadClipboardFromDisk();
+            }
         }
         //FAWE end
     }

@@ -551,7 +551,7 @@ public class WorldEditPlugin extends JavaPlugin {
     }
 
     //FAWE start
-    public BukkitPlayer getCachedPlayer(Player player) {
+    BukkitPlayer getCachedPlayer(Player player) {
         List<MetadataValue> meta = player.getMetadata("WE");
         if (meta.isEmpty()) {
             return null;
