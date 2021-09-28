@@ -237,7 +237,10 @@ public class FastSchematicReader extends NBTSchematicReader {
         inputStream.readNamedTagLazy(root);
 
         if (version != 1 && version != 2) {
-            throw new IOException("This schematic version is not supported; Version: " + version + ", DataVersion: " + dataVersion + ". It's very likely your schematic has an invalid file extension, if the schematic has been created on a version lower than 1.13.2, the extension MUST be `.schematic`, elsewise the schematic can't be read properly.");
+            throw new IOException("This schematic version is not supported; Version: " + version
+                    + ", DataVersion: " + dataVersion + ". It's very likely your schematic has an invalid file extension," +
+                    " if the schematic has been created on a version lower than 1.13.2, the extension MUST be `.schematic`," +
+                    " elsewise the schematic can't be read properly.");
         }
 
         if (blocks != null) {

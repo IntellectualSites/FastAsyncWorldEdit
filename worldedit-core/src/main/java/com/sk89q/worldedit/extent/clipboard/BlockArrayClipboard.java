@@ -95,7 +95,7 @@ public class BlockArrayClipboard implements Clipboard {
         shifted.shift(offset);
         this.region = shifted;
         this.offset = shifted.getMinimumPoint();
-        this.origin = parent.getOrigin();
+        this.origin = parent.getOrigin().add(this.offset);
     }
 
     /**
