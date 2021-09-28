@@ -235,8 +235,7 @@ public class ClipboardFormats {
         }
         if (f == null || !f.exists()) {
             if (!input.contains("../")) {
-                dir = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
-                f = MainUtil.resolve(dir, input, format, true);
+                f = MainUtil.resolve(dir, input, null, true);
             }
         }
         if (f == null || !f.exists() || !MainUtil.isInSubDirectory(working, f)) {
