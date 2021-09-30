@@ -268,7 +268,8 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
         int relZ = z - offsetZ;
         if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024) {
             throw new UnsupportedOperationException(
-                    "LocalVectorSet can only contain vectors within 1024 blocks (cuboid) of the first entry. ");
+                    "LocalVectorSet can only contain vectors within 1024 blocks (cuboid) of the first entry. Attempted to set " +
+                            "block at " + x + ", " + y + ", " + z + ". With origin " + offsetX + " " + offsetZ);
         }
         if (y < -128 || y > 383) {
             throw new UnsupportedOperationException("LocalVectorSet can only contain vectors from y elem:[-128,383]");
