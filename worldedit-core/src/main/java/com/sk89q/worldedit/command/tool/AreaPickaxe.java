@@ -64,10 +64,11 @@ public class AreaPickaxe implements BlockTool {
 
         try (EditSession editSession = session.createEditSession(player, "AreaPickaxe")) {
             editSession.getSurvivalExtent().setToolUse(config.superPickaxeManyDrop);
+            int maxY = editSession.getMaxY();
 
             try {
                 for (int x = ox - range; x <= ox + range; ++x) {
-                    for (int y = oy - range; y <= oy + range; ++y) {
+                    for (int y = oy - range; y <= oy + range && y <= maxY; ++y) {
                         for (int z = oz - range; z <= oz + range; ++z) {
                             if (!initialType.equals(editSession.getBlock(x, y, z).getBlockType())) {
                                 continue;
