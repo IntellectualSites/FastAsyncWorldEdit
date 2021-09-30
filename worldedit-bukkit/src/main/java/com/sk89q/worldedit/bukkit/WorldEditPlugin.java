@@ -235,7 +235,7 @@ public class WorldEditPlugin extends JavaPlugin {
         // datapacks aren't loaded until just before the world is, and bukkit has no event for this
         // so the earliest we can do this is in WorldInit
         setupTags();
-        setupBiomes(true); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
+        setupBiomes(false); // FAWE - load biomes later. Initialize biomes twice to allow for the registry to be present for
         // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
         WorldEdit.getInstance().getEventBus().post(new PlatformReadyEvent(platform));
     }
@@ -244,7 +244,7 @@ public class WorldEditPlugin extends JavaPlugin {
     private void initializeRegistries() {
         // FAWE start - move Biomes to their own method. Initialize biomes twice to allow for the registry to be present for
         // plugins requiring WE biomes during startup, as well as allowing custom biomes loaded later on to be present in WE.
-        setupBiomes(false);
+        setupBiomes(true);
         // FAWE end
         /*
 
