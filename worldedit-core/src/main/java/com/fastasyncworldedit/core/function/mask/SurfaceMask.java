@@ -12,6 +12,10 @@ public class SurfaceMask extends AdjacentAnyMask {
         super(getMask(extent), extent.getMinY(), extent.getMaxY());
     }
 
+    private SurfaceMask(CachedMask mask, int minY, int maxY) {
+        super(mask, minY, maxY);
+    }
+
     public static AbstractExtentMask getMask(Extent extent) {
         return new BlockMaskBuilder()
                 .addTypes(BlockTypes.AIR, BlockTypes.CAVE_AIR, BlockTypes.VOID_AIR)
@@ -26,8 +30,8 @@ public class SurfaceMask extends AdjacentAnyMask {
 
     @Override
     public Mask copy() {
-        // The mask is not mutable. There is no need to clone it.
-        return this;
+        // CachedMask (super getParentMask) should not be used from multiple threads.
+        return new SurfaceMask(getParentMask(), minY, maxY);
     }
 
 }
