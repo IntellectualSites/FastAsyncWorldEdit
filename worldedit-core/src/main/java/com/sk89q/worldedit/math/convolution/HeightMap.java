@@ -52,6 +52,10 @@ public class HeightMap {
 
     private final Region region;
     private final EditSession session;
+    //FAWE start
+    private final int minSessionY;
+    private final int maxSessionY;
+    //FAWE end
 
     /**
      * Constructs the HeightMap.
@@ -79,7 +83,11 @@ public class HeightMap {
         this.width = region.getWidth();
         this.height = region.getLength();
 
+        //FAWE start
         this.layers = layers;
+        this.minSessionY = session.getMinY();
+        this.maxSessionY = session.getMaxY();
+        //FAWE end
 
         int minX = region.getMinimumPoint().getBlockX();
         int minY = region.getMinimumPoint().getBlockY();
@@ -129,6 +137,8 @@ public class HeightMap {
         this.data = data;
 
         this.layers = layers;
+        this.minSessionY = session.getMinY();
+        this.maxSessionY = session.getMaxY();
     }
     //FAWE end
 
@@ -284,7 +294,7 @@ public class HeightMap {
                         int y0 = newHeight - 1;
                         for (int setY = y0, getY = curHeight - 1; setY >= curHeight; setY--, getY--) {
                             BlockState get;
-                            if (getY >= session.getMinY() && getY <= session.getMaxY()) {
+                            if (getY >= minSessionY && getY <= maxSessionY) {
                                 get = session.getBlock(xr, getY, zr);
                             } else {
                                 get = BlockTypes.AIR.getDefaultState();
@@ -299,9 +309,9 @@ public class HeightMap {
                         ++blocksChanged;
                     }
                 } else if (curHeight > newHeight) {
-                    for (int setY = originY, getY = newHeight; setY >= newHeight; setY++, getY++) {
+                    for (int setY = originY, getY = newHeight; setY <= newHeight; setY++, getY++) {
                         BlockState get;
-                        if (getY >= session.getMinY() && getY <= session.getMaxY()) {
+                        if (getY >= minSessionY && getY <= maxSessionY) {
                             get = session.getBlock(xr, getY, zr);
                         } else {
                             get = BlockTypes.AIR.getDefaultState();
