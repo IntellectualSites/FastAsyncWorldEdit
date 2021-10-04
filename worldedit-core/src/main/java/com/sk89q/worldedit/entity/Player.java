@@ -442,16 +442,16 @@ public interface Player extends Entity, Actor {
                 getSession().setClipboard(holder);
             }
         } catch (FaweClipboardVersionMismatchException e) {
-            printError(Caption.of("fawe.error.clipboard.on.disk.version.mismatch"));
+            print(Caption.of("fawe.error.clipboard.on.disk.version.mismatch"));
         } catch (RuntimeException e) {
-            printError(Caption.of("fawe.error.clipboard.invalid"));
+            print(Caption.of("fawe.error.clipboard.invalid"));
             e.printStackTrace();
             print(Caption.of("fawe.error.stacktrace"));
             print(Caption.of("fawe.error.clipboard.load.failure"));
             print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
             print(Caption.of("fawe.error.stacktrace"));
         } catch (Exception e) {
-            printError(Caption.of("fawe.error.clipboard.invalid"));
+            print(Caption.of("fawe.error.clipboard.invalid"));
             e.printStackTrace();
             print(Caption.of("fawe.error.stacktrace"));
             print(Caption.of("fawe.error.no-failure"));

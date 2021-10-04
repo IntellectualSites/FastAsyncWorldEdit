@@ -47,7 +47,7 @@ public class Config {
                 }
             }
         }
-        LOGGER.debug("Failed to get config option: " + key);
+        LOGGER.error("Failed to get config option: {}", key);
         return null;
     }
 
@@ -78,7 +78,7 @@ public class Config {
                 }
             }
         }
-        LOGGER.debug("Failed to set config option: " + key + ": " + value + " | " + instance + " | " + root.getSimpleName() + ".yml");
+        LOGGER.error("Failed to set config option: {}: {} | {} | {}.yml", key, value, instance, root.getSimpleName());
     }
 
     public boolean load(File file) {
@@ -343,9 +343,11 @@ public class Config {
             setAccessible(field);
             return field;
         } catch (Throwable ignored) {
-            LOGGER.debug("Invalid config field: " + StringMan.join(split, ".") + " for " + toNodeName(instance
-                    .getClass()
-                    .getSimpleName()));
+            LOGGER.warn(
+                    "Invalid config field: {} for {}",
+                    StringMan.join(split, "."),
+                    toNodeName(instance.getClass().getSimpleName())
+            );
             return null;
         }
     }

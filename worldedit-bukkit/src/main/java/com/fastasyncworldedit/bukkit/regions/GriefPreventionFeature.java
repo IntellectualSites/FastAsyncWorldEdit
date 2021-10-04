@@ -22,7 +22,7 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
 
     public GriefPreventionFeature(final Plugin griefpreventionPlugin) {
         super(griefpreventionPlugin.getName());
-        LOGGER.debug("Plugin 'GriefPrevention' found. Using it now.");
+        LOGGER.info("Plugin 'GriefPrevention' found. Using it now.");
     }
 
     public boolean isAllowed(Player player, Claim claim, MaskType type) {

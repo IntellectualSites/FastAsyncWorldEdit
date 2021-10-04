@@ -61,7 +61,7 @@ public class MutableEntityChange implements Change {
             most = ((LongTag) map.get("PersistentIDMSB")).getValue();
             least = ((LongTag) map.get("PersistentIDLSB")).getValue();
         } else {
-            LOGGER.debug("Skipping entity without uuid.");
+            LOGGER.info("Skipping entity without uuid.");
             return;
         }
         List<DoubleTag> pos = (List<DoubleTag>) map.get("Pos").getValue();
@@ -76,7 +76,7 @@ public class MutableEntityChange implements Change {
         Map<String, Tag> map = tag.getValue();
         Tag posTag = map.get("Pos");
         if (posTag == null) {
-            LOGGER.debug("Missing pos tag: " + tag);
+            LOGGER.warn("Missing pos tag: {}", tag);
             return;
         }
         List<DoubleTag> pos = (List<DoubleTag>) posTag.getValue();

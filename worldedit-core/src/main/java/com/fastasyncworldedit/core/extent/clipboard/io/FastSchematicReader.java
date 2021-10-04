@@ -398,7 +398,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                     }
                     clipboard.createEntity(loc.setPosition(loc.subtract(min.toVector3())), state);
                 } else {
-                    LOGGER.debug("Invalid entity: " + id);
+                    LOGGER.error("Invalid entity: {}", id);
                 }
             }
         }

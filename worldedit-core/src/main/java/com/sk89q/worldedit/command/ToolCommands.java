@@ -226,7 +226,7 @@ public class ToolCommands {
     )
     @CommandPermissions("worldedit.tool.inspect")
     public void inspectBrush(Player player, LocalSession session) throws WorldEditException {
-        setTool(player, session, new InspectBrush(), "worldedit.tool.info.equip");
+        setTool(player, session, new InspectBrush(), "worldedit.tool.inspect.equip");
     }
     //FAWE end
 

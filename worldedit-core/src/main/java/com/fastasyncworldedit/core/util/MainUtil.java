@@ -442,7 +442,7 @@ public class MainUtil {
                 content = scanner.next().trim();
             }
             if (!content.startsWith("<")) {
-                LOGGER.debug(content);
+                LOGGER.info(content);
             }
             if (responseCode == 200) {
                 return url;
@@ -644,7 +644,7 @@ public class MainUtil {
                 return newFile;
             }
         } catch (IOException e) {
-            LOGGER.debug("Could not save " + resource, e);
+            LOGGER.error("Could not save {}, {}", resource, e);
         }
         return null;
     }
@@ -886,7 +886,7 @@ public class MainUtil {
                 pool.submit(file::delete);
                 Component msg = Caption.of("worldedit.schematic.delete.deleted");
                 if (printDebug) {
-                    LOGGER.debug(msg.toString());
+                    LOGGER.info(msg.toString());
                 }
             }
         });

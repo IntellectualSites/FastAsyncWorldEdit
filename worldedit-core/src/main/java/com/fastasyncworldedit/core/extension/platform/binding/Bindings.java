@@ -59,7 +59,7 @@ public class Bindings {
             Annotation annotation = annotations[0] == binding ? annotations[1] : annotations[0];
             key = Key.of(ret, annotation);
         } else {
-            LOGGER.debug("Cannot annotate: " + method + " with " + StringMan.getString(annotations));
+            LOGGER.error("Cannot annotate: {} with {}", method, StringMan.getString(annotations));
             return false;
         }
 

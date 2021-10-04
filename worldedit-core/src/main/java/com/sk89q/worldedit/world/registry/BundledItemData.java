@@ -104,7 +104,7 @@ public final class BundledItemData {
         if (url == null) {
             throw new IOException("Could not find items.json");
         }
-        LOGGER.debug("Using {} for bundled item data.", url);
+        LOGGER.info("Using {} for bundled item data.", url);
         String data = Resources.toString(url, Charset.defaultCharset());
         List<ItemEntry> entries = gson.fromJson(data, new TypeToken<List<ItemEntry>>() {
         }.getType());
