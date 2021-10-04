@@ -165,7 +165,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("it.unimi.dsi:fastutil"))
         }
         relocate("org.incendo.serverlib", "com.fastasyncworldedit.serverlib") {
-            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.0"))
+            include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.1"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
             include(dependency("com.intellectualsites.paster:Paster:1.1.1"))
