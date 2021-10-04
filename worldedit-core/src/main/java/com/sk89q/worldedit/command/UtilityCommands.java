@@ -206,9 +206,9 @@ public class UtilityCommands {
             desc = "Cancel your current command"
     )
     @CommandPermissions(value = "fawe.cancel", queued = false)
-    public void cancel(Actor actor) {
-        int cancelled = actor.cancel(false);
-        actor.print(Caption.of("fawe.cancel.worldedit.cancel.count", cancelled));
+    public void cancel(Player player) {
+        int cancelled = player.cancel(false);
+        player.print(Caption.of("fawe.cancel.count", cancelled));
     }
 
     @Command(

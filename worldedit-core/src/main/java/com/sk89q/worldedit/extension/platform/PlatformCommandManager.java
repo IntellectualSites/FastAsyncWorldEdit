@@ -763,7 +763,7 @@ public final class PlatformCommandManager {
                 actor.print(e.getRichMessage());
             }
         } catch (FaweException e) {
-            actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", e.getComponent()));
+            actor.print(Caption.of("fawe.cancel.reason", e.getComponent()));
         } catch (UsageException e) {
             ImmutableList<Command> cmd = e.getCommands();
             if (!cmd.isEmpty()) {
@@ -777,7 +777,7 @@ public final class PlatformCommandManager {
             handleUnknownException(actor, e.getCause());
         } catch (CommandException e) {
             if (e.getCause() instanceof FaweException) {
-                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", ((FaweException) e.getCause()).getComponent()));
+                actor.print(Caption.of("fawe.cancel.reason", ((FaweException) e.getCause()).getComponent()));
             } else {
                 Component msg = e.getRichMessage();
                 if (msg == TextComponent.empty()) {
