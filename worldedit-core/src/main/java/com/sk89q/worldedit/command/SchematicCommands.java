@@ -944,7 +944,7 @@ public class SchematicCommands {
                     }
                     LOGGER.info(actor.getName() + " saved " + file.getCanonicalPath());
                 } else {
-                    actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.manual"));
+                    actor.print(Caption.of("fawe.cancel.reason.manual"));
                 }
             }
             //FAWE end

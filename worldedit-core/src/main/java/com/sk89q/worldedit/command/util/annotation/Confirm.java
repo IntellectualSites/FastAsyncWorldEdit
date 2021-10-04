@@ -61,7 +61,7 @@ public @interface Confirm {
                         * (long) value;
                 long max = 2 << 18;
                 if (max != -1 && area > max) {
-                    actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm.region",
+                    actor.print(Caption.of("fawe.cancel.reason.confirm.region",
                             pos1, pos2, getArgs(context), region.getHeight() * area
                     ));
                     return confirm(actor, context);
@@ -77,7 +77,7 @@ public @interface Confirm {
                 }
                 int max = WorldEdit.getInstance().getConfiguration().maxRadius;
                 if (max != -1 && value > max) {
-                    actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm.radius",
+                    actor.print(Caption.of("fawe.cancel.reason.confirm.radius",
                             value, max, getArgs(context)
                     ));
                     return confirm(actor, context);
@@ -93,7 +93,7 @@ public @interface Confirm {
                 }
                 int max = 50; //TODO configurable, get Key.of(Method.class) @Limit
                 if (max != -1 && value > max) {
-                    actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm.limit",
+                    actor.print(Caption.of("fawe.cancel.reason.confirm.limit",
                             value, max, getArgs(context)
                     ));
                     return confirm(actor, context);
@@ -107,7 +107,7 @@ public @interface Confirm {
                 if (checkExisting(context)) {
                     return true;
                 }
-                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.confirm", Processor.getArgs(context)));
+                actor.print(Caption.of("fawe.cancel.reason.confirm", Processor.getArgs(context)));
                 return confirm(actor, context);
             }
         };

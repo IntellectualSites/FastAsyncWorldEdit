@@ -23,8 +23,8 @@ public class MemoryCheckingExtent extends PassthroughExtent {
         if (MemUtil.isMemoryLimited()) {
             if (this.actor != null) {
                 actor.print(Caption.of(
-                        "fawe.cancel.worldedit.cancel.reason",
-                        Caption.of("fawe.cancel.worldedit.cancel.reason.low.memory")
+                        "fawe.cancel.reason",
+                        Caption.of("fawe.cancel.reason.low.memory")
                 ));
                 if (Permission.hasPermission(this.actor, "worldedit.fast")) {
                     this.actor.print(Caption.of("fawe.info.worldedit.oom.admin"));
