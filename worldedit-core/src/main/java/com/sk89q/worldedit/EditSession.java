@@ -1337,9 +1337,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             if (used.MAX_CHANGES > 0 || used.MAX_ENTITIES > 0) {
                 actor.print(Caption.of("fawe.error.worldedit.some.fails", used.MAX_FAILS));
             } else if (new ExtentTraverser<>(getExtent()).findAndGet(FaweRegionExtent.class) != null) {
-                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.outside.region"));
+                actor.print(Caption.of("fawe.cancel.reason.outside.region"));
             } else {
-                actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason.outside.level"));
+                actor.print(Caption.of("fawe.cancel.reason.outside.level"));
             }
         }
         if (wnaMode) {

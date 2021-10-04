@@ -72,8 +72,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
         UUID uid = player.getUniqueId();
         if (plot.getFlag(NoWorldeditFlag.class)) {
             player.print(Caption.of(
-                    "fawe.cancel.worldedit.cancel.reason.no.region.reason",
-                    Caption.of("fawe.cancel.worldedit.cancel.reason.no.region.plot.noworldeditflag")
+                    "fawe.cancel.reason.no.region.reason",
+                    Caption.of("fawe.cancel.reason.no.region.plot.noworldeditflag")
             ));
             return false;
         }
@@ -82,8 +82,8 @@ public class PlotSquaredFeature extends FaweMaskManager {
         }
         if (type != MaskType.MEMBER) {
             player.print(Caption.of(
-                    "fawe.cancel.worldedit.cancel.reason.no.region.reason",
-                    Caption.of("fawe.cancel.worldedit.cancel.reason.no.region.plot.owner.only")
+                    "fawe.cancel.reason.no.region.reason",
+                    Caption.of("fawe.cancel.reason.no.region.plot.owner.only")
             ));
             return false;
         }
@@ -93,7 +93,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         if (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) {
             if (!player.hasPermission("fawe.plotsquared.member")) {
                 player.print(Caption.of(
-                        "fawe.cancel.worldedit.cancel.reason.no.region.reason",
+                        "fawe.cancel.reason.no.region.reason",
                         Caption.of("fawe.error.no-perm", "fawe.plotsquared.member")
                 ));
                 return false;
@@ -102,15 +102,15 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 return true;
             } else {
                 player.print(Caption.of(
-                        "fawe.cancel.worldedit.cancel.reason.no.region.reason",
-                        Caption.of("fawe.cancel.worldedit.cancel.reason.no.region.plot.owner.offline")
+                        "fawe.cancel.reason.no.region.reason",
+                        Caption.of("fawe.cancel.reason.no.region.plot.owner.offline")
                 ));
                 return false;
             }
         }
         player.print(Caption.of(
-                "fawe.cancel.worldedit.cancel.reason.no.region.reason",
-                Caption.of("fawe.cancel.worldedit.cancel.reason.no.region.not.added")
+                "fawe.cancel.reason.no.region.reason",
+                Caption.of("fawe.cancel.reason.no.region.not.added")
         ));
         return false;
     }

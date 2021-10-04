@@ -134,52 +134,52 @@ public enum FaweCache implements Trimable {
      */
     public static final FaweBlockBagException BLOCK_BAG = new FaweBlockBagException();
     public static final FaweException MANUAL = new FaweException(
-            Caption.of("fawe.cancel.worldedit.cancel.reason.manual"),
+            Caption.of("fawe.cancel.reason.manual"),
             Type.MANUAL
     );
     public static final FaweException NO_REGION = new FaweException(
-            Caption.of("fawe.cancel.worldedit.cancel.reason.no.region"),
+            Caption.of("fawe.cancel.reason.no.region"),
             Type.NO_REGION
     );
     public static final FaweException OUTSIDE_REGION = new FaweException(
             Caption.of(
-                    "fawe.cancel.worldedit.cancel.reason.outside.region"),
+                    "fawe.cancel.reason.outside.region"),
             Type.OUTSIDE_REGION
     );
     public static final FaweException MAX_CHECKS = new FaweException(
-            Caption.of("fawe.cancel.worldedit.cancel.reason.max" + ".checks"),
+            Caption.of("fawe.cancel.reason.max" + ".checks"),
             Type.MAX_CHECKS
     );
     public static final FaweException MAX_CHANGES = new FaweException(
-            Caption.of("fawe.cancel.worldedit.cancel.reason.max" + ".changes"),
+            Caption.of("fawe.cancel.reason.max" + ".changes"),
             Type.MAX_CHANGES
     );
     public static final FaweException LOW_MEMORY = new FaweException(
-            Caption.of("fawe.cancel.worldedit.cancel.reason.low" + ".memory"),
+            Caption.of("fawe.cancel.reason.low" + ".memory"),
             Type.LOW_MEMORY
     );
     public static final FaweException MAX_ENTITIES = new FaweException(
             Caption.of(
-                    "fawe.cancel.worldedit.cancel.reason.max.entities"),
+                    "fawe.cancel.reason.max.entities"),
             Type.MAX_ENTITIES
     );
     public static final FaweException MAX_TILES = new FaweException(Caption.of(
-            "fawe.cancel.worldedit.cancel.reason.max.tiles",
+            "fawe.cancel.reason.max.tiles",
             Type.MAX_TILES
     ));
     public static final FaweException MAX_ITERATIONS = new FaweException(
             Caption.of(
-                    "fawe.cancel.worldedit.cancel.reason.max.iterations"),
+                    "fawe.cancel.reason.max.iterations"),
             Type.MAX_ITERATIONS
     );
     public static final FaweException PLAYER_ONLY = new FaweException(
             Caption.of(
-                    "fawe.cancel.worldedit.cancel.reason.player-only"),
+                    "fawe.cancel.reason.player-only"),
             Type.PLAYER_ONLY
     );
     public static final FaweException ACTOR_REQUIRED = new FaweException(
             Caption.of(
-                    "fawe.cancel.worldedit.cancel.reason.actor-required"),
+                    "fawe.cancel.reason.actor-required"),
             Type.ACTOR_REQUIRED
     );
 

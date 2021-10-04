@@ -445,7 +445,7 @@ public class PlatformManager {
     public void handleThrowable(Throwable e, Actor actor) {
         FaweException faweException = FaweException.get(e);
         if (faweException != null) {
-            actor.print(Caption.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
+            actor.print(Caption.of("fawe.cancel.reason", faweException.getComponent()));
         } else {
             actor.print(Caption.of("worldedit.command.error.report"));
             actor.print(Caption.of(e.getClass().getName(), TextComponent.of(": "), TextComponent.of(e.getMessage())));
@@ -499,7 +499,7 @@ public class PlatformManager {
         } catch (Throwable e) {
             FaweException faweException = FaweException.get(e);
             if (faweException != null) {
-                player.print(Caption.of("fawe.cancel.worldedit.cancel.reason", faweException.getComponent()));
+                player.print(Caption.of("fawe.cancel.reason", faweException.getComponent()));
             } else {
                 player.print(Caption.of("worldedit.command.error.report"));
                 player.print(Caption.of(e.getClass().getName() + ": " + e.getMessage()));
