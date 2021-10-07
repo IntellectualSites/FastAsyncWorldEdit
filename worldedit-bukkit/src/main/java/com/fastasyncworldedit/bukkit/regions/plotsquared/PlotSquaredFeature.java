@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
 import com.fastasyncworldedit.core.FaweAPI;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.regions.filter.RegionFilter;
@@ -24,6 +25,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 
 import java.util.List;
 import java.util.Locale;
@@ -68,10 +70,57 @@ public class PlotSquaredFeature extends FaweMaskManager {
             return false;
         }
         UUID uid = player.getUniqueId();
-        return !plot.getFlag(NoWorldeditFlag.class) && (plot.isOwner(uid) || type == MaskType.MEMBER && (
-                plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)
-                        || (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) && player
-                        .hasPermission("fawe.plotsquared.member")) || player.hasPermission("fawe.plotsquared.admin"));
+        if (plot.getFlag(NoWorldeditFlag.class)) {
+            player.print(Caption.of(
+                    "fawe.cancel.reason.no.region.reason",
+                    Caption.of("fawe.cancel.reason.no.region.plot.noworldeditflag")
+            ));
+            return false;
+        }
+        if (plot.isOwner(uid) || player.hasPermission("fawe.plotsquared.admin")) {
+            return true;
+        }
+        if (type != MaskType.MEMBER) {
+            player.print(Caption.of(
+                    "fawe.cancel.reason.no.region.reason",
+                    Caption.of("fawe.cancel.reason.no.region.plot.owner.only")
+            ));
+            return false;
+        }
+        if (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)) {
+            return true;
+        }
+        if (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) {
+            if (!player.hasPermission("fawe.plotsquared.member")) {
+                player.print(Caption.of(
+                        "fawe.cancel.reason.no.region.reason",
+                        Caption.of("fawe.error.no-perm", "fawe.plotsquared.member")
+                ));
+                return false;
+            }
+            if (!plot.getOwners().isEmpty() && plot.getOwners().stream().anyMatch(this::playerOnline)) {
+                return true;
+            } else {
+                player.print(Caption.of(
+                        "fawe.cancel.reason.no.region.reason",
+                        Caption.of("fawe.cancel.reason.no.region.plot.owner.offline")
+                ));
+                return false;
+            }
+        }
+        player.print(Caption.of(
+                "fawe.cancel.reason.no.region.reason",
+                Caption.of("fawe.cancel.reason.no.region.not.added")
+        ));
+        return false;
+    }
+
+    private boolean playerOnline(UUID uuid) {
+        if (uuid == null) {
+            return false;
+        }
+        org.bukkit.entity.Player player = Bukkit.getPlayer(uuid);
+        return player != null && player.isOnline();
     }
 
     @Override
