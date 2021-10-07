@@ -461,9 +461,9 @@ public class Settings extends Config {
 
         @Comment({
                 "Don't bug console when these plugins slow down WorldEdit operations",
-                " - You'll see a message in console if you need to change this option"
+                " - You'll see a message in console or ingame if you need to change this option"
         })
-        public List<String> ALLOWED_PLUGINS = new ArrayList<>(Collections.singleton(("ExamplePlugin")));
+        public List<String> ALLOWED_PLUGINS = new ArrayList<>(Collections.singleton(("com.example.ExamplePlugin")));
         @Comment("Should debug messages be sent when third party extents are used?")
         public boolean DEBUG = true;
 
