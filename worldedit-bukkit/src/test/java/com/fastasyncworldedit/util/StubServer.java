@@ -50,6 +50,7 @@ import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.structure.StructureManager;
 import org.bukkit.util.CachedServerIcon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -223,6 +224,11 @@ public class StubServer implements Server {
 
     @Override
     public int getTicksPerWaterAmbientSpawns() {
+        return 0;
+    }
+
+    @Override
+    public int getTicksPerWaterUndergroundCreatureSpawns() {
         return 0;
     }
 
@@ -694,6 +700,11 @@ public class StubServer implements Server {
     }
 
     @Override
+    public int getWaterUndergroundCreatureSpawnLimit() {
+        return 0;
+    }
+
+    @Override
     public int getAmbientSpawnLimit() {
         return 0;
     }
@@ -915,6 +926,11 @@ public class StubServer implements Server {
     public @NotNull
     List<Entity> selectEntities(@NotNull CommandSender commandSender, @NotNull String s) throws
             IllegalArgumentException {
+        return null;
+    }
+
+    @Override
+    public @NotNull StructureManager getStructureManager() {
         return null;
     }
 
