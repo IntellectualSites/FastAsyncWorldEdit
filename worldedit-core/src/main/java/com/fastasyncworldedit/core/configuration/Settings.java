@@ -213,17 +213,17 @@ public class Settings extends Config {
                 "of a waterlogged fence). For blocking/remapping of all occurence of a property like waterlogged, see",
                 "remap-properties below.",
                 "Example block property blocking:",
-                " - minecraft:conduit[waterlogged=true]",
-                " - minecraft:piston[extended=false,facing=west]",
-                " - minecraft:wheat[growth=7]"
+                " - \"minecraft:conduit[waterlogged=true]\"",
+                " - \"minecraft:piston[extended=false,facing=west]\"",
+                " - \"minecraft:wheat[age=7]\""
         })
-        public List<String> DISALLOWED_BLOCKS = Arrays.asList("minecraft:wheat", "minecraft:fire", "minecraft:redstone_wire");
+        public List<String> DISALLOWED_BLOCKS = Arrays.asList("\"minecraft:wheat\"", "\"minecraft:fire\"", "\"minecraft:redstone_wire\"");
         @Comment({
                 "List of block properties that should be remapped if used in an edit. Entries should take the form",
-                "property_name[value1_old:value1_new,value2_old:value2_new]. For example:",
-                " - waterlogged[true:false]",
-                " - growth[7:4,6:4,5:4]",
-                " - extended[true:false]"
+                "\"property_name[value1_old:value1_new,value2_old:value2_new]\". For example:",
+                " - \"waterlogged[true:false]\"",
+                " - \"age[7:4,6:4,5:4]\"",
+                " - \"extended[true:false]\""
         })
         public List<String> REMAP_PROPERTIES = new ArrayList<>();
     }
