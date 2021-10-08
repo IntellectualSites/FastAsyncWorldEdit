@@ -20,11 +20,11 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.extent.DisallowedBlocksExtent;
 import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
 import com.fastasyncworldedit.core.jnbt.JSON2NBT;
 import com.fastasyncworldedit.core.jnbt.NBTException;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.fastasyncworldedit.core.limit.PropertyRemap;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.world.block.BlanketBaseBlock;
@@ -65,7 +65,6 @@ import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -176,26 +175,43 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
         }
     }
 
-    private static Map<Property<?>, Object> parseProperties(
+    //FAWE start - make public
+    public static Map<Property<?>, Object> parseProperties(
+            //FAWE end
             BlockType type,
             String[] stateProperties,
-            ParserContext context
+            ParserContext context,
+            //FAWE start - if null should be returned instead of throwing an error
+            boolean nullNotError
+            //FAWE end
     ) throws NoMatchException {
         Map<Property<?>, Object> blockStates = new HashMap<>();
 
         //FAWE start - disallowed states
-        Set<String> disallowed;
-        boolean checkState = false;
-        if (context.getActor() != null && !context.getActor().getLimit().isUnlimited()) {
-            disallowed = context
-                    .getActor()
-                    .getLimit().DISALLOWED_STATES
-                    .stream()
-                    .map(String::toLowerCase)
-                    .collect(Collectors.toSet());
-            checkState = !disallowed.isEmpty();
-        } else {
-            disallowed = Collections.emptySet();
+        if (context != null && context.getActor() != null && !context.getActor().getLimit().isUnlimited()) {
+            for (String input : context.getActor().getLimit().DISALLOWED_BLOCKS) {
+                if (input.indexOf('[') == -1 && input.indexOf(']') == -1) {
+                    continue;
+                }
+                if (!type.getId().equalsIgnoreCase(input.substring(0, input.indexOf('[')))) {
+                    continue;
+                }
+                String[] properties = input.substring(input.indexOf('[') + 1, input.indexOf(']')).split(",");
+                Set<String> blocked = Arrays.stream(properties).filter(s -> {
+                    for (String in : stateProperties) {
+                        if (in.equalsIgnoreCase(s)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }).collect(Collectors.toSet());
+                if (!blocked.isEmpty()) {
+                    throw new DisallowedUsageException(Caption.of(
+                            "fawe.error.limit.disallowed-block",
+                            TextComponent.of(input)
+                    ));
+                }
+            }
         }
         //FAWE end
 
@@ -205,6 +221,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 try {
                     String[] parts = parseableData.split("=");
                     if (parts.length != 2) {
+                        //FAWE start - if null should be returned instead of throwing an error
+                        if (nullNotError) {
+                            return null;
+                        }
+                        //FAWE end
                         throw new InputParseException(
                                 Caption.of(
                                         "worldedit.error.parser.bad-state-format",
@@ -213,17 +234,17 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         );
                     }
 
-                    //FAWE start - disallowed states
-                    if (checkState && disallowed.contains(parts[0].toLowerCase())) {
-                        throw new DisallowedUsageException(Caption.of("fawe.error.limit.disallowed-property",
-                                TextComponent.of(parts[0])));
-                    }
-                    //FAWE end
-
                     @SuppressWarnings("unchecked")
                     Property<Object> propertyKey = (Property<Object>) type.getPropertyMap().get(parts[0]);
                     if (propertyKey == null) {
-                        if (context.getActor() != null) {
+                        //FAWE start - nullable context
+                        if (context != null && context.getActor() != null) {
+                            //FAWE end
+                            //FAWE start - if null should be returned instead of throwing an error
+                            if (nullNotError) {
+                                return null;
+                            }
+                            //FAWE end
                             throw new NoMatchException(Caption.of(
                                     "worldedit.error.parser.unknown-property",
                                     TextComponent.of(parts[0]),
@@ -235,6 +256,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         return Maps.newHashMap();
                     }
                     if (blockStates.containsKey(propertyKey)) {
+                        //FAWE start - if null should be returned instead of throwing an error
+                        if (nullNotError) {
+                            return null;
+                        }
+                        //FAWE end
                         throw new InputParseException(Caption.of(
                                 "worldedit.error.parser.duplicate-property",
                                 TextComponent.of(parts[0])
@@ -244,6 +270,11 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                     try {
                         value = propertyKey.getValueFor(parts[1]);
                     } catch (IllegalArgumentException e) {
+                        //FAWE start - if null should be returned instead of throwing an error
+                        if (nullNotError) {
+                            return null;
+                        }
+                        //FAWE end
                         throw new NoMatchException(Caption.of(
                                 "worldedit.error.parser.unknown-value",
                                 TextComponent.of(parts[1]),
@@ -251,10 +282,30 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         ));
                     }
 
+                    //FAWE start - blocked states
+                    if (context != null && context.getActor() != null && !context.getActor().getLimit().isUnlimited()) {
+                        if (context.getActor().getLimit().REMAP_PROPERTIES != null
+                                && !context.getActor().getLimit().REMAP_PROPERTIES.isEmpty()) {
+                            for (PropertyRemap remap : context.getActor().getLimit().REMAP_PROPERTIES) {
+                                Object newValue = remap.apply(type, value);
+                                if (newValue != value) {
+                                    value = newValue;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    //FAWE end
+
                     blockStates.put(propertyKey, value);
                 } catch (NoMatchException | DisallowedUsageException e) {
                     throw e; // Pass-through
                 } catch (Exception e) {
+                    //FAWE start - if null should be returned instead of throwing an error
+                    if (nullNotError) {
+                        return null;
+                    }
+                    //FAWE end
                     throw new InputParseException(Caption.of(
                             "worldedit.error.parser.bad-state-format",
                             TextComponent.of(parseableData)
@@ -415,7 +466,9 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             }
             //FAWE end
 
-            blockStates.putAll(parseProperties(state.getBlockType(), stateProperties, context));
+            //FAWE start -  Not null if nullNotError false.
+            blockStates.putAll(parseProperties(state.getBlockType(), stateProperties, context, false));
+            //FAWE end
             if (context.isPreferringWildcard()) {
                 if (stateString == null || stateString.isEmpty()) {
                     state = new FuzzyBlockState(state);
@@ -460,13 +513,15 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             if (actor != null) {
                 if (!actor.hasPermission("worldedit.anyblock")
                         && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
-                    throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(input)));
+                    throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(blockType.getId())));
                 }
                 FaweLimit limit = actor.getLimit();
                 if (!limit.isUnlimited()) {
+                    // No need to account for blocked states/properties as it will simply return false in the equality check
+                    // during contains.
                     if (limit.DISALLOWED_BLOCKS.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
                         throw new DisallowedUsageException(Caption.of("fawe.error.limit.disallowed-block",
-                                TextComponent.of(input)));
+                                TextComponent.of(blockType.getId())));
                     }
                 }
             }

@@ -1,7 +1,10 @@
 package com.fastasyncworldedit.core.configuration;
 
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.fastasyncworldedit.core.limit.PropertyRemap;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,7 +13,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Settings extends Config {
 
@@ -203,13 +208,24 @@ public class Settings extends Config {
         })
         public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
         @Comment({
-                "List of blocks to deny use of",
+                "List of blocks to deny use of. Can be either an entire block type or a block with a specific property value.",
+                "Where block properties are specified, any blockstate with the property will be disallowed (i.g. all directions",
+                "of a waterlogged fence). For blocking/remapping of all occurence of a property like waterlogged, see",
+                "remap-properties below.",
+                "Example block property blocking:",
+                " - minecraft:conduit[waterlogged=true]",
+                " - minecraft:piston[extended=false,facing=west]",
+                " - minecraft:wheat[growth=7]"
         })
         public List<String> DISALLOWED_BLOCKS = Arrays.asList("minecraft:wheat", "minecraft:fire", "minecraft:redstone_wire");
         @Comment({
-                "List of block properties that cannot deviate from the default state, e.g. waterlogged.",
+                "List of block properties that should be remapped if used in an edit. Entries should take the form",
+                "property_name[value1_old:value1_new,value2_old:value2_new]. For example:",
+                " - waterlogged[true:false]",
+                " - growth[7:4,6:4,5:4]",
+                " - extended[true:false]"
         })
-        public List<String> DISALLOWED_STATES = new ArrayList<>();
+        public List<String> REMAP_PROPERTIES = new ArrayList<>();
     }
 
     public static class HISTORY {
@@ -642,16 +658,40 @@ public class Settings extends Config {
                     }
                 }
 
-                if (limit.DISALLOWED_STATES == null) {
-                    limit.DISALLOWED_STATES = newLimit.DISALLOWED_STATES.isEmpty() ? Collections.emptySet() : new HashSet<>(
-                            newLimit.DISALLOWED_STATES);
-                } else if (limit.DISALLOWED_STATES.isEmpty() || newLimit.DISALLOWED_STATES.isEmpty()) {
-                    limit.DISALLOWED_STATES = Collections.emptySet();
+                if (limit.REMAP_PROPERTIES == null) {
+                    limit.REMAP_PROPERTIES = newLimit.REMAP_PROPERTIES.isEmpty() ? Collections.emptySet() :
+                            newLimit.REMAP_PROPERTIES.stream().flatMap(s -> {
+                                String propertyStr = s.substring(0, s.indexOf('['));
+                                List<Property<?>> properties =
+                                        BlockTypesCache.getAllProperties().get(propertyStr.toLowerCase(Locale.ROOT));
+                                if (properties == null || properties.isEmpty()) {
+                                    return Stream.empty();
+                                }
+                                String[] mappings = s.substring(s.indexOf('[') + 1, s.indexOf(']')).split(",");
+                                Set<PropertyRemap<?>> remaps = new HashSet<>();
+                                for (Property<?> property : properties) {
+                                    for (String mapping : mappings) {
+                                        try {
+                                            String[] fromTo = mapping.split(":");
+                                            remaps.add(property.getRemap(
+                                                    property.getValueFor(fromTo[0]),
+                                                    property.getValueFor(fromTo[1])
+                                            ));
+                                        } catch (IllegalArgumentException ignored) {
+                                            // This property is unlikely to be the one being targeted.
+                                            break;
+                                        }
+                                    }
+                                }
+                                return remaps.stream();
+                            }).collect(Collectors.toSet());
+                } else if (limit.REMAP_PROPERTIES.isEmpty() || newLimit.REMAP_PROPERTIES.isEmpty()) {
+                    limit.REMAP_PROPERTIES = Collections.emptySet();
                 } else {
-                    limit.DISALLOWED_STATES = new HashSet<>(limit.DISALLOWED_STATES);
-                    limit.DISALLOWED_STATES.retainAll(newLimit.DISALLOWED_STATES);
-                    if (limit.DISALLOWED_STATES.isEmpty()) {
-                        limit.DISALLOWED_STATES = Collections.emptySet();
+                    limit.REMAP_PROPERTIES = new HashSet<>(limit.REMAP_PROPERTIES);
+                    limit.REMAP_PROPERTIES.retainAll(newLimit.REMAP_PROPERTIES);
+                    if (limit.REMAP_PROPERTIES.isEmpty()) {
+                        limit.REMAP_PROPERTIES = Collections.emptySet();
                     }
                 }
             }

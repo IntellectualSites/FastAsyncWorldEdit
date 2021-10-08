@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.object;
+package com.fastasyncworldedit.core.limit;
 
 import com.fastasyncworldedit.core.FaweCache;
 
@@ -23,7 +23,7 @@ public class FaweLimit {
     public Set<String> STRIP_NBT = null;
     public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
     public Set<String> DISALLOWED_BLOCKS = null;
-    public Set<String> DISALLOWED_STATES = null;
+    public Set<PropertyRemap<?>> REMAP_PROPERTIES = null;
 
     public static FaweLimit MAX;
 
@@ -117,7 +117,7 @@ public class FaweLimit {
         MAX.STRIP_NBT = null;
         MAX.UNIVERSAL_DISALLOWED_BLOCKS = false;
         MAX.DISALLOWED_BLOCKS = null;
-        MAX.DISALLOWED_STATES = null;
+        MAX.REMAP_PROPERTIES = null;
     }
 
     public boolean MAX_CHANGES() {
@@ -243,7 +243,7 @@ public class FaweLimit {
                 && (STRIP_NBT == null || STRIP_NBT.isEmpty())
                 && !UNIVERSAL_DISALLOWED_BLOCKS
                 && (DISALLOWED_BLOCKS == null || DISALLOWED_BLOCKS.isEmpty())
-                && (DISALLOWED_STATES == null || DISALLOWED_STATES.isEmpty());
+                && (REMAP_PROPERTIES == null || REMAP_PROPERTIES.isEmpty());
     }
 
     public void set(FaweLimit limit) {
@@ -263,7 +263,7 @@ public class FaweLimit {
         STRIP_NBT = limit.STRIP_NBT;
         UNIVERSAL_DISALLOWED_BLOCKS = limit.UNIVERSAL_DISALLOWED_BLOCKS;
         DISALLOWED_BLOCKS = limit.DISALLOWED_BLOCKS;
-        DISALLOWED_STATES = limit.DISALLOWED_STATES;
+        REMAP_PROPERTIES = limit.REMAP_PROPERTIES;
     }
 
     public FaweLimit copy() {
@@ -284,7 +284,7 @@ public class FaweLimit {
         limit.STRIP_NBT = STRIP_NBT;
         limit.UNIVERSAL_DISALLOWED_BLOCKS = UNIVERSAL_DISALLOWED_BLOCKS;
         limit.DISALLOWED_BLOCKS = DISALLOWED_BLOCKS;
-        limit.DISALLOWED_STATES = DISALLOWED_STATES;
+        limit.REMAP_PROPERTIES = REMAP_PROPERTIES;
         return limit;
     }
 

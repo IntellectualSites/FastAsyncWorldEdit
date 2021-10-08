@@ -43,7 +43,8 @@ import com.fastasyncworldedit.core.history.RollbackOptimizedHistory;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
 import com.fastasyncworldedit.core.history.changeset.NullChangeSet;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.fastasyncworldedit.core.limit.PropertyRemap;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
@@ -562,11 +563,12 @@ public final class EditSessionBuilder {
                 if (this.limit.DISALLOWED_BLOCKS != null && !this.limit.DISALLOWED_BLOCKS.isEmpty()) {
                     limitBlocks.addAll(this.limit.DISALLOWED_BLOCKS);
                 }
-                if (!limitBlocks.isEmpty() || (this.limit.DISALLOWED_STATES != null && !this.limit.DISALLOWED_STATES.isEmpty())) {
+                Set<PropertyRemap<?>> remaps = this.limit.REMAP_PROPERTIES;
+                if (!limitBlocks.isEmpty() || (remaps != null && !remaps.isEmpty())) {
                     if (placeChunks) {
-                        extent.addProcessor(new DisallowedBlocksExtent(this.extent, limitBlocks, this.limit.DISALLOWED_STATES));
+                        extent.addProcessor(new DisallowedBlocksExtent(this.extent, limitBlocks, remaps));
                     } else {
-                        this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, this.limit.DISALLOWED_STATES);
+                        this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, remaps);
                     }
                 }
             }

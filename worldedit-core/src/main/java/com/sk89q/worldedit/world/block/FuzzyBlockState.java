@@ -52,8 +52,8 @@ public class FuzzyBlockState extends BlockState {
     }
     //FAWE end
 
-    private FuzzyBlockState(BlockState state, Map<Property<?>, Object> values) {
-        //FAWE start - use internal ids
+    //FAWE start - use internal ids, public constructor
+    public FuzzyBlockState(BlockState state, Map<Property<?>, Object> values) {
         super(state.getBlockType(), state.getInternalId(), state.getOrdinal());
         if (values == null || values.isEmpty()) {
             props = Collections.emptyMap();
