@@ -689,7 +689,31 @@ public class Settings extends Config {
                     limit.REMAP_PROPERTIES = Collections.emptySet();
                 } else {
                     limit.REMAP_PROPERTIES = new HashSet<>(limit.REMAP_PROPERTIES);
-                    limit.REMAP_PROPERTIES.retainAll(newLimit.REMAP_PROPERTIES);
+                    limit.REMAP_PROPERTIES.retainAll(newLimit.REMAP_PROPERTIES.stream().flatMap(s -> {
+                        String propertyStr = s.substring(0, s.indexOf('['));
+                        List<Property<?>> properties =
+                                BlockTypesCache.getAllProperties().get(propertyStr.toLowerCase(Locale.ROOT));
+                        if (properties == null || properties.isEmpty()) {
+                            return Stream.empty();
+                        }
+                        String[] mappings = s.substring(s.indexOf('[') + 1, s.indexOf(']')).split(",");
+                        Set<PropertyRemap<?>> remaps = new HashSet<>();
+                        for (Property<?> property : properties) {
+                            for (String mapping : mappings) {
+                                try {
+                                    String[] fromTo = mapping.split(":");
+                                    remaps.add(property.getRemap(
+                                            property.getValueFor(fromTo[0]),
+                                            property.getValueFor(fromTo[1])
+                                    ));
+                                } catch (IllegalArgumentException ignored) {
+                                    // This property is unlikely to be the one being targeted.
+                                    break;
+                                }
+                            }
+                        }
+                        return remaps.stream();
+                    }).collect(Collectors.toSet()));
                     if (limit.REMAP_PROPERTIES.isEmpty()) {
                         limit.REMAP_PROPERTIES = Collections.emptySet();
                     }
