@@ -26,6 +26,7 @@ import com.google.gson.reflect.TypeToken;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.renderer.TranslatableComponentRenderer;
 import com.sk89q.worldedit.util.io.ResourceLoader;
+import com.sk89q.worldedit.util.io.file.ArchiveUnpacker;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,6 +95,10 @@ public class TranslationManager {
     public TranslationManager(ResourceLoader resourceLoader) {
         checkNotNull(resourceLoader);
         this.resourceLoader = resourceLoader;
+    }
+
+    public TranslationManager(ArchiveUnpacker archiveUnpacker, ResourceLoader resourceLoader) {
+        this(resourceLoader);
     }
 
     public void setDefaultLocale(Locale defaultLocale) {
