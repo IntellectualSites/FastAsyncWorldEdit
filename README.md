@@ -36,7 +36,7 @@ For additional information about compiling FastAsyncWorldEdit, see [COMPILING.md
 ## Submitting Your Changes
 FastAsyncWorldEdit is open source (specifically licensed under GPL v3), so note that your contributions will also be open source. The best way to submit a change is to create a fork on GitHub, put your changes there, and then create a "pull request" on our FastAsyncWorldEdit repository.
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for important guidelines to follow.
+Please read [CONTRIBUTING.md](https://github.com/IntellectualSites/.github/blob/main/CONTRIBUTING.md) for important guidelines to follow.
 
 ## YourKit
 <a href="https://www.yourkit.com">

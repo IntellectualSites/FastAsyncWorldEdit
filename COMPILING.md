@@ -6,7 +6,7 @@ but it needs some version of Java to bootstrap from.
 
 Note that if you have JRE 8 installed, Gradle will currently attempt to use that to compile, which will not work. It is easiest to uninstall JRE 8 and replace it with JDK 16.
 
-You can get the JDK 16 [here](https://adoptopenjdk.net/?variant=openjdk16&jvmVariant=hotspot).
+You can get the JDK 16 [here](https://adoptium.net/).
 
 The build process uses Gradle, which you do *not* need to download. FastAsyncWorldEdit is a multi-module project with three active modules:
 
