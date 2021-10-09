@@ -217,7 +217,7 @@ public class Settings extends Config {
                 " - \"minecraft:piston[extended=false,facing=west]\"",
                 " - \"minecraft:wheat[age=7]\""
         })
-        public List<String> DISALLOWED_BLOCKS = Arrays.asList("\"minecraft:wheat\"", "\"minecraft:fire\"", "\"minecraft:redstone_wire\"");
+        public List<String> DISALLOWED_BLOCKS = Arrays.asList("minecraft:wheat", "minecraft:fire", "minecraft:redstone_wire");
         @Comment({
                 "List of block properties that should be remapped if used in an edit. Entries should take the form",
                 "\"property_name[value1_old:value1_new,value2_old:value2_new]\". For example:",
