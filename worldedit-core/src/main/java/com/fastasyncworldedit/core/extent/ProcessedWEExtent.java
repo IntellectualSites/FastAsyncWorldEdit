@@ -1,7 +1,7 @@
 package com.fastasyncworldedit.core.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.WEManager;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;

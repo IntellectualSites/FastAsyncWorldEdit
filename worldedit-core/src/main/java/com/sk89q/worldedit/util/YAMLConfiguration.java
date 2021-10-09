@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * A less simple implementation of {@link LocalConfiguration}
@@ -94,10 +95,10 @@ public class YAMLConfiguration extends LocalConfiguration {
         butcherDefaultRadius = Math.max(-1, config.getInt("limits.butcher-radius.default", butcherDefaultRadius));
         butcherMaxRadius = Math.max(-1, config.getInt("limits.butcher-radius.maximum", butcherMaxRadius));
 
-        disallowedBlocks = new HashSet<>(config.getStringList(
-                "limits.disallowed-blocks",
-                Lists.newArrayList(getDefaultDisallowedBlocks())
-        ));
+        disallowedBlocks = config.getStringList("limits.disallowed-blocks", Lists.newArrayList(getDefaultDisallowedBlocks()))
+                .stream()
+                .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
         allowedDataCycleBlocks = new HashSet<>(config.getStringList("limits.allowed-data-cycle-blocks", null));
 
         registerHelp = config.getBoolean("register-help", true);

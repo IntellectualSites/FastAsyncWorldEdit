@@ -23,7 +23,7 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;

@@ -27,7 +27,7 @@ import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.history.DiskStorageHistory;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.BrushCache;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.StringMan;

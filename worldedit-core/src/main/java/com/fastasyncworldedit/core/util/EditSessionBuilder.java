@@ -23,7 +23,7 @@ import com.fastasyncworldedit.core.history.RollbackOptimizedHistory;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
 import com.fastasyncworldedit.core.history.changeset.NullChangeSet;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
