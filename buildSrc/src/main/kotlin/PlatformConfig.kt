@@ -59,12 +59,12 @@ fun Project.applyPlatformAndCoreConfiguration() {
 
     dependencies {
         "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.7.2")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.7.2")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.8.1")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.8.1")
         "testImplementation"("org.mockito:mockito-core:3.12.4")
         "testImplementation"("org.mockito:mockito-junit-jupiter:3.12.4")
         "testImplementation"("net.bytebuddy:byte-buddy:1.11.9")
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:3.12.4")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.8.1")
     }
 
     // Java 8 turns on doclint which we fail

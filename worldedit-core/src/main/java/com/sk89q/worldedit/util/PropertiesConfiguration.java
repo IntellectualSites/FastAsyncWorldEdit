@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Simple LocalConfiguration that loads settings using
@@ -92,7 +93,10 @@ public class PropertiesConfiguration extends LocalConfiguration {
 
         profile = getBool("profile", profile);
         traceUnflushedSessions = getBool("trace-unflushed-sessions", traceUnflushedSessions);
-        disallowedBlocks = getStringSet("disallowed-blocks", getDefaultDisallowedBlocks());
+        disallowedBlocks = getStringSet("disallowed-blocks", getDefaultDisallowedBlocks())
+                .stream()
+                .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
         defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
         maxChangeLimit = getInt("max-changed-blocks", maxChangeLimit);
         defaultVerticalHeight = getInt("default-vertical-height", defaultVerticalHeight);

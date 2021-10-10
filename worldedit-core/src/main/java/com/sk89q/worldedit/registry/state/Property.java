@@ -19,10 +19,12 @@
 
 package com.sk89q.worldedit.registry.state;
 
+import com.fastasyncworldedit.core.limit.PropertyRemap;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Describes a state property of a block.
@@ -57,16 +59,45 @@ public interface Property<T> {
     T getValueFor(String string) throws IllegalArgumentException;
 
     //FAWE start
+
+    /**
+     * Get the index of the given value in the list of values
+     *
+     * @param value value to get index for
+     * @throws IllegalArgumentException if value not applicable to this property
+     */
     default int getIndex(T value) {
         return getValues().indexOf(value);
     }
 
-    default int getIndexFor(CharSequence string) throws IllegalArgumentException {
-        return getIndex(getValueFor(string.toString()));
+    /**
+     * Get the index of the given value in the list of values
+     *
+     * @param value value to get index for
+     * @throws IllegalArgumentException if value not applicable to this property
+     */
+    default int getIndexFor(CharSequence value) throws IllegalArgumentException {
+        return getIndex(getValueFor(value.toString()));
     }
 
+    /**
+     * Get the {@link PropertyKey} associated with this property.
+     */
     default PropertyKey getKey() {
         return PropertyKey.getOrCreate(getName());
+    }
+
+    /**
+     * Get a {@link PropertyRemap} instance for this property with the given remap.
+     *
+     * @param from value to remap from
+     * @param to   value to remap to
+     * @return new {@link PropertyRemap} instance
+     */
+    default PropertyRemap<T> getRemap(Object from, Object to) {
+        Objects.requireNonNull(from);
+        Objects.requireNonNull(to);
+        return new PropertyRemap<T>(this, (T) from, (T) to);
     }
     //FAWE end
 }

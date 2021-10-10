@@ -54,7 +54,7 @@ import com.fastasyncworldedit.core.function.mask.IdMask;
 import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.fastasyncworldedit.core.math.heightmap.ScalableHeightMap;
 import com.fastasyncworldedit.core.math.heightmap.ScalableHeightMap.Shape;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
