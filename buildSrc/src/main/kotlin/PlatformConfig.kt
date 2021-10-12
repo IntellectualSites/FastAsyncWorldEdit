@@ -14,7 +14,6 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getByName
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
@@ -29,66 +28,14 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "maven-publish")
     apply(plugin = "com.github.johnrengelman.shadow")
 
+    applyCommonJavaConfiguration(
+            sourcesJar = name in setOf("worldedit-core", "worldedit-bukkit"),
+    )
+
     if (project.hasProperty("buildnumber")) {
         ext["internalVersion"] = "$version;${rootProject.ext["gitCommitHash"]}"
     } else {
         ext["internalVersion"] = "$version"
-    }
-
-    tasks
-        .withType<JavaCompile>()
-        .matching { it.name == "compileJava" || it.name == "compileTestJava" }
-        .configureEach {
-            val disabledLint = listOf(
-                "processing", "path", "fallthrough", "serial"
-            )
-            options.release.set(11)
-            options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
-            options.isDeprecation = false
-            options.encoding = "UTF-8"
-            options.compilerArgs.add("-parameters")
-        }
-
-    configurations.all {
-        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 16)
-    }
-
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-    }
-
-    dependencies {
-        "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.8.1")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.8.1")
-        "testImplementation"("org.mockito:mockito-core:3.12.4")
-        "testImplementation"("org.mockito:mockito-junit-jupiter:3.12.4")
-        "testImplementation"("net.bytebuddy:byte-buddy:1.11.9")
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-    }
-
-    // Java 8 turns on doclint which we fail
-    tasks.withType<Javadoc>().configureEach {
-        (options as StandardJavadocDocletOptions).apply {
-            addStringOption("Xdoclint:none", "-quiet")
-            tags(
-                "apiNote:a:API Note:",
-                "implSpec:a:Implementation Requirements:",
-                "implNote:a:Implementation Note:"
-            )
-            options.encoding = "UTF-8"
-            links(
-                    "https://javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.2/",
-                    "https://jd.adventure.kyori.net/api/4.9.1/",
-                    "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/2.14.1/",
-                    "https://javadoc.io/doc/com.google.guava/guava/21.0/",
-                    "https://www.antlr.org/api/Java/",
-                    "https://docs.enginehub.org/javadoc/org.enginehub.piston/core/0.5.7/",
-                    "https://docs.enginehub.org/javadoc/org.enginehub.piston/default-impl/0.5.7/",
-                    "https://papermc.io/javadocs/paper/1.17/",
-                    "https://ci.athion.net/job/FastAsyncWorldEdit-1.17-Core-Javadocs/javadoc/" // needed for other module linking
-            )
-        }
     }
 
     configure<JavaPluginExtension> {

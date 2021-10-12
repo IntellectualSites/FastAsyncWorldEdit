@@ -23,9 +23,10 @@ jobs:
         uses: "actions/setup-java@v2.3.1"
         with:
           distribution: "temurin"
+          cache: 'gradle'
           java-version: "17"
       - name: "Clean Build"
-        run: "./gradlew clean build"
+        run: "./gradlew clean build --no-daemon"
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:

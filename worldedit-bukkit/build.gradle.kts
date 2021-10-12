@@ -53,10 +53,24 @@ val localImplementation = configurations.create("localImplementation") {
     isCanBeResolved = false
 }
 
+val adapters = configurations.create("adapters") {
+    description = "Adapters to include in the JAR"
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
+    attributes {
+        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.REOBFUSCATED))
+    }
+}
+
 dependencies {
     // Modules
     api(projects.worldeditCore)
     api(projects.worldeditLibs.bukkit)
+
+    project.project(":worldedit-bukkit:adapters").subprojects.forEach {
+        "adapters"(project(it.path))
+    }
 
     // Minecraft expectations
     implementation(libs.fastutil)
@@ -124,8 +138,6 @@ tasks.named<Copy>("processResources") {
     filesMatching("plugin.yml") {
         expand("internalVersion" to internalVersion)
     }
-    // exclude adapters entirely from this JAR, they should only be in the shadow JAR
-    exclude("**/worldedit-adapters.jar")
 }
 
 tasks.named<Jar>("jar") {
@@ -138,8 +150,14 @@ tasks.named<Jar>("jar") {
 addJarManifest(WorldEditKind.Plugin, includeClasspath = true)
 
 tasks.named<ShadowJar>("shadowJar") {
-    from(zipTree("src/main/resources/worldedit-adapters.jar").matching {
-        exclude("META-INF/")
+    dependsOn(project.project(":worldedit-bukkit:adapters").subprojects.map { it.tasks.named("assemble") })
+    from(Callable {
+        adapters.resolve()
+                .map { f ->
+                    zipTree(f).matching {
+                        exclude("META-INF/")
+                    }
+                }
     })
     archiveFileName.set("${rootProject.name}-Bukkit-${project.version}.${archiveExtension.getOrElse("jar")}")
     dependencies {
