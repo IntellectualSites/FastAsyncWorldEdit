@@ -48,9 +48,9 @@ public class FaweVersion {
     @Override
     public String toString() {
         if (hash == 0 && build == 0) {
-            return "FastAsyncWorldEdit-1.17-NoVer-SNAPSHOT";
+            return getSimpleVersionName() + "-NoVer-SNAPSHOT";
         } else {
-            return "FastAsyncWorldEdit-1.17-" + build;
+            return getSimpleVersionName() + "-" + build;
         }
     }
 

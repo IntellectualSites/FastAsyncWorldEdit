@@ -21,10 +21,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.FaweVersion;
-import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.bukkit.util.UpdateNotification;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
@@ -49,8 +46,6 @@ import org.enginehub.piston.CommandManager;
 import org.enginehub.piston.inject.InjectedValueStore;
 import org.enginehub.piston.inject.Key;
 import org.enginehub.piston.inject.MapBackedValueStore;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 
 import java.util.Optional;
 
@@ -96,19 +91,7 @@ public class WorldEditListener implements Listener {
         if ((session = WorldEdit.getInstance().getSessionManager().getIfPresent(player)) != null) {
             session.loadDefaults(player, true);
         }
-
-        FaweVersion faweVersion = Fawe.get().getVersion();
-        if (Settings.IMP.ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
-            if (player.hasPermission("fawe.admin") && WorldEditPlugin.hasUpdate) {
-                int versionDifference = Integer.parseInt(WorldEditPlugin.faweVersion) - faweVersion.build;
-                player.print(Caption.of("fawe.info.update-available", versionDifference, faweVersion.toString(),
-                        faweVersion.getSimpleVersionName() + "-" + WorldEditPlugin.faweVersion,
-                        TextComponent
-                                .of("https://www.spigotmc.org/resources/13932/")
-                                .clickEvent(ClickEvent.openUrl("https://www.spigotmc.org/resources/13932/"))
-                ));
-            }
-        }
+        UpdateNotification.doUpdateNotification(player);
     }
     //FAWE end
 
