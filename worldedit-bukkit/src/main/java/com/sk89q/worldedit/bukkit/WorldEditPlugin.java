@@ -22,6 +22,8 @@ package com.sk89q.worldedit.bukkit;
 import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.FaweVersion;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.bukkit.util.ClassSourceValidator;
@@ -76,12 +78,16 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.enginehub.piston.CommandManager;
 import org.incendo.serverlib.ServerLib;
+import org.w3c.dom.Document;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -109,6 +115,8 @@ public class WorldEditPlugin extends JavaPlugin {
     private BukkitServerInterface platform;
     private BukkitConfiguration config;
     private BukkitPermissionAttachmentManager permissionAttachmentManager;
+    protected static boolean hasUpdate;
+    protected static String faweVersion = "";
 
     @Override
     public void onLoad() {
@@ -223,6 +231,34 @@ public class WorldEditPlugin extends JavaPlugin {
         ServerLib.checkJavaLTS();
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
+
+        if (Settings.IMP.ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
+            try {
+                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                DocumentBuilder db = dbf.newDocumentBuilder();
+                Document doc = db.parse(new URL("https://ci.athion.net/job/FastAsyncWorldEdit-1.17/api/xml/").openStream());
+                faweVersion = doc.getElementsByTagName("lastSuccessfulBuild").item(0).getFirstChild().getTextContent();
+                FaweVersion faweVersion = Fawe.get().getVersion();
+                if (faweVersion.build == 0) {
+                    LOGGER.warn("You are using a snapshot or a custom version of FAWE. This is not an official build distributed " +
+                            "via https://www.spigotmc.org/resources/13932/");
+                    return;
+                }
+                if (faweVersion.build < Integer.parseInt(WorldEditPlugin.faweVersion)) {
+                    hasUpdate = true;
+                    int versionDifference = Integer.parseInt(WorldEditPlugin.faweVersion) - faweVersion.build;
+                    LOGGER.warn(
+                            "An update for FastAsyncWorldEdit is available. You are {} build(s) out of date. You are running " +
+                                    "version {}, the latest version is {}. Update at https://www.spigotmc.org/resources/13932/",
+                            versionDifference,
+                            faweVersion.build,
+                            WorldEditPlugin.faweVersion
+                    );
+                }
+            } catch (Exception e) {
+                LOGGER.error("Unable to check for updates. Skipping.");
+            }
+        }
     }
 
     private void setupPreWorldData() {

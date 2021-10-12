@@ -15,7 +15,8 @@
 	"fawe.info.worldedit.bypassed": "Currently bypassing FAWE restriction.",
 	"fawe.info.worldedit.restricted": "Your FAWE edits are now restricted.",
 	"fawe.info.worldedit.oom.admin": "Possible options:\n - //fast\n - Do smaller edits\n - Allocate more memory\n - Disable `max-memory-percent`",
-    	"fawe.info.temporarily-not-working": "Temporarily not working",
+    "fawe.info.temporarily-not-working": "Temporarily not working",
+    "fawe.info.update-available": "An update for FastAsyncWorldEdit is available. You are {0} builds out of date. You are running version {1}, the latest version is {2}. Update at {3}",
 
 	"fawe.web.generating.link": "Uploading {0}, please wait...",
 	"fawe.web.generating.link.failed": "Failed to generate download link!",
