@@ -577,7 +577,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         Environment env = bukkitWorld.getEnvironment();
         ChunkGenerator gen = bukkitWorld.getGenerator();
 
-        Path tempDir = Files.createTempDirectory("WorldEditWorldGen");
+        Path tempDir = Files.createTempDirectory("FastAsyncWorldEditWorldGen");
         LevelStorageSource levelStorage = LevelStorageSource.createDefault(tempDir);
         ResourceKey<LevelStem> worldDimKey = getWorldDimKey(env);
         try (LevelStorageSource.LevelStorageAccess session = levelStorage.c("worldeditregentempworld", worldDimKey)) {

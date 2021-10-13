@@ -500,10 +500,10 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
          *
          * @return the radius of required neighbor chunks
          */
-        public abstract int requiredNeigborChunkRadius();
+        public abstract int requiredNeighborChunkRadius();
 
         int requiredNeigborChunkRadius0() {
-            return Math.max(0, requiredNeigborChunkRadius());
+            return Math.max(0, requiredNeighborChunkRadius());
         }
 
         /**
