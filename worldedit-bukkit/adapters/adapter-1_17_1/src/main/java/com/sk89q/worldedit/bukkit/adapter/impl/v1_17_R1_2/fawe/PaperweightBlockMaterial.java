@@ -147,7 +147,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isToolRequired() {
-        // TODO paperweight: Removed in 1.16.1, this is not present in higher versions
+        // Removed in 1.16.1, this is not present in higher versions
         return false;
     }
 

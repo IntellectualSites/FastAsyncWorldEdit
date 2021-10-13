@@ -211,7 +211,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         org.bukkit.generator.ChunkGenerator generator = originalBukkitWorld.getGenerator();
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(tempDir);
         ResourceKey<LevelStem> levelStemResourceKey = getWorldDimKey(environment);
-        //TODO paperweight c: missing mapping?
         session = levelStorageSource.c("worldeditregentempworld", levelStemResourceKey);
         PrimaryLevelData originalWorldData = originalServerWorld.serverLevelData;
 

@@ -66,15 +66,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static final Field fieldStorage;
     public static final Field fieldPalette;
-    public static final Field fieldSize;
+    public static final Field fieldBits;
 
     public static final Field fieldBitsPerEntry;
 
-    public static final Field fieldFluidCount;
+    public static final Field fieldTickingFluidContent;
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
 
-    private static final Field fieldBiomeArray;
+    private static final Field fieldBiomes;
 
     private static final MethodHandle methodGetVisibleChunk;
 
@@ -84,16 +84,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldLock;
     private static final long fieldLockOffset;
 
-    private static final Field fieldEventDispatcherMap;
+    private static final Field fieldGameEventDispatcherSections;
     private static final MethodHandle methodremoveTickingBlockEntity;
 
-    private static final Field fieldTileEntityRemoved;
+    private static final Field fieldRemove;
 
     static {
         try {
-            // TODO
-            fieldSize = PalettedContainer.class.getDeclaredField("bits");
-            fieldSize.setAccessible(true);
+            fieldBits = PalettedContainer.class.getDeclaredField("bits");
+            fieldBits.setAccessible(true);
             fieldStorage = PalettedContainer.class.getDeclaredField("storage");
             fieldStorage.setAccessible(true);
             fieldPalette = PalettedContainer.class.getDeclaredField("palette");
@@ -102,33 +101,32 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldBitsPerEntry = BitStorage.class.getDeclaredField("bits");
             fieldBitsPerEntry.setAccessible(true);
 
-            fieldFluidCount = LevelChunkSection.class.getDeclaredField("tickingFluidCount");
-            fieldFluidCount.setAccessible(true);
+            fieldTickingFluidContent = LevelChunkSection.class.getDeclaredField("tickingFluidCount");
+            fieldTickingFluidContent.setAccessible(true);
             fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField("tickingBlockCount");
             fieldTickingBlockCount.setAccessible(true);
             fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField("nonEmptyBlockCount");
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldBiomeArray = ChunkBiomeContainer.class.getDeclaredField("biomes");
-            fieldBiomeArray.setAccessible(true);
+            fieldBiomes = ChunkBiomeContainer.class.getDeclaredField("biomes");
+            fieldBiomes.setAccessible(true);
 
-            Method declaredGetVisibleChunk = ChunkMap.class.getDeclaredMethod("getVisibleChunkIfPresent", long.class);
-            declaredGetVisibleChunk.setAccessible(true);
-            methodGetVisibleChunk = MethodHandles.lookup().unreflect(declaredGetVisibleChunk);
+            Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod("getVisibleChunkIfPresent", long.class);
+            getVisibleChunkIfPresent.setAccessible(true);
+            methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
 
             Unsafe unsafe = UnsafeUtility.getUNSAFE();
             fieldLock = PalettedContainer.class.getDeclaredField("lock");
             fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
 
-            fieldEventDispatcherMap = LevelChunk.class.getDeclaredField("gameEventDispatcherSections");
-            fieldEventDispatcherMap.setAccessible(true);
-            //TODO paperweight Method -> Field?
-            Method removeTickingBlockEntity = LevelChunk.class.getDeclaredMethod("blockEntities", BlockPos.class);
-            removeTickingBlockEntity.setAccessible(true);
-            methodremoveTickingBlockEntity = MethodHandles.lookup().unreflect(removeTickingBlockEntity);
+            fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField("gameEventDispatcherSections");
+            fieldGameEventDispatcherSections.setAccessible(true);
+            Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod("removeBlockEntityTicker", BlockPos.class);
+            removeBlockEntityTicker.setAccessible(true);
+            methodremoveTickingBlockEntity = MethodHandles.lookup().unreflect(removeBlockEntityTicker);
 
-            fieldTileEntityRemoved = BlockEntity.class.getDeclaredField("remove");
-            fieldTileEntityRemoved.setAccessible(true);
+            fieldRemove = BlockEntity.class.getDeclaredField("remove");
+            fieldRemove.setAccessible(true);
 
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(LevelChunkSection[].class);
             int scale = unsafe.arrayIndexScale(LevelChunkSection[].class);
@@ -354,7 +352,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             try {
                 fieldStorage.set(dataPaletteBlocks, nmsBits);
                 fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
-                fieldSize.set(dataPaletteBlocks, bitsPerEntry);
+                fieldBits.set(dataPaletteBlocks, bitsPerEntry);
                 setCount(ticking_blocks.size(), 4096 - air, levelChunkSection);
                 if (!fastmode) {
                     ticking_blocks.forEach((pos, ordinal) -> levelChunkSection
@@ -379,14 +377,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final LevelChunkSection section) throws
             IllegalAccessException {
-        fieldFluidCount.setShort(section, (short) 0); // TODO FIXME
+        fieldTickingFluidContent.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
     }
 
     public static Biome[] getBiomeArray(ChunkBiomeContainer chunkBiomeContainer) {
         try {
-            return (Biome[]) fieldBiomeArray.get(chunkBiomeContainer);
+            return (Biome[]) fieldBiomes.get(chunkBiomeContainer);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return null;
@@ -420,7 +418,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                                 gameEventDispatcher.unregister(gameEventListener);
                                 if (gameEventDispatcher.isEmpty()) {
                                     try {
-                                        ((Int2ObjectMap<GameEventDispatcher>) fieldEventDispatcherMap.get(levelChunk))
+                                        ((Int2ObjectMap<GameEventDispatcher>) fieldGameEventDispatcherSections.get(levelChunk))
                                                 .remove(i);
                                     } catch (IllegalAccessException e) {
                                         e.printStackTrace();
@@ -429,7 +427,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                             }
                         }
                     }
-                    fieldTileEntityRemoved.set(beacon, true);
+                    fieldRemove.set(beacon, true);
                 }
             }
             methodremoveTickingBlockEntity.invoke(levelChunk, beacon.getBlockPos());
