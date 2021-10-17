@@ -20,12 +20,14 @@
 package com.sk89q.worldedit.world.storage;
 
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.chunk.Chunk;
 
+import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -84,6 +86,20 @@ public abstract class ChunkStore implements Closeable {
      */
     public abstract CompoundTag getChunkTag(BlockVector2 position, World world) throws DataException, IOException;
 
+    //FAWE start - biome and entity restore
+    /**
+     * Get the tag for the entities stored in a chunk from the entities folder. 1.17+ use only.
+     * If an error occurs, returns null.
+     *
+     * @param position the position of the chunk
+     * @return tag
+     */
+    @Nullable
+    public CompoundTag getEntitiesTag(BlockVector2 position, World world) {
+        return null;
+    }
+    //FAWE end
+
     /**
      * Get a chunk at a location.
      *
@@ -95,7 +111,17 @@ public abstract class ChunkStore implements Closeable {
      */
     public Chunk getChunk(BlockVector2 position, World world) throws DataException, IOException {
         CompoundTag rootTag = getChunkTag(position, world);
-        return ChunkStoreHelper.getChunk(rootTag);
+        //FAWE start - biome and entity restore
+        int dataVersion = rootTag.getInt("DataVersion");
+        if (dataVersion == 0) {
+            dataVersion = -1;
+        }
+        if (dataVersion >= Constants.DATA_VERSION_MC_1_17) {
+            return ChunkStoreHelper.getChunk(rootTag, () -> getEntitiesTag(position, world));
+        } else {
+            return ChunkStoreHelper.getChunk(rootTag);
+        }
+        //FAWE end
     }
 
     @Override

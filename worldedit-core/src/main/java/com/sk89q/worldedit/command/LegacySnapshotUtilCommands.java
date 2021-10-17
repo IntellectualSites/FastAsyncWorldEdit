@@ -47,9 +47,16 @@ class LegacySnapshotUtilCommands {
         this.we = we;
     }
 
+    //FAWE start - biome and entity restore
     void restore(
-            Actor actor, World world, LocalSession session, EditSession editSession,
-            String snapshotName
+            Actor actor,
+            World world,
+            LocalSession session,
+            EditSession editSession,
+            String snapshotName,
+            boolean restoreBiomes,
+            boolean restoreEntities
+            //FAWE end
     ) throws WorldEditException {
         LocalConfiguration config = we.getConfiguration();
 
@@ -108,8 +115,9 @@ class LegacySnapshotUtilCommands {
 
         try {
             // Restore snapshot
-            SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region);
-            //player.print(restore.getChunksAffected() + " chunk(s) will be loaded.");
+            //FAWE start - biome and entity restore
+            SnapshotRestore restore = new SnapshotRestore(chunkStore, editSession, region, restoreBiomes, restoreEntities);
+            //FAWE end
 
             restore.restore();
 

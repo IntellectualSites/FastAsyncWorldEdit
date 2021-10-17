@@ -23,6 +23,7 @@ package com.sk89q.worldedit.world.storage;
 
 import com.sk89q.worldedit.world.DataException;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,10 +74,17 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
     }
 
     @Override
-    protected InputStream getInputStream(String name, String worldName) throws IOException, DataException {
+    //FAWE start - biome and entity restore
+    protected InputStream getInputStream(String name, String worldName, @Nullable String folderOverride) throws IOException,
+            DataException {
         // Detect subfolder for the world's files
-        if (folder != null) {
+        if (folderOverride != null) {
+            if (!folderOverride.isEmpty()) {
+                name = folderOverride + "/" + name;
+            }
+        } else if (folder != null) {
             if (!folder.isEmpty()) {
+                //FAWE end
                 name = folder + "/" + name;
             }
         } else {
@@ -93,7 +101,9 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
                             endIndex = entryName.lastIndexOf('\\');
                         }
                         folder = entryName.substring(0, endIndex);
-                        if (folder.endsWith("poi")) {
+                        //FAWE start - biome and entity restore
+                        if (folder.endsWith("poi") || folder.endsWith("entities")) {
+                            //FAWE end
                             continue;
                         }
                         name = folder + "/" + name;
