@@ -159,7 +159,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         //generate chunk coords lists with a certain radius
         Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
-        chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
+        chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
             if (radius == -1) { //ignore ChunkStatus.EMPTY
                 return;
             }
@@ -176,7 +176,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
         Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap<>();
-        chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeigborChunkRadius0).distinct().forEach(radius -> {
+        chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
             if (radius == -1) { //ignore ChunkStatus.EMPTY
                 return;
             }
@@ -198,7 +198,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         //run generation tasks excluding FULL chunk status
         for (Map.Entry<ChunkStatus, Concurrency> entry : chunkStati.entrySet()) {
             ChunkStatus chunkStatus = entry.getKey();
-            int radius = chunkStatus.requiredNeigborChunkRadius0();
+            int radius = chunkStatus.requiredNeighborChunkRadius0();
 
             List<Long> coords = chunkCoordsForRadius.get(radius);
             if (this.generateConcurrent && entry.getValue() == Concurrency.RADIUS) {
@@ -502,7 +502,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
          */
         public abstract int requiredNeighborChunkRadius();
 
-        int requiredNeigborChunkRadius0() {
+        int requiredNeighborChunkRadius0() {
             return Math.max(0, requiredNeighborChunkRadius());
         }
 
