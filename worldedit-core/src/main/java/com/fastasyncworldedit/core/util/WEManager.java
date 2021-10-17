@@ -140,11 +140,6 @@ public class WEManager {
                 player.printError(TextComponent.of("Missing permission " + "fawe." + manager.getKey()));
             }
         }
-        LOGGER.info("Region info for {}", player.getName());
-        LOGGER.info("There are {} backupRegions being added to Regions. Regions has {} before backupRegions" +
-                " are added",  backupRegions.size(), regions.size());
-        regions.addAll(backupRegions);
-        LOGGER.info("Finished adding regions for {}", player.getName());
         if (!masks.isEmpty()) {
             player.setMeta("lastMask", masks);
         } else {
