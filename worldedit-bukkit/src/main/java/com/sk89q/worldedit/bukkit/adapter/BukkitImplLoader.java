@@ -172,6 +172,9 @@ public class BukkitImplLoader {
                 if (className.equals(customCandidate)) {
                     LOGGER.warn("Failed to load the Bukkit adapter class '" + className + "'", e);
                 }
+                if (className.contains("Paperweight")) {
+                    e.printStackTrace();
+                }
             }
         }
 
