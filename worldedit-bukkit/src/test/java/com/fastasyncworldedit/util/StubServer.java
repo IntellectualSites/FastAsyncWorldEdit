@@ -994,6 +994,11 @@ public class StubServer implements Server {
     }
 
     @Override
+    public @NotNull File getPluginsFolder() {
+        return null;
+    }
+
+    @Override
     public boolean isStopping() {
         return false;
     }

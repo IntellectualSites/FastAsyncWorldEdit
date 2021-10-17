@@ -21,6 +21,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.util.UpdateNotification;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
@@ -90,6 +91,7 @@ public class WorldEditListener implements Listener {
         if ((session = WorldEdit.getInstance().getSessionManager().getIfPresent(player)) != null) {
             session.loadDefaults(player, true);
         }
+        UpdateNotification.doUpdateNotification(player);
     }
     //FAWE end
 
