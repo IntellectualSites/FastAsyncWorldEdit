@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2;
 
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;

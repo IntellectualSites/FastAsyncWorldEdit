@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe.regen;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.regen;
 
 import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.core.Fawe;
@@ -9,7 +9,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
-import com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe.PaperweightGetBlocks;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
