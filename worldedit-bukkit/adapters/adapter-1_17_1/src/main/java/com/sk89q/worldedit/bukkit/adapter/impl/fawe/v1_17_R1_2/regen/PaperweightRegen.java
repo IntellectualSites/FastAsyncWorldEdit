@@ -9,6 +9,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
+import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -71,8 +72,11 @@ import org.bukkit.generator.BlockPopulator;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
@@ -145,17 +149,24 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             worldPaperConfigField = tmpPaperConfigField;
             flatBedrockField = tmpFlatBedrockField;
 
-            generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField("settings");
+            generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
+                    "settings", "g"));
             generatorSettingBaseSupplierField.setAccessible(true);
 
-            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField("settings");
+            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "e"));
             generatorSettingFlatField.setAccessible(true);
 
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
             delegateField.setAccessible(true);
 
-            chunkProviderField = ServerLevel.class.getDeclaredField("chunkSource");
+            chunkProviderField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "c"));
             chunkProviderField.setAccessible(true);
+
+            // TODO: chunkSource in ServerLevel.java is final - regen not working therefor - VarHandle throws
+            //  IllegalAccessException
+            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(Field.class, MethodHandles.lookup());
+            VarHandle modifiers = lookup.findVarHandle(Field.class, "modifiers", int.class);
+            modifiers.set(chunkProviderField, chunkProviderField.getModifiers() & ~Modifier.FINAL);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

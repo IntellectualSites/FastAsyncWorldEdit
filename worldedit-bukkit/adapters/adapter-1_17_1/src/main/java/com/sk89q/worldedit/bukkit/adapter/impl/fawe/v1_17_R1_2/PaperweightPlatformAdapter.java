@@ -11,6 +11,7 @@ import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.UnsafeUtility;
 import com.mojang.datafixers.util.Either;
+import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -36,13 +37,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkBiomeContainer;
-import net.minecraft.world.level.chunk.HashMapPalette;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.chunk.LinearPalette;
-import net.minecraft.world.level.chunk.Palette;
-import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.gameevent.GameEventDispatcher;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
@@ -52,11 +47,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.function.Function;
@@ -91,41 +82,50 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static {
         try {
-            fieldBits = PalettedContainer.class.getDeclaredField("bits");
+            fieldBits = PalettedContainer.class.getDeclaredField(Refraction.pickName("bits", "l"));
             fieldBits.setAccessible(true);
-            fieldStorage = PalettedContainer.class.getDeclaredField("storage");
+            fieldStorage = PalettedContainer.class.getDeclaredField(Refraction.pickName("storage", "c"));
             fieldStorage.setAccessible(true);
-            fieldPalette = PalettedContainer.class.getDeclaredField("palette");
+            fieldPalette = PalettedContainer.class.getDeclaredField(Refraction.pickName("palette", "k"));
             fieldPalette.setAccessible(true);
 
-            fieldBitsPerEntry = BitStorage.class.getDeclaredField("bits");
+            fieldBitsPerEntry = BitStorage.class.getDeclaredField(Refraction.pickName("bits", "c"));
             fieldBitsPerEntry.setAccessible(true);
 
-            fieldTickingFluidContent = LevelChunkSection.class.getDeclaredField("tickingFluidCount");
+            fieldTickingFluidContent = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "h"));
             fieldTickingFluidContent.setAccessible(true);
-            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField("tickingBlockCount");
+            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "g"));
             fieldTickingBlockCount.setAccessible(true);
-            fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField("nonEmptyBlockCount");
+            fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("nonEmptyBlockCount", "f"));
             fieldNonEmptyBlockCount.setAccessible(true);
 
-            fieldBiomes = ChunkBiomeContainer.class.getDeclaredField("biomes");
+            fieldBiomes = ChunkBiomeContainer.class.getDeclaredField(Refraction.pickName("biomes", "f"));
             fieldBiomes.setAccessible(true);
 
-            Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod("getVisibleChunkIfPresent", long.class);
+            Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
+                    "getVisibleChunkIfPresent",
+                    "getVisibleChunk"
+            ), long.class);
             getVisibleChunkIfPresent.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
 
             Unsafe unsafe = UnsafeUtility.getUNSAFE();
-            fieldLock = PalettedContainer.class.getDeclaredField("lock");
+            fieldLock = PalettedContainer.class.getDeclaredField(Refraction.pickName("lock", "m"));
             fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
 
-            fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField("gameEventDispatcherSections");
+            fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField(Refraction.pickName(
+                    "gameEventDispatcherSections", "x"));
             fieldGameEventDispatcherSections.setAccessible(true);
-            Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod("removeBlockEntityTicker", BlockPos.class);
+            Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
+                    Refraction.pickName(
+                            "removeBlockEntityTicker",
+                            "l"
+                    ), BlockPos.class
+            );
             removeBlockEntityTicker.setAccessible(true);
             methodremoveTickingBlockEntity = MethodHandles.lookup().unreflect(removeBlockEntityTicker);
 
-            fieldRemove = BlockEntity.class.getDeclaredField("remove");
+            fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
 
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(LevelChunkSection[].class);
