@@ -197,7 +197,7 @@ public class WorldEditCommands {
         if (hookMode != null) {
             newMode = hookMode == HookMode.ACTIVE;
             if (newMode == previousMode) {
-                actor.printError(Caption.of(previousMode
+                actor.print(Caption.of(previousMode
                         ? "worldedit.trace.active.already"
                         : "worldedit.trace.inactive.already"));
                 return;
@@ -206,7 +206,7 @@ public class WorldEditCommands {
             newMode = !previousMode;
         }
         session.setTracingActions(newMode);
-        actor.printInfo(Caption.of(newMode ? "worldedit.trace.active" : "worldedit.trace.inactive"));
+        actor.print(Caption.of(newMode ? "worldedit.trace.active" : "worldedit.trace.inactive"));
     }
 
     @Command(

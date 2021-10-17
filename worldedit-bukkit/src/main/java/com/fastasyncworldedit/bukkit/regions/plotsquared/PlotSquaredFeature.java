@@ -39,17 +39,19 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
     public PlotSquaredFeature() {
         super("PlotSquared");
-        LOGGER.debug("Optimizing PlotSquared");
+        LOGGER.info("Optimizing PlotSquared");
         if (Settings.FAWE_Components.FAWE_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
                 new FaweTrim();
             }
+            // TODO: revisit this later on - when?
+            /*
             if (MainCommand.getInstance().getCommand("generatebiome") == null) {
                 new PlotSetBiome();
             }
+             */
         }
-        // TODO: revisit this later on
         /*
         try {
             if (Settings.Enabled_Components.WORLDS) {

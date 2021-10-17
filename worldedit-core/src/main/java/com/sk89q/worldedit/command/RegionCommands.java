@@ -523,7 +523,7 @@ public class RegionCommands {
         HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
         float[] changed = heightMap.applyFilter(filter, iterations);
         int affected = heightMap.applyChanges(changed, snowBlockCount);
-        actor.printInfo(Caption.of("worldedit.snowsmooth.changed", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.snowsmooth.changed", TextComponent.of(affected)));
         return affected;
     }
 

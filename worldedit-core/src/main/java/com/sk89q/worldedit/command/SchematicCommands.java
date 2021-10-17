@@ -432,7 +432,7 @@ public class SchematicCommands {
     ) throws WorldEditException {
         //FAWE end
         if (worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion() == -1) {
-            actor.printError(TranslatableComponent.of("worldedit.schematic.unsupported-minecraft-version"));
+            actor.print(TranslatableComponent.of("worldedit.schematic.unsupported-minecraft-version"));
             return;
         }
 

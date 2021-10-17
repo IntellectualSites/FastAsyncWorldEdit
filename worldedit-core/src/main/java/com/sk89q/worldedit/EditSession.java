@@ -1281,7 +1281,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         List<TracingExtent> tracingExtents = getActiveTracingExtents();
         assert actor != null;
         if (tracingExtents.isEmpty()) {
-            actor.printError(TextComponent.of("worldedit.trace.no-tracing-extents"));
+            actor.print(TextComponent.of("worldedit.trace.no-tracing-extents"));
             return;
         }
         // find the common stacks

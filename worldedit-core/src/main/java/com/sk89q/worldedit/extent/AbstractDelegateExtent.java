@@ -213,7 +213,7 @@ public class AbstractDelegateExtent implements Extent {
             Extent next = ((AbstractDelegateExtent) extent).getExtent();
             new ExtentTraverser(this).setNext(next);
         } else {
-            LOGGER.debug("Cannot disable queue");
+            LOGGER.error("Cannot disable queue");
         }
     }
 

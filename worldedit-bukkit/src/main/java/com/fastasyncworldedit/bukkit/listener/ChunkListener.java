@@ -61,8 +61,7 @@ public abstract class ChunkListener implements Listener {
             TaskManager.IMP.repeat(() -> {
                 Location tmpLoc = lastCancelPos;
                 if (tmpLoc != null) {
-                    LOGGER.debug("[FAWE Tick Limiter] Detected and cancelled physics lag source at "
-                            + tmpLoc);
+                    LOGGER.info("[FAWE Tick Limiter] Detected and cancelled physics lag source at {}",  tmpLoc);
                 }
                 rateLimit--;
                 physicsFreeze = false;
