@@ -50,7 +50,7 @@ import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.math.MutableVector3;
 import com.fastasyncworldedit.core.math.random.SimplexNoise;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
@@ -1281,7 +1281,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         List<TracingExtent> tracingExtents = getActiveTracingExtents();
         assert actor != null;
         if (tracingExtents.isEmpty()) {
-            actor.printError(TextComponent.of("worldedit.trace.no-tracing-extents"));
+            actor.print(TextComponent.of("worldedit.trace.no-tracing-extents"));
             return;
         }
         // find the common stacks

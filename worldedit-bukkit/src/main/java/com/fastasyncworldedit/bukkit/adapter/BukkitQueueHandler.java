@@ -42,7 +42,6 @@ public class BukkitQueueHandler extends QueueHandler {
                 if (timingsEnabled) {
                     if (alertTimingsChange) {
                         alertTimingsChange = false;
-                        LOGGER.debug("Having `parallel-threads` > 1 interferes with the timings.");
                     }
                     Timings.setTimingsEnabled(false);
                     timingsCheck.invoke(null);

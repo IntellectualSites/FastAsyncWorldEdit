@@ -57,7 +57,7 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
         this.blockSize = (int) size;
         this.command = command;
         this.closed = true;
-        LOGGER.debug("Size: {}", size);
+        LOGGER.info("Size: {}", size);
     }
 
     public long getTime() {

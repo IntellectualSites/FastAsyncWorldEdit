@@ -287,7 +287,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
         } else if (change.getClass() == EntityRemove.class) {
             add((EntityRemove) change);
         } else {
-            LOGGER.debug("Unknown change: " + change.getClass());
+            LOGGER.error("Unknown change: {}", change.getClass());
         }
     }
 

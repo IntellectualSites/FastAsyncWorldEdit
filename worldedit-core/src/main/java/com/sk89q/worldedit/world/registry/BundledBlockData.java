@@ -119,7 +119,7 @@ public final class BundledBlockData {
         if (url == null) {
             throw new IOException("Could not find blocks.json");
         }
-        LOGGER.debug("Using {} for bundled block data.", url);
+        LOGGER.info("Using {} for bundled block data.", url);
         String data = Resources.toString(url, Charset.defaultCharset());
         List<BlockEntry> entries = gson.fromJson(data, new TypeToken<List<BlockEntry>>() {
         }.getType());

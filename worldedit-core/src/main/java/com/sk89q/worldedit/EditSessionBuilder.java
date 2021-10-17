@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.DisallowedBlocksExtent;
 import com.fastasyncworldedit.core.extent.FaweRegionExtent;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.extent.LimitExtent;
@@ -42,7 +43,8 @@ import com.fastasyncworldedit.core.history.RollbackOptimizedHistory;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
 import com.fastasyncworldedit.core.history.changeset.NullChangeSet;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.fastasyncworldedit.core.limit.PropertyRemap;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
@@ -68,7 +70,9 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -549,6 +553,23 @@ public final class EditSessionBuilder {
                     extent.addProcessor(new StripNBTExtent(this.extent, this.limit.STRIP_NBT));
                 } else {
                     this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+                }
+            }
+            if (this.limit != null && !this.limit.isUnlimited()) {
+                Set<String> limitBlocks = new HashSet<>();
+                if ((getActor() == null || getActor().hasPermission("worldedit.anyblock") && this.limit.UNIVERSAL_DISALLOWED_BLOCKS)) {
+                    limitBlocks.addAll(WorldEdit.getInstance().getConfiguration().disallowedBlocks);
+                }
+                if (this.limit.DISALLOWED_BLOCKS != null && !this.limit.DISALLOWED_BLOCKS.isEmpty()) {
+                    limitBlocks.addAll(this.limit.DISALLOWED_BLOCKS);
+                }
+                Set<PropertyRemap<?>> remaps = this.limit.REMAP_PROPERTIES;
+                if (!limitBlocks.isEmpty() || (remaps != null && !remaps.isEmpty())) {
+                    if (placeChunks) {
+                        extent.addProcessor(new DisallowedBlocksExtent(this.extent, limitBlocks, remaps));
+                    } else {
+                        this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, remaps);
+                    }
                 }
             }
             this.extent = wrapExtent(this.extent, eventBus, event, EditSession.Stage.BEFORE_HISTORY);

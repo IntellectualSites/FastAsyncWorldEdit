@@ -22,7 +22,7 @@ package com.sk89q.worldedit.extension.platform;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.entity.MapMetadatable;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.task.InterruptableCondition;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.internal.cui.CUIEvent;

@@ -132,7 +132,7 @@ public final class ChunkDeleter {
 
     private boolean runBatch(ChunkDeletionInfo.ChunkBatch chunkBatch) {
         int chunkCount = chunkBatch.getChunkCount();
-        LOGGER.debug("Processing deletion batch with {} chunks.", chunkCount);
+        LOGGER.info("Processing deletion batch with {} chunks.", chunkCount);
         final Map<Path, Stream<BlockVector2>> regionToChunkList = groupChunks(chunkBatch);
         BiPredicate<RegionAccess, BlockVector2> predicate = createPredicates(chunkBatch.deletionPredicates);
         shouldPreload = chunkBatch.chunks == null;
@@ -269,10 +269,10 @@ public final class ChunkDeleter {
                     region.deleteChunk(chunk);
                     totalChunksDeleted++;
                     if (debugRate != 0 && totalChunksDeleted % debugRate == 0) {
-                        LOGGER.debug("Deleted {} chunks so far.", totalChunksDeleted);
+                        LOGGER.info("Deleted {} chunks so far.", totalChunksDeleted);
                     }
                 } else {
-                    LOGGER.debug("Chunk did not match predicates: " + chunk);
+                    LOGGER.warn("Chunk did not match predicates: {}", chunk);
                 }
             }
             return true;

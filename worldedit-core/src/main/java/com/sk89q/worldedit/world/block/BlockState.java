@@ -152,8 +152,8 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                 String input = key.toString();
                 throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(
                                 BlockTypesCache.values)
-                        .filter(b -> StringMan.blockStateMatches(input, b.getId()))
                         .map(BlockType::getId)
+                        .filter(id -> StringMan.blockStateMatches(input, id))
                         .sorted(StringMan.blockStateComparator(input))
                         .collect(Collectors.toList())
                 );
@@ -163,7 +163,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             return type.getDefaultState();
         }
 
-        List<? extends Property> propList = type.getProperties();
+        List<? extends Property<?>> propList = type.getProperties();
 
         if (state.charAt(state.length() - 1) != ']') {
             state = state + "]";
@@ -172,7 +172,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         charSequence.setString(state);
 
         if (propList.size() == 1) {
-            AbstractProperty property = (AbstractProperty) propList.get(0);
+            AbstractProperty<?> property = (AbstractProperty<?>) propList.get(0);
             String name = property.getName();
 
             charSequence.setSubstring(propStrStart + name.length() + 2, state.length() - 1);
@@ -188,7 +188,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             stateId = type.getDefaultState().getInternalId();
         }
         int length = state.length();
-        AbstractProperty property = null;
+        AbstractProperty<?> property = null;
 
         int last = propStrStart + 1;
         for (int i = last; i < length; i++) {
@@ -200,7 +200,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                     if (property != null) {
                         int index = property.getIndexFor(charSequence);
                         if (index == -1) {
-                            throw SuggestInputParseException.of(charSequence.toString(), property.getValues());
+                            throw SuggestInputParseException.of(charSequence.toString(), (List<Object>) property.getValues());
                         }
                         stateId = property.modifyIndex(stateId, index);
                     } else {
@@ -288,7 +288,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public <V> BlockState with(final Property<V> property, final V value) {
         try {
             BlockType type = getBlockType();
-            int newState = ((AbstractProperty) property).modify(this.getInternalId(), value);
+            int newState = ((AbstractProperty<V>) property).modify(this.getInternalId(), value);
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
@@ -298,7 +298,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     @Override
     public <V> V getState(final Property<V> property) {
         try {
-            AbstractProperty ap = (AbstractProperty) property;
+            AbstractProperty<V> ap = (AbstractProperty<V>) property;
             return (V) ap.getValue(this.getInternalId());
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
@@ -309,7 +309,11 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     public <V> BlockState with(final PropertyKey property, final V value) {
         try {
             BlockType type = getBlockType();
-            int newState = ((AbstractProperty) type.getProperty(property)).modify(this.getInternalId(), value);
+            AbstractProperty<V> abstractProperty = ((AbstractProperty<V>) type.getProperty(property));
+            if (abstractProperty == null) {
+                return this;
+            }
+            int newState = abstractProperty.modify(this.getInternalId(), value);
             return newState != this.getInternalId() ? type.withStateId(newState) : this;
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Property not found: " + property);
@@ -340,7 +344,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
         //FAWE end
         BlockType type = this.getBlockType();
         // Lazily initialize the map
-        Map<? extends Property, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property, Object>) this::getState);
+        Map<? extends Property<?>, Object> map = Maps.asMap(type.getPropertiesSet(), (Function<Property<?>, Object>) this::getState);
         //noinspection RedundantCast - This is required for compilation, etc.
         return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
         //FAWE end

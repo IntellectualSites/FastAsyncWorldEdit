@@ -41,7 +41,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
     public PlotSquaredFeature() {
         super("PlotSquared");
-        LOGGER.debug("Optimizing PlotSquared");
+        LOGGER.info("Optimizing PlotSquared");
         if (com.fastasyncworldedit.core.configuration.Settings.IMP.ENABLED_COMPONENTS.PLOTSQUARED_v4_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
             try {
@@ -49,7 +49,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 setupSchematicHandler();
                 setupChunkManager();
             } catch (Throwable ignored) {
-                LOGGER.debug("Please update PlotSquared: https://www.spigotmc.org/resources/77506/");
+                LOGGER.info("Please update PlotSquared: https://www.spigotmc.org/resources/77506/");
             }
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
                 new FaweTrim();
@@ -85,12 +85,12 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
     private void setupChunkManager() throws RuntimeException {
         ChunkManager.manager = new FaweChunkManager(ChunkManager.manager);
-        LOGGER.debug(" - ChunkManager: " + ChunkManager.manager);
+        LOGGER.info(" - ChunkManager: {}", ChunkManager.manager);
     }
 
     private void setupSchematicHandler() throws RuntimeException {
         SchematicHandler.manager = new FaweSchematicHandler();
-        LOGGER.debug(" - SchematicHandler: " + SchematicHandler.manager);
+        LOGGER.info(" - SchematicHandler: {}", SchematicHandler.manager);
     }
 
     public boolean isAllowed(Player player, Plot plot, MaskType type) {

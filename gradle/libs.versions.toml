@@ -33,11 +33,11 @@ sparsebitset = "1.2"
 parallelgzip = "1.0.5"
 adventure = "4.9.2"
 truezip = "6.8.4"
-auto-value = "1.7.4"
+auto-value = "1.8.2"
 findbugs = "3.0.2"
 rhino-runtime = "1.7.13"
 zstd-jni = "1.4.8-1" # Not latest as it can be difficult to obtain latest ZSTD libs
-antlr4 = "4.9.1"
+antlr4 = "4.9.2"
 json-simple = "1.1.1"
 paranamer = "2.8"
 jlibnoise = "1.0.0"
@@ -51,8 +51,8 @@ text = "3.0.4"
 piston = "0.5.7"
 
 # Tests
-mockito = "3.12.4"
-checker-qual = "3.18.0"
+mockito = "4.0.0"
+checker-qual = "3.18.1"
 
 # Gradle plugins
 pluginyml = "0.5.0"

@@ -15,7 +15,8 @@
 	"fawe.info.worldedit.bypassed": "Currently bypassing FAWE restriction.",
 	"fawe.info.worldedit.restricted": "Your FAWE edits are now restricted.",
 	"fawe.info.worldedit.oom.admin": "Possible options:\n - //fast\n - Do smaller edits\n - Allocate more memory\n - Disable `max-memory-percent`",
-    	"fawe.info.temporarily-not-working": "Temporarily not working",
+    "fawe.info.temporarily-not-working": "Temporarily not working",
+    "fawe.info.update-available": "An update for FastAsyncWorldEdit is available. You are {0} build(s) out of date.\nYou are running version {1}, the latest version is {2}.\nUpdate at {3}",
 
 	"fawe.web.generating.link": "Uploading {0}, please wait...",
 	"fawe.web.generating.link.failed": "Failed to generate download link!",
@@ -148,6 +149,8 @@
     "fawe.error.clipboard.invalid.info": "File: {0} (len: {1})",
     "fawe.error.clipboard.load.failure": "Could not load clipboard. Possible that the clipboard is still being written to from another server?!",
     "fawe.error.clipboard.on.disk.version.mismatch": "Clipboard version mismatch. Please delete your clipboards folder and restart the server.",
+    "fawe.error.limit.disallowed-block": "Your limit disallows use of block '{0}'",
+    "fawe.error.limit.disallowed-property": "Your limit disallows use of property '{0}'",
 
     "fawe.cancel.count": "Cancelled {0} edits.",
 	"fawe.cancel.reason.confirm": "Use //confirm to execute {0}",

@@ -65,8 +65,7 @@ public class InspectBrush extends BrushTool {
 
     public boolean perform(final Player player, LocalSession session, boolean rightClick) {
         if (!player.hasPermission("worldedit.tool.inspect")) {
-            player.print(Caption.of("", "worldedit.tool.inspect"));
-            LOGGER.debug("No tool control");
+            player.print(Caption.of("fawe.error.no-perm", "worldedit.tool.inspect"));
             return false;
         }
         if (!Settings.IMP.HISTORY.USE_DATABASE) {
@@ -74,7 +73,6 @@ public class InspectBrush extends BrushTool {
                     "fawe.error.setting.disable",
                     "history.use-database (Import with /history import )"
             ));
-            LOGGER.debug("No db");
             return false;
         }
         try {

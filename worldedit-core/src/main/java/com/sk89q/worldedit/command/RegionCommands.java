@@ -23,7 +23,7 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
-import com.fastasyncworldedit.core.object.FaweLimit;
+import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -523,7 +523,7 @@ public class RegionCommands {
         HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1.0));
         float[] changed = heightMap.applyFilter(filter, iterations);
         int affected = heightMap.applyChanges(changed, snowBlockCount);
-        actor.printInfo(Caption.of("worldedit.snowsmooth.changed", TextComponent.of(affected)));
+        actor.print(Caption.of("worldedit.snowsmooth.changed", TextComponent.of(affected)));
         return affected;
     }
 
