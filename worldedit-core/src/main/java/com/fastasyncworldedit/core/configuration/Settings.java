@@ -92,6 +92,8 @@ public class Settings extends Config {
         @Comment({"Show additional information in console. It helps us at IntellectualSites to find out more about an issue.",
                 "Leave it off if you don't need it, it can spam your console."})
         public boolean DEBUG = false;
+        @Comment({"Whether or not FAWE should notify you on startup about new versions available."})
+        public boolean UPDATE_NOTIFICATIONS = true;
 
     }
 

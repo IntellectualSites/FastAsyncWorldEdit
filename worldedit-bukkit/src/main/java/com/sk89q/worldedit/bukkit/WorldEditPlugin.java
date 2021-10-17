@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.bukkit.util.UpdateNotification;
 import com.fastasyncworldedit.core.Fawe;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -223,6 +224,8 @@ public class WorldEditPlugin extends JavaPlugin {
         ServerLib.checkJavaLTS();
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
+        // Check if a new build is available
+        UpdateNotification.doUpdateCheck();
     }
 
     private void setupPreWorldData() {
