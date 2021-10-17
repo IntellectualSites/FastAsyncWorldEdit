@@ -490,8 +490,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             } else {
                                 existingSection = levelChunkSections[layer];
                                 if (existingSection == null) {
-                                    LOGGER.error("Skipping invalid null section. chunk:" + chunkX + ","
-                                            + chunkZ + " layer: " + layer);
+                                    LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
+                                            + layer);
                                     continue;
                                 }
                             }
@@ -534,7 +534,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     newSection,
                                     layer
                             )) {
-                                LOGGER.error("Failed to set chunk section:" + chunkX + "," + chunkZ + " layer: " + layer);
+                                LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
+                                        + layer);
                             } else {
                                 updateGet(nmsChunk, levelChunkSections, newSection, setArr, layer);
                             }
@@ -643,7 +644,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             final ListTag posTag = (ListTag) entityTagMap.get("Pos");
                             final ListTag rotTag = (ListTag) entityTagMap.get("Rotation");
                             if (idTag == null || posTag == null || rotTag == null) {
-                                LOGGER.debug("Unknown entity tag: " + nativeTag);
+                                LOGGER.error("Unknown entity tag: {}", nativeTag);
                                 continue;
                             }
                             final double x = posTag.getDouble(0);

@@ -59,8 +59,7 @@ public class PaperweightStarlightRelighter implements Relighter {
                     )
             );
         } catch (NoSuchMethodException | IllegalAccessException e) {
-            LOGGER.error("Failed to locate relight method in LightEngineThreaded on Tuinity. " +
-                    "Is everything up to date?", e);
+            LOGGER.error("Failed to locate 'relight' method in ThreadedLevelLightEngine. Is everything up to date?", e);
         }
         RELIGHT = tmp;
     }
@@ -151,7 +150,7 @@ public class PaperweightStarlightRelighter implements Relighter {
                             }, // no callback for single chunks required
                             i -> {
                                 if (i != coords.size()) {
-                                    LOGGER.warn("Processed " + i + " chunks instead of " + coords.size());
+                                    LOGGER.warn("Processed {} chunks instead of {}", i, coords.size());
                                 }
                                 // post process chunks on main thread
                                 TaskManager.IMP.task(() -> postProcessChunks(coords));
