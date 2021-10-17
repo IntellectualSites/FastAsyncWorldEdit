@@ -6,7 +6,12 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
     gradlePluginPortal()
+    maven {
+        name = "PaperMC"
+        url = uri("https://papermc.io/repo/repository/maven-public/")
+    }
     maven {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
@@ -23,4 +28,5 @@ dependencies {
     implementation(gradleApi())
     implementation("org.ajoberstar.grgit:grgit-gradle:4.1.0")
     implementation("gradle.plugin.com.github.jengelman.gradle.plugins:shadow:7.0.0")
+    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.1.11")
 }
