@@ -1,15 +1,17 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe.regen;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.regen;
 
 import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
-import com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe.PaperweightGetBlocks;
+import com.sk89q.worldedit.bukkit.adapter.Refraction;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
@@ -71,8 +73,11 @@ import org.bukkit.generator.BlockPopulator;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;
@@ -145,16 +150,17 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             worldPaperConfigField = tmpPaperConfigField;
             flatBedrockField = tmpFlatBedrockField;
 
-            generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField("settings");
+            generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
+                    "settings", "g"));
             generatorSettingBaseSupplierField.setAccessible(true);
 
-            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField("settings");
+            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "e"));
             generatorSettingFlatField.setAccessible(true);
 
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
             delegateField.setAccessible(true);
 
-            chunkProviderField = ServerLevel.class.getDeclaredField("chunkSource");
+            chunkProviderField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "c"));
             chunkProviderField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -327,8 +333,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 return getProtoChunkAt(x, z);
             }
         };
-        chunkProviderField.set(freshWorld, freshChunkProvider);
 
+        ReflectionUtils.unsafeSet(chunkProviderField, freshWorld, freshChunkProvider);
         //let's start then
         structureManager = server.getStructureManager();
         threadedLevelLightEngine = freshChunkProvider.getLightEngine();

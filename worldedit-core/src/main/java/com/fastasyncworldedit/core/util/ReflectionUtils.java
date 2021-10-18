@@ -1,5 +1,7 @@
 package com.fastasyncworldedit.core.util;
 
+import sun.misc.Unsafe;
+
 import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
@@ -11,6 +13,18 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 public class ReflectionUtils {
+
+    private static Unsafe UNSAFE;
+
+    static {
+        try {
+            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            UNSAFE = (Unsafe) unsafeField.get(null);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static <T> T as(Class<T> t, Object o) {
         return t.isInstance(o) ? t.cast(o) : null;
@@ -111,5 +125,14 @@ public class ReflectionUtils {
             return null;
         }
     }
+
+    public static void unsafeSet(Object base, long offset, Object value) {
+        UNSAFE.putObject(base, offset, value);
+    }
+
+    public static void unsafeSet(Field field, Object base, Object value) {
+        UNSAFE.putObject(base, UNSAFE.objectFieldOffset(field), value);
+    }
+
 
 }

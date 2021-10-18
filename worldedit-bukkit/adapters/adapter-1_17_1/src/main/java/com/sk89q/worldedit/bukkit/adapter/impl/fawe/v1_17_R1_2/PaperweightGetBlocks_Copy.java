@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2;
 
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.queue.IBlocks;
@@ -8,7 +8,7 @@ import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe.nbt.PaperweightLazyCompoundTag;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;

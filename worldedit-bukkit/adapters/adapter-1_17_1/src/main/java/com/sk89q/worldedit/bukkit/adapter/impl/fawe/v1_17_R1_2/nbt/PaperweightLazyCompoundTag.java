@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe.nbt;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.nbt;
 
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.LazyCompoundTag;

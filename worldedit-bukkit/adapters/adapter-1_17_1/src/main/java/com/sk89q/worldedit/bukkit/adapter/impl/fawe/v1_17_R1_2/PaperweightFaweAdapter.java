@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2;
 
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
@@ -20,8 +20,9 @@ import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe.nbt.PaperweightLazyCompoundTag;
-import com.sk89q.worldedit.bukkit.adapter.impl.v1_17_R1_2.fawe.regen.PaperweightRegen;
+import com.sk89q.worldedit.bukkit.adapter.ext.fawe.PaperweightAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.nbt.PaperweightLazyCompoundTag;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -110,7 +111,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private final BukkitImplAdapter<net.minecraft.nbt.Tag> parent;
+    private final PaperweightAdapter parent;
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
@@ -121,7 +122,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     private Map<String, List<Property<?>>> allBlockProperties = null;
 
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
-        this.parent = new PaperweightFaweAdapter();
+        this.parent = new PaperweightAdapter();
     }
 
     @Nullable
