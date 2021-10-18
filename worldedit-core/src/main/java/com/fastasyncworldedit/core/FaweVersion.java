@@ -2,8 +2,6 @@ package com.fastasyncworldedit.core;
 
 /**
  * An internal FAWE class not meant for public use.
- *
- * @hidden
  **/
 public class FaweVersion {
 

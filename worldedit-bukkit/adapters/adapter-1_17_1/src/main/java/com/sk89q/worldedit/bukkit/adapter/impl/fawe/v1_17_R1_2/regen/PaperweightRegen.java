@@ -73,11 +73,8 @@ import org.bukkit.generator.BlockPopulator;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashSet;

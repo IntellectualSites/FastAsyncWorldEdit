@@ -54,10 +54,14 @@ enum FSSDTestType {
         @Override
         List<DynamicTest> getTests(FSSDContext context) {
             return ImmutableList.of(
-                dynamicTest("return an empty stream from getSnapshots(worldName)",
-                    () -> context.db.getSnapshots(WORLD_ALPHA)),
-                dynamicTest("return an empty optional from getSnapshot(name)",
-                    () -> context.db.getSnapshot(context.nameUri(WORLD_ALPHA)))
+                    dynamicTest(
+                            "return an empty stream from getSnapshots(worldName)",
+                            () -> context.db.getSnapshots(WORLD_ALPHA)
+                    ),
+                    dynamicTest(
+                            "return an empty optional from getSnapshot(name)",
+                            () -> context.db.getSnapshot(context.nameUri(WORLD_ALPHA))
+                    )
             );
         }
     },
@@ -74,7 +78,7 @@ enum FSSDTestType {
         List<DynamicTest> getTests(FSSDContext context) throws IOException {
             int dim = ThreadLocalRandom.current().nextInt();
             Path worldFolder = EntryMaker.WORLD_DIM_DIR
-                .createEntry(context.db.getRoot(), new EntryMaker.DimInfo(WORLD_ALPHA, dim));
+                    .createEntry(context.db.getRoot(), new EntryMaker.DimInfo(WORLD_ALPHA, dim));
             Files.setLastModifiedTime(worldFolder, FileTime.from(TIME_ONE.toInstant()));
             return singleSnapTest(context, WORLD_ALPHA, TIME_ONE);
         }
@@ -83,7 +87,7 @@ enum FSSDTestType {
         @Override
         List<DynamicTest> getTests(FSSDContext context) throws IOException {
             Path worldFolder = EntryMaker.WORLD_NO_REGION_DIR
-                .createEntry(context.db.getRoot(), WORLD_ALPHA);
+                    .createEntry(context.db.getRoot(), WORLD_ALPHA);
             Files.setLastModifiedTime(worldFolder, FileTime.from(TIME_ONE.toInstant()));
             return singleSnapTest(context, WORLD_ALPHA, TIME_ONE);
         }
@@ -92,7 +96,7 @@ enum FSSDTestType {
         @Override
         List<DynamicTest> getTests(FSSDContext context) throws IOException {
             Path worldFolder = EntryMaker.WORLD_LEGACY_DIR
-                .createEntry(context.db.getRoot(), WORLD_ALPHA);
+                    .createEntry(context.db.getRoot(), WORLD_ALPHA);
             Files.setLastModifiedTime(worldFolder, FileTime.from(TIME_ONE.toInstant()));
             return singleSnapTest(context, WORLD_ALPHA, TIME_ONE);
         }
@@ -101,11 +105,11 @@ enum FSSDTestType {
         @Override
         List<DynamicTest> getTests(FSSDContext context) throws IOException {
             Path worldArchive = EntryMaker.WORLD_ARCHIVE
-                .createEntry(context.db.getRoot(), WORLD_ALPHA);
+                    .createEntry(context.db.getRoot(), WORLD_ALPHA);
             try (ArchiveDir rootOfArchive = context.getRootOfArchive(worldArchive)) {
                 Files.setLastModifiedTime(
-                    rootOfArchive.getPath(),
-                    FileTime.from(TIME_ONE.toInstant())
+                        rootOfArchive.getPath(),
+                        FileTime.from(TIME_ONE.toInstant())
                 );
             }
             return singleSnapTest(context, WORLD_ALPHA + ".zip", TIME_ONE);
@@ -116,20 +120,26 @@ enum FSSDTestType {
         List<? extends DynamicNode> getTests(FSSDContext context) throws IOException {
             Path root = context.db.getRoot();
             Path timestampedDir = EntryMaker.TIMESTAMPED_DIR
-                .createEntry(root, TIME_ONE);
+                    .createEntry(root, TIME_ONE);
             EntryMaker.WORLD_DIR.createEntry(timestampedDir, WORLD_ALPHA);
             EntryMaker.WORLD_ARCHIVE.createEntry(timestampedDir, WORLD_BETA);
             return ImmutableList.of(
-                dynamicContainer("world dir",
-                    singleSnapTest(context,
-                        root.relativize(timestampedDir) + File.separator + WORLD_ALPHA,
-                        TIME_ONE)
-                ),
-                dynamicContainer("world archive",
-                    singleSnapTest(context,
-                        root.relativize(timestampedDir) + File.separator + WORLD_BETA + ".zip",
-                        TIME_ONE)
-                )
+                    dynamicContainer(
+                            "world dir",
+                            singleSnapTest(
+                                    context,
+                                    root.relativize(timestampedDir) + File.separator + WORLD_ALPHA,
+                                    TIME_ONE
+                            )
+                    ),
+                    dynamicContainer(
+                            "world archive",
+                            singleSnapTest(
+                                    context,
+                                    root.relativize(timestampedDir) + File.separator + WORLD_BETA + ".zip",
+                                    TIME_ONE
+                            )
+                    )
             );
         }
     },
@@ -138,17 +148,20 @@ enum FSSDTestType {
         List<? extends DynamicNode> getTests(FSSDContext context) throws IOException {
             Path root = context.db.getRoot();
             Path timestampedArchive = EntryMaker.TIMESTAMPED_ARCHIVE
-                .createEntry(root, TIME_ONE);
+                    .createEntry(root, TIME_ONE);
             try (ArchiveDir timestampedDir = context.getRootOfArchive(timestampedArchive)) {
                 EntryMaker.WORLD_DIR.createEntry(timestampedDir.getPath(), WORLD_ALPHA);
                 EntryMaker.WORLD_ARCHIVE.createEntry(timestampedDir.getPath(), WORLD_BETA);
             }
             return ImmutableList.of(
-                dynamicContainer("world dir",
-                    singleSnapTest(context,
-                        root.relativize(timestampedArchive) + File.separator + WORLD_ALPHA,
-                        TIME_ONE)
-                )
+                    dynamicContainer(
+                            "world dir",
+                            singleSnapTest(
+                                    context,
+                                    root.relativize(timestampedArchive) + File.separator + WORLD_ALPHA,
+                                    TIME_ONE
+                            )
+                    )
             );
         }
     },
@@ -157,22 +170,28 @@ enum FSSDTestType {
         List<? extends DynamicNode> getTests(FSSDContext context) throws IOException {
             Path root = context.db.getRoot();
             Path timestampedDirA = EntryMaker.TIMESTAMPED_DIR
-                .createEntry(root.resolve(WORLD_ALPHA), TIME_ONE);
+                    .createEntry(root.resolve(WORLD_ALPHA), TIME_ONE);
             Path timestampedDirB = EntryMaker.TIMESTAMPED_DIR
-                .createEntry(root.resolve(WORLD_BETA), TIME_ONE);
+                    .createEntry(root.resolve(WORLD_BETA), TIME_ONE);
             EntryMaker.WORLD_DIR.createEntry(timestampedDirA, WORLD_ALPHA);
             EntryMaker.WORLD_ARCHIVE.createEntry(timestampedDirB, WORLD_BETA);
             return ImmutableList.of(
-                dynamicContainer("world dir",
-                    singleSnapTest(context,
-                        root.relativize(timestampedDirA) + File.separator + WORLD_ALPHA,
-                        TIME_ONE)
-                ),
-                dynamicContainer("world archive",
-                    singleSnapTest(context,
-                        root.relativize(timestampedDirB) + File.separator + WORLD_BETA + ".zip",
-                        TIME_ONE)
-                )
+                    dynamicContainer(
+                            "world dir",
+                            singleSnapTest(
+                                    context,
+                                    root.relativize(timestampedDirA) + File.separator + WORLD_ALPHA,
+                                    TIME_ONE
+                            )
+                    ),
+                    dynamicContainer(
+                            "world archive",
+                            singleSnapTest(
+                                    context,
+                                    root.relativize(timestampedDirB) + File.separator + WORLD_BETA + ".zip",
+                                    TIME_ONE
+                            )
+                    )
             );
         }
     },
@@ -181,57 +200,57 @@ enum FSSDTestType {
         List<DynamicTest> getTests(FSSDContext context) throws IOException {
             Path root = context.db.getRoot();
             Path timestampedDirA = EntryMaker.TIMESTAMPED_DIR
-                .createEntry(root, TIME_ONE);
+                    .createEntry(root, TIME_ONE);
             EntryMaker.WORLD_DIR.createEntry(timestampedDirA, WORLD_ALPHA);
             Path timestampedDirB = EntryMaker.TIMESTAMPED_DIR
-                .createEntry(root, TIME_TWO);
+                    .createEntry(root, TIME_TWO);
             EntryMaker.WORLD_DIR.createEntry(timestampedDirB, WORLD_ALPHA);
             return ImmutableList.of(
-                dynamicTest("list both snapshots in order (newest first)", () -> {
-                    List<Snapshot> snapshots = context.db
-                        .getSnapshotsNewestFirst(WORLD_ALPHA).collect(toList());
-                    assertEquals(2, snapshots.size());
-                    assertValidSnapshot(TIME_ONE, snapshots.get(0));
-                    assertValidSnapshot(TIME_TWO, snapshots.get(1));
-                }),
-                dynamicTest("list both snapshots in order (oldest first)", () -> {
-                    List<Snapshot> snapshots = context.db
-                        .getSnapshotsOldestFirst(WORLD_ALPHA).collect(toList());
-                    assertEquals(2, snapshots.size());
-                    assertValidSnapshot(TIME_TWO, snapshots.get(0));
-                    assertValidSnapshot(TIME_ONE, snapshots.get(1));
-                }),
-                dynamicTest("list only 1 if getting AFTER 2", () -> {
-                    List<Snapshot> snapshots = context.db
-                        .getSnapshotsAfter(WORLD_ALPHA, TIME_TWO).collect(toList());
-                    assertEquals(1, snapshots.size());
-                    assertValidSnapshot(TIME_ONE, snapshots.get(0));
-                }),
-                dynamicTest("list only 2 if getting BEFORE 1", () -> {
-                    List<Snapshot> snapshots = context.db
-                        .getSnapshotsBefore(WORLD_ALPHA, TIME_ONE).collect(toList());
-                    assertEquals(1, snapshots.size());
-                    assertValidSnapshot(TIME_TWO, snapshots.get(0));
-                }),
-                dynamicTest("list both if AFTER time before 2", () -> {
-                    List<Snapshot> snapshots = context.db
-                        .getSnapshotsAfter(WORLD_ALPHA, TIME_TWO.minusSeconds(1))
-                        .collect(toList());
-                    assertEquals(2, snapshots.size());
-                    // sorted newest first
-                    assertValidSnapshot(TIME_ONE, snapshots.get(0));
-                    assertValidSnapshot(TIME_TWO, snapshots.get(1));
-                }),
-                dynamicTest("list both if BEFORE time after 1", () -> {
+                    dynamicTest("list both snapshots in order (newest first)", () -> {
                         List<Snapshot> snapshots = context.db
-                            .getSnapshotsBefore(WORLD_ALPHA, TIME_ONE.plusSeconds(1))
-                            .collect(toList());
+                                .getSnapshotsNewestFirst(WORLD_ALPHA).collect(toList());
                         assertEquals(2, snapshots.size());
-                        // sorted oldest first
+                        assertValidSnapshot(TIME_ONE, snapshots.get(0));
+                        assertValidSnapshot(TIME_TWO, snapshots.get(1));
+                    }),
+                    dynamicTest("list both snapshots in order (oldest first)", () -> {
+                        List<Snapshot> snapshots = context.db
+                                .getSnapshotsOldestFirst(WORLD_ALPHA).collect(toList());
+                        assertEquals(2, snapshots.size());
                         assertValidSnapshot(TIME_TWO, snapshots.get(0));
                         assertValidSnapshot(TIME_ONE, snapshots.get(1));
-                    }
-                )
+                    }),
+                    dynamicTest("list only 1 if getting AFTER 2", () -> {
+                        List<Snapshot> snapshots = context.db
+                                .getSnapshotsAfter(WORLD_ALPHA, TIME_TWO).collect(toList());
+                        assertEquals(1, snapshots.size());
+                        assertValidSnapshot(TIME_ONE, snapshots.get(0));
+                    }),
+                    dynamicTest("list only 2 if getting BEFORE 1", () -> {
+                        List<Snapshot> snapshots = context.db
+                                .getSnapshotsBefore(WORLD_ALPHA, TIME_ONE).collect(toList());
+                        assertEquals(1, snapshots.size());
+                        assertValidSnapshot(TIME_TWO, snapshots.get(0));
+                    }),
+                    dynamicTest("list both if AFTER time before 2", () -> {
+                        List<Snapshot> snapshots = context.db
+                                .getSnapshotsAfter(WORLD_ALPHA, TIME_TWO.minusSeconds(1))
+                                .collect(toList());
+                        assertEquals(2, snapshots.size());
+                        // sorted newest first
+                        assertValidSnapshot(TIME_ONE, snapshots.get(0));
+                        assertValidSnapshot(TIME_TWO, snapshots.get(1));
+                    }),
+                    dynamicTest("list both if BEFORE time after 1", () -> {
+                                List<Snapshot> snapshots = context.db
+                                        .getSnapshotsBefore(WORLD_ALPHA, TIME_ONE.plusSeconds(1))
+                                        .collect(toList());
+                                assertEquals(2, snapshots.size());
+                                // sorted oldest first
+                                assertValidSnapshot(TIME_TWO, snapshots.get(0));
+                                assertValidSnapshot(TIME_ONE, snapshots.get(1));
+                            }
+                    )
             );
         }
     },
@@ -239,36 +258,40 @@ enum FSSDTestType {
         @Override
         List<? extends DynamicNode> getTests(FSSDContext context) throws IOException {
             Path worldFolderA = EntryMaker.WORLD_DIR
-                .createEntry(context.db.getRoot(), WORLD_ALPHA);
+                    .createEntry(context.db.getRoot(), WORLD_ALPHA);
             Files.setLastModifiedTime(worldFolderA, FileTime.from(TIME_ONE.toInstant()));
             Path worldFolderB = EntryMaker.WORLD_DIR
-                .createEntry(context.db.getRoot(), WORLD_BETA);
+                    .createEntry(context.db.getRoot(), WORLD_BETA);
             Files.setLastModifiedTime(worldFolderB, FileTime.from(TIME_TWO.toInstant()));
             return Stream.of(
-                singleSnapTest(context, WORLD_ALPHA, TIME_ONE),
-                singleSnapTest(context, WORLD_BETA, TIME_TWO)
+                    singleSnapTest(context, WORLD_ALPHA, TIME_ONE),
+                    singleSnapTest(context, WORLD_BETA, TIME_TWO)
             ).flatMap(List::stream).collect(toList());
         }
     };
 
-    List<DynamicTest> singleSnapTest(FSSDContext context, String name,
-                                                    ZonedDateTime time) {
+    List<DynamicTest> singleSnapTest(
+            FSSDContext context, String name,
+            ZonedDateTime time
+    ) {
         return ImmutableList.of(
-            dynamicTest("return a valid snapshot for " + name, () -> {
-                try (Snapshot snapshot = context.requireSnapshot(name)) {
-                    assertValidSnapshot(time, snapshot);
-                }
-            }),
-            dynamicTest("list a valid snapshot for " + name, () -> {
-                try (Snapshot snapshot = context.requireListsSnapshot(name)) {
-                    assertValidSnapshot(time, snapshot);
-                }
-            })
+                dynamicTest("return a valid snapshot for " + name, () -> {
+                    try (Snapshot snapshot = context.requireSnapshot(name)) {
+                        assertValidSnapshot(time, snapshot);
+                    }
+                }),
+                dynamicTest("list a valid snapshot for " + name, () -> {
+                    try (Snapshot snapshot = context.requireListsSnapshot(name)) {
+                        assertValidSnapshot(time, snapshot);
+                    }
+                })
         );
     }
 
-    private static void assertValidSnapshot(ZonedDateTime time,
-                                            Snapshot snapshot) throws IOException, DataException {
+    private static void assertValidSnapshot(
+            ZonedDateTime time,
+            Snapshot snapshot
+    ) throws IOException, DataException {
         assertEquals(time, snapshot.getInfo().getDateTime());
         // MCA file
         assertEquals(CHUNK_TAG.toString(), snapshot.getChunkTag(CHUNK_POS).toString());
@@ -281,10 +304,10 @@ enum FSSDTestType {
 
     Stream<DynamicNode> getNamedTests(FSSDContext context) throws IOException {
         return Stream.of(dynamicContainer(
-            name(),
-            URI.create("method:" + getClass().getName() +
-                "#getTests(" + FSSDContext.class.getName() + ")"),
-            getTests(context).stream()
+                name(),
+                URI.create("method:" + getClass().getName() +
+                        "#getTests(" + FSSDContext.class.getName() + ")"),
+                getTests(context).stream()
         ));
     }
 

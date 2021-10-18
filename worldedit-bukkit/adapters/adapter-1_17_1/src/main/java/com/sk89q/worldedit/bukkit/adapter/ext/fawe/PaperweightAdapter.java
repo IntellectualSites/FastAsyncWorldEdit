@@ -141,6 +141,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.spigotmc.SpigotConfig;
 import org.spigotmc.WatchdogThread;
 
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -162,7 +163,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -193,7 +193,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         serverWorldsField.setAccessible(true);
 
         getChunkFutureMethod = ServerChunkCache.class.getDeclaredMethod("getChunkFutureMainThread",
-                int.class, int.class, ChunkStatus.class, boolean.class);
+                int.class, int.class, ChunkStatus.class, boolean.class
+        );
         getChunkFutureMethod.setAccessible(true);
 
         chunkProviderExecutorField = ServerChunkCache.class.getDeclaredField(
@@ -232,7 +233,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
      * Read the given NBT data into the given tile entity.
      *
      * @param tileEntity the tile entity
-     * @param tag the tag
+     * @param tag        the tag
      */
     static void readTagIntoTileEntity(net.minecraft.nbt.CompoundTag tag, BlockEntity tileEntity) {
         tileEntity.load(tag);
@@ -243,7 +244,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
      * Write the tile entity's NBT data to the given tag.
      *
      * @param tileEntity the tile entity
-     * @param tag the tag
+     * @param tag        the tag
      */
     private static void readTileEntityIntoTag(BlockEntity tileEntity, net.minecraft.nbt.CompoundTag tag) {
         tileEntity.save(tag);
@@ -262,7 +263,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
     /**
      * Create an entity using the given entity ID.
      *
-     * @param id the entity ID
+     * @param id    the entity ID
      * @param world the world
      * @return an entity or null
      */
@@ -275,7 +276,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
      * Write the given NBT data into the given entity.
      *
      * @param entity the entity
-     * @param tag the tag
+     * @param tag    the tag
      */
     private static void readTagIntoEntity(net.minecraft.nbt.CompoundTag tag, Entity entity) {
         entity.load(tag);
@@ -285,7 +286,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
      * Write the entity's NBT data to the given tag.
      *
      * @param entity the entity
-     * @param tag the tag
+     * @param tag    the tag
      */
     private static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag tag) {
         entity.save(tag);
@@ -349,8 +350,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
 
     @Override
     public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
-        return new PaperweightWorldNativeAccess(this,
-                new WeakReference<>(((CraftWorld) world).getHandle()));
+        return new PaperweightWorldNativeAccess(
+                this,
+                new WeakReference<>(((CraftWorld) world).getHandle())
+        );
     }
 
     private static net.minecraft.core.Direction adapt(Direction face) {
@@ -462,7 +465,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         return TranslatableComponent.of(CraftItemStack.asNMSCopy(BukkitAdapter.adapt(itemStack)).getDescriptionId());
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public Map<String, ? extends Property<?>> getProperties(BlockType blockType) {
         Map<String, Property<?>> properties = Maps.newTreeMap(String::compareTo);
@@ -474,11 +477,25 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
             if (state instanceof net.minecraft.world.level.block.state.properties.BooleanProperty) {
                 property = new BooleanProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
             } else if (state instanceof DirectionProperty) {
-                property = new DirectionalProperty(state.getName(),
-                        (List<Direction>) state.getPossibleValues().stream().map(e -> Direction.valueOf(((StringRepresentable) e).getSerializedName().toUpperCase(Locale.ROOT))).collect(Collectors.toList()));
+                property = new DirectionalProperty(
+                        state.getName(),
+                        (List<Direction>) state
+                                .getPossibleValues()
+                                .stream()
+                                .map(e -> Direction.valueOf(((StringRepresentable) e)
+                                        .getSerializedName()
+                                        .toUpperCase(Locale.ROOT)))
+                                .collect(Collectors.toList())
+                );
             } else if (state instanceof net.minecraft.world.level.block.state.properties.EnumProperty) {
-                property = new EnumProperty(state.getName(),
-                        (List<String>) state.getPossibleValues().stream().map(e -> ((StringRepresentable) e).getSerializedName()).collect(Collectors.toList()));
+                property = new EnumProperty(
+                        state.getName(),
+                        (List<String>) state
+                                .getPossibleValues()
+                                .stream()
+                                .map(e -> ((StringRepresentable) e).getSerializedName())
+                                .collect(Collectors.toList())
+                );
             } else if (state instanceof net.minecraft.world.level.block.state.properties.IntegerProperty) {
                 property = new IntegerProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
             } else {
@@ -536,7 +553,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         }
         fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, stack);
         fakePlayer.absMoveTo(position.getBlockX(), position.getBlockY(), position.getBlockZ(),
-                (float) face.toVector().toYaw(), (float) face.toVector().toPitch());
+                (float) face.toVector().toYaw(), (float) face.toVector().toPitch()
+        );
 
         final BlockPos blockPos = new BlockPos(position.getBlockX(), position.getBlockY(), position.getBlockZ());
         final Vec3 blockVec = Vec3.atLowerCornerOf(blockPos);
@@ -545,7 +563,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         UseOnContext context = new UseOnContext(fakePlayer, InteractionHand.MAIN_HAND, rayTrace);
         InteractionResult result = stack.placeItem(context, InteractionHand.MAIN_HAND);
         if (result != InteractionResult.SUCCESS) {
-            if (worldServer.getBlockState(blockPos).use(worldServer, fakePlayer, InteractionHand.MAIN_HAND, rayTrace).consumesAction()) {
+            if (worldServer
+                    .getBlockState(blockPos)
+                    .use(worldServer, fakePlayer, InteractionHand.MAIN_HAND, rayTrace)
+                    .consumesAction()) {
                 result = InteractionResult.SUCCESS;
             } else {
                 result = stack.getItem().use(worldServer, fakePlayer, InteractionHand.MAIN_HAND).getResult();
@@ -559,7 +580,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
     public boolean canPlaceAt(org.bukkit.World world, BlockVector3 position, BlockState blockState) {
         int internalId = BlockStateIdAccess.getBlockStateId(blockState);
         net.minecraft.world.level.block.state.BlockState blockData = Block.stateById(internalId);
-        return blockData.canSurvive(((CraftWorld) world).getHandle(), new BlockPos(position.getX(), position.getY(), position.getZ()));
+        return blockData.canSurvive(
+                ((CraftWorld) world).getHandle(),
+                new BlockPos(position.getX(), position.getY(), position.getZ())
+        );
     }
 
     @Override
@@ -661,7 +685,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
     }
 
     @SuppressWarnings("unchecked")
-    private Dynamic<net.minecraft.nbt.Tag> recursivelySetSeed(Dynamic<net.minecraft.nbt.Tag> dynamic, long seed, Set<Dynamic<net.minecraft.nbt.Tag>> seen) {
+    private Dynamic<net.minecraft.nbt.Tag> recursivelySetSeed(
+            Dynamic<net.minecraft.nbt.Tag> dynamic,
+            long seed,
+            Set<Dynamic<net.minecraft.nbt.Tag>> seen
+    ) {
         if (!seen.add(dynamic)) {
             return dynamic;
         }
@@ -685,7 +713,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
     }
 
     @SuppressWarnings("unchecked")
-    private void regenForWorld(Region region, Extent extent, ServerLevel serverWorld, RegenOptions options) throws WorldEditException {
+    private void regenForWorld(Region region, Extent extent, ServerLevel serverWorld, RegenOptions options) throws
+            WorldEditException {
         List<CompletableFuture<ChunkAccess>> chunkLoadings = submitChunkLoadTasks(region, serverWorld);
         BlockableEventLoop<Runnable> executor;
         try {
@@ -858,7 +887,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
      *
      * @param foreign the foreign tag
      * @return the converted tag
-     * @throws SecurityException on error
+     * @throws SecurityException        on error
      * @throws IllegalArgumentException on error
      */
     private ListTag toNativeList(net.minecraft.nbt.ListTag foreign) throws SecurityException, IllegalArgumentException {
@@ -935,6 +964,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
     }
 
     private class SpigotWatchdog implements Watchdog {
+
         private final Field instanceField;
         private final Field lastTickField;
 
@@ -959,9 +989,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
                 logger.log(Level.WARNING, "Failed to tick watchdog", e);
             }
         }
+
     }
 
     private static class MojangWatchdog implements Watchdog {
+
         private final DedicatedServer server;
         private final Field tickField;
 
@@ -981,9 +1013,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
             } catch (IllegalAccessException ignored) {
             }
         }
+
     }
 
     private static class NoOpWorldLoadListener implements ChunkProgressListener {
+
         @Override
         public void updateSpawnPos(ChunkPos spawnPos) {
         }
@@ -1003,5 +1037,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         @Override
         public void setChunkRadius(int radius) {
         }
+
     }
+
 }

@@ -87,6 +87,7 @@ public abstract class ChunkStore implements Closeable {
     public abstract CompoundTag getChunkTag(BlockVector2 position, World world) throws DataException, IOException;
 
     //FAWE start - biome and entity restore
+
     /**
      * Get the tag for the entities stored in a chunk from the entities folder. 1.17+ use only.
      * If an error occurs, returns null.

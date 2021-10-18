@@ -20,16 +20,13 @@
 package com.sk89q.worldedit.world.chunk;
 
 import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.DataException;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A 16 by 16 block chunk.
@@ -46,6 +43,7 @@ public interface Chunk {
     BaseBlock getBlock(BlockVector3 position) throws DataException;
 
     //FAWE start - biome and entity restore
+
     /**
      * Get a biome.
      *
@@ -59,6 +57,7 @@ public interface Chunk {
 
     /**
      * Get the stored entities.
+     *
      * @return list of stored entities
      */
     default List<BaseEntity> getEntities() throws DataException {

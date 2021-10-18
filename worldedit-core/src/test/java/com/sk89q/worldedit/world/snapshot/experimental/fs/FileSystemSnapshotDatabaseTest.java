@@ -71,9 +71,9 @@ class FileSystemSnapshotDatabaseTest {
     static final String WORLD_BETA = "World Beta";
 
     static final DateTimeFormatter FORMATTER =
-        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH_mm_ss");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH_mm_ss");
     static final ZonedDateTime TIME_ONE = Instant.parse("2018-01-01T12:00:00.00Z")
-        .atZone(ZoneId.systemDefault());
+            .atZone(ZoneId.systemDefault());
     static final ZonedDateTime TIME_TWO = TIME_ONE.minusDays(1);
 
     private static Path TEMP_DIR;
@@ -88,11 +88,11 @@ class FileSystemSnapshotDatabaseTest {
         try {
             // Find the single chunk
             BlockVector2 chunkPos = IntStream.range(0, 32).mapToObj(
-                x -> IntStream.range(0, 32).filter(z -> reader.hasChunk(x, z))
-                    .mapToObj(z -> BlockVector2.at(x, z))
-            ).flatMap(Function.identity())
-                .findAny()
-                .orElseThrow(() -> new AssertionError("No chunk in region file."));
+                            x -> IntStream.range(0, 32).filter(z -> reader.hasChunk(x, z))
+                                    .mapToObj(z -> BlockVector2.at(x, z))
+                    ).flatMap(Function.identity())
+                    .findAny()
+                    .orElseThrow(() -> new AssertionError("No chunk in region file."));
             ByteArrayOutputStream cap = new ByteArrayOutputStream();
             try (InputStream in = reader.getChunkInputStream(chunkPos);
                  GZIPOutputStream gzOut = new GZIPOutputStream(cap)) {
@@ -100,7 +100,7 @@ class FileSystemSnapshotDatabaseTest {
             }
             CHUNK_DATA = cap.toByteArray();
             CHUNK_TAG = ChunkStoreHelper.readCompoundTag(() -> new GZIPInputStream(
-                new ByteArrayInputStream(CHUNK_DATA)
+                    new ByteArrayInputStream(CHUNK_DATA)
             ));
             CHUNK_POS = chunkPos.toBlockVector3();
         } finally {
@@ -142,14 +142,18 @@ class FileSystemSnapshotDatabaseTest {
         try {
             Path relative = root.getFileSystem().getPath("relative");
             Files.createDirectories(relative);
-            FileSystemSnapshotDatabase db2 = new FileSystemSnapshotDatabase(relative,
-                ArchiveNioSupports.combined());
+            FileSystemSnapshotDatabase db2 = new FileSystemSnapshotDatabase(
+                    relative,
+                    ArchiveNioSupports.combined()
+            );
             assertEquals(root.getFileSystem().getPath(".").toRealPath()
-                .resolve(relative), db2.getRoot());
+                    .resolve(relative), db2.getRoot());
             Path absolute = root.resolve("absolute");
             Files.createDirectories(absolute);
-            FileSystemSnapshotDatabase db3 = new FileSystemSnapshotDatabase(absolute,
-                ArchiveNioSupports.combined());
+            FileSystemSnapshotDatabase db3 = new FileSystemSnapshotDatabase(
+                    absolute,
+                    ArchiveNioSupports.combined()
+            );
             assertEquals(absolute, db3.getRoot());
         } finally {
             deleteTree(root);
@@ -160,26 +164,28 @@ class FileSystemSnapshotDatabaseTest {
     @TestFactory
     Stream<DynamicNode> withSpecificNioSupport() {
         return Stream.of(
-            ZipArchiveNioSupport.getInstance()
-        )
-            .map(nioSupport -> {
-                Stream<? extends DynamicNode> nodes = Stream.of(FSSDTestType.values())
-                    .flatMap(type -> {
-                        try {
-                            return getTests(nioSupport, type);
-                        } catch (IOException e) {
-                            throw new UncheckedIOException(e);
-                        }
-                    });
-                return dynamicContainer(
-                    nioSupport.getClass().getSimpleName() + ", can, for format:",
-                    nodes
-                );
-            });
+                        ZipArchiveNioSupport.getInstance()
+                )
+                .map(nioSupport -> {
+                    Stream<? extends DynamicNode> nodes = Stream.of(FSSDTestType.values())
+                            .flatMap(type -> {
+                                try {
+                                    return getTests(nioSupport, type);
+                                } catch (IOException e) {
+                                    throw new UncheckedIOException(e);
+                                }
+                            });
+                    return dynamicContainer(
+                            nioSupport.getClass().getSimpleName() + ", can, for format:",
+                            nodes
+                    );
+                });
     }
 
-    private static Stream<? extends DynamicNode> getTests(ArchiveNioSupport nioSupport,
-                                                          FSSDTestType type) throws IOException {
+    private static Stream<? extends DynamicNode> getTests(
+            ArchiveNioSupport nioSupport,
+            FSSDTestType type
+    ) throws IOException {
         Path root = newTempDb();
         try {
             Path dbRoot = root.resolve("snapshots");

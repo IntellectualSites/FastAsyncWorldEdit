@@ -42,39 +42,39 @@ class ExpressionTest extends BaseExpressionTest {
     @TestFactory
     public Stream<DynamicNode> testEvaluate() throws ExpressionException {
         List<ExpressionTestCase> testCases = ImmutableList.of(
-            // basic arithmetic
-            testCase("1 - 2 + 3", 2),
-            // unary ops
-            testCase("2 + +4", 6),
-            testCase("2 - -4", 6),
-            testCase("2 * -4", -8),
-            // check functions
-            testCase("sin(5)", sin(5)),
-            testCase("atan2(3, 4)", atan2(3, 4)),
-            testCase("min(1, 2)", 1),
-            testCase("max(1, 2)", 2),
-            testCase("max(1, 2, 3, 4, 5)", 5),
-            // check conditionals
-            testCase("0 || 5", 5),
-            testCase("2 || 5", 2),
-            testCase("2 && 5", 5),
-            testCase("5 && 0", 0),
-            // check ternaries
-            testCase("false ? 1 : 2", 2),
-            testCase("true ? 1 : 2", 1),
-            // - ternary binds inside
-            testCase("true ? true ? 1 : 2 : 3", 1),
-            testCase("true ? false ? 1 : 2 : 3", 2),
-            testCase("false ? true ? 1 : 2 : 3", 3),
-            testCase("false ? false ? 1 : 2 : 3", 3),
-            // check return
-            testCase("return 1; 0", 1)
+                // basic arithmetic
+                testCase("1 - 2 + 3", 2),
+                // unary ops
+                testCase("2 + +4", 6),
+                testCase("2 - -4", 6),
+                testCase("2 * -4", -8),
+                // check functions
+                testCase("sin(5)", sin(5)),
+                testCase("atan2(3, 4)", atan2(3, 4)),
+                testCase("min(1, 2)", 1),
+                testCase("max(1, 2)", 2),
+                testCase("max(1, 2, 3, 4, 5)", 5),
+                // check conditionals
+                testCase("0 || 5", 5),
+                testCase("2 || 5", 2),
+                testCase("2 && 5", 5),
+                testCase("5 && 0", 0),
+                // check ternaries
+                testCase("false ? 1 : 2", 2),
+                testCase("true ? 1 : 2", 1),
+                // - ternary binds inside
+                testCase("true ? true ? 1 : 2 : 3", 1),
+                testCase("true ? false ? 1 : 2 : 3", 2),
+                testCase("false ? true ? 1 : 2 : 3", 3),
+                testCase("false ? false ? 1 : 2 : 3", 3),
+                // check return
+                testCase("return 1; 0", 1)
         );
         return testCases.stream()
-            .map(testCase -> dynamicTest(
-                testCase.getExpression(),
-                () -> checkTestCase(testCase)
-            ));
+                .map(testCase -> dynamicTest(
+                        testCase.getExpression(),
+                        () -> checkTestCase(testCase)
+                ));
     }
 
     @Test
@@ -82,8 +82,10 @@ class ExpressionTest extends BaseExpressionTest {
         assertEquals(8, compile("foo+bar", "foo", "bar").evaluate(5D, 3D), 0);
 
         // variables need to be assigned first
-        EvaluationException ex = assertThrows(EvaluationException.class,
-            () -> simpleEval("a*=5"));
+        EvaluationException ex = assertThrows(
+                EvaluationException.class,
+                () -> simpleEval("a*=5")
+        );
         assertTrue(ex.getMessage().contains("not initialized yet"));
 
         // can't modify e, pi, true, false
@@ -93,11 +95,11 @@ class ExpressionTest extends BaseExpressionTest {
     @TestFactory
     Stream<DynamicNode> testModifyConstants() {
         return Stream.of("e", "pi", "true", "false").map(constant ->
-            dynamicTest(constant, () -> {
-                EvaluationException ex = assertThrows(EvaluationException.class, () ->
-                    simpleEval(constant + "++"));
-                assertTrue(ex.getMessage().endsWith("'" + constant + "' is not a variable"));
-            }));
+                dynamicTest(constant, () -> {
+                    EvaluationException ex = assertThrows(EvaluationException.class, () ->
+                            simpleEval(constant + "++"));
+                    assertTrue(ex.getMessage().endsWith("'" + constant + "' is not a variable"));
+                }));
     }
 
     @Test
@@ -214,45 +216,63 @@ class ExpressionTest extends BaseExpressionTest {
     public void testErrors() {
         // test lexer errors
         {
-            ExpressionException e = assertThrows(ExpressionException.class,
-                () -> compile("#"));
+            ExpressionException e = assertThrows(
+                    ExpressionException.class,
+                    () -> compile("#")
+            );
             assertEquals(0, e.getPosition(), "Error position");
         }
         // test parser errors
         {
-            ExpressionException e = assertThrows(ExpressionException.class,
-                () -> compile("x"));
+            ExpressionException e = assertThrows(
+                    ExpressionException.class,
+                    () -> compile("x")
+            );
             assertEquals(0, e.getPosition(), "Error position");
         }
         {
-            ExpressionException e = assertThrows(ExpressionException.class,
-                () -> compile("x()"));
+            ExpressionException e = assertThrows(
+                    ExpressionException.class,
+                    () -> compile("x()")
+            );
             assertEquals(0, e.getPosition(), "Error position");
         }
         {
             // verify that you must return a value
-            ExpressionException e = assertThrows(ExpressionException.class,
-                () -> compile("return"));
+            ExpressionException e = assertThrows(
+                    ExpressionException.class,
+                    () -> compile("return")
+            );
             assertEquals(6, e.getPosition(), "Error position");
         }
-        assertThrows(ExpressionException.class,
-            () -> compile("("));
-        assertThrows(ExpressionException.class,
-            () -> compile("x("));
+        assertThrows(
+                ExpressionException.class,
+                () -> compile("(")
+        );
+        assertThrows(
+                ExpressionException.class,
+                () -> compile("x(")
+        );
         // test overloader errors
         {
-            ExpressionException e = assertThrows(ExpressionException.class,
-                () -> compile("atan2(1)"));
+            ExpressionException e = assertThrows(
+                    ExpressionException.class,
+                    () -> compile("atan2(1)")
+            );
             assertEquals(0, e.getPosition(), "Error position");
         }
         {
-            ExpressionException e = assertThrows(ExpressionException.class,
-                () -> compile("atan2(1, 2, 3)"));
+            ExpressionException e = assertThrows(
+                    ExpressionException.class,
+                    () -> compile("atan2(1, 2, 3)")
+            );
             assertEquals(0, e.getPosition(), "Error position");
         }
         {
-            ExpressionException e = assertThrows(ExpressionException.class,
-                () -> compile("rotate(1, 2, 3)"));
+            ExpressionException e = assertThrows(
+                    ExpressionException.class,
+                    () -> compile("rotate(1, 2, 3)")
+            );
             assertEquals(7, e.getPosition(), "Error position");
         }
 
@@ -289,41 +309,41 @@ class ExpressionTest extends BaseExpressionTest {
         checkTestCase("c=5; a=0; while (c > 0) { ++a; --c; } a", 5);
         checkTestCase("c=5; a=0; do { ++a; --c; } while (c > 0); a", 5);
         checkTestCase("" +
-            "c=5;" +
-            "a=0;" +
-            "while (c > 0) {" +
-            "   ++a;" +
-            "   --c;" +
-            "   if (c == 1) break;" +
-            "}" +
-            "a", 4);
+                "c=5;" +
+                "a=0;" +
+                "while (c > 0) {" +
+                "   ++a;" +
+                "   --c;" +
+                "   if (c == 1) break;" +
+                "}" +
+                "a", 4);
         checkTestCase("" +
-            "c=5;" +
-            "a=0;" +
-            "while (c > 0) {" +
-            "   ++a;" +
-            "   if (a < 5) continue;" +
-            "   --c;" +
-            "}" +
-            "a", 9);
+                "c=5;" +
+                "a=0;" +
+                "while (c > 0) {" +
+                "   ++a;" +
+                "   if (a < 5) continue;" +
+                "   --c;" +
+                "}" +
+                "a", 9);
         checkTestCase("" +
-            "c=5;" +
-            "a=0;" +
-            "do {" +
-            "   ++a;" +
-            "   --c;" +
-            "   if (c == 1) break;" +
-            "} while (c > 0);" +
-            "a", 4);
+                "c=5;" +
+                "a=0;" +
+                "do {" +
+                "   ++a;" +
+                "   --c;" +
+                "   if (c == 1) break;" +
+                "} while (c > 0);" +
+                "a", 4);
         checkTestCase("" +
-            "c=5;" +
-            "a=0;" +
-            "do {" +
-            "   ++a;" +
-            "   if (a < 5) continue;" +
-            "   --c;" +
-            "} while (c > 0);" +
-            "a", 9);
+                "c=5;" +
+                "a=0;" +
+                "do {" +
+                "   ++a;" +
+                "   if (a < 5) continue;" +
+                "   --c;" +
+                "} while (c > 0);" +
+                "a", 9);
     }
 
     @Test
@@ -331,33 +351,33 @@ class ExpressionTest extends BaseExpressionTest {
         checkTestCase("a=0; for (i=0; i<5; ++i) { ++a; } a", 5);
         checkTestCase("y=0; for (i=1,5) { y *= 10; y += i; } y", 12345);
         checkTestCase("" +
-            "a=0;" +
-            "for (c = 5; c > 0; c--) {" +
-            "   ++a;" +
-            "   if (c == 2) break;" +
-            "}" +
-            "a", 4);
+                "a=0;" +
+                "for (c = 5; c > 0; c--) {" +
+                "   ++a;" +
+                "   if (c == 2) break;" +
+                "}" +
+                "a", 4);
         checkTestCase("" +
-            "a=0;" +
-            "for (c = 5; c > 0; c--) {" +
-            "   if (a > 1) continue;" +
-            "   ++a;" +
-            "}" +
-            "a", 2);
+                "a=0;" +
+                "for (c = 5; c > 0; c--) {" +
+                "   if (a > 1) continue;" +
+                "   ++a;" +
+                "}" +
+                "a", 2);
         checkTestCase("" +
-            "a=0;" +
-            "for (c = 1,5) {" +
-            "   ++a;" +
-            "   if (c == 4) break;" +
-            "}" +
-            "a", 4);
+                "a=0;" +
+                "for (c = 1,5) {" +
+                "   ++a;" +
+                "   if (c == 4) break;" +
+                "}" +
+                "a", 4);
         checkTestCase("" +
-            "a=0;" +
-            "for (c = 1,5) {" +
-            "   if (a > 1) continue;" +
-            "   ++a;" +
-            "}" +
-            "a", 2);
+                "a=0;" +
+                "for (c = 1,5) {" +
+                "   if (a > 1) continue;" +
+                "   ++a;" +
+                "}" +
+                "a", 2);
     }
 
     @Test
@@ -375,33 +395,33 @@ class ExpressionTest extends BaseExpressionTest {
         // try to continue in a switch :P
         {
             EvaluationException ex = assertThrows(EvaluationException.class, () -> simpleEval("" +
-                "switch(1) {" +
-                "   case 1: continue;" +
-                "}"));
+                    "switch(1) {" +
+                    "   case 1: continue;" +
+                    "}"));
             assertTrue(ex.getMessage().contains("continue in a switch"));
         }
         {
             EvaluationException ex = assertThrows(EvaluationException.class, () -> simpleEval("" +
-                "switch(1) {" +
-                "   default: continue;" +
-                "}"));
+                    "switch(1) {" +
+                    "   default: continue;" +
+                    "}"));
             assertTrue(ex.getMessage().contains("continue in a switch"));
         }
         // duplicate case checks
         {
             EvaluationException ex = assertThrows(EvaluationException.class, () -> simpleEval("" +
-                "switch(1) {" +
-                "   case 1: 1;" +
-                "   case 1: 1;" +
-                "}"));
+                    "switch(1) {" +
+                    "   case 1: 1;" +
+                    "   case 1: 1;" +
+                    "}"));
             assertTrue(ex.getMessage().contains("Duplicate cases"));
         }
         {
             EvaluationException ex = assertThrows(EvaluationException.class, () -> simpleEval("" +
-                "switch(1) {" +
-                "   default: 1;" +
-                "   default: 1;" +
-                "}"));
+                    "switch(1) {" +
+                    "   default: 1;" +
+                    "   default: 1;" +
+                    "}"));
             assertTrue(ex.getMessage().contains("Duplicate default cases"));
         }
     }
@@ -420,9 +440,11 @@ class ExpressionTest extends BaseExpressionTest {
     @Test
     public void testTimeout() {
         ExpressionTimeoutException e = assertTimeoutPreemptively(Duration.ofSeconds(10), () ->
-            assertThrows(ExpressionTimeoutException.class,
-                () -> simpleEval("for(i=0;i<256;i++){for(j=0;j<256;j++){for(k=0;k<256;k++){for(l=0;l<256;l++){ln(pi)}}}}"),
-                "Loop was not stopped.")
+                assertThrows(
+                        ExpressionTimeoutException.class,
+                        () -> simpleEval("for(i=0;i<256;i++){for(j=0;j<256;j++){for(k=0;k<256;k++){for(l=0;l<256;l++){ln(pi)}}}}"),
+                        "Loop was not stopped."
+                )
         );
         assertTrue(e.getMessage().contains("Calculations exceeded time limit"));
     }

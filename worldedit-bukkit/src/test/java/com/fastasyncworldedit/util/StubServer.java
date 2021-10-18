@@ -911,8 +911,7 @@ public class StubServer implements Server {
     }
 
     @Override
-    public @NotNull
-    <T extends Keyed> Iterable<Tag<T>> getTags(@NotNull String s, @NotNull Class<T> aClass) {
+    public @NotNull <T extends Keyed> Iterable<Tag<T>> getTags(@NotNull String s, @NotNull Class<T> aClass) {
         return null;
     }
 

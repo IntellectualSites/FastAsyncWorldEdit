@@ -513,15 +513,20 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             if (actor != null) {
                 if (!actor.hasPermission("worldedit.anyblock")
                         && worldEdit.getConfiguration().disallowedBlocks.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
-                    throw new DisallowedUsageException(Caption.of("worldedit.error.disallowed-block", TextComponent.of(blockType.getId())));
+                    throw new DisallowedUsageException(Caption.of(
+                            "worldedit.error.disallowed-block",
+                            TextComponent.of(blockType.getId())
+                    ));
                 }
                 FaweLimit limit = actor.getLimit();
                 if (!limit.isUnlimited()) {
                     // No need to account for blocked states/properties as it will simply return false in the equality check
                     // during contains.
                     if (limit.DISALLOWED_BLOCKS.contains(blockType.getId().toLowerCase(Locale.ROOT))) {
-                        throw new DisallowedUsageException(Caption.of("fawe.error.limit.disallowed-block",
-                                TextComponent.of(blockType.getId())));
+                        throw new DisallowedUsageException(Caption.of(
+                                "fawe.error.limit.disallowed-block",
+                                TextComponent.of(blockType.getId())
+                        ));
                     }
                 }
             }

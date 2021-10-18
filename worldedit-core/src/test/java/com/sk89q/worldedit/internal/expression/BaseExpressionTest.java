@@ -122,4 +122,5 @@ class BaseExpressionTest {
         expression.optimize();
         return expression;
     }
+
 }

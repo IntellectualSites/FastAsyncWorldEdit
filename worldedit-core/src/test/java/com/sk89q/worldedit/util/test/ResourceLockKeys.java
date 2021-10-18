@@ -20,8 +20,10 @@
 package com.sk89q.worldedit.util.test;
 
 public class ResourceLockKeys {
+
     public static final String WORLDEDIT_PLATFORM = "WORLDEDIT_PLATFORM";
 
     private ResourceLockKeys() {
     }
+
 }

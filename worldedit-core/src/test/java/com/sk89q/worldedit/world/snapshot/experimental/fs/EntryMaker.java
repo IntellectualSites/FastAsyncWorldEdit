@@ -36,6 +36,7 @@ import static com.sk89q.worldedit.world.snapshot.experimental.fs.FileSystemSnaps
 import static com.sk89q.worldedit.world.snapshot.experimental.fs.FileSystemSnapshotDatabaseTest.REGION_DATA;
 
 interface EntryMaker<T> {
+
     EntryMaker<ZonedDateTime> TIMESTAMPED_DIR = (directory, time) -> {
         Path timestampedDir = directory.resolve(time.format(FORMATTER));
         Files.createDirectories(timestampedDir);
@@ -44,8 +45,8 @@ interface EntryMaker<T> {
     EntryMaker<ZonedDateTime> TIMESTAMPED_ARCHIVE = (directory, time) -> {
         Path zipFile = directory.resolve(time.format(FORMATTER) + ".zip");
         try (FileSystem zipFs = FileSystems.newFileSystem(
-            URI.create("jar:" + zipFile.toUri() + "!/"),
-            ImmutableMap.of("create", "true")
+                URI.create("jar:" + zipFile.toUri() + "!/"),
+                ImmutableMap.of("create", "true")
         )) {
             TIMESTAMPED_DIR.createEntry(zipFs.getPath("/"), time);
         }
@@ -63,6 +64,7 @@ interface EntryMaker<T> {
     };
 
     class DimInfo {
+
         final String worldName;
         final int dim;
 
@@ -70,6 +72,7 @@ interface EntryMaker<T> {
             this.worldName = worldName;
             this.dim = dim;
         }
+
     }
 
     EntryMaker<DimInfo> WORLD_DIM_DIR = (directory, dimInfo) -> {
@@ -95,12 +98,12 @@ interface EntryMaker<T> {
         Files.createDirectories(worldDir);
         Files.createFile(worldDir.resolve("level.dat"));
         Path chunkFile = worldDir.resolve(LegacyChunkStore.getFilename(
-            CHUNK_POS.toBlockVector2(), "/"
+                CHUNK_POS.toBlockVector2(), "/"
         ));
         Files.createDirectories(chunkFile.getParent());
         Files.write(chunkFile, CHUNK_DATA);
         chunkFile = worldDir.resolve(LegacyChunkStore.getFilename(
-            CHUNK_POS.add(32, 0, 32).toBlockVector2(), "/"
+                CHUNK_POS.add(32, 0, 32).toBlockVector2(), "/"
         ));
         Files.createDirectories(chunkFile.getParent());
         Files.write(chunkFile, CHUNK_DATA);
@@ -112,8 +115,8 @@ interface EntryMaker<T> {
         try {
             Files.deleteIfExists(temp);
             try (FileSystem zipFs = FileSystems.newFileSystem(
-                URI.create("jar:" + temp.toUri() + "!/"),
-                ImmutableMap.of("create", "true")
+                    URI.create("jar:" + temp.toUri() + "!/"),
+                    ImmutableMap.of("create", "true")
             )) {
                 WORLD_DIR.createEntry(zipFs.getPath("/"), worldName);
             }

@@ -63,7 +63,8 @@ public class VariedVectorGenerator {
                         BlockVector3.at(-maxXZ, -maxY - 1, -maxXZ),
                         BlockVector3.at(maxXZ, -maxY - 1, maxXZ),
                         BlockVector3.at(-maxXZ, maxY, -maxXZ),
-                        BlockVector3.at(maxXZ, maxY, maxXZ));
+                        BlockVector3.at(maxXZ, maxY, maxXZ)
+                );
     }
 
     public Stream<BlockVector3> makeVectorsStream() {
@@ -108,4 +109,5 @@ public class VariedVectorGenerator {
             }
         };
     }
+
 }

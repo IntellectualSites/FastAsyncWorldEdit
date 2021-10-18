@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 
 /**
  * This is an internal class not meant to be used outside the FAWE internals.
- * @hidden
  */
 public class UnsafeUtility {
 

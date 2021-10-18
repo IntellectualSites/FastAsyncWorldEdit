@@ -37,22 +37,23 @@ class CommandArgParserTest {
     @Test
     void testArgumentParsing() {
         assertEquals(ImmutableList.of(
-            Substring.wrap("", 0, 0)
+                Substring.wrap("", 0, 0)
         ), argParse(""));
         assertEquals(ImmutableList.of(
-            Substring.wrap("ab", 0, 2)
+                Substring.wrap("ab", 0, 2)
         ), argParse("ab"));
         assertEquals(ImmutableList.of(
-            Substring.wrap("", 0, 0),
-            Substring.wrap("", 1, 1)
+                Substring.wrap("", 0, 0),
+                Substring.wrap("", 1, 1)
         ), argParse(" "));
         assertEquals(ImmutableList.of(
-            Substring.wrap("a", 0, 1),
-            Substring.wrap("", 2, 2)
+                Substring.wrap("a", 0, 1),
+                Substring.wrap("", 2, 2)
         ), argParse("a "));
         assertEquals(ImmutableList.of(
-            Substring.wrap("a", 0, 1),
-            Substring.wrap("b", 2, 3)
+                Substring.wrap("a", 0, 1),
+                Substring.wrap("b", 2, 3)
         ), argParse("a b"));
     }
+
 }

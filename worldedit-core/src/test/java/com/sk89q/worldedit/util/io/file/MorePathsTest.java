@@ -38,32 +38,33 @@ class MorePathsTest {
     @Test
     void testRelative() {
         assertEquals(
-            paths("a", "a/b", "a/b/c"),
-            MorePaths.iterPaths(Paths.get("a/b/c")).collect(toList())
+                paths("a", "a/b", "a/b/c"),
+                MorePaths.iterPaths(Paths.get("a/b/c")).collect(toList())
         );
     }
 
     @Test
     void testAbsolute() {
         assertEquals(
-            paths("/", "/a", "/a/b", "/a/b/c"),
-            MorePaths.iterPaths(Paths.get("/a/b/c")).collect(toList())
+                paths("/", "/a", "/a/b", "/a/b/c"),
+                MorePaths.iterPaths(Paths.get("/a/b/c")).collect(toList())
         );
     }
 
     @Test
     void testEmpty() {
         assertEquals(
-            paths(""),
-            MorePaths.iterPaths(Paths.get("")).collect(toList())
+                paths(""),
+                MorePaths.iterPaths(Paths.get("")).collect(toList())
         );
     }
 
     @Test
     void testJustFile() {
         assertEquals(
-            paths("a"),
-            MorePaths.iterPaths(Paths.get("a")).collect(toList())
+                paths("a"),
+                MorePaths.iterPaths(Paths.get("a")).collect(toList())
         );
     }
+
 }

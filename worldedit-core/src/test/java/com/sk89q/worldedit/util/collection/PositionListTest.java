@@ -29,17 +29,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 abstract class PositionListTest {
 
     static class Long extends PositionListTest {
+
         @Override
         protected PositionList createPositionList() {
             return new LongPositionList();
         }
+
     }
 
     static class Vector extends PositionListTest {
+
         @Override
         protected PositionList createPositionList() {
             return new VectorPositionList();
         }
+
     }
 
     private final VariedVectorGenerator generator = new VariedVectorGenerator(true);
@@ -116,4 +120,5 @@ abstract class PositionListTest {
             assertEquals(0, positionList.size());
         });
     }
+
 }

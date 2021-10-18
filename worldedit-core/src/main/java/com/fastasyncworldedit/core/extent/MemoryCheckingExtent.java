@@ -5,7 +5,6 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.Permission;
 import com.fastasyncworldedit.core.util.WEManager;
-import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 

@@ -35,11 +35,13 @@ import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
-public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChunk, net.minecraft.world.level.block.state.BlockState, BlockPos> {
+public class PaperweightWorldNativeAccess implements
+        WorldNativeAccess<LevelChunk, net.minecraft.world.level.block.state.BlockState, BlockPos> {
+
     private static final int UPDATE = 1;
     private static final int NOTIFY = 2;
 
@@ -81,12 +83,19 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
 
     @Nullable
     @Override
-    public net.minecraft.world.level.block.state.BlockState setBlockState(LevelChunk chunk, BlockPos position, net.minecraft.world.level.block.state.BlockState state) {
+    public net.minecraft.world.level.block.state.BlockState setBlockState(
+            LevelChunk chunk,
+            BlockPos position,
+            net.minecraft.world.level.block.state.BlockState state
+    ) {
         return chunk.setType(position, state, false, this.sideEffectSet.shouldApply(SideEffect.UPDATE));
     }
 
     @Override
-    public net.minecraft.world.level.block.state.BlockState getValidBlockForPosition(net.minecraft.world.level.block.state.BlockState block, BlockPos position) {
+    public net.minecraft.world.level.block.state.BlockState getValidBlockForPosition(
+            net.minecraft.world.level.block.state.BlockState block,
+            BlockPos position
+    ) {
         return Block.updateFromNeighbourShapes(block, getWorld(), position);
     }
 
@@ -106,7 +115,12 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
     }
 
     @Override
-    public void notifyBlockUpdate(LevelChunk chunk, BlockPos position, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
+    public void notifyBlockUpdate(
+            LevelChunk chunk,
+            BlockPos position,
+            net.minecraft.world.level.block.state.BlockState oldState,
+            net.minecraft.world.level.block.state.BlockState newState
+    ) {
         if (chunk.getSections()[getWorld().getSectionIndex(position.getY())] != null) {
             getWorld().sendBlockUpdated(position, oldState, newState, UPDATE | NOTIFY);
         }
@@ -125,7 +139,11 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
     }
 
     @Override
-    public void notifyNeighbors(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
+    public void notifyNeighbors(
+            BlockPos pos,
+            net.minecraft.world.level.block.state.BlockState oldState,
+            net.minecraft.world.level.block.state.BlockState newState
+    ) {
         ServerLevel world = getWorld();
         if (sideEffectSet.shouldApply(SideEffect.EVENTS)) {
             world.updateNeighborsAt(pos, oldState.getBlock());
@@ -149,14 +167,22 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
     }
 
     @Override
-    public void updateNeighbors(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState, int recursionLimit) {
+    public void updateNeighbors(
+            BlockPos pos,
+            net.minecraft.world.level.block.state.BlockState oldState,
+            net.minecraft.world.level.block.state.BlockState newState,
+            int recursionLimit
+    ) {
         ServerLevel world = getWorld();
         // a == updateNeighbors
         // b == updateDiagonalNeighbors
         oldState.updateIndirectNeighbourShapes(world, pos, NOTIFY, recursionLimit);
         if (sideEffectSet.shouldApply(SideEffect.EVENTS)) {
             CraftWorld craftWorld = world.getWorld();
-            BlockPhysicsEvent event = new BlockPhysicsEvent(craftWorld.getBlockAt(pos.getX(), pos.getY(), pos.getZ()), CraftBlockData.fromData(newState));
+            BlockPhysicsEvent event = new BlockPhysicsEvent(
+                    craftWorld.getBlockAt(pos.getX(), pos.getY(), pos.getZ()),
+                    CraftBlockData.fromData(newState)
+            );
             world.getCraftServer().getPluginManager().callEvent(event);
             if (event.isCancelled()) {
                 return;
@@ -167,7 +193,11 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
     }
 
     @Override
-    public void onBlockStateChange(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
+    public void onBlockStateChange(
+            BlockPos pos,
+            net.minecraft.world.level.block.state.BlockState oldState,
+            net.minecraft.world.level.block.state.BlockState newState
+    ) {
         getWorld().onBlockStateChange(pos, oldState, newState);
     }
 

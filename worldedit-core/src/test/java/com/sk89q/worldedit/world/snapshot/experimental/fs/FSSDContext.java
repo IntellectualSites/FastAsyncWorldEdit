@@ -24,13 +24,13 @@ import com.sk89q.worldedit.util.io.file.ArchiveDir;
 import com.sk89q.worldedit.util.io.file.ArchiveNioSupport;
 import com.sk89q.worldedit.world.snapshot.experimental.Snapshot;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
@@ -75,8 +75,10 @@ class FSSDContext {
             snapshots = snapshotStream.collect(toList());
         }
         try {
-            assertTrue(snapshots.size() <= 1,
-                "Too many snapshots matched for " + worldName);
+            assertTrue(
+                    snapshots.size() <= 1,
+                    "Too many snapshots matched for " + worldName
+            );
             return requireSnapshot(name, snapshots.stream().findAny().orElse(null));
         } catch (Throwable t) {
             Closer closer = Closer.create();
@@ -99,6 +101,7 @@ class FSSDContext {
 
     ArchiveDir getRootOfArchive(Path archive) throws IOException {
         return archiveNioSupport.tryOpenAsDir(archive)
-            .orElseThrow(() -> new AssertionError("No archive opener for " + archive));
+                .orElseThrow(() -> new AssertionError("No archive opener for " + archive));
     }
+
 }

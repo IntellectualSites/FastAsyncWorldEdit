@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Verifies that {@link RegionOptimizedVectorSorter} sorts properly.
  */
 public class RegionOptimizedVectorSorterTest {
+
     /**
      * Find factors, smallest to biggest.
      *
@@ -64,10 +65,10 @@ public class RegionOptimizedVectorSorterTest {
     }
 
     @ParameterizedTest(
-        name = "size={0}"
+            name = "size={0}"
     )
     @ValueSource(ints = {
-        0, 1, 10, 100, 1_000, 10_000, 100_000, 1_000_000, 10_000_000
+            0, 1, 10, 100, 1_000, 10_000, 100_000, 1_000_000, 10_000_000
     })
     void checkSorted(int size) {
         Random rng = new Random(size);
@@ -84,7 +85,7 @@ public class RegionOptimizedVectorSorterTest {
             int minZ = z / 2;
             int maxZ = minZ + z % 2;
             toSort = Lists.newArrayList(new CuboidRegion(
-                BlockVector3.at(-minX, 0, -minZ), BlockVector3.at(maxX - 1, 0, maxZ - 1)
+                    BlockVector3.at(-minX, 0, -minZ), BlockVector3.at(maxX - 1, 0, maxZ - 1)
             ));
         }
         assertEquals(size, toSort.size());
@@ -104,23 +105,23 @@ public class RegionOptimizedVectorSorterTest {
             String spaceship = "(" + curr + " <=> " + next + ")";
             if (currRegionX > nextRegionX) {
                 fail(spaceship + " "
-                    + currRegionX + " region x should be less than or equal to " + nextRegionX);
+                        + currRegionX + " region x should be less than or equal to " + nextRegionX);
             } else if (currRegionX == nextRegionX) {
                 if (currRegionZ > nextRegionZ) {
                     fail(spaceship + " "
-                        + currRegionZ + " region z should be less than or equal to " + nextRegionZ);
+                            + currRegionZ + " region z should be less than or equal to " + nextRegionZ);
                 } else if (currRegionZ == nextRegionZ) {
                     if (currChunkX > nextChunkX) {
                         fail(spaceship + " "
-                            + currChunkX + " chunk x should be less than or equal to " + nextChunkX);
+                                + currChunkX + " chunk x should be less than or equal to " + nextChunkX);
                     } else if (currChunkX == nextChunkX) {
                         if (currChunkZ > nextChunkZ) {
                             fail(spaceship + " "
-                                + currChunkZ + " chunk z should be less than or equal to " + nextChunkZ);
+                                    + currChunkZ + " chunk z should be less than or equal to " + nextChunkZ);
                         } else if (currChunkZ == nextChunkZ) {
                             if (curr.getY() < next.getY()) {
                                 fail(spaceship + " "
-                                    + curr + " y should be greater than or equal to " + next);
+                                        + curr + " y should be greater than or equal to " + next);
                             }
                         }
                     }
@@ -128,4 +129,5 @@ public class RegionOptimizedVectorSorterTest {
             }
         }
     }
+
 }

@@ -513,7 +513,10 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public org.bukkit.inventory.ItemStack adapt(BaseItemStack baseItemStack) {
-        ItemStack stack = new ItemStack(Registry.ITEM.get(ResourceLocation.tryParse(baseItemStack.getType().getId())), baseItemStack.getAmount());
+        ItemStack stack = new ItemStack(
+                Registry.ITEM.get(ResourceLocation.tryParse(baseItemStack.getType().getId())),
+                baseItemStack.getAmount()
+        );
         stack.setTag(((net.minecraft.nbt.CompoundTag) fromNative(baseItemStack.getNbtData())));
         return CraftItemStack.asCraftMirror(stack);
     }
@@ -525,7 +528,11 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     ) {
         TreeType bukkitType = BukkitWorld.toBukkitTreeType(treeType);
         if (bukkitType == TreeType.CHORUS_PLANT) {
-            blockVector3 = blockVector3.add(0, 1, 0); // bukkit skips the feature gen which does this offset normally, so we have to add it back
+            blockVector3 = blockVector3.add(
+                    0,
+                    1,
+                    0
+            ); // bukkit skips the feature gen which does this offset normally, so we have to add it back
         }
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
         serverLevel.captureTreeGeneration = true;

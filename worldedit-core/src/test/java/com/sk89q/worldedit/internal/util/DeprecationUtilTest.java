@@ -28,37 +28,44 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DeprecationUtilTest {
 
     public interface ModifiedApi {
+
         @Deprecated
         default boolean oldApi() {
             return newApi();
         }
 
         @NonAbstractForCompatibility(
-            delegateName = "oldApi",
-            delegateParams = {}
+                delegateName = "oldApi",
+                delegateParams = {}
         )
         default boolean newApi() {
             DeprecationUtil.checkDelegatingOverride(getClass());
             return oldApi();
         }
+
     }
 
     public static class OldImpl implements ModifiedApi {
+
         @SuppressWarnings("deprecation")
         @Override
         public boolean oldApi() {
             return false;
         }
+
     }
 
     public static class NewImpl implements ModifiedApi {
+
         @Override
         public boolean newApi() {
             return true;
         }
+
     }
 
     public static class NewBadImpl implements ModifiedApi {
+
     }
 
     @Test

@@ -12,6 +12,7 @@ public abstract class SimpleClipboard implements Clipboard {
     private final int volume;
     private BlockVector3 offset;
     private BlockVector3 origin;
+
     SimpleClipboard(BlockVector3 dimensions, BlockVector3 offset) {
         this.size = dimensions;
         this.offset = offset;

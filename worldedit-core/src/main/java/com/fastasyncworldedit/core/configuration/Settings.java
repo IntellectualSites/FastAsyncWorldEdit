@@ -228,6 +228,7 @@ public class Settings extends Config {
                 " - \"extended[true:false]\""
         })
         public List<String> REMAP_PROPERTIES = new ArrayList<>();
+
     }
 
     public static class HISTORY {

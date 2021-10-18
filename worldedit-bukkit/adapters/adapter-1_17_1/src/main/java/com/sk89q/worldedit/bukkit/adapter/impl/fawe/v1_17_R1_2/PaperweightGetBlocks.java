@@ -491,7 +491,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 existingSection = levelChunkSections[layer];
                                 if (existingSection == null) {
                                     LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
-                                            + layer);
+                                            +layer
+                                    );
                                     continue;
                                 }
                             }
@@ -535,7 +536,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     layer
                             )) {
                                 LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
-                                        + layer);
+                                        +layer
+                                );
                             } else {
                                 updateGet(nmsChunk, levelChunkSections, newSection, setArr, layer);
                             }

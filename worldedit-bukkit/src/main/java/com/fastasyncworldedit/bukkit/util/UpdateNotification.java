@@ -16,7 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;
 
 /**
- * @hidden
+ *
  */
 public class UpdateNotification {
 

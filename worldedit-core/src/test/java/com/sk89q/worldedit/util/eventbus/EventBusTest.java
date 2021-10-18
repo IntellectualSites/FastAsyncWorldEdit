@@ -69,4 +69,5 @@ public class EventBusTest {
         eventBus.post(e2);
         assertEquals(singletonList(e1), subscriber.events);
     }
+
 }

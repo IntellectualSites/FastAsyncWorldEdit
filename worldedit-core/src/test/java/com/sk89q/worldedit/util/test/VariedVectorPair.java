@@ -22,6 +22,7 @@ package com.sk89q.worldedit.util.test;
 import com.sk89q.worldedit.math.BlockVector3;
 
 public class VariedVectorPair {
+
     public final BlockVector3 first;
     public final BlockVector3 second;
 
@@ -29,4 +30,5 @@ public class VariedVectorPair {
         this.first = first;
         this.second = second;
     }
+
 }

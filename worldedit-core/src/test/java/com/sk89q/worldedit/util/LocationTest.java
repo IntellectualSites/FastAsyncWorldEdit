@@ -150,7 +150,7 @@ public class LocationTest {
         World world = mock(World.class);
         long start = System.currentTimeMillis();
         BlockVector3 location1 = BlockVector3.ZERO;
-        location1.add(10,10,10);
+        location1.add(10, 10, 10);
         System.out.println(System.currentTimeMillis() - start + " ms");
     }
 

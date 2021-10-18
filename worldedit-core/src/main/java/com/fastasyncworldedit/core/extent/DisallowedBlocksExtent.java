@@ -154,7 +154,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                     }
                 }
                 if (remaps == null || remaps.isEmpty()) {
-                    blocks[i] =  block;
+                    blocks[i] = block;
                     continue;
                 }
                 for (PropertyRemap<?> remap : remaps) {

@@ -37,7 +37,11 @@ import java.util.OptionalInt;
 import java.util.UUID;
 
 class PaperweightFakePlayer extends ServerPlayer {
-    private static final GameProfile FAKE_WORLDEDIT_PROFILE = new GameProfile(UUID.nameUUIDFromBytes("worldedit".getBytes()), "[WorldEdit]");
+
+    private static final GameProfile FAKE_WORLDEDIT_PROFILE = new GameProfile(
+            UUID.nameUUIDFromBytes("worldedit".getBytes()),
+            "[WorldEdit]"
+    );
     private static final Vec3 ORIGIN = new Vec3(0.0D, 0.0D, 0.0D);
 
     PaperweightFakePlayer(ServerLevel world) {
@@ -95,4 +99,5 @@ class PaperweightFakePlayer extends ServerPlayer {
     @Override
     public void openTextEdit(SignBlockEntity sign) {
     }
+
 }

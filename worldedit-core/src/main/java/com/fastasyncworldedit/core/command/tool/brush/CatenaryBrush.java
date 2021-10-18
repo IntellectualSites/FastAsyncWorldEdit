@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.command.tool.brush;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.command.tool.ResettableTool;
 import com.fastasyncworldedit.core.configuration.Caption;
-import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.command.tool.brush.Brush;

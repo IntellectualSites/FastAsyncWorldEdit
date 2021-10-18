@@ -49,6 +49,7 @@ import net.minecraft.world.item.DyeColor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -62,20 +63,19 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 /**
  * Handles converting all Pre 1.13.2 data using the Legacy DataFix System (ported to 1.13.2)
- *
+ * <p>
  * We register a DFU Fixer per Legacy Data Version and apply the fixes using legacy strategy
  * which is safer, faster and cleaner code.
- *
+ * <p>
  * The pre DFU code did not fail when the Source version was unknown.
- *
+ * <p>
  * This class also provides util methods for converting compounds to wrap the update call to
  * receive the source version in the compound
  */
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({"rawtypes", "unchecked"})
 class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.worldedit.world.DataFixer {
 
     @SuppressWarnings("unchecked")
@@ -118,7 +118,12 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
     private String fixBlockState(String blockState, int srcVer) {
         net.minecraft.nbt.CompoundTag stateNBT = stateToNBT(blockState);
         Dynamic<net.minecraft.nbt.Tag> dynamic = new Dynamic<>(OPS_NBT, stateNBT);
-        net.minecraft.nbt.CompoundTag fixed = (net.minecraft.nbt.CompoundTag) INSTANCE.fixer.update(References.BLOCK_STATE, dynamic, srcVer, DATA_VERSION).getValue();
+        net.minecraft.nbt.CompoundTag fixed = (net.minecraft.nbt.CompoundTag) INSTANCE.fixer.update(
+                References.BLOCK_STATE,
+                dynamic,
+                srcVer,
+                DATA_VERSION
+        ).getValue();
         return nbtToState(fixed);
     }
 
@@ -128,7 +133,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         if (tagCompound.contains("Properties", 10)) {
             sb.append('[');
             net.minecraft.nbt.CompoundTag props = tagCompound.getCompound("Properties");
-            sb.append(props.getAllKeys().stream().map(k -> k + "=" + props.getString(k).replace("\"", "")).collect(Collectors.joining(",")));
+            sb.append(props
+                    .getAllKeys()
+                    .stream()
+                    .map(k -> k + "=" + props.getString(k).replace("\"", ""))
+                    .collect(Collectors.joining(",")));
             sb.append(']');
         }
         return sb.toString();
@@ -220,6 +229,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
     @SuppressWarnings("unchecked")
     private class WrappedDataFixer implements DataFixer {
+
         private final DataFixer realFixer;
 
         WrappedDataFixer(DataFixer realFixer) {
@@ -240,7 +250,12 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
             return realFixer.update(type, dynamic, sourceVer, targetVer);
         }
 
-        private net.minecraft.nbt.CompoundTag convert(LegacyType type, net.minecraft.nbt.CompoundTag cmp, int sourceVer, int desiredVersion) {
+        private net.minecraft.nbt.CompoundTag convert(
+                LegacyType type,
+                net.minecraft.nbt.CompoundTag cmp,
+                int sourceVer,
+                int desiredVersion
+        ) {
             List<DataConverter> converters = PaperweightDataConverters.this.converters.get(type);
             if (converters != null && !converters.isEmpty()) {
                 for (DataConverter converter : converters) {
@@ -265,6 +280,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         public Schema getSchema(int i) {
             return realFixer.getSchema(i);
         }
+
     }
 
     public static net.minecraft.nbt.CompoundTag convert(LegacyType type, net.minecraft.nbt.CompoundTag cmp) {
@@ -275,7 +291,12 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         return convert(type.getDFUType(), cmp, sourceVer);
     }
 
-    public static net.minecraft.nbt.CompoundTag convert(LegacyType type, net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer) {
+    public static net.minecraft.nbt.CompoundTag convert(
+            LegacyType type,
+            net.minecraft.nbt.CompoundTag cmp,
+            int sourceVer,
+            int targetVer
+    ) {
         return convert(type.getDFUType(), cmp, sourceVer, targetVer);
     }
 
@@ -288,16 +309,25 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         return convert(type, cmp, sourceVer, DATA_VERSION);
     }
 
-    public static net.minecraft.nbt.CompoundTag convert(TypeReference type, net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer) {
+    public static net.minecraft.nbt.CompoundTag convert(
+            TypeReference type,
+            net.minecraft.nbt.CompoundTag cmp,
+            int sourceVer,
+            int targetVer
+    ) {
         if (sourceVer >= targetVer) {
             return cmp;
         }
-        return (net.minecraft.nbt.CompoundTag) INSTANCE.fixer.update(type, new Dynamic<>(OPS_NBT, cmp), sourceVer, targetVer).getValue();
+        return (net.minecraft.nbt.CompoundTag) INSTANCE.fixer
+                .update(type, new Dynamic<>(OPS_NBT, cmp), sourceVer, targetVer)
+                .getValue();
     }
 
 
     public interface DataInspector {
+
         net.minecraft.nbt.CompoundTag inspect(net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer);
+
     }
 
     public interface DataConverter {
@@ -305,6 +335,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         int getDataVersion();
 
         net.minecraft.nbt.CompoundTag convert(net.minecraft.nbt.CompoundTag cmp);
+
     }
 
 
@@ -582,7 +613,13 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         return key;
     }
 
-    private static void convertCompound(LegacyType type, net.minecraft.nbt.CompoundTag cmp, String key, int sourceVer, int targetVer) {
+    private static void convertCompound(
+            LegacyType type,
+            net.minecraft.nbt.CompoundTag cmp,
+            String key,
+            int sourceVer,
+            int targetVer
+    ) {
         cmp.put(key, convert(type, cmp.getCompound(key), sourceVer, targetVer));
     }
 
@@ -658,6 +695,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorBlockEntity implements DataInspector {
@@ -840,6 +878,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
 
@@ -859,7 +898,12 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
             return cmp;
         }
 
-        abstract net.minecraft.nbt.CompoundTag inspectChecked(net.minecraft.nbt.CompoundTag nbttagcompound, int sourceVer, int targetVer);
+        abstract net.minecraft.nbt.CompoundTag inspectChecked(
+                net.minecraft.nbt.CompoundTag nbttagcompound,
+                int sourceVer,
+                int targetVer
+        );
+
     }
 
     private static class DataInspectorItemList extends DataInspectorTagged {
@@ -878,6 +922,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return nbttagcompound;
         }
+
     }
 
     private static class DataInspectorItem extends DataInspectorTagged {
@@ -896,6 +941,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return nbttagcompound;
         }
+
     }
 
     private static class DataConverterMaterialId implements DataConverter {
@@ -1296,6 +1342,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterBanner implements DataConverter {
@@ -1342,6 +1389,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterPotionId implements DataConverter {
@@ -1619,7 +1667,15 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
     private static class DataConverterMinecart implements DataConverter {
 
-        private static final List<String> a = Lists.newArrayList("MinecartRideable", "MinecartChest", "MinecartFurnace", "MinecartTNT", "MinecartSpawner", "MinecartHopper", "MinecartCommandBlock");
+        private static final List<String> a = Lists.newArrayList(
+                "MinecartRideable",
+                "MinecartChest",
+                "MinecartFurnace",
+                "MinecartTNT",
+                "MinecartSpawner",
+                "MinecartHopper",
+                "MinecartCommandBlock"
+        );
 
         DataConverterMinecart() {
         }
@@ -1643,6 +1699,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterMobSpawner implements DataConverter {
@@ -1687,6 +1744,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
                 return cmp;
             }
         }
+
     }
 
     private static class DataConverterUUID implements DataConverter {
@@ -1705,11 +1763,47 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterHealth implements DataConverter {
 
-        private static final Set<String> a = Sets.newHashSet("ArmorStand", "Bat", "Blaze", "CaveSpider", "Chicken", "Cow", "Creeper", "EnderDragon", "Enderman", "Endermite", "EntityHorse", "Ghast", "Giant", "Guardian", "LavaSlime", "MushroomCow", "Ozelot", "Pig", "PigZombie", "Rabbit", "Sheep", "Shulker", "Silverfish", "Skeleton", "Slime", "SnowMan", "Spider", "Squid", "Villager", "VillagerGolem", "Witch", "WitherBoss", "Wolf", "Zombie");
+        private static final Set<String> a = Sets.newHashSet(
+                "ArmorStand",
+                "Bat",
+                "Blaze",
+                "CaveSpider",
+                "Chicken",
+                "Cow",
+                "Creeper",
+                "EnderDragon",
+                "Enderman",
+                "Endermite",
+                "EntityHorse",
+                "Ghast",
+                "Giant",
+                "Guardian",
+                "LavaSlime",
+                "MushroomCow",
+                "Ozelot",
+                "Pig",
+                "PigZombie",
+                "Rabbit",
+                "Sheep",
+                "Shulker",
+                "Silverfish",
+                "Skeleton",
+                "Slime",
+                "SnowMan",
+                "Spider",
+                "Squid",
+                "Villager",
+                "VillagerGolem",
+                "Witch",
+                "WitherBoss",
+                "Wolf",
+                "Zombie"
+        );
 
         DataConverterHealth() {
         }
@@ -1738,6 +1832,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterSaddle implements DataConverter {
@@ -1762,6 +1857,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterHanging implements DataConverter {
@@ -1800,6 +1896,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterDropChances implements DataConverter {
@@ -1823,13 +1920,15 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             if (cmp.contains("ArmorDropChances", 9)) {
                 nbttaglist = cmp.getList("ArmorDropChances", 5);
-                if (nbttaglist.size() == 4 && nbttaglist.getFloat(0) == 0.0F && nbttaglist.getFloat(1) == 0.0F && nbttaglist.getFloat(2) == 0.0F && nbttaglist.getFloat(3) == 0.0F) {
+                if (nbttaglist.size() == 4 && nbttaglist.getFloat(0) == 0.0F && nbttaglist.getFloat(1) == 0.0F && nbttaglist.getFloat(
+                        2) == 0.0F && nbttaglist.getFloat(3) == 0.0F) {
                     cmp.remove("ArmorDropChances");
                 }
             }
 
             return cmp;
         }
+
     }
 
     private static class DataConverterRiding implements DataConverter {
@@ -1865,6 +1964,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
             nbttagcompound.remove("Riding");
             return nbttagcompound1;
         }
+
     }
 
     private static class DataConverterBook implements DataConverter {
@@ -1933,6 +2033,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterCookedFish implements DataConverter {
@@ -1953,6 +2054,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterZombie implements DataConverter {
@@ -1995,6 +2097,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         private int convert(int i) {
             return i >= 0 && i < 6 ? i : -1;
         }
+
     }
 
     private static class DataConverterVBO implements DataConverter {
@@ -2010,6 +2113,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
             cmp.putString("useVbo", "true");
             return cmp;
         }
+
     }
 
     private static class DataConverterGuardian implements DataConverter {
@@ -2032,6 +2136,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterSkeleton implements DataConverter {
@@ -2060,6 +2165,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterZombieType implements DataConverter {
@@ -2098,6 +2204,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterHorse implements DataConverter {
@@ -2140,6 +2247,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterTileEntity implements DataConverter {
@@ -2302,7 +2410,8 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         public net.minecraft.nbt.CompoundTag convert(net.minecraft.nbt.CompoundTag cmp) {
             String s = cmp.getString("id");
 
-            if ("minecraft:potion".equals(s) || "minecraft:splash_potion".equals(s) || "minecraft:lingering_potion".equals(s) || "minecraft:tipped_arrow".equals(s)) {
+            if ("minecraft:potion".equals(s) || "minecraft:splash_potion".equals(s) || "minecraft:lingering_potion".equals(s) || "minecraft:tipped_arrow".equals(
+                    s)) {
                 net.minecraft.nbt.CompoundTag nbttagcompound1 = cmp.getCompound("tag");
 
                 if (!nbttagcompound1.contains("Potion", 8)) {
@@ -2316,6 +2425,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterShulker implements DataConverter {
@@ -2334,11 +2444,12 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterShulkerBoxItem implements DataConverter {
 
-        public static final String[] a = new String[] { "minecraft:white_shulker_box", "minecraft:orange_shulker_box", "minecraft:magenta_shulker_box", "minecraft:light_blue_shulker_box", "minecraft:yellow_shulker_box", "minecraft:lime_shulker_box", "minecraft:pink_shulker_box", "minecraft:gray_shulker_box", "minecraft:silver_shulker_box", "minecraft:cyan_shulker_box", "minecraft:purple_shulker_box", "minecraft:blue_shulker_box", "minecraft:brown_shulker_box", "minecraft:green_shulker_box", "minecraft:red_shulker_box", "minecraft:black_shulker_box" };
+        public static final String[] a = new String[]{"minecraft:white_shulker_box", "minecraft:orange_shulker_box", "minecraft:magenta_shulker_box", "minecraft:light_blue_shulker_box", "minecraft:yellow_shulker_box", "minecraft:lime_shulker_box", "minecraft:pink_shulker_box", "minecraft:gray_shulker_box", "minecraft:silver_shulker_box", "minecraft:cyan_shulker_box", "minecraft:purple_shulker_box", "minecraft:blue_shulker_box", "minecraft:brown_shulker_box", "minecraft:green_shulker_box", "minecraft:red_shulker_box", "minecraft:black_shulker_box"};
 
         DataConverterShulkerBoxItem() {
         }
@@ -2375,6 +2486,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterShulkerBoxBlock implements DataConverter {
@@ -2393,6 +2505,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterLang implements DataConverter {
@@ -2411,6 +2524,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterTotem implements DataConverter {
@@ -2429,6 +2543,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterBedBlock implements DataConverter {
@@ -2476,6 +2591,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterBedItem implements DataConverter {
@@ -2494,12 +2610,14 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataConverterSignText implements DataConverter {
 
         public static final Gson a = new GsonBuilder().registerTypeAdapter(Component.class, new JsonDeserializer() {
-            MutableComponent a(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
+            MutableComponent a(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws
+                    JsonParseException {
                 if (jsonelement.isJsonPrimitive()) {
                     return new TextComponent(jsonelement.getAsString());
                 } else if (jsonelement.isJsonArray()) {
@@ -2509,7 +2627,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
                     while (iterator.hasNext()) {
                         JsonElement jsonelement1 = (JsonElement) iterator.next();
-                        MutableComponent ichatbasecomponent1 = this.a(jsonelement1, jsonelement1.getClass(), jsondeserializationcontext);
+                        MutableComponent ichatbasecomponent1 = this.a(
+                                jsonelement1,
+                                jsonelement1.getClass(),
+                                jsondeserializationcontext
+                        );
 
                         if (ichatbasecomponent == null) {
                             ichatbasecomponent = ichatbasecomponent1;
@@ -2524,7 +2646,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
                 }
             }
 
-            public Object deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
+            public Object deserialize(
+                    JsonElement jsonelement,
+                    Type type,
+                    JsonDeserializationContext jsondeserializationcontext
+            ) throws JsonParseException {
                 return this.a(jsonelement, type, jsondeserializationcontext);
             }
         }).create();
@@ -2590,9 +2716,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             nbttagcompound.putString(s, Component.Serializer.toJson(object));
         }
+
     }
 
     private static class DataInspectorPlayerVehicle implements DataInspector {
+
         @Override
         public net.minecraft.nbt.CompoundTag inspect(net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer) {
             if (cmp.contains("RootVehicle", 10)) {
@@ -2605,9 +2733,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorLevelPlayer implements DataInspector {
+
         @Override
         public net.minecraft.nbt.CompoundTag inspect(net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer) {
             if (cmp.contains("Player", 10)) {
@@ -2616,9 +2746,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorStructure implements DataInspector {
+
         @Override
         public net.minecraft.nbt.CompoundTag inspect(net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer) {
             net.minecraft.nbt.ListTag nbttaglist;
@@ -2649,9 +2781,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorChunks implements DataInspector {
+
         @Override
         public net.minecraft.nbt.CompoundTag inspect(net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer) {
             if (cmp.contains("Level", 10)) {
@@ -2663,7 +2797,15 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
                     nbttaglist = nbttagcompound1.getList("Entities", 10);
 
                     for (j = 0; j < nbttaglist.size(); ++j) {
-                        nbttaglist.set(j, convert(LegacyType.ENTITY, (net.minecraft.nbt.CompoundTag) nbttaglist.get(j), sourceVer, targetVer));
+                        nbttaglist.set(
+                                j,
+                                convert(
+                                        LegacyType.ENTITY,
+                                        (net.minecraft.nbt.CompoundTag) nbttaglist.get(j),
+                                        sourceVer,
+                                        targetVer
+                                )
+                        );
                     }
                 }
 
@@ -2671,16 +2813,26 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
                     nbttaglist = nbttagcompound1.getList("TileEntities", 10);
 
                     for (j = 0; j < nbttaglist.size(); ++j) {
-                        nbttaglist.set(j, convert(LegacyType.BLOCK_ENTITY, (net.minecraft.nbt.CompoundTag) nbttaglist.get(j), sourceVer, targetVer));
+                        nbttaglist.set(
+                                j,
+                                convert(
+                                        LegacyType.BLOCK_ENTITY,
+                                        (net.minecraft.nbt.CompoundTag) nbttaglist.get(j),
+                                        sourceVer,
+                                        targetVer
+                                )
+                        );
                     }
                 }
             }
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorEntityPassengers implements DataInspector {
+
         @Override
         public net.minecraft.nbt.CompoundTag inspect(net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer) {
             if (cmp.contains("Passengers", 9)) {
@@ -2693,9 +2845,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorPlayer implements DataInspector {
+
         @Override
         public net.minecraft.nbt.CompoundTag inspect(net.minecraft.nbt.CompoundTag cmp, int sourceVer, int targetVer) {
             convertItems(cmp, "Inventory", sourceVer, targetVer);
@@ -2710,9 +2864,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorVillagers implements DataInspector {
+
         ResourceLocation entityVillager = getKey("EntityVillager");
 
         @Override
@@ -2736,9 +2892,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorMobSpawnerMinecart implements DataInspector {
+
         ResourceLocation entityMinecartMobSpawner = getKey("EntityMinecartMobSpawner");
         ResourceLocation tileEntityMobSpawner = getKey("TileEntityMobSpawner");
 
@@ -2753,9 +2911,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorMobSpawnerMobs implements DataInspector {
+
         ResourceLocation tileEntityMobSpawner = getKey("TileEntityMobSpawner");
 
         @Override
@@ -2776,9 +2936,11 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
 
     private static class DataInspectorCommandBlock implements DataInspector {
+
         ResourceLocation tileEntityCommand = getKey("TileEntityCommand");
 
         @Override
@@ -2791,5 +2953,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
 
             return cmp;
         }
+
     }
+
 }

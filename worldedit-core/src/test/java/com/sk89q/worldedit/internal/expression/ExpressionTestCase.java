@@ -45,4 +45,5 @@ public class ExpressionTestCase {
     public String toString() {
         return expression + " -> " + result;
     }
+
 }
