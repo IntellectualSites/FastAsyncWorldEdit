@@ -4,6 +4,7 @@ import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
+import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -161,12 +162,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
             chunkProviderField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "c"));
             chunkProviderField.setAccessible(true);
-
-            // TODO: chunkSource in ServerLevel.java is final - regen not working therefor - VarHandle throws
-            //  IllegalAccessException
-            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(Field.class, MethodHandles.lookup());
-            VarHandle modifiers = lookup.findVarHandle(Field.class, "modifiers", int.class);
-            modifiers.set(chunkProviderField, chunkProviderField.getModifiers() & ~Modifier.FINAL);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -338,8 +333,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 return getProtoChunkAt(x, z);
             }
         };
-        chunkProviderField.set(freshWorld, freshChunkProvider);
 
+        ReflectionUtils.unsafeSet(chunkProviderField, freshWorld, freshChunkProvider);
         //let's start then
         structureManager = server.getStructureManager();
         threadedLevelLightEngine = freshChunkProvider.getLightEngine();
