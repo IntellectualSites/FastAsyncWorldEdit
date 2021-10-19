@@ -465,10 +465,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         areaLazyField.setAccessible(true);
         Method initAreaFactoryMethod = Layers.class.getDeclaredMethod(
                 Refraction.pickName("getDefaultLayer", "a"),
-                long.class,
                 boolean.class,
                 int.class,
-                int.class
+                int.class,
+                LongFunction.class
         );
         initAreaFactoryMethod.setAccessible(true);
 
