@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.google.common.collect.ImmutableList;
-import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
@@ -229,13 +228,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             }
 
             if (fixer != null && t != null) {
-                //FAWE start
-                t = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
-                        DataFixer.FixTypes.BLOCK_ENTITY,
-                        t.asBinaryTag(),
-                        -1
-                ));
-                //FAWE end
+                t = fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, t, -1);
             }
 
             BlockVector3 vec = BlockVector3.at(x, y, z);
@@ -296,11 +289,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                 if (tag instanceof CompoundTag) {
                     CompoundTag compound = (CompoundTag) tag;
                     if (fixer != null) {
-                        compound = (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
-                                DataFixer.FixTypes.ENTITY,
-                                compound.asBinaryTag(),
-                                -1
-                        ));
+                        compound = fixer.fixUp(DataFixer.FixTypes.ENTITY, compound, -1);
                     }
                     String id = convertEntityId(compound.getString("id"));
                     Location location = NBTConversions.toLocation(

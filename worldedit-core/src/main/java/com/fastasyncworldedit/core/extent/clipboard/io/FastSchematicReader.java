@@ -9,7 +9,6 @@ import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
 import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
-import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
@@ -27,7 +26,6 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -106,18 +104,18 @@ public class FastSchematicReader extends NBTSchematicReader {
         return fixer.fixUp(DataFixer.FixTypes.BLOCK_STATE, palettePart, dataVersion);
     }
 
-    private CompoundBinaryTag fixBlockEntity(CompoundTag tag) {
+    private CompoundTag fixBlockEntity(CompoundTag tag) {
         if (fixer == null || dataVersion == -1) {
-            return tag.asBinaryTag();
+            return tag;
         }
-        return fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, tag.asBinaryTag(), dataVersion);
+        return fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, tag, dataVersion);
     }
 
-    private CompoundBinaryTag fixEntity(CompoundTag tag) {
+    private CompoundTag fixEntity(CompoundTag tag) {
         if (fixer == null || dataVersion == -1) {
-            return tag.asBinaryTag();
+            return tag;
         }
-        return fixer.fixUp(DataFixer.FixTypes.ENTITY, tag.asBinaryTag(), dataVersion);
+        return fixer.fixUp(DataFixer.FixTypes.ENTITY, tag, dataVersion);
     }
 
     private String fixBiome(String biomePalettePart) {
@@ -353,7 +351,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                         x,
                         y,
                         z,
-                        (CompoundTag) AdventureNBTConverter.fromAdventure(fixBlockEntity(new CompoundTag(values)))
+                        fixBlockEntity(new CompoundTag(values))
                 );
             }
         }
@@ -374,7 +372,7 @@ public class FastSchematicReader extends NBTSchematicReader {
 
                 EntityType type = EntityTypes.parse(id.getValue());
                 if (type != null) {
-                    final CompoundTag ent = (CompoundTag) AdventureNBTConverter.fromAdventure(fixEntity(new CompoundTag(value)));
+                    final CompoundTag ent = fixEntity(new CompoundTag(value));
                     BaseEntity state = new BaseEntity(type, ent);
                     Location loc = ent.getEntityLocation(clipboard);
                     if (brokenEntities) {
