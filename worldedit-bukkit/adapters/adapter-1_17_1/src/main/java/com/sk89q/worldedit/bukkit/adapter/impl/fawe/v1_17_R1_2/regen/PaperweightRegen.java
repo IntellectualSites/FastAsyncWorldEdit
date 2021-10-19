@@ -157,7 +157,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
             delegateField.setAccessible(true);
 
-            chunkProviderField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "c"));
+            chunkProviderField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "C"));
             chunkProviderField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -454,16 +454,22 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     }
 
     private BiomeSource fastOverworldBiomeSource(BiomeSource biomeSource) throws Exception {
-        Field legacyBiomeInitLayerField = OverworldBiomeSource.class.getDeclaredField("legacyBiomeInitLayer");
+        Field legacyBiomeInitLayerField = OverworldBiomeSource.class.getDeclaredField(
+                Refraction.pickName("legacyBiomeInitLayer", "i"));
         legacyBiomeInitLayerField.setAccessible(true);
-        Field largeBiomesField = OverworldBiomeSource.class.getDeclaredField("largeBiomes");
+        Field largeBiomesField = OverworldBiomeSource.class.getDeclaredField(Refraction.pickName("largeBiomes", "j"));
         largeBiomesField.setAccessible(true);
-        Field biomeRegistryField = OverworldBiomeSource.class.getDeclaredField("biomes");
+        Field biomeRegistryField = OverworldBiomeSource.class.getDeclaredField(Refraction.pickName("biomes", "k"));
         biomeRegistryField.setAccessible(true);
-        Field areaLazyField = Layer.class.getDeclaredField("area");
+        Field areaLazyField = Layer.class.getDeclaredField(Refraction.pickName("area", "b"));
         areaLazyField.setAccessible(true);
         Method initAreaFactoryMethod = Layers.class.getDeclaredMethod(
-                "getDefaultLayer", long.class, boolean.class, int.class, int.class);
+                Refraction.pickName("getDefaultLayer", "a"),
+                long.class,
+                boolean.class,
+                int.class,
+                int.class
+        );
         initAreaFactoryMethod.setAccessible(true);
 
         //init new WorldChunkManagerOverworld
