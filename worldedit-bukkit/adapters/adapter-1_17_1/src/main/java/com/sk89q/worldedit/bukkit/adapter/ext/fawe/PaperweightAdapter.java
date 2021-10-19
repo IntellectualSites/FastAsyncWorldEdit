@@ -167,7 +167,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-public final class PaperweightAdapter implements BukkitImplAdapter {
+public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft.nbt.Tag> {
 
     private final Logger logger = Logger.getLogger(getClass().getCanonicalName());
 
@@ -835,7 +835,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
      * @param foreign non-native NMS NBT structure
      * @return native WorldEdit NBT structure
      */
-    Tag toNative(net.minecraft.nbt.Tag foreign) {
+    @Override
+    public Tag toNative(net.minecraft.nbt.Tag foreign) {
         if (foreign == null) {
             return null;
         }

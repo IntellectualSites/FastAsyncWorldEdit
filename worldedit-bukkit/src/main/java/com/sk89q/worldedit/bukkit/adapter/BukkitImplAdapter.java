@@ -286,7 +286,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     }
 
     default BinaryTag toNativeBinary(T foreign) {
-        return null;
+        return toNative(foreign).asBinaryTag();
     }
 
     @Deprecated
