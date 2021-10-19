@@ -73,7 +73,9 @@ public class FaweDelegateRegionManager {
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 } finally {
-                    TaskManager.IMP.task(whenDone);
+                    if (whenDone != null) {
+                        TaskManager.IMP.task(whenDone);
+                    }
                 }
             }
         });
@@ -176,7 +178,9 @@ public class FaweDelegateRegionManager {
                         null,
                         RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE)
                 );
-                TaskManager.IMP.task(whenDone);
+                if (whenDone != null) {
+                    TaskManager.IMP.task(whenDone);
+                }
             }
         });
         return true;
@@ -239,7 +243,9 @@ public class FaweDelegateRegionManager {
                         ), null,
                         RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE)
                 );
-                TaskManager.IMP.task(whenDone);
+                if (whenDone != null) {
+                    TaskManager.IMP.task(whenDone);
+                }
             }
         });
     }
@@ -266,7 +272,9 @@ public class FaweDelegateRegionManager {
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }
-                TaskManager.IMP.task(whenDone);
+                if (whenDone != null) {
+                    TaskManager.IMP.task(whenDone);
+                }
             }
         });
     }
@@ -317,7 +325,9 @@ public class FaweDelegateRegionManager {
                     e.printStackTrace();
                 }
             }
-            TaskManager.IMP.task(whenDone);
+            if (whenDone != null) {
+                TaskManager.IMP.task(whenDone);
+            }
         });
         return true;
     }
@@ -339,7 +349,9 @@ public class FaweDelegateRegionManager {
                     editSession.regenerate(region);
                     editSession.flushQueue();
                 }
-                TaskManager.IMP.task(whenDone);
+                if (whenDone != null) {
+                    TaskManager.IMP.task(whenDone);
+                }
             }
         });
         return true;

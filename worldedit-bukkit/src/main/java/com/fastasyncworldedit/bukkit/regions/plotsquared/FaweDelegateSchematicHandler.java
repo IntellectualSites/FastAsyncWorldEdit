@@ -70,7 +70,9 @@ public class FaweDelegateSchematicHandler {
                 whenDone.value = false;
             }
             if (schematic == null) {
-                TaskManager.runTask(whenDone);
+                if (whenDone != null) {
+                    TaskManager.runTask(whenDone);
+                }
                 return;
             }
             BlockVector3 dimension = schematic.getClipboard().getDimensions();
@@ -82,7 +84,9 @@ public class FaweDelegateSchematicHandler {
             if (((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
                     (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
                     > 256)) {
-                TaskManager.runTask(whenDone);
+                if (whenDone != null) {
+                    TaskManager.runTask(whenDone);
+                }
                 return;
             }
             // Calculate the optimal height to paste the schematic at
@@ -121,7 +125,9 @@ public class FaweDelegateSchematicHandler {
                 clipboard.paste(editSession, to, true, false, true);
                 if (whenDone != null) {
                     whenDone.value = true;
-                    TaskManager.runTask(whenDone);
+                    if (whenDone != null) {
+                        TaskManager.runTask(whenDone);
+                    }
                 }
             }
         };
@@ -175,7 +181,9 @@ public class FaweDelegateSchematicHandler {
     public void upload(final CompoundTag tag, final UUID uuid, final String file, final RunnableVal<URL> whenDone) {
         if (tag == null) {
             LOGGER.warn("Cannot save empty tag");
-            com.plotsquared.core.util.task.TaskManager.runTask(whenDone);
+            if (whenDone != null) {
+                TaskManager.runTask(whenDone);
+            }
             return;
         }
         final CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
