@@ -6,7 +6,7 @@ import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismat
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.fastasyncworldedit.core.math.IntTriple;
 import com.fastasyncworldedit.core.util.MainUtil;
-import com.fastasyncworldedit.core.util.UnsafeUtility;
+import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
@@ -332,7 +332,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         if (cb == null || !cb.isDirect()) {
             return;
         }
-        UnsafeUtility.getUNSAFE().invokeCleaner(cb);
+        ReflectionUtils.getUnsafe().invokeCleaner(cb);
     }
 
     @Override

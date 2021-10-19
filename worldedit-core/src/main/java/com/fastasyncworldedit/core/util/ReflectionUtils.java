@@ -12,6 +12,9 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Comparator;
 
+/**
+ * This is an internal class not meant to be used outside the FAWE internals.
+ */
 public class ReflectionUtils {
 
     private static Unsafe UNSAFE;
@@ -134,5 +137,11 @@ public class ReflectionUtils {
         UNSAFE.putObject(base, UNSAFE.objectFieldOffset(field), value);
     }
 
+    /**
+     * @return an instance of {@link Unsafe}
+     */
+    public static Unsafe getUnsafe() {
+        return UNSAFE;
+    }
 
 }
