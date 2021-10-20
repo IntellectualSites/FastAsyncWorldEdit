@@ -298,7 +298,10 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
     }
 
     default T fromNativeBinary(BinaryTag foreign) {
-        return null;
+        if (foreign == null) {
+            return null;
+        }
+        return fromNative(AdventureNBTConverter.fromAdventure(foreign));
     }
 
     @Nullable

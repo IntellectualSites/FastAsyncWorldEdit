@@ -909,6 +909,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      * @param foreign structure to convert
      * @return non-native structure
      */
+    @Override
     public net.minecraft.nbt.Tag fromNative(Tag foreign) {
         if (foreign == null) {
             return null;
