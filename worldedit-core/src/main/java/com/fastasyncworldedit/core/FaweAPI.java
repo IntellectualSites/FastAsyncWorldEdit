@@ -152,10 +152,22 @@ public class FaweAPI {
     }
 
     /**
-     * Get a player's allowed WorldEdit region.
+     * Get a player's allowed WorldEdit region(s).
      */
     public static Region[] getRegions(Player player) {
         return WEManager.IMP.getMask(player);
+    }
+
+    /**
+     * Get a player's allowed WorldEdit region(s).
+     *
+     * @param player      Player to get mask of
+     * @param type        Mask type; whether to check if the player is an owner of a member of the regions
+     * @param isWhiteList If searching for whitelist or blacklist regions. True if whitelist
+     * @return array of allowed regions if whitelist, else of disallowed regions.
+     */
+    public static Region[] getRegions(Player player, FaweMaskManager.MaskType type, boolean isWhiteList) {
+        return WEManager.IMP.getMask(player, type, isWhiteList);
     }
 
     /**

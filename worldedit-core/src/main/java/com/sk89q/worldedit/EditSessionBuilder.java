@@ -86,6 +86,7 @@ public final class EditSessionBuilder {
     private FaweLimit limit;
     private AbstractChangeSet changeSet;
     private Region[] allowedRegions;
+    private Region[] disallowedRegions;
     private Boolean fastMode;
     private Boolean checkMemory;
     private Boolean combineStages;
@@ -342,6 +343,34 @@ public final class EditSessionBuilder {
     }
 
     /**
+     * Set the regions the edit is allowed to operate in. Set to null for the regions to be calculated based on the actor if
+     * present
+     */
+    public EditSessionBuilder disallowedRegions(@Nullable Region[] disallowedRegions) {
+        this.disallowedRegions = disallowedRegions;
+        return setDirty();
+    }
+
+    /**
+     * Set the regions the edit is allowed to operate in. Set to null for the regions to be calculated based on the actor if
+     * present
+     */
+    @Deprecated
+    public EditSessionBuilder disallowedRegions(@Nullable RegionWrapper[] disallowedRegions) {
+        this.disallowedRegions = disallowedRegions;
+        return setDirty();
+    }
+
+    /**
+     * Set the region the edit is allowed to operate in. Set to null for the regions to be calculated based on the actor if
+     * present
+     */
+    public EditSessionBuilder disallowedRegions(@Nullable RegionWrapper disallowedRegion) {
+        this.disallowedRegions = disallowedRegion == null ? null : disallowedRegion.toArray();
+        return setDirty();
+    }
+
+    /**
      * Set the edit to be allowed to edit everywhere
      */
     public EditSessionBuilder allowedRegionsEverywhere() {
@@ -511,23 +540,33 @@ public final class EditSessionBuilder {
                 if (actor != null && !actor.hasPermission("fawe.bypass") && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player) {
                         Player player = (Player) actor;
-                        allowedRegions = player.getCurrentRegions();
+                        allowedRegions = player.getAllowedRegions();
+                    }
+                }
+            }
+            if (disallowedRegions == null && Settings.IMP.REGION_RESTRICTIONS && Settings.IMP.REGION_RESTRICTIONS_OPTIONS.ALLOW_BLACKLISTS) {
+                if (actor != null && !actor.hasPermission("fawe.bypass") && !actor.hasPermission("fawe.bypass.regions")) {
+                    if (actor instanceof Player) {
+                        Player player = (Player) actor;
+                        disallowedRegions = player.getDisallowedRegions();
                     }
                 }
             }
             FaweRegionExtent regionExtent = null;
-            if (allowedRegions != null) {
+            if (disallowedRegions != null) { // Always use MultiRegionExtent if we have blacklist regions
+                regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, disallowedRegions);
+            } else if (allowedRegions == null) {
+                allowedRegions = new Region[]{RegionWrapper.GLOBAL()};
+            } else {
                 if (allowedRegions.length == 0) {
                     regionExtent = new NullExtent(this.extent, FaweCache.NO_REGION);
                 } else {
                     if (allowedRegions.length == 1) {
                         regionExtent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
                     } else {
-                        regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions);
+                        regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, disallowedRegions);
                     }
                 }
-            } else {
-                allowedRegions = new Region[]{RegionWrapper.GLOBAL()};
             }
             // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks
             if (placeChunks) {

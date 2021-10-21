@@ -391,7 +391,7 @@ public class EditSessionBuilder {
             }
             if (allowedRegions == null) {
                 if (player != null && !player.hasPermission("fawe.bypass") && !player.hasPermission("fawe.bypass.regions")) {
-                    allowedRegions = player.getCurrentRegions();
+                    allowedRegions = player.getAllowedRegions();
                 }
             }
             FaweRegionExtent regionExtent = null;
@@ -402,7 +402,7 @@ public class EditSessionBuilder {
                     if (allowedRegions.length == 1) {
                         regionExtent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
                     } else {
-                        regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions);
+                        regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, null);
                     }
                 }
             } else {
