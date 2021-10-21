@@ -30,14 +30,14 @@ public abstract class FaweMaskManager {
      */
     @Deprecated(forRemoval = true)
     public FaweMask getMask(final Player player, MaskType type) {
-        return null;
+        return getMask(player, type, true);
     }
 
     /**
      * Get a {@link FaweMask} for the given player and {@link MaskType}. If isWhitelist is false, will return a "blacklist" mask.
      */
     public FaweMask getMask(final Player player, MaskType type, boolean isWhitelist) {
-        return null;
+        return getMask(player, type);
     }
 
     /**
