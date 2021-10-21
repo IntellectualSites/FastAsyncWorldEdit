@@ -608,11 +608,22 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public int getInternalBiomeId(BiomeType biomeType) {
-        Biome biomeBase = CraftBlock.biomeToBiomeBase(
-                MinecraftServer.getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY),
-                BukkitAdapter.adapt(biomeType)
-        );
-        return MinecraftServer.getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).getId(biomeBase);
+        if (biomeType.getId().startsWith("minecraft:")) {
+            Biome biomeBase = CraftBlock.biomeToBiomeBase(
+                    MinecraftServer.getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY),
+                    BukkitAdapter.adapt(biomeType)
+            );
+            return MinecraftServer.getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).getId(biomeBase);
+        } else {
+            WritableRegistry<Biome> biomeRegistry = MinecraftServer.getServer().registryAccess()
+                    .ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
+
+            ResourceLocation resourceLocation = biomeRegistry.keySet().stream()
+                    .filter(resource -> resource.toString().equals(biomeType.getId()))
+                    .findAny().orElse(null);
+
+            return biomeRegistry.getId(biomeRegistry.get(resourceLocation));
+        }
     }
 
     @Override
