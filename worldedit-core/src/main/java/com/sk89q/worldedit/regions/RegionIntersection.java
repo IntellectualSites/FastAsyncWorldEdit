@@ -30,12 +30,11 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -58,7 +57,7 @@ public class RegionIntersection extends AbstractRegion {
      *
      * @param regions a list of regions, which is copied
      */
-    public RegionIntersection(List<Region> regions) {
+    public RegionIntersection(Collection<Region> regions) {
         this(null, regions);
     }
 
@@ -77,7 +76,7 @@ public class RegionIntersection extends AbstractRegion {
      * @param world   the world
      * @param regions a list of regions, which is copied
      */
-    public RegionIntersection(World world, List<Region> regions) {
+    public RegionIntersection(World world, Collection<Region> regions) {
         super(world);
         checkNotNull(regions);
         checkArgument(!regions.isEmpty(), "empty region list is not supported");
@@ -174,9 +173,22 @@ public class RegionIntersection extends AbstractRegion {
     }
 
     @Override
-    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        // Doesn't need to do anything
-        return CompletableFuture.completedFuture(set);
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set, boolean asBlacklist) {
+        if (!asBlacklist) {
+            return processSet(chunk, get, set);
+        }
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+        for (Region region : regions) {
+            BlockVector3 regMin = region.getMinimumPoint();
+            BlockVector3 regMax = region.getMaximumPoint();
+            if (tx >= regMin.getX() && bx <= regMax.getX() && tz >= regMin.getZ() && bz <= regMax.getZ()) {
+                return region.processSet(chunk, get, set, true);
+            }
+        }
+        return set; // default return set as no "blacklist" regions contained the chunk
     }
 
     public List<Region> getRegions() {

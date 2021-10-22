@@ -748,13 +748,13 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             if (minY <= set.getMinSectionPosition() << 4 && maxY >= (set.getMaxSectionPosition() << 4) + 15) {
                 return set;
             }
-            trimY(set, minY, maxY);
+            trimY(set, minY, maxY, true);
             trimNBT(set, this::contains);
             return set;
         }
         if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
             if (minY > set.getMinSectionPosition() << 4 || maxY < (set.getMaxSectionPosition() << 4) + 15) {
-                trimY(set, minY, maxY);
+                trimY(set, minY, maxY, true);
             }
             final int lowerX = Math.max(0, minX - bx);
             final int upperX = Math.min(15, 15 + maxX - tx);
@@ -769,50 +769,127 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
             for (int layer = get.getMinSectionPosition(); layer < get.getMaxSectionPosition(); layer++) {
-                if (set.hasSection(layer)) {
-                    char[] arr = Objects.requireNonNull(set.loadIfPresent(layer)); // This shouldn't be null if above is true
-                    if (trimX || trimZ) {
-                        int indexY = 0;
-                        for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
-                            int index;
-                            if (trimZ) {
-                                index = indexY;
-                                for (int z = 0; z < lowerZ; z++) {
-                                    // null the z values
-                                    for (int x = 0; x < 16; x++, index++) {
-                                        arr[index] = 0;
-                                    }
-                                }
-                                index = indexY + upperZi;
-                                for (int z = upperZ + 1; z < 16; z++) {
-                                    // null the z values
-                                    for (int x = 0; x < 16; x++, index++) {
-                                        arr[index] = 0;
-                                    }
-                                }
-                            }
-                            if (trimX) {
-                                index = indexY + lowerZi;
-                                for (int z = lowerZ; z <= upperZ; z++, index += 16) {
-                                    for (int x = 0; x < lowerX; x++) {
-                                        // null the x values
-                                        arr[index + x] = 0;
-                                    }
-                                    for (int x = upperX + 1; x < 16; x++) {
-                                        // null the x values
-                                        arr[index + x] = 0;
-                                    }
-                                }
+                if (!set.hasSection(layer)) {
+                    continue;
+                }
+                char[] arr = Objects.requireNonNull(set.loadIfPresent(layer)); // This shouldn't be null if above is true
+                if (!(trimX || trimZ)) {
+                    continue;
+                }
+                int indexY = 0;
+                for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
+                    int index;
+                    if (trimZ) {
+                        index = indexY;
+                        for (int z = 0; z < lowerZ; z++) {
+                            // null the z values
+                            for (int x = 0; x < 16; x++, index++) {
+                                arr[index] = 0;
                             }
                         }
-                        set.setBlocks(layer, arr);
+                        index = indexY + upperZi;
+                        for (int z = upperZ + 1; z < 16; z++) {
+                            // null the z values
+                            for (int x = 0; x < 16; x++, index++) {
+                                arr[index] = 0;
+                            }
+                        }
+                    }
+                    if (trimX) {
+                        index = indexY + lowerZi; // Skip blocks already removed by trimZ
+                        for (int z = lowerZ; z <= upperZ; z++, index += 16) {
+                            for (int x = 0; x < lowerX; x++) {
+                                // null the x values
+                                arr[index + x] = 0;
+                            }
+                            for (int x = upperX + 1; x < 16; x++) {
+                                // null the x values
+                                arr[index + x] = 0;
+                            }
+                        }
                     }
                 }
+                set.setBlocks(layer, arr);
             }
+
             trimNBT(set, this::contains);
             return set;
         }
         return null;
+    }
+
+    @Override
+    public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set, boolean asBlacklist) {
+        if (!asBlacklist) {
+            return processSet(chunk, get, set);
+        }
+        int bx = chunk.getX() << 4;
+        int bz = chunk.getZ() << 4;
+        int tx = bx + 15;
+        int tz = bz + 15;
+
+        if (bx >= minX && tx <= maxX && bz >= minZ && tz <= maxZ) {
+            // contains all X/Z
+            int sMaxY = (set.getMaxSectionPosition() << 4) + 15;
+            int sMinY = set.getMinSectionPosition() << 4;
+            if (minY <= sMinY && maxY >= sMaxY) {
+                return null;
+            }
+            trimY(set, minY, maxY, false);
+            trimNBT(set, this::contains);
+            return set;
+        }
+        if (tx >= minX && bx <= maxX && tz >= minZ && bz <= maxZ) {
+            if (minY > set.getMinSectionPosition() << 4 || maxY < (set.getMaxSectionPosition() << 4) + 15) {
+                trimY(set, minY, maxY, false);
+            }
+            final int lowerX = Math.max(0, minX - bx);
+            final int upperX = Math.min(15, 15 + maxX - tx);
+
+            final int lowerZ = Math.max(0, minZ - bz);
+            final int upperZ = Math.min(15, 15 + maxZ - tz);
+
+            final int lowerZi = (lowerZ << 4);
+
+            boolean trimX = lowerX != 0 || upperX != 15;
+            boolean trimZ = lowerZ != 0 || upperZ != 15;
+
+            for (int layer = get.getMinSectionPosition(); layer < get.getMaxSectionPosition(); layer++) {
+                if (!set.hasSection(layer)) {
+                    continue;
+                }
+                char[] arr = Objects.requireNonNull(set.loadIfPresent(layer)); // This shouldn't be null if above is true
+                if (!(trimX || trimZ)) {
+                    continue;
+                }
+                int indexY = 0;
+                for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
+                    int index;
+                    if (trimZ) {
+                        index = indexY;
+                        for (int z = lowerZ; z <= upperZ; z++) {
+                            // null the z values
+                            for (int x = 0; x < 16; x++, index++) {
+                                arr[index] = 0;
+                            }
+                        }
+                    }
+                    if (trimX) {
+                        index = indexY + lowerZi; // Skip blocks already removed by trimZ
+                        for (int z = lowerZ; z <= upperZ; z++, index += 16) {
+                            for (int x = lowerX; x <= upperX; x++) {
+                                // null the x values
+                                arr[index + x] = 0;
+                            }
+                        }
+                    }
+                }
+                set.setBlocks(layer, arr);
+            }
+            trimNBT(set, bv3 -> !this.contains(bv3));
+            return set;
+        }
+        return set;
     }
     //FAWE end
 

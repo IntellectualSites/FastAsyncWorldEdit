@@ -44,7 +44,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
                 new FaweTrim();
             }
-            // TODO: revisit this later on - when?
+            // TODO: revisit this later on
             /*
             if (MainCommand.getInstance().getCommand("generatebiome") == null) {
                 new PlotSetBiome();
@@ -60,10 +60,6 @@ public class PlotSquaredFeature extends FaweMaskManager {
             log.debug("You need to update PlotSquared to access the CFI and REPLACEALL commands");
         }
         */
-    }
-
-    public static String getName(UUID uuid) {
-        return UUIDHandler.getName(uuid);
     }
 
     public boolean isAllowed(Player player, Plot plot, MaskType type) {
@@ -181,15 +177,6 @@ public class PlotSquaredFeature extends FaweMaskManager {
                 return isAllowed(player, finalPlot, type);
             }
         };
-    }
-
-    @Override
-    public RegionFilter getFilter(String world) {
-        PlotArea area = PlotSquared.get().getPlotAreaManager().getPlotArea(world, null);
-        if (area != null) {
-            return new PlotRegionFilter(area);
-        }
-        return null;
     }
 
 }

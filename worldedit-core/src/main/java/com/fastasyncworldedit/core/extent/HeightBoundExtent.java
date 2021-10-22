@@ -50,7 +50,7 @@ public class HeightBoundExtent extends FaweRegionExtent {
 
     @Override
     public IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        if (trimY(set, min, max) | trimNBT(set, this::contains)) {
+        if (trimY(set, min, max, true) | trimNBT(set, this::contains)) {
             return set;
         }
         return null;

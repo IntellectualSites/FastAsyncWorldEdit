@@ -348,11 +348,45 @@ public interface Player extends Entity, Actor {
     <B extends BlockStateHolder<B>> void sendFakeBlock(BlockVector3 pos, @Nullable B block);
 
     //FAWE start
-    Region[] getCurrentRegions();
+    /**
+     * Get the player's current allowed WorldEdit regions.
+     *
+     * @return an array of allowed regions
+     */
+    Region[] getAllowedRegions();
 
-    Region[] getCurrentRegions(FaweMaskManager.MaskType type);
+    /**
+     * Get the player's current allowed WorldEdit regions.
+     *
+     * @param type Mask type; whether to check if the player is an owner of a member of the regions
+     * @return an array of allowed regions
+     */
+    Region[] getAllowedRegions(FaweMaskManager.MaskType type);
 
+    /**
+     * Get the player's current disallowed WorldEdit regions. Effectively a blacklist.
+     *
+     * @return an array of disallowed regions
+     */
+    Region[] getDisallowedRegions();
+
+    /**
+     * Get the player's current disallowed WorldEdit regions. Effectively a blacklist.
+     *
+     * @param type Mask type; whether to check if the player is an owner of a member of the regions
+     * @return an array of disallowed regions
+     */
+    Region[] getDisallowedRegions(FaweMaskManager.MaskType type);
+
+    /**
+     * Get the largest region in the player's allowed WorldEdit region.
+     */
     Region getLargestRegion();
+
+    /**
+     * Set a players selection and selector type to the given region
+     */
+    void setSelection(Region region);
 
     /**
      * Get the player's selection region. If the selection is defined in
@@ -365,8 +399,6 @@ public interface Player extends Entity, Actor {
     default Region getSelection() throws IncompleteRegionException {
         return getSession().getSelection(getWorld());
     }
-
-    void setSelection(Region region);
 
     /**
      * Set the player's WorldEdit selection.
