@@ -9,6 +9,7 @@ import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.StreamDelegate;
 import com.fastasyncworldedit.core.jnbt.streamer.ValueReader;
+import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.NBTInputStream;
@@ -108,14 +109,26 @@ public class FastSchematicReader extends NBTSchematicReader {
         if (fixer == null || dataVersion == -1) {
             return tag;
         }
-        return fixer.fixUp(DataFixer.FixTypes.BLOCK_ENTITY, tag, dataVersion);
+        //FAWE start - BinaryTag
+        return (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                DataFixer.FixTypes.BLOCK_ENTITY,
+                tag.asBinaryTag(),
+                dataVersion
+        ));
+        //FAWE end
     }
 
     private CompoundTag fixEntity(CompoundTag tag) {
         if (fixer == null || dataVersion == -1) {
             return tag;
         }
-        return fixer.fixUp(DataFixer.FixTypes.ENTITY, tag, dataVersion);
+        //FAWE start - BinaryTag
+        return (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+                DataFixer.FixTypes.ENTITY,
+                tag.asBinaryTag(),
+                dataVersion
+        ));
+        //FAWE end
     }
 
     private String fixBiome(String biomePalettePart) {

@@ -41,9 +41,11 @@ public interface DataFixer {
         private FixTypes() {
         }
 
-        public static FixType<CompoundTag> CHUNK = new FixType<>();
-        public static FixType<CompoundTag> BLOCK_ENTITY = new FixType<>();
-        public static FixType<CompoundTag> ENTITY = new FixType<>();
+        //FAWE start - BinaryTag
+        public static FixType<CompoundBinaryTag> CHUNK = new FixType<>();
+        public static FixType<CompoundBinaryTag> BLOCK_ENTITY = new FixType<>();
+        public static FixType<CompoundBinaryTag> ENTITY = new FixType<>();
+        //FAWE end
         public static FixType<String> BLOCK_STATE = new FixType<>();
         public static FixType<String> BIOME = new FixType<>();
         public static FixType<String> ITEM_TYPE = new FixType<>();

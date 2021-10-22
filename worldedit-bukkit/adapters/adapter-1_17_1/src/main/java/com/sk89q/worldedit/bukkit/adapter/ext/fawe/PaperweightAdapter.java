@@ -30,21 +30,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
-import com.sk89q.jnbt.ByteArrayTag;
-import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.EndTag;
-import com.sk89q.jnbt.FloatTag;
-import com.sk89q.jnbt.IntArrayTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.LongArrayTag;
-import com.sk89q.jnbt.LongTag;
-import com.sk89q.jnbt.NBTConstants;
-import com.sk89q.jnbt.ShortTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -70,7 +56,20 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.ByteArrayBinaryTag;
+import com.sk89q.worldedit.util.nbt.ByteBinaryTag;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.DoubleBinaryTag;
+import com.sk89q.worldedit.util.nbt.EndBinaryTag;
+import com.sk89q.worldedit.util.nbt.FloatBinaryTag;
+import com.sk89q.worldedit.util.nbt.IntArrayBinaryTag;
+import com.sk89q.worldedit.util.nbt.IntBinaryTag;
+import com.sk89q.worldedit.util.nbt.ListBinaryTag;
+import com.sk89q.worldedit.util.nbt.LongArrayBinaryTag;
+import com.sk89q.worldedit.util.nbt.LongBinaryTag;
+import com.sk89q.worldedit.util.nbt.ShortBinaryTag;
+import com.sk89q.worldedit.util.nbt.StringBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -342,7 +341,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         if (te != null) {
             net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
             readTileEntityIntoTag(te, tag); // Load data
-            return state.toBaseBlock((CompoundTag) toNative(tag));
+            //FAWE start - BinaryTag
+            return state.toBaseBlock((CompoundBinaryTag) toNativeBinary(tag));
+            //FAWE end
         }
 
         return state.toBaseBlock();
@@ -750,7 +751,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             if (blockEntity != null) {
                 net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
                 blockEntity.save(tag);
-                state = state.toBaseBlock(((CompoundTag) toNative(tag)));
+                //FAWE start - BinaryTag
+                state = state.toBaseBlock(((CompoundBinaryTag) toNativeBinary(tag)));
+                //FAWE end
             }
             extent.setBlock(vec, state.toBaseBlock());
             if (options.shouldRegenBiomes()) {
@@ -835,49 +838,50 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      * @param foreign non-native NMS NBT structure
      * @return native WorldEdit NBT structure
      */
+    //FAWE start - BinaryTag
     @Override
-    public Tag toNative(net.minecraft.nbt.Tag foreign) {
+    public BinaryTag toNativeBinary(net.minecraft.nbt.Tag foreign) {
         if (foreign == null) {
             return null;
         }
         if (foreign instanceof net.minecraft.nbt.CompoundTag) {
-            Map<String, Tag> values = new HashMap<>();
+            Map<String, BinaryTag> values = new HashMap<>();
             Set<String> foreignKeys = ((net.minecraft.nbt.CompoundTag) foreign).getAllKeys();
 
             for (String str : foreignKeys) {
                 net.minecraft.nbt.Tag base = ((net.minecraft.nbt.CompoundTag) foreign).get(str);
-                values.put(str, toNative(base));
+                values.put(str, toNativeBinary(base));
             }
-            return new CompoundTag(values);
+            return CompoundBinaryTag.from(values);
         } else if (foreign instanceof net.minecraft.nbt.ByteTag) {
-            return new ByteTag(((net.minecraft.nbt.ByteTag) foreign).getAsByte());
+            return ByteBinaryTag.of(((net.minecraft.nbt.ByteTag) foreign).getAsByte());
         } else if (foreign instanceof net.minecraft.nbt.ByteArrayTag) {
-            return new ByteArrayTag(((net.minecraft.nbt.ByteArrayTag) foreign).getAsByteArray());
+            return ByteArrayBinaryTag.of(((net.minecraft.nbt.ByteArrayTag) foreign).getAsByteArray());
         } else if (foreign instanceof net.minecraft.nbt.DoubleTag) {
-            return new DoubleTag(((net.minecraft.nbt.DoubleTag) foreign).getAsDouble());
+            return DoubleBinaryTag.of(((net.minecraft.nbt.DoubleTag) foreign).getAsDouble());
         } else if (foreign instanceof net.minecraft.nbt.FloatTag) {
-            return new FloatTag(((net.minecraft.nbt.FloatTag) foreign).getAsFloat());
+            return FloatBinaryTag.of(((net.minecraft.nbt.FloatTag) foreign).getAsFloat());
         } else if (foreign instanceof net.minecraft.nbt.IntTag) {
-            return new IntTag(((net.minecraft.nbt.IntTag) foreign).getAsInt());
+            return IntBinaryTag.of(((net.minecraft.nbt.IntTag) foreign).getAsInt());
         } else if (foreign instanceof net.minecraft.nbt.IntArrayTag) {
-            return new IntArrayTag(((net.minecraft.nbt.IntArrayTag) foreign).getAsIntArray());
+            return IntArrayBinaryTag.of(((net.minecraft.nbt.IntArrayTag) foreign).getAsIntArray());
         } else if (foreign instanceof net.minecraft.nbt.LongArrayTag) {
-            return new LongArrayTag(((net.minecraft.nbt.LongArrayTag) foreign).getAsLongArray());
+            return LongArrayBinaryTag.of(((net.minecraft.nbt.LongArrayTag) foreign).getAsLongArray());
         } else if (foreign instanceof net.minecraft.nbt.ListTag) {
             try {
                 return toNativeList((net.minecraft.nbt.ListTag) foreign);
             } catch (Throwable e) {
                 logger.log(Level.WARNING, "Failed to convert net.minecraft.nbt.ListTag", e);
-                return new ListTag(ByteTag.class, new ArrayList<ByteTag>());
+                return ListBinaryTag.empty();
             }
         } else if (foreign instanceof net.minecraft.nbt.LongTag) {
-            return new LongTag(((net.minecraft.nbt.LongTag) foreign).getAsLong());
+            return LongBinaryTag.of(((net.minecraft.nbt.LongTag) foreign).getAsLong());
         } else if (foreign instanceof net.minecraft.nbt.ShortTag) {
-            return new ShortTag(((net.minecraft.nbt.ShortTag) foreign).getAsShort());
+            return ShortBinaryTag.of(((net.minecraft.nbt.ShortTag) foreign).getAsShort());
         } else if (foreign instanceof net.minecraft.nbt.StringTag) {
-            return new StringTag(foreign.getAsString());
+            return StringBinaryTag.of(foreign.getAsString());
         } else if (foreign instanceof net.minecraft.nbt.EndTag) {
-            return new EndTag();
+            return EndBinaryTag.get();
         } else {
             throw new IllegalArgumentException("Don't know how to make native " + foreign.getClass().getCanonicalName());
         }
@@ -891,16 +895,14 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      * @throws SecurityException        on error
      * @throws IllegalArgumentException on error
      */
-    private ListTag toNativeList(net.minecraft.nbt.ListTag foreign) throws SecurityException, IllegalArgumentException {
-        List<Tag> values = new ArrayList<>();
-        int type = foreign.getElementType();
+    private ListBinaryTag toNativeList(net.minecraft.nbt.ListTag foreign) throws SecurityException, IllegalArgumentException {
+        ListBinaryTag.Builder values = ListBinaryTag.builder();
 
         for (net.minecraft.nbt.Tag tag : foreign) {
-            values.add(toNative(tag));
+            values.add(toNativeBinary(tag));
         }
 
-        Class<? extends Tag> cls = NBTConstants.getClassFromType(type);
-        return new ListTag(cls, values);
+        return values.build();
     }
 
     /**
@@ -910,50 +912,50 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      * @return non-native structure
      */
     @Override
-    public net.minecraft.nbt.Tag fromNative(Tag foreign) {
+    public net.minecraft.nbt.Tag fromNativeBinary(BinaryTag foreign) {
         if (foreign == null) {
             return null;
         }
-        if (foreign instanceof CompoundTag) {
+        if (foreign instanceof CompoundBinaryTag) {
             net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-            for (Map.Entry<String, Tag> entry : ((CompoundTag) foreign)
-                    .getValue().entrySet()) {
-                tag.put(entry.getKey(), fromNative(entry.getValue()));
+            for (String key : ((CompoundBinaryTag) foreign).keySet()) {
+                tag.put(key, fromNativeBinary(((CompoundBinaryTag) foreign).get(key)));
             }
             return tag;
-        } else if (foreign instanceof ByteTag) {
-            return net.minecraft.nbt.ByteTag.valueOf(((ByteTag) foreign).getValue());
-        } else if (foreign instanceof ByteArrayTag) {
-            return new net.minecraft.nbt.ByteArrayTag(((ByteArrayTag) foreign).getValue());
-        } else if (foreign instanceof DoubleTag) {
-            return net.minecraft.nbt.DoubleTag.valueOf(((DoubleTag) foreign).getValue());
-        } else if (foreign instanceof FloatTag) {
-            return net.minecraft.nbt.FloatTag.valueOf(((FloatTag) foreign).getValue());
-        } else if (foreign instanceof IntTag) {
-            return net.minecraft.nbt.IntTag.valueOf(((IntTag) foreign).getValue());
-        } else if (foreign instanceof IntArrayTag) {
-            return new net.minecraft.nbt.IntArrayTag(((IntArrayTag) foreign).getValue());
-        } else if (foreign instanceof LongArrayTag) {
-            return new net.minecraft.nbt.LongArrayTag(((LongArrayTag) foreign).getValue());
-        } else if (foreign instanceof ListTag) {
+        } else if (foreign instanceof ByteBinaryTag) {
+            return net.minecraft.nbt.ByteTag.valueOf(((ByteBinaryTag) foreign).value());
+        } else if (foreign instanceof ByteArrayBinaryTag) {
+            return new net.minecraft.nbt.ByteArrayTag(((ByteArrayBinaryTag) foreign).value());
+        } else if (foreign instanceof DoubleBinaryTag) {
+            return net.minecraft.nbt.DoubleTag.valueOf(((DoubleBinaryTag) foreign).value());
+        } else if (foreign instanceof FloatBinaryTag) {
+            return net.minecraft.nbt.FloatTag.valueOf(((FloatBinaryTag) foreign).value());
+        } else if (foreign instanceof IntBinaryTag) {
+            return net.minecraft.nbt.IntTag.valueOf(((IntBinaryTag) foreign).value());
+        } else if (foreign instanceof IntArrayBinaryTag) {
+            return new net.minecraft.nbt.IntArrayTag(((IntArrayBinaryTag) foreign).value());
+        } else if (foreign instanceof LongArrayBinaryTag) {
+            return new net.minecraft.nbt.LongArrayTag(((LongArrayBinaryTag) foreign).value());
+        } else if (foreign instanceof ListBinaryTag) {
             net.minecraft.nbt.ListTag tag = new net.minecraft.nbt.ListTag();
-            ListTag foreignList = (ListTag) foreign;
-            for (Tag t : foreignList.getValue()) {
-                tag.add(fromNative(t));
+            ListBinaryTag foreignList = (ListBinaryTag) foreign;
+            for (BinaryTag t : foreignList) {
+                tag.add(fromNativeBinary(t));
             }
             return tag;
-        } else if (foreign instanceof LongTag) {
-            return net.minecraft.nbt.LongTag.valueOf(((LongTag) foreign).getValue());
-        } else if (foreign instanceof ShortTag) {
-            return net.minecraft.nbt.ShortTag.valueOf(((ShortTag) foreign).getValue());
-        } else if (foreign instanceof StringTag) {
-            return net.minecraft.nbt.StringTag.valueOf(((StringTag) foreign).getValue());
-        } else if (foreign instanceof EndTag) {
+        } else if (foreign instanceof LongBinaryTag) {
+            return net.minecraft.nbt.LongTag.valueOf(((LongBinaryTag) foreign).value());
+        } else if (foreign instanceof ShortBinaryTag) {
+            return net.minecraft.nbt.ShortTag.valueOf(((ShortBinaryTag) foreign).value());
+        } else if (foreign instanceof StringBinaryTag) {
+            return net.minecraft.nbt.StringTag.valueOf(((StringBinaryTag) foreign).value());
+        } else if (foreign instanceof EndBinaryTag) {
             return net.minecraft.nbt.EndTag.INSTANCE;
         } else {
             throw new IllegalArgumentException("Don't know how to make NMS " + foreign.getClass().getCanonicalName());
         }
     }
+    //FAWE end
 
     @Override
     public boolean supportsWatchdog() {
