@@ -57,6 +57,17 @@ public class RegionIntersection extends AbstractRegion {
      *
      * @param regions a list of regions, which is copied
      */
+    public RegionIntersection(List<Region> regions) {
+        this(null, regions);
+    }
+
+    /**
+     * Create a new instance with the included list of regions.
+     *
+     * @param regions a list of regions, which is copied
+     * @deprecated Use {@link #RegionIntersection(List)} to match upstream
+     */
+    @Deprecated(forRemoval = true)
     public RegionIntersection(Collection<Region> regions) {
         this(null, regions);
     }
