@@ -401,11 +401,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     @Override
     protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
         // BlockPopulator#populate has to be called synchronously for TileEntity access
-        TaskManager.IMP.task(() -> blockPopulator.populate(
-                freshWorld.getWorld(),
-                random,
-                levelChunk.level.getChunk(levelChunk.locX, levelChunk.locZ).getBukkitChunk()
-        ));
+        TaskManager.IMP.task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
     }
 
     @Override
