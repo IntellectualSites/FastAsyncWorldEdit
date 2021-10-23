@@ -36,6 +36,8 @@ public @interface CommandPermissions {
      */
     String[] value() default {};
 
+    //FAWE start
     boolean queued() default true;
+    //FAWE end
 
 }

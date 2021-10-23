@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweVersion;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.intellectualsites.paster.IncendoPaster;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -98,6 +99,7 @@ public class WorldEditCommands {
         }
 
         actor.printInfo(TextComponent.of("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki"));
+        UpdateNotification.doUpdateNotification(actor);
         //FAWE end
 
         PlatformManager pm = we.getPlatformManager();
@@ -187,6 +189,7 @@ public class WorldEditCommands {
             name = "trace",
             desc = "Toggles trace hook"
     )
+    @CommandPermissions(value = "worldedit.trace", queued = false)
     void trace(
             Actor actor, LocalSession session,
             @Arg(desc = "The mode to set the trace hook to", def = "")
