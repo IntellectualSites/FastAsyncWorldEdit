@@ -21,7 +21,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
-import com.fastasyncworldedit.bukkit.util.UpdateNotification;
+import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;

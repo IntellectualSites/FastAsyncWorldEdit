@@ -1,10 +1,10 @@
-package com.fastasyncworldedit.bukkit.util;
+package com.fastasyncworldedit.core.util;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweVersion;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.sk89q.worldedit.entity.Player;
+import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
@@ -15,9 +15,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;
 
-/**
- *
- */
 public class UpdateNotification {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -63,14 +60,14 @@ public class UpdateNotification {
     /**
      * Trigger an update notification based on captions. Useful to notify server administrators ingame.
      *
-     * @param player The player to notify.
+     * @param actor The player to notify.
      */
-    public static void doUpdateNotification(Player player) {
+    public static void doUpdateNotification(Actor actor) {
         if (Settings.IMP.ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
-            if (player.hasPermission("fawe.admin") && UpdateNotification.hasUpdate) {
+            if (actor.hasPermission("fawe.admin") && UpdateNotification.hasUpdate) {
                 FaweVersion faweVersion = Fawe.get().getVersion();
                 int versionDifference = Integer.parseInt(UpdateNotification.faweVersion) - faweVersion.build;
-                player.print(Caption.of("fawe.info.update-available", versionDifference, faweVersion.toString(),
+                actor.print(Caption.of("fawe.info.update-available", versionDifference, faweVersion.toString(),
                         faweVersion.getSimpleVersionName() + "-" + UpdateNotification.faweVersion,
                         TextComponent
                                 .of("https://www.spigotmc.org/resources/13932/")
