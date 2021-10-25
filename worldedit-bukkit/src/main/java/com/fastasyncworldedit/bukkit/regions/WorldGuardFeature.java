@@ -88,13 +88,13 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
             LOGGER.info("Region capability is not enabled for that world.");
             return Collections.emptySet();
         }
-        final ProtectedRegion global = manager.getRegion("__global__");
-        // If they're allowed and it's a whitelist return, else if they're not allowed and it's a blacklist, return
-        if (global != null && isAllowed(player, global) == isWhitelist) {
-            return Collections.singleton(global);
-        }
         //Merge WorldGuardFlag
         if (isWhitelist) {
+            // Only consider global when whitelisting
+            final ProtectedRegion global = manager.getRegion("__global__");
+            if (global != null && isAllowed(player, global)) {
+                return Collections.singleton(global);
+            }
             final ApplicableRegionSet regions = manager.getApplicableRegions(BlockVector3.at(
                     location.getX(),
                     location.getY(),
@@ -119,6 +119,9 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
             final Collection<ProtectedRegion> regions = manager.getRegions().values();
             Set<ProtectedRegion> protectedRegions = new HashSet<>();
             for (ProtectedRegion region : regions) {
+                if (region.getId().equals("__global__")) {
+                    continue;
+                }
                 if (!isAllowed(player, region)) {
                     protectedRegions.add(region);
                 }
