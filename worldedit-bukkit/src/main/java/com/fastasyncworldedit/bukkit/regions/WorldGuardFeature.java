@@ -168,7 +168,7 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
                     };
                 } else {
                     if (myRegion instanceof ProtectedCuboidRegion) {
-                        result.add(new CuboidRegion(myRegion.getMaximumPoint(), myRegion.getMaximumPoint()));
+                        result.add(new CuboidRegion(myRegion.getMinimumPoint(), myRegion.getMaximumPoint()));
                     } else {
                         result.add(adapt(myRegion));
                     }
