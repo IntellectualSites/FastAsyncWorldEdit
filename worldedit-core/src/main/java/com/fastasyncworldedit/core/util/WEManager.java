@@ -147,11 +147,13 @@ public class WEManager {
                 player.printError(TextComponent.of("Missing permission " + "fawe." + manager.getKey()));
             }
         }
-        regions.addAll(backupRegions);
-        if (!masks.isEmpty() && isWhitelist) {
-            player.setMeta("lastMask", masks);
-        } else if (isWhitelist) {
-            player.deleteMeta("lastMask");
+        if (isWhitelist) {
+            regions.addAll(backupRegions);
+            if (!masks.isEmpty()) {
+                player.setMeta("lastMask", masks);
+            } else {
+                player.deleteMeta("lastMask");
+            }
         }
         return regions.toArray(new Region[0]);
     }
