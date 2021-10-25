@@ -363,7 +363,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
 
     @Override
     public void sendAnnouncements() {
-        if (WorldEditPlugin.getInstance().getLifecycledBukkitImplAdapter() == null) {
+        if (!WorldEditPlugin.getInstance().getLifecycledBukkitImplAdapter().isValid()) {
             //FAWE start - swap out EH download url with ours
             print(Caption.of(
                     "worldedit.version.bukkit.unsupported-adapter",
