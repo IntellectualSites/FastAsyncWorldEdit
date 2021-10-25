@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
@@ -324,10 +325,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 },
                 () -> server.overworld().getDataStorage()
         ) {
-            // redirect to our protoChunks list
+            // redirect to LevelChunks created in #createChunks
             @Override
             public ChunkAccess getChunk(int x, int z, ChunkStatus chunkstatus, boolean flag) {
-                return getProtoChunkAt(x, z);
+                return getChunkAt(x, z);
             }
         };
 
@@ -399,7 +400,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     @Override
     protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
-        blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.bukkitChunk);
+        // BlockPopulator#populate has to be called synchronously for TileEntity access
+        TaskManager.IMP.task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
     }
 
     @Override
