@@ -536,7 +536,7 @@ public final class EditSessionBuilder {
                     }
                 }
             }
-            if (allowedRegions == null) {
+            if (allowedRegions == null && Settings.IMP.REGION_RESTRICTIONS) {
                 if (actor != null && !actor.hasPermission("fawe.bypass") && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player) {
                         Player player = (Player) actor;
@@ -564,7 +564,7 @@ public final class EditSessionBuilder {
                     if (allowedRegions.length == 1) {
                         regionExtent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
                     } else {
-                        regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, disallowedRegions);
+                        regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, null);
                     }
                 }
             }
