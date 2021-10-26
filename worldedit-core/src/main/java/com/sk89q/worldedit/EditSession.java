@@ -532,7 +532,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @see #getLimit()
      */
     @Deprecated
-    public long getBlockChangeLimit() {
+    public int getBlockChangeLimit() {
         return originalLimit.MAX_CHANGES;
     }
 
