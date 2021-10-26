@@ -422,7 +422,7 @@ public class LocalSession implements TextureHolder {
 
         //FAWE start
         Actor actor = editSession.getActor();
-        int limit = actor == null ? Integer.MAX_VALUE : actor.getLimit().MAX_HISTORY;
+        long limit = actor == null ? Long.MAX_VALUE : actor.getLimit().MAX_HISTORY;
         remember(editSession, true, limit);
     }
 
@@ -488,7 +488,7 @@ public class LocalSession implements TextureHolder {
                 historyNegativeIndex = 0;
             }
             if (limit != null) {
-                int limitMb = limit.MAX_HISTORY;
+                long limitMb = limit.MAX_HISTORY;
                 while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
                         .size() > 1) {
                     ChangeSet item = (ChangeSet) history.remove(0);
@@ -502,7 +502,7 @@ public class LocalSession implements TextureHolder {
         }
     }
 
-    public void remember(EditSession editSession, boolean append, int limitMb) {
+    public void remember(EditSession editSession, boolean append, long limitMb) {
         historyWriteLock.lock();
         try {
             if (Settings.IMP.HISTORY.USE_DISK) {

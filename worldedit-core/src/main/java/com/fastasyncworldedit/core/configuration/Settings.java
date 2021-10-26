@@ -616,7 +616,7 @@ public class Settings extends Config {
                 );
                 limit.MAX_CHANGES = Math.max(
                         limit.MAX_CHANGES,
-                        newLimit.MAX_CHANGES != -1 ? newLimit.MAX_CHANGES : Integer.MAX_VALUE
+                        newLimit.MAX_CHANGES != -1 ? newLimit.MAX_CHANGES : Long.MAX_VALUE
                 );
                 limit.MAX_BLOCKSTATES = Math.max(
                         limit.MAX_BLOCKSTATES,
@@ -624,7 +624,7 @@ public class Settings extends Config {
                 );
                 limit.MAX_CHECKS = Math.max(
                         limit.MAX_CHECKS,
-                        newLimit.MAX_CHECKS != -1 ? newLimit.MAX_CHECKS : Integer.MAX_VALUE
+                        newLimit.MAX_CHECKS != -1 ? newLimit.MAX_CHECKS : Long.MAX_VALUE
                 );
                 limit.MAX_ENTITIES = Math.max(
                         limit.MAX_ENTITIES,
