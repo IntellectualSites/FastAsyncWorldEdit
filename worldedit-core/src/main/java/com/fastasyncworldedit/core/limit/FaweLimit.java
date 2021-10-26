@@ -13,7 +13,7 @@ public class FaweLimit {
     public int MAX_ITERATIONS = 0;
     public int MAX_BLOCKSTATES = 0;
     public int MAX_ENTITIES = 0;
-    public long MAX_HISTORY = 0;
+    public int MAX_HISTORY = 0;
     public int MAX_EXPRESSION_MS = 0;
     public int INVENTORY_MODE = Integer.MAX_VALUE;
     public int SPEED_REDUCTION = Integer.MAX_VALUE;
@@ -109,7 +109,7 @@ public class FaweLimit {
         MAX.MAX_ITERATIONS = Integer.MAX_VALUE;
         MAX.MAX_BLOCKSTATES = Integer.MAX_VALUE;
         MAX.MAX_ENTITIES = Integer.MAX_VALUE;
-        MAX.MAX_HISTORY = Long.MAX_VALUE;
+        MAX.MAX_HISTORY = Integer.MAX_VALUE;
         MAX.MAX_EXPRESSION_MS = 50;
         MAX.FAST_PLACEMENT = true;
         MAX.CONFIRM_LARGE = true;
