@@ -164,9 +164,9 @@ public class Settings extends Config {
         @Comment("Max actions that can be run concurrently (i.e. commands)")
         public int MAX_ACTIONS = 1;
         @Comment("Max number of block changes (e.g. by `//set stone`).")
-        public int MAX_CHANGES = 50000000;
+        public long MAX_CHANGES = 50000000;
         @Comment("Max number of blocks checked (e.g. `//count stone` which doesn't change blocks)")
-        public int MAX_CHECKS = 50000000;
+        public long MAX_CHECKS = 50000000;
         @Comment("Number of times a change can fail (e.g. if the player can't access that region)")
         public int MAX_FAILS = 50000000;
         @Comment("Allowed brush iterations (e.g. `//brush smooth`)")
