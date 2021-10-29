@@ -921,7 +921,7 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType GRAY_BED = init();
     @Nullable
-    public static final ItemType GREEN_CANDLE = init();
+    public static final ItemType GRAY_CANDLE = init();
     @Nullable
     public static final ItemType GRAY_CARPET = init();
     @Nullable
@@ -946,6 +946,8 @@ public final class ItemTypes {
     public static final ItemType GREEN_BANNER = init();
     @Nullable
     public static final ItemType GREEN_BED = init();
+    @Nullable
+    public static final ItemType GREEN_CANDLE = init();
     @Nullable
     public static final ItemType GREEN_CARPET = init();
     @Nullable
