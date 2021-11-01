@@ -37,7 +37,7 @@ dependencies {
     implementation(libs.log4j)
     implementation(libs.log4jCore
     )
-    implementation("commons-cli:commons-cli:1.4")
+    implementation("commons-cli:commons-cli:1.5.0")
     api(libs.parallelgzip) { isTransitive = false }
     api(libs.lz4Java)
 }
