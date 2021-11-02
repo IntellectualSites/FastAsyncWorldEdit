@@ -69,7 +69,7 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
     /**
      * Filter with a chunk object.
      */
-    public final IChunkSet filter(IChunk chunk, IChunkGet get, IChunkSet set, Filter filter) {
+    public synchronized final IChunkSet filter(IChunk chunk, IChunkGet get, IChunkSet set, Filter filter) {
         initChunk(chunk.getX(), chunk.getZ());
         for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
             if (set.hasSection(layer)) {
@@ -83,7 +83,7 @@ public abstract class ChunkFilterBlock extends AbstractExtentFilterBlock {
     /**
      * Filter a chunk with a region / filter.
      */
-    public final IChunkSet filter(IChunk chunk, IChunkGet get, IChunkSet set, Filter filter, Region region, boolean full) {
+    public synchronized final IChunkSet filter(IChunk chunk, IChunkGet get, IChunkSet set, Filter filter, Region region, boolean full) {
         if (region != null) {
             region.filter(chunk, filter, this, get, set, full);
         } else {
