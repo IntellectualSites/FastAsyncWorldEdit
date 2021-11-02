@@ -541,7 +541,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      *
      * @param limit the limit (&gt;= 0) or -1 for no limit
      */
-    public void setBlockChangeLimit(int limit) {
+    public void setBlockChangeLimit(long limit) {
         this.limit.MAX_CHANGES = limit;
     }
 
