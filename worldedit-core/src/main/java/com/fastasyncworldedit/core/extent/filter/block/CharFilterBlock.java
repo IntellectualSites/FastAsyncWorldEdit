@@ -56,7 +56,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final ChunkFilterBlock initChunk(int chunkX, int chunkZ) {
+    public synchronized final ChunkFilterBlock initChunk(int chunkX, int chunkZ) {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
         this.xx = chunkX << 4;
@@ -65,7 +65,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final ChunkFilterBlock initLayer(IBlocks iget, IChunkSet iset, int layer) {
+    public synchronized final ChunkFilterBlock initLayer(IBlocks iget, IChunkSet iset, int layer) {
         this.get = (CharGetBlocks) iget;
         minLayer = this.get.getMinSectionPosition();
         maxLayer = this.get.getMaxSectionPosition();
@@ -88,7 +88,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void flood(
+    public synchronized void flood(
             IChunkGet iget, IChunkSet iset, int layer, Flood flood,
             FilterBlockMask mask
     ) {
@@ -114,7 +114,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void filter(Filter filter, int x, int y, int z) {
+    public synchronized void filter(Filter filter, int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -123,7 +123,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void filter(Filter filter, int startY, int endY) {
+    public synchronized void filter(Filter filter, int startY, int endY) {
         for (y = startY, index = startY << 8; y <= endY; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
@@ -134,7 +134,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public void filter(Filter filter, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
+    public synchronized void filter(Filter filter, int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         int yis = minY << 8;
         int zis = minZ << 4;
         int zie = (15 - maxZ) << 4;
@@ -153,7 +153,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final void filter(Filter filter, Region region) {
+    public synchronized final void filter(Filter filter, Region region) {
         for (y = 0, index = 0; y < 16; y++) {
             int absY = yy + y;
             for (z = 0; z < 16; z++) {
@@ -169,7 +169,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
-    public final void filter(Filter filter) {
+    public synchronized final void filter(Filter filter) {
         for (y = 0, index = 0; y < 16; y++) {
             for (z = 0; z < 16; z++) {
                 for (x = 0; x < 16; x++, index++) {
