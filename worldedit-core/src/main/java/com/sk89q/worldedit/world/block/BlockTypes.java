@@ -730,9 +730,9 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType GRAY_BED = init();
     @Nullable
-    public static final BlockType GREEN_CANDLE = init();
+    public static final BlockType GRAY_CANDLE = init();
     @Nullable
-    public static final BlockType GREEN_CANDLE_CAKE = init();
+    public static final BlockType GRAY_CANDLE_CAKE = init();
     @Nullable
     public static final BlockType GRAY_CARPET = init();
     @Nullable
@@ -757,6 +757,10 @@ public final class BlockTypes {
     public static final BlockType GREEN_BANNER = init();
     @Nullable
     public static final BlockType GREEN_BED = init();
+    @Nullable
+    public static final BlockType GREEN_CANDLE = init();
+    @Nullable
+    public static final BlockType GREEN_CANDLE_CAKE = init();
     @Nullable
     public static final BlockType GREEN_CARPET = init();
     @Nullable
