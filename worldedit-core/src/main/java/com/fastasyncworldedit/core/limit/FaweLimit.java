@@ -7,9 +7,9 @@ import java.util.Set;
 public class FaweLimit {
 
     public int MAX_ACTIONS = 0;
-    public int MAX_CHANGES = 0;
+    public long MAX_CHANGES = 0;
     public int MAX_FAILS = 0;
-    public int MAX_CHECKS = 0;
+    public long MAX_CHECKS = 0;
     public int MAX_ITERATIONS = 0;
     public int MAX_BLOCKSTATES = 0;
     public int MAX_ENTITIES = 0;
@@ -103,9 +103,9 @@ public class FaweLimit {
         MAX.SPEED_REDUCTION = 0;
         MAX.INVENTORY_MODE = 0;
         MAX.MAX_ACTIONS = 1;
-        MAX.MAX_CHANGES = Integer.MAX_VALUE;
+        MAX.MAX_CHANGES = Long.MAX_VALUE;
         MAX.MAX_FAILS = Integer.MAX_VALUE;
-        MAX.MAX_CHECKS = Integer.MAX_VALUE;
+        MAX.MAX_CHECKS = Long.MAX_VALUE;
         MAX.MAX_ITERATIONS = Integer.MAX_VALUE;
         MAX.MAX_BLOCKSTATES = Integer.MAX_VALUE;
         MAX.MAX_ENTITIES = Integer.MAX_VALUE;
@@ -229,9 +229,9 @@ public class FaweLimit {
     }
 
     public boolean isUnlimited() {
-        return MAX_CHANGES == Integer.MAX_VALUE
+        return MAX_CHANGES == Long.MAX_VALUE
                 && MAX_FAILS == Integer.MAX_VALUE
-                && MAX_CHECKS == Integer.MAX_VALUE
+                && MAX_CHECKS == Long.MAX_VALUE
                 && MAX_ITERATIONS == Integer.MAX_VALUE
                 && MAX_BLOCKSTATES == Integer.MAX_VALUE
                 && MAX_ENTITIES == Integer.MAX_VALUE

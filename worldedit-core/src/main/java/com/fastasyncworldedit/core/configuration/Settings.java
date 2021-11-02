@@ -164,9 +164,9 @@ public class Settings extends Config {
         @Comment("Max actions that can be run concurrently (i.e. commands)")
         public int MAX_ACTIONS = 1;
         @Comment("Max number of block changes (e.g. by `//set stone`).")
-        public int MAX_CHANGES = 50000000;
+        public long MAX_CHANGES = 50000000;
         @Comment("Max number of blocks checked (e.g. `//count stone` which doesn't change blocks)")
-        public int MAX_CHECKS = 50000000;
+        public long MAX_CHECKS = 50000000;
         @Comment("Number of times a change can fail (e.g. if the player can't access that region)")
         public int MAX_FAILS = 50000000;
         @Comment("Allowed brush iterations (e.g. `//brush smooth`)")
@@ -616,7 +616,7 @@ public class Settings extends Config {
                 );
                 limit.MAX_CHANGES = Math.max(
                         limit.MAX_CHANGES,
-                        newLimit.MAX_CHANGES != -1 ? newLimit.MAX_CHANGES : Integer.MAX_VALUE
+                        newLimit.MAX_CHANGES != -1 ? newLimit.MAX_CHANGES : Long.MAX_VALUE
                 );
                 limit.MAX_BLOCKSTATES = Math.max(
                         limit.MAX_BLOCKSTATES,
@@ -624,7 +624,7 @@ public class Settings extends Config {
                 );
                 limit.MAX_CHECKS = Math.max(
                         limit.MAX_CHECKS,
-                        newLimit.MAX_CHECKS != -1 ? newLimit.MAX_CHECKS : Integer.MAX_VALUE
+                        newLimit.MAX_CHECKS != -1 ? newLimit.MAX_CHECKS : Long.MAX_VALUE
                 );
                 limit.MAX_ENTITIES = Math.max(
                         limit.MAX_ENTITIES,
