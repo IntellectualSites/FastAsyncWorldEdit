@@ -27,6 +27,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
+import org.enginehub.piston.exception.StopExecutionException;
 import org.enginehub.piston.inject.InjectedValueAccess;
 
 import java.util.UUID;
@@ -49,36 +50,76 @@ public class ConsumeBindings extends Bindings {
     @Binding
     @Confirm(Confirm.Processor.REGION)
     public int regionMultiple(Actor actor, InjectedValueAccess context, @Selection Region region, String argument) {
-        int times = (int) Expression.compile(argument).evaluate();
-        return Confirm.Processor.REGION.check(actor, context, times);
+        try {
+            int times = (int) Expression.compile(argument).evaluate();
+            return Confirm.Processor.REGION.check(actor, context, times);
+        } catch (Throwable t) {
+            if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
+                throw t;
+            } else {
+                throw new InputParseException(t.getMessage(), t);
+            }
+        }
     }
 
     @Binding
     @Confirm(Confirm.Processor.RADIUS)
     public Integer radiusInteger(Actor actor, InjectedValueAccess context, String argument) {
-        int times = (int) Expression.compile(argument).evaluate();
-        return Confirm.Processor.RADIUS.check(actor, context, times);
+        try {
+            int times = (int) Expression.compile(argument).evaluate();
+            return Confirm.Processor.RADIUS.check(actor, context, times);
+        } catch (Throwable t) {
+            if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
+                throw t;
+            } else {
+                throw new InputParseException(t.getMessage(), t);
+            }
+        }
     }
 
     @Binding
     @Confirm(Confirm.Processor.LIMIT)
     public Integer limitInteger(Actor actor, InjectedValueAccess context, String argument) {
-        int times = (int) Expression.compile(argument).evaluate();
-        return Confirm.Processor.LIMIT.check(actor, context, times);
+        try {
+            int times = (int) Expression.compile(argument).evaluate();
+            return Confirm.Processor.LIMIT.check(actor, context, times);
+        } catch (Throwable t) {
+            if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
+                throw t;
+            } else {
+                throw new InputParseException(t.getMessage(), t);
+            }
+        }
     }
 
     @Binding
     @Confirm(Confirm.Processor.RADIUS)
     public Double radiusDouble(Actor actor, InjectedValueAccess context, String argument) {
-        double times = Expression.compile(argument).evaluate();
-        return Confirm.Processor.RADIUS.check(actor, context, times);
+        try {
+            double times = Expression.compile(argument).evaluate();
+            return Confirm.Processor.RADIUS.check(actor, context, times);
+        } catch (Throwable t) {
+            if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
+                throw t;
+            } else {
+                throw new InputParseException(t.getMessage(), t);
+            }
+        }
     }
 
     @Binding
     @Confirm(Confirm.Processor.LIMIT)
     public Double limitDouble(Actor actor, InjectedValueAccess context, String argument) {
-        double times = Expression.compile(argument).evaluate();
-        return Confirm.Processor.LIMIT.check(actor, context, times);
+        try {
+            double times = Expression.compile(argument).evaluate();
+            return Confirm.Processor.LIMIT.check(actor, context, times);
+        } catch (Throwable t) {
+            if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
+                throw t;
+            } else {
+                throw new InputParseException(t.getMessage(), t);
+            }
+        }
     }
 
     @Binding

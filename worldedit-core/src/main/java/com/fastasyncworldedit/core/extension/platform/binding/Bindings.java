@@ -101,11 +101,15 @@ public class Bindings {
 
                 @Override
                 public ConversionResult<Object> convert(String s, InjectedValueAccess access) {
-                    Object o = invoke(s, argsFunc, access, method);
-                    if (o == null) {
-                        return FailedConversion.from(new NullPointerException());
+                    try {
+                        Object o = invoke(s, argsFunc, access, method);
+                        if (o == null) {
+                            return FailedConversion.from(new NullPointerException());
+                        }
+                        return SuccessfulConversion.fromSingle(o);
+                    } catch (Throwable t) {
+                        return FailedConversion.from(t);
                     }
-                    return SuccessfulConversion.fromSingle(o);
                 }
             });
         }
