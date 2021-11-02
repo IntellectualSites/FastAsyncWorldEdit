@@ -50,7 +50,9 @@ public class BlockReplace implements RegionFunction {
 
     @Override
     public boolean apply(BlockVector3 position) throws WorldEditException {
-        return extent.setBlock(position, pattern.applyBlock(position));
+        //FAWE start - allow extent to be used down the pipeline
+        return pattern.apply(extent, position, position);
+        //FAWE end
     }
 
 }
