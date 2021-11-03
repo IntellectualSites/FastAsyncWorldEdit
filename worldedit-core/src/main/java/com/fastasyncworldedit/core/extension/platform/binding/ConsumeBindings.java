@@ -57,7 +57,7 @@ public class ConsumeBindings extends Bindings {
             if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
                 throw t;
             } else {
-                throw new InputParseException(t.getMessage(), t);
+                throw new InputParseException(TextComponent.of(t.getMessage()), t);
             }
         }
     }
@@ -72,7 +72,7 @@ public class ConsumeBindings extends Bindings {
             if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
                 throw t;
             } else {
-                throw new InputParseException(t.getMessage(), t);
+                throw new InputParseException(TextComponent.of(t.getMessage()), t);
             }
         }
     }
@@ -87,7 +87,7 @@ public class ConsumeBindings extends Bindings {
             if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
                 throw t;
             } else {
-                throw new InputParseException(t.getMessage(), t);
+                throw new InputParseException(TextComponent.of(t.getMessage()), t);
             }
         }
     }
@@ -102,7 +102,7 @@ public class ConsumeBindings extends Bindings {
             if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
                 throw t;
             } else {
-                throw new InputParseException(t.getMessage(), t);
+                throw new InputParseException(TextComponent.of(t.getMessage()), t);
             }
         }
     }
@@ -117,7 +117,7 @@ public class ConsumeBindings extends Bindings {
             if (t instanceof StopExecutionException) { // Maintain throw from Confirm#check
                 throw t;
             } else {
-                throw new InputParseException(t.getMessage(), t);
+                throw new InputParseException(TextComponent.of(t.getMessage()), t);
             }
         }
     }
