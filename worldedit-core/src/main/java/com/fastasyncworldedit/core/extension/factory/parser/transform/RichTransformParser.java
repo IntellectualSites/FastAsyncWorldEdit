@@ -126,7 +126,7 @@ public class RichTransformParser extends FaweParser<ResettableExtent> {
                 }
             }
         } catch (Throwable e) {
-            throw new InputParseException(Caption.of(e.getMessage()), e);
+            throw new InputParseException(TextComponent.of(e.getMessage()), e);
         }
         if (!intersection.isEmpty()) {
             if (intersection.size() == 1) {

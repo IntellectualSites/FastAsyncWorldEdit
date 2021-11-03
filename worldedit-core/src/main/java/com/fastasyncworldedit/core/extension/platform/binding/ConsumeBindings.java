@@ -168,7 +168,7 @@ public class ConsumeBindings extends Bindings {
         try {
             return getWorldEdit().getBlockFactory().parseFromInput(argument, parserContext);
         } catch (NoMatchException e) {
-            throw new InputParseException(Caption.of(e.getMessage()));
+            throw new InputParseException(TextComponent.of(e.getMessage()));
         }
     }
 

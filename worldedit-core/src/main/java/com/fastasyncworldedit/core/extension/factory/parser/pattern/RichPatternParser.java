@@ -175,7 +175,7 @@ public class RichPatternParser extends FaweParser<Pattern> {
                                 return result;
                             } catch (Throwable e2) {
                                 e2.printStackTrace();
-                                throw new InputParseException(Caption.of(e2.getMessage()));
+                                throw new InputParseException(TextComponent.of(e2.getMessage()));
                             }
                         });
                     }
@@ -189,7 +189,7 @@ public class RichPatternParser extends FaweParser<Pattern> {
             throw rethrow;
         } catch (Throwable e) {
             e.printStackTrace();
-            throw new InputParseException(Caption.of(e.getMessage()), e);
+            throw new InputParseException(TextComponent.of(e.getMessage()), e);
         }
         if (patterns.isEmpty()) {
             return null;

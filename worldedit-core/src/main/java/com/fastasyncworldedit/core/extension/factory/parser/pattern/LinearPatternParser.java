@@ -57,7 +57,7 @@ public class LinearPatternParser extends RichParser<Pattern> {
             Set<Pattern> patterns = ((RandomPattern) inner).getPatterns();
             return new LinearBlockPattern(patterns.toArray(new Pattern[0]));
         }
-        throw new InputParseException(Caption.of("Pattern " + inner.getClass().getSimpleName()
+        throw new InputParseException(TextComponent.of("Pattern " + inner.getClass().getSimpleName()
                 + " cannot be used with " + getPrefix()));
     }
 

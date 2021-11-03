@@ -448,7 +448,7 @@ public class PlatformManager {
             actor.print(Caption.of("fawe.cancel.reason", faweException.getComponent()));
         } else {
             actor.print(Caption.of("worldedit.command.error.report"));
-            actor.print(Caption.of(e.getClass().getName(), TextComponent.of(": "), TextComponent.of(e.getMessage())));
+            actor.print(TextComponent.of(e.getClass().getName()+ ": " + e.getMessage()));
             e.printStackTrace();
         }
     }
@@ -502,7 +502,7 @@ public class PlatformManager {
                 player.print(Caption.of("fawe.cancel.reason", faweException.getComponent()));
             } else {
                 player.print(Caption.of("worldedit.command.error.report"));
-                player.print(Caption.of(e.getClass().getName() + ": " + e.getMessage()));
+                player.print(TextComponent.of(e.getClass().getName() + ": " + e.getMessage()));
                 e.printStackTrace();
             }
             //FAWE end

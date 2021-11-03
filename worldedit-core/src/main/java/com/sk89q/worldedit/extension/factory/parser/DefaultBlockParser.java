@@ -495,14 +495,16 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
             throw new NoMatchException(Caption.of("worldedit.error.unknown-block", TextComponent.of(input)));
         }
 
+        //FAWE start
         if (blockAndExtraData.length > 1 && blockAndExtraData[1].startsWith("{")) {
             String joined = StringMan.join(Arrays.copyOfRange(blockAndExtraData, 1, blockAndExtraData.length), "|");
             try {
                 nbt = JSON2NBT.getTagFromJson(joined);
             } catch (NBTException e) {
-                throw new NoMatchException(Caption.of(e.getMessage()));
+                throw new NoMatchException(TextComponent.of(e.getMessage()));
             }
         }
+        //FAWE end
 
         // Check if the item is allowed
         BlockType blockType = state.getBlockType();

@@ -94,7 +94,7 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
             }
             return new RandomFullClipboardPattern(clipboards, rotate, flip);
         } catch (IOException e) {
-            throw new InputParseException(Caption.of(e.getMessage()), e);
+            throw new InputParseException(TextComponent.of(e.getMessage()), e);
         }
     }
 

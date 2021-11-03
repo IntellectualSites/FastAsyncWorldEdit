@@ -114,7 +114,7 @@ public class WEManager {
                                 backupRegions.add(region);
                             }
                         } else {
-                            player.print(Caption.of("Invalid Mask"));
+                            player.print(Caption.of("fawe.error.region-mask-invalid", mask.getClass().getSimpleName()));
                             removed = true;
                             iterator.remove();
                         }

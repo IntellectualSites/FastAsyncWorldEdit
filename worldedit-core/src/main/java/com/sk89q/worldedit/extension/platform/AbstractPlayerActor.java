@@ -50,6 +50,7 @@ import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.TargetBlock;
 import com.sk89q.worldedit.util.auth.AuthorizationException;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockCategories;
@@ -86,7 +87,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                     throwable = throwable.getCause();
                 }
                 if (throwable instanceof WorldEditException) {
-                    printError(Caption.of(throwable.getLocalizedMessage()));
+                    printError(TextComponent.of(throwable.getLocalizedMessage()));
                 } else {
                     FaweException fe = FaweException.get(throwable);
                     if (fe != null) {

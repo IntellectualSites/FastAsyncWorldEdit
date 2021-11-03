@@ -179,7 +179,7 @@ public class ImageUtil {
         try {
             return MainUtil.readImage(getInputStream(uri));
         } catch (IOException e) {
-            throw new InputParseException(Caption.of(e.getMessage()));
+            throw new InputParseException(TextComponent.of(e.getMessage()));
         }
     }
 
@@ -192,7 +192,7 @@ public class ImageUtil {
             }
             return new URL(uriStr).openStream();
         } catch (IOException e) {
-            throw new InputParseException(Caption.of(e.getMessage()));
+            throw new InputParseException(TextComponent.of(e.getMessage()));
         }
     }
 
@@ -219,7 +219,7 @@ public class ImageUtil {
             }
             throw new InputParseException(Caption.of("fawe.error.invalid-image", TextComponent.of(arg)));
         } catch (IOException e) {
-            throw new InputParseException(Caption.of(e.getMessage()));
+            throw new InputParseException(TextComponent.of(e.getMessage()));
         }
     }
 
@@ -253,7 +253,7 @@ public class ImageUtil {
             }
             throw new InputParseException(Caption.of("fawe.error.invalid-image", TextComponent.of(arg)));
         } catch (IOException | URISyntaxException e) {
-            throw new InputParseException(Caption.of(e.getMessage()));
+            throw new InputParseException(TextComponent.of(e.getMessage()));
         }
     }
 

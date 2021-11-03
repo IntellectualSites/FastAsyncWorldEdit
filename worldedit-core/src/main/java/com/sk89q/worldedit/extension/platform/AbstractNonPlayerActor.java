@@ -25,6 +25,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 
 import java.io.File;
 import java.util.Map;
@@ -72,7 +73,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
             throwable = throwable.getCause();
         }
         if (throwable instanceof WorldEditException) {
-            printError(Caption.of(throwable.getLocalizedMessage()));
+            printError(TextComponent.of(throwable.getLocalizedMessage()));
         } else {
             FaweException fe = FaweException.get(throwable);
             if (fe != null) {

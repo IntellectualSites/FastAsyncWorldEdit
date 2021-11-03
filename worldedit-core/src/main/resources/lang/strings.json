@@ -129,6 +129,7 @@
   "fawe.error.clipboard.on.disk.version.mismatch": "Clipboard version mismatch. Please delete your clipboards folder and restart the server.",
   "fawe.error.limit.disallowed-block": "Your limit disallows use of block '{0}'",
   "fawe.error.limit.disallowed-property": "Your limit disallows use of property '{0}'",
+  "fawe.error.region-mask-invalid": "Invalid region mask: {0}",
   "fawe.cancel.count": "Cancelled {0} edits.",
   "fawe.cancel.reason.confirm": "Use //confirm to execute {0}",
   "fawe.cancel.reason.confirm.region": "Your selection is large ({0} -> {1}, containing {3} blocks). Use //confirm to execute {2}",
