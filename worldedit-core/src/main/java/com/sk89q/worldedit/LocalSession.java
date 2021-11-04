@@ -1120,6 +1120,24 @@ public class LocalSession implements TextureHolder {
         //FAWE end
     }
 
+    /**
+     * Get the tool assigned to the item.
+     *
+     * @param item the item type
+     * @return the tool, which may be {@code null}
+     * @deprecated This method is deprecated and only for compatibility with WorldEdit. Use {@link #getTool(BaseItem, Player)}
+     * instead.
+     */
+    @Nullable
+    @Deprecated
+    public Tool getTool(ItemType item) {
+        //FAWE start
+        synchronized (this.tools) {
+            return tools.get(item.getInternalId());
+        }
+        //FAWE end
+    }
+
     //FAWE start
     @Nullable
     public Tool getTool(Player player) {
