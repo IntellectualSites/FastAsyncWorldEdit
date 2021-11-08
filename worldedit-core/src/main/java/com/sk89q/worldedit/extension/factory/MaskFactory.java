@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extension.factory;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.AdjacentMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.AngleMaskParser;
+import com.fastasyncworldedit.core.extension.factory.parser.mask.BesideMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.ExtremaMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.FalseMaskParser;
 import com.fastasyncworldedit.core.extension.factory.parser.mask.LiquidMaskParser;
@@ -106,6 +107,7 @@ public final class MaskFactory extends AbstractFactory<Mask> {
         // Mask Parsers from FAWE
         register(new AdjacentMaskParser(worldEdit));
         register(new AngleMaskParser(worldEdit));
+        register(new BesideMaskParser(worldEdit));
         register(new ExtremaMaskParser(worldEdit));
         register(new FalseMaskParser(worldEdit));
         register(new LiquidMaskParser(worldEdit));

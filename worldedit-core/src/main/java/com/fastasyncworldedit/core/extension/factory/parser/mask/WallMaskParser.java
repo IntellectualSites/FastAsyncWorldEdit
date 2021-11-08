@@ -1,47 +1,38 @@
 package com.fastasyncworldedit.core.extension.factory.parser.mask;
 
-import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.function.mask.WallMask;
+import com.google.common.collect.ImmutableList;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.command.util.SuggestionHelper;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.function.mask.BlockMask;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.internal.registry.SimpleInputParser;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
-import javax.annotation.Nonnull;
-import java.util.stream.Stream;
+import java.util.List;
 
-public class WallMaskParser extends RichParser<Mask> {
+public class WallMaskParser extends SimpleInputParser<Mask> {
+
+    private static final List<String> aliases = ImmutableList.of("#wall");
 
     public WallMaskParser(WorldEdit worldEdit) {
-        super(worldEdit, "#wall", "|");
+        super(worldEdit);
     }
 
     @Override
-    protected Stream<String> getSuggestions(final String argumentInput, final int index) {
-        if (index == 0) {
-            return worldEdit.getMaskFactory().getSuggestions(argumentInput).stream();
-        } else if (index == 1 || index == 2) {
-            return SuggestionHelper.suggestPositiveDoubles(argumentInput);
-        }
-        return Stream.empty();
+    public List<String> getMatchedAliases() {
+        return aliases;
     }
 
     @Override
-    protected Mask parseFromInput(@Nonnull final String[] arguments, final ParserContext context) throws InputParseException {
-        if (arguments.length > 3 || arguments.length == 0) {
-            return null;
-        }
-        Mask subMask = worldEdit.getMaskFactory().parseFromInput(arguments[0], context);
-        int min = arguments.length > 1 ? Integer.parseInt(arguments[1]) : -1;
-        int max = arguments.length > 2 ? Integer.parseInt(arguments[2]) : -1;
-        if (min == -1 && max == -1) {
-            min = 1;
-            max = 8;
-        } else if (max == -1) {
-            max = min;
-        }
-        return new WallMask(subMask, min, max);
+    public Mask parseFromSimpleInput(String input, ParserContext context) throws InputParseException {
+        return new MaskIntersection(
+                new ExistingBlockMask(context.getExtent()),
+                new WallMask(new BlockMask(context.getExtent(), BlockTypes.AIR.getDefaultState().toBaseBlock()), 1, 8)
+        );
     }
 
 }
