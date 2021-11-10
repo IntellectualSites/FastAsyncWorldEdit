@@ -312,7 +312,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                 }
             }
         }
-        if (biomesOut != null && biomesOut.getSize() != 0) {
+        if (biomesOut != null && biomesOut.getSize() != 0 && biomePalette != null && biomePalette.length > 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(biomesOut.toByteArrays())))) {
                 for (int z = 0; z < length; z++) {
                     for (int x = 0; x < width; x++) {
