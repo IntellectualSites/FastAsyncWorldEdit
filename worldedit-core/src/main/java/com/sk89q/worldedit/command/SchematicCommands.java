@@ -416,7 +416,7 @@ public class SchematicCommands {
             name = "save",
             desc = "Save your clipboard into a schematic file"
     )
-    @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other"})
+    @CommandPermissions({"worldedit.clipboard.save", "worldedit.schematic.save", "worldedit.schematic.save.other", "worldedit.schematic.save.global"})
     public void save(
             Actor actor, LocalSession session,
             @Arg(desc = "File name.")
@@ -429,6 +429,12 @@ public class SchematicCommands {
             @Switch(name = 'g', desc = "Bypasses per-player-schematic folders")
                     boolean global
     ) throws WorldEditException {
+
+         if (global && !actor.hasPermission("worldedit.schematic.save.global")) {
+             actor.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.save.global"));
+             return;
+        }
+
         //FAWE end
         if (worldEdit.getPlatformManager().queryCapability(Capability.GAME_HOOKS).getDataVersion() == -1) {
             actor.print(TranslatableComponent.of("worldedit.schematic.unsupported-minecraft-version"));
