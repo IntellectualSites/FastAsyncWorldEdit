@@ -3,7 +3,7 @@ plugins {
 }
 
 applyPaperweightAdapterConfiguration(
-        "1.17.1-R0.1-20211001.111503-102"
+        "1.17.1-R0.1-20211109.085555-183"
 )
 
 repositories {

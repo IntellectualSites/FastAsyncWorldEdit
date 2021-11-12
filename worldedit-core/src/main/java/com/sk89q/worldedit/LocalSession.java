@@ -1109,14 +1109,7 @@ public class LocalSession implements TextureHolder {
             loadDefaults(player, true); // Permissions have changed so redo the player's current tools.
             return null;
         }
-        if (tool != null) {
-            return tool;
-        } else if (item.getInternalId() == wandItem.getInternalId() && SelectionWand.INSTANCE.canUse(player)) {
-            loadDefaults(player, true); // Permissions have changed so redo the player's current tools.
-            return SelectionWand.INSTANCE;
-        } else {
-            return null;
-        }
+        return tool;
         //FAWE end
     }
 

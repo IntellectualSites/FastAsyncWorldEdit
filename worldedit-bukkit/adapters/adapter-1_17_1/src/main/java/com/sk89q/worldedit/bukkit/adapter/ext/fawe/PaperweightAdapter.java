@@ -605,7 +605,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         Path tempDir = Files.createTempDirectory("FastAsyncWorldEditWorldGen");
         LevelStorageSource levelStorage = LevelStorageSource.createDefault(tempDir);
         ResourceKey<LevelStem> worldDimKey = getWorldDimKey(env);
-        try (LevelStorageSource.LevelStorageAccess session = levelStorage.c("worldeditregentempworld", worldDimKey)) {
+        try (LevelStorageSource.LevelStorageAccess session = levelStorage.createAccess("worldeditregentempworld", worldDimKey)) {
             ServerLevel originalWorld = ((CraftWorld) bukkitWorld).getHandle();
             PrimaryLevelData levelProperties = (PrimaryLevelData) originalWorld.getServer()
                     .getWorldData().overworldData();
