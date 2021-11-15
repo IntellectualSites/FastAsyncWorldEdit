@@ -1,4 +1,4 @@
-package com.fastasyncworldedit.core.extension.factory.parser.pattern;
+package com.sk89q.worldedit.extension.factory.parser.pattern;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.util.StringUtil;
@@ -26,9 +26,8 @@ public class RandomPatternParser extends InputParser<Pattern> {
 
     @Override
     public Stream<String> getSuggestions(String input) {
+        //FAWE start
         List<String> patterns = StringUtil.split(input, ',', '[', ']');
-        /*String[] splits = input.split(",", -1);
-        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']', true);*/
         if (patterns.size() == 1) {
             return Stream.empty();
         }
@@ -37,7 +36,6 @@ public class RandomPatternParser extends InputParser<Pattern> {
         String previous = String.join(",", patterns.subList(0, patterns.size() - 1));
         if (token.matches("[0-9]+(\\.[0-9]*)?%.*")) {
             String[] p = token.split("%");
-
             if (p.length < 2) {
                 return Stream.empty();
             } else {
@@ -46,15 +44,16 @@ public class RandomPatternParser extends InputParser<Pattern> {
         }
         final List<String> innerSuggestions = worldEdit.getPatternFactory().getSuggestions(token);
         return innerSuggestions.stream().map(s -> previous + "," + s);
+        //FAWE end
     }
 
     @Override
     public Pattern parseFromInput(String input, ParserContext context) throws InputParseException {
         RandomPattern randomPattern = new RandomPattern();
 
+        //FAWE start
         List<String> patterns = StringUtil.split(input, ',', '[', ']');
-        /*String[] splits = input.split(",", -1);
-        List<String> patterns = StringUtil.parseListInQuotes(splits, ',', '[', ']', true);*/
+        //FAWE end
         if (patterns.size() == 1) {
             return null; // let a 'single'-pattern parser handle it
         }
@@ -64,7 +63,9 @@ public class RandomPatternParser extends InputParser<Pattern> {
 
             // Parse special percentage syntax
             if (token.matches("[0-9]+(\\.[0-9]*)?%.*")) {
+                //FAWE start
                 String[] p = token.split("%", 2);
+                //FAWE end
 
                 if (p.length < 2) {
                     throw new InputParseException(Caption.of(

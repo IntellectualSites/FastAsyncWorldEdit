@@ -42,7 +42,7 @@ import com.fastasyncworldedit.core.extension.factory.parser.pattern.OffsetPatter
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.PerlinPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RandomFullClipboardPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RandomOffsetPatternParser;
-import com.fastasyncworldedit.core.extension.factory.parser.pattern.RandomPatternParser;
+import com.sk89q.worldedit.extension.factory.parser.pattern.RandomPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RelativePatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RichPatternParser;
 import com.fastasyncworldedit.core.extension.factory.parser.pattern.RidgedMultiFractalPatternParser;
