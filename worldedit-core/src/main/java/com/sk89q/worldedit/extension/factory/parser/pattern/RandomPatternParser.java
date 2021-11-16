@@ -33,17 +33,20 @@ public class RandomPatternParser extends InputParser<Pattern> {
         }
         // get suggestions for the last token only
         String token = patterns.get(patterns.size() - 1);
+        String randString = "";
         String previous = String.join(",", patterns.subList(0, patterns.size() - 1));
         if (token.matches("[0-9]+(\\.[0-9]*)?%.*")) {
             String[] p = token.split("%");
             if (p.length < 2) {
                 return Stream.empty();
             } else {
+                randString = p[0];
                 token = p[1];
             }
         }
         final List<String> innerSuggestions = worldEdit.getPatternFactory().getSuggestions(token);
-        return innerSuggestions.stream().map(s -> previous + "," + s);
+        String prev = previous + "," + randString + "%";
+        return innerSuggestions.stream().map(s -> prev + s);
         //FAWE end
     }
 
