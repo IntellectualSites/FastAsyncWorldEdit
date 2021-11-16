@@ -114,10 +114,14 @@ public class RichPatternParser extends FaweParser<Pattern> {
                                 chance = Expression.compile(command.substring(0, percentIndex)).evaluate();
                                 String value = command.substring(percentIndex + 1);
                                 if (!entry.getValue().isEmpty()) {
-                                    if (!value.isEmpty()) {
-                                        value += " ";
+                                    boolean addBrackets = !value.isEmpty();
+                                    if (addBrackets) {
+                                        value += "[";
                                     }
                                     value += StringMan.join(entry.getValue(), " ");
+                                    if (addBrackets) {
+                                        value += "]";
+                                    }
                                 }
                                 pattern = parseFromInput(value, context);
                             } else { // legacy block pattern
