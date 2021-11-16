@@ -100,11 +100,14 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
 
     @Override
     public E parseFromInput(String input, ParserContext context) throws InputParseException {
+        int i = input.indexOf('[');
+        // Rich parser requires arguments, else, it should not be used
+        if (i == -1) {
+            return null;
+        }
+        String inputPrefix = input.substring(0, i);
         for (String prefix : this.prefixes) {
-            if (!input.startsWith(prefix)) {
-                continue;
-            }
-            if (input.length() < prefix.length()) {
+            if (!inputPrefix.equals(prefix)) {
                 continue;
             }
             String[] arguments = extractArguments(input.substring(prefix.length()), true);
