@@ -46,9 +46,9 @@ public abstract class RichParser<E> extends InputParser<E> implements AliasedPar
             }
             int i = other.indexOf('[');
             if (i == -1) {
-                return other.startsWith(prefix);
+                return other.equals(prefix);
             }
-            return other.substring(0, i).equalsIgnoreCase(prefix);
+            return other.substring(0, i).equals(prefix);
         };
     }
 
