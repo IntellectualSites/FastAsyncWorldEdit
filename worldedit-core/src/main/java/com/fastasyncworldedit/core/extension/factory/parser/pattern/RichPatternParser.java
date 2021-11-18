@@ -32,6 +32,8 @@ import java.util.stream.Stream;
 
 public class RichPatternParser extends FaweParser<Pattern> {
 
+    private static final java.util.regex.Pattern percentPatternRegex = java.util.regex.Pattern.compile("[0-9]+(\\.[0-9]*)?%.*");
+
     /**
      * Create a new rich pattern-parser.
      *
@@ -110,7 +112,7 @@ public class RichPatternParser extends FaweParser<Pattern> {
                             pattern = parseFromInput(command.substring(1, end == -1 ? command.length() : end), context);
                         } else {
                             int percentIndex = command.indexOf('%');
-                            if (percentIndex != -1) {  // Legacy percent pattern
+                            if (percentIndex != -1 && percentPatternRegex.matcher(command).matches()) {  // Legacy percent pattern
                                 chance = Expression.compile(command.substring(0, percentIndex)).evaluate();
                                 String value = command.substring(percentIndex + 1);
                                 if (!entry.getValue().isEmpty()) {
