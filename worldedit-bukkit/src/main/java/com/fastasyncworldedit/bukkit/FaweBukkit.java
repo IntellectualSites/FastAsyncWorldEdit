@@ -48,6 +48,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -153,7 +154,7 @@ public class FaweBukkit implements IFawe, Listener {
 
         List<Plugin> plugins = new ArrayList<>();
         Collections.addAll(plugins, Bukkit.getServer().getPluginManager().getPlugins());
-        plugins.sort((plugin1, plugin2) -> plugin1.getName().compareToIgnoreCase(plugin2.getName()));
+        plugins.sort(Comparator.comparing(Plugin::getName));
 
         msg.append("Server Version: ").append(Bukkit.getVersion()).append("\n");
         msg.append("Plugins (").append(plugins.size()).append("):\n");
