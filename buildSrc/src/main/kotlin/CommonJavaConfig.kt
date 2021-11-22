@@ -24,7 +24,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                 val disabledLint = listOf(
                         "processing", "path", "fallthrough", "serial"
                 )
-                options.release.set(11)
+                options.release.set(17)
                 options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
                 options.isDeprecation = true
                 options.encoding = "UTF-8"
@@ -32,7 +32,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
             }
 
     configurations.all {
-        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 16)
+        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
     }
 
     tasks.withType<Test>().configureEach {

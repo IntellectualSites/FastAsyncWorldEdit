@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import io.github.gradlenexus.publishplugin.NexusPublishExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ExternalModuleDependency
@@ -21,6 +22,8 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
+import org.gradle.plugins.signing.SigningExtension
+import java.net.URI
 import javax.inject.Inject
 
 fun Project.applyLibrariesConfiguration() {
@@ -28,6 +31,8 @@ fun Project.applyLibrariesConfiguration() {
     apply(plugin = "java-base")
     apply(plugin = "maven-publish")
     apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "signing")
+    apply(plugin = "io.github.gradle-nexus.publish-plugin")
 
     configurations {
         create("shade")
@@ -112,7 +117,7 @@ fun Project.applyLibrariesConfiguration() {
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
             attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 11)
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
         }
         outgoing.artifact(tasks.named("jar"))
     }
@@ -127,7 +132,7 @@ fun Project.applyLibrariesConfiguration() {
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
             attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 11)
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
         }
         outgoing.artifact(tasks.named("jar"))
     }
@@ -156,6 +161,16 @@ fun Project.applyLibrariesConfiguration() {
 
     libsComponent.addVariantsFromConfiguration(sourcesElements.get()) {
         mapToMavenScope("runtime")
+    }
+
+    configure<SigningExtension> {
+        if (!version.toString().endsWith("-SNAPSHOT")) {
+            val signingKey: String? by project
+            val signingPassword: String? by project
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            isRequired
+            sign(tasks["publications"])
+        }
     }
 
     configure<PublishingExtension> {
@@ -212,31 +227,13 @@ fun Project.applyLibrariesConfiguration() {
                 }
             }
         }
+    }
 
+    configure<NexusPublishExtension> {
         repositories {
-            mavenLocal()
-            val nexusUsername: String? by project
-            val nexusPassword: String? by project
-            if (nexusUsername != null && nexusPassword != null) {
-                maven {
-                    val releasesRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/releases/"
-                    val snapshotRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/snapshots/"
-                    /* Commenting this out for now - Fawe currently does not user semver or any sort of versioning that
-                    differentiates between snapshots and releases, API & (past) deployment wise, this will come with a next major release.
-                    url = uri(
-                            if (version.toString().endsWith("-SNAPSHOT")) snapshotRepositoryUrl
-                            else releasesRepositoryUrl
-                    )
-                     */
-                    url = uri(releasesRepositoryUrl)
-
-                    credentials {
-                        username = nexusUsername
-                        password = nexusPassword
-                    }
-                }
-            } else {
-                logger.warn("No nexus repository is added; nexusUsername or nexusPassword is null.")
+            sonatype {
+                nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
+                snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
             }
         }
     }

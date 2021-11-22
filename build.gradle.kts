@@ -17,7 +17,8 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("1.17")
+var rootVersion by extra("2.0.0")
+var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
 var date: String by extra("")
@@ -27,15 +28,14 @@ ext {
     }
     date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
     revision = "-${git.head().abbreviatedId}"
-    val commit: String? = git.head().abbreviatedId
     buildNumber = if (project.hasProperty("buildnumber")) {
         project.properties["buildnumber"] as String
     } else {
-        commit.toString()
+        null.toString() //1.18 TODO: drop classifier if not used, otherwise the version is 'null'
     }
 }
 
-version = String.format("%s-%s", rootVersion, buildNumber)
+version = String.format("%s-%s+%s", rootVersion, snapshot, buildNumber)
 
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")

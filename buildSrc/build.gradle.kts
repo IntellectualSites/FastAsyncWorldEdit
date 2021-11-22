@@ -29,4 +29,5 @@ dependencies {
     implementation("org.ajoberstar.grgit:grgit-gradle:4.1.0")
     implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.0")
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.1.14")
+    implementation("io.github.gradle-nexus:publish-plugin:1.1.0")
 }

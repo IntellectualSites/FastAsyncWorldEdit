@@ -12,6 +12,9 @@ import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
+import org.gradle.plugins.signing.SigningExtension
+import io.github.gradlenexus.publishplugin.NexusPublishExtension
+import java.net.URI
 
 fun Project.applyPlatformAndCoreConfiguration() {
     applyCommonConfiguration()
@@ -20,6 +23,8 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "idea")
     apply(plugin = "maven-publish")
     apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "signing")
+    apply(plugin = "io.github.gradle-nexus.publish-plugin")
 
     applyCommonJavaConfiguration(
             sourcesJar = name in setOf("worldedit-core", "worldedit-bukkit"),
@@ -43,6 +48,16 @@ fun Project.applyPlatformAndCoreConfiguration() {
     val javaComponent = components["java"] as AdhocComponentWithVariants
     javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
         skip()
+    }
+
+    configure<SigningExtension> {
+        if (!version.toString().endsWith("-SNAPSHOT")) {
+            val signingKey: String? by project
+            val signingPassword: String? by project
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            isRequired
+            sign(tasks["publications"])
+        }
     }
 
     configure<PublishingExtension> {
@@ -99,31 +114,13 @@ fun Project.applyPlatformAndCoreConfiguration() {
                 }
             }
         }
+    }
 
+    configure<NexusPublishExtension> {
         repositories {
-            mavenLocal()
-            val nexusUsername: String? by project
-            val nexusPassword: String? by project
-            if (nexusUsername != null && nexusPassword != null) {
-                maven {
-                    val releasesRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/releases/"
-                    val snapshotRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/snapshots/"
-                    /* Commenting this out for now - Fawe currently does not user semver or any sort of versioning that
-                    differentiates between snapshots and releases, API & (past) deployment wise, this will come with a next major release.
-                    url = uri(
-                            if (version.toString().endsWith("-SNAPSHOT")) snapshotRepositoryUrl
-                            else releasesRepositoryUrl
-                    )
-                     */
-                    url = uri(releasesRepositoryUrl)
-
-                    credentials {
-                        username = nexusUsername
-                        password = nexusPassword
-                    }
-                }
-            } else {
-                logger.warn("No nexus repository is added; nexusUsername or nexusPassword is null.")
+            sonatype {
+                nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
+                snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
             }
         }
     }
