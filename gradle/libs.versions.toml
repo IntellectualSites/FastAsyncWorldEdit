@@ -1,9 +1,9 @@
 [versions]
 # Minecraft expectations
-fastutil = "8.2.1"
+fastutil = "8.5.6"
 log4j = "2.14.1"
-guava = "21.0"
-gson = "2.8.0"
+guava = "31.0.1-jre"
+gson = "2.8.8"
 
 # Platform expectations
 paper = "1.17.1-R0.1-SNAPSHOT"
@@ -39,7 +39,6 @@ rhino-runtime = "1.7.13"
 zstd-jni = "1.4.8-1" # Not latest as it can be difficult to obtain latest ZSTD libs
 antlr4 = "4.9.3"
 json-simple = "1.1.1"
-paranamer = "2.8"
 jlibnoise = "1.0.0"
 jchronic = "0.2.4a"
 lz4-java = "1.8.0"
@@ -104,7 +103,6 @@ zstd = { group = "com.github.luben", name = "zstd-jni", version.ref = "zstd-jni"
 antlr4 = { group = "org.antlr", name = "antlr4", version.ref = "antlr4" }
 antlr4Runtime = { group = "org.antlr", name = "antlr4-runtime", version.ref = "antlr4" }
 jsonSimple = { group = "com.googlecode.json-simple", name = "json-simple", version.ref = "json-simple" }
-paranamer = { group = "com.thoughtworks.paranamer", name = "paranamer", version.ref = "paranamer" }
 jlibnoise = { group = "com.sk89q.lib", name = "jlibnoise", version.ref = "jlibnoise" }
 jchronic = { group = "com.sk89q", name = "jchronic", version.ref = "jchronic" }
 lz4Java = { group = "org.lz4", name = "lz4-java", version.ref = "lz4-java" }

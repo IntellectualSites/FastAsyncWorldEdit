@@ -8,7 +8,6 @@ dependencies {
     "shade"(libs.jchronic) {
         exclude(group = "junit", module = "junit")
     }
-    "shade"(libs.paranamer)
     "shade"(libs.jlibnoise)
     "shade"(libs.piston)
     "shade"(libs.pistonRuntime)
