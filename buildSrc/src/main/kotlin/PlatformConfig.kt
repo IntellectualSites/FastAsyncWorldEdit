@@ -13,8 +13,6 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
 import org.gradle.plugins.signing.SigningExtension
-import io.github.gradlenexus.publishplugin.NexusPublishExtension
-import java.net.URI
 
 fun Project.applyPlatformAndCoreConfiguration() {
     applyCommonConfiguration()
@@ -24,7 +22,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
     apply(plugin = "maven-publish")
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "signing")
-    apply(plugin = "io.github.gradle-nexus.publish-plugin")
 
     applyCommonJavaConfiguration(
             sourcesJar = name in setOf("worldedit-core", "worldedit-bukkit"),
@@ -112,15 +109,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
                         url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit/issues")
                     }
                 }
-            }
-        }
-    }
-
-    configure<NexusPublishExtension> {
-        repositories {
-            sonatype {
-                nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
-                snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
             }
         }
     }

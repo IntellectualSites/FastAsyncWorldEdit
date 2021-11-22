@@ -2,6 +2,11 @@ import org.ajoberstar.grgit.Grgit
 import java.time.format.DateTimeFormatter
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import java.net.URI
+
+plugins {
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+}
 
 logger.lifecycle("""
 *******************************************
@@ -66,3 +71,12 @@ allprojects {
 }
 
 applyCommonConfiguration()
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+    }
+}
