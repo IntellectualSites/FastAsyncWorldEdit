@@ -29,13 +29,13 @@ ext {
     date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
     revision = "-${git.head().abbreviatedId}"
     buildNumber = if (project.hasProperty("buildnumber")) {
-        project.properties["buildnumber"] as String
+        snapshot + "+" + project.properties["buildnumber"] as String
     } else {
-        null.toString() //1.18 TODO: drop classifier if not used, otherwise the version is 'null'
+        project.properties["snapshot"] as String
     }
 }
 
-version = String.format("%s-%s+%s", rootVersion, snapshot, buildNumber)
+version = String.format("%s-%s", rootVersion, buildNumber)
 
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
