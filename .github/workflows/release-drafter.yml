@@ -1,0 +1,14 @@
+name: "draft release"
+
+on:
+  push:
+    branches:
+      - "2.0.0"
+
+jobs:
+  update_release_draft:
+    runs-on: "ubuntu-latest"
+    steps:
+      - uses: "release-drafter/release-drafter@v5.15.0"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
