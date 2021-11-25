@@ -30,3 +30,9 @@ dependencies {
     implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.0")
     implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.2.0")
 }
+
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
