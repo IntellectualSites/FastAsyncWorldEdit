@@ -21,6 +21,7 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.the
 import org.gradle.plugins.signing.SigningExtension
 import javax.inject.Inject
 
@@ -184,13 +185,15 @@ fun Project.applyLibrariesConfiguration() {
         mapToMavenScope("runtime")
     }
 
+    val publishingExtension = the<PublishingExtension>()
+
     configure<SigningExtension> {
         if (!version.toString().endsWith("-SNAPSHOT")) {
             val signingKey: String? by project
             val signingPassword: String? by project
             useInMemoryPgpKeys(signingKey, signingPassword)
             isRequired
-            sign(tasks["publications"])
+            sign(publishingExtension.publications)
         }
     }
 

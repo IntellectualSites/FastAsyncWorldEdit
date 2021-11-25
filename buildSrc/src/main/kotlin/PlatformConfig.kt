@@ -47,13 +47,15 @@ fun Project.applyPlatformAndCoreConfiguration() {
         skip()
     }
 
+    val publishingExtension = the<PublishingExtension>()
+
     configure<SigningExtension> {
         if (!version.toString().endsWith("-SNAPSHOT")) {
             val signingKey: String? by project
             val signingPassword: String? by project
             useInMemoryPgpKeys(signingKey, signingPassword)
             isRequired
-            sign(tasks["publications"])
+            sign(publishingExtension.publications)
         }
     }
 
