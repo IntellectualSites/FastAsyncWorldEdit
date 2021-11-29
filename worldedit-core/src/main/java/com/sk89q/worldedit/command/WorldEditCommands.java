@@ -80,52 +80,17 @@ public class WorldEditCommands {
     )
     @CommandPermissions(queued = false)
     public void version(Actor actor) {
-        //FAWE start - get own version format
+        //FAWE start - use own, minimized message that doesn't print "Platforms" and "Capabilities"
         FaweVersion fVer = Fawe.get().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
-        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
-
-        if (fVer != null) {
-            FaweVersion version = Fawe.get().getVersion();
-            Date date = new GregorianCalendar(2000 + version.year, version.month - 1, version.day)
-                    .getTime();
-
-            TextComponent dateArg = TextComponent.of(date.toLocaleString());
-            TextComponent commitArg = TextComponent.of(Integer.toHexString(version.hash));
-            TextComponent buildArg = TextComponent.of(version.build);
-            TextComponent platformArg = TextComponent.of(Settings.IMP.PLATFORM);
-
-            actor.print(Caption.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
-        }
-
-        actor.printInfo(TextComponent.of("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki"));
+        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr));
+        actor.print(TextComponent.of("Authors: Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
+        actor.print(TextComponent.of("Wiki: https://git.io/JMEPa")
+                .clickEvent(ClickEvent.openUrl("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki")));
+        actor.print(TextComponent.of("Discord: https://discord.gg/intellectualsites")
+                .clickEvent(ClickEvent.openUrl("https://discord.gg/intellectualsites")));
         UpdateNotification.doUpdateNotification(actor);
         //FAWE end
-
-        PlatformManager pm = we.getPlatformManager();
-
-        TextComponentProducer producer = new TextComponentProducer();
-        for (Platform platform : pm.getPlatforms()) {
-            producer.append(
-                    TextComponent.of("* ", TextColor.GRAY)
-                            .append(TextComponent.of(platform.getPlatformName())
-                                    .hoverEvent(HoverEvent.showText(TextComponent.of(platform.getId()))))
-                            .append(TextComponent.of("(" + platform.getPlatformVersion() + ")"))
-            ).newline();
-        }
-        actor.print(new MessageBox("Platforms", producer, TextColor.GRAY).create());
-
-        producer.reset();
-        for (Capability capability : Capability.values()) {
-            Platform platform = pm.queryCapability(capability);
-            producer.append(
-                    TextComponent.of(capability.name(), TextColor.GRAY)
-                            .append(TextComponent.of(": ")
-                                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "none")))
-            ).newline();
-        }
-        actor.print(new MessageBox("Capabilities", producer, TextColor.GRAY).create());
-
     }
 
     @Command(
