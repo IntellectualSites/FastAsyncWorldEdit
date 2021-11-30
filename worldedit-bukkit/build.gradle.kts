@@ -42,12 +42,6 @@ repositories {
     flatDir { dir(File("src/main/resources")) }
 }
 
-configurations.all {
-    resolutionStrategy {
-        force("com.google.guava:guava:31.0.1-jre")
-    }
-}
-
 val localImplementation = configurations.create("localImplementation") {
     description = "Dependencies used locally, but provided by the runtime Bukkit implementation"
     isCanBeConsumed = false
