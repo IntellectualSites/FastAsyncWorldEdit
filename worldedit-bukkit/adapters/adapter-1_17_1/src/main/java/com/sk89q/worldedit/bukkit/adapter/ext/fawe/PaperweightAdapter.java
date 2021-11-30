@@ -658,8 +658,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         }
     }
 
-    // FAWE private -> public static
+    // FAWE start - private -> public static
     public static WorldGenSettings replaceSeed(ServerLevel originalWorld, long seed, WorldGenSettings originalOpts) {
+    // FAWE end
         RegistryWriteOps<net.minecraft.nbt.Tag> nbtReadRegOps = RegistryWriteOps.create(
                 NbtOps.INSTANCE,
                 originalWorld.getServer().registryAccess()
@@ -686,9 +687,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 );
     }
 
-    // FAWE private -> private static
+    // FAWE start - private -> private static
     @SuppressWarnings("unchecked")
     private static Dynamic<net.minecraft.nbt.Tag> recursivelySetSeed(
+    // FAWE end
             Dynamic<net.minecraft.nbt.Tag> dynamic,
             long seed,
             Set<Dynamic<net.minecraft.nbt.Tag>> seen
