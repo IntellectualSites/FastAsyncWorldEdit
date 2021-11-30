@@ -354,10 +354,10 @@ public class TextureUtil implements TextureHolder {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
                 new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/").mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar")
+                        new URL("https://launcher.mojang.com/v1/objects/d49eb6caed53d23927648c97451503442f9e26fd/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.17.1.jar")) {
+                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.18.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -370,6 +370,7 @@ public class TextureUtil implements TextureHolder {
                                     "folder with a `.minecraft/versions` jar in it.");
                     LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
+                //TODO 1.18 AccessControlException is deprecated and scheduled for removal as of Java 17. Exchange on sight to be prepared for future releases
             } catch (AccessControlException e) {
                 LOGGER.error(
                         "Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
@@ -811,10 +812,10 @@ public class TextureUtil implements TextureHolder {
                 new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/")
                         .mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar")
+                        new URL("https://launcher.mojang.com/v1/objects/d49eb6caed53d23927648c97451503442f9e26fd/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.17.1.jar")) {
+                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.18.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {

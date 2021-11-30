@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core;
 /**
  * An internal FAWE class not meant for public use.
  **/
+//TODO 18 update to semver
 public class FaweVersion {
 
     public final int year;

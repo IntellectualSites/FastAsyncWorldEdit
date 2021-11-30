@@ -34,7 +34,7 @@ public class Config {
     /**
      * Get the value for a node. Probably throws some error if you try to get a non-existent key.
      */
-    private <T> T get(String key, Class root) {
+    private <T> T get(String key, Class<?> root) {
         String[] split = key.split("\\.");
         Object instance = getInstance(split, root);
         if (instance != null) {
@@ -57,7 +57,7 @@ public class Config {
      * @param key   config node
      * @param value value
      */
-    private void set(String key, Object value, Class root) {
+    private void set(String key, Object value, Class<?> root) {
         String[] split = key.split("\\.");
         Object instance = getInstance(split, root);
         if (instance != null) {
@@ -201,7 +201,7 @@ public class Config {
     /**
      * Get the static fields in a section.
      */
-    private Map<String, Object> getFields(Class clazz) {
+    private Map<String, Object> getFields(Class<?> clazz) {
         HashMap<String, Object> map = new HashMap<>();
         for (Field field : clazz.getFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
@@ -223,12 +223,11 @@ public class Config {
             }
             StringBuilder m = new StringBuilder();
             for (Object obj : listValue) {
-                m.append(System.lineSeparator() + spacing + "- " + toYamlString(obj, spacing));
+                m.append(System.lineSeparator()).append(spacing).append("- ").append(toYamlString(obj, spacing));
             }
             return m.toString();
         }
-        if (value instanceof String) {
-            String stringValue = (String) value;
+        if (value instanceof String stringValue) {
             if (stringValue.isEmpty()) {
                 return "''";
             }
@@ -237,11 +236,11 @@ public class Config {
         return value != null ? value.toString() : "null";
     }
 
-    private void save(PrintWriter writer, Class clazz, final Object instance, int indent) {
+    private void save(PrintWriter writer, Class<?> clazz, final Object instance, int indent) {
         try {
             String CTRF = System.lineSeparator();
             String spacing = StringMan.repeat(" ", indent);
-            HashMap<Class, Object> instances = new HashMap<>();
+            HashMap<Class<?>, Object> instances = new HashMap<>();
             for (Field field : clazz.getFields()) {
                 if (field.getAnnotation(Ignore.class) != null) {
                     continue;
@@ -272,7 +271,7 @@ public class Config {
                             configBlock = new ConfigBlock();
                             field.set(instance, configBlock);
                             for (String blockName : blockNames.value()) {
-                                configBlock.put(blockName, current.newInstance());
+                                configBlock.put(blockName, current.getDeclaredConstructor().newInstance());
                             }
                         }
                         // Save each instance
@@ -299,11 +298,10 @@ public class Config {
                     }
                     writer.write(spacing + toNodeName(current.getSimpleName()) + ":" + CTRF);
                     if (value == null) {
-                        field.set(instance, value = current.newInstance());
+                        field.set(instance, value = current.getDeclaredConstructor().newInstance());
                         instances.put(current, value);
                     }
                     save(writer, current, value, indent + 2);
-                    continue;
                 } else {
                     writer.write(spacing + toNodeName(field.getName() + ": ") + toYamlString(
                             field.get(instance),
@@ -321,7 +319,7 @@ public class Config {
      *
      * @param split the node (split by period)
      */
-    private Field getField(String[] split, Class root) {
+    private Field getField(String[] split, Class<?> root) {
         Object instance = getInstance(split, root);
         if (instance == null) {
             return null;
@@ -352,74 +350,64 @@ public class Config {
         }
     }
 
-    private Object getInstance(Object instance, Class clazz) throws IllegalAccessException, InstantiationException {
-        try {
-            Field instanceField = clazz.getDeclaredField(clazz.getSimpleName());
-        } catch (Throwable ignored) {
-        }
-        return clazz.newInstance();
-    }
-
     /**
      * Get the instance for a specific config node.
      *
      * @param split the node (split by period)
      * @return The instance or null
      */
-    private Object getInstance(String[] split, Class root) {
+    private Object getInstance(String[] split, Class<?> root) {
         try {
             Class<?> clazz = root == null ? MethodHandles.lookup().lookupClass() : root;
             Object instance = this;
             while (split.length > 0) {
-                switch (split.length) {
-                    case 1:
-                        return instance;
-                    default:
-                        Class found = null;
-                        Class<?>[] classes = clazz.getDeclaredClasses();
-                        for (Class current : classes) {
-                            if (StringMan.isEqual(current.getSimpleName(), toFieldName(split[0]))) {
-                                found = current;
-                                break;
-                            }
-                        }
-                        try {
-                            Field instanceField = clazz.getDeclaredField(toFieldName(split[0]));
-                            setAccessible(instanceField);
-                            if (instanceField.getType() != ConfigBlock.class) {
-                                Object value = instanceField.get(instance);
-                                if (value == null) {
-                                    value = found.newInstance();
-                                    instanceField.set(instance, value);
-                                }
-                                clazz = found;
-                                instance = value;
-                                split = Arrays.copyOfRange(split, 1, split.length);
-                                continue;
-                            }
-                            ConfigBlock value = (ConfigBlock) instanceField.get(instance);
-                            if (value == null) {
-                                value = new ConfigBlock();
-                                instanceField.set(instance, value);
-                            }
-                            instance = value.get(split[1]);
-                            if (instance == null) {
-                                instance = found.newInstance();
-                                value.put(split[1], instance);
-                            }
-                            clazz = found;
-                            split = Arrays.copyOfRange(split, 2, split.length);
-                            continue;
-                        } catch (NoSuchFieldException ignored) {
-                        }
-                        if (found != null) {
-                            split = Arrays.copyOfRange(split, 1, split.length);
-                            clazz = found;
-                            instance = clazz.newInstance();
-                            continue;
-                        }
-                        return null;
+                if (split.length == 1) {
+                    return instance;
                 }
+                Class<?> found = null;
+                Class<?>[] classes = clazz.getDeclaredClasses();
+                for (Class<?> current : classes) {
+                    if (StringMan.isEqual(current.getSimpleName(), toFieldName(split[0]))) {
+                        found = current;
+                        break;
+                    }
+                }
+                try {
+                    Field instanceField = clazz.getDeclaredField(toFieldName(split[0]));
+                    setAccessible(instanceField);
+                    if (instanceField.getType() != ConfigBlock.class) {
+                        Object value = instanceField.get(instance);
+                        if (value == null) {
+                            value = found.getDeclaredConstructor().newInstance();
+                            instanceField.set(instance, value);
+                        }
+                        clazz = found;
+                        instance = value;
+                        split = Arrays.copyOfRange(split, 1, split.length);
+                        continue;
+                    }
+                    ConfigBlock value = (ConfigBlock) instanceField.get(instance);
+                    if (value == null) {
+                        value = new ConfigBlock();
+                        instanceField.set(instance, value);
+                    }
+                    instance = value.get(split[1]);
+                    if (instance == null) {
+                        instance = found.getDeclaredConstructor().newInstance();
+                        value.put(split[1], instance);
+                    }
+                    clazz = found;
+                    split = Arrays.copyOfRange(split, 2, split.length);
+                    continue;
+                } catch (NoSuchFieldException ignored) {
+                }
+                if (found != null) {
+                    split = Arrays.copyOfRange(split, 1, split.length);
+                    clazz = found;
+                    instance = clazz.getDeclaredConstructor().newInstance();
+                    continue;
+                }
+                return null;
             }
         } catch (Throwable e) {
             e.printStackTrace();

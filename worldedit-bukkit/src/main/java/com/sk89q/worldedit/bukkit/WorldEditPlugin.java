@@ -220,8 +220,6 @@ public class WorldEditPlugin extends JavaPlugin {
         // Enable metrics
         new Metrics(this, BSTATS_ID);
 
-        // Check whether the server runs on 11 or greater
-        ServerLib.checkJavaLTS();
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
         // Check if a new build is available

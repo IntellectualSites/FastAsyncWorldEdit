@@ -30,6 +30,7 @@ public class UpdateNotification {
             try {
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
+                //TODO 1.18 revisit and update to semver parsing after updating FaweVersion.java
                 Document doc = db.parse(new URL("https://ci.athion.net/job/FastAsyncWorldEdit-1.17/api/xml/").openStream());
                 faweVersion = doc.getElementsByTagName("lastSuccessfulBuild").item(0).getFirstChild().getTextContent();
                 FaweVersion faweVersion = Fawe.get().getVersion();
@@ -42,8 +43,10 @@ public class UpdateNotification {
                     hasUpdate = true;
                     int versionDifference = Integer.parseInt(UpdateNotification.faweVersion) - faweVersion.build;
                     LOGGER.warn(
-                            "An update for FastAsyncWorldEdit is available. You are {} build(s) out of date.\nYou are running " +
-                                    "version {}, the latest version is {}-{}.\nUpdate at https://www.spigotmc.org/resources/13932/",
+                            """
+                                    An update for FastAsyncWorldEdit is available. You are {} build(s) out of date.
+                                    You are running version {}, the latest version is {}-{}.
+                                    Update at https://www.spigotmc.org/resources/13932/""",
                             versionDifference,
                             faweVersion.toString(),
                             faweVersion.getSimpleVersionName(),

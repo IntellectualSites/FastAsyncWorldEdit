@@ -60,13 +60,13 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
             options.encoding = "UTF-8"
             links(
                     "https://javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.2/",
-                    "https://jd.adventure.kyori.net/api/4.9.1/",
+                    "https://jd.adventure.kyori.net/api/4.9.3/",
                     "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/2.14.1/",
-                    "https://javadoc.io/doc/com.google.guava/guava/21.0/",
+                    "https://javadoc.io/doc/com.google.guava/guava/31.0.1/",
                     "https://www.antlr.org/api/Java/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/core/0.5.7/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/default-impl/0.5.7/",
-                    "https://papermc.io/javadocs/paper/1.17/",
+                    "https://papermc.io/javadocs/paper/1.18/",
                     "https://ci.athion.net/job/FastAsyncWorldEdit-1.17-Core-Javadocs/javadoc/" // needed for other module linking
             )
         }
