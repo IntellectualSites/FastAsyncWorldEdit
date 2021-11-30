@@ -6,7 +6,7 @@ guava = "31.0.1-jre"
 gson = "2.8.8"
 
 # Platform expectations
-paper = "1.18-rc3-R0.1-SNAPSHOT"
+paper = "1.18-R0.1-SNAPSHOT"
 
 # Plugins
 vault = "1.7.1"
