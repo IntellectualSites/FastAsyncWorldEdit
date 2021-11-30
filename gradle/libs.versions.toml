@@ -6,7 +6,7 @@ guava = "31.0.1-jre"
 gson = "2.8.8"
 
 # Platform expectations
-paper = "1.17.1-R0.1-SNAPSHOT"
+paper = "1.18-rc3-R0.1-SNAPSHOT"
 
 # Plugins
 vault = "1.7.1"
@@ -25,7 +25,7 @@ redprotect = "1.9.6"
 
 # Third party
 flow-math = "1.0.3"
-paperlib = "1.0.7"
+paperlib = "1.0.8-SNAPSHOT"
 bstats = "2.2.1"
 serverlib = "2.3.1"
 paster = "1.1.1"
