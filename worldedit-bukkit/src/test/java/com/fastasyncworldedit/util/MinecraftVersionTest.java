@@ -50,4 +50,9 @@ public class MinecraftVersionTest {
         assertFalse(latestVersion.isLower(new MinecraftVersion(1, 14, 2)));
     }
 
+    @Test
+    public void testBadTest() {
+        assertEquals(latestVersion.equals(1.18))
+    }
+
 }
