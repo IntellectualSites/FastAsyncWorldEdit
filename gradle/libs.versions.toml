@@ -17,7 +17,7 @@ griefprevention = "16.17.1"
 griefdefender = "920a610"
 mcore = "7.0.1"
 residence = "4.5._13.1"
-towny = "0.97.2.15"
+towny = "0.97.5.0"
 protocollib = "4.7.0"
 plotsquaredV6 = "6.1.4"
 plotsquaredV4 = "4.514"
@@ -54,7 +54,7 @@ mockito = "4.1.0"
 checker-qual = "3.19.0"
 
 # Gradle plugins
-pluginyml = "0.5.0"
+pluginyml = "0.5.1"
 
 [libraries]
 # Minecraft expectations
