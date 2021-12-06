@@ -52,7 +52,7 @@ public class MinecraftVersionTest {
 
     @Test
     public void testBadTest() {
-        assertEquals(latestVersion.equals(1.18))
+        assertEquals(latestVersion.equals(1.17))
     }
 
 }
