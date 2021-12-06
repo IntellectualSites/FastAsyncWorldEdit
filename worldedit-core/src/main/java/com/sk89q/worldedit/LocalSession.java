@@ -398,9 +398,20 @@ public class LocalSession implements TextureHolder {
      * Clear history.
      */
     public void clearHistory() {
-        history.clear();
         //FAWE start
+        historyWriteLock.lock();
+        try {
+            // Ensure that changesets are properly removed
+            for (Object item : history) {
+                getChangeSet(item).delete();
+            }
+            history.clear();
+        } finally {
+            historyWriteLock.unlock();
+        }
+
         historyNegativeIndex = 0;
+        save();
         historySize = 0;
         currentWorld = null;
         //FAWE end
