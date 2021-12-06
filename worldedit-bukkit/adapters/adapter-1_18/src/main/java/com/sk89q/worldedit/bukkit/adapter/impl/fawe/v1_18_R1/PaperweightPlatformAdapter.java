@@ -22,22 +22,23 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
-import net.minecraft.network.protocol.game.ClientboundLightUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
+import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkBiomeContainer;
+import net.minecraft.world.level.chunk.GlobalPalette;
 import net.minecraft.world.level.chunk.HashMapPalette;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -55,6 +56,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -74,8 +76,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     public static final Field fieldTickingFluidContent;
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
-
-    private static final Field fieldBiomes;
 
     private static final MethodHandle methodGetVisibleChunk;
 
@@ -108,9 +108,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldTickingBlockCount.setAccessible(true);
             fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("nonEmptyBlockCount", "f"));
             fieldNonEmptyBlockCount.setAccessible(true);
-
-            fieldBiomes = ChunkBiomeContainer.class.getDeclaredField(Refraction.pickName("biomes", "f"));
-            fieldBiomes.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
                     "getVisibleChunkIfPresent",
@@ -248,21 +245,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         LevelChunk levelChunk = optional.get();
         TaskManager.IMP.task(() -> {
-            ClientboundLevelChunkPacketData chunkPacket = new ClientboundLevelChunkPacketData(levelChunk);
-            nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(chunkPacket));
-            if (lighting) {
-                //This needs to be true otherwise Minecraft will update lighting from/at the chunk edges (bad)
-                boolean trustEdges = true;
-                ClientboundLightUpdatePacket packet =
-                        new ClientboundLightUpdatePacket(coordIntPair, nmsWorld.getChunkSource().getLightEngine(), null, null,
-                                trustEdges
-                        );
-                nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
-            }
+            ClientboundLevelChunkWithLightPacket packet =
+                    new ClientboundLevelChunkWithLightPacket(levelChunk, nmsWorld.getChunkSource().getLightEngine(), null, null
+                            , true, false); // last false is to not bother with x-ray
+            nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
         });
     }
 
-    private static Stream<ServerPlayer> nearbyPlayers(ServerLevel serverLevel, ChunkPos coordIntPair) {
+    private static List<ServerPlayer> nearbyPlayers(ServerLevel serverLevel, ChunkPos coordIntPair) {
         return serverLevel.getChunkSource().chunkMap.getPlayers(coordIntPair, false);
     }
 
@@ -271,17 +261,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
      */
     public static LevelChunkSection newChunkSection(
             final int layer, final char[] blocks, boolean fastmode,
-            CachedBukkitAdapter adapter
+            CachedBukkitAdapter adapter, Registry<Biome> biomeRegistry
     ) {
-        return newChunkSection(layer, null, blocks, fastmode, adapter);
+        return newChunkSection(layer, null, blocks, fastmode, adapter, biomeRegistry);
     }
 
     public static LevelChunkSection newChunkSection(
             final int layer, final Function<Integer, char[]> get, char[] set,
-            boolean fastmode, CachedBukkitAdapter adapter
+            boolean fastmode, CachedBukkitAdapter adapter, Registry<Biome> biomeRegistry
     ) {
         if (set == null) {
-            return newChunkSection(layer);
+            return newChunkSection(layer, biomeRegistry);
         }
         final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
         final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
@@ -324,30 +314,42 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 bitArray.fromRaw(blocksCopy);
             }
 
-            LevelChunkSection levelChunkSection = newChunkSection(layer);
             // set palette & data bits
+
             final PalettedContainer<net.minecraft.world.level.block.state.BlockState> dataPaletteBlocks =
-                    levelChunkSection.getStates();
+                    new PalettedContainer<>(
+                            Block.BLOCK_STATE_REGISTRY,
+                            Blocks.AIR.defaultBlockState(),
+                            PalettedContainer.Strategy.SECTION_STATES,
+                            null
+                    );
             // private DataPalette<T> h;
             // protected DataBits a;
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
-            final BitStorage nmsBits = new BitStorage(bitsPerEntry, 4096, bits);
+            final BitStorage nmsBits = new SimpleBitStorage(bitsPerEntry, 4096, bits);
             final Palette<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer;
             if (bitsPerEntry <= 4) {
-                blockStatePalettedContainer = new LinearPalette<>(Block.BLOCK_STATE_REGISTRY, bitsPerEntry, dataPaletteBlocks,
-                        NbtUtils::readBlockState
+                blockStatePalettedContainer = LinearPalette.create(
+                        4,
+                        dataPaletteBlocks.registry,
+                        dataPaletteBlocks,
+                        List.of()
                 );
             } else if (bitsPerEntry < 9) {
-                blockStatePalettedContainer = new HashMapPalette<>(
-                        Block.BLOCK_STATE_REGISTRY,
+                blockStatePalettedContainer = HashMapPalette.create(
                         bitsPerEntry,
+                        dataPaletteBlocks.registry,
                         dataPaletteBlocks,
-                        NbtUtils::readBlockState,
-                        NbtUtils::writeBlockState
+                        List.of()
                 );
             } else {
-                blockStatePalettedContainer = LevelChunkSection.GLOBAL_BLOCKSTATE_PALETTE;
+                blockStatePalettedContainer = GlobalPalette.create(
+                        bitsPerEntry,
+                        dataPaletteBlocks.registry,
+                        dataPaletteBlocks,
+                        List.of());
             }
+            LevelChunkSection levelChunkSection = newChunkSection(layer, biomeRegistry);
 
             // set palette if required
             if (bitsPerEntry < 9) {
@@ -381,8 +383,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
-    private static LevelChunkSection newChunkSection(int layer) {
-        return new LevelChunkSection(layer);
+    private static LevelChunkSection newChunkSection(int layer, Registry<Biome> biomeRegistry) {
+        PalettedContainer<net.minecraft.world.level.block.state.BlockState> dataPaletteBlocks =
+                new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(),
+                        PalettedContainer.Strategy.SECTION_STATES, null);
+        PalettedContainer<Biome> biomesPalette = new PalettedContainer<>(biomeRegistry,
+                biomeRegistry.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null);
+        return new LevelChunkSection(layer, dataPaletteBlocks, biomesPalette);
     }
 
     public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final LevelChunkSection section) throws
@@ -390,15 +397,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         fieldTickingFluidContent.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
-    }
-
-    public static Biome[] getBiomeArray(ChunkBiomeContainer chunkBiomeContainer) {
-        try {
-            return (Biome[]) fieldBiomes.get(chunkBiomeContainer);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     public static BiomeType adapt(Biome biome, LevelAccessor levelAccessor) {

@@ -22,7 +22,6 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_18_R1.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R1.nbt.PaperweightLazyCompoundTag;
-import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R1.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -55,7 +54,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ChunkHolder;
@@ -229,9 +228,31 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         return Registry.BLOCK.get(new ResourceLocation(blockType.getNamespace(), blockType.getResource()));
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
-    public BaseBlock getBlock(Location location) {
+    public BlockState getBlock(Location location) {
+        Preconditions.checkNotNull(location);
+
+        CraftWorld craftWorld = ((CraftWorld) location.getWorld());
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+        final ServerLevel handle = craftWorld.getHandle();
+        LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
+        final BlockPos blockPos = new BlockPos(x, y, z);
+        final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(blockPos);
+        int internalId = Block.getId(blockData);
+        BlockState state = BlockStateIdAccess.getBlockStateById(internalId);
+        if (state == null) {
+            org.bukkit.block.Block bukkitBlock = location.getBlock();
+            state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
+        }
+
+        return state;
+    }
+
+    @Override
+    public BaseBlock getFullBlock(final Location location) {
         Preconditions.checkNotNull(location);
 
         CraftWorld craftWorld = ((CraftWorld) location.getWorld());
@@ -239,19 +260,22 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         int y = location.getBlockY();
         int z = location.getBlockZ();
 
-        final ServerLevel serverLevel = craftWorld.getHandle();
-        LevelChunk levelChunk = serverLevel.getChunk(x >> 4, z >> 4);
+        final ServerLevel handle = craftWorld.getHandle();
+        LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
         final BlockPos blockPos = new BlockPos(x, y, z);
-        org.bukkit.block.Block bukkitBlock = location.getBlock();
-        BlockState state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
+        final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(blockPos);
+        int internalId = Block.getId(blockData);
+        BlockState state = BlockStateIdAccess.getBlockStateById(internalId);
+        if (state == null) {
+            org.bukkit.block.Block bukkitBlock = location.getBlock();
+            state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
+        }
         if (state.getBlockType().getMaterial().hasContainer()) {
 
             // Read the NBT data
-            BlockEntity blockEntity = levelChunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
+            BlockEntity blockEntity = chunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
             if (blockEntity != null) {
-                net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                //TODO save -> saveAdditional
-                blockEntity.save(tag); // readTileEntityIntoTag - load data
+                net.minecraft.nbt.CompoundTag tag = blockEntity.saveWithId();
                 return state.toBaseBlock((CompoundTag) toNative(tag));
             }
         }
@@ -304,12 +328,6 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         } else {
             if (existing == blockState) {
                 return true;
-            }
-            if (section == null) {
-                if (blockState.isAir()) {
-                    return true;
-                }
-                levelChunkSections[y4] = section = new LevelChunkSection(y4 << 4);
             }
             levelChunk.setBlockState(blockPos, blockState, false);
         }
@@ -482,7 +500,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
             stream.filter(entityPlayer -> checkPlayer == null || entityPlayer == checkPlayer)
                     .forEach(entityPlayer -> {
                         synchronized (chunkPacket) {
-                            ClientboundLevelChunkPacketData nmsPacket = (ClientboundLevelChunkPacketData) chunkPacket.getNativePacket();
+                            ClientboundLevelChunkWithLightPacket nmsPacket = (ClientboundLevelChunkWithLightPacket) chunkPacket.getNativePacket();
                             if (nmsPacket == null) {
                                 nmsPacket = mapUtil.create(this, chunkPacket);
                                 chunkPacket.setNativePacket(nmsPacket);
@@ -600,7 +618,8 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
-        return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
+//        return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
+        return false;
     }
 
     @Override

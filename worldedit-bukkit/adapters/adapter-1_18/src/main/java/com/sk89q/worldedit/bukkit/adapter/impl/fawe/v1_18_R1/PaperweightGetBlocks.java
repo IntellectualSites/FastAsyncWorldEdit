@@ -43,7 +43,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 import net.minecraft.world.level.chunk.DataLayer;
 import net.minecraft.world.level.chunk.HashMapPalette;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -60,7 +59,6 @@ import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,9 +84,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     private static final Function<BlockPos, BlockVector3> posNms2We = v -> BlockVector3.at(v.getX(), v.getY(), v.getZ());
     private static final Function<BlockEntity, CompoundTag> nmsTile2We =
-            tileEntity -> new PaperweightLazyCompoundTag(Suppliers.memoize(
-                    //TODO save -> saveAdditional
-                    () -> tileEntity.save(new net.minecraft.nbt.CompoundTag())));
+            tileEntity -> new PaperweightLazyCompoundTag(Suppliers.memoize(tileEntity::saveWithId));
     private final PaperweightFaweAdapter adapter = ((PaperweightFaweAdapter) WorldEditPlugin
             .getInstance()
             .getBukkitImplAdapter());
@@ -100,6 +96,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private final int maxHeight;
     private final int minSectionPosition;
     private final int maxSectionPosition;
+    private final Registry<Biome> biomeRegistry;
     private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
     private DataLayer[] blockLight;
@@ -124,6 +121,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.maxSectionPosition = maxHeight >> 4;
         this.skyLight = new DataLayer[getSectionCount()];
         this.blockLight = new DataLayer[getSectionCount()];
+        this.biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
     }
 
     public int getChunkX() {
@@ -194,19 +192,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        ChunkBiomeContainer index = getChunk().getBiomes();
-        Biome biomes = null;
-        if (y == -1) {
-            for (y = serverLevel.getMinBuildHeight(); y < serverLevel.getMaxBuildHeight(); y += 4) {
-                biomes = index.getNoiseBiome(x >> 2, y >> 2, z >> 2);
-                if (biomes != null) {
-                    break;
-                }
-            }
-        } else {
-            biomes = index.getNoiseBiome(x >> 2, y >> 2, z >> 2);
-        }
-        return biomes != null ? PaperweightPlatformAdapter.adapt(biomes, serverLevel) : null;
+        LevelChunkSection section = getSections(false)[(y >> 4) - getMinSectionPosition()];
+        Biome biomes = section.getNoiseBiome(x >> 2, y >> 2, z >> 2);
+        return PaperweightPlatformAdapter.adapt(biomes, serverLevel);
     }
 
     @Override
@@ -217,10 +205,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         if (dataLayer != null) {
             lightUpdate = true;
             synchronized (dataLayer) {
-                byte[] bytes = PaperLib.isPaper() ? dataLayer.getIfSet() : dataLayer.getData();
-                if (!PaperLib.isPaper() || bytes != DataLayer.EMPTY_NIBBLE) {
-                    Arrays.fill(bytes, (byte) 0);
-                }
+                byte[] bytes = dataLayer.getData();
+                Arrays.fill(bytes, (byte) 0);
             }
         }
         if (sky) {
@@ -233,10 +219,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             if (dataLayer1 != null) {
                 lightUpdate = true;
                 synchronized (dataLayer1) {
-                    byte[] bytes = PaperLib.isPaper() ? dataLayer1.getIfSet() : dataLayer1.getData();
-                    if (!PaperLib.isPaper() || bytes != DataLayer.EMPTY_NIBBLE) {
-                        Arrays.fill(bytes, (byte) 0);
-                    }
+                    byte[] bytes = dataLayer1.getData();
+                    Arrays.fill(bytes, (byte) 0);
                 }
             }
         }
@@ -251,7 +235,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         if (blockEntity == null) {
             return null;
         }
-        return new PaperweightLazyCompoundTag(Suppliers.memoize(() -> blockEntity.save(new net.minecraft.nbt.CompoundTag())));
+        return new PaperweightLazyCompoundTag(Suppliers.memoize(blockEntity::saveWithId));
     }
 
     @Override
@@ -480,7 +464,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         LevelChunkSection newSection;
                         LevelChunkSection existingSection = levelChunkSections[layer];
                         if (existingSection == null) {
-                            newSection = PaperweightPlatformAdapter.newChunkSection(layerNo, setArr, fastmode, adapter);
+                            newSection = PaperweightPlatformAdapter.newChunkSection(layerNo, setArr, fastmode, adapter, biomeRegistry);
                             if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, layer)) {
                                 updateGet(nmsChunk, levelChunkSections, newSection, setArr, layer);
                                 continue;
@@ -524,7 +508,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             this::loadPrivately,
                                             setArr,
                                             fastmode,
-                                            adapter
+                                            adapter,
+                                            biomeRegistry
                                     );
                             if (!PaperweightPlatformAdapter.setSectionAtomic(
                                     levelChunkSections,
@@ -546,22 +531,26 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 BiomeType[] biomes = set.getBiomes();
                 if (biomes != null) {
                     // set biomes
-                    ChunkBiomeContainer currentBiomes = nmsChunk.getBiomes();
-                    if (createCopy) {
-                        copy.storeBiomes(currentBiomes);
-                    }
-                    for (int y = 0, i = 0; y < 64; y++) {
-                        for (int z = 0; z < 4; z++) {
-                            for (int x = 0; x < 4; x++, i++) {
-                                final BiomeType biome = biomes[i];
-                                if (biome != null) {
-                                    Biome nmsBiome =
-                                            nmsWorld.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).get(
-                                                    ResourceLocation.tryParse(biome.getId()));
-                                    if (nmsBiome == null) {
-                                        throw new NullPointerException("BiomeBase null for BiomeType " + biome.getId());
+                    //TODO implement biome history
+//                    ChunkBiomeContainer currentBiomes = nmsChunk.getBiomes();
+//                    if (createCopy) {
+//                        copy.storeBiomes(currentBiomes);
+//                    }
+                    for (LevelChunkSection section : nmsChunk.getSections()) {
+                        for (int y = 0, i = 0; y < 4; y++) {
+                            for (int z = 0; z < 4; z++) {
+                                for (int x = 0; x < 4; x++, i++) {
+                                    final BiomeType biome = biomes[i];
+                                    if (biome != null) {
+                                        Biome nmsBiome =
+                                                nmsWorld.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).get(
+                                                        ResourceLocation.tryParse(biome.getId()));
+                                        if (nmsBiome == null) {
+                                            throw new NullPointerException("BiomeBase null for BiomeType " + biome.getId());
+                                        }
+                                        section.setBiome(x, y, z, nmsBiome);
+//                                    currentBiomes.setBiome(x, y, z, nmsBiome);
                                     }
-                                    currentBiomes.setBiome(x, y, z, nmsBiome);
                                 }
                             }
                         }
@@ -665,7 +654,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     }
                                     entity.load(tag);
                                     entity.absMoveTo(x, y, z, yaw, pitch);
-                                    nmsWorld.addEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                                    nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
                                 }
                             }
                         }
@@ -718,7 +707,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         // Set Modified
                         nmsChunk.setLightCorrect(true); // Set Modified
                         nmsChunk.mustNotSave = false;
-                        nmsChunk.isUnsaved(); // TODO 1.18 revisit
+                        nmsChunk.setUnsaved(true);
                         // send to player
                         if (Settings.IMP.LIGHTING.MODE == 0 || !Settings.IMP.LIGHTING.DELAY_PACKET_SENDING) {
                             this.send(finalMask, finalLightUpdate);

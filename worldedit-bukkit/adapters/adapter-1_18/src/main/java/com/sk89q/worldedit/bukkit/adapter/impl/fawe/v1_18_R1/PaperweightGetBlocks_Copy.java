@@ -18,7 +18,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkBiomeContainer;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -36,7 +35,6 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     private final int minHeight;
     private final int maxHeight;
     private final ServerLevel serverLevel;
-    private ChunkBiomeContainer chunkBiomeContainer;
 
     protected PaperweightGetBlocks_Copy(ServerLevel world) {
         this.serverLevel = world;
@@ -52,8 +50,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
                         blockEntity.getBlockPos().getY(),
                         blockEntity.getBlockPos().getZ()
                 ),
-                new PaperweightLazyCompoundTag(Suppliers.memoize(() -> blockEntity.save(new net.minecraft.nbt.CompoundTag())))
-                //TODO 1.18 save -> saveAdditional
+                new PaperweightLazyCompoundTag(Suppliers.memoize(blockEntity::saveWithId))
         );
     }
 
@@ -142,28 +139,18 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         return minHeight >> 4;
     }
 
-    protected void storeBiomes(ChunkBiomeContainer chunkBiomeContainer) {
-        // The to do one line below is pre-paperweight and needs to be revised
-        // TODO revisit last parameter, BiomeStorage[] *would* be more efficient
-        this.chunkBiomeContainer = new ChunkBiomeContainer(chunkBiomeContainer.biomeRegistry, serverLevel,
-                chunkBiomeContainer.writeBiomes()
-        );
-    }
+    //TODO fix change in biome storage
+//    protected void storeBiomes(ChunkBiomeContainer chunkBiomeContainer) {
+//        // The to do one line below is pre-paperweight and needs to be revised
+//        // TODO revisit last parameter, BiomeStorage[] *would* be more efficient
+//        this.chunkBiomeContainer = new ChunkBiomeContainer(chunkBiomeContainer.biomeRegistry, serverLevel,
+//                chunkBiomeContainer.writeBiomes()
+//        );
+//    }
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        Biome biome = null;
-        if (y == -1) {
-            for (y = serverLevel.getMinBuildHeight(); y <= serverLevel.getMaxBuildHeight(); y += 4) {
-                biome = this.chunkBiomeContainer.getNoiseBiome(x >> 2, y >> 2, z >> 2);
-                if (biome != null) {
-                    break;
-                }
-            }
-        } else {
-            biome = this.chunkBiomeContainer.getNoiseBiome(x >> 2, y >> 2, z >> 2);
-        }
-        return biome != null ? PaperweightPlatformAdapter.adapt(biome, serverLevel) : null;
+        return null;
     }
 
     @Override
