@@ -59,7 +59,6 @@ import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.EmptyClipboardException;
 import com.sk89q.worldedit.LocalSession;
@@ -1187,9 +1186,9 @@ public class BrushCommands {
             //FAWE start - Suggest different brush material if sand or gravel is used
             if (pattern instanceof BlockStateHolder) {
                 BlockType type = ((BlockStateHolder) pattern).getBlockType();
-                switch (type.getInternalId()) {
-                    case BlockID.SAND:
-                    case BlockID.GRAVEL:
+                switch (type.getId()) {
+                    case "minecraft:sand":
+                    case "minecraft:gravel":
                         player.print(
                                 Caption.of("fawe.worldedit.brush.brush.try.other"));
                         falling = true;

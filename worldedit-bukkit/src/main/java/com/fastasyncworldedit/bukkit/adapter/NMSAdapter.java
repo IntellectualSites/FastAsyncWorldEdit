@@ -4,7 +4,6 @@ import com.fastasyncworldedit.core.FAWEPlatformAdapterImpl;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.util.MathMan;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -24,8 +23,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         int num_palette = 0;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
-            if (ordinal == BlockID.__RESERVED__) {
-                ordinal = BlockID.AIR;
+            if (ordinal == 0) {
+                ordinal = 1;
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -43,17 +42,17 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             }
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
-        char lastOrdinal = BlockID.__RESERVED__;
+        char lastOrdinal = 0;
         boolean lastticking = false;
         boolean tick_placed = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
-                case BlockID.__RESERVED__:
-                    ordinal = BlockID.AIR;
-                case BlockID.AIR:
-                case BlockID.CAVE_AIR:
-                case BlockID.VOID_AIR:
+                case 0:
+                    ordinal = 1;
+                case 1:
+                case 2:
+                case 3:
                     air++;
                     break;
                 default:
@@ -95,13 +94,13 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         char[] getArr = null;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
-            if (ordinal == BlockID.__RESERVED__) {
+            if (ordinal == 0) {
                 if (getArr == null) {
                     getArr = get.apply(layer);
                 }
                 ordinal = getArr[i];
-                if (ordinal == BlockID.__RESERVED__) {
-                    ordinal = BlockID.AIR;
+                if (ordinal == 0) {
+                    ordinal = 1;
                 }
             }
             int palette = blockToPalette[ordinal];
@@ -120,24 +119,24 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             }
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
-        char lastOrdinal = BlockID.__RESERVED__;
+        char lastOrdinal = 0;
         boolean lastticking = false;
         boolean tick_placed = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED;
         boolean tick_existing = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_EXISTING;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
-                case BlockID.__RESERVED__: {
+                case 0: {
                     if (getArr == null) {
                         getArr = get.apply(layer);
                     }
                     ordinal = getArr[i];
                     switch (ordinal) {
-                        case BlockID.__RESERVED__:
-                            ordinal = BlockID.AIR;
-                        case BlockID.AIR:
-                        case BlockID.CAVE_AIR:
-                        case BlockID.VOID_AIR:
+                        case 0:
+                            ordinal = 1;
+                        case 1:
+                        case 2:
+                        case 3:
                             air++;
                             break;
                         default:
@@ -164,9 +163,9 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                     set[i] = ordinal;
                     break;
                 }
-                case BlockID.AIR:
-                case BlockID.CAVE_AIR:
-                case BlockID.VOID_AIR:
+                case 1:
+                case 2:
+                case 3:
                     air++;
                     break;
             }

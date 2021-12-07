@@ -2,7 +2,6 @@ package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.fastasyncworldedit.core.util.MathMan;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.google.common.primitives.Booleans;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
@@ -14,7 +13,6 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.Registries;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -218,13 +216,14 @@ public class BlockTypesCache {
                     : item, item -> item));
 
             int size = blockMap.size() + 1;
-            Field[] idFields = BlockID.class.getDeclaredFields();
-            for (Field field : idFields) {
-                size = Math.max(field.getInt(null) + 1, size);
-            }
             BIT_OFFSET = MathMan.log2nlz(size);
             BIT_MASK = ((1 << BIT_OFFSET) - 1);
             values = new BlockType[size];
+
+            /*Field[] idFields = BlockID.class.getDeclaredFields();
+            for (Field field : idFields) {
+                size = Math.max(field.getInt(null) + 1, size);
+            }
 
             // Register the statically declared ones first
             for (Field field : idFields) {
@@ -245,9 +244,26 @@ public class BlockTypesCache {
                     // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
                     values[internalId] = type;
                 }
+            }*/
+
+            // Register "Reserved"
+            {
+                int internalId = 0;
+                String id = "minecraft:__reserved__";
+                String defaultState = blockMap.remove(id);
+                if (defaultState == null) {
+                    defaultState = id;
+                }
+                if (values[internalId] != null) {
+                    throw new IllegalStateException("Invalid duplicate id for __reserved__! Something has gone very wrong. Are " +
+                            "any plugins shading FAWE?!");
+                }
+                BlockType type = register(defaultState, internalId, stateList, tickList);
+                // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
+                values[internalId] = type;
             }
 
-            { // Register new blocks
+            { // Register real blocks
                 int internalId = 1;
                 for (Map.Entry<String, String> entry : blockMap.entrySet()) {
                     String defaultState = entry.getValue();

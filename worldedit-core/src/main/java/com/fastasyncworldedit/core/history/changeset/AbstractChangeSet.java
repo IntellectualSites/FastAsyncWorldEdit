@@ -10,7 +10,6 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -187,7 +186,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                         int xx = bx + x;
                         int from = blocksGet[index];
                         if (from == 0) {
-                            from = BlockID.AIR;
+                            from = 1;
                         }
                         final int combinedFrom = from;
                         final int combinedTo = blocksSet[index];
