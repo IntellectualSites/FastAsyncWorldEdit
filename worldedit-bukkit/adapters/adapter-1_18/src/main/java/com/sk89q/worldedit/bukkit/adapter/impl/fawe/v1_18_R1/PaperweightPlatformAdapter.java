@@ -5,7 +5,6 @@ import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
@@ -20,6 +19,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
@@ -30,6 +30,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.SimpleBitStorage;
+import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -45,17 +46,24 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.LinearPalette;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.gameevent.GameEventDispatcher;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import org.bukkit.craftbukkit.v1_18_R1.CraftChunk;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -63,15 +71,16 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 public final class PaperweightPlatformAdapter extends NMSAdapter {
 
+    public static final Field fieldData;
+
+    public static final Constructor<?> dataConstructor;
+
     public static final Field fieldStorage;
     public static final Field fieldPalette;
-    public static final Field fieldBits;
 
-    public static final Field fieldBitsPerEntry;
 
     public static final Field fieldTickingFluidContent;
     public static final Field fieldTickingBlockCount;
@@ -81,6 +90,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final int CHUNKSECTION_BASE;
     private static final int CHUNKSECTION_SHIFT;
+
+    private static final Field fieldThreadingDetector;
+    private static final long fieldThreadingDetectorOffset;
 
     private static final Field fieldLock;
     private static final long fieldLockOffset;
@@ -92,15 +104,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static {
         try {
-            fieldBits = PalettedContainer.class.getDeclaredField(Refraction.pickName("bits", "l"));
-            fieldBits.setAccessible(true);
-            fieldStorage = PalettedContainer.class.getDeclaredField(Refraction.pickName("storage", "c"));
-            fieldStorage.setAccessible(true);
-            fieldPalette = PalettedContainer.class.getDeclaredField(Refraction.pickName("palette", "k"));
-            fieldPalette.setAccessible(true);
+            fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "d"));
+            fieldData.setAccessible(true);
 
-            fieldBitsPerEntry = BitStorage.class.getDeclaredField(Refraction.pickName("bits", "c"));
-            fieldBitsPerEntry.setAccessible(true);
+            Class<?> dataClazz = fieldData.getType();
+            dataConstructor = dataClazz.getConstructors()[0];
+            dataConstructor.setAccessible(true);
+
+            fieldStorage = dataClazz.getDeclaredField(Refraction.pickName("storage", "b"));
+            fieldStorage.setAccessible(true);
+            fieldPalette = dataClazz.getDeclaredField(Refraction.pickName("palette", "c"));
+            fieldPalette.setAccessible(true);
 
             fieldTickingFluidContent = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "h"));
             fieldTickingFluidContent.setAccessible(true);
@@ -111,22 +125,25 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
                     "getVisibleChunkIfPresent",
-                    "getVisibleChunk"
+                    "b"
             ), long.class);
             getVisibleChunkIfPresent.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
 
             Unsafe unsafe = ReflectionUtils.getUnsafe();
-            fieldLock = PalettedContainer.class.getDeclaredField(Refraction.pickName("lock", "m"));
+            fieldThreadingDetector = PalettedContainer.class.getDeclaredField(Refraction.pickName("threadingDetector", "f"));
+            fieldThreadingDetectorOffset = unsafe.objectFieldOffset(fieldThreadingDetector);
+
+            fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "c"));
             fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
 
             fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField(Refraction.pickName(
-                    "gameEventDispatcherSections", "x"));
+                    "gameEventDispatcherSections", "t"));
             fieldGameEventDispatcherSections.setAccessible(true);
             Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
                     Refraction.pickName(
                             "removeBlockEntityTicker",
-                            "l"
+                            "m"
                     ), BlockPos.class
             );
             removeBlockEntityTicker.setAccessible(true);
@@ -168,13 +185,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             synchronized (section) {
                 Unsafe unsafe = ReflectionUtils.getUnsafe();
                 PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.getStates();
-                Semaphore currentLock = (Semaphore) unsafe.getObject(blocks, fieldLockOffset);
-                if (currentLock instanceof DelegateSemaphore) {
-                    return (DelegateSemaphore) currentLock;
+                ThreadingDetector currentThreadingDetector = (ThreadingDetector) unsafe.getObject(blocks,
+                        fieldThreadingDetectorOffset) ;
+                synchronized(currentThreadingDetector) {
+                    Semaphore currentLock = (Semaphore) unsafe.getObject(currentThreadingDetector, fieldLockOffset);
+                    if (currentLock instanceof DelegateSemaphore) {
+                        return (DelegateSemaphore) currentLock;
+                    }
+                    DelegateSemaphore newLock = new DelegateSemaphore(1, currentLock);
+                    unsafe.putObject(currentThreadingDetector, fieldLockOffset, newLock);
+                    return newLock;
                 }
-                DelegateSemaphore newLock = new DelegateSemaphore(1, currentLock);
-                unsafe.putObject(blocks, fieldLockOffset, newLock);
-                return newLock;
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -292,16 +313,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             int num_palette = num_palette_buffer[0];
             // BlockStates
+
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-            if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
-                bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
-            } else {
-                bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
-            }
-            if (bitsPerEntry > 8) {
+            Object configuration =
+                    PalettedContainer.Strategy.SECTION_STATES.getConfiguration(new FakeIdMapBlock(num_palette), bitsPerEntry);
+            if (bitsPerEntry > 0 && bitsPerEntry < 5) {
+                bitsPerEntry = 4;
+            } else if (bitsPerEntry > 8) {
                 bitsPerEntry = MathMan.log2nlz(Block.BLOCK_STATE_REGISTRY.size() - 1);
             }
 
+            bitsPerEntry = 0;
             final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntry);
             final int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
 
@@ -328,7 +350,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             final BitStorage nmsBits = new SimpleBitStorage(bitsPerEntry, 4096, bits);
             final Palette<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer;
-            if (bitsPerEntry <= 4) {
+            if (bitsPerEntry == 0) {
+                blockStatePalettedContainer = new SingleValuePalette(
+                        dataPaletteBlocks.registry,
+                        dataPaletteBlocks,
+                        List.of()
+                );
+            } else if (bitsPerEntry == 4) {
                 blockStatePalettedContainer = LinearPalette.create(
                         4,
                         dataPaletteBlocks.registry,
@@ -349,7 +377,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                         dataPaletteBlocks,
                         List.of());
             }
-            LevelChunkSection levelChunkSection = newChunkSection(layer, biomeRegistry);
 
             // set palette if required
             if (bitsPerEntry < 9) {
@@ -361,10 +388,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     blockStatePalettedContainer.idFor(blockState);
                 }
             }
+            LevelChunkSection levelChunkSection;
             try {
-                fieldStorage.set(dataPaletteBlocks, nmsBits);
-                fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
-                fieldBits.set(dataPaletteBlocks, bitsPerEntry);
+                Object data = dataConstructor.newInstance(configuration, nmsBits, blockStatePalettedContainer);
+                fieldData.set(dataPaletteBlocks, data);
+                //fieldStorage.set(dataPaletteBlocks, nmsBits);
+                //fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
+                PalettedContainer<Biome> biomesPalette = new PalettedContainer<>(biomeRegistry,
+                        biomeRegistry.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null);
+                levelChunkSection = new LevelChunkSection(layer, dataPaletteBlocks, biomesPalette);
                 setCount(ticking_blocks.size(), 4096 - air, levelChunkSection);
                 if (!fastmode) {
                     ticking_blocks.forEach((pos, ordinal) -> levelChunkSection
@@ -372,7 +404,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                                     Block.stateById(ordinal)
                             ));
                 }
-            } catch (final IllegalAccessException e) {
+            } catch (final IllegalAccessException | InvocationTargetException | InstantiationException e) {
                 throw new RuntimeException(e);
             }
 
@@ -442,6 +474,38 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+    }
+
+    static class FakeIdMapBlock implements IdMap<net.minecraft.world.level.block.state.BlockState> {
+
+        private final int size;
+
+        FakeIdMapBlock(int size) {
+            this.size = size;
+        }
+
+        @Override
+        public int getId(final net.minecraft.world.level.block.state.BlockState entry) {
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        public net.minecraft.world.level.block.state.BlockState byId(final int index) {
+            return null;
+        }
+
+        @Override
+        public int size() {
+            return size;
+        }
+
+        @NotNull
+        @Override
+        public Iterator<net.minecraft.world.level.block.state.BlockState> iterator() {
+            return Collections.emptyIterator();
+        }
+
     }
 
 }

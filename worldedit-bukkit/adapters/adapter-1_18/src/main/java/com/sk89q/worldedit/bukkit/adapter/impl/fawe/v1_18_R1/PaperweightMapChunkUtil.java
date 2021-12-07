@@ -11,11 +11,12 @@ public class PaperweightMapChunkUtil extends MapChunkUtil<ClientboundLevelChunkW
 
     public PaperweightMapChunkUtil() throws NoSuchFieldException {
         fieldX = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("TWO_MEGABYTES", "a"));
-        fieldZ = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName("x", "b"));
-        fieldBitMask = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName("z", "c"));
-        fieldChunkData = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("biomes", "f"));
-        fieldBlockEntities = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("buffer", "g"));
-        fieldFull = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("blockEntitiesTags", "h"));
+        fieldZ = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName("x", "a"));
+        fieldBitMask = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName("z", "b"));
+        fieldHeightMap = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("heightmaps", "b"));
+        fieldChunkData = ClientboundLevelChunkWithLightPacket.class.getDeclaredField(Refraction.pickName("chunkData", "c"));
+        fieldBlockEntities = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("buffer", "c"));
+        fieldFull = ClientboundLevelChunkPacketData.class.getDeclaredField(Refraction.pickName("blockEntitiesData", "d"));
         fieldX.setAccessible(true);
         fieldZ.setAccessible(true);
         fieldBitMask.setAccessible(true);

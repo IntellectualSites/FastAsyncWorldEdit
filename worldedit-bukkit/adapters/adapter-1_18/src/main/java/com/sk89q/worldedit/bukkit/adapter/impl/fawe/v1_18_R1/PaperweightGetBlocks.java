@@ -849,7 +849,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 final BitStorage bits = (BitStorage) PaperweightPlatformAdapter.fieldStorage.get(blocks);
                 final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.fieldPalette.get(blocks);
 
-                final int bitsPerEntry = (int) PaperweightPlatformAdapter.fieldBitsPerEntry.get(bits);
+                final int bitsPerEntry = bits.getBits();
                 final long[] blockStates = bits.getRaw();
 
                 new BitArrayUnstretched(bitsPerEntry, 4096, blockStates).toRaw(data);
