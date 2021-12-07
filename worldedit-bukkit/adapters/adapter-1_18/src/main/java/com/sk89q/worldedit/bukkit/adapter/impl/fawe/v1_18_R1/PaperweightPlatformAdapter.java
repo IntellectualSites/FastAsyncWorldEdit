@@ -403,13 +403,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 fieldData.set(blockStatePalettedContainer, data);
                 //fieldStorage.set(dataPaletteBlocks, nmsBits);
                 //fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
-                PalettedContainer<Biome> biomesPalette = new PalettedContainer<>(
-                        biomeRegistry,
-                        biomeRegistry.getOrThrow(Biomes.PLAINS),
-                        PalettedContainer.Strategy.SECTION_BIOMES,
-                        null
-                );
-                levelChunkSection = new LevelChunkSection(layer, blockStatePalettedContainer, biomesPalette);
+                if (biomes == null) {
+                    biomes = new PalettedContainer<>(
+                            biomeRegistry,
+                            biomeRegistry.getOrThrow(Biomes.PLAINS),
+                            PalettedContainer.Strategy.SECTION_BIOMES,
+                            null
+                    );
+                }
+                levelChunkSection = new LevelChunkSection(layer, blockStatePalettedContainer, biomes);
                 setCount(ticking_blocks.size(), 4096 - air, levelChunkSection);
                 if (!fastmode) {
                     ticking_blocks.forEach((pos, ordinal) -> levelChunkSection.setBlockState(
