@@ -9,9 +9,9 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
+import com.sk89q.worldedit.bukkit.adapter.ext.fawe.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -21,12 +21,9 @@ import com.sk89q.worldedit.world.RegenOptions;
 import io.papermc.lib.PaperLib;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.worldgen.biome.Biomes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.resources.RegistryReadOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -78,12 +75,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BooleanSupplier;
@@ -220,19 +215,11 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
         PrimaryLevelData levelProperties = (PrimaryLevelData) server.getWorldData();
-        RegistryReadOps<net.minecraft.nbt.Tag> nbtRegOps = RegistryReadOps.createAndLoad(
-                NbtOps.INSTANCE, server.resources.getResourceManager(),
-                RegistryAccess.builtin()
-        );
-        WorldGenSettings newOpts = WorldGenSettings.CODEC
-                .encodeStart(nbtRegOps, levelProperties.worldGenSettings())
-                .flatMap(tag -> WorldGenSettings.CODEC.parse(this.recursivelySetSeed(
-                        new Dynamic<>(nbtRegOps, tag),
-                        seed,
-                        new HashSet<>()
-                )))
-                .result()
-                .orElseThrow(() -> new IllegalStateException("Unable to map GeneratorOptions"));
+        WorldGenSettings originalOpts = levelProperties.worldGenSettings();
+
+        WorldGenSettings newOpts = options.getSeed().isPresent()
+                ? PaperweightAdapter.replaceSeed(originalServerWorld, seed, originalOpts)
+                : originalOpts;
         LevelSettings newWorldSettings = new LevelSettings(
                 "worldeditregentempworld",
                 originalWorldData.settings.gameType(),
@@ -436,23 +423,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             default:
                 return LevelStem.OVERWORLD;
         }
-    }
-
-    private Dynamic<net.minecraft.nbt.Tag> recursivelySetSeed(
-            Dynamic<net.minecraft.nbt.Tag> dynamic,
-            long seed,
-            Set<Dynamic<net.minecraft.nbt.Tag>> dynamicSet
-    ) {
-        return !dynamicSet.add(dynamic) ? dynamic : dynamic.updateMapValues((pair) -> {
-            if (pair.getFirst().asString("").equals("seed")) {
-                return pair.mapSecond((v) -> v.createLong(seed));
-            } else {
-                return ((Dynamic) pair.getSecond()).getValue() instanceof CompoundTag
-                        ? pair.mapSecond((v) -> this.recursivelySetSeed((Dynamic) v, seed, dynamicSet))
-                        : pair;
-
-            }
-        });
     }
 
     private BiomeSource fastOverworldBiomeSource(BiomeSource biomeSource) throws Exception {
