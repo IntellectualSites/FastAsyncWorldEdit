@@ -102,7 +102,6 @@ dependencies {
     compileOnly(libs.protocollib) { isTransitive = false }
     compileOnly(libs.plotsquaredV6Bukkit) { isTransitive = false }
     compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
-    compileOnly(libs.plotsquaredV4) { isTransitive = false }
 
     // Third party
     compileOnly(libs.flowmath) {

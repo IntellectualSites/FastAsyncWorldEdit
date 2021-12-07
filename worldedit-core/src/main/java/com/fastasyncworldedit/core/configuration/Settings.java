@@ -63,8 +63,6 @@ public class Settings extends Config {
     @Create
     public WEB WEB;
     @Create
-    public PLOTSQUARED_INTEGRATION PLOTSQUARED_INTEGRATION;
-    @Create
     public EXTENT EXTENT;
     @Create
     public EXPERIMENTAL EXPERIMENTAL;
@@ -483,17 +481,6 @@ public class Settings extends Config {
                 "Set to -1 to disable"
         })
         public int PER_PLAYER_FILE_NUM_LIMIT = -1;
-
-    }
-
-    public static class PLOTSQUARED_INTEGRATION {
-
-        @Comment({
-                "Only disables/enables the components with PlotSquared v4.",
-                "For v6, see PlotSquared settings.yml"
-        })
-        public boolean CLEAR = true;
-        public boolean COPY_AND_SWAP = true;
 
     }
 

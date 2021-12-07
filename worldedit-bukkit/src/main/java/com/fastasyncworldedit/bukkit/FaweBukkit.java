@@ -310,14 +310,12 @@ public class FaweBukkit implements IFawe, Listener {
         if (plotSquared == null) {
             return;
         }
-        if (plotSquared.getClass().getPackage().toString().contains("intellectualsites")) {
-            WEManager.IMP.addManager(new com.fastasyncworldedit.bukkit.regions.plotsquaredv4.PlotSquaredFeature());
-            LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
-        } else if (PlotSquared.get().getVersion().version[0] == 6) {
+        if (PlotSquared.get().getVersion().version[0] == 6) {
             WEManager.IMP.addManager(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
-            LOGGER.info("Plugin 'PlotSquared' found. Using it now.");
+            LOGGER.info("Plugin 'PlotSquared' v6 found. Using it now.");
         } else {
             LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");
+            LOGGER.info("https://www.spigotmc.org/resources/77506/");
         }
     }
 
