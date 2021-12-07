@@ -122,7 +122,7 @@ public final class NullChunk implements IQueueChunk {
     }
 
     @Nullable
-    public BiomeType[] getBiomes() {
+    public BiomeType[][] getBiomes() {
         return null;
     }
 

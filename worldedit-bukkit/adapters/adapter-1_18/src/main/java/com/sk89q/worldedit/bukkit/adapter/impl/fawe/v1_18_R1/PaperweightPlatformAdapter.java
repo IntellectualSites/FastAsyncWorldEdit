@@ -65,6 +65,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -109,7 +110,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldData.setAccessible(true);
 
             Class<?> dataClazz = fieldData.getType();
-            System.out.println(dataClazz.getName());
             dataConstructor = dataClazz.getDeclaredConstructors()[0];
             dataConstructor.setAccessible(true);
 
@@ -284,17 +284,19 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
      */
     public static LevelChunkSection newChunkSection(
             final int layer, final char[] blocks, boolean fastmode,
-            CachedBukkitAdapter adapter, Registry<Biome> biomeRegistry
+            CachedBukkitAdapter adapter, Registry<Biome> biomeRegistry,
+            @Nullable PalettedContainer<Biome> biomes
     ) {
-        return newChunkSection(layer, null, blocks, fastmode, adapter, biomeRegistry);
+        return newChunkSection(layer, null, blocks, fastmode, adapter, biomeRegistry, biomes);
     }
 
     public static LevelChunkSection newChunkSection(
             final int layer, final Function<Integer, char[]> get, char[] set,
-            boolean fastmode, CachedBukkitAdapter adapter, Registry<Biome> biomeRegistry
+            boolean fastmode, CachedBukkitAdapter adapter, Registry<Biome> biomeRegistry,
+            @Nullable PalettedContainer<Biome> biomes
     ) {
         if (set == null) {
-            return newChunkSection(layer, biomeRegistry);
+            return newChunkSection(layer, biomeRegistry, biomes);
         }
         final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
         final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
@@ -340,7 +342,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             // set palette & data bits
 
-            final PalettedContainer<net.minecraft.world.level.block.state.BlockState> dataPaletteBlocks =
+            final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
                     new PalettedContainer<>(
                             Block.BLOCK_STATE_REGISTRY,
                             Blocks.AIR.defaultBlockState(),
@@ -356,32 +358,32 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             } else {
                 nmsBits = new SimpleBitStorage(bitsPerEntry, 4096, bits);
             }
-            final Palette<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer;
+            final Palette<net.minecraft.world.level.block.state.BlockState> blockStatePalette;
             if (bitsPerEntry == 0) {
-                blockStatePalettedContainer = new SingleValuePalette(
-                        dataPaletteBlocks.registry,
-                        dataPaletteBlocks,
+                blockStatePalette = new SingleValuePalette<>(
+                        blockStatePalettedContainer.registry,
+                        blockStatePalettedContainer,
                         List.of()
                 );
             } else if (bitsPerEntry == 4) {
-                blockStatePalettedContainer = LinearPalette.create(
+                blockStatePalette = LinearPalette.create(
                         4,
-                        dataPaletteBlocks.registry,
-                        dataPaletteBlocks,
+                        blockStatePalettedContainer.registry,
+                        blockStatePalettedContainer,
                         List.of()
                 );
             } else if (bitsPerEntry < 9) {
-                blockStatePalettedContainer = HashMapPalette.create(
+                blockStatePalette = HashMapPalette.create(
                         bitsPerEntry,
-                        dataPaletteBlocks.registry,
-                        dataPaletteBlocks,
+                        blockStatePalettedContainer.registry,
+                        blockStatePalettedContainer,
                         List.of()
                 );
             } else {
-                blockStatePalettedContainer = GlobalPalette.create(
+                blockStatePalette = GlobalPalette.create(
                         bitsPerEntry,
-                        dataPaletteBlocks.registry,
-                        dataPaletteBlocks,
+                        blockStatePalettedContainer.registry,
+                        blockStatePalettedContainer,
                         List.of());
             }
 
@@ -392,24 +394,30 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     blockToPalette[ordinal] = Integer.MAX_VALUE;
                     final BlockState state = BlockTypesCache.states[ordinal];
                     final net.minecraft.world.level.block.state.BlockState blockState = ((PaperweightBlockMaterial) state.getMaterial()).getState();
-                    blockStatePalettedContainer.idFor(blockState);
+                    blockStatePalette.idFor(blockState);
                 }
             }
             LevelChunkSection levelChunkSection;
             try {
-                Object data = dataConstructor.newInstance(configuration, nmsBits, blockStatePalettedContainer);
-                fieldData.set(dataPaletteBlocks, data);
+                Object data = dataConstructor.newInstance(configuration, nmsBits, blockStatePalette);
+                fieldData.set(blockStatePalettedContainer, data);
                 //fieldStorage.set(dataPaletteBlocks, nmsBits);
                 //fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
-                PalettedContainer<Biome> biomesPalette = new PalettedContainer<>(biomeRegistry,
-                        biomeRegistry.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null);
-                levelChunkSection = new LevelChunkSection(layer, dataPaletteBlocks, biomesPalette);
+                PalettedContainer<Biome> biomesPalette = new PalettedContainer<>(
+                        biomeRegistry,
+                        biomeRegistry.getOrThrow(Biomes.PLAINS),
+                        PalettedContainer.Strategy.SECTION_BIOMES,
+                        null
+                );
+                levelChunkSection = new LevelChunkSection(layer, blockStatePalettedContainer, biomesPalette);
                 setCount(ticking_blocks.size(), 4096 - air, levelChunkSection);
                 if (!fastmode) {
-                    ticking_blocks.forEach((pos, ordinal) -> levelChunkSection
-                            .setBlockState(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(),
-                                    Block.stateById(ordinal)
-                            ));
+                    ticking_blocks.forEach((pos, ordinal) -> levelChunkSection.setBlockState(
+                            pos.getBlockX(),
+                            pos.getBlockY(),
+                            pos.getBlockZ(),
+                            Block.stateById(ordinal)
+                    ));
                 }
             } catch (final IllegalAccessException | InvocationTargetException | InstantiationException e) {
                 throw new RuntimeException(e);
@@ -422,13 +430,106 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
-    private static LevelChunkSection newChunkSection(int layer, Registry<Biome> biomeRegistry) {
-        PalettedContainer<net.minecraft.world.level.block.state.BlockState> dataPaletteBlocks =
-                new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(),
-                        PalettedContainer.Strategy.SECTION_STATES, null);
-        PalettedContainer<Biome> biomesPalette = new PalettedContainer<>(biomeRegistry,
-                biomeRegistry.getOrThrow(Biomes.PLAINS), PalettedContainer.Strategy.SECTION_BIOMES, null);
+    private static LevelChunkSection newChunkSection(
+            int layer, Registry<Biome> biomeRegistry,
+            @Nullable PalettedContainer<Biome> biomes
+    ) {
+        PalettedContainer<net.minecraft.world.level.block.state.BlockState> dataPaletteBlocks = new PalettedContainer<>(
+                Block.BLOCK_STATE_REGISTRY,
+                Blocks.AIR.defaultBlockState(),
+                PalettedContainer.Strategy.SECTION_STATES,
+                null
+        );
+        PalettedContainer<Biome> biomesPalette = biomes != null ? biomes : new PalettedContainer<>(
+                biomeRegistry,
+                biomeRegistry.getOrThrow(Biomes.PLAINS),
+                PalettedContainer.Strategy.SECTION_BIOMES,
+                null
+        );
         return new LevelChunkSection(layer, dataPaletteBlocks, biomesPalette);
+    }
+
+    public static PalettedContainer<Biome> getBiomePalettedContainer(
+            BiomeType[] biomes, Registry<Biome> biomeRegistry,
+            ServerLevel serverLevel
+    ) {
+        if (biomes == null) {
+            return null;
+        }
+        List<BiomeType> uniqueBiomes = new LinkedList<>(Arrays.asList(biomes));
+        int biomeCount = uniqueBiomes.size();
+        int bitsPerEntry = MathMan.log2nlz(biomeCount - 1);
+        Object configuration = PalettedContainer.Strategy.SECTION_STATES.getConfiguration(
+                new FakeIdMapBiome(biomeCount),
+                bitsPerEntry
+        );
+        if (bitsPerEntry > 3) {
+            bitsPerEntry = MathMan.log2nlz(biomeRegistry.size() - 1);
+        }
+        PalettedContainer<Biome> biomePalettedContainer = new PalettedContainer<>(
+                biomeRegistry,
+                biomeRegistry.getOrThrow(Biomes.PLAINS),
+                PalettedContainer.Strategy.SECTION_BIOMES,
+                null
+        );
+
+        final Palette<Biome> biomePalette;
+        if (bitsPerEntry == 0) {
+            biomePalette = new SingleValuePalette<>(
+                    biomePalettedContainer.registry,
+                    biomePalettedContainer,
+                    List.of()
+            );
+        } else if (bitsPerEntry == 4) {
+            biomePalette = LinearPalette.create(
+                    4,
+                    biomePalettedContainer.registry,
+                    biomePalettedContainer,
+                    List.of()
+            );
+        } else if (bitsPerEntry < 9) {
+            biomePalette = HashMapPalette.create(
+                    bitsPerEntry,
+                    biomePalettedContainer.registry,
+                    biomePalettedContainer,
+                    List.of()
+            );
+        } else {
+            biomePalette = GlobalPalette.create(
+                    bitsPerEntry,
+                    biomePalettedContainer.registry,
+                    biomePalettedContainer,
+                    List.of()
+            );
+        }
+
+        int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
+        final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntryNonZero);
+        final int bitLongArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
+
+
+        BitStorage bitStorage = bitsPerEntry == 0 ? new ZeroBitStorage(64) : new SimpleBitStorage(
+                bitsPerEntry,
+                64,
+                new long[bitLongArrayEnd]
+        );
+
+        try {
+            Object data = dataConstructor.newInstance(configuration, bitStorage, biomePalette);
+            fieldData.set(biomePalettedContainer, data);
+            int index = 0;
+            for (int y = 0; y < 4; y++) {
+                for (int z = 0; z < 4; z++) {
+                    for (int x = 0; x < 4; x++, index++) {
+                        biomePalettedContainer.set(x, y, z, biomeRegistry.get(ResourceLocation.tryParse(biomes[index].getId())));
+                    }
+                }
+            }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+        return biomePalettedContainer;
+
     }
 
     public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final LevelChunkSection section) throws
@@ -510,6 +611,38 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         @NotNull
         @Override
         public Iterator<net.minecraft.world.level.block.state.BlockState> iterator() {
+            return Collections.emptyIterator();
+        }
+
+    }
+
+    static class FakeIdMapBiome implements IdMap<Biome> {
+
+        private final int size;
+
+        FakeIdMapBiome(int size) {
+            this.size = size;
+        }
+
+        @Override
+        public int getId(final Biome entry) {
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        public Biome byId(final int index) {
+            return null;
+        }
+
+        @Override
+        public int size() {
+            return size;
+        }
+
+        @NotNull
+        @Override
+        public Iterator<Biome> iterator() {
             return Collections.emptyIterator();
         }
 

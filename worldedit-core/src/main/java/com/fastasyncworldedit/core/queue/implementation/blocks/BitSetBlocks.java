@@ -161,7 +161,7 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public BiomeType[] getBiomes() {
+    public BiomeType[][] getBiomes() {
         return null;
     }
 

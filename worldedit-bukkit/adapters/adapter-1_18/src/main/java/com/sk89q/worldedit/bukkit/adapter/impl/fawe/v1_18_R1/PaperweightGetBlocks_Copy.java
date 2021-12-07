@@ -18,6 +18,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.PalettedContainer;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     private final int minHeight;
     private final int maxHeight;
     private final ServerLevel serverLevel;
+    private PalettedContainer<Biome>[] biomes = null;
 
     protected PaperweightGetBlocks_Copy(ServerLevel world) {
         this.serverLevel = world;
@@ -139,18 +141,10 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         return minHeight >> 4;
     }
 
-    //TODO fix change in biome storage
-//    protected void storeBiomes(ChunkBiomeContainer chunkBiomeContainer) {
-//        // The to do one line below is pre-paperweight and needs to be revised
-//        // TODO revisit last parameter, BiomeStorage[] *would* be more efficient
-//        this.chunkBiomeContainer = new ChunkBiomeContainer(chunkBiomeContainer.biomeRegistry, serverLevel,
-//                chunkBiomeContainer.writeBiomes()
-//        );
-//    }
-
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        return null;
+        Biome biome = biomes[(y >> 4) - getMinSectionPosition()].get(x >> 2, (y & 15) >> 2, z >> 2);
+        return biome != null ? PaperweightPlatformAdapter.adapt(biome, serverLevel) : null;
     }
 
     @Override
@@ -174,6 +168,13 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
 
     protected void storeSection(int layer, char[] data) {
         blocks[layer] = data;
+    }
+
+    protected void storeBiomes(int layer, PalettedContainer<Biome> biomeData) {
+        if (biomes == null) {
+            biomes = new PalettedContainer[getSectionCount()];
+        }
+        biomes[layer] = biomeData;
     }
 
     @Override
