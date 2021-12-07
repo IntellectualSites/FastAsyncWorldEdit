@@ -31,6 +31,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.util.ThreadingDetector;
+import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -108,7 +109,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldData.setAccessible(true);
 
             Class<?> dataClazz = fieldData.getType();
-            dataConstructor = dataClazz.getConstructors()[0];
+            System.out.println(dataClazz.getName());
+            dataConstructor = dataClazz.getDeclaredConstructors()[0];
             dataConstructor.setAccessible(true);
 
             fieldStorage = dataClazz.getDeclaredField(Refraction.pickName("storage", "b"));
@@ -323,8 +325,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 bitsPerEntry = MathMan.log2nlz(Block.BLOCK_STATE_REGISTRY.size() - 1);
             }
 
-            bitsPerEntry = 0;
-            final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntry);
+            int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
+            final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntryNonZero);
             final int blockBitArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
 
             if (num_palette == 1) {
@@ -332,7 +334,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     blockStates[i] = 0;
                 }
             } else {
-                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntry, 4096, blockStates);
+                final BitArrayUnstretched bitArray = new BitArrayUnstretched(bitsPerEntryNonZero, 4096, blockStates);
                 bitArray.fromRaw(blocksCopy);
             }
 
@@ -348,7 +350,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             // private DataPalette<T> h;
             // protected DataBits a;
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
-            final BitStorage nmsBits = new SimpleBitStorage(bitsPerEntry, 4096, bits);
+            final BitStorage nmsBits;
+            if (bitsPerEntry == 0) {
+                nmsBits = new ZeroBitStorage(4096);
+            } else {
+                nmsBits = new SimpleBitStorage(bitsPerEntry, 4096, bits);
+            }
             final Palette<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer;
             if (bitsPerEntry == 0) {
                 blockStatePalettedContainer = new SingleValuePalette(

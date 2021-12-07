@@ -36,6 +36,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.BitStorage;
+import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.LightLayer;
@@ -846,8 +847,15 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 lock.acquire();
 
                 final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.getStates();
-                final BitStorage bits = (BitStorage) PaperweightPlatformAdapter.fieldStorage.get(blocks);
-                final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.fieldPalette.get(blocks);
+                final Object dataObject = PaperweightPlatformAdapter.fieldData.get(blocks);
+                final BitStorage bits = (BitStorage) PaperweightPlatformAdapter.fieldStorage.get(dataObject);
+
+                if (bits instanceof ZeroBitStorage) {
+                    Arrays.fill(data, (char) 0);
+                    return data;
+                }
+
+                final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.fieldPalette.get(dataObject);
 
                 final int bitsPerEntry = bits.getBits();
                 final long[] blockStates = bits.getRaw();
@@ -1017,8 +1025,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 try {
                     final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocksExisting = existing.getStates();
 
+                    final Object dataObject = PaperweightPlatformAdapter.fieldData.get(blocksExisting);
                     final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.fieldPalette.get(
-                            blocksExisting);
+                            dataObject);
                     int paletteSize;
 
                     if (palette instanceof LinearPalette || palette instanceof HashMapPalette) {
