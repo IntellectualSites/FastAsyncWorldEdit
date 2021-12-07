@@ -61,6 +61,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -73,6 +74,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public final class PaperweightPlatformAdapter extends NMSAdapter {
 
@@ -451,15 +453,25 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return new LevelChunkSection(layer, dataPaletteBlocks, biomesPalette);
     }
 
-    public static PalettedContainer<Biome> getBiomePalettedContainer(
-            BiomeType[] biomes, Registry<Biome> biomeRegistry,
-            ServerLevel serverLevel
-    ) {
+    /**
+     * Create a new {@link PalettedContainer<Biome>}. Should only be used if no biome container existed beforehand.
+     */
+    public static PalettedContainer<Biome> getBiomePalettedContainer(BiomeType[] biomes, Registry<Biome> biomeRegistry) {
         if (biomes == null) {
             return null;
         }
-        List<BiomeType> uniqueBiomes = new LinkedList<>(Arrays.asList(biomes));
-        int biomeCount = uniqueBiomes.size();
+        // Don't stream this as typically will see 1-4 biomes; stream overhead is large for the small length
+        Map<BiomeType, Biome> palette = new HashMap<>();
+        for (BiomeType biomeType : new LinkedList<>(Arrays.asList(biomes))) {
+            Biome biome;
+            if (biomeType == null) {
+                biome = biomeRegistry.getOrThrow(Biomes.PLAINS);
+            } else {
+                biome = biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()));
+            }
+            palette.put(biomeType, biome);
+        }
+        int biomeCount = palette.size();
         int bitsPerEntry = MathMan.log2nlz(biomeCount - 1);
         Object configuration = PalettedContainer.Strategy.SECTION_STATES.getConfiguration(
                 new FakeIdMapBiome(biomeCount),
@@ -480,40 +492,40 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             biomePalette = new SingleValuePalette<>(
                     biomePalettedContainer.registry,
                     biomePalettedContainer,
-                    List.of()
+                    new ArrayList<>(palette.values()) // Must be modifiable
             );
         } else if (bitsPerEntry == 4) {
             biomePalette = LinearPalette.create(
                     4,
                     biomePalettedContainer.registry,
                     biomePalettedContainer,
-                    List.of()
+                    new ArrayList<>(palette.values()) // Must be modifiable
             );
         } else if (bitsPerEntry < 9) {
             biomePalette = HashMapPalette.create(
                     bitsPerEntry,
                     biomePalettedContainer.registry,
                     biomePalettedContainer,
-                    List.of()
+                    new ArrayList<>(palette.values()) // Must be modifiable
             );
         } else {
             biomePalette = GlobalPalette.create(
                     bitsPerEntry,
                     biomePalettedContainer.registry,
                     biomePalettedContainer,
-                    List.of()
+                    null // unused
             );
         }
 
         int bitsPerEntryNonZero = Math.max(bitsPerEntry, 1); // We do want to use zero sometimes
         final int blocksPerLong = MathMan.floorZero((double) 64 / bitsPerEntryNonZero);
-        final int bitLongArrayEnd = MathMan.ceilZero((float) 4096 / blocksPerLong);
+        final int arrayLength = MathMan.ceilZero(64f / blocksPerLong);
 
 
         BitStorage bitStorage = bitsPerEntry == 0 ? new ZeroBitStorage(64) : new SimpleBitStorage(
                 bitsPerEntry,
                 64,
-                new long[bitLongArrayEnd]
+                new long[arrayLength]
         );
 
         try {
@@ -523,7 +535,16 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             for (int y = 0; y < 4; y++) {
                 for (int z = 0; z < 4; z++) {
                     for (int x = 0; x < 4; x++, index++) {
-                        biomePalettedContainer.set(x, y, z, biomeRegistry.get(ResourceLocation.tryParse(biomes[index].getId())));
+                        BiomeType biomeType = biomes[index];
+                        if (biomeType == null) {
+                            continue;
+                        }
+                        Biome biome = biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()));
+                        if (biome == null) {
+                            System.out.println(biomeType.getId());
+                            continue;
+                        }
+                        biomePalettedContainer.set(x, y, z, biome);
                     }
                 }
             }
@@ -531,7 +552,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             throw new RuntimeException(e);
         }
         return biomePalettedContainer;
-
     }
 
     public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final LevelChunkSection section) throws

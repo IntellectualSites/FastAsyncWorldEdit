@@ -60,10 +60,13 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
+        int layer;
         if (biomes == null || (y >> 4) < minSectionPosition || (y >> 4) > maxSectionPosition) {
             return null;
+        } else if (biomes[(layer = (y >> 4) - minSectionPosition)] == null) {
+            return null;
         }
-        return biomes[(y >> 4) - minSectionPosition][(y & 15) >> 2 | (z >> 2) << 2 | x >> 2];
+        return biomes[layer][(y & 15) >> 2 | (z >> 2) << 2 | x >> 2];
     }
 
     @Override
@@ -95,10 +98,14 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         updateSectionIndexRange(y >> 4);
         y -= minSectionPosition << 4;
+        int layer = (y >> 4) - minSectionPosition;
         if (biomes == null) {
-            biomes = new BiomeType[sectionCount][64];
+            biomes = new BiomeType[sectionCount][];
+            biomes[layer] = new BiomeType[64];
+        } else if (biomes[layer] == null) {
+            biomes[layer] = new BiomeType[64];
         }
-        biomes[(y >> 4) - minSectionPosition][(y & 15) >> 2 | (z >> 2) << 2 | x >> 2] = biome;
+        biomes[layer][(y & 12) << 2 | (z & 12) | (x & 12) >> 2] = biome;
         return true;
     }
 

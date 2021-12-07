@@ -41,6 +41,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,6 +58,7 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_18_R1.util.CraftNamespacedKey;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -442,7 +444,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 LevelChunkSection[] levelChunkSections = nmsChunk.getSections();
 
                 for (int layerNo = getMinSectionPosition(); layerNo <= getMaxSectionPosition(); layerNo++) {
-                    int layer = layerNo - getMinSectionPosition();
+
+                    int getSectionIndex = layerNo - getMinSectionPosition();
+                    int setSectionIndex = layerNo - set.getMinSectionPosition();
 
                     if (!set.hasSection(layerNo)) {
                         // No blocks, but might be biomes present. Handle this lazily.
@@ -452,19 +456,17 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         if (layerNo < set.getMinSectionPosition() || layerNo > set.getMaxSectionPosition()) {
                             continue;
                         }
-                        layer = layerNo - set.getMinSectionPosition();
-                        if (biomes[layer] != null) {
-                            synchronized (super.sectionLocks[layer]) {
-                                LevelChunkSection existingSection = levelChunkSections[layer];
+                        if (biomes[setSectionIndex] != null) {
+                            synchronized (super.sectionLocks[getSectionIndex]) {
+                                LevelChunkSection existingSection = levelChunkSections[getSectionIndex];
                                 if (createCopy && existingSection != null) {
-                                    copy.storeBiomes(layer, existingSection.getBiomes().copy());
+                                    copy.storeBiomes(getSectionIndex, existingSection.getBiomes().copy());
                                 }
 
                                 if (existingSection == null) {
                                     PalettedContainer<Biome> biomeData = PaperweightPlatformAdapter.getBiomePalettedContainer(
-                                            biomes[layer],
-                                            biomeRegistry,
-                                            serverLevel
+                                            biomes[setSectionIndex],
+                                            biomeRegistry
                                     );
                                     LevelChunkSection newSection = PaperweightPlatformAdapter.newChunkSection(
                                             layerNo,
@@ -474,47 +476,28 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             biomeRegistry,
                                             biomeData
                                     );
-                                    if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, layer)) {
-                                        updateGet(nmsChunk, levelChunkSections, newSection, new char[4096], layer);
+                                    if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, getSectionIndex)) {
+                                        updateGet(nmsChunk, levelChunkSections, newSection, new char[4096], getSectionIndex);
                                         continue;
                                     } else {
-                                        existingSection = levelChunkSections[layer];
+                                        existingSection = levelChunkSections[getSectionIndex];
                                         if (existingSection == null) {
                                             LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
-                                                    +layer
+                                                    getSectionIndex
                                             );
                                             continue;
                                         }
                                     }
                                 } else {
                                     PalettedContainer<Biome> biomeData = existingSection.getBiomes();
-                                    int index = 0;
-                                    for (int y = 0; y < 4; y++) {
-                                        for (int z = 0; z < 4; z++) {
-                                            for (int x = 0; x < 4; x++, index++) {
-                                                BiomeType biomeType = biomes[layer][index];
-                                                if (biomeType == null) {
-                                                    continue;
-                                                }
-                                                Biome biome = biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()));
-                                                if (biome != null) {
-                                                    biomeData.set(
-                                                            x,
-                                                            y,
-                                                            z,
-                                                            biome
-                                                    );
-                                                }
-                                            }
-                                        }
-                                    }
+                                    setBiomesToPalettedContainer(biomes[setSectionIndex], biomeData);
                                 }
                             }
                         }
                         continue;
                     }
 
-                    bitMask |= 1 << layer;
+                    bitMask |= 1 << getSectionIndex;
 
                     char[] tmp = set.load(layerNo);
                     char[] setArr = new char[4096];
@@ -522,29 +505,28 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                     // synchronise on internal section to avoid circular locking with a continuing edit if the chunk was
                     // submitted to keep loaded internal chunks to queue target size.
-                    synchronized (super.sectionLocks[layer]) {
+                    synchronized (super.sectionLocks[getSectionIndex]) {
 
                         LevelChunkSection newSection;
-                        LevelChunkSection existingSection = levelChunkSections[layer];
+                        LevelChunkSection existingSection = levelChunkSections[getSectionIndex];
 
                         if (createCopy) {
                             char[] tmpLoad = loadPrivately(layerNo);
                             char[] copyArr = new char[4096];
                             System.arraycopy(tmpLoad, 0, copyArr, 0, 4096);
-                            copy.storeSection(layer, copyArr);
+                            copy.storeSection(getSectionIndex, copyArr);
                             if (biomes != null && existingSection != null) {
-                                copy.storeBiomes(layer, existingSection.getBiomes().copy());
+                                copy.storeBiomes(getSectionIndex, existingSection.getBiomes().copy());
                             }
                         }
 
                         if (existingSection == null) {
-                            PalettedContainer<Biome> biomeData = biomes == null
-                                    ? null
-                                    : PaperweightPlatformAdapter.getBiomePalettedContainer(
-                                            biomes[layer],
-                                            biomeRegistry,
-                                            serverLevel
-                                    );
+                            PalettedContainer<Biome> biomeData = biomes == null ? new PalettedContainer<>(
+                                    biomeRegistry,
+                                    biomeRegistry.getOrThrow(Biomes.PLAINS),
+                                    PalettedContainer.Strategy.SECTION_BIOMES,
+                                    null
+                            ) : PaperweightPlatformAdapter.getBiomePalettedContainer(biomes[setSectionIndex], biomeRegistry);
                             newSection = PaperweightPlatformAdapter.newChunkSection(
                                     layerNo,
                                     setArr,
@@ -553,14 +535,14 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     biomeRegistry,
                                     biomeData
                             );
-                            if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, layer)) {
-                                updateGet(nmsChunk, levelChunkSections, newSection, setArr, layer);
+                            if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, getSectionIndex)) {
+                                updateGet(nmsChunk, levelChunkSections, newSection, setArr, getSectionIndex);
                                 continue;
                             } else {
-                                existingSection = levelChunkSections[layer];
+                                existingSection = levelChunkSections[getSectionIndex];
                                 if (existingSection == null) {
                                     LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
-                                            +layer
+                                            getSectionIndex
                                     );
                                     continue;
                                 }
@@ -579,10 +561,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     this.levelChunk = nmsChunk;
                                     this.sections = null;
                                     this.reset();
-                                } else if (existingSection != getSections(false)[layer]) {
-                                    this.sections[layer] = existingSection;
+                                } else if (existingSection != getSections(false)[getSectionIndex]) {
+                                    this.sections[getSectionIndex] = existingSection;
                                     this.reset();
-                                } else if (!Arrays.equals(update(layer, new char[4096], true), loadPrivately(layerNo))) {
+                                } else if (!Arrays.equals(update(getSectionIndex, new char[4096], true), loadPrivately(layerNo))) {
                                     this.reset(layerNo);
                             /*} else if (lock.isModified()) {
                                 this.reset(layerNo);*/
@@ -591,13 +573,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 sectionLock.writeLock().unlock();
                             }
 
-                            PalettedContainer<Biome> biomeData = biomes == null
-                                    ? existingSection.getBiomes()
-                                    : PaperweightPlatformAdapter.getBiomePalettedContainer(
-                                            biomes[layer],
-                                            biomeRegistry,
-                                            serverLevel
-                                    );
+                            PalettedContainer<Biome> biomeData = existingSection.getBiomes();
+
+                            if (biomes != null && biomes[setSectionIndex] != null) {
+                                setBiomesToPalettedContainer(biomes[setSectionIndex], biomeData);
+                            }
 
                             newSection =
                                     PaperweightPlatformAdapter.newChunkSection(
@@ -613,13 +593,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     levelChunkSections,
                                     existingSection,
                                     newSection,
-                                    layer
+                                    getSectionIndex
                             )) {
                                 LOGGER.error("Skipping invalid null section. chunk: {}, {} layer: {}", chunkX, chunkZ,
-                                        +layer
+                                        getSectionIndex
                                 );
                             } else {
-                                updateGet(nmsChunk, levelChunkSections, newSection, setArr, layer);
+                                updateGet(nmsChunk, levelChunkSections, newSection, setArr, getSectionIndex);
                             }
                         }
                     }
@@ -1058,6 +1038,32 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private void setBiomesToPalettedContainer(
+            final BiomeType[] biomes,
+            PalettedContainer<Biome> data
+    ) {
+        int index = 0;
+        if (biomes == null) {
+            return;
+        }
+        for (int y = 0; y < 4; y++) {
+            for (int z = 0; z < 4; z++) {
+                for (int x = 0; x < 4; x++, index++) {
+                    BiomeType biomeType = biomes[index];
+                    if (biomeType == null) {
+                        continue;
+                    }
+                    data.set(
+                            x,
+                            y,
+                            z,
+                            biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()))
+                    );
                 }
             }
         }
