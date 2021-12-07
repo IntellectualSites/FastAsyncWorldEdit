@@ -12,7 +12,7 @@ FastAsyncWorldEdit is a fork of WorldEdit that has huge speed and memory improve
 * Use it in creative, survival in single player or on your server.
 * Use it on your Minecraft server to fix grieving and mistakes.
 
-Java Edition required. FastAsyncWorldEdit is compatible with Bukkit, Spigot, Paper, and Tuinity.
+Java Edition required. FastAsyncWorldEdit is compatible with Bukkit, Spigot and Paper.
 
 ## Download FastAsyncWorldEdit
 * Spigot: https://www.spigotmc.org/resources/fast-async-worldedit.13932/
