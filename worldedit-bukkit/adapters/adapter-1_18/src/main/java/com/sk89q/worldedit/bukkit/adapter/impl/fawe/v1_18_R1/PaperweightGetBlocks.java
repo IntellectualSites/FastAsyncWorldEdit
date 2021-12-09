@@ -1099,6 +1099,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocksExisting = existing.getStates();
 
                     final Object dataObject = PaperweightPlatformAdapter.fieldData.get(blocksExisting);
+                    //TODO this field doesn't exist in 1.18
                     final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.fieldPalette.get(
                             dataObject);
                     int paletteSize;

@@ -115,6 +115,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             dataConstructor = dataClazz.getDeclaredConstructors()[0];
             dataConstructor.setAccessible(true);
 
+            //TODO FIXME 1.18
             fieldStorage = dataClazz.getDeclaredField(Refraction.pickName("storage", "b"));
             fieldStorage.setAccessible(true);
             fieldPalette = dataClazz.getDeclaredField(Refraction.pickName("palette", "c"));
@@ -184,7 +185,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     static DelegateSemaphore applyLock(LevelChunkSection section) {
-        //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which acquires the lock in NMS?
         try {
             synchronized (section) {
                 Unsafe unsafe = ReflectionUtils.getUnsafe();
@@ -575,6 +575,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     static void removeBeacon(BlockEntity beacon, LevelChunk levelChunk) {
         try {
             // Do the method ourselves to avoid trying to reflect generic method parameters
+            // similar to removeGameEventListener
             if (levelChunk.loaded || levelChunk.level.isClientSide()) {
                 BlockEntity blockEntity = levelChunk.blockEntities.remove(beacon.getBlockPos());
                 if (blockEntity != null) {
