@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit.adapter.ext.fawe;
 
+import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -316,15 +317,15 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         return combinedId == 0 && state.getBlockType() != BlockTypes.AIR ? OptionalInt.empty() : OptionalInt.of(combinedId);
     }
 
+    @Deprecated
     @Override
-    public BaseBlock getBlock(Location location) {
-        checkNotNull(location);
+    public BlockState getBlock(Location location) {
+        Preconditions.checkNotNull(location);
 
         CraftWorld craftWorld = ((CraftWorld) location.getWorld());
         int x = location.getBlockX();
         int y = location.getBlockY();
         int z = location.getBlockZ();
-
         final ServerLevel handle = craftWorld.getHandle();
         LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
         final BlockPos blockPos = new BlockPos(x, y, z);
@@ -336,11 +337,26 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
         }
 
+        return state;
+    }
+
+    @Override
+    public BaseBlock getFullBlock(Location location) {
+        BlockState state = getBlock(location);
+
+        CraftWorld craftWorld = ((CraftWorld) location.getWorld());
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+
+        final ServerLevel handle = craftWorld.getHandle();
+        LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
+        final BlockPos blockPos = new BlockPos(x, y, z);
+
         // Read the NBT data
         BlockEntity te = chunk.getBlockEntity(blockPos);
         if (te != null) {
-            net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-            readTileEntityIntoTag(te, tag); // Load data
+            net.minecraft.nbt.CompoundTag tag = te.save(new net.minecraft.nbt.CompoundTag());
             //FAWE start - BinaryTag
             return state.toBaseBlock((CompoundBinaryTag) toNativeBinary(tag));
             //FAWE end

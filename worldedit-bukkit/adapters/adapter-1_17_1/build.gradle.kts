@@ -59,4 +59,5 @@ dependencies {
     compileOnly("com.mojang:datafixerupper:4.0.26")
     compileOnly("com.mojang:authlib:2.3.31")
     compileOnly("com.mojang:brigadier:1.0.18")
+    compileOnly("io.netty:netty-all:4.1.25.Final")
 }
