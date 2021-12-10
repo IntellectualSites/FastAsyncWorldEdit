@@ -113,7 +113,7 @@ public class WorldEditCommands {
     //FAWE start
     @Command(
             name = "debugpaste",
-            desc = "Writes a report of latest.log, config.yml, config-legacy.yml, strings.json to https://athion.net/ISPaster/paste"
+            desc = "Writes a report of latest.log, config.yml, worldedit-config.yml, strings.json to https://athion.net/ISPaster/paste"
     )
     @CommandPermissions(value = {"worldedit.report", "worldedit.debugpaste"}, queued = false)
     public void report(Actor actor) throws WorldEditException {
@@ -121,8 +121,8 @@ public class WorldEditCommands {
         try {
             final File logFile = new File("logs/latest.log");
             final File config = new File(Fawe.imp().getDirectory(), "config.yml");
-            final File legacyConfig = new File(Fawe.imp().getDirectory(), "config-legacy.yml");
-            dest = IncendoPaster.debugPaste(logFile, Fawe.imp().getDebugInfo(), config, legacyConfig);
+            final File worldeditConfig = new File(Fawe.imp().getDirectory(), "worldedit-config.yml");
+            dest = IncendoPaster.debugPaste(logFile, Fawe.imp().getDebugInfo(), config, worldeditConfig);
         } catch (IOException e) {
             actor.printInfo(TextComponent.of(e.getMessage()));
             return;

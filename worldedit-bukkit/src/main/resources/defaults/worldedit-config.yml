@@ -10,39 +10,39 @@
 #   in categories, like "max-blocks-changed", are placed in the "limits"
 #   category.
 # - If you want to check the format of this file before putting it
-#   into WorldEdit, paste it into http://yaml-online-parser.appspot.com/
+#   into WorldEdit, paste it into https://yaml-online-parser.appspot.com/
 #   and see if it gives you "ERROR:".
 # - Lines starting with # are comments, so they are ignored.
 # - If you want to allow blocks, make sure to change "disallowed-blocks" to []
 #
 
-limits :
-  max-blocks-changed :
+limits:
+  max-blocks-changed:
     # Ignored, use FAWE config limits
-    default : -1
-    maximum : -1
-  max-polygonal-points :
-    default : -1
-    maximum : 20
-  max-radius : -1
-  max-super-pickaxe-size : 5
-  max-brush-radius : 100
-  butcher-radius :
-    default : -1
-    maximum : -1
-  disallowed-blocks :
+    default: -1
+    maximum: -1
+  max-polygonal-points:
+    default: -1
+    maximum: 20
+  max-radius: -1
+  max-super-pickaxe-size: 5
+  max-brush-radius: 100
+  butcher-radius:
+    default: -1
+    maximum: -1
+  disallowed-blocks:
     - "minecraft:wheat"
     - "minecraft:fire"
     - "minecraft:redstone_wire"
 
-use-inventory :
-  enable : false
-  allow-override : true
-  creative-mode-overrides : false
+use-inventory:
+  enable: false
+  allow-override: true
+  creative-mode-overrides: false
 
-logging :
-  log-commands : false
-  file : worldedit.log
+logging:
+  log-commands: false
+  file: worldedit.log
   # The format of custom log message. This is java general format string (java.util.Formatter). Arguments are:
   #   1$ : date - a Date object representing event time of the log record.
   #   2$ : source - a string representing the caller, if available; otherwise, the logger's name.
@@ -53,44 +53,44 @@ logging :
   # For details see:
   #   https://docs.oracle.com/javase/8/docs/api/java/util/Formatter.html
   #   https://docs.oracle.com/javase/8/docs/api/java/util/logging/SimpleFormatter.html#format-java.util.logging.LogRecord-
-  format : "[%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s]: %5$s%6$s%n"
+  format: "[%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS %4$s]: %5$s%6$s%n"
 
-super-pickaxe :
-  drop-items : true
-  many-drop-items : false
+super-pickaxe:
+  drop-items: true
+  many-drop-items: false
 
-snapshots :
-  directory :
+snapshots:
+  directory:
 
-navigation-wand :
-  item : minecraft:compass
-  max-distance : 100
+navigation-wand:
+  item: minecraft:compass
+  max-distance: 100
 
-scripting :
-  timeout : 3000
-  dir : craftscripts
+scripting:
+  timeout: 3000
+  dir: craftscripts
 
-saving :
-  dir : schematics
+saving:
+  dir: schematics
 
-files :
-  allow-symbolic-links : false
+files:
+  allow-symbolic-links: false
 
-history :
-  size : 15
-  expiration : 10
+history:
+  size: 15
+  expiration: 10
 
-calculation :
-  timeout : 100
+calculation:
+  timeout: 100
 
-debugging :
-  trace-unflushed-sessions : false
+debugging:
+  trace-unflushed-sessions: false
 
-wand-item : minecraft:wooden_axe
-shell-save-type :
-no-double-slash : false
-no-op-permissions : false
-debug : false
-show-help-on-first-use : true
-server-side-cui : true
-command-block-support : false
+wand-item: minecraft:wooden_axe
+shell-save-type:
+no-double-slash: false
+no-op-permissions: false
+debug: false
+show-help-on-first-use: true
+server-side-cui: true
+command-block-support: false

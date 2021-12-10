@@ -217,7 +217,7 @@ public class Settings extends Config {
         })
         public List<String> STRIP_NBT = new ArrayList<>();
         @Comment({
-                "If the disallowed blocks listed in config-legacy.yml should be disallowed in all edits,",
+                "If the disallowed blocks listed in worldedit-config.yml should be disallowed in all edits,",
                 "not just where blocks patterns are used.",
                 " - Can prevent blocks being pasted from clipboards, etc.",
                 " - If fast-placement is disabled, this may cause edits to be slower."

@@ -44,7 +44,7 @@ If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-<identifier>`
 
 ## Other commands
 
-* `gradlew idea` will generate an [IntelliJ IDEA](http://www.jetbrains.com/idea/) module for each folder.
+* `gradlew idea` will generate an [IntelliJ IDEA](https://www.jetbrains.com/idea/) module for each folder.
 
 _Possibly broken_:
 * `gradlew eclipse` will generate an [Eclipse](https://www.eclipse.org/downloads/) project for each folder.
