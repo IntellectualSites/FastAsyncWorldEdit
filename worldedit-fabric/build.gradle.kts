@@ -46,7 +46,7 @@ repositories {
 
 dependencies {
     "api"(project(":worldedit-core"))
-    "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
+    "implementation"("org.apache.logging.log4j:log4j-slf4j-impl:2.15.0")
 
     "minecraft"("com.mojang:minecraft:$minecraftVersion")
     "mappings"("net.fabricmc:yarn:$yarnMappings")
