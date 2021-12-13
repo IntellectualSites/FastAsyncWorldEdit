@@ -1,7 +1,7 @@
 [versions]
 # Minecraft expectations
 fastutil = "8.5.6"
-log4j = "2.14.1"
+log4j = "2.15.0"
 guava = "31.0.1-jre"
 gson = "2.8.8"
 
@@ -19,7 +19,7 @@ mcore = "7.0.1"
 residence = "4.5._13.1"
 towny = "0.97.5.0"
 protocollib = "4.7.0"
-plotsquaredV6 = "6.1.4"
+plotsquaredV6 = "6.2.0"
 redprotect = "1.9.6"
 
 # Third party
@@ -50,7 +50,7 @@ piston = "0.5.7"
 
 # Tests
 mockito = "4.1.0"
-checker-qual = "3.19.0"
+checker-qual = "3.20.0"
 
 # Gradle plugins
 pluginyml = "0.5.1"
