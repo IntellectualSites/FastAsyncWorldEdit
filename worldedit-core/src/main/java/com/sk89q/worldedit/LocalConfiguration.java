@@ -54,7 +54,7 @@ public abstract class LocalConfiguration {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     public boolean profile = false;
-    public boolean traceUnflushedSessions = false;
+    public boolean traceUnflushedSessions = true;
     public Set<String> disallowedBlocks = new HashSet<>();
     protected BlockMask disallowedBlocksMask;
     public int defaultChangeLimit = -1;

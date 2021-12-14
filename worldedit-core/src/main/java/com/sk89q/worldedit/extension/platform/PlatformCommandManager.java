@@ -120,6 +120,7 @@ import com.sk89q.worldedit.internal.command.CommandLoggingHandler;
 import com.sk89q.worldedit.internal.command.CommandRegistrationHandler;
 import com.sk89q.worldedit.internal.command.exception.ExceptionConverter;
 import com.sk89q.worldedit.internal.command.exception.WorldEditExceptionConverter;
+import com.sk89q.worldedit.internal.util.ErrorReporting;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.internal.util.Substring;
 import com.sk89q.worldedit.regions.Region;
@@ -884,10 +885,9 @@ public final class PlatformCommandManager {
     }
 
     private void handleUnknownException(Actor actor, Throwable t) {
-        actor.print(Caption.of("worldedit.command.error.report"));
-        actor.print(TextComponent.of(t.getClass().getName() + ": " + t.getMessage()));
         //FAWE start - Exchange name
         LOGGER.error("An unexpected error while handling a FastAsyncWorldEdit command", t);
+        ErrorReporting.trigger(actor, t);
         //FAWE end
     }
 
