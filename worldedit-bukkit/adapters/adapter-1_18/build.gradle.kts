@@ -12,6 +12,6 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("1.18-R0.1-20211210.020702-61")
+    paperDevBundle("1.18.1-R0.1-20211218.091106-15")
     compileOnly(libs.paperlib)
 }
