@@ -6,8 +6,8 @@ import com.plotsquared.core.command.CommandCategory;
 import com.plotsquared.core.command.CommandDeclaration;
 import com.plotsquared.core.command.RequiredType;
 import com.plotsquared.core.command.SubCommand;
+import com.plotsquared.core.configuration.caption.Placeholders;
 import com.plotsquared.core.configuration.caption.StaticCaption;
-import com.plotsquared.core.configuration.caption.Templates;
 import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.player.PlotPlayer;
 
@@ -21,19 +21,19 @@ public class FaweTrim extends SubCommand {
     private boolean ran = false;
 
     @Override
-    public boolean onCommand(final PlotPlayer plotPlayer, final String[] strings) {
+    public boolean onCommand(final PlotPlayer<?> plotPlayer, final String[] strings) {
         if (ran) {
-            plotPlayer.sendMessage(TranslatableCaption.of("error.task_in_process"));
+            plotPlayer.sendMessage(TranslatableCaption.miniMessage("error.task_in_process"));
             return false;
         }
         if (strings.length != 2) {
             plotPlayer.sendMessage(StaticCaption
-                    .of("First make a backup of your world called <world-copy> then stand in the middle of an empty plot"));
-            plotPlayer.sendMessage(StaticCaption.of("use /plot trimall <world> <boolean-delete-unowned>"));
+                    .miniMessage("First make a backup of your world called <world-copy> then stand in the middle of an empty plot"));
+            plotPlayer.sendMessage(StaticCaption.miniMessage("use /plot trimall <world> <boolean-delete-unowned>"));
             return false;
         }
         if (!PlotSquared.platform().worldUtil().isWorld(strings[0])) {
-            plotPlayer.sendMessage(TranslatableCaption.of("errors.not_valid_plot_world"), Templates.of("value", strings[0]));
+            plotPlayer.sendMessage(TranslatableCaption.miniMessage("errors.not_valid_plot_world"), Placeholders.miniMessage("value", strings[0]));
             return false;
         }
         ran = true;

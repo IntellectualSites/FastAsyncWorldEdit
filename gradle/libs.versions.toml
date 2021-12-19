@@ -19,7 +19,7 @@ mcore = "7.0.1"
 residence = "4.5._13.1"
 towny = "0.97.5.0"
 protocollib = "4.7.0"
-plotsquaredV6 = "6.2.0"
+plotsquaredV6 = "6.3.0"
 plotsquaredV4 = "4.514"
 redprotect = "1.9.6"
 
@@ -31,7 +31,7 @@ serverlib = "2.3.1"
 paster = "1.1.1"
 sparsebitset = "1.2"
 parallelgzip = "1.0.5"
-adventure = "4.9.3"
+adventure = "4.10.0-SNAPSHOT"
 truezip = "6.8.4"
 auto-value = "1.8.2"
 findbugs = "3.0.2"
@@ -45,7 +45,6 @@ jchronic = "0.2.4a"
 lz4-java = "1.8.0"
 lz4-stream = "1.0.0"
 ## Internal
-adventure-text-minimessage = "4.2.0-SNAPSHOT"
 text-adapter = "3.0.6"
 text = "3.0.4"
 piston = "0.5.7"
@@ -113,7 +112,7 @@ lz4JavaStream = { group = "net.jpountz", name = "lz4-java-stream", version.ref =
 # Internal
 ## Text
 adventureTextAdapterBukkit = { group = "net.kyori", name = "text-adapter-bukkit", version.ref = "text-adapter" }
-adventureTextMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure-text-minimessage" }
+adventureTextMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 adventureTextApi = { group = "net.kyori", name = "text-api", version.ref = "text" }
 adventureTextSerializerGson = { group = "net.kyori", name = "text-serializer-gson", version.ref = "text" }
 adventureTextSerializerLegacy = { group = "net.kyori", name = "text-serializer-legacy", version.ref = "text" }

@@ -6,7 +6,7 @@ import com.plotsquared.core.command.CommandCategory;
 import com.plotsquared.core.command.CommandDeclaration;
 import com.plotsquared.core.command.MainCommand;
 import com.plotsquared.core.command.RequiredType;
-import com.plotsquared.core.configuration.caption.Templates;
+import com.plotsquared.core.configuration.caption.Placeholders;
 import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
@@ -53,17 +53,17 @@ public class PlotSetBiome extends Command {
             RunnableVal3<Command, Runnable, Runnable> confirm,
             RunnableVal2<Command, CommandResult> whenDone
     ) throws CommandException {
-        final Plot plot = check(player.getCurrentPlot(), TranslatableCaption.of("errors.not_in_plot"));
+        final Plot plot = check(player.getCurrentPlot(), TranslatableCaption.miniMessage("errors.not_in_plot"));
         checkTrue(
                 plot.isOwner(player.getUUID()) || Permissions.hasPermission(player, "plots.admin.command.generatebiome"),
-                TranslatableCaption.of("permission.no_plot_perms")
+                TranslatableCaption.miniMessage("permission.no_plot_perms")
         );
         if (plot.getRunning() != 0) {
-            player.sendMessage(TranslatableCaption.of("errors.wait_for_timer"));
+            player.sendMessage(TranslatableCaption.miniMessage("errors.wait_for_timer"));
             return null;
         }
-        checkTrue(args.length == 1, TranslatableCaption.of("commandconfig.command_syntax"),
-                Templates.of("value", getUsage())
+        checkTrue(args.length == 1, TranslatableCaption.miniMessage("commandconfig.command_syntax"),
+                Placeholders.miniMessage("value", getUsage())
         );
         final Set<CuboidRegion> regions = plot.getRegions();
         BiomeRegistry biomeRegistry =
@@ -74,18 +74,18 @@ public class PlotSetBiome extends Command {
         if (biome == null) {
             String biomes = StringMan.join(
                     BiomeType.REGISTRY.values(),
-                    TranslatableCaption.of("blocklist.block_list_separator").getComponent(player)
+                    TranslatableCaption.miniMessage("blocklist.block_list_separator").getComponent(player)
             );
-            player.sendMessage(TranslatableCaption.of("biome.need_biome"));
+            player.sendMessage(TranslatableCaption.miniMessage("biome.need_biome"));
             player.sendMessage(
-                    TranslatableCaption.of("commandconfig.subcommand_set_options_header"),
-                    Templates.of("values", biomes)
+                    TranslatableCaption.miniMessage("commandconfig.subcommand_set_options_header"),
+                    Placeholders.miniMessage("values", biomes)
             );
             return CompletableFuture.completedFuture(false);
         }
         confirm.run(this, () -> {
             if (plot.getRunning() != 0) {
-                player.sendMessage(TranslatableCaption.of("errors.wait_for_timer"));
+                player.sendMessage(TranslatableCaption.miniMessage("errors.wait_for_timer"));
                 return;
             }
             plot.addRunning();
