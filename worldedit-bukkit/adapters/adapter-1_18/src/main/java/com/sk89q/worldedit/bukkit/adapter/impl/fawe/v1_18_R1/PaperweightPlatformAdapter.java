@@ -74,7 +74,6 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public final class PaperweightPlatformAdapter extends NMSAdapter {
 
@@ -342,17 +341,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 bitArray.fromRaw(blocksCopy);
             }
 
-            // set palette & data bits
-
-            final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
-                    new PalettedContainer<>(
-                            Block.BLOCK_STATE_REGISTRY,
-                            Blocks.AIR.defaultBlockState(),
-                            PalettedContainer.Strategy.SECTION_STATES,
-                            null
-                    );
-            // private DataPalette<T> h;
-            // protected DataBits a;
             final long[] bits = Arrays.copyOfRange(blockStates, 0, blockBitArrayEnd);
             final BitStorage nmsBits;
             if (bitsPerEntry == 0) {
@@ -361,48 +349,32 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 nmsBits = new SimpleBitStorage(bitsPerEntry, 4096, bits);
             }
             final Palette<net.minecraft.world.level.block.state.BlockState> blockStatePalette;
-            if (bitsPerEntry == 0) {
-                blockStatePalette = new SingleValuePalette<>(
-                        blockStatePalettedContainer.registry,
-                        blockStatePalettedContainer,
-                        List.of()
-                );
-            } else if (bitsPerEntry == 4) {
-                blockStatePalette = LinearPalette.create(
-                        4,
-                        blockStatePalettedContainer.registry,
-                        blockStatePalettedContainer,
-                        List.of()
-                );
-            } else if (bitsPerEntry < 9) {
-                blockStatePalette = HashMapPalette.create(
-                        bitsPerEntry,
-                        blockStatePalettedContainer.registry,
-                        blockStatePalettedContainer,
-                        List.of()
-                );
-            } else {
-                blockStatePalette = GlobalPalette.create(
-                        bitsPerEntry,
-                        blockStatePalettedContainer.registry,
-                        blockStatePalettedContainer,
-                        List.of());
-            }
-
-            // set palette if required
+            List<net.minecraft.world.level.block.state.BlockState> palette;
             if (bitsPerEntry < 9) {
+                palette = new ArrayList<>();
                 for (int i = 0; i < num_palette; i++) {
-                    final int ordinal = paletteToBlock[i];
+                    int ordinal = paletteToBlock[i];
                     blockToPalette[ordinal] = Integer.MAX_VALUE;
                     final BlockState state = BlockTypesCache.states[ordinal];
-                    final net.minecraft.world.level.block.state.BlockState blockState = ((PaperweightBlockMaterial) state.getMaterial()).getState();
-                    blockStatePalette.idFor(blockState);
+                    palette.add(((PaperweightBlockMaterial) state.getMaterial()).getState());
                 }
+            } else {
+                palette = List.of();
             }
+
+            // Create palette with data
+            final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
+                    new PalettedContainer<>(
+                            Block.BLOCK_STATE_REGISTRY,
+                            PalettedContainer.Strategy.SECTION_STATES,
+                            PalettedContainer.Strategy.SECTION_STATES.getConfiguration(Block.BLOCK_STATE_REGISTRY, bitsPerEntry),
+                            nmsBits,
+                            palette,
+                            null,
+                            null
+                    );
             LevelChunkSection levelChunkSection;
             try {
-                Object data = dataConstructor.newInstance(configuration, nmsBits, blockStatePalette);
-                fieldData.set(blockStatePalettedContainer, data);
                 //fieldStorage.set(dataPaletteBlocks, nmsBits);
                 //fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
                 if (biomes == null) {
@@ -423,7 +395,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                             Block.stateById(ordinal)
                     ));
                 }
-            } catch (final IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            } catch (final IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
 
