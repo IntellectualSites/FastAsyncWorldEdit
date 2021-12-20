@@ -3,7 +3,7 @@ name: draft release
 on:
   push:
     branches:
-      - "2.0.0"
+      - main
 
 jobs:
   update_release_draft:
