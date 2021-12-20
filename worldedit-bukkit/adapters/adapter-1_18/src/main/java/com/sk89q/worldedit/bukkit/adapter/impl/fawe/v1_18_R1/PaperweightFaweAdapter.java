@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R1;
 
+import ca.spottedleaf.starlight.common.light.StarLightEngine;
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
@@ -655,7 +656,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     @Override
     public RelighterFactory getRelighterFactory() {
         try {
-            Class.forName("ca.spottedleaf.starlight.light.StarLightEngine");
+            Class.forName("ca.spottedleaf.starlight.common.light.StarLightEngine");
             if (PaperweightStarlightRelighter.isUsable()) {
                 return new PaperweightStarlightRelighterFactory();
             }
