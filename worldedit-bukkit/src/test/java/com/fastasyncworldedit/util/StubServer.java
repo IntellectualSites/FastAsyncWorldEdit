@@ -156,6 +156,26 @@ public class StubServer implements Server {
     }
 
     @Override
+    public @NotNull String getResourcePack() {
+        return null;
+    }
+
+    @Override
+    public @NotNull String getResourcePackHash() {
+        return null;
+    }
+
+    @Override
+    public @NotNull String getResourcePackPrompt() {
+        return null;
+    }
+
+    @Override
+    public boolean isResourcePackRequired() {
+        return false;
+    }
+
+    @Override
     public boolean hasWhitelist() {
         return false;
     }
