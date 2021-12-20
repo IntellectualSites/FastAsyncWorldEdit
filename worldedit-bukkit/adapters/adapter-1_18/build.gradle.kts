@@ -12,7 +12,6 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("1.18-rc3-R0.1-20211129.221606-5") //TODO 1.18 switch to mainline
+    paperDevBundle("1.18.1-R0.1-20211218.091106-15")
     compileOnly(libs.paperlib)
-    compileOnly(libs.paper)
 }

@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.function.generator;
 
 import com.fastasyncworldedit.core.util.MathMan;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -237,11 +236,8 @@ public class CavesGen extends GenBase {
                                 BlockState material = chunk.getBlock(bx + local_x, local_y, bz + local_z);
                                 BlockState materialAbove = chunk.getBlock(bx + local_x, local_y + 1, bz + local_z);
                                 BlockType blockType = material.getBlockType();
-                                switch (blockType.getInternalId()) {
-                                    case BlockID.MYCELIUM:
-                                    case BlockID.GRASS:
-                                        grassFound = true;
-
+                                switch (blockType.getId()) {
+                                    case "minecraft:mycelium", "minecraft:grass_block" -> grassFound = true;
                                 }
                                 if (this.isSuitableBlock(material, materialAbove)) {
                                     if (local_y - 1 < 10) {
@@ -281,13 +277,13 @@ public class CavesGen extends GenBase {
     }
 
     protected boolean isSuitableBlock(BlockStateHolder material, BlockStateHolder materialAbove) {
-        switch (material.getBlockType().getInternalId()) {
-            case BlockID.AIR:
-            case BlockID.CAVE_AIR:
-            case BlockID.VOID_AIR:
-            case BlockID.WATER:
-            case BlockID.LAVA:
-            case BlockID.BEDROCK:
+        switch (material.getBlockType().getId()) {
+            case "minecraft:air":
+            case "minecraft:cave_air":
+            case "minecraft:void_air":
+            case "minecraft:water":
+            case "minecraft:lava":
+            case "minecraft:bedrock":
                 return false;
             default:
                 return true;

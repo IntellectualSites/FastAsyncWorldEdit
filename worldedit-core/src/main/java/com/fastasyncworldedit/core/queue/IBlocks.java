@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -116,11 +115,11 @@ public interface IBlocks extends Trimable {
                 for (int i = 0; i < ids.length; i++) {
                     char ordinal = ids[i];
                     switch (ordinal) {
-                        case BlockID.__RESERVED__:
-                        case BlockID.CAVE_AIR:
-                        case BlockID.VOID_AIR:
-                            ids[i] = BlockID.AIR;
-                        case BlockID.AIR:
+                        case 0:
+                        case 2:
+                        case 3:
+                            ids[i] = 1;
+                        case 1:
                             continue;
                         default:
                             nonEmpty++;
@@ -140,10 +139,10 @@ public interface IBlocks extends Trimable {
                 for (int i = 0; i < palette.paletteToBlockLength; i++) {
                     int ordinal = palette.paletteToBlock[i];
                     switch (ordinal) {
-                        case BlockID.__RESERVED__:
-                        case BlockID.CAVE_AIR:
-                        case BlockID.VOID_AIR:
-                        case BlockID.AIR:
+                        case 0:
+                        case 2:
+                        case 3:
+                        case 1:
                             sectionWriter.write(0);
                             break;
                         default:

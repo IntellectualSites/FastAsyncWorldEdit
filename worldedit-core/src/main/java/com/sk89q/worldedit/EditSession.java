@@ -434,9 +434,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return output;
     }
 
-    // pkg private for TracedEditSession only, may later become public API
-    boolean commitRequired() {
-        //FAWE start
+    private boolean commitRequired() {
+    //FAWE start - false for us, returning true if the reorder extent != null for upstream
         return false;
     }
     //FAWE end

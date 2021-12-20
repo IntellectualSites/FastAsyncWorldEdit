@@ -520,7 +520,7 @@ public class BukkitWorld extends AbstractWorld {
     public BaseBlock getFullBlock(BlockVector3 position) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
-            return adapter.getBlock(BukkitAdapter.adapt(getWorld(), position));
+            return adapter.getFullBlock(BukkitAdapter.adapt(getWorld(), position));
         } else {
             return getBlock(position).toBaseBlock();
         }

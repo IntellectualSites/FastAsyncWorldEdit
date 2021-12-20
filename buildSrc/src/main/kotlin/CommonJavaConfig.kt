@@ -62,7 +62,6 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                     "https://javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.2/",
                     "https://jd.adventure.kyori.net/api/4.9.3/",
                     "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/2.14.1/",
-                    "https://javadoc.io/doc/com.google.guava/guava/31.0.1/",
                     "https://www.antlr.org/api/Java/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/core/0.5.7/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/default-impl/0.5.7/",

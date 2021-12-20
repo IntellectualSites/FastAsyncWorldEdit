@@ -96,7 +96,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public BiomeType[] getBiomes() {
+    public BiomeType[][] getBiomes() {
         // Uses set as this method is only used to retrieve biomes that have been set to the extent/chunk.
         return delegate.set(this).getBiomes();
     }

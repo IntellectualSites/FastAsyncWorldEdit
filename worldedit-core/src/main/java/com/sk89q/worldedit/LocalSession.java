@@ -1192,13 +1192,13 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the brush tool assigned to the item. If there is no tool assigned
-     * or the tool is not assigned, the slot will be replaced with the
+     * or the tool is not a brush tool, the slot will be replaced with the
      * brush tool.
      *
      * @param item the item type
      * @return the tool, or {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
-     * @deprecated FAWE binds to the item, not the type - this allows brushes to persist
+     * @deprecated FAWE binds to the item, not the type - this allows brushes to persist, also deprecated in upstream
      */
     @Deprecated
     public BrushTool getBrushTool(ItemType item) throws InvalidToolBindException {
@@ -1231,6 +1231,17 @@ public class LocalSession implements TextureHolder {
         return (BrushTool) tool;
     }
     //FAWE end
+
+    /**
+     * Get the brush tool assigned to this item.
+     *
+     * @param item the item type
+     * @return the brush tool assigned to the item type
+     */
+    @Nullable
+    public BrushTool getBrush(ItemType item) {
+        return getTool(item) instanceof BrushTool tool ? tool : null;
+    }
 
     //FAWE start - see note of getBrushTool
 

@@ -1,12 +1,12 @@
 Compiling
 =========
 
-You can compile FastAsyncWorldEdit as long as you have some version of Java greater than or equal to 16 installed. Gradle will download JDK 16 specifically if needed,
+You can compile FastAsyncWorldEdit as long as you have some version of Java greater than or equal to 17 installed. Gradle will download JDK 17 specifically if needed,
 but it needs some version of Java to bootstrap from.
 
 Note that if you have JRE 8 installed, Gradle will currently attempt to use that to compile, which will not work. It is easiest to uninstall JRE 8 and replace it with JDK 16.
 
-You can get the JDK 16 [here](https://adoptium.net/).
+You can get the JDK 17 [here](https://adoptium.net/).
 
 The build process uses Gradle, which you do *not* need to download. FastAsyncWorldEdit is a multi-module project with three active modules:
 
@@ -44,7 +44,7 @@ If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-<identifier>`
 
 ## Other commands
 
-* `gradlew idea` will generate an [IntelliJ IDEA](http://www.jetbrains.com/idea/) module for each folder.
+* `gradlew idea` will generate an [IntelliJ IDEA](https://www.jetbrains.com/idea/) module for each folder.
 
 _Possibly broken_:
 * `gradlew eclipse` will generate an [Eclipse](https://www.eclipse.org/downloads/) project for each folder.

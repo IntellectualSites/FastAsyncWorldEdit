@@ -63,8 +63,6 @@ public class Settings extends Config {
     @Create
     public WEB WEB;
     @Create
-    public PLOTSQUARED_INTEGRATION PLOTSQUARED_INTEGRATION;
-    @Create
     public EXTENT EXTENT;
     @Create
     public EXPERIMENTAL EXPERIMENTAL;
@@ -219,7 +217,7 @@ public class Settings extends Config {
         })
         public List<String> STRIP_NBT = new ArrayList<>();
         @Comment({
-                "If the disallowed blocks listed in config-legacy.yml should be disallowed in all edits,",
+                "If the disallowed blocks listed in worldedit-config.yml should be disallowed in all edits,",
                 "not just where blocks patterns are used.",
                 " - Can prevent blocks being pasted from clipboards, etc.",
                 " - If fast-placement is disabled, this may cause edits to be slower."
@@ -483,17 +481,6 @@ public class Settings extends Config {
                 "Set to -1 to disable"
         })
         public int PER_PLAYER_FILE_NUM_LIMIT = -1;
-
-    }
-
-    public static class PLOTSQUARED_INTEGRATION {
-
-        @Comment({
-                "Only disables/enables the components with PlotSquared v4.",
-                "For v6, see PlotSquared settings.yml"
-        })
-        public boolean CLEAR = true;
-        public boolean COPY_AND_SWAP = true;
 
     }
 

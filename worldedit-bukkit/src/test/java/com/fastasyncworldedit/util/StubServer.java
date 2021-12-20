@@ -119,6 +119,11 @@ public class StubServer implements Server {
     }
 
     @Override
+    public int getSimulationDistance() {
+        return 12;
+    }
+
+    @Override
     public @NotNull
     String getIp() {
         return null;
@@ -463,6 +468,11 @@ public class StubServer implements Server {
     @Override
     public void setSpawnRadius(int i) {
 
+    }
+
+    @Override
+    public boolean getHideOnlinePlayers() {
+        return false;
     }
 
     @Override

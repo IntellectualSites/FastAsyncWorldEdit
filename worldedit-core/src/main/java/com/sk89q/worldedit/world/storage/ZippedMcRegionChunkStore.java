@@ -101,9 +101,7 @@ public class ZippedMcRegionChunkStore extends McRegionChunkStore {
                             endIndex = entryName.lastIndexOf('\\');
                         }
                         folder = entryName.substring(0, endIndex);
-                        //FAWE start - biome and entity restore
                         if (folder.endsWith("poi") || folder.endsWith("entities")) {
-                            //FAWE end
                             continue;
                         }
                         name = folder + "/" + name;

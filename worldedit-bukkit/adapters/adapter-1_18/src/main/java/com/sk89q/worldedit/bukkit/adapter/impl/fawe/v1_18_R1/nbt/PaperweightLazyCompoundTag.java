@@ -94,8 +94,9 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
 
     public List<Tag> getList(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
-        if (tag instanceof net.minecraft.nbt.ListTag nbtList) {
+        if (tag instanceof net.minecraft.nbt.ListTag) {
             ArrayList<Tag> list = new ArrayList<>();
+            net.minecraft.nbt.ListTag nbtList = (net.minecraft.nbt.ListTag) tag;
             for (net.minecraft.nbt.Tag elem : nbtList) {
                 if (elem instanceof net.minecraft.nbt.CompoundTag) {
                     list.add(new PaperweightLazyCompoundTag((net.minecraft.nbt.CompoundTag) elem));

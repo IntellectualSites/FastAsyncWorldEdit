@@ -230,9 +230,24 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         return Registry.BLOCK.get(new ResourceLocation(blockType.getNamespace(), blockType.getResource()));
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
-    public BaseBlock getBlock(Location location) {
+    public BlockState getBlock(Location location) {
+        Preconditions.checkNotNull(location);
+
+        CraftWorld craftWorld = ((CraftWorld) location.getWorld());
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+        final ServerLevel handle = craftWorld.getHandle();
+        LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
+        final BlockPos blockPos = new BlockPos(x, y, z);
+        final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(blockPos);
+        return adapt(blockData);
+    }
+
+    @Override
+    public BaseBlock getFullBlock(final Location location) {
         Preconditions.checkNotNull(location);
 
         CraftWorld craftWorld = ((CraftWorld) location.getWorld());
@@ -240,18 +255,22 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         int y = location.getBlockY();
         int z = location.getBlockZ();
 
-        final ServerLevel serverLevel = craftWorld.getHandle();
-        LevelChunk levelChunk = serverLevel.getChunk(x >> 4, z >> 4);
+        final ServerLevel handle = craftWorld.getHandle();
+        LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
         final BlockPos blockPos = new BlockPos(x, y, z);
-        org.bukkit.block.Block bukkitBlock = location.getBlock();
-        BlockState state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
+        final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(blockPos);
+        BlockState state = adapt(blockData);
+        if (state == null) {
+            org.bukkit.block.Block bukkitBlock = location.getBlock();
+            state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
+        }
         if (state.getBlockType().getMaterial().hasContainer()) {
 
             // Read the NBT data
-            BlockEntity blockEntity = levelChunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
+            BlockEntity blockEntity = chunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
             if (blockEntity != null) {
-                net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                blockEntity.save(tag); // readTileEntityIntoTag - load data
+                //TODO 1.18 recheck logic, I may skipped loading - NMF
+                net.minecraft.nbt.CompoundTag tag = blockEntity.save(new net.minecraft.nbt.CompoundTag());
                 return state.toBaseBlock((CompoundTag) toNative(tag));
             }
         }

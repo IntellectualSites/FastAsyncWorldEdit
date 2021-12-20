@@ -59,7 +59,7 @@ public interface IDelegateBukkitImplAdapter<T> extends BukkitImplAdapter<T> {
     }
 
     @Override
-    default BaseBlock getBlock(Location location) {
+    default BlockState getBlock(Location location) {
         return getParent().getBlock(location);
     }
 

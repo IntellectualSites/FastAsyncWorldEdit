@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit.adapter.ext.fawe;
 
+import com.google.common.base.Preconditions;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -35,8 +36,10 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightFaweAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.Extent;
@@ -316,9 +319,31 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         return combinedId == 0 && state.getBlockType() != BlockTypes.AIR ? OptionalInt.empty() : OptionalInt.of(combinedId);
     }
 
+    @Deprecated
     @Override
-    public BaseBlock getBlock(Location location) {
-        checkNotNull(location);
+    public BlockState getBlock(Location location) {
+        Preconditions.checkNotNull(location);
+
+        CraftWorld craftWorld = ((CraftWorld) location.getWorld());
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
+        final ServerLevel handle = craftWorld.getHandle();
+        LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
+        final BlockPos blockPos = new BlockPos(x, y, z);
+        final CraftBlockData blockData = chunk.getBlockState(blockPos).createCraftBlockData();
+        BlockState state = BukkitAdapter.adapt(blockData);
+        if (state == null) {
+            org.bukkit.block.Block bukkitBlock = location.getBlock();
+            state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
+        }
+
+        return state;
+    }
+
+    @Override
+    public BaseBlock getFullBlock(Location location) {
+        BlockState state = getBlock(location);
 
         CraftWorld craftWorld = ((CraftWorld) location.getWorld());
         int x = location.getBlockX();
@@ -328,19 +353,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         final ServerLevel handle = craftWorld.getHandle();
         LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
         final BlockPos blockPos = new BlockPos(x, y, z);
-        final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(blockPos);
-        int internalId = Block.getId(blockData);
-        BlockState state = BlockStateIdAccess.getBlockStateById(internalId);
-        if (state == null) {
-            org.bukkit.block.Block bukkitBlock = location.getBlock();
-            state = BukkitAdapter.adapt(bukkitBlock.getBlockData());
-        }
 
         // Read the NBT data
         BlockEntity te = chunk.getBlockEntity(blockPos);
         if (te != null) {
-            net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-            readTileEntityIntoTag(te, tag); // Load data
+            net.minecraft.nbt.CompoundTag tag = te.save(new net.minecraft.nbt.CompoundTag());
             //FAWE start - BinaryTag
             return state.toBaseBlock((CompoundBinaryTag) toNativeBinary(tag));
             //FAWE end
@@ -748,8 +765,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             BlockPos pos = new BlockPos(vec.getBlockX(), vec.getBlockY(), vec.getBlockZ());
             ChunkAccess chunk = chunks.get(new ChunkPos(pos));
             final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(pos);
-            int internalId = Block.getId(blockData);
-            BlockStateHolder<?> state = BlockStateIdAccess.getBlockStateById(internalId);
+            BlockStateHolder<?> state = ((PaperweightFaweAdapter) WorldEditPlugin
+                    .getInstance()
+                    .getBukkitImplAdapter()).adapt(blockData);
             Objects.requireNonNull(state);
             BlockEntity blockEntity = chunk.getBlockEntity(pos);
             if (blockEntity != null) {
