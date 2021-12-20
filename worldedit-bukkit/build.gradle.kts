@@ -187,7 +187,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.1"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            include(dependency("com.intellectualsites.paster:Paster:1.1.1"))
+            include(dependency("com.intellectualsites.paster:Paster:1.1.3"))
         }
         relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
             include(dependency("org.lz4:lz4-java:1.8.0"))
