@@ -25,7 +25,6 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import net.minecraft.core.BlockPos;
@@ -151,7 +150,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         if (light != null) {
             lightUpdate = true;
             try {
-                fillLightNibble(light, LightLayer.SKY, minSectionPosition, maxSectionPosition);
+                fillLightNibble(light, LightLayer.BLOCK, minSectionPosition, maxSectionPosition);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
