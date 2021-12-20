@@ -246,21 +246,25 @@ public class BlockTypesCache {
                 }
             }*/
 
-            // Register "Reserved"
+            // Register "Reserved". Ensure air/reserved and 0/1/2/3
             {
                 int internalId = 0;
-                String id = "minecraft:__reserved__";
-                String defaultState = blockMap.remove(id);
-                if (defaultState == null) {
-                    defaultState = id;
+                for (String id : new String[]{"minecraft:__reserved__", "minecraft:air", "minecraft:cave_air",
+                        "minecraft:void_air"}) {
+                    String defaultState = blockMap.remove(id);
+                    if (defaultState == null) {
+                        defaultState = id;
+                    }
+                    if (values[internalId] != null) {
+                        throw new IllegalStateException(
+                                "Invalid duplicate id for __reserved__! Something has gone very wrong. Are " +
+                                        "any plugins shading FAWE?!");
+                    }
+                    BlockType type = register(defaultState, internalId, stateList, tickList);
+                    // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
+                    values[internalId] = type;
+                    internalId++;
                 }
-                if (values[internalId] != null) {
-                    throw new IllegalStateException("Invalid duplicate id for __reserved__! Something has gone very wrong. Are " +
-                            "any plugins shading FAWE?!");
-                }
-                BlockType type = register(defaultState, internalId, stateList, tickList);
-                // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
-                values[internalId] = type;
             }
 
             { // Register real blocks

@@ -968,7 +968,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     private char ordinal(net.minecraft.world.level.block.state.BlockState ibd, PaperweightFaweAdapter adapter) {
         if (ibd == null) {
-            return BlockTypes.AIR.getDefaultState().getOrdinalChar();
+            return 1;
         } else {
             return adapter.adaptToChar(ibd);
         }

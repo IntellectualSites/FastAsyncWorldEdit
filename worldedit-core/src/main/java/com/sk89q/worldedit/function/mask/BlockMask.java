@@ -210,9 +210,9 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public boolean replacesAir() {
-        return ordinals[BlockTypes.AIR.getDefaultState().getOrdinal()]
-                || ordinals[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()]
-                || ordinals[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()];
+        return ordinals[1]
+                || ordinals[2]
+                || ordinals[3];
     }
 
     @Override
@@ -334,9 +334,9 @@ public class BlockMask extends ABlockMask {
             cloned[i] = !cloned[i];
         }
         if (replacesAir()) {
-            cloned[BlockTypes.AIR.getDefaultState().getOrdinal()] = false;
-            cloned[BlockTypes.CAVE_AIR.getDefaultState().getOrdinal()] = false;
-            cloned[BlockTypes.VOID_AIR.getDefaultState().getOrdinal()] = false;
+            cloned[1] = false;
+            cloned[2] = false;
+            cloned[3] = false;
             cloned[0] = false;
         }
         return new BlockMask(getExtent(), cloned);
