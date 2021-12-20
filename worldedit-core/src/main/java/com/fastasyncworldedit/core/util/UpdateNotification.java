@@ -30,8 +30,7 @@ public class UpdateNotification {
             try {
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 DocumentBuilder db = dbf.newDocumentBuilder();
-                //TODO 1.18 revisit and update to semver parsing after updating FaweVersion.java
-                Document doc = db.parse(new URL("https://ci.athion.net/job/FastAsyncWorldEdit-1.17/api/xml/").openStream());
+                Document doc = db.parse(new URL("https://ci.athion.net/job/FastAsyncWorldEdit/api/xml/").openStream());
                 faweVersion = doc.getElementsByTagName("lastSuccessfulBuild").item(0).getFirstChild().getTextContent();
                 FaweVersion faweVersion = Fawe.get().getVersion();
                 if (faweVersion.build == 0) {
@@ -45,11 +44,10 @@ public class UpdateNotification {
                     LOGGER.warn(
                             """
                                     An update for FastAsyncWorldEdit is available. You are {} build(s) out of date.
-                                    You are running version {}, the latest version is {}-{}.
+                                    You are running build {}, the latest version is build {}.
                                     Update at https://www.spigotmc.org/resources/13932/""",
                             versionDifference,
-                            faweVersion.toString(),
-                            faweVersion.getSimpleVersionName(),
+                            faweVersion.build,
                             UpdateNotification.faweVersion
                     );
                 }
@@ -70,8 +68,11 @@ public class UpdateNotification {
             if (actor.hasPermission("fawe.admin") && UpdateNotification.hasUpdate) {
                 FaweVersion faweVersion = Fawe.get().getVersion();
                 int versionDifference = Integer.parseInt(UpdateNotification.faweVersion) - faweVersion.build;
-                actor.print(Caption.of("fawe.info.update-available", versionDifference, faweVersion.toString(),
-                        faweVersion.getSimpleVersionName() + "-" + UpdateNotification.faweVersion,
+                actor.print(Caption.of(
+                        "fawe.info.update-available",
+                        versionDifference,
+                        faweVersion.build,
+                        UpdateNotification.faweVersion,
                         TextComponent
                                 .of("https://www.spigotmc.org/resources/13932/")
                                 .clickEvent(ClickEvent.openUrl("https://www.spigotmc.org/resources/13932/"))
