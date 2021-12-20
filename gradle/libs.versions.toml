@@ -32,7 +32,7 @@ sparsebitset = "1.2"
 parallelgzip = "1.0.5"
 adventure = "4.9.3"
 truezip = "6.8.4"
-auto-value = "1.8.2"
+auto-value = "1.9"
 findbugs = "3.0.2"
 rhino-runtime = "1.7.13"
 zstd-jni = "1.4.8-1" # Not latest as it can be difficult to obtain latest ZSTD libs
@@ -49,8 +49,8 @@ text = "3.0.4"
 piston = "0.5.7"
 
 # Tests
-mockito = "4.1.0"
-checker-qual = "3.20.0"
+mockito = "4.2.0"
+checker-qual = "3.21.0"
 
 # Gradle plugins
 pluginyml = "0.5.1"
