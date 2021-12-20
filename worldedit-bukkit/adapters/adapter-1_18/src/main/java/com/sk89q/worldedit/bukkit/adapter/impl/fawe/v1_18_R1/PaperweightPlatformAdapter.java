@@ -541,7 +541,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                         }
                         Biome biome = biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()));
                         if (biome == null) {
-                            System.out.println(biomeType.getId());
                             continue;
                         }
                         biomePalettedContainer.set(x, y, z, biome);
