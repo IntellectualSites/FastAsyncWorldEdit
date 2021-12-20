@@ -546,25 +546,27 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 }
 
                 // Biomes
-                BiomeType[] biomes = set.getBiomes();
+                BiomeType[][] biomes = set.getBiomes();
                 if (biomes != null) {
                     // set biomes
                     ChunkBiomeContainer currentBiomes = nmsChunk.getBiomes();
                     if (createCopy) {
                         copy.storeBiomes(currentBiomes);
                     }
-                    for (int y = 0, i = 0; y < 64; y++) {
-                        for (int z = 0; z < 4; z++) {
-                            for (int x = 0; x < 4; x++, i++) {
-                                final BiomeType biome = biomes[i];
-                                if (biome != null) {
-                                    Biome nmsBiome =
-                                            nmsWorld.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).get(
-                                                    ResourceLocation.tryParse(biome.getId()));
-                                    if (nmsBiome == null) {
-                                        throw new NullPointerException("BiomeBase null for BiomeType " + biome.getId());
+                    for (int layer = 0; layer < 16; layer++) {
+                        for (int y = 0, i = 0; y < 4; y++) {
+                            for (int z = 0; z < 4; z++) {
+                                for (int x = 0; x < 4; x++, i++) {
+                                    final BiomeType biome = biomes[layer][i];
+                                    if (biome != null) {
+                                        Biome nmsBiome =
+                                                nmsWorld.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).get(
+                                                        ResourceLocation.tryParse(biome.getId()));
+                                        if (nmsBiome == null) {
+                                            throw new NullPointerException("BiomeBase null for BiomeType " + biome.getId());
+                                        }
+                                        currentBiomes.setBiome(x, (layer << 2) + y, z, nmsBiome);
                                     }
-                                    currentBiomes.setBiome(x, y, z, nmsBiome);
                                 }
                             }
                         }
