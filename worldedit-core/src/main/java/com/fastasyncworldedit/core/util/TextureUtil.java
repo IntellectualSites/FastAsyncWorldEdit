@@ -33,7 +33,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -370,8 +369,7 @@ public class TextureUtil implements TextureHolder {
                                     "folder with a `.minecraft/versions` jar in it.");
                     LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
-                //TODO 1.18 AccessControlException is deprecated and scheduled for removal as of Java 17. Exchange on sight to be prepared for future releases
-            } catch (AccessControlException e) {
+            } catch (SecurityException e) {
                 LOGGER.error(
                         "Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
                 LOGGER.error(
