@@ -34,7 +34,7 @@ ext {
     date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
     revision = "-${git.head().abbreviatedId}"
     buildNumber = if (project.hasProperty("buildnumber")) {
-        snapshot + "+" + project.properties["buildnumber"] as String
+        snapshot + "-" + project.properties["buildnumber"] as String
     } else {
         project.properties["snapshot"] as String
     }

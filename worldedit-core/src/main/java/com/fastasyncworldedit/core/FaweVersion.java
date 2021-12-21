@@ -7,7 +7,6 @@ import java.util.Locale;
 /**
  * An internal FAWE class not meant for public use.
  **/
-//TODO 18 update to semver
 public class FaweVersion {
 
     public final int year;
@@ -37,7 +36,7 @@ public class FaweVersion {
         }
         this.semver = ver;
         this.snapshot = split.length > 1 && split[1].toLowerCase(Locale.ROOT).contains("snapshot");
-        this.build = version.contains("+") ? Integer.parseInt(version.substring(version.indexOf('+') + 1)) : 0;
+        this.build = version.contains("-") ? Integer.parseInt(version.substring(version.indexOf('-') + 10)) : 0;
         this.hash = Integer.parseInt(commit.substring(commit.indexOf('=') + 1), 16);
         String[] split2 = date.substring(date.indexOf('=') + 1).split("\\.");
         this.year = Integer.parseInt(split2[0]);
@@ -60,7 +59,7 @@ public class FaweVersion {
             return "FastAsyncWorldEdit-NoVer-SNAPSHOT";
         } else {
             String snapshot = this.snapshot ? "-SNAPSHOT" : "";
-            String build = this.build > 0 ? "+" + this.build : "";
+            String build = this.build > 0 ? "-" + this.build : "";
             return "FastAsyncWorldEdit-" + StringMan.join(semver, ".") + snapshot + build;
         }
     }
