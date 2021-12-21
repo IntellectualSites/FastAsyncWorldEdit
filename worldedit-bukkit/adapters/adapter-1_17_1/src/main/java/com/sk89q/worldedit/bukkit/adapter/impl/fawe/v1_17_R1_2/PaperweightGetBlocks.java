@@ -553,6 +553,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         copy.storeBiomes(currentBiomes);
                     }
                     for (int layer = 0; layer < 16; layer++) {
+                        if (biomes[layer] == null) {
+                            continue;
+                        }
                         for (int y = 0, i = 0; y < 4; y++) {
                             for (int z = 0; z < 4; z++) {
                                 for (int x = 0; x < 4; x++, i++) {
