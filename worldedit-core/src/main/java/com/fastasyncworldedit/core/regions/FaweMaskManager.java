@@ -24,37 +24,9 @@ public abstract class FaweMaskManager {
     }
 
     /**
-     * Get a {@link FaweMask} for the given player and {@link MaskType}
-     *
-     * @deprecated Use {@link #getMask(Player, MaskType, boolean)}
-     */
-    @Deprecated(forRemoval = true)
-    public FaweMask getMask(final Player player, MaskType type) {
-        return getMask(player, type, true);
-    }
-
-    /**
      * Get a {@link FaweMask} for the given player and {@link MaskType}. If isWhitelist is false, will return a "blacklist" mask.
      */
-    public FaweMask getMask(final Player player, MaskType type, boolean isWhitelist) {
-        return getMask(player, type);
-    }
-
-    /**
-     * @deprecated Not used internally
-     */
-    @Deprecated(forRemoval = true)
-    public boolean isValid(FaweMask mask) {
-        return true;
-    }
-
-    /**
-     * @deprecated Not used internally
-     */
-    @Deprecated(forRemoval = true)
-    public RegionFilter getFilter(String world) {
-        return null;
-    }
+    public abstract FaweMask getMask(final Player player, MaskType type, boolean isWhitelist);
 
     public boolean isExclusive() {
         return Settings.IMP.REGION_RESTRICTIONS_OPTIONS.EXCLUSIVE_MANAGERS.contains(this.key);

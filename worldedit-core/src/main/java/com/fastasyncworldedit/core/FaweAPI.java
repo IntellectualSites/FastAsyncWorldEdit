@@ -11,7 +11,6 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -59,17 +58,6 @@ import java.util.UUID;
 public class FaweAPI {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-
-    /**
-     * Offers a lot of options for building an EditSession.
-     *
-     * @return A new EditSessionBuilder
-     * @deprecated See {@link WorldEdit#newEditSessionBuilder()}
-     */
-    @Deprecated(forRemoval = true)
-    public static EditSessionBuilder getEditSessionBuilder(World world) {
-        return new EditSessionBuilder(world);
-    }
 
     /**
      * The TaskManager has some useful methods for doing things asynchronously.
