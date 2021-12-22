@@ -11,6 +11,7 @@ import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.net.URL;
@@ -29,6 +30,7 @@ public class UpdateNotification {
         if (Settings.IMP.ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
             try {
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document doc = db.parse(new URL("https://ci.athion.net/job/FastAsyncWorldEdit/api/xml/").openStream());
                 faweVersion = doc.getElementsByTagName("lastSuccessfulBuild").item(0).getFirstChild().getTextContent();

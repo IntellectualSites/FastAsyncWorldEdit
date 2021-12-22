@@ -353,10 +353,10 @@ public class TextureUtil implements TextureHolder {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
                 new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/").mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://launcher.mojang.com/v1/objects/d49eb6caed53d23927648c97451503442f9e26fd/client.jar")
+                        new URL("https://launcher.mojang.com/v1/objects/7e46fb47609401970e2818989fa584fd467cd036/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.18.jar")) {
+                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.18.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -810,10 +810,10 @@ public class TextureUtil implements TextureHolder {
                 new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/")
                         .mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://launcher.mojang.com/v1/objects/d49eb6caed53d23927648c97451503442f9e26fd/client.jar")
+                        new URL("https://launcher.mojang.com/v1/objects/7e46fb47609401970e2818989fa584fd467cd036/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.18.jar")) {
+                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.18.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
