@@ -258,47 +258,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Nullable
     private final Region[] allowedRegions;
 
-    @Deprecated(forRemoval = true)
-    public EditSession(
-            @Nonnull EventBus bus, World world, @Nullable Player actor,
-            @Nullable FaweLimit limit, @Nullable AbstractChangeSet changeSet,
-            @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue,
-            @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages,
-            @Nullable BlockBag blockBag, @Nullable EditSessionEvent event
-    ) {
-        this(new EditSessionBuilder(bus).world(world).actor(actor)
-                .limit(limit)
-                .changeSet(changeSet)
-                .allowedRegions(allowedRegions)
-                .fastMode(fastmode)
-                .checkMemory(checkMemory)
-                .combineStages(combineStages)
-                .blockBag(blockBag)
-                .event(event));
-    }
-    //FAWE end
-
-    /**
-     * Construct the object with a maximum number of blocks and a block bag.
-     *
-     * @param eventBus  the event bus
-     * @param world     the world
-     * @param maxBlocks the maximum number of blocks that can be changed, or -1 to use no limit
-     * @param blockBag  an optional {@link BlockBag} to use, otherwise null
-     * @param event     the event to call with the extent
-     */
-    //FAWE start - EditSessionEvent
-    @Deprecated(forRemoval = true)
-    public EditSession(
-            @Nonnull EventBus eventBus,
-            World world,
-            int maxBlocks,
-            @Nullable BlockBag blockBag,
-            EditSessionEvent event
-    ) {
-        this(eventBus, world, null, null, null, null, true, null, null, null, blockBag, event);
-    }
-
     EditSession(EditSessionBuilder builder) {
         super(builder.compile().getExtent());
         this.world = builder.getWorld();
@@ -320,27 +279,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             this.tracingExtents = null;
         }
-
-        this.allowedRegions = builder.getAllowedRegions() != null ? builder.getAllowedRegions().clone() : null;
-    }
-
-    @Deprecated(forRemoval = true)
-    public EditSession(com.fastasyncworldedit.core.util.EditSessionBuilder builder) {
-        super(builder.compile().getExtent());
-        this.world = builder.getWorld();
-        this.bypassHistory = builder.getBypassHistory();
-        this.bypassAll = builder.getBypassAll();
-        this.originalLimit = builder.getLimit();
-        this.limit = builder.getLimit().copy();
-        this.actor = builder.getPlayer();
-        this.changeSet = builder.getChangeTask();
-        this.minY = world.getMinY();
-        this.maxY = world.getMaxY();
-        this.blockBag = builder.getBlockBag();
-        this.history = changeSet != null;
-        this.relighter = builder.getRelighter();
-        this.wnaMode = builder.isWNAMode();
-        this.tracingExtents = null;
 
         this.allowedRegions = builder.getAllowedRegions() != null ? builder.getAllowedRegions().clone() : null;
     }

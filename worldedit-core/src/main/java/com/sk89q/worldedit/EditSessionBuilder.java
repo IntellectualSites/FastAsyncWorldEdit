@@ -378,14 +378,6 @@ public final class EditSessionBuilder {
     }
 
     /**
-     * Does nothing as of 1.13 new queueing system
-     */
-    @Deprecated(forRemoval = true)
-    public EditSessionBuilder autoQueue(@Nullable Boolean autoQueue) {
-        return this;
-    }
-
-    /**
      * Set fast mode. Use null to set to actor's fast mode setting. Also set to true by default if history for console disabled
      */
     public EditSessionBuilder fastMode(@Nullable Boolean fastMode) {

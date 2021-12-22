@@ -172,6 +172,9 @@ public class BukkitImplLoader {
                 if (className.equals(customCandidate)) {
                     LOGGER.warn("Failed to load the Bukkit adapter class '" + className + "'", e);
                 }
+                if (className.contains("Adapter") && className.contains("18")) {
+                    e.printStackTrace();
+                }
             }
         }
 

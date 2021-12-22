@@ -127,7 +127,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     }
 
     @Override
-    public FaweMask getMask(Player player, MaskType type) {
+    public FaweMask getMask(Player player, MaskType type, boolean isWhitelist) {
         final PlotPlayer<org.bukkit.entity.Player> pp = PlotPlayer.from(BukkitAdapter.adapt(player));
         if (pp == null) {
             return null;
