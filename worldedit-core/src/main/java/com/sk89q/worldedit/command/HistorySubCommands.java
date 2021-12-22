@@ -114,7 +114,7 @@ public class HistorySubCommands {
             @Switch(name = 'f', desc = "Restore instead of rollback")
                     boolean restore
     ) throws WorldEditException {
-        if (!Settings.IMP.HISTORY.USE_DATABASE) {
+        if (!Settings.settings().HISTORY.USE_DATABASE) {
             player.print(Caption.of("fawe.error.setting.disable", "history.use-database (Import with /history import )"));
             return;
         }
@@ -168,7 +168,7 @@ public class HistorySubCommands {
     @CommandPermissions("fawe.rollback.import")
     @Confirm
     public synchronized void importdb(Actor actor) throws WorldEditException {
-        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY);
+        File folder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.settings().PATHS.HISTORY);
         if (folder.exists()) {
             for (File worldFolder : Objects.requireNonNull(folder.listFiles())) {
                 if (worldFolder != null && worldFolder.isDirectory()) {
@@ -382,7 +382,7 @@ public class HistorySubCommands {
             @ArgFlag(name = 'p', desc = "Page to view.", def = "")
                     Integer page
     ) throws WorldEditException {
-        if (!Settings.IMP.HISTORY.USE_DATABASE) {
+        if (!Settings.settings().HISTORY.USE_DATABASE) {
             player.print(Caption.of("fawe.error.setting.disable", "history.use-database (Import with //history import )"));
             return;
         }

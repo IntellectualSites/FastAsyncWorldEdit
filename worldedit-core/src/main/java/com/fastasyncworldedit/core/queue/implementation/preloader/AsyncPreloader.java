@@ -31,7 +31,7 @@ public class AsyncPreloader implements Preloader, Runnable {
 
     public AsyncPreloader() {
         this.update = new ConcurrentHashMap<>();
-        TaskManager.IMP.laterAsync(this, 1);
+        TaskManager.taskManager().laterAsync(this, 1);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class AsyncPreloader implements Preloader, Runnable {
                 existing.setKey(world);
                 existing.setValue(ImmutableSet.copyOf(Iterables.limit(
                         region.getChunks(),
-                        Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT
+                        Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT
                 )));
             }
             synchronized (update) {
@@ -94,7 +94,7 @@ public class AsyncPreloader implements Preloader, Runnable {
             return;
         }
         if (update.isEmpty()) {
-            TaskManager.IMP.laterAsync(this, 1);
+            TaskManager.taskManager().laterAsync(this, 1);
             return;
         }
         Iterator<Map.Entry<UUID, MutablePair<World, Set<BlockVector2>>>> plrIter = update.entrySet().iterator();
@@ -118,7 +118,7 @@ public class AsyncPreloader implements Preloader, Runnable {
         if (cancelled.get()) {
             return;
         }
-        TaskManager.IMP.laterAsync(this, 20);
+        TaskManager.taskManager().laterAsync(this, 20);
     }
 
     private void queueLoad(World world, BlockVector2 chunk) {

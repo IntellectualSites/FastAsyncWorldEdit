@@ -27,7 +27,7 @@ public class UpdateNotification {
      * Check whether a new build with a higher build number than the current build is available.
      */
     public static void doUpdateCheck() {
-        if (Settings.IMP.ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
+        if (Settings.settings().ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
             try {
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
@@ -66,7 +66,7 @@ public class UpdateNotification {
      * @param actor The player to notify.
      */
     public static void doUpdateNotification(Actor actor) {
-        if (Settings.IMP.ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
+        if (Settings.settings().ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
             if (actor.hasPermission("fawe.admin") && UpdateNotification.hasUpdate) {
                 FaweVersion faweVersion = Fawe.get().getVersion();
                 int versionDifference = Integer.parseInt(UpdateNotification.faweVersion) - faweVersion.build;

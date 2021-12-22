@@ -62,7 +62,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
         checkNotNull(mask);
         this.mask = mask;
         //FAWE start
-        this.threadIdToFilter = FaweCache.IMP.createCache(() -> new CharFilterBlock(getExtent()));
+        this.threadIdToFilter = FaweCache.faweCache().createCache(() -> new CharFilterBlock(getExtent()));
         //FAWE end
     }
 

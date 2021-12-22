@@ -107,7 +107,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         this.player = player;
         //FAWE start
         this.permAttachment = plugin.getPermissionAttachmentManager().getOrAddAttachment(player);
-        if (player != null && Settings.IMP.CLIPBOARD.USE_DISK) {
+        if (player != null && Settings.settings().CLIPBOARD.USE_DISK) {
             BukkitPlayer cached = WorldEditPlugin.getInstance().getCachedPlayer(player);
             if (cached == null) {
                 loadClipboardFromDisk();
@@ -169,7 +169,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         player.getInventory().setItemInMainHand(newItem);
         HashMap<Integer, ItemStack> overflow = inv.addItem(item);
         if (!overflow.isEmpty()) {
-            TaskManager.IMP.sync(new RunnableVal<>() {
+            TaskManager.taskManager().sync(new RunnableVal<>() {
                 @Override
                 public void run(Object value) {
                     for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
@@ -243,7 +243,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         org.bukkit.World finalWorld = world;
         //FAWE end
-        return TaskManager.IMP.sync(() -> player.teleport(new Location(
+        return TaskManager.taskManager().sync(() -> player.teleport(new Location(
                 finalWorld,
                 pos.getX(),
                 pos.getY(),

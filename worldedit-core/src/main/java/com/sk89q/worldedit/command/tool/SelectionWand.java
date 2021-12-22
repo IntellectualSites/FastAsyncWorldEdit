@@ -56,7 +56,7 @@ public enum SelectionWand implements DoubleActionBlockTool {
 
         if (selector.selectPrimary(blockPoint, ActorSelectorLimits.forActor(player))) {
             //FAWE start
-            if (Settings.IMP.EXPERIMENTAL.OTHER) {
+            if (Settings.settings().EXPERIMENTAL.OTHER) {
                 LOGGER.info("actSecondary Hit and about to explain with explainPrimarySelection");
             }
             //FAWE end
@@ -79,7 +79,7 @@ public enum SelectionWand implements DoubleActionBlockTool {
 
         if (selector.selectSecondary(blockPoint, ActorSelectorLimits.forActor(player))) {
             //FAWE start
-            if (Settings.IMP.EXPERIMENTAL.OTHER) {
+            if (Settings.settings().EXPERIMENTAL.OTHER) {
                 LOGGER.info("actPrimary Hit and about to explain with explainSecondarySelection");
             }
             //FAWE end

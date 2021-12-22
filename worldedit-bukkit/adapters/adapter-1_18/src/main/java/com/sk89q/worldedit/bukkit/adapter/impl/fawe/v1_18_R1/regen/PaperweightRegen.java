@@ -397,7 +397,7 @@
 //    @Override
 //    protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
 //        // BlockPopulator#populate has to be called synchronously for TileEntity access
-//        TaskManager.IMP.task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
+//        TaskManager.taskManager().task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
 //    }
 //
 //    @Override

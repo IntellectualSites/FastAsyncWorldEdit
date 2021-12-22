@@ -504,10 +504,10 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                                 chunkPacket.setNativePacket(nmsPacket);
                             }
                             try {
-                                FaweCache.IMP.CHUNK_FLAG.get().set(true);
+                                FaweCache.faweCache().CHUNK_FLAG.get().set(true);
                                 entityPlayer.connection.send(nmsPacket);
                             } finally {
-                                FaweCache.IMP.CHUNK_FLAG.get().set(false);
+                                FaweCache.faweCache().CHUNK_FLAG.get().set(false);
                             }
                         }
                     });

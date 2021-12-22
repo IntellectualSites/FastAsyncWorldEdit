@@ -93,7 +93,7 @@ public class RegionVisitor implements Operation {
     @Override
     public Operation resume(RunContext run) throws WorldEditException {
         //FAWE start > allow chunk preloading
-        if (singleQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
+        if (singleQueue != null && Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT > 1) {
             /*
              * The following is done to reduce iteration cost
              *  - Preload chunks just in time
@@ -107,7 +107,7 @@ public class RegionVisitor implements Operation {
             int lastTrailChunkZ = Integer.MIN_VALUE;
             int lastLeadChunkX = Integer.MIN_VALUE;
             int lastLeadChunkZ = Integer.MIN_VALUE;
-            int loadingTarget = Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT;
+            int loadingTarget = Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT;
             while (trailIter.hasNext()) {
                 BlockVector3 pt = trailIter.next();
                 apply(pt);

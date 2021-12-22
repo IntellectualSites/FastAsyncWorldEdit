@@ -151,7 +151,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     private boolean generate() throws Exception {
         if (generateConcurrent) {
             //Using concurrent chunk generation
-            executor = Executors.newFixedThreadPool(Settings.IMP.QUEUE.PARALLEL_THREADS);
+            executor = Executors.newFixedThreadPool(Settings.settings().QUEUE.PARALLEL_THREADS);
         } // else using sequential chunk generation, concurrent not supported
 
         //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?

@@ -401,7 +401,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         try {
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
-            boolean fastmode = set.isFastMode() && Settings.IMP.QUEUE.NO_TICK_FASTMODE;
+            boolean fastmode = set.isFastMode() && Settings.settings().QUEUE.NO_TICK_FASTMODE;
 
             // Remove existing tiles. Create a copy so that we can remove blocks
             Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
@@ -755,7 +755,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         nmsChunk.mustNotSave = false;
                         nmsChunk.setUnsaved(true);
                         // send to player
-                        if (Settings.IMP.LIGHTING.MODE == 0 || !Settings.IMP.LIGHTING.DELAY_PACKET_SENDING) {
+                        if (Settings.settings().LIGHTING.MODE == 0 || !Settings.settings().LIGHTING.DELAY_PACKET_SENDING) {
                             this.send(finalMask, finalLightUpdate);
                         }
                         if (finalizer != null) {
@@ -881,7 +881,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             data = new char[4096];
             Arrays.fill(data, (char) 1);
         }
-        if (data == null || data == FaweCache.IMP.EMPTY_CHAR_4096) {
+        if (data == null || data == FaweCache.faweCache().EMPTY_CHAR_4096) {
             data = new char[4096];
             Arrays.fill(data, (char) 1);
         }
@@ -921,7 +921,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     return data;
                 }
 
-                char[] paletteToOrdinal = FaweCache.IMP.PALETTE_TO_BLOCK_CHAR.get();
+                char[] paletteToOrdinal = FaweCache.faweCache().PALETTE_TO_BLOCK_CHAR.get();
                 try {
                     if (num_palette != 1) {
                         for (int i = 0; i < num_palette; i++) {

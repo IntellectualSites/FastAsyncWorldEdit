@@ -115,7 +115,7 @@ public class MainUtil {
 
     public static long getTotalSize(Path path) {
         final AtomicLong size = new AtomicLong(0);
-        traverse(path, new RunnableVal2<Path, BasicFileAttributes>() {
+        traverse(path, new RunnableVal2<>() {
             @Override
             public void run(Path path, BasicFileAttributes attrs) {
                 size.addAndGet(attrs.size());
@@ -126,7 +126,7 @@ public class MainUtil {
 
     public static void traverse(Path path, final BiConsumer<Path, BasicFileAttributes> onEach) {
         try {
-            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(path, new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult
                 visitFile(Path file, BasicFileAttributes attrs) {
@@ -231,20 +231,19 @@ public class MainUtil {
     }
 
     public static long getSize(ChangeSet changeSet) {
-        if (changeSet instanceof FaweStreamChangeSet) {
-            FaweStreamChangeSet fscs = (FaweStreamChangeSet) changeSet;
+        if (changeSet instanceof FaweStreamChangeSet fscs) {
             return fscs.getSizeOnDisk() + fscs.getSizeInMemory();
 //        } else if (changeSet instanceof CPUOptimizedChangeSet) {
 //            return changeSet.size() + 32;
         } else if (changeSet != null) {
-            return changeSet.size() * 128;
+            return changeSet.size() * 128L;
         } else {
             return 0;
         }
     }
 
     public static FaweOutputStream getCompressedOS(OutputStream os, int amount) throws IOException {
-        return getCompressedOS(os, amount, Settings.IMP.HISTORY.BUFFER_SIZE);
+        return getCompressedOS(os, amount, Settings.settings().HISTORY.BUFFER_SIZE);
     }
 
     private static final LZ4Factory FACTORY = LZ4Factory.fastestInstance();
@@ -350,7 +349,7 @@ public class MainUtil {
     }
 
     public static FaweInputStream getCompressedIS(InputStream is) throws IOException {
-        return getCompressedIS(is, Settings.IMP.HISTORY.BUFFER_SIZE);
+        return getCompressedIS(is, Settings.settings().HISTORY.BUFFER_SIZE);
     }
 
     public static FaweInputStream getCompressedIS(InputStream is, int buffer) throws IOException {
@@ -381,7 +380,7 @@ public class MainUtil {
     }
 
     public static URL upload(UUID uuid, String file, String extension, @Nonnull final RunnableVal<OutputStream> writeTask) {
-        return upload(Settings.IMP.WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
+        return upload(Settings.settings().WEB.URL, uuid != null, uuid != null ? uuid.toString() : null, file, extension, writeTask);
     }
 
     public static URL upload(
@@ -413,16 +412,15 @@ public class MainUtil {
                     StandardCharsets.UTF_8
             ), true)) {
                 String crlf = "\r\n";
-                writer.append("--" + boundary).append(crlf);
+                writer.append("--").append(boundary).append(crlf);
                 writer.append("Content-Disposition: form-data; name=\"param\"").append(crlf);
-                writer.append("Content-Type: text/plain; charset=" + StandardCharsets.UTF_8.displayName()).append(crlf);
+                writer.append("Content-Type: text/plain; charset=").append(StandardCharsets.UTF_8.displayName()).append(crlf);
                 String param = "value";
                 writer.append(crlf).append(param).append(crlf).flush();
-                writer.append("--" + boundary).append(crlf);
-                writer
-                        .append("Content-Disposition: form-data; name=\"schematicFile\"; filename=\"" + filename + '"')
+                writer.append("--").append(boundary).append(crlf);
+                writer.append("Content-Disposition: form-data; name=\"schematicFile\"; filename=\"").append(filename).append(String.valueOf('"'))
                         .append(crlf);
-                writer.append("Content-Type: " + URLConnection.guessContentTypeFromName(filename)).append(crlf);
+                writer.append("Content-Type: ").append(URLConnection.guessContentTypeFromName(filename)).append(crlf);
                 writer.append("Content-Transfer-Encoding: binary").append(crlf);
                 writer.append(crlf).flush();
                 OutputStream nonClosable = new AbstractDelegateOutputStream(new BufferedOutputStream(output)) {
@@ -434,7 +432,7 @@ public class MainUtil {
                 writeTask.run();
                 nonClosable.flush();
                 writer.append(crlf).flush();
-                writer.append("--" + boundary + "--").append(crlf).flush();
+                writer.append("--").append(boundary).append("--").append(crlf).flush();
             }
             int responseCode = ((HttpURLConnection) con).getResponseCode();
             String content;
@@ -663,21 +661,19 @@ public class MainUtil {
                 continue;
             }
             switch (c) {
-                case '-':
-                    val = -val;
-                    break;
-                case '.':
+                case '-' -> val = -val;
+                case '.' -> {
                     res[index--] = val;
                     if (index == -1) {
                         return res;
                     }
                     val = 0;
                     numIndex = 1;
-                    break;
-                default:
+                }
+                default -> {
                     val = val + (c - 48) * numIndex;
                     numIndex *= 10;
-                    break;
+                }
             }
         }
         res[index] = val;
@@ -802,30 +798,30 @@ public class MainUtil {
             int years = (int) (time / 33868800);
             int time1 = years * 33868800;
             time -= time1;
-            toreturn.append(years + "y ");
+            toreturn.append(years).append("y ");
         }
         if (time >= 604800) {
             int weeks = (int) (time / 604800);
-            time -= weeks * 604800;
-            toreturn.append(weeks + "w ");
+            time -= weeks * 604800L;
+            toreturn.append(weeks).append("w ");
         }
         if (time >= 86400) {
             int days = (int) (time / 86400);
-            time -= days * 86400;
-            toreturn.append(days + "d ");
+            time -= days * 86400L;
+            toreturn.append(days).append("d ");
         }
         if (time >= 3600) {
             int hours = (int) (time / 3600);
-            time -= hours * 3600;
-            toreturn.append(hours + "h ");
+            time -= hours * 3600L;
+            toreturn.append(hours).append("h ");
         }
         if (time >= 60) {
             int minutes = (int) (time / 60);
-            time -= minutes * 60;
-            toreturn.append(minutes + "m ");
+            time -= minutes * 60L;
+            toreturn.append(minutes).append("m ");
         }
         if (toreturn.equals("") || time > 0) {
-            toreturn.append((time) + "s ");
+            toreturn.append(time).append("s ");
         }
         return toreturn.toString().trim();
     }
@@ -849,23 +845,23 @@ public class MainUtil {
                 case "wks":
                 case "w":
 
-                    time += 604800 * nums;
+                    time += 604800L * nums;
                 case "days":
                 case "day":
                 case "d":
-                    time += 86400 * nums;
+                    time += 86400L * nums;
                 case "hour":
                 case "hr":
                 case "hrs":
                 case "hours":
                 case "h":
-                    time += 3600 * nums;
+                    time += 3600L * nums;
                 case "minutes":
                 case "minute":
                 case "mins":
                 case "min":
                 case "m":
-                    time += 60 * nums;
+                    time += 60L * nums;
                 case "seconds":
                 case "second":
                 case "secs":

@@ -861,7 +861,7 @@ public class BrushCommands {
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
         File file = new File(
                 Fawe.imp().getDirectory(),
-                Settings.IMP.PATHS.HEIGHTMAP + File.separator + filenamePng
+                Settings.settings().PATHS.HEIGHTMAP + File.separator + filenamePng
         );
         if (file.exists()) {
             return new FileInputStream(file);
@@ -1310,7 +1310,7 @@ public class BrushCommands {
         worldEdit.checkMaxBrushRadius(radius);
 
         //FAWE start
-        FaweLimit limit = Settings.IMP.getLimit(player);
+        FaweLimit limit = Settings.settings().getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
         //FAWE end
 
@@ -1345,7 +1345,7 @@ public class BrushCommands {
         worldEdit.checkMaxBrushRadius(radius);
 
         //FAWE start
-        FaweLimit limit = Settings.IMP.getLimit(player);
+        FaweLimit limit = Settings.settings().getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
         //FAWE end
 

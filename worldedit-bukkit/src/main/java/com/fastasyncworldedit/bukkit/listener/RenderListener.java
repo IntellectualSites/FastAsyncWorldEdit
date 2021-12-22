@@ -28,7 +28,7 @@ public class RenderListener implements Listener {
 
     public RenderListener(Plugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        TaskManager.IMP.repeat(new Runnable() {
+        TaskManager.taskManager().repeat(new Runnable() {
             private long last = 0;
 
             @Override
@@ -81,7 +81,7 @@ public class RenderListener implements Listener {
 
     private void setViewDistance(Player player, int value) {
         UUID uuid = player.getUniqueId();
-        if (value == Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING) {
+        if (value == Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING) {
             views.remove(uuid);
         } else {
             int[] val = views.get(uuid);
@@ -105,7 +105,7 @@ public class RenderListener implements Listener {
 
     private int getViewDistance(Player player) {
         int[] value = views.get(player.getUniqueId());
-        return value == null ? Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING : value[0];
+        return value == null ? Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING : value[0];
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

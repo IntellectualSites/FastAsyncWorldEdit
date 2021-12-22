@@ -340,7 +340,7 @@ public class TextureUtil implements TextureHolder {
      * Do not use. Use {@link Fawe#getTextureUtil()}
      */
     public TextureUtil() throws FileNotFoundException {
-        this(MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.TEXTURES));
+        this(MainUtil.getFile(Fawe.imp().getDirectory(), Settings.settings().PATHS.TEXTURES));
     }
 
     /**
@@ -351,12 +351,12 @@ public class TextureUtil implements TextureHolder {
         if (!folder.exists()) {
             try {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
-                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/").mkdirs();
+                new File(Fawe.imp().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/").mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
                         new URL("https://launcher.mojang.com/v1/objects/7e46fb47609401970e2818989fa584fd467cd036/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.18.1.jar")) {
+                             Fawe.imp().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.18.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -807,13 +807,13 @@ public class TextureUtil implements TextureHolder {
             // Get all the jar files
             File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
             if (files.length == 0) {
-                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/")
+                new File(Fawe.imp().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/")
                         .mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
                         new URL("https://launcher.mojang.com/v1/objects/7e46fb47609401970e2818989fa584fd467cd036/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.18.1.jar")) {
+                             Fawe.imp().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.18.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {

@@ -19,12 +19,16 @@ import java.util.stream.Stream;
 
 public class Settings extends Config {
 
+    /**
+     * @deprecated Use {@link #settings()} instead to get an instance.
+     */
     @Ignore
+    @Deprecated(forRemoval = true, since = "2.0.0")
     public static final Settings IMP = new Settings();
-
+    @Ignore
+    static Settings INSTANCE = new Settings();
     @Ignore
     public boolean PROTOCOL_SUPPORT_FIX = false;
-
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
     public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues";
@@ -38,7 +42,6 @@ public class Settings extends Config {
     public String COMMIT; // These values are set from FAWE before loading
     @Final
     public String PLATFORM; // These values are set from FAWE before loading
-
     @Comment({
             "Set true to enable WorldEdit restrictions per region (e.g. PlotSquared or WorldGuard).",
             "To be allowed to WorldEdit in a region, users need the appropriate",
@@ -51,7 +54,6 @@ public class Settings extends Config {
             " - Disable with 100 or -1."
     })
     public int MAX_MEMORY_PERCENT = 95;
-
     @Create
     public ENABLED_COMPONENTS ENABLED_COMPONENTS;
     @Create
@@ -77,16 +79,174 @@ public class Settings extends Config {
     @Create
     public ConfigBlock<LIMITS> LIMITS;
 
+    /**
+     * Gets an instance of Settings.
+     *
+     * @return an instance of Settings
+     * @since 2.0.0
+     */
+    public static Settings settings() {
+        return INSTANCE;
+    }
+
+    public void reload(File file) {
+        load(file);
+        save(file);
+    }
+
+    public FaweLimit getLimit(Actor actor) {
+        FaweLimit limit;
+        if (actor.hasPermission("fawe.limit.*") || actor.hasPermission("fawe.bypass")) {
+            limit = FaweLimit.MAX.copy();
+        } else {
+            limit = new FaweLimit();
+        }
+        ArrayList<String> keys = new ArrayList<>(LIMITS.getSections());
+        if (keys.remove("default")) {
+            keys.add("default");
+        }
+
+        boolean limitFound = false;
+        for (String key : keys) {
+            if (actor.hasPermission("fawe.limit." + key) || !limitFound && key.equals("default")) {
+                limitFound = true;
+                LIMITS newLimit = LIMITS.get(key);
+                limit.MAX_ACTIONS = Math.max(
+                        limit.MAX_ACTIONS,
+                        newLimit.MAX_ACTIONS != -1 ? newLimit.MAX_ACTIONS : Integer.MAX_VALUE
+                );
+                limit.MAX_CHANGES = Math.max(
+                        limit.MAX_CHANGES,
+                        newLimit.MAX_CHANGES != -1 ? newLimit.MAX_CHANGES : Long.MAX_VALUE
+                );
+                limit.MAX_BLOCKSTATES = Math.max(
+                        limit.MAX_BLOCKSTATES,
+                        newLimit.MAX_BLOCKSTATES != -1 ? newLimit.MAX_BLOCKSTATES : Integer.MAX_VALUE
+                );
+                limit.MAX_CHECKS = Math.max(
+                        limit.MAX_CHECKS,
+                        newLimit.MAX_CHECKS != -1 ? newLimit.MAX_CHECKS : Long.MAX_VALUE
+                );
+                limit.MAX_ENTITIES = Math.max(
+                        limit.MAX_ENTITIES,
+                        newLimit.MAX_ENTITIES != -1 ? newLimit.MAX_ENTITIES : Integer.MAX_VALUE
+                );
+                limit.MAX_FAILS = Math.max(limit.MAX_FAILS, newLimit.MAX_FAILS != -1 ? newLimit.MAX_FAILS : Integer.MAX_VALUE);
+                limit.MAX_ITERATIONS = Math.max(
+                        limit.MAX_ITERATIONS,
+                        newLimit.MAX_ITERATIONS != -1 ? newLimit.MAX_ITERATIONS : Integer.MAX_VALUE
+                );
+                limit.MAX_HISTORY = Math.max(
+                        limit.MAX_HISTORY,
+                        newLimit.MAX_HISTORY_MB != -1 ? newLimit.MAX_HISTORY_MB : Integer.MAX_VALUE
+                );
+                limit.MAX_EXPRESSION_MS = Math.max(
+                        limit.MAX_EXPRESSION_MS,
+                        newLimit.MAX_EXPRESSION_MS != -1 ? newLimit.MAX_EXPRESSION_MS : Integer.MAX_VALUE
+                );
+                limit.INVENTORY_MODE = Math.min(limit.INVENTORY_MODE, newLimit.INVENTORY_MODE);
+                limit.SPEED_REDUCTION = Math.min(limit.SPEED_REDUCTION, newLimit.SPEED_REDUCTION);
+                limit.FAST_PLACEMENT |= newLimit.FAST_PLACEMENT;
+                limit.CONFIRM_LARGE &= newLimit.CONFIRM_LARGE;
+                limit.RESTRICT_HISTORY_TO_REGIONS &= newLimit.RESTRICT_HISTORY_TO_REGIONS;
+                if (limit.STRIP_NBT == null) {
+                    limit.STRIP_NBT = newLimit.STRIP_NBT.isEmpty() ? Collections.emptySet() : new HashSet<>(newLimit.STRIP_NBT);
+                } else if (limit.STRIP_NBT.isEmpty() || newLimit.STRIP_NBT.isEmpty()) {
+                    limit.STRIP_NBT = Collections.emptySet();
+                } else {
+                    limit.STRIP_NBT = new HashSet<>(limit.STRIP_NBT);
+                    limit.STRIP_NBT.retainAll(newLimit.STRIP_NBT);
+                    if (limit.STRIP_NBT.isEmpty()) {
+                        limit.STRIP_NBT = Collections.emptySet();
+                    }
+                }
+                limit.UNIVERSAL_DISALLOWED_BLOCKS &= newLimit.UNIVERSAL_DISALLOWED_BLOCKS;
+
+                if (limit.DISALLOWED_BLOCKS == null) {
+                    limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : new HashSet<>(
+                            newLimit.DISALLOWED_BLOCKS);
+                } else if (limit.DISALLOWED_BLOCKS.isEmpty() || newLimit.DISALLOWED_BLOCKS.isEmpty()) {
+                    limit.DISALLOWED_BLOCKS = Collections.emptySet();
+                } else {
+                    limit.DISALLOWED_BLOCKS = new HashSet<>(limit.DISALLOWED_BLOCKS);
+                    limit.DISALLOWED_BLOCKS.retainAll(newLimit.DISALLOWED_BLOCKS
+                            .stream()
+                            .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
+                            .collect(Collectors.toSet()));
+                    if (limit.DISALLOWED_BLOCKS.isEmpty()) {
+                        limit.DISALLOWED_BLOCKS = Collections.emptySet();
+                    }
+                }
+
+                if (limit.REMAP_PROPERTIES == null) {
+                    limit.REMAP_PROPERTIES = newLimit.REMAP_PROPERTIES.isEmpty() ? Collections.emptySet() :
+                            newLimit.REMAP_PROPERTIES.stream().flatMap(s -> {
+                                String propertyStr = s.substring(0, s.indexOf('['));
+                                List<Property<?>> properties =
+                                        BlockTypesCache.getAllProperties().get(propertyStr.toLowerCase(Locale.ROOT));
+                                if (properties == null || properties.isEmpty()) {
+                                    return Stream.empty();
+                                }
+                                String[] mappings = s.substring(s.indexOf('[') + 1, s.indexOf(']')).split(",");
+                                Set<PropertyRemap<?>> remaps = new HashSet<>();
+                                for (Property<?> property : properties) {
+                                    for (String mapping : mappings) {
+                                        try {
+                                            String[] fromTo = mapping.split(":");
+                                            remaps.add(property.getRemap(
+                                                    property.getValueFor(fromTo[0]),
+                                                    property.getValueFor(fromTo[1])
+                                            ));
+                                        } catch (IllegalArgumentException ignored) {
+                                            // This property is unlikely to be the one being targeted.
+                                            break;
+                                        }
+                                    }
+                                }
+                                return remaps.stream();
+                            }).collect(Collectors.toSet());
+                } else if (limit.REMAP_PROPERTIES.isEmpty() || newLimit.REMAP_PROPERTIES.isEmpty()) {
+                    limit.REMAP_PROPERTIES = Collections.emptySet();
+                } else {
+                    limit.REMAP_PROPERTIES = new HashSet<>(limit.REMAP_PROPERTIES);
+                    limit.REMAP_PROPERTIES.retainAll(newLimit.REMAP_PROPERTIES.stream().flatMap(s -> {
+                        String propertyStr = s.substring(0, s.indexOf('['));
+                        List<Property<?>> properties =
+                                BlockTypesCache.getAllProperties().get(propertyStr.toLowerCase(Locale.ROOT));
+                        if (properties == null || properties.isEmpty()) {
+                            return Stream.empty();
+                        }
+                        String[] mappings = s.substring(s.indexOf('[') + 1, s.indexOf(']')).split(",");
+                        Set<PropertyRemap<?>> remaps = new HashSet<>();
+                        for (Property<?> property : properties) {
+                            for (String mapping : mappings) {
+                                try {
+                                    String[] fromTo = mapping.split(":");
+                                    remaps.add(property.getRemap(
+                                            property.getValueFor(fromTo[0]),
+                                            property.getValueFor(fromTo[1])
+                                    ));
+                                } catch (IllegalArgumentException ignored) {
+                                    // This property is unlikely to be the one being targeted.
+                                    break;
+                                }
+                            }
+                        }
+                        return remaps.stream();
+                    }).collect(Collectors.toSet()));
+                    if (limit.REMAP_PROPERTIES.isEmpty()) {
+                        limit.REMAP_PROPERTIES = Collections.emptySet();
+                    }
+                }
+            }
+        }
+        return limit;
+    }
+
     @Comment("Enable or disable core components")
     public static final class ENABLED_COMPONENTS {
 
         public boolean COMMANDS = true;
-        @Comment({
-                "Disable the FAWE-PlotSquared hook to take over most intense P2 queueing",
-                "Specific aspects can be turned on and off further below",
-                "Only disables/enables the hook with v4. For v6, see PlotSquared settings.yml"
-        })
-        public boolean PLOTSQUARED_V4_HOOK = true;
         @Comment({"Show additional information in console. It helps us at IntellectualSites to find out more about an issue.",
                 "Leave it off if you don't need it, it can spam your console."})
         public boolean DEBUG = false;
@@ -341,12 +501,12 @@ public class Settings extends Config {
     @Comment("This relates to how FAWE places chunks")
     public static class QUEUE {
 
+        @Create
+        public static PROGRESS PROGRESS;
         @Comment({
                 "This should equal the number of processors you have",
         })
         public int PARALLEL_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors());
-        @Create
-        public static PROGRESS PROGRESS;
         @Comment({
                 "When doing edits that effect more than this many chunks:",
                 " - FAWE will start placing before all calculations are finished",
@@ -573,160 +733,6 @@ public class Settings extends Config {
         @Comment({"If existing lighting should be removed before relighting"})
         public boolean REMOVE_FIRST = true;
 
-    }
-
-    public void reload(File file) {
-        load(file);
-        save(file);
-    }
-
-    public FaweLimit getLimit(Actor actor) {
-        FaweLimit limit;
-        if (actor.hasPermission("fawe.limit.*") || actor.hasPermission("fawe.bypass")) {
-            limit = FaweLimit.MAX.copy();
-        } else {
-            limit = new FaweLimit();
-        }
-        ArrayList<String> keys = new ArrayList<>(LIMITS.getSections());
-        if (keys.remove("default")) {
-            keys.add("default");
-        }
-
-        boolean limitFound = false;
-        for (String key : keys) {
-            if (actor.hasPermission("fawe.limit." + key) || !limitFound && key.equals("default")) {
-                limitFound = true;
-                LIMITS newLimit = LIMITS.get(key);
-                limit.MAX_ACTIONS = Math.max(
-                        limit.MAX_ACTIONS,
-                        newLimit.MAX_ACTIONS != -1 ? newLimit.MAX_ACTIONS : Integer.MAX_VALUE
-                );
-                limit.MAX_CHANGES = Math.max(
-                        limit.MAX_CHANGES,
-                        newLimit.MAX_CHANGES != -1 ? newLimit.MAX_CHANGES : Long.MAX_VALUE
-                );
-                limit.MAX_BLOCKSTATES = Math.max(
-                        limit.MAX_BLOCKSTATES,
-                        newLimit.MAX_BLOCKSTATES != -1 ? newLimit.MAX_BLOCKSTATES : Integer.MAX_VALUE
-                );
-                limit.MAX_CHECKS = Math.max(
-                        limit.MAX_CHECKS,
-                        newLimit.MAX_CHECKS != -1 ? newLimit.MAX_CHECKS : Long.MAX_VALUE
-                );
-                limit.MAX_ENTITIES = Math.max(
-                        limit.MAX_ENTITIES,
-                        newLimit.MAX_ENTITIES != -1 ? newLimit.MAX_ENTITIES : Integer.MAX_VALUE
-                );
-                limit.MAX_FAILS = Math.max(limit.MAX_FAILS, newLimit.MAX_FAILS != -1 ? newLimit.MAX_FAILS : Integer.MAX_VALUE);
-                limit.MAX_ITERATIONS = Math.max(
-                        limit.MAX_ITERATIONS,
-                        newLimit.MAX_ITERATIONS != -1 ? newLimit.MAX_ITERATIONS : Integer.MAX_VALUE
-                );
-                limit.MAX_HISTORY = Math.max(
-                        limit.MAX_HISTORY,
-                        newLimit.MAX_HISTORY_MB != -1 ? newLimit.MAX_HISTORY_MB : Integer.MAX_VALUE
-                );
-                limit.MAX_EXPRESSION_MS = Math.max(
-                        limit.MAX_EXPRESSION_MS,
-                        newLimit.MAX_EXPRESSION_MS != -1 ? newLimit.MAX_EXPRESSION_MS : Integer.MAX_VALUE
-                );
-                limit.INVENTORY_MODE = Math.min(limit.INVENTORY_MODE, newLimit.INVENTORY_MODE);
-                limit.SPEED_REDUCTION = Math.min(limit.SPEED_REDUCTION, newLimit.SPEED_REDUCTION);
-                limit.FAST_PLACEMENT |= newLimit.FAST_PLACEMENT;
-                limit.CONFIRM_LARGE &= newLimit.CONFIRM_LARGE;
-                limit.RESTRICT_HISTORY_TO_REGIONS &= newLimit.RESTRICT_HISTORY_TO_REGIONS;
-                if (limit.STRIP_NBT == null) {
-                    limit.STRIP_NBT = newLimit.STRIP_NBT.isEmpty() ? Collections.emptySet() : new HashSet<>(newLimit.STRIP_NBT);
-                } else if (limit.STRIP_NBT.isEmpty() || newLimit.STRIP_NBT.isEmpty()) {
-                    limit.STRIP_NBT = Collections.emptySet();
-                } else {
-                    limit.STRIP_NBT = new HashSet<>(limit.STRIP_NBT);
-                    limit.STRIP_NBT.retainAll(newLimit.STRIP_NBT);
-                    if (limit.STRIP_NBT.isEmpty()) {
-                        limit.STRIP_NBT = Collections.emptySet();
-                    }
-                }
-                limit.UNIVERSAL_DISALLOWED_BLOCKS &= newLimit.UNIVERSAL_DISALLOWED_BLOCKS;
-
-                if (limit.DISALLOWED_BLOCKS == null) {
-                    limit.DISALLOWED_BLOCKS = newLimit.DISALLOWED_BLOCKS.isEmpty() ? Collections.emptySet() : new HashSet<>(
-                            newLimit.DISALLOWED_BLOCKS);
-                } else if (limit.DISALLOWED_BLOCKS.isEmpty() || newLimit.DISALLOWED_BLOCKS.isEmpty()) {
-                    limit.DISALLOWED_BLOCKS = Collections.emptySet();
-                } else {
-                    limit.DISALLOWED_BLOCKS = new HashSet<>(limit.DISALLOWED_BLOCKS);
-                    limit.DISALLOWED_BLOCKS.retainAll(newLimit.DISALLOWED_BLOCKS
-                            .stream()
-                            .map(s -> s.contains(":") ? s.toLowerCase(Locale.ROOT) : ("minecraft:" + s).toLowerCase(Locale.ROOT))
-                            .collect(Collectors.toSet()));
-                    if (limit.DISALLOWED_BLOCKS.isEmpty()) {
-                        limit.DISALLOWED_BLOCKS = Collections.emptySet();
-                    }
-                }
-
-                if (limit.REMAP_PROPERTIES == null) {
-                    limit.REMAP_PROPERTIES = newLimit.REMAP_PROPERTIES.isEmpty() ? Collections.emptySet() :
-                            newLimit.REMAP_PROPERTIES.stream().flatMap(s -> {
-                                String propertyStr = s.substring(0, s.indexOf('['));
-                                List<Property<?>> properties =
-                                        BlockTypesCache.getAllProperties().get(propertyStr.toLowerCase(Locale.ROOT));
-                                if (properties == null || properties.isEmpty()) {
-                                    return Stream.empty();
-                                }
-                                String[] mappings = s.substring(s.indexOf('[') + 1, s.indexOf(']')).split(",");
-                                Set<PropertyRemap<?>> remaps = new HashSet<>();
-                                for (Property<?> property : properties) {
-                                    for (String mapping : mappings) {
-                                        try {
-                                            String[] fromTo = mapping.split(":");
-                                            remaps.add(property.getRemap(
-                                                    property.getValueFor(fromTo[0]),
-                                                    property.getValueFor(fromTo[1])
-                                            ));
-                                        } catch (IllegalArgumentException ignored) {
-                                            // This property is unlikely to be the one being targeted.
-                                            break;
-                                        }
-                                    }
-                                }
-                                return remaps.stream();
-                            }).collect(Collectors.toSet());
-                } else if (limit.REMAP_PROPERTIES.isEmpty() || newLimit.REMAP_PROPERTIES.isEmpty()) {
-                    limit.REMAP_PROPERTIES = Collections.emptySet();
-                } else {
-                    limit.REMAP_PROPERTIES = new HashSet<>(limit.REMAP_PROPERTIES);
-                    limit.REMAP_PROPERTIES.retainAll(newLimit.REMAP_PROPERTIES.stream().flatMap(s -> {
-                        String propertyStr = s.substring(0, s.indexOf('['));
-                        List<Property<?>> properties =
-                                BlockTypesCache.getAllProperties().get(propertyStr.toLowerCase(Locale.ROOT));
-                        if (properties == null || properties.isEmpty()) {
-                            return Stream.empty();
-                        }
-                        String[] mappings = s.substring(s.indexOf('[') + 1, s.indexOf(']')).split(",");
-                        Set<PropertyRemap<?>> remaps = new HashSet<>();
-                        for (Property<?> property : properties) {
-                            for (String mapping : mappings) {
-                                try {
-                                    String[] fromTo = mapping.split(":");
-                                    remaps.add(property.getRemap(
-                                            property.getValueFor(fromTo[0]),
-                                            property.getValueFor(fromTo[1])
-                                    ));
-                                } catch (IllegalArgumentException ignored) {
-                                    // This property is unlikely to be the one being targeted.
-                                    break;
-                                }
-                            }
-                        }
-                        return remaps.stream();
-                    }).collect(Collectors.toSet()));
-                    if (limit.REMAP_PROPERTIES.isEmpty()) {
-                        limit.REMAP_PROPERTIES = Collections.emptySet();
-                    }
-                }
-            }
-        }
-        return limit;
     }
 
 }

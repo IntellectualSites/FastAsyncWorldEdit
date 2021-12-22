@@ -213,7 +213,7 @@ public class ImageUtil {
                 arg = arg.replaceFirst("file:/+", "");
                 File file = MainUtil.getFile(MainUtil.getFile(
                         Fawe.imp().getDirectory(),
-                        Settings.IMP.PATHS.HEIGHTMAP
+                        Settings.settings().PATHS.HEIGHTMAP
                 ), arg);
                 return MainUtil.readImage(file);
             }
@@ -235,7 +235,7 @@ public class ImageUtil {
                 arg = arg.replaceFirst("file:/+", "");
                 File file = MainUtil.getFile(MainUtil.getFile(
                         Fawe.imp().getDirectory(),
-                        Settings.IMP.PATHS.HEIGHTMAP
+                        Settings.settings().PATHS.HEIGHTMAP
                 ), arg);
                 if (!file.exists()) {
                     throw new InputParseException(Caption.of(

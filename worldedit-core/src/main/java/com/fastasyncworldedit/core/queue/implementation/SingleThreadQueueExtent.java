@@ -266,7 +266,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             if (aggressive) {
                 pollSubmissions(0, aggressive);
             } else {
-                pollSubmissions(Settings.IMP.QUEUE.PARALLEL_THREADS, aggressive);
+                pollSubmissions(Settings.settings().QUEUE.PARALLEL_THREADS, aggressive);
             }
         }
         synchronized (this) {
@@ -312,7 +312,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             // If queueing is enabled AND either of the following
             //  - memory is low & queue size > num threads + 8
             //  - queue size > target size and primary queue has less than num threads submissions
-            if (enabledQueue && ((lowMem && size > Settings.IMP.QUEUE.PARALLEL_THREADS + 8) || (size > Settings.IMP.QUEUE.TARGET_SIZE && Fawe
+            if (enabledQueue && ((lowMem && size > Settings.settings().QUEUE.PARALLEL_THREADS + 8) || (size > Settings.settings().QUEUE.TARGET_SIZE && Fawe
                     .get()
                     .getQueueHandler()
                     .isUnderutilized()))) {
@@ -321,9 +321,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                 if (future != null && !future.isDone()) {
                     final int targetSize;
                     if (lowMem) {
-                        targetSize = Settings.IMP.QUEUE.PARALLEL_THREADS + 8;
+                        targetSize = Settings.settings().QUEUE.PARALLEL_THREADS + 8;
                     } else {
-                        targetSize = Settings.IMP.QUEUE.TARGET_SIZE;
+                        targetSize = Settings.settings().QUEUE.TARGET_SIZE;
                     }
                     pollSubmissions(targetSize, lowMem);
                     submissions.add(future);
@@ -361,10 +361,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      * @param region region of chunks
      */
     public void preload(Region region) {
-        if (Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
+        if (Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT > 1) {
             int loadCount = 0;
             for (BlockVector2 from : region.getChunks()) {
-                if (loadCount >= Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT) {
+                if (loadCount >= Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT) {
                     break;
                 }
                 loadCount++;
@@ -409,7 +409,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                                     lastException = hash;
                                     exceptionCount = 0;
                                     LOGGER.catching(e);
-                                } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                                } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
                                     exceptionCount++;
                                     LOGGER.warn(message);
                                 }
@@ -449,7 +449,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     lastException = hash;
                     exceptionCount = 0;
                     LOGGER.catching(e);
-                } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
                     exceptionCount++;
                     LOGGER.warn(message);
                 }
@@ -464,7 +464,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                 for (IQueueChunk chunk : chunks.values()) {
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
-                        pollSubmissions(Settings.IMP.QUEUE.PARALLEL_THREADS, true);
+                        pollSubmissions(Settings.settings().QUEUE.PARALLEL_THREADS, true);
                         submissions.add(future);
                     }
                 }

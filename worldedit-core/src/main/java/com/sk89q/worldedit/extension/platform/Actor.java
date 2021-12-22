@@ -226,7 +226,7 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
     }
 
     default FaweLimit getLimit() {
-        return Settings.IMP.getLimit(this);
+        return Settings.settings().getLimit(this);
     }
 
     default boolean runAsyncIfFree(Runnable r) {

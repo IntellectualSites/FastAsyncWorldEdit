@@ -34,7 +34,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final LoadingCache<Class<?>, Map<Long, Filter>> classToThreadIdToFilter =
-            FaweCache.IMP.createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
+            FaweCache.faweCache().createCache((Supplier<Map<Long, Filter>>) ConcurrentHashMap::new);
     // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
     // not very important)
     private boolean[] faweExceptionReasonsUsed = new boolean[FaweException.Type.values().length];
@@ -157,7 +157,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
                     lastException = hash;
                     exceptionCount = 0;
                     LOGGER.catching(e);
-                } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
                     exceptionCount++;
                     LOGGER.warn(message);
                 }

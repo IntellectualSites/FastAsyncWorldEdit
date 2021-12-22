@@ -290,13 +290,13 @@ public abstract class BreadthFirstSearch implements Operation {
         BlockVectorSet chunkLoadSet = new BlockVectorSet();
         for (currentDepth = 0; !queue.isEmpty() && currentDepth <= maxDepth; currentDepth++) {
             int loadCount = 0;
-            if (singleQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
+            if (singleQueue != null && Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT > 1) {
                 int cx = Integer.MIN_VALUE;
                 int cz = Integer.MIN_VALUE;
                 outer:
                 for (BlockVector3 from : queue) {
                     for (BlockVector3 direction : dirs) {
-                        if (loadCount > Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT) {
+                        if (loadCount > Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT) {
                             break outer;
                         }
                         int x = from.getBlockX() + direction.getBlockX();

@@ -46,9 +46,9 @@ public class ReplaceAll extends Command {
             plot.addRunning();
             FawePlayer<Object> fp = FawePlayer.wrap(player.getName());
             Captions.TASK_START.send(player);
-            TaskManager.IMP.async(() -> fp.runAction(() -> {
+            TaskManager.taskManager().async(() -> fp.runAction(() -> {
                 String worldName = plot.getWorldName();
-                TaskManager.IMP.sync(new RunnableVal<Object>() {
+                TaskManager.taskManager().sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
                         SetupUtils.manager.unload(worldName, true);
@@ -58,7 +58,7 @@ public class ReplaceAll extends Command {
                 String cmd = "/replaceallpattern " + worldName + " " + StringMan.join(args, " ");
                 CommandEvent event = new CommandEvent(actor, cmd);
                 PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
-                TaskManager.IMP.sync(new RunnableVal<Object>() {
+                TaskManager.taskManager().sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
                         plot.teleportPlayer(player);

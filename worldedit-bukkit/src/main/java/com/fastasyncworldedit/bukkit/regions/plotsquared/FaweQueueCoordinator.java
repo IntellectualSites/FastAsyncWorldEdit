@@ -194,7 +194,7 @@ public class FaweQueueCoordinator extends QueueCoordinator {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        instance.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.IMP.asTag(tag));
+        instance.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.faweCache().asTag(tag));
         return true;
     }
 

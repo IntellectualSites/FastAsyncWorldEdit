@@ -41,7 +41,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     private final ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
     private final ForkJoinPool forkJoinPoolSecondary = new ForkJoinPool();
-    private final ThreadPoolExecutor blockingExecutor = FaweCache.IMP.newBlockingExecutor();
+    private final ThreadPoolExecutor blockingExecutor = FaweCache.faweCache().newBlockingExecutor();
     private final ConcurrentLinkedQueue<FutureTask> syncTasks = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<FutureTask> syncWhenFree = new ConcurrentLinkedQueue<>();
 
@@ -56,7 +56,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private double targetTPS = 18;
 
     public QueueHandler() {
-        TaskManager.IMP.repeat(this, 1);
+        TaskManager.taskManager().repeat(this, 1);
     }
 
     @Override
@@ -87,7 +87,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     private long getAllocate() {
         long now = System.currentTimeMillis();
-        targetTPS = 18 - Math.max(Settings.IMP.QUEUE.EXTRA_TIME_MS * 0.05, 0);
+        targetTPS = 18 - Math.max(Settings.settings().QUEUE.EXTRA_TIME_MS * 0.05, 0);
         long diff = 50 + this.last - (this.last = now);
         long absDiff = Math.abs(diff);
         if (diff == 0) {

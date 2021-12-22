@@ -65,7 +65,7 @@ public class FaweAPI {
      * @return TaskManager
      */
     public static TaskManager getTaskManager() {
-        return TaskManager.IMP;
+        return TaskManager.taskManager();
     }
 
     /**
@@ -186,7 +186,7 @@ public class FaweAPI {
         if (!file.exists() || file.isDirectory()) {
             throw new IllegalArgumentException("Not a file!");
         }
-        if (Settings.IMP.HISTORY.USE_DISK) {
+        if (Settings.settings().HISTORY.USE_DISK) {
             throw new IllegalArgumentException("History on disk not enabled!");
         }
         if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".bd")) {
@@ -228,7 +228,7 @@ public class FaweAPI {
             throw new IllegalArgumentException("Origin is not a valid world");
         }
         World world = (World) extent;
-        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName());
+        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.settings().PATHS.HISTORY + File.separator + world.getName());
         if (!history.exists()) {
             return new ArrayList<>();
         }
@@ -352,7 +352,7 @@ public class FaweAPI {
             World unwrapped = WorldWrapper.unwrap(world);
             if (unwrapped instanceof IQueueExtent) {
                 queue = (IQueueExtent) unwrapped;
-            } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1) {
+            } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1) {
                 ParallelQueueExtent parallel =
                         new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, true);
                 queue = parallel.getExtent();
@@ -372,7 +372,7 @@ public class FaweAPI {
                 }
             }
             if (mode != RelightMode.NONE) {
-                if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                if (Settings.settings().LIGHTING.REMOVE_FIRST) {
                     relighter.removeAndRelight(true);
                 } else {
                     relighter.fixSkyLighting();

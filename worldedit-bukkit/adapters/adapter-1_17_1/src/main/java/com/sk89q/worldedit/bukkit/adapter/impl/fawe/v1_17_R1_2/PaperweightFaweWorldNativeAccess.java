@@ -250,7 +250,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 }
             }
         };
-        TaskManager.IMP.async(() -> TaskManager.IMP.sync(runnableVal));
+        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnableVal));
     }
 
     @Override
@@ -269,7 +269,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         if (Fawe.isMainThread()) {
             runnableVal.run();
         } else {
-            TaskManager.IMP.sync(runnableVal);
+            TaskManager.taskManager().sync(runnableVal);
         }
         cachedChanges.clear();
         cachedChunksToSend.clear();

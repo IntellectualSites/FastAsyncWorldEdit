@@ -77,7 +77,7 @@ public class NMSRelighter implements Relighter {
         this.concurrentLightQueue = new ConcurrentHashMap<>(12);
         this.maxY = queue.getMaxY();
         this.minY = queue.getMinY();
-        this.relightMode = relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE);
+        this.relightMode = relightMode != null ? relightMode : RelightMode.valueOf(Settings.settings().LIGHTING.MODE);
         this.lightingLock = new ReentrantLock();
     }
 
@@ -911,11 +911,11 @@ public class NMSRelighter implements Relighter {
             chunk.setBitMask(bitMask);
             iter.remove();
         }
-        if (Settings.IMP.LIGHTING.ASYNC) {
+        if (Settings.settings().LIGHTING.ASYNC) {
             queue.flush();
             finished.set(true);
         } else {
-            TaskManager.IMP.sync(new RunnableVal<>() {
+            TaskManager.taskManager().sync(new RunnableVal<>() {
                 @Override
                 public void run(Object value) {
                     queue.flush();
@@ -949,10 +949,10 @@ public class NMSRelighter implements Relighter {
                 finished.set(true);
             }
         };
-        if (Settings.IMP.LIGHTING.ASYNC) {
+        if (Settings.settings().LIGHTING.ASYNC) {
             runnable.run();
         } else {
-            TaskManager.IMP.sync(runnable);
+            TaskManager.taskManager().sync(runnable);
         }
     }
 

@@ -62,7 +62,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                 continue;
             }
             char[] setSection = hasSectionSet ? set.loadIfPresent(layer) : null;
-            if (setSection == null || Arrays.equals(setSection, FaweCache.IMP.EMPTY_CHAR_4096) ||
+            if (setSection == null || Arrays.equals(setSection, FaweCache.faweCache().EMPTY_CHAR_4096) ||
                     Arrays.equals(setSection, AIR_LAYER)) {
                 hasSectionSet = false;
             }
@@ -86,7 +86,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                         } else if (getSection == null) {
                             getSection = get.load(layer);
                             // skip empty layer
-                            if (Arrays.equals(getSection, FaweCache.IMP.EMPTY_CHAR_4096)
+                            if (Arrays.equals(getSection, FaweCache.faweCache().EMPTY_CHAR_4096)
                                     || Arrays.equals(getSection, AIR_LAYER)) {
                                 hasSectionGet = false;
                                 if (!hasSectionSet) {

@@ -68,7 +68,7 @@ public class InspectBrush extends BrushTool {
             player.print(Caption.of("fawe.error.no-perm", "worldedit.tool.inspect"));
             return false;
         }
-        if (!Settings.IMP.HISTORY.USE_DATABASE) {
+        if (!Settings.settings().HISTORY.USE_DATABASE) {
             player.print(Caption.of(
                     "fawe.error.setting.disable",
                     "history.use-database (Import with /history import )"

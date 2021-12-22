@@ -44,7 +44,7 @@ public class MemUtil {
         }
         final long heapFreeSize = Runtime.getRuntime().freeMemory();
         final int size = (int) ((heapFreeSize * 100) / heapMaxSize);
-        if (size > (100 - Settings.IMP.MAX_MEMORY_PERCENT)) {
+        if (size > (100 - Settings.settings().MAX_MEMORY_PERCENT)) {
             memoryPlentifulTask();
             return Integer.MAX_VALUE;
         }

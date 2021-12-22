@@ -430,7 +430,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 int by = layer << 4;
                 int ty = by + 15;
                 if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
-                    set.setBlocks(layer, FaweCache.IMP.EMPTY_CHAR_4096);
+                    set.setBlocks(layer, FaweCache.faweCache().EMPTY_CHAR_4096);
                     processExtra = true;
                     continue;
                 }

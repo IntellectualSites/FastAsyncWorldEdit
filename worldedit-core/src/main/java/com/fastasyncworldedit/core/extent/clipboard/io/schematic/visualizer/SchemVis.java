@@ -203,7 +203,7 @@
 //     */
 //    private void clean() {
 //        if (chunks.size() > 225) {
-//            TaskManager.IMP.sync(() -> {
+//            TaskManager.taskManager().sync(() -> {
 //                if (chunks.size() > 225) {
 //                    synchronized (SchemVis.this) {
 //                        Location pos = player.toWorldEditPlayer().getLocation();
@@ -233,7 +233,7 @@
 //     * @param chunkZ
 //     */
 //    private void send(IQueueExtent packetQueue, int chunkX, int chunkZ) {
-//        TaskManager.IMP.getPublicForkJoinPool().submit(() -> {
+//        TaskManager.taskManager().getPublicForkJoinPool().submit(() -> {
 //            try {
 //                int OX = chunkOffset.getBlockX();
 //                int OZ = chunkOffset.getBlockZ();

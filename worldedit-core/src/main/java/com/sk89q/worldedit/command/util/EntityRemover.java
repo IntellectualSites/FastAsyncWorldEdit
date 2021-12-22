@@ -148,7 +148,7 @@ public class EntityRemover {
             if (registryType != null) {
                 if (type.matches(registryType)) {
                     //FAWE start - Calling this async violates thread safety
-                    TaskManager.IMP.sync(entity::remove);
+                    TaskManager.taskManager().sync(entity::remove);
                     //FAWE end
                     return true;
                 }

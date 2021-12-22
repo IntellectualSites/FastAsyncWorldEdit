@@ -32,7 +32,7 @@ public abstract class SingleThreadIntervalQueue<T> {
                 }
                 synchronized (objMap) {
                     if (!objMap.isEmpty()) {
-                        TaskManager.IMP.laterAsync(this, interval);
+                        TaskManager.taskManager().laterAsync(this, interval);
                     } else {
                         queued.set(false);
                     }
@@ -54,7 +54,7 @@ public abstract class SingleThreadIntervalQueue<T> {
             objMap.put(obj, Fawe.get().getTimer().getTick());
             if (!queued.get()) {
                 queued.set(true);
-                TaskManager.IMP.laterAsync(task, 3);
+                TaskManager.taskManager().laterAsync(task, 3);
             }
         }
     }

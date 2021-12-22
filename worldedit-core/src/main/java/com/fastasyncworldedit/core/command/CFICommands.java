@@ -226,7 +226,7 @@
 //            World world = FaweAPI.getWorld(folder.getName());
 //            if (world != null) {
 //                if (player.getWorld() != world) {
-//                    TaskManager.IMP.sync(new RunnableVal<Object>() {
+//                    TaskManager.taskManager().sync(new RunnableVal<Object>() {
 //                        @Override
 //                        public void run(Object value) {
 //                            Location spawn = new Location(world, world.getSpawnPosition().toVector3());

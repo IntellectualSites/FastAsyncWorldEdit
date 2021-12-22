@@ -71,7 +71,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         maxLayer = this.get.getMaxSectionPosition();
         this.layer = layer;
         if (!iget.hasSection(layer)) {
-            getArr = FaweCache.IMP.EMPTY_CHAR_4096;
+            getArr = FaweCache.faweCache().EMPTY_CHAR_4096;
         } else {
             getArr = iget.load(layer);
         }

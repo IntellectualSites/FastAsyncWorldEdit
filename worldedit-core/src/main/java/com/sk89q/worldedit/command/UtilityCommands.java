@@ -135,7 +135,7 @@ public class UtilityCommands {
             @Arg(name = "max", desc = "int", def = "200") int max
     ) throws IOException {
         actor.print(TextComponent.of("Please wait while we generate the minified heightmaps."));
-        File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
+        File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.settings().PATHS.HEIGHTMAP);
 
         File webSrc = new File(Fawe.imp().getDirectory(), "web" + File.separator + "heightmap");
         File minImages = new File(webSrc, "images" + File.separator + "min");
@@ -698,7 +698,7 @@ public class UtilityCommands {
 
         //FAWE start - run this sync
         int finalRadius = radius;
-        int killed = TaskManager.IMP.sync(() -> killMatchingEntities(finalRadius, actor, flags::createFunction));
+        int killed = TaskManager.taskManager().sync(() -> killMatchingEntities(finalRadius, actor, flags::createFunction));
         //FAWE end
 
         actor.print(Caption.of(
@@ -730,7 +730,7 @@ public class UtilityCommands {
         }
 
         //FAWE start - run this sync
-        int removed = TaskManager.IMP.sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
+        int removed = TaskManager.taskManager().sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
         //FAWE end
         actor.print(Caption.of("worldedit.remove.removed", TextComponent.of(removed)));
         return removed;
@@ -953,7 +953,7 @@ public class UtilityCommands {
         String dirFilter = File.separator;
 
         boolean listMine = false;
-        boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
+        boolean listGlobal = !Settings.settings().PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
             for (String arg : args) {
                 switch (arg.toLowerCase(Locale.ROOT)) {

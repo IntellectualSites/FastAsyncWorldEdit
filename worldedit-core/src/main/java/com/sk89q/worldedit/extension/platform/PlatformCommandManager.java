@@ -434,7 +434,7 @@ public final class PlatformCommandManager {
 
     public void registerAllCommands() {
         //FAWE start
-        if (Settings.IMP.ENABLED_COMPONENTS.COMMANDS) {
+        if (Settings.settings().ENABLED_COMPONENTS.COMMANDS) {
             // TODO: Ping @MattBDev to reimplement (or remove) 2020-02-04
 //            registerSubCommands(
 //                "patterns",
@@ -674,7 +674,7 @@ public final class PlatformCommandManager {
 
         Actor actor = event.getActor();
         String args = event.getArguments();
-        TaskManager.IMP.taskNow(() -> {
+        TaskManager.taskManager().taskNow(() -> {
             if (!Fawe.isMainThread()) {
                 Thread.currentThread().setName("FAWE Thread for player: " + actor.getName());
             }

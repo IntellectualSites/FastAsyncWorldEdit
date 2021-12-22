@@ -327,7 +327,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         // tiles
         if (tiles != null && !tiles.isEmpty()) {
             for (Map<String, Object> tileRaw : tiles) {
-                CompoundTag tile = FaweCache.IMP.asTag(tileRaw);
+                CompoundTag tile = FaweCache.faweCache().asTag(tileRaw);
 
                 int[] pos = tile.getIntArray("Pos");
                 int x;
@@ -372,7 +372,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         // entities
         if (entities != null && !entities.isEmpty()) {
             for (Map<String, Object> entRaw : entities) {
-                Map<String, Tag> value = new HashMap<>(FaweCache.IMP.asTag(entRaw).getValue());
+                Map<String, Tag> value = new HashMap<>(FaweCache.faweCache().asTag(entRaw).getValue());
                 StringTag id = (StringTag) value.get("Id");
                 if (id == null) {
                     id = (StringTag) value.get("id");
