@@ -14,7 +14,7 @@ public class MutableBlockVector3 extends BlockVector3 {
     }
 
     public static MutableBlockVector3 get(int x, int y, int z) {
-        return FaweCache.IMP.MUTABLE_BLOCKVECTOR3.get().setComponents(x, y, z);
+        return FaweCache.INSTANCE.MUTABLE_BLOCKVECTOR3.get().setComponents(x, y, z);
     }
 
     public MutableBlockVector3() {

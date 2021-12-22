@@ -187,21 +187,21 @@ public class ClipboardFormats {
                 }
                 return null;
             }
-            URL base = new URL(Settings.IMP.WEB.URL);
+            URL base = new URL(Settings.settings().WEB.URL);
             input = new URL(base, "uploads/" + input.substring(4) + "."
                     + format.getPrimaryFileExtension()).toString();
         }
         if (input.startsWith("http")) {
             return null;
         }
-        if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
+        if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
                 && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find()
                 && !player.hasPermission("worldedit.schematic.load.other")) {
             player.print(Caption.of("fawe.error.no-perm", "worldedit.schematic.load.other"));
             return null;
         }
         File working = worldEdit.getWorkingDirectoryPath(config.saveDir).toFile();
-        File dir = Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
+        File dir = Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
                 ? new File(working, player.getUniqueId().toString()) : working;
         File f;
         if (input.startsWith("#")) {
@@ -219,7 +219,7 @@ public class ClipboardFormats {
                 return null;
             }
         } else {
-            if (Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS
+            if (Settings.settings().PATHS.PER_PLAYER_SCHEMATICS
                     && Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}").matcher(input).find()
                     && !player.hasPermission("worldedit.schematic.load.other")) {
                 if (message) {

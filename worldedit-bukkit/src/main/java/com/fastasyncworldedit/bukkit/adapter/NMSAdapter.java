@@ -44,7 +44,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         }
         char lastOrdinal = 0;
         boolean lastticking = false;
-        boolean tick_placed = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED;
+        boolean tick_placed = Settings.settings().EXPERIMENTAL.ALLOW_TICK_PLACED;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
@@ -121,8 +121,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         }
         char lastOrdinal = 0;
         boolean lastticking = false;
-        boolean tick_placed = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_PLACED;
-        boolean tick_existing = Settings.IMP.EXPERIMENTAL.ALLOW_TICK_EXISTING;
+        boolean tick_placed = Settings.settings().EXPERIMENTAL.ALLOW_TICK_PLACED;
+        boolean tick_existing = Settings.settings().EXPERIMENTAL.ALLOW_TICK_EXISTING;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {

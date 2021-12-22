@@ -99,7 +99,7 @@ public class SurvivalModeExtent extends AbstractDelegateExtent {
             Collection<BaseItemStack> drops = world.getBlockDrops(location);
             boolean canSet = super.setBlock(location, block);
             if (canSet) {
-                TaskManager.IMP.sync(new RunnableVal<>() {
+                TaskManager.taskManager().sync(new RunnableVal<>() {
                     @Override
                     public void run(Object value) {
                         for (BaseItemStack stack : drops) {

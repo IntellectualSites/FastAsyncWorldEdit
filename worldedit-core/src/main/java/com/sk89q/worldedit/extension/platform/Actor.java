@@ -220,13 +220,13 @@ public interface Actor extends Identifiable, SessionOwner, Subject, MapMetadatab
 
     default boolean checkAction() {
         long time = getMeta("faweActionTick", Long.MIN_VALUE);
-        long tick = Fawe.get().getTimer().getTick();
+        long tick = Fawe.instance().getTimer().getTick();
         setMeta("faweActionTick", tick);
         return tick > time;
     }
 
     default FaweLimit getLimit() {
-        return Settings.IMP.getLimit(this);
+        return Settings.settings().getLimit(this);
     }
 
     default boolean runAsyncIfFree(Runnable r) {

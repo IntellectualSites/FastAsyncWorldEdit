@@ -90,7 +90,7 @@ public class BrushSettings {
     //        }
     //        if (settings.containsKey(SettingType.TRANSFORM.name())) {
     //            String transformArgs = (String) settings.get(SettingType.TRANSFORM.name());
-    //            ResettableExtent extent = Fawe.get().getTransformParser().parseFromInput(transformArgs, parserContext);
+    //            ResettableExtent extent = Fawe.instance().getTransformParser().parseFromInput(transformArgs, parserContext);
     //            bs.setTransform(extent);
     //            bs.constructor.put(SettingType.TRANSFORM, transformArgs);
     //        }

@@ -68,7 +68,7 @@ public class InspectBrush extends BrushTool {
             player.print(Caption.of("fawe.error.no-perm", "worldedit.tool.inspect"));
             return false;
         }
-        if (!Settings.IMP.HISTORY.USE_DATABASE) {
+        if (!Settings.settings().HISTORY.USE_DATABASE) {
             player.print(Caption.of(
                     "fawe.error.setting.disable",
                     "history.use-database (Import with /history import )"
@@ -95,7 +95,7 @@ public class InspectBrush extends BrushTool {
                     int from = change.from;
                     int to = change.to;
                     UUID uuid = edit.getUUID();
-                    String name = Fawe.imp().getName(uuid);
+                    String name = Fawe.platform().getName(uuid);
                     int index = edit.getIndex();
                     long age = System.currentTimeMillis() - edit.getBDFile().lastModified();
                     String ageFormatted = MainUtil.secToTime(age / 1000);

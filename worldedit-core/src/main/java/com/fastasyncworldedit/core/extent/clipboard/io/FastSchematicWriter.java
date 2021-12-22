@@ -123,7 +123,7 @@ public class FastSchematicWriter implements ClipboardWriter {
                 out1.writeNamedTag("WEOffsetX", offset.getBlockX());
                 out1.writeNamedTag("WEOffsetY", offset.getBlockY());
                 out1.writeNamedTag("WEOffsetZ", offset.getBlockZ());
-                out1.writeNamedTag("FAWEVersion", Fawe.get().getVersion().build);
+                out1.writeNamedTag("FAWEVersion", Fawe.instance().getVersion().build);
             });
 
             ByteArrayOutputStream blocksCompressed = new ByteArrayOutputStream();

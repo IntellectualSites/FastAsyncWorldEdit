@@ -147,7 +147,7 @@
 //        CFISettings settings = getSettings(player).remove();
 //        generator.setPacketViewer(player);
 //        settings.setGenerator(generator).bind();
-//        generator.setImageViewer(Fawe.imp().getImageViewer(player));
+//        generator.setImageViewer(Fawe.platform().getImageViewer(player));
 //        generator.update();
 //        mainMenu(player);
 //    }
@@ -226,7 +226,7 @@
 //            World world = FaweAPI.getWorld(folder.getName());
 //            if (world != null) {
 //                if (player.getWorld() != world) {
-//                    TaskManager.IMP.sync(new RunnableVal<Object>() {
+//                    TaskManager.taskManager().sync(new RunnableVal<Object>() {
 //                        @Override
 //                        public void run(Object value) {
 //                            Location spawn = new Location(world, world.getSpawnPosition().toVector3());
@@ -425,7 +425,7 @@
 //        switch (argOpt.toLowerCase(Locale.ROOT)) {
 //            case "true":
 //            case "*": {
-//                generator.setTextureUtil(Fawe.get().getTextureUtil());
+//                generator.setTextureUtil(Fawe.instance().getTextureUtil());
 //                return;
 //            }
 //            case "#clipboard": {
@@ -453,7 +453,7 @@
 //                parserContext.setExtent(extent);
 //                Request.request().setExtent(extent);
 //                Mask mask = worldEdit.getMaskFactory().parseFromInput(argOpt, parserContext);
-//                TextureUtil tu = Fawe.get().getTextureUtil();
+//                TextureUtil tu = Fawe.instance().getTextureUtil();
 //                for (int typeId : tu.getValidBlockIds()) {
 //                    BlockType type = BlockTypes.get(typeId);
 //                    extent.init(0, 0, 0, type.getDefaultState().toBaseBlock());
@@ -464,7 +464,7 @@
 //                break;
 //            }
 //        }
-//        generator.setTextureUtil(new FilteredTextureUtil(Fawe.get().getTextureUtil(), blocks));
+//        generator.setTextureUtil(new FilteredTextureUtil(Fawe.instance().getTextureUtil(), blocks));
 //        coloring(player);
 //    }
 //
@@ -493,9 +493,9 @@
 //    public void complexity(Player player, int min, int max) throws  FileNotFoundException {
 //        HeightMapMCAGenerator gen = assertSettings(player).getGenerator();
 //        if (min == 0 && max == 100) {
-//            gen.setTextureUtil(Fawe.get().getTextureUtil());
+//            gen.setTextureUtil(Fawe.instance().getTextureUtil());
 //        } else {
-//            gen.setTextureUtil(new CleanTextureUtil(Fawe.get().getTextureUtil(), min, max));
+//            gen.setTextureUtil(new CleanTextureUtil(Fawe.instance().getTextureUtil(), min, max));
 //        }
 //        coloring(player);
 //    }
@@ -1201,7 +1201,7 @@
 //            whiteOnly = true;
 //            maskArg = null;
 //            imageMaskArg = null;
-//            generator.setTextureUtil(Fawe.get().getTextureUtil());
+//            generator.setTextureUtil(Fawe.instance().getTextureUtil());
 //        }
 //
 //        public void resetComponent() {

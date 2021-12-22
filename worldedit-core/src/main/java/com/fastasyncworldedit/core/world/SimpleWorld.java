@@ -97,7 +97,7 @@ public interface SimpleWorld extends World {
 
     @Override
     default boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
-        Fawe.get().getQueueHandler().sync((Supplier<Boolean>) () -> playEffect(
+        Fawe.instance().getQueueHandler().sync((Supplier<Boolean>) () -> playEffect(
                 position,
                 2001,
                 blockType.getLegacyCombinedId() >> 4

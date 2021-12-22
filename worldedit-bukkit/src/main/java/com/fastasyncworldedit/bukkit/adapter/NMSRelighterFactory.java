@@ -18,7 +18,7 @@ public class NMSRelighterFactory implements RelighterFactory {
     Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue) {
         return new NMSRelighter(
                 queue,
-                relightMode != null ? relightMode : RelightMode.valueOf(Settings.IMP.LIGHTING.MODE)
+                relightMode != null ? relightMode : RelightMode.valueOf(Settings.settings().LIGHTING.MODE)
         );
     }
 

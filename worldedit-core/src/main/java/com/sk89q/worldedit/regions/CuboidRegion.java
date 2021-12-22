@@ -467,7 +467,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     @Override
     public Iterator<BlockVector3> iterator() {
         //FAWE start
-        if (Settings.IMP.HISTORY.COMPRESSION_LEVEL >= 9) {
+        if (Settings.settings().HISTORY.COMPRESSION_LEVEL >= 9) {
             return iterator_old();
         }
         //FAWE end

@@ -238,7 +238,7 @@
 //        PrimaryLevelData newWorldData = new PrimaryLevelData(newWorldSettings, newOpts, Lifecycle.stable());
 //
 //        //init world
-//        freshWorld = Fawe.get().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
+//        freshWorld = Fawe.instance().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
 //                server,
 //                server.executor,
 //                session,
@@ -345,7 +345,7 @@
 //
 //        //shutdown chunk provider
 //        try {
-//            Fawe.get().getQueueHandler().sync(() -> {
+//            Fawe.instance().getQueueHandler().sync(() -> {
 //                try {
 //                    freshChunkProvider.close(false);
 //                } catch (IOException e) {
@@ -357,7 +357,7 @@
 //
 //        //remove world from server
 //        try {
-//            Fawe.get().getQueueHandler().sync(this::removeWorldFromWorldsMap);
+//            Fawe.instance().getQueueHandler().sync(this::removeWorldFromWorldsMap);
 //        } catch (Exception ignored) {
 //        }
 //
@@ -397,7 +397,7 @@
 //    @Override
 //    protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
 //        // BlockPopulator#populate has to be called synchronously for TileEntity access
-//        TaskManager.IMP.task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
+//        TaskManager.taskManager().task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
 //    }
 //
 //    @Override
@@ -412,7 +412,7 @@
 //
 //    //util
 //    private void removeWorldFromWorldsMap() {
-//        Fawe.get().getQueueHandler().sync(() -> {
+//        Fawe.instance().getQueueHandler().sync(() -> {
 //            try {
 //                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
 //                map.remove("worldeditregentempworld");

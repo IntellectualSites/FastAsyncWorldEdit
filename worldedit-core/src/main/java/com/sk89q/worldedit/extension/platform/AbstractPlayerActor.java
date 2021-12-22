@@ -491,7 +491,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public Region[] getAllowedRegions(FaweMaskManager.MaskType type) {
-        return WEManager.IMP.getMask(this, type, true);
+        return WEManager.weManager().getMask(this, type, true);
     }
 
     @Override
@@ -501,7 +501,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     @Override
     public Region[] getDisallowedRegions(FaweMaskManager.MaskType type) {
-        return WEManager.IMP.getMask(this, type, false);
+        return WEManager.weManager().getMask(this, type, false);
     }
 
     @Override
@@ -677,7 +677,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         if (async) {
             asyncNotifyQueue.run(wrapped);
         } else {
-            TaskManager.IMP.taskNow(wrapped, false);
+            TaskManager.taskManager().taskNow(wrapped, false);
         }
         return true;
     }

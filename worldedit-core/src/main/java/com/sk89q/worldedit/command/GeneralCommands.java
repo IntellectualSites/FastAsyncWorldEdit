@@ -475,7 +475,7 @@ public class GeneralCommands {
             String arg = arguments.get(0);
             String argLower = arg.toLowerCase(Locale.ROOT);
 
-            TextureUtil util = Fawe.get().getTextureUtil();
+            TextureUtil util = Fawe.instance().getTextureUtil();
             int randomIndex = 1;
             boolean checkRandomization = true;
             if (arguments.size() >= 2 && MathMan.isInteger(arguments.get(0)) && MathMan.isInteger(arguments.get(1))) {
@@ -500,7 +500,7 @@ public class GeneralCommands {
                     Clipboard clipboard = session.getClipboard().getClipboard();
                     util = TextureUtil.fromClipboard(clipboard);
                 } else if (argLower.equals("*") || argLower.equals("true")) {
-                    util = Fawe.get().getTextureUtil();
+                    util = Fawe.instance().getTextureUtil();
                 } else {
                     ParserContext parserContext = new ParserContext();
                     parserContext.setActor(actor);

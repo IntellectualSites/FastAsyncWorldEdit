@@ -380,7 +380,7 @@ public class WorldEditPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        Fawe.get().onDisable();
+        Fawe.instance().onDisable();
         WorldEdit worldEdit = WorldEdit.getInstance();
         worldEdit.getSessionManager().unload();
         if (platform != null) {

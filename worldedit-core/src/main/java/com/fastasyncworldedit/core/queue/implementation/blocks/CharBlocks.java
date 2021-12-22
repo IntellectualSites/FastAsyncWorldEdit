@@ -201,7 +201,7 @@ public abstract class CharBlocks implements IBlocks {
             set(layer, index, value);
         } catch (ArrayIndexOutOfBoundsException exception) {
             LOGGER.error("Tried setting block at coordinates (" + x + "," + y + "," + z + ")");
-            assert Fawe.imp() != null;
+            assert Fawe.platform() != null;
             LOGGER.error("Layer variable was = {}", layer, exception);
         }
     }

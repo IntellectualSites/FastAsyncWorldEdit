@@ -81,7 +81,7 @@ public class WorldEditCommands {
     @CommandPermissions(queued = false)
     public void version(Actor actor) {
         //FAWE start - use own, minimized message that doesn't print "Platforms" and "Capabilities"
-        FaweVersion fVer = Fawe.get().getVersion();
+        FaweVersion fVer = Fawe.instance().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
         actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr));
         actor.print(TextComponent.of("Authors: Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
@@ -105,7 +105,7 @@ public class WorldEditCommands {
                 .queryCapability(Capability.CONFIGURATION)
                 .getConfiguration()));
         //FAWE start
-        Fawe.get().setupConfigs();
+        Fawe.instance().setupConfigs();
         //FAWE end
         actor.print(Caption.of("worldedit.reload.config"));
     }
@@ -120,9 +120,9 @@ public class WorldEditCommands {
         String dest;
         try {
             final File logFile = new File("logs/latest.log");
-            final File config = new File(Fawe.imp().getDirectory(), "config.yml");
-            final File worldeditConfig = new File(Fawe.imp().getDirectory(), "worldedit-config.yml");
-            dest = IncendoPaster.debugPaste(logFile, Fawe.imp().getDebugInfo(), config, worldeditConfig);
+            final File config = new File(Fawe.platform().getDirectory(), "config.yml");
+            final File worldeditConfig = new File(Fawe.platform().getDirectory(), "worldedit-config.yml");
+            dest = IncendoPaster.debugPaste(logFile, Fawe.platform().getDebugInfo(), config, worldeditConfig);
         } catch (IOException e) {
             actor.printInfo(TextComponent.of(e.getMessage()));
             return;

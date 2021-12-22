@@ -32,10 +32,10 @@ import java.util.concurrent.Future;
 @SuppressWarnings("rawtypes")
 public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
-    private static final Pool<ChunkHolder> POOL = FaweCache.IMP.registerPool(
+    private static final Pool<ChunkHolder> POOL = FaweCache.INSTANCE.registerPool(
             ChunkHolder.class,
             ChunkHolder::new,
-            Settings.IMP.QUEUE.POOL
+            Settings.settings().QUEUE.POOL
     );
 
     public static ChunkHolder newInstance() {

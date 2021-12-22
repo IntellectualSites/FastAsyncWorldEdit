@@ -26,7 +26,7 @@ public class PNGWriter implements ClipboardWriter {
 
     public PNGWriter(OutputStream out) throws IOException {
         this.out = ImageIO.createImageOutputStream(out);
-        this.tu = Fawe.get().getCachedTextureUtil(false, 0, 100);
+        this.tu = Fawe.instance().getCachedTextureUtil(false, 0, 100);
     }
 
     @Override

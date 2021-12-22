@@ -27,14 +27,14 @@ public class UpdateNotification {
      * Check whether a new build with a higher build number than the current build is available.
      */
     public static void doUpdateCheck() {
-        if (Settings.IMP.ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
+        if (Settings.settings().ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
             try {
                 DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
                 DocumentBuilder db = dbf.newDocumentBuilder();
                 Document doc = db.parse(new URL("https://ci.athion.net/job/FastAsyncWorldEdit/api/xml/").openStream());
                 faweVersion = doc.getElementsByTagName("lastSuccessfulBuild").item(0).getFirstChild().getTextContent();
-                FaweVersion faweVersion = Fawe.get().getVersion();
+                FaweVersion faweVersion = Fawe.instance().getVersion();
                 if (faweVersion.build == 0) {
                     LOGGER.warn("You are using a snapshot or a custom version of FAWE. This is not an official build distributed " +
                             "via https://www.spigotmc.org/resources/13932/");
@@ -66,9 +66,9 @@ public class UpdateNotification {
      * @param actor The player to notify.
      */
     public static void doUpdateNotification(Actor actor) {
-        if (Settings.IMP.ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
+        if (Settings.settings().ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
             if (actor.hasPermission("fawe.admin") && UpdateNotification.hasUpdate) {
-                FaweVersion faweVersion = Fawe.get().getVersion();
+                FaweVersion faweVersion = Fawe.instance().getVersion();
                 int versionDifference = Integer.parseInt(UpdateNotification.faweVersion) - faweVersion.build;
                 actor.print(Caption.of(
                         "fawe.info.update-available",

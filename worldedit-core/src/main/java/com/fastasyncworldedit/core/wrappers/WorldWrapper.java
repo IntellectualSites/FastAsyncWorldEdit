@@ -238,7 +238,7 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public void simulateBlockMine(BlockVector3 pt) {
-        TaskManager.IMP.sync(new RunnableVal<Object>() {
+        TaskManager.taskManager().sync(new RunnableVal<Object>() {
             @Override
             public void run(Object value) {
                 parent.simulateBlockMine(pt);
@@ -249,7 +249,7 @@ public class WorldWrapper extends AbstractWorld {
     //FAWE start
     @Override
     public Collection<BaseItemStack> getBlockDrops(final BlockVector3 position) {
-        return TaskManager.IMP.sync(() -> parent.getBlockDrops(position));
+        return TaskManager.taskManager().sync(() -> parent.getBlockDrops(position));
     }
     //FAWE end
 
@@ -266,7 +266,7 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
             MaxChangedBlocksException {
-        return TaskManager.IMP.sync(() -> {
+        return TaskManager.taskManager().sync(() -> {
             try {
                 return parent.generateTree(type, editSession, position);
             } catch (MaxChangedBlocksException e) {
@@ -307,12 +307,12 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        return TaskManager.IMP.sync(() -> parent.getEntities(region));
+        return TaskManager.taskManager().sync(() -> parent.getEntities(region));
     }
 
     @Override
     public List<? extends Entity> getEntities() {
-        return TaskManager.IMP.sync(parent::getEntities);
+        return TaskManager.taskManager().sync(parent::getEntities);
     }
 
     @Override

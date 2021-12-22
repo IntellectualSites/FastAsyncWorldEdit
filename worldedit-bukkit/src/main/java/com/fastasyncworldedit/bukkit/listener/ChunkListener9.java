@@ -37,13 +37,13 @@ public class ChunkListener9 extends ChunkListener {
                 event.setCancelled(true);
                 return;
             }
-            if (System.currentTimeMillis() - physStart > Settings.IMP.TICK_LIMITER.PHYSICS_MS) {
+            if (System.currentTimeMillis() - physStart > Settings.settings().TICK_LIMITER.PHYSICS_MS) {
                 physCancelPair = pair;
                 event.setCancelled(true);
                 return;
             }
         }
-        FaweTimer timer = Fawe.get().getTimer();
+        FaweTimer timer = Fawe.instance().getTimer();
         if (timer.getTick() != physTick) {
             physTick = timer.getTick();
             physStart = System.currentTimeMillis();
@@ -52,7 +52,7 @@ public class ChunkListener9 extends ChunkListener {
             return;
         }
         if ((++physSkip & 1023) == 0) {
-            if (System.currentTimeMillis() - physStart > Settings.IMP.TICK_LIMITER.PHYSICS_MS) {
+            if (System.currentTimeMillis() - physStart > Settings.settings().TICK_LIMITER.PHYSICS_MS) {
                 Block block = event.getBlock();
                 int cx = block.getX() >> 4;
                 int cz = block.getZ() >> 4;

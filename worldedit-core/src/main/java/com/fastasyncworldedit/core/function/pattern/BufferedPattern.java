@@ -32,7 +32,7 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
         }
         actionTime = tmp;
         this.pattern = parent;
-        this.timer = Fawe.get().getTimer();
+        this.timer = Fawe.instance().getTimer();
     }
 
     @Override

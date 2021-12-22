@@ -59,7 +59,15 @@ import java.util.function.Supplier;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public enum FaweCache implements Trimable {
-    IMP; // singleton
+    /**
+     * @deprecated Use {@link #INSTANCE} to get an instance.
+     */
+    @Deprecated(forRemoval = true, since = "2.0.0")
+    IMP,
+    /**
+     * @since 2.0.0
+     */
+    INSTANCE;// singleton
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -301,7 +309,7 @@ public enum FaweCache implements Trimable {
 
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-            if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+            if (Settings.settings().PROTOCOL_SUPPORT_FIX || num_palette != 1) {
                 bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
             } else {
                 bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
@@ -387,7 +395,7 @@ public enum FaweCache implements Trimable {
 
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-            if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+            if (Settings.settings().PROTOCOL_SUPPORT_FIX || num_palette != 1) {
                 bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
             } else {
                 bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries
@@ -568,7 +576,7 @@ public enum FaweCache implements Trimable {
     Thread stuff
      */
     public ThreadPoolExecutor newBlockingExecutor() {
-        int nThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
+        int nThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
         ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<>(nThreads, true);
         return new ThreadPoolExecutor(nThreads, nThreads,
                 0L, TimeUnit.MILLISECONDS, queue,
@@ -609,7 +617,7 @@ public enum FaweCache implements Trimable {
                             lastException = hash;
                             LOGGER.catching(throwable);
                             count = 0;
-                        } else if (count < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                        } else if (count < Settings.settings().QUEUE.PARALLEL_THREADS) {
                             LOGGER.warn(throwable.getMessage());
                             count++;
                         }

@@ -68,7 +68,7 @@ public class FaweBukkit implements IFawe, Listener {
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
         try {
-            Settings.IMP.TICK_LIMITER.ENABLED = !Bukkit.hasWhitelist();
+            Settings.settings().TICK_LIMITER.ENABLED = !Bukkit.hasWhitelist();
             Fawe.set(this);
             Fawe.setupInjector();
             try {
@@ -76,7 +76,7 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (Throwable e) {
                 LOGGER.error("Brush Listener Failed", e);
             }
-            if (PaperLib.isPaper() && Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
+            if (PaperLib.isPaper() && Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
         } catch (final Throwable e) {
@@ -89,12 +89,12 @@ public class FaweBukkit implements IFawe, Listener {
         platformAdapter = new NMSAdapter();
 
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
-        TaskManager.IMP.later(this::setupPlotSquared, 0);
+        TaskManager.taskManager().later(this::setupPlotSquared, 0);
 
         // Registered delayed Event Listeners
-        TaskManager.IMP.task(() -> {
+        TaskManager.taskManager().task(() -> {
             // Fix for ProtocolSupport
-            Settings.IMP.PROTOCOL_SUPPORT_FIX =
+            Settings.settings().PROTOCOL_SUPPORT_FIX =
                     Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
 
             // This class
@@ -141,7 +141,7 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 this.itemUtil = tmp = new ItemUtil();
             } catch (Throwable e) {
-                Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES = false;
+                Settings.settings().EXPERIMENTAL.PERSISTENT_BRUSHES = false;
                 LOGGER.error("Persistent Brushes Failed", e);
             }
         }
@@ -311,7 +311,7 @@ public class FaweBukkit implements IFawe, Listener {
             return;
         }
         if (PlotSquared.get().getVersion().version[0] == 6) {
-            WEManager.IMP.addManager(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
+            WEManager.weManager().addManager(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' v6 found. Using it now.");
         } else {
             LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");

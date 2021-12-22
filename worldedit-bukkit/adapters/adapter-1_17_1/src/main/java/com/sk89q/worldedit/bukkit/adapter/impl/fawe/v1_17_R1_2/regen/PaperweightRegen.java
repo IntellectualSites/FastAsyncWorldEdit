@@ -232,7 +232,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         PrimaryLevelData newWorldData = new PrimaryLevelData(newWorldSettings, newOpts, Lifecycle.stable());
 
         //init world
-        freshWorld = Fawe.get().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
+        freshWorld = Fawe.instance().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
                 server,
                 server.executor,
                 session,
@@ -336,7 +336,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         //shutdown chunk provider
         try {
-            Fawe.get().getQueueHandler().sync(() -> {
+            Fawe.instance().getQueueHandler().sync(() -> {
                 try {
                     freshChunkProvider.close(false);
                 } catch (IOException e) {
@@ -348,7 +348,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         //remove world from server
         try {
-            Fawe.get().getQueueHandler().sync(this::removeWorldFromWorldsMap);
+            Fawe.instance().getQueueHandler().sync(this::removeWorldFromWorldsMap);
         } catch (Exception ignored) {
         }
 
@@ -388,7 +388,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     @Override
     protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
         // BlockPopulator#populate has to be called synchronously for TileEntity access
-        TaskManager.IMP.task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
+        TaskManager.taskManager().task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
     }
 
     @Override
@@ -403,7 +403,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     //util
     private void removeWorldFromWorldsMap() {
-        Fawe.get().getQueueHandler().sync(() -> {
+        Fawe.instance().getQueueHandler().sync(() -> {
             try {
                 Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
                 map.remove("worldeditregentempworld");

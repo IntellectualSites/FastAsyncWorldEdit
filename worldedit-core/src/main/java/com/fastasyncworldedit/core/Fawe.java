@@ -101,17 +101,17 @@ public class Fawe {
         this.setupConfigs();
         TaskManager.IMP = this.implementation.getTaskManager();
 
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             MainUtil.deleteOlder(
                     MainUtil.getFile(this.implementation
-                            .getDirectory(), Settings.IMP.PATHS.HISTORY),
-                    TimeUnit.DAYS.toMillis(Settings.IMP.HISTORY.DELETE_AFTER_DAYS),
+                            .getDirectory(), Settings.settings().PATHS.HISTORY),
+                    TimeUnit.DAYS.toMillis(Settings.settings().HISTORY.DELETE_AFTER_DAYS),
                     false
             );
             MainUtil.deleteOlder(
                     MainUtil.getFile(this.implementation
-                            .getDirectory(), Settings.IMP.PATHS.CLIPBOARD),
-                    TimeUnit.DAYS.toMillis(Settings.IMP.CLIPBOARD.DELETE_AFTER_DAYS),
+                            .getDirectory(), Settings.settings().PATHS.CLIPBOARD),
+                    TimeUnit.DAYS.toMillis(Settings.settings().CLIPBOARD.DELETE_AFTER_DAYS),
                     false
             );
         });
@@ -123,28 +123,49 @@ public class Fawe {
         this.timer = new FaweTimer();
 
         // Delayed worldedit setup
-        TaskManager.IMP.later(() -> {
+        TaskManager.taskManager().later(() -> {
             try {
-                WEManager.IMP.addManagers(Fawe.this.implementation.getMaskManagers());
+                WEManager.weManager().addManagers(Fawe.this.implementation.getMaskManagers());
             } catch (Throwable ignored) {
             }
         }, 0);
 
-        TaskManager.IMP.repeat(timer, 1);
+        TaskManager.taskManager().repeat(timer, 1);
     }
 
     /**
      * Get the implementation specific class.
+     * @deprecated use {@link #platform()}
      */
     @SuppressWarnings("unchecked")
+    @Deprecated(forRemoval = true, since = "2.0.0")
     public static <T extends IFawe> T imp() {
         return instance != null ? (T) instance.implementation : null;
     }
 
     /**
+     * Get the implementation specific class.
+     * @since 2.0.0
+     */
+    @SuppressWarnings("unchecked")
+    public static <T extends IFawe> T platform() {
+        return instance != null ? (T) instance.implementation : null;
+    }
+
+
+    /**
+     * Get the implementation independent class.
+     * @ use {@link #instance()}
+     */
+    @Deprecated(forRemoval = true, since = "2.0.0")
+    public static Fawe get() {
+        return instance;
+    }
+
+    /**
      * Get the implementation independent class.
      */
-    public static Fawe get() {
+    public static Fawe instance() {
         return instance;
     }
 
@@ -225,8 +246,8 @@ public class Fawe {
     }
 
     public void onDisable() {
-        if (imp().getPreloader(false) != null) {
-            imp().getPreloader(false).cancel();
+        if (platform().getPreloader(false) != null) {
+            platform().getPreloader(false).cancel();
         }
     }
 
@@ -296,7 +317,7 @@ public class Fawe {
         MainUtil.copyFile(MainUtil.getJarFile(), "lang/strings.json", null);
         // Setting up config.yml
         File file = new File(this.implementation.getDirectory(), "config.yml");
-        Settings.IMP.PLATFORM = implementation.getPlatform().replace("\"", "");
+        Settings.settings().PLATFORM = implementation.getPlatform().replace("\"", "");
         try (InputStream stream = getClass().getResourceAsStream("/fawe.properties");
              BufferedReader br = new BufferedReader(new InputStreamReader(stream))) {
             String versionString = br.readLine();
@@ -304,17 +325,17 @@ public class Fawe {
             String dateString = br.readLine();
             br.close();
             this.version = FaweVersion.tryParse(versionString, commitString, dateString);
-            Settings.IMP.DATE = new Date(100 + version.year, version.month, version.day).toString();
-            Settings.IMP.BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit/" + version.build;
-            Settings.IMP.COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
+            Settings.settings().DATE = new Date(100 + version.year, version.month, version.day).toString();
+            Settings.settings().BUILD = "https://ci.athion.net/job/FastAsyncWorldEdit/" + version.build;
+            Settings.settings().COMMIT = "https://github.com/IntellectualSites/FastAsyncWorldEdit/commit/" + Integer.toHexString(version.hash);
         } catch (Throwable ignored) {
         }
         try {
-            Settings.IMP.reload(file);
+            Settings.settings().reload(file);
         } catch (Throwable e) {
             LOGGER.error("Failed to load config.", e);
         }
-        Settings.IMP.QUEUE.TARGET_SIZE = Math.max(Settings.IMP.QUEUE.TARGET_SIZE, Settings.IMP.QUEUE.PARALLEL_THREADS);
+        Settings.settings().QUEUE.TARGET_SIZE = Math.max(Settings.settings().QUEUE.TARGET_SIZE, Settings.settings().QUEUE.PARALLEL_THREADS);
         try {
             byte[] in = new byte[0];
             byte[] compressed = LZ4Factory.fastestJavaInstance().fastCompressor().compress(in);
@@ -332,14 +353,14 @@ public class Fawe {
             assert (Zstd.decompress(ob, compressed) == 0);
             LOGGER.info("ZSTD Compression Binding loaded successfully");
         } catch (Throwable e) {
-            if (Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.IMP.HISTORY.COMPRESSION_LEVEL > 6) {
-                Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.CLIPBOARD.COMPRESSION_LEVEL);
-                Settings.IMP.HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.IMP.HISTORY.COMPRESSION_LEVEL);
+            if (Settings.settings().CLIPBOARD.COMPRESSION_LEVEL > 6 || Settings.settings().HISTORY.COMPRESSION_LEVEL > 6) {
+                Settings.settings().CLIPBOARD.COMPRESSION_LEVEL = Math.min(6, Settings.settings().CLIPBOARD.COMPRESSION_LEVEL);
+                Settings.settings().HISTORY.COMPRESSION_LEVEL = Math.min(6, Settings.settings().HISTORY.COMPRESSION_LEVEL);
                 LOGGER.error("ZSTD Compression Binding Not Found.\n"
                         + "FAWE will still work but compression won't work as well.", e);
             }
         }
-        Settings.IMP.save(file);
+        Settings.settings().save(file);
     }
 
     public WorldEdit getWorldEdit() {
@@ -347,7 +368,7 @@ public class Fawe {
     }
 
     private void setupMemoryListener() {
-        if (Settings.IMP.MAX_MEMORY_PERCENT < 1 || Settings.IMP.MAX_MEMORY_PERCENT > 99) {
+        if (Settings.settings().MAX_MEMORY_PERCENT < 1 || Settings.settings().MAX_MEMORY_PERCENT > 99) {
             return;
         }
         try {
@@ -371,7 +392,7 @@ public class Fawe {
                     if (max < 0) {
                         continue;
                     }
-                    final long alert = (max * Settings.IMP.MAX_MEMORY_PERCENT) / 100;
+                    final long alert = (max * Settings.settings().MAX_MEMORY_PERCENT) / 100;
                     mp.setUsageThreshold(alert);
                 }
             }

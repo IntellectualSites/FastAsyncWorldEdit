@@ -59,7 +59,7 @@ public class AsyncNotifyQueue implements Closeable {
             }
             return null;
         };
-        self[0] = Fawe.get().getQueueHandler().async(wrapped);
+        self[0] = Fawe.instance().getQueueHandler().async(wrapped);
         return self[0];
     }
 

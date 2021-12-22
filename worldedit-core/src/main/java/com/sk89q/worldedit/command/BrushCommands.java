@@ -860,8 +860,8 @@ public class BrushCommands {
         }
         String filenamePng = filename.endsWith(".png") ? filename : filename + ".png";
         File file = new File(
-                Fawe.imp().getDirectory(),
-                Settings.IMP.PATHS.HEIGHTMAP + File.separator + filenamePng
+                Fawe.platform().getDirectory(),
+                Settings.settings().PATHS.HEIGHTMAP + File.separator + filenamePng
         );
         if (file.exists()) {
             return new FileInputStream(file);
@@ -936,7 +936,7 @@ public class BrushCommands {
         if (tool != null) {
             root |= name.startsWith("../");
             name = FileSystems.getDefault().getPath(name).getFileName().toString();
-            File folder = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
+            File folder = MainUtil.getFile(Fawe.platform().getDirectory(), "brushes");
             name = name.endsWith(".jsgz") ? name : name + ".jsgz";
             File file;
             if (root && player.hasPermission("worldedit.brush.save.other")) {
@@ -971,7 +971,7 @@ public class BrushCommands {
         public void loadBrush(Player player, LocalSession session, @Arg(desc = "String name") String name)
                 throws WorldEditException, IOException {
             name = FileSystems.getDefault().getPath(name).getFileName().toString();
-            File folder = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
+            File folder = MainUtil.getFile(Fawe.platform().getDirectory(), "brushes");
             name = name.endsWith(".jsgz") ? name : name + ".jsgz";
             File file = new File(folder, player.getUniqueId() + File.separator + name);
             if (!file.exists()) {
@@ -1006,7 +1006,7 @@ public class BrushCommands {
                     int page
     ) throws WorldEditException {
         String baseCmd = "/brush loadbrush";
-        File dir = MainUtil.getFile(Fawe.imp().getDirectory(), "brushes");
+        File dir = MainUtil.getFile(Fawe.platform().getDirectory(), "brushes");
         // TODO NOT IMPLEMENTED
         //        UtilityCommands.list(dir, actor, args, page, null, true, baseCmd);
     }
@@ -1310,7 +1310,7 @@ public class BrushCommands {
         worldEdit.checkMaxBrushRadius(radius);
 
         //FAWE start
-        FaweLimit limit = Settings.IMP.getLimit(player);
+        FaweLimit limit = Settings.settings().getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
         //FAWE end
 
@@ -1345,7 +1345,7 @@ public class BrushCommands {
         worldEdit.checkMaxBrushRadius(radius);
 
         //FAWE start
-        FaweLimit limit = Settings.IMP.getLimit(player);
+        FaweLimit limit = Settings.settings().getLimit(player);
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
         //FAWE end
 

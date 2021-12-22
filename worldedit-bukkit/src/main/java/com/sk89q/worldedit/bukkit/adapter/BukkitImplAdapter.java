@@ -314,7 +314,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     @Nullable
     default World createWorld(WorldCreator creator) {
-        return ((FaweBukkit) Fawe.imp()).createWorldUnloaded(creator::createWorld);
+        return ((FaweBukkit) Fawe.platform()).createWorldUnloaded(creator::createWorld);
     }
 
     /**

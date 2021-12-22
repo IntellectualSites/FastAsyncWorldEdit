@@ -27,7 +27,7 @@ public class LazyBaseEntity extends BaseEntity {
             if (Fawe.isMainThread()) {
                 setNbtData(tmp.get());
             } else {
-                setNbtData(TaskManager.IMP.sync(tmp));
+                setNbtData(TaskManager.taskManager().sync(tmp));
             }
         }
         return super.getNbtData();

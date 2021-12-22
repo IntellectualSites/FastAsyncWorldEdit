@@ -64,7 +64,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             return;
         }
         waitingAsync.incrementAndGet();
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             waitingAsync.decrementAndGet();
             synchronized (waitingAsync) {
                 waitingAsync.notifyAll();
@@ -168,7 +168,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             char[] blocksGet;
             char[] tmp = get.load(layer);
             if (tmp == null) {
-                blocksGet = FaweCache.IMP.EMPTY_CHAR_4096;
+                blocksGet = FaweCache.INSTANCE.EMPTY_CHAR_4096;
             } else {
                 System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
             }
@@ -379,7 +379,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             wrappedTask.run();
             return Futures.immediateCancelledFuture();
         } else {
-            return Fawe.get().getQueueHandler().submit(wrappedTask);
+            return Fawe.instance().getQueueHandler().submit(wrappedTask);
         }
     }
 

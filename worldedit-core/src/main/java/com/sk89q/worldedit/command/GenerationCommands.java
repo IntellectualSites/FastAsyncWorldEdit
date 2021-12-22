@@ -582,7 +582,7 @@ public class GenerationCommands {
             @Arg(desc = "TODO", def = "100") int threshold,
             @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions
     ) throws WorldEditException, IOException {
-        TextureUtil tu = Fawe.get().getCachedTextureUtil(randomize, 0, threshold);
+        TextureUtil tu = Fawe.instance().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(imageURL);
         if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
             throw new IOException("Only i.imgur.com links are allowed!");

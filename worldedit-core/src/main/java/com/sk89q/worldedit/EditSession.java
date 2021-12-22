@@ -1289,7 +1289,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 // Don't relight twice!
                 if (!relighter.isFinished() && relighter.getLock().tryLock()) {
                     try {
-                        if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                        if (Settings.settings().LIGHTING.REMOVE_FIRST) {
                             relighter.removeAndRelight(true);
                         } else {
                             relighter.fixLightingSafe(true);
@@ -1305,14 +1305,14 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         // Cancel any preloader associated with the actor if present
         if (getActor() instanceof Player) {
-            Preloader preloader = Fawe.imp().getPreloader(false);
+            Preloader preloader = Fawe.platform().getPreloader(false);
             if (preloader != null) {
                 preloader.cancel(getActor());
             }
         }
         // Enqueue it
         if (getChangeSet() != null) {
-            if (Settings.IMP.HISTORY.COMBINE_STAGES) {
+            if (Settings.settings().HISTORY.COMBINE_STAGES) {
                 ((AbstractChangeSet) getChangeSet()).closeAsync();
             } else {
                 try {
@@ -3649,7 +3649,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
             if (containsAny) {
                 changes++;
-                TaskManager.IMP.sync(new RunnableVal<Object>() {
+                TaskManager.taskManager().sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
                         regenerateChunk(cx, cz, biome, seed);

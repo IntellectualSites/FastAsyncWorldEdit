@@ -425,7 +425,7 @@ public interface Player extends Entity, Actor {
     default void unregister() {
         cancel(true);
         LocalSession session = getSession();
-        if (Settings.IMP.CLIPBOARD.USE_DISK && Settings.IMP.CLIPBOARD.DELETE_ON_LOGOUT) {
+        if (Settings.settings().CLIPBOARD.USE_DISK && Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT) {
             ClipboardHolder holder = session.getExistingClipboard();
             if (holder != null) {
                 for (Clipboard clipboard : holder.getClipboards()) {
@@ -441,10 +441,10 @@ public interface Player extends Entity, Actor {
                     doc.getFile().delete();
                 }
             }
-        } else if (Settings.IMP.CLIPBOARD.DELETE_ON_LOGOUT || Settings.IMP.CLIPBOARD.USE_DISK) {
+        } else if (Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT || Settings.settings().CLIPBOARD.USE_DISK) {
             session.setClipboard(null);
         }
-        if (Settings.IMP.HISTORY.DELETE_ON_LOGOUT) {
+        if (Settings.settings().HISTORY.DELETE_ON_LOGOUT) {
             session.clearHistory();
         }
     }
@@ -456,8 +456,8 @@ public interface Player extends Entity, Actor {
      */
     default void loadClipboardFromDisk() {
         File file = MainUtil.getFile(
-                Fawe.imp().getDirectory(),
-                Settings.IMP.PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
+                Fawe.platform().getDirectory(),
+                Settings.settings().PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
         );
         try {
             if (file.exists() && file.length() > 5) {

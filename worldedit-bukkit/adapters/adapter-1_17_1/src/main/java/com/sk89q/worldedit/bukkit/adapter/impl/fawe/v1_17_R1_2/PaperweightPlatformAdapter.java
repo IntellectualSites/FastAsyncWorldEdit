@@ -215,7 +215,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 e.printStackTrace();
             }
         }
-        return TaskManager.IMP.sync(() -> serverLevel.getChunk(chunkX, chunkZ));
+        return TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ));
     }
 
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {
@@ -247,7 +247,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             return;
         }
         LevelChunk levelChunk = optional.get();
-        TaskManager.IMP.task(() -> {
+        TaskManager.taskManager().task(() -> {
             ClientboundLevelChunkPacket chunkPacket = new ClientboundLevelChunkPacket(levelChunk);
             nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(chunkPacket));
             if (lighting) {
@@ -283,10 +283,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (set == null) {
             return newChunkSection(layer);
         }
-        final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
-        final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-        final long[] blockStates = FaweCache.IMP.BLOCK_STATES.get();
-        final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
+        final int[] blockToPalette = FaweCache.INSTANCE.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.INSTANCE.PALETTE_TO_BLOCK.get();
+        final long[] blockStates = FaweCache.INSTANCE.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.INSTANCE.SECTION_BLOCKS.get();
         try {
             int[] num_palette_buffer = new int[1];
             Map<BlockVector3, Integer> ticking_blocks = new HashMap<>();
@@ -303,7 +303,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             int num_palette = num_palette_buffer[0];
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
-            if (Settings.IMP.PROTOCOL_SUPPORT_FIX || num_palette != 1) {
+            if (Settings.settings().PROTOCOL_SUPPORT_FIX || num_palette != 1) {
                 bitsPerEntry = Math.max(bitsPerEntry, 4); // Protocol support breaks <4 bits per entry
             } else {
                 bitsPerEntry = Math.max(bitsPerEntry, 1); // For some reason minecraft needs 4096 bits to store 0 entries

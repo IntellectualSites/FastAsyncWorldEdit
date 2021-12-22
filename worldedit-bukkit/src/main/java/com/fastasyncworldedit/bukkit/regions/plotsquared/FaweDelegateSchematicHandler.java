@@ -132,7 +132,7 @@ public class FaweDelegateSchematicHandler {
             }
         };
         if (Fawe.isMainThread()) {
-            com.fastasyncworldedit.core.util.TaskManager.IMP.async(r);
+            com.fastasyncworldedit.core.util.TaskManager.taskManager().async(r);
         } else {
             r.run();
         }
@@ -186,7 +186,7 @@ public class FaweDelegateSchematicHandler {
             }
             return;
         }
-        final CompoundTag weTag = (CompoundTag) FaweCache.IMP.asTag(tag);
+        final CompoundTag weTag = (CompoundTag) FaweCache.INSTANCE.asTag(tag);
         SchematicHandler.upload(uuid, file, "schem", new RunnableVal<>() {
             @Override
             public void run(OutputStream output) {

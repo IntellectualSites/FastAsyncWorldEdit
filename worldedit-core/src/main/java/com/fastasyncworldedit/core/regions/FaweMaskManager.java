@@ -29,7 +29,7 @@ public abstract class FaweMaskManager {
     public abstract FaweMask getMask(final Player player, MaskType type, boolean isWhitelist);
 
     public boolean isExclusive() {
-        return Settings.IMP.REGION_RESTRICTIONS_OPTIONS.EXCLUSIVE_MANAGERS.contains(this.key);
+        return Settings.settings().REGION_RESTRICTIONS_OPTIONS.EXCLUSIVE_MANAGERS.contains(this.key);
     }
 
     public enum MaskType {
@@ -39,7 +39,7 @@ public abstract class FaweMaskManager {
         public static MaskType getDefaultMaskType() {
             try {
                 return MaskType
-                        .valueOf(Settings.IMP.REGION_RESTRICTIONS_OPTIONS.MODE.toUpperCase(Locale.ROOT));
+                        .valueOf(Settings.settings().REGION_RESTRICTIONS_OPTIONS.MODE.toUpperCase(Locale.ROOT));
             } catch (Exception ignored) {
                 return MEMBER;
             }

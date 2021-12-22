@@ -135,9 +135,9 @@ public class UtilityCommands {
             @Arg(name = "max", desc = "int", def = "200") int max
     ) throws IOException {
         actor.print(TextComponent.of("Please wait while we generate the minified heightmaps."));
-        File srcFolder = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HEIGHTMAP);
+        File srcFolder = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().PATHS.HEIGHTMAP);
 
-        File webSrc = new File(Fawe.imp().getDirectory(), "web" + File.separator + "heightmap");
+        File webSrc = new File(Fawe.platform().getDirectory(), "web" + File.separator + "heightmap");
         File minImages = new File(webSrc, "images" + File.separator + "min");
         File maxImages = new File(webSrc, "images" + File.separator + "max");
         final int sub = srcFolder.getAbsolutePath().length();
@@ -698,7 +698,7 @@ public class UtilityCommands {
 
         //FAWE start - run this sync
         int finalRadius = radius;
-        int killed = TaskManager.IMP.sync(() -> killMatchingEntities(finalRadius, actor, flags::createFunction));
+        int killed = TaskManager.taskManager().sync(() -> killMatchingEntities(finalRadius, actor, flags::createFunction));
         //FAWE end
 
         actor.print(Caption.of(
@@ -730,7 +730,7 @@ public class UtilityCommands {
         }
 
         //FAWE start - run this sync
-        int removed = TaskManager.IMP.sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
+        int removed = TaskManager.taskManager().sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
         //FAWE end
         actor.print(Caption.of("worldedit.remove.removed", TextComponent.of(removed)));
         return removed;
@@ -953,7 +953,7 @@ public class UtilityCommands {
         String dirFilter = File.separator;
 
         boolean listMine = false;
-        boolean listGlobal = !Settings.IMP.PATHS.PER_PLAYER_SCHEMATICS;
+        boolean listGlobal = !Settings.settings().PATHS.PER_PLAYER_SCHEMATICS;
         if (len > 0) {
             for (String arg : args) {
                 switch (arg.toLowerCase(Locale.ROOT)) {
@@ -982,7 +982,7 @@ public class UtilityCommands {
                             if (!exists) {
                                 arg = arg.substring(0, arg.length() - File.separator.length());
                                 if (arg.length() > 3 && arg.length() <= 16) {
-                                    UUID fromName = Fawe.imp().getUUID(arg);
+                                    UUID fromName = Fawe.platform().getUUID(arg);
                                     if (fromName != null) {
                                         newDirFilter = dirFilter + fromName + File.separator;
                                         listGlobal = true;
@@ -1103,7 +1103,7 @@ public class UtilityCommands {
                 if (newList.isEmpty()) {
                     String checkName = filter.replace("\\", "/").split("/")[0];
                     if (checkName.length() > 3 && checkName.length() <= 16) {
-                        UUID fromName = Fawe.imp().getUUID(checkName);
+                        UUID fromName = Fawe.platform().getUUID(checkName);
                         if (fromName != null) {
                             lowerFilter = filter.replaceFirst(checkName, fromName.toString()).toLowerCase(Locale.ROOT);
                             for (int i = 0; i < normalizedNames.length; i++) {

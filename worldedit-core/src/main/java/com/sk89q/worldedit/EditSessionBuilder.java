@@ -303,7 +303,7 @@ public final class EditSessionBuilder {
      */
     public EditSessionBuilder changeSet(boolean disk, @Nullable UUID uuid) {
         if (disk) {
-            if (Settings.IMP.HISTORY.USE_DATABASE) {
+            if (Settings.settings().HISTORY.USE_DATABASE) {
                 this.changeSet = new RollbackOptimizedHistory(world, uuid);
             } else {
                 this.changeSet = new DiskStorageHistory(world, uuid);
@@ -437,7 +437,7 @@ public final class EditSessionBuilder {
         }
         if (fastMode == null) {
             if (actor == null) {
-                fastMode = !Settings.IMP.HISTORY.ENABLE_FOR_CONSOLE;
+                fastMode = !Settings.settings().HISTORY.ENABLE_FOR_CONSOLE;
             } else {
                 fastMode = actor.getSession().hasFastMode();
             }
@@ -466,12 +466,12 @@ public final class EditSessionBuilder {
                 wnaMode = false;
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
-                } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
-                    ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, fastMode);
+                } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
+                    ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.instance().getQueueHandler(), world, fastMode);
                     queue = parallel.getExtent();
                     extent = parallel;
                 } else {
-                    extent = queue = Fawe.get().getQueueHandler().getQueue(world);
+                    extent = queue = Fawe.instance().getQueueHandler().getQueue(world);
                 }
             } else {
                 wnaMode = true;
@@ -480,7 +480,7 @@ public final class EditSessionBuilder {
             if (combineStages == null) {
                 combineStages =
                         // If it's enabled in the settings
-                        Settings.IMP.HISTORY.COMBINE_STAGES
+                        Settings.settings().HISTORY.COMBINE_STAGES
                                 // If fast placement is disabled, it's slower to perform a copy on each chunk
                                 && this.limit.FAST_PLACEMENT
                                 // If the edit uses items from the inventory we can't use a delayed task
@@ -490,17 +490,17 @@ public final class EditSessionBuilder {
             this.bypassHistory = this.extent = wrapExtent(bypassAll, eventBus, event, EditSession.Stage.BEFORE_REORDER);
             if (!this.fastMode || changeSet != null) {
                 if (changeSet == null) {
-                    if (Settings.IMP.HISTORY.USE_DISK) {
+                    if (Settings.settings().HISTORY.USE_DISK) {
                         UUID uuid = actor == null ? Identifiable.CONSOLE : actor.getUniqueId();
-                        if (Settings.IMP.HISTORY.USE_DATABASE) {
+                        if (Settings.settings().HISTORY.USE_DATABASE) {
                             changeSet = new RollbackOptimizedHistory(world, uuid);
                         } else {
                             changeSet = new DiskStorageHistory(world, uuid);
                         }
-//                    } else if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0) {
+//                    } else if (combineStages && Settings.settings().HISTORY.COMPRESSION_LEVEL == 0) {
 //                        changeSet = new CPUOptimizedChangeSet(world);
                     } else {
-                        if (combineStages && Settings.IMP.HISTORY.COMPRESSION_LEVEL == 0) {
+                        if (combineStages && Settings.settings().HISTORY.COMPRESSION_LEVEL == 0) {
                             //TODO add CPUOptimizedChangeSet
                         }
                         changeSet = new MemoryOptimizedHistory(world);
@@ -528,7 +528,7 @@ public final class EditSessionBuilder {
                     }
                 }
             }
-            if (allowedRegions == null && Settings.IMP.REGION_RESTRICTIONS) {
+            if (allowedRegions == null && Settings.settings().REGION_RESTRICTIONS) {
                 if (actor != null && !actor.hasPermission("fawe.bypass") && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player) {
                         Player player = (Player) actor;
@@ -536,7 +536,7 @@ public final class EditSessionBuilder {
                     }
                 }
             }
-            if (disallowedRegions == null && Settings.IMP.REGION_RESTRICTIONS && Settings.IMP.REGION_RESTRICTIONS_OPTIONS.ALLOW_BLACKLISTS) {
+            if (disallowedRegions == null && Settings.settings().REGION_RESTRICTIONS && Settings.settings().REGION_RESTRICTIONS_OPTIONS.ALLOW_BLACKLISTS) {
                 if (actor != null && !actor.hasPermission("fawe.bypass") && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player) {
                         Player player = (Player) actor;
@@ -562,7 +562,7 @@ public final class EditSessionBuilder {
             }
             // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks
             if (placeChunks) {
-                if (((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.IMP.LIGHTING.MODE > 0))) {
+                if (((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.settings().LIGHTING.MODE > 0))) {
                     relighter = WorldEdit.getInstance().getPlatformManager()
                             .queryCapability(Capability.WORLD_EDITING)
                             .getRelighterFactory().createRelighter(relightMode, world, queue);
@@ -704,13 +704,13 @@ public final class EditSessionBuilder {
         }
         if (toReturn != extent) {
             String className = toReturn.getClass().getName().toLowerCase(Locale.ROOT);
-            for (String allowed : Settings.IMP.EXTENT.ALLOWED_PLUGINS) {
+            for (String allowed : Settings.settings().EXTENT.ALLOWED_PLUGINS) {
                 if (className.contains(allowed.toLowerCase(Locale.ROOT))) {
                     this.wrapped = true;
                     return toReturn;
                 }
             }
-            if (Settings.IMP.EXTENT.DEBUG) {
+            if (Settings.settings().EXTENT.DEBUG) {
                 if (event.getActor() != null) {
                     event.getActor().printDebug(TextComponent.of("Potentially unsafe extent blocked: " + toReturn
                             .getClass()

@@ -236,7 +236,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 e.printStackTrace();
             }
         }
-        return TaskManager.IMP.sync(() -> serverLevel.getChunk(chunkX, chunkZ));
+        return TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ));
     }
 
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {
@@ -268,7 +268,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             return;
         }
         LevelChunk levelChunk = optional.get();
-        TaskManager.IMP.task(() -> {
+        TaskManager.taskManager().task(() -> {
             ClientboundLevelChunkWithLightPacket packet =
                     new ClientboundLevelChunkWithLightPacket(levelChunk, nmsWorld.getChunkSource().getLightEngine(), null, null
                             , true, false); // last false is to not bother with x-ray
@@ -299,10 +299,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (set == null) {
             return newChunkSection(layer, biomeRegistry, biomes);
         }
-        final int[] blockToPalette = FaweCache.IMP.BLOCK_TO_PALETTE.get();
-        final int[] paletteToBlock = FaweCache.IMP.PALETTE_TO_BLOCK.get();
-        final long[] blockStates = FaweCache.IMP.BLOCK_STATES.get();
-        final int[] blocksCopy = FaweCache.IMP.SECTION_BLOCKS.get();
+        final int[] blockToPalette = FaweCache.INSTANCE.BLOCK_TO_PALETTE.get();
+        final int[] paletteToBlock = FaweCache.INSTANCE.PALETTE_TO_BLOCK.get();
+        final long[] blockStates = FaweCache.INSTANCE.BLOCK_STATES.get();
+        final int[] blocksCopy = FaweCache.INSTANCE.SECTION_BLOCKS.get();
         try {
             int[] num_palette_buffer = new int[1];
             Map<BlockVector3, Integer> ticking_blocks = new HashMap<>();

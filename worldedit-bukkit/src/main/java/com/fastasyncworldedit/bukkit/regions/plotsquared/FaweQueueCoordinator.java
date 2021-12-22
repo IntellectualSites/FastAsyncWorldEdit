@@ -35,8 +35,8 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     public FaweQueueCoordinator(World world) {
         super(world);
         this.world = world;
-        instance = Fawe.get().getQueueHandler().getQueue(world);
-        Fawe.get().getQueueHandler().unCache();
+        instance = Fawe.instance().getQueueHandler().getQueue(world);
+        Fawe.instance().getQueueHandler().unCache();
     }
 
     @Override
@@ -194,7 +194,7 @@ public class FaweQueueCoordinator extends QueueCoordinator {
 
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        instance.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.IMP.asTag(tag));
+        instance.setTile(x, y, z, (com.sk89q.jnbt.CompoundTag) FaweCache.INSTANCE.asTag(tag));
         return true;
     }
 

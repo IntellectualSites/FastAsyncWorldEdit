@@ -129,9 +129,9 @@ public interface IBlocks extends Trimable {
                 sectionWriter.writeShort(nonEmpty); // non empty
                 FaweCache.Palette palette;
                 if (stretched) {
-                    palette = FaweCache.IMP.toPalette(0, ids);
+                    palette = FaweCache.INSTANCE.toPalette(0, ids);
                 } else {
-                    palette = FaweCache.IMP.toPaletteUnstretched(0, ids);
+                    palette = FaweCache.INSTANCE.toPaletteUnstretched(0, ids);
                 }
 
                 sectionWriter.writeByte(palette.bitsPerEntry); // bits per block

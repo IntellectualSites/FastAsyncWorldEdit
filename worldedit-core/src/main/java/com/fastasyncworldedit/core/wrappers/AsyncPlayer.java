@@ -38,7 +38,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void findFreePosition(Location searchPos) {
-        TaskManager.IMP.sync(new RunnableVal<Boolean>() {
+        TaskManager.taskManager().sync(new RunnableVal<Boolean>() {
             @Override
             public void run(Boolean value) {
                 getBasePlayer().findFreePosition(searchPos);
@@ -48,7 +48,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void setOnGround(Location searchPos) {
-        TaskManager.IMP.sync(new RunnableVal<Boolean>() {
+        TaskManager.taskManager().sync(new RunnableVal<Boolean>() {
             @Override
             public void run(Boolean value) {
                 getBasePlayer().setOnGround(searchPos);
@@ -58,7 +58,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void findFreePosition() {
-        TaskManager.IMP.sync(new RunnableVal<Boolean>() {
+        TaskManager.taskManager().sync(new RunnableVal<Boolean>() {
             @Override
             public void run(Boolean value) {
                 getBasePlayer().findFreePosition();
@@ -68,12 +68,12 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public boolean ascendLevel() {
-        return TaskManager.IMP.sync(() -> getBasePlayer().ascendLevel());
+        return TaskManager.taskManager().sync(() -> getBasePlayer().ascendLevel());
     }
 
     @Override
     public boolean descendLevel() {
-        return TaskManager.IMP.sync(() -> getBasePlayer().descendLevel());
+        return TaskManager.taskManager().sync(() -> getBasePlayer().descendLevel());
     }
 
     @Override
@@ -155,7 +155,7 @@ public class AsyncPlayer extends PlayerProxy {
                         unwrap(getBasePlayer())).build();
                 edit.setBlock(BlockVector3.at(x, y - 1, z), BlockTypes.GLASS);
                 edit.flushQueue();
-                LocalSession session = Fawe.get().getWorldEdit().getSessionManager().get(this);
+                LocalSession session = Fawe.instance().getWorldEdit().getSessionManager().get(this);
                 if (session != null) {
                     session.remember(edit, true, getBasePlayer().getLimit().MAX_HISTORY);
                 }
@@ -173,12 +173,12 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void setPosition(Vector3 pos, float pitch, float yaw) {
-        Fawe.get().getQueueHandler().sync(() -> super.setPosition(pos, pitch, yaw));
+        Fawe.instance().getQueueHandler().sync(() -> super.setPosition(pos, pitch, yaw));
     }
 
     @Override
     public Location getBlockTrace(int range, boolean useLastBlock) {
-        return TaskManager.IMP.sync(() -> {
+        return TaskManager.taskManager().sync(() -> {
             TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
             return useLastBlock ? tb.getAnyTargetBlock() : tb.getTargetBlock();
         });
@@ -186,7 +186,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public Location getBlockTraceFace(int range, boolean useLastBlock) {
-        return TaskManager.IMP.sync(() -> {
+        return TaskManager.taskManager().sync(() -> {
             TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
             return useLastBlock ? tb.getAnyTargetBlockFace() : tb.getTargetBlockFace();
         });
@@ -194,7 +194,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public Location getSolidBlockTrace(int range) {
-        return TaskManager.IMP.sync(() -> {
+        return TaskManager.taskManager().sync(() -> {
             TargetBlock tb = new TargetBlock(AsyncPlayer.this, range, 0.2D);
             return tb.getSolidTargetBlock();
         });
@@ -207,7 +207,7 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public boolean passThroughForwardWall(int range) {
-        return TaskManager.IMP.sync(() -> {
+        return TaskManager.taskManager().sync(() -> {
             int searchDist = 0;
             TargetBlock hitBlox = new TargetBlock(AsyncPlayer.this, range, 0.2);
             Extent world = getLocation().getExtent();

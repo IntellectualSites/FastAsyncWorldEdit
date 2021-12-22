@@ -23,10 +23,10 @@ import java.util.stream.IntStream;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
-    private static final Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(
+    private static final Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
             CharSetBlocks.class,
             CharSetBlocks::new,
-            Settings.IMP.QUEUE.POOL
+            Settings.settings().QUEUE.POOL
     );
 
     public static CharSetBlocks newInstance() {

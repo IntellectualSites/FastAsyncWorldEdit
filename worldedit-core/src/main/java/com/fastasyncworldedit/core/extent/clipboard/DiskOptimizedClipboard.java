@@ -72,8 +72,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         this(
                 region.getDimensions(),
                 MainUtil.getFile(
-                        Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."),
-                        Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"
+                        Fawe.instance() != null ? Fawe.platform().getDirectory() : new File("."),
+                        Settings.settings().PATHS.CLIPBOARD + File.separator + uuid + ".bd"
                 )
         );
         setOffset(region.getMinimumPoint());
@@ -84,8 +84,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         this(
                 dimensions,
                 MainUtil.getFile(
-                        Fawe.imp() != null ? Fawe.imp().getDirectory() : new File("."),
-                        Settings.IMP.PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"
+                        Fawe.platform() != null ? Fawe.platform().getDirectory() : new File("."),
+                        Settings.settings().PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"
                 )
         );
     }
