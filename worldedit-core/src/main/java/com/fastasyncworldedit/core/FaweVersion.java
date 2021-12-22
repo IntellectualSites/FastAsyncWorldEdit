@@ -36,7 +36,8 @@ public class FaweVersion {
         }
         this.semver = ver;
         this.snapshot = split.length > 1 && split[1].toLowerCase(Locale.ROOT).contains("snapshot");
-        this.build = version.contains("-") ? Integer.parseInt(version.substring(version.indexOf('-') + 10)) : 0;
+        int buildIndex = this.snapshot ? 2 : 1;
+        this.build = split.length == buildIndex + 1 ? Integer.parseInt(split[buildIndex]) : 0;
         this.hash = Integer.parseInt(commit.substring(commit.indexOf('=') + 1), 16);
         String[] split2 = date.substring(date.indexOf('=') + 1).split("\\.");
         this.year = Integer.parseInt(split2[0]);
