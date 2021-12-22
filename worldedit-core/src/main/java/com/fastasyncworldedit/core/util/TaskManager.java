@@ -36,6 +36,9 @@ public abstract class TaskManager {
      * @since 2.0.0
      */
     public static TaskManager taskManager() {
+        if (INSTANCE == null) {
+            INSTANCE = Fawe.imp().getTaskManager();
+        }
         return INSTANCE;
     }
 
