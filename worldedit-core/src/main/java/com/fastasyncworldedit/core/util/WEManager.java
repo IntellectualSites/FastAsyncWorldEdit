@@ -45,6 +45,9 @@ public class WEManager {
      * @return an instance of the WEManager
      */
     public static WEManager weManager() {
+        if (INSTANCE == null) {
+            INSTANCE = new WEManager();
+        }
         return INSTANCE;
     }
 
