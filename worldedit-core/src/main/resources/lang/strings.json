@@ -597,6 +597,7 @@
   "worldedit.selection.polygon2d.explain.secondary": "Added point #{0} at {1}.",
   "worldedit.selection.sphere.explain.secondary": "Radius set to {0}.",
   "worldedit.selection.sphere.explain.secondary-defined": "Radius set to {0} ({1}).",
+  "worldedit.selection.updated": "Positions updated.",
   "worldedit.sideeffect.lighting": "Lighting",
   "worldedit.sideeffect.lighting.description": "Updates block lighting",
   "worldedit.sideeffect.neighbors": "Neighbors",

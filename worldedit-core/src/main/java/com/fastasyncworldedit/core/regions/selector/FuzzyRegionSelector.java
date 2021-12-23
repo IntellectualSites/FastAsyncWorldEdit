@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.regions.selector;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extent.PassthroughExtent;
+import com.fastasyncworldedit.core.function.mask.IdMask;
 import com.fastasyncworldedit.core.regions.FuzzyRegion;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
@@ -23,11 +24,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class FuzzyRegionSelector extends PassthroughExtent implements RegionSelector {
+import static com.google.common.base.Preconditions.checkNotNull;
 
-    private final Actor actor;
-    private FuzzyRegion region;
+public class FuzzyRegionSelector extends PassthroughExtent implements ActorRegionSelector {
+
     private final ArrayList<BlockVector3> positions;
+    private Actor actor;
+    private FuzzyRegion region;
 
     public FuzzyRegionSelector(Actor actor, @Nullable World world, Mask mask) {
         super(WorldEdit.getInstance().newEditSessionBuilder().world(world)
@@ -37,6 +40,30 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
                 .build());
         this.actor = actor;
         this.region = new FuzzyRegion(world, getExtent(), mask);
+        this.positions = new ArrayList<>();
+        new MaskTraverser(mask).reset(getExtent());
+    }
+
+    public FuzzyRegionSelector(World world) {
+        super(WorldEdit.getInstance().newEditSessionBuilder().world(checkNotNull(world))
+                .changeSetNull()
+                .checkMemory(false)
+                .build());
+        this.actor = null;
+        Mask mask = new IdMask(world);
+        this.region = new FuzzyRegion(world, getExtent(), mask);
+        this.positions = new ArrayList<>();
+        new MaskTraverser(mask).reset(getExtent());
+    }
+
+    public FuzzyRegionSelector(RegionSelector oldSelector) {
+        super(WorldEdit.getInstance().newEditSessionBuilder().world(checkNotNull(oldSelector).getWorld())
+                .changeSetNull()
+                .checkMemory(false)
+                .build());
+        this.actor = null;
+        Mask mask = new IdMask(oldSelector.getWorld());
+        this.region = new FuzzyRegion(oldSelector.getWorld(), getExtent(), mask);
         this.positions = new ArrayList<>();
         new MaskTraverser(mask).reset(getExtent());
     }
@@ -151,6 +178,12 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
     @Override
     public List<BlockVector3> getVertices() {
         return positions;
+    }
+
+    @Override
+    public void setActor(@Nullable Actor actor) {
+        this.actor = actor;
+        setWorld(getWorld()); // "reset" with actor
     }
 
 }

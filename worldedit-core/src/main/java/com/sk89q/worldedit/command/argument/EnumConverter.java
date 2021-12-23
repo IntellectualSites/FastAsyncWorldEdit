@@ -41,10 +41,6 @@ public final class EnumConverter {
 
     public static void register(CommandManager commandManager) {
         commandManager.registerConverter(
-                Key.of(SelectorChoice.class),
-                basic(SelectorChoice.class)
-        );
-        commandManager.registerConverter(
                 Key.of(TreeGenerator.TreeType.class),
                 full(
                         TreeGenerator.TreeType.class,
@@ -84,10 +80,6 @@ public final class EnumConverter {
 
     private static <E extends Enum<E>> ArgumentConverter<E> basic(Class<E> enumClass) {
         return full(enumClass, e -> ImmutableSet.of(e.name().toLowerCase(Locale.ROOT)), null);
-    }
-
-    private static <E extends Enum<E>> ArgumentConverter<E> basic(Class<E> enumClass, @Nullable E unknownValue) {
-        return full(enumClass, e -> ImmutableSet.of(e.name().toLowerCase(Locale.ROOT)), unknownValue);
     }
 
     private static <E extends Enum<E>> ArgumentConverter<E> full(

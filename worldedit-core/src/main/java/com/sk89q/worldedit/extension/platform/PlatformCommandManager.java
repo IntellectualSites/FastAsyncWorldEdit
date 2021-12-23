@@ -98,6 +98,7 @@ import com.sk89q.worldedit.command.argument.LocationConverter;
 import com.sk89q.worldedit.command.argument.OffsetConverter;
 import com.sk89q.worldedit.command.argument.RegionFactoryConverter;
 import com.sk89q.worldedit.command.argument.RegistryConverter;
+import com.sk89q.worldedit.command.argument.SelectorChoiceConverter;
 import com.sk89q.worldedit.command.argument.SideEffectConverter;
 import com.sk89q.worldedit.command.argument.VectorConverter;
 import com.sk89q.worldedit.command.argument.WorldConverter;
@@ -272,6 +273,7 @@ public final class PlatformCommandManager {
         SideEffectConverter.register(commandManager);
         HeightConverter.register(commandManager);
         OffsetConverter.register(worldEdit, commandManager);
+        SelectorChoiceConverter.register(commandManager);
         //FAWE start
         commandManager.registerConverter(
                 Key.of(com.sk89q.worldedit.function.pattern.Pattern.class, Annotations.patternList()),
