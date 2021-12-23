@@ -81,7 +81,7 @@ public class InspectBrush extends BrushTool {
             final int y = target.getBlockY();
             final int z = target.getBlockZ();
             World world = player.getWorld();
-            RollbackDatabase db = DBHandler.IMP.getDatabase(world);
+            RollbackDatabase db = DBHandler.dbHandler().getDatabase(world);
             int count = 0;
             for (Supplier<RollbackOptimizedHistory> supplier : db.getEdits(target, false)) {
                 count++;

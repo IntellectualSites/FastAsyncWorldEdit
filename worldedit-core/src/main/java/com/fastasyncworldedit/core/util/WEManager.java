@@ -35,10 +35,6 @@ public class WEManager {
     public static WEManager IMP = new WEManager();
     private final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
 
-    private WEManager() {
-        INSTANCE = this;
-    }
-
     /**
      * Get an instance of the WEManager.
      *

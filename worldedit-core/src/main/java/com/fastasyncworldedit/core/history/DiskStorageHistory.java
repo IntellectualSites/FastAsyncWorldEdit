@@ -121,7 +121,7 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     public void delete() {
         deleteFiles();
         if (Settings.settings().HISTORY.USE_DATABASE) {
-            RollbackDatabase db = DBHandler.IMP.getDatabase(getWorld());
+            RollbackDatabase db = DBHandler.dbHandler().getDatabase(getWorld());
             db.delete(uuid, index);
         }
     }

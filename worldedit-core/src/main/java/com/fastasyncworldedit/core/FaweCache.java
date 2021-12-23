@@ -67,7 +67,7 @@ public enum FaweCache implements Trimable {
     /**
      * @since 2.0.0
      */
-    INSTANCE;// singleton
+    INSTANCE;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
