@@ -437,12 +437,14 @@ public interface Player extends Entity, Actor {
                     } else {
                         continue;
                     }
-                    doc.close(); // Ensure closed before deletion
-                    doc.getFile().delete();
+                    WorldEdit.getInstance().getExecutorService().submit(() -> {
+                        doc.close(); // Ensure closed before deletion
+                        doc.getFile().delete();
+                    });
                 }
             }
         } else if (Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT || Settings.settings().CLIPBOARD.USE_DISK) {
-            session.setClipboard(null);
+            WorldEdit.getInstance().getExecutorService().submit(() -> session.setClipboard(null));
         }
         if (Settings.settings().HISTORY.DELETE_ON_LOGOUT) {
             session.clearHistory();
