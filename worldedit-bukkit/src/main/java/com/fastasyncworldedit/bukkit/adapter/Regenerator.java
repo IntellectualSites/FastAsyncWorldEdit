@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -16,8 +17,6 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -156,7 +155,10 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     private boolean generate() throws Exception {
         if (generateConcurrent) {
             //Using concurrent chunk generation
-            executor = Executors.newFixedThreadPool(Settings.settings().QUEUE.PARALLEL_THREADS);
+            executor = Executors.newFixedThreadPool(Settings.settings().QUEUE.PARALLEL_THREADS, new ThreadFactoryBuilder()
+                    .setNameFormat("fawe-regen-%d")
+                    .build()
+            );
         } // else using sequential chunk generation, concurrent not supported
 
         //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
@@ -301,14 +303,6 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         }
     }
 
-    // FIXME this shouldn't be needed
-    private BlockStateHolder avoidReserved(BaseBlock baseBlock) {
-        if (baseBlock.getBlockType() == BlockTypes.__RESERVED__) {
-            return BlockTypes.AIR.getDefaultState();
-        }
-        return baseBlock;
-    }
-
     private class PlacementPattern implements Pattern {
 
         @Override
@@ -318,9 +312,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         @Override
         public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
-            return extent.setBlock(set.getX(), set.getY(), set.getZ(),
-                    avoidReserved(source.getFullBlock(get.getX(), get.getY(), get.getZ()))
-            );
+            return extent.setBlock(set.getX(), set.getY(), set.getZ(), source.getFullBlock(get.getX(), get.getY(), get.getZ()));
         }
 
     }
@@ -340,9 +332,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         @Override
         public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
-            return extent.setBlock(set.getX(), set.getY(), set.getZ(),
-                    avoidReserved(source.getFullBlock(get.getX(), get.getY(), get.getZ()))
-            )
+            return extent.setBlock(set.getX(), set.getY(), set.getZ(), source.getFullBlock(get.getX(), get.getY(), get.getZ()))
                     && extent.setBiome(set.getX(), set.getY(), set.getZ(), biomeGetter.apply(get));
         }
 
