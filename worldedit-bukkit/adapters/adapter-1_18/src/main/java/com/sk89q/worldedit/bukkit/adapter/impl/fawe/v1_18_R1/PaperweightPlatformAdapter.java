@@ -363,15 +363,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             // Create palette with data
+            @SuppressWarnings("deprecation") // constructor is deprecated on paper, but needed to keep compatibility with spigot
             final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
                     new PalettedContainer<>(
                             Block.BLOCK_STATE_REGISTRY,
                             PalettedContainer.Strategy.SECTION_STATES,
                             PalettedContainer.Strategy.SECTION_STATES.getConfiguration(Block.BLOCK_STATE_REGISTRY, bitsPerEntry),
                             nmsBits,
-                            palette,
-                            null,
-                            null
+                            palette
                     );
             LevelChunkSection levelChunkSection;
             try {
