@@ -269,9 +269,27 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         LevelChunk levelChunk = optional.get();
         TaskManager.taskManager().task(() -> {
-            ClientboundLevelChunkWithLightPacket packet =
-                    new ClientboundLevelChunkWithLightPacket(levelChunk, nmsWorld.getChunkSource().getLightEngine(), null, null
-                            , true, false); // last false is to not bother with x-ray
+            ClientboundLevelChunkWithLightPacket packet;
+            if (PaperLib.isPaper()) {
+                packet = new ClientboundLevelChunkWithLightPacket(
+                        levelChunk,
+                        nmsWorld.getChunkSource().getLightEngine(),
+                        null,
+                        null,
+                        true,
+                        false // last false is to not bother with x-ray
+                );
+            } else {
+                // deprecated on paper
+                //noinspection deprecation
+                packet = new ClientboundLevelChunkWithLightPacket(
+                        levelChunk,
+                        nmsWorld.getChunkSource().getLightEngine(),
+                        null,
+                        null,
+                        true
+                );
+            }
             nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
         });
     }
