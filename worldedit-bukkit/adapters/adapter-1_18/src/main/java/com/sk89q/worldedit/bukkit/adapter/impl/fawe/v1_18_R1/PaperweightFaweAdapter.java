@@ -23,6 +23,7 @@ import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_18_R1.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R1.nbt.PaperweightLazyCompoundTag;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R1.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -616,8 +617,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public boolean regenerate(org.bukkit.World bukkitWorld, Region region, Extent target, RegenOptions options) throws Exception {
-//        return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
-        return false;
+        return new PaperweightRegen(bukkitWorld, region, target, options).regenerate();
     }
 
     @Override

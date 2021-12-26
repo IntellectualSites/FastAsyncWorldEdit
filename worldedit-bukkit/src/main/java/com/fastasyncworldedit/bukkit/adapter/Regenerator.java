@@ -5,7 +5,9 @@ import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -14,6 +16,8 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
+import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypes;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -32,6 +36,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -283,19 +288,64 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     private void copyToWorld() {
         //Setting Blocks
-        long start = System.currentTimeMillis();
         boolean genbiomes = options.shouldRegenBiomes();
         boolean hasBiome = options.hasBiomeType();
         BiomeType biome = options.getBiomeType();
-        for (BlockVector3 vec : region) {
-            BaseBlock block = source.getFullBlock(vec);
-            target.setBlock(vec, block);
-            if (hasBiome) {
-                target.setBiome(vec, biome);
-            } else if (genbiomes) {
-                target.setBiome(vec, source.getBiome(vec));
-            }
+        if (!genbiomes && !hasBiome) {
+            target.setBlocks(region, new PlacementPattern());
         }
+        if (hasBiome) {
+            target.setBlocks(region, new WithBiomePlacementPattern(ignored -> biome));
+        } else if (genbiomes) {
+            target.setBlocks(region, new WithBiomePlacementPattern(vec -> source.getBiome(vec)));
+        }
+    }
+
+    // FIXME this shouldn't be needed
+    private BlockStateHolder avoidReserved(BaseBlock baseBlock) {
+        if (baseBlock.getBlockType() == BlockTypes.__RESERVED__) {
+            return BlockTypes.AIR.getDefaultState();
+        }
+        return baseBlock;
+    }
+
+    private class PlacementPattern implements Pattern {
+
+        @Override
+        public BaseBlock applyBlock(final BlockVector3 position) {
+            return source.getFullBlock(position);
+        }
+
+        @Override
+        public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
+            return extent.setBlock(set.getX(), set.getY(), set.getZ(),
+                    avoidReserved(source.getFullBlock(get.getX(), get.getY(), get.getZ()))
+            );
+        }
+
+    }
+
+    private class WithBiomePlacementPattern implements Pattern {
+
+        private final Function<BlockVector3, BiomeType> biomeGetter;
+
+        private WithBiomePlacementPattern(final Function<BlockVector3, BiomeType> biomeGetter) {
+            this.biomeGetter = biomeGetter;
+        }
+
+        @Override
+        public BaseBlock applyBlock(final BlockVector3 position) {
+            return source.getFullBlock(position);
+        }
+
+        @Override
+        public boolean apply(final Extent extent, final BlockVector3 get, final BlockVector3 set) throws WorldEditException {
+            return extent.setBlock(set.getX(), set.getY(), set.getZ(),
+                    avoidReserved(source.getFullBlock(get.getX(), get.getY(), get.getZ()))
+            )
+                    && extent.setBiome(set.getX(), set.getY(), set.getZ(), biomeGetter.apply(get));
+        }
+
     }
 
     //functions to be implemented by sub class
