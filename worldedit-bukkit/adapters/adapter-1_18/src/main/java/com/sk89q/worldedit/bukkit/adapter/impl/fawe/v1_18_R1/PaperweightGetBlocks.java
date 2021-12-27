@@ -896,7 +896,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 final BitStorage bits = (BitStorage) PaperweightPlatformAdapter.fieldStorage.get(dataObject);
 
                 if (bits instanceof ZeroBitStorage) {
-                    Arrays.fill(data, (char) 1);
+                    Arrays.fill(data, adapter.adaptToChar(blocks.get(0, 0, 0))); // get(int) is only public on paper
                     return data;
                 }
 
