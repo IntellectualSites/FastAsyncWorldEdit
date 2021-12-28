@@ -193,6 +193,9 @@ public abstract class CharBlocks implements IBlocks {
         return get(layer, index);
     }
 
+    /**
+     * Default char value to be used when "updating"/resetting data arrays
+     */
     protected abstract char defaultOrdinal();
 
     // Not synchronized as it refers to a synchronized method and includes nothing that requires synchronization

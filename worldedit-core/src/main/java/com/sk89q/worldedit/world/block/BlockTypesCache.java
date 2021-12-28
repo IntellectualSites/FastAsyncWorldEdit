@@ -304,6 +304,9 @@ public class BlockTypesCache {
         }
     }
 
+    /**
+     * Statically-set reserved IDs. Should be used as minimally as possible, and for IDs that will see frequent use
+     */
     public static class ReservedIDs {
         public static final int __RESERVED__ = 0;
         public static final int AIR = 1;
