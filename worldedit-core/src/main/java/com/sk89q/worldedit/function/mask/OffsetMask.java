@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.function.mask;
 
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 
 import javax.annotation.Nullable;
@@ -47,7 +49,10 @@ public class OffsetMask extends AbstractMask {
      */
     @Deprecated
     public OffsetMask(Mask mask, BlockVector3 offset) {
-        this(mask, offset, 0, 255);
+        this(mask, offset,
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY()
+        );
     }
 
     /**

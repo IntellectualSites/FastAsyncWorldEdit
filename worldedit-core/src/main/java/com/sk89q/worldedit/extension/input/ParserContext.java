@@ -21,8 +21,10 @@ package com.sk89q.worldedit.extension.input;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.MaskFactory;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.World;
@@ -303,8 +305,8 @@ public class ParserContext {
             minY = extent.getMinY();
             maxY = extent.getMaxY();
         } else {
-            minY = 0;
-            maxY = 255;
+            minY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY();
+            maxY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY();
         }
 
         return minY;

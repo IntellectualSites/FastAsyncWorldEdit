@@ -28,7 +28,9 @@ import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -110,7 +112,10 @@ public abstract class BreadthFirstSearch implements Operation {
      */
     public BreadthFirstSearch(RegionFunction function) {
         //FAWE start - int depth, min/max y
-        this(function, Integer.MAX_VALUE, 0, 255, null);
+        this(function, Integer.MAX_VALUE,
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY(), null
+        );
     }
 
     //FAWE start - int depth, min/max y, preloading

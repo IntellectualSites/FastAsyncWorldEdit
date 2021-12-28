@@ -20,9 +20,11 @@
 package com.sk89q.worldedit.world;
 
 import com.fastasyncworldedit.core.function.mask.BlockMaskBuilder;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Platform;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -66,12 +68,12 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public int getMinY() {
-        return 0;
+        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY();
     }
 
     @Override
     public int getMaxY() {
-        return 255;
+        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY();
     }
 
     @Override

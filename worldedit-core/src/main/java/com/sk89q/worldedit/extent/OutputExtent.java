@@ -22,7 +22,9 @@ package com.sk89q.worldedit.extent;
 import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -95,7 +97,9 @@ public interface OutputExtent {
     @Deprecated
     default boolean setBiome(BlockVector2 position, BiomeType biome) {
         boolean result = false;
-        for (int y = 0; y < 256; y++) {
+        int minY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY();
+        int maxY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY();
+        for (int y = minY; y < maxY; y++) {
             result |= setBiome(position.toBlockVector3().mutY(y), biome);
         }
         return result;

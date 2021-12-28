@@ -1,5 +1,7 @@
 package com.fastasyncworldedit.core.regions;
 
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 
@@ -27,7 +29,13 @@ public class RegionWrapper extends CuboidRegion {
      */
     @Deprecated
     public RegionWrapper(final int minX, final int maxX, final int minZ, final int maxZ) {
-        this(minX, maxX, 0, 255, minZ, maxZ);
+        this(minX,
+                maxX,
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY(),
+                minZ,
+                maxZ
+        );
     }
 
     public RegionWrapper(final int minX, final int maxX, final int minY, final int maxY, final int minZ, final int maxZ) {

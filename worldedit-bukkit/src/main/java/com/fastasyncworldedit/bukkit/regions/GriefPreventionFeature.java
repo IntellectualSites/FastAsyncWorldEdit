@@ -1,7 +1,9 @@
 package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.core.regions.FaweMask;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -38,12 +40,12 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
                 claim.getGreaterBoundaryCorner().getBlockX();
                 final BlockVector3 pos1 = BlockVector3.at(
                         claim.getLesserBoundaryCorner().getBlockX(),
-                        0,
+                        player.getWorld().getMinHeight(),
                         claim.getLesserBoundaryCorner().getBlockZ()
                 );
                 final BlockVector3 pos2 = BlockVector3.at(
                         claim.getGreaterBoundaryCorner().getBlockX(),
-                        256,
+                        player.getWorld().getMaxHeight(),
                         claim.getGreaterBoundaryCorner().getBlockZ()
                 );
                 return new FaweMask(new CuboidRegion(pos1, pos2)) {

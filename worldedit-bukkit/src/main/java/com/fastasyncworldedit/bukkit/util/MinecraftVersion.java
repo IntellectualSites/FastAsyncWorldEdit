@@ -12,6 +12,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
 
     public static final MinecraftVersion NETHER = new MinecraftVersion(1, 16);
     public static final MinecraftVersion CAVES_17 = new MinecraftVersion(1, 17);
+    public static final MinecraftVersion CAVES_18 = new MinecraftVersion(1, 18);
 
     private final int major;
     private final int minor;
