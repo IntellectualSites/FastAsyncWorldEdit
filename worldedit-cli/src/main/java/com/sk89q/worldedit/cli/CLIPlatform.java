@@ -26,6 +26,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.AbstractPlatform;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Preference;
+import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.World;
@@ -167,6 +168,16 @@ class CLIPlatform extends AbstractPlatform {
     public @Nonnull
     RelighterFactory getRelighterFactory() {
         return (_a, _b, _c) -> NullRelighter.INSTANCE;
+    }
+
+    @Override
+    public int getVersionMinY() {
+        return dataVersion >= Constants.DATA_VERSION_MC_1_18 ? -64 : 0;
+    }
+
+    @Override
+    public int getVersionMaxY() {
+        return dataVersion >= Constants.DATA_VERSION_MC_1_18 ? 319 : 255;
     }
 
     public void addWorld(World world) {
