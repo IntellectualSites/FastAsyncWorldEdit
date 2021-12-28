@@ -37,8 +37,13 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
         if (data == null) {
             data = new char[4096];
         }
-        Arrays.fill(data, (char) 1);
+        Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
         return data;
+    }
+
+    @Override
+    protected char defaultOrdinal() {
+        return BlockTypesCache.ReservedIDs.AIR;
     }
 
     @Override

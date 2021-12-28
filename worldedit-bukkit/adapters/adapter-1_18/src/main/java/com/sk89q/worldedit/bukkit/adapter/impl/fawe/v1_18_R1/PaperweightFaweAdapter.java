@@ -420,7 +420,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 LOGGER.error("Attempted to convert {} with ID {} to char. ibdToStateOrdinal length: {}. Defaulting to air!",
                         blockState.getBlock(), Block.BLOCK_STATE_REGISTRY.getId(blockState), ibdToStateOrdinal.length, e1
                 );
-                return 0;
+                return BlockTypesCache.ReservedIDs.AIR;
             }
         }
     }

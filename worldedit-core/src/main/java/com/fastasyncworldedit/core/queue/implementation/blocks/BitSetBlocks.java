@@ -9,6 +9,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -59,7 +60,7 @@ public class BitSetBlocks implements IChunkSet {
         for (int y = 0, index = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++, index++) {
-                    if (data[index] != 0) {
+                    if (data[index] != BlockTypesCache.ReservedIDs.__RESERVED__) {
                         row.set(null, x, by + y, z, minSectionPosition, maxSectionPosition);
                     }
                 }

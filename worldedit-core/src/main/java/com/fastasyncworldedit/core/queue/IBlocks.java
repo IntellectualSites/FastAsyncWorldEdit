@@ -9,6 +9,7 @@ import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 
 import javax.annotation.Nullable;
@@ -115,11 +116,11 @@ public interface IBlocks extends Trimable {
                 for (int i = 0; i < ids.length; i++) {
                     char ordinal = ids[i];
                     switch (ordinal) {
-                        case 0:
-                        case 2:
-                        case 3:
-                            ids[i] = 1;
-                        case 1:
+                        case BlockTypesCache.ReservedIDs.__RESERVED__:
+                        case BlockTypesCache.ReservedIDs.CAVE_AIR:
+                        case BlockTypesCache.ReservedIDs.VOID_AIR:
+                            ids[i] = BlockTypesCache.ReservedIDs.AIR;
+                        case BlockTypesCache.ReservedIDs.AIR:
                             continue;
                         default:
                             nonEmpty++;
@@ -139,10 +140,10 @@ public interface IBlocks extends Trimable {
                 for (int i = 0; i < palette.paletteToBlockLength; i++) {
                     int ordinal = palette.paletteToBlock[i];
                     switch (ordinal) {
-                        case 0:
-                        case 2:
-                        case 3:
-                        case 1:
+                        case BlockTypesCache.ReservedIDs.__RESERVED__:
+                        case BlockTypesCache.ReservedIDs.AIR:
+                        case BlockTypesCache.ReservedIDs.CAVE_AIR:
+                        case BlockTypesCache.ReservedIDs.VOID_AIR:
                             sectionWriter.write(0);
                             break;
                         default:

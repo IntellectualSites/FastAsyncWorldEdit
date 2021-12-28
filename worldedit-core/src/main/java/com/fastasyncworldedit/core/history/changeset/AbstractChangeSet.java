@@ -30,6 +30,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -185,8 +186,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                     for (int x = 0; x < 16; x++, index++) {
                         int xx = bx + x;
                         int from = blocksGet[index];
-                        if (from == 0) {
-                            from = 1;
+                        if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                            from = BlockTypesCache.ReservedIDs.AIR;
                         }
                         final int combinedFrom = from;
                         final int combinedTo = blocksSet[index];
