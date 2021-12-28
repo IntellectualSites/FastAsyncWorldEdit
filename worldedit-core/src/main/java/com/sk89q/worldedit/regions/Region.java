@@ -476,5 +476,6 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
     default ProcessorScope getScope() {
         return ProcessorScope.REMOVING_BLOCKS;
     }
+    //FAWE end
 
 }
