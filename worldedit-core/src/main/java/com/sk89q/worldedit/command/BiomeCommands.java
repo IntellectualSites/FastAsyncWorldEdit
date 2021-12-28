@@ -193,7 +193,7 @@ public class BiomeCommands {
 
         player.print(Caption.of(
                 "worldedit.setbiome.changed",
-                TextComponent.of(visitor.getAffected())
+                TextComponent.of(visitor.getAffected() / (editSession.getMaxY() - editSession.getMinY()))
         ));
     }
 

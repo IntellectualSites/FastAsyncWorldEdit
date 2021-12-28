@@ -97,7 +97,6 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         updateSectionIndexRange(y >> 4);
-        y -= minSectionPosition << 4;
         int layer = (y >> 4) - minSectionPosition;
         if (biomes == null) {
             biomes = new BiomeType[sectionCount][];
