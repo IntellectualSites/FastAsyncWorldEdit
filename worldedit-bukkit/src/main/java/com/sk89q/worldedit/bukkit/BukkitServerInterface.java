@@ -275,7 +275,7 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     RelighterFactory getRelighterFactory() {
         if (this.relighterFactory == null) {
             this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
-            LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");
+            LOGGER.info("Using {} as relighter factory.", this.relighterFactory.getClass().getCanonicalName());
         }
         return this.relighterFactory;
     }

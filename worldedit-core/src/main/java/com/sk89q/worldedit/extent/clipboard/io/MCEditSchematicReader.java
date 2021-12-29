@@ -206,7 +206,7 @@ public class MCEditSchematicReader extends NBTSchematicReader {
             //FAWE start - tile entity safety - perhaps caused by the old issue with tile entities created in the wrong
             // position in schematics?
             if (index >= blocks.length) {
-                LOGGER.warn("Skipping corrupt tile entity at position " + x + " " + y + " " + z + " in schematic.");
+                LOGGER.warn("Skipping corrupt tile entity at position {} {} {} in schematic.", x, y, z);
                 continue;
             }
 
@@ -275,8 +275,8 @@ public class MCEditSchematicReader extends NBTSchematicReader {
                             byte data = blockData[index];
                             int combined = block << 8 | data;
                             if (unknownBlocks.add(combined)) {
-                                LOGGER.warn("Unknown block when loading schematic: "
-                                        + block + ":" + data + ". This is most likely a bad schematic.");
+                                LOGGER.warn("Unknown block when loading schematic: {} {}. This is most likely a" +
+                                        "bad schematic.", block, data);
                             }
                         }
                     } catch (WorldEditException ignored) { // BlockArrayClipboard won't throw this
