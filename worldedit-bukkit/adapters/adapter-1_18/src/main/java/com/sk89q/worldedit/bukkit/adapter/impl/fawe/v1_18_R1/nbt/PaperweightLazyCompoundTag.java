@@ -108,7 +108,6 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
         return Collections.emptyList();
     }
 
-    //TODO 1.18 be a ListBinaryTag ?
     public ListTag getListTag(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
         if (tag instanceof net.minecraft.nbt.ListTag) {

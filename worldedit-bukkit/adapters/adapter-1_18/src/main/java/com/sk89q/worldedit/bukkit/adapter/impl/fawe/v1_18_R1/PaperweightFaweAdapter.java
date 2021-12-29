@@ -287,7 +287,6 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         return SideEffectSet.defaults().getSideEffectsToApply();
     }
 
-    //TODO 1.18 address raw access of BlockStateHolder
     public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
         CraftChunk craftChunk = (CraftChunk) chunk;
         LevelChunk levelChunk = craftChunk.getHandle();
