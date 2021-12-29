@@ -13,6 +13,7 @@ import com.sk89q.worldedit.world.registry.BlockMaterial;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.Registries;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -220,55 +221,30 @@ public class BlockTypesCache {
             BIT_MASK = ((1 << BIT_OFFSET) - 1);
             values = new BlockType[size];
 
-            /*Field[] idFields = BlockID.class.getDeclaredFields();
-            for (Field field : idFields) {
-                size = Math.max(field.getInt(null) + 1, size);
-            }
-
-            // Register the statically declared ones first
-            for (Field field : idFields) {
-                if (field.getType() == int.class) {
-                    int internalId = field.getInt(null);
-                    String id = "minecraft:" + field.getName().toLowerCase(Locale.ROOT);
-                    String defaultState = blockMap.remove(id);
-                    if (defaultState == null) {
-                        if (internalId != 0) {
-                            continue;
-                        }
-                        defaultState = id;
-                    }
-                    if (values[internalId] != null) {
-                        throw new IllegalStateException("Invalid duplicate id for " + field.getName());
-                    }
-                    BlockType type = register(defaultState, internalId, stateList, tickList);
-                    // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
-                    values[internalId] = type;
-                }
-            }*/
-
-            // Register "Reserved". Ensure air/reserved and 0/1/2/3
+            // Register reserved IDs. Ensure air/reserved are 0/1/2/3
             {
-                int internalId = 0;
-                for (String id : new String[]{"minecraft:__reserved__", "minecraft:air", "minecraft:cave_air",
-                        "minecraft:void_air"}) {
-                    String defaultState = blockMap.remove(id);
-                    if (defaultState == null) {
-                        defaultState = id;
+                for (Field field : ReservedIDs.class.getDeclaredFields()) {
+                    if (field.getType() == int.class) {
+                        int internalId = field.getInt(null);
+                        String id = "minecraft:" + field.getName().toLowerCase(Locale.ROOT);
+                        String defaultState = blockMap.remove(id);
+                        if (defaultState == null) {
+                            defaultState = id;
+                        }
+                        if (values[internalId] != null) {
+                            throw new IllegalStateException(String.format(
+                                    "Invalid duplicate id for %s! Something has gone very wrong. Are " +
+                                            "any plugins shading FAWE?!", id));
+                        }
+                        BlockType type = register(defaultState, internalId, stateList, tickList);
+                        // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
+                        values[internalId] = type;
                     }
-                    if (values[internalId] != null) {
-                        throw new IllegalStateException(
-                                "Invalid duplicate id for __reserved__! Something has gone very wrong. Are " +
-                                        "any plugins shading FAWE?!");
-                    }
-                    BlockType type = register(defaultState, internalId, stateList, tickList);
-                    // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
-                    values[internalId] = type;
-                    internalId++;
                 }
             }
 
             { // Register real blocks
-                int internalId = 1;
+                int internalId = 0;
                 for (Map.Entry<String, String> entry : blockMap.entrySet()) {
                     String defaultState = entry.getValue();
                     // Skip already registered ids
@@ -326,6 +302,17 @@ public class BlockTypesCache {
             }
             return allProperties;
         }
+    }
+
+    /**
+     * Statically-set reserved IDs. Should be used as minimally as possible, and for IDs that will see frequent use
+     */
+    public static class ReservedIDs {
+        public static final int __RESERVED__ = 0;
+        public static final int AIR = 1;
+        public static final int CAVE_AIR = 2;
+        public static final int VOID_AIR = 3;
+
     }
 
 }

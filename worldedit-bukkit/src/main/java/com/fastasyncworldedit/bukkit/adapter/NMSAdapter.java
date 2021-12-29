@@ -23,8 +23,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         int num_palette = 0;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
-            if (ordinal == 0) {
-                ordinal = 1;
+            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                ordinal = BlockTypesCache.ReservedIDs.AIR;
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -48,11 +48,11 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
-                case 0:
-                    ordinal = 1;
-                case 1:
-                case 2:
-                case 3:
+                case BlockTypesCache.ReservedIDs.__RESERVED__:
+                    ordinal = BlockTypesCache.ReservedIDs.AIR;
+                case BlockTypesCache.ReservedIDs.AIR:
+                case BlockTypesCache.ReservedIDs.CAVE_AIR:
+                case BlockTypesCache.ReservedIDs.VOID_AIR:
                     air++;
                     break;
                 default:
@@ -94,13 +94,13 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         char[] getArr = null;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
-            if (ordinal == 0) {
+            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                 if (getArr == null) {
                     getArr = get.apply(layer);
                 }
                 ordinal = getArr[i];
-                if (ordinal == 0) {
-                    ordinal = 1;
+                if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                    ordinal = BlockTypesCache.ReservedIDs.AIR;
                 }
             }
             int palette = blockToPalette[ordinal];
@@ -119,24 +119,24 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             }
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
-        char lastOrdinal = 0;
+        char lastOrdinal = BlockTypesCache.ReservedIDs.__RESERVED__;
         boolean lastticking = false;
         boolean tick_placed = Settings.settings().EXPERIMENTAL.ALLOW_TICK_PLACED;
         boolean tick_existing = Settings.settings().EXPERIMENTAL.ALLOW_TICK_EXISTING;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
             switch (ordinal) {
-                case 0: {
+                case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
                     if (getArr == null) {
                         getArr = get.apply(layer);
                     }
                     ordinal = getArr[i];
                     switch (ordinal) {
-                        case 0:
-                            ordinal = 1;
-                        case 1:
-                        case 2:
-                        case 3:
+                        case BlockTypesCache.ReservedIDs.__RESERVED__:
+                            ordinal = BlockTypesCache.ReservedIDs.AIR;
+                        case BlockTypesCache.ReservedIDs.AIR:
+                        case BlockTypesCache.ReservedIDs.CAVE_AIR:
+                        case BlockTypesCache.ReservedIDs.VOID_AIR:
                             air++;
                             break;
                         default:
@@ -151,23 +151,19 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                                 }
                                 if (ticking) {
                                     BlockState state = BlockState.getFromOrdinal(ordinal);
-                                    ticking_blocks
-                                            .put(
-                                                    BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
-                                                    WorldEditPlugin.getInstance().getBukkitImplAdapter()
-                                                            .getInternalBlockStateId(state).orElse(0)
-                                            );
+                                    ticking_blocks.put(BlockVector3.at(i & 15, (i >> 8) & 15, (i >> 4) & 15),
+                                            WorldEditPlugin
+                                                    .getInstance()
+                                                    .getBukkitImplAdapter()
+                                                    .getInternalBlockStateId(state)
+                                                    .orElse(0)
+                                    );
                                 }
                             }
                     }
                     set[i] = ordinal;
-                    break;
                 }
-                case 1:
-                case 2:
-                case 3:
-                    air++;
-                    break;
+                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR -> air++;
             }
             if (!fastmode && tick_placed) {
                 boolean ticking;

@@ -11,6 +11,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -324,6 +325,11 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public char[] load(final int layer) {
         updateSectionIndexRange(layer);
         return super.load(layer);
+    }
+
+    @Override
+    protected char defaultOrdinal() {
+        return BlockTypesCache.ReservedIDs.__RESERVED__;
     }
 
     // Checks and updates the various section arrays against the new layer index

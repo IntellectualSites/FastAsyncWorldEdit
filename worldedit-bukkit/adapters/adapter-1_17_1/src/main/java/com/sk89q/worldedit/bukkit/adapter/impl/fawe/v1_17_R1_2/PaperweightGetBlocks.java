@@ -25,6 +25,7 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import net.minecraft.core.BlockPos;
@@ -844,16 +845,16 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         // Section is null, return empty array
         if (section == null) {
             data = new char[4096];
-            Arrays.fill(data, (char) 1);
+            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
             return data;
         }
         if (data != null && data.length != 4096) {
             data = new char[4096];
-            Arrays.fill(data, (char) 1);
+            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
         }
         if (data == null || data == FaweCache.INSTANCE.EMPTY_CHAR_4096) {
             data = new char[4096];
-            Arrays.fill(data, (char) 1);
+            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
         }
         DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(section);
         synchronized (lock) {
@@ -878,8 +879,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     for (int i = 0; i < 4096; i++) {
                         char paletteVal = data[i];
                         char ordinal = adapter.ibdIDToOrdinal(paletteVal);
-                        // Don't read "empty".
-                        data[i] = ordinal == 0 ? 1 : ordinal;
+                        data[i] = ordinal;
                     }
                     return data;
                 }
@@ -898,18 +898,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 val = ordinal(palette.valueFor(i), adapter);
                                 paletteToOrdinal[i] = val;
                             }
-                            // Don't read "empty".
-                            if (val == 0) {
-                                val = 1;
-                            }
                             data[i] = val;
                         }
                     } else {
                         char ordinal = ordinal(palette.valueFor(0), adapter);
-                        // Don't read "empty".
-                        if (ordinal == 0) {
-                            ordinal = 1;
-                        }
                         Arrays.fill(data, ordinal);
                     }
                 } finally {
@@ -929,7 +921,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     private char ordinal(net.minecraft.world.level.block.state.BlockState ibd, PaperweightFaweAdapter adapter) {
         if (ibd == null) {
-            return 1;
+            return BlockTypesCache.ReservedIDs.AIR;
         } else {
             return adapter.adaptToChar(ibd);
         }
