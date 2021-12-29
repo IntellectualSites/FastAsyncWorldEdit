@@ -367,8 +367,8 @@ public class WorldEditPlugin extends JavaPlugin {
             } else {
                 //FAWE start - Identify as FAWE
                 LOGGER.info("FastAsyncWorldEdit could not find a Bukkit adapter for this MC version, "
-                        + "but it seems that you have another implementation of FastAsyncWorldEdit installed (" + platform.getPlatformName() + ") "
-                        + "that handles the world editing.");
+                        + "but it seems that you have another implementation of FastAsyncWorldEdit installed ({}) "
+                        + "that handles the world editing.", platform.getPlatformName());
                 //FAWE end
             }
             this.adapter.invalidate();

@@ -722,7 +722,7 @@ public final class EditSessionBuilder {
                             "FAWE config.yml to let FAWE recognize the extent:"));
                     event.getActor().print(toReturn.getClass().getName());
                 } else {
-                    LOGGER.warn("Potentially unsafe extent blocked: " + toReturn.getClass().getName());
+                    LOGGER.warn("Potentially unsafe extent blocked: {}", toReturn.getClass().getName());
                     LOGGER.warn(
                             " - For area restrictions and block logging, it is recommended that third party plugins use the FAWE API");
                     LOGGER.warn(

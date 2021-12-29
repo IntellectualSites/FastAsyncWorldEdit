@@ -377,8 +377,8 @@ public abstract class ChunkListener implements Listener {
                             if (Math.abs(velocity.getX()) > vertical
                                     || Math.abs(velocity.getZ()) > vertical) {
                                 LOGGER.warn(
-                                        "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at "
-                                                + ent.getLocation());
+                                        "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at {}",
+                                        ent.getLocation());
                                 ent.remove();
                             }
                         }
@@ -408,7 +408,7 @@ public abstract class ChunkListener implements Listener {
             if (rateLimit <= 0) {
                 rateLimit = 20;
                 LOGGER.warn(
-                        "[FAWE `tick-limiter`] Detected and cancelled item lag source at " + loc);
+                        "[FAWE `tick-limiter`] Detected and cancelled item lag source at {}", loc);
             }
             event.setCancelled(true);
         }

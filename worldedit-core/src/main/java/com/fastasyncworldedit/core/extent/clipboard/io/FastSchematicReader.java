@@ -178,7 +178,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                 try {
                     state = BlockState.get(palettePart);
                 } catch (InputParseException ignored) {
-                    LOGGER.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
+                    LOGGER.warn("Invalid BlockState in palette: {}. Block will be replaced with air.", palettePart);
                     state = BlockTypes.AIR.getDefaultState();
                 }
                 int index = (int) entry.getValue();
