@@ -514,7 +514,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             } else if (state instanceof net.minecraft.world.level.block.state.properties.IntegerProperty) {
                 property = new IntegerProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
             } else {
-                throw new IllegalArgumentException("WorldEdit needs an update to support " + state.getClass().getSimpleName());
+                throw new IllegalArgumentException("FastAsyncWorldEdit needs an update to support " + state.getClass().getSimpleName());
             }
 
             properties.put(property.getName(), property);

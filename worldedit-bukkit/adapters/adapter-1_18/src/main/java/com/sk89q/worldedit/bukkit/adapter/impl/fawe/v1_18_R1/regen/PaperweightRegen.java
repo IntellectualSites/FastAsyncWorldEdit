@@ -193,7 +193,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         org.bukkit.generator.ChunkGenerator generator = originalBukkitWorld.getGenerator();
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(tempDir);
         ResourceKey<LevelStem> levelStemResourceKey = getWorldDimKey(environment);
-        session = levelStorageSource.createAccess("worldeditregentempworld", levelStemResourceKey);
+        session = levelStorageSource.createAccess("faweregentempworld", levelStemResourceKey);
         PrimaryLevelData originalWorldData = originalServerWorld.serverLevelData;
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
@@ -203,7 +203,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 ? PaperweightAdapter.replaceSeed(originalServerWorld, seed, originalOpts)
                 : originalOpts;
         LevelSettings newWorldSettings = new LevelSettings(
-                "worldeditregentempworld",
+                "faweregentempworld",
                 originalWorldData.settings.gameType(),
                 originalWorldData.settings.hardcore(),
                 originalWorldData.settings.difficulty(),
@@ -389,7 +389,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         Fawe.instance().getQueueHandler().sync(() -> {
             try {
                 Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
-                map.remove("worldeditregentempworld");
+                map.remove("faweregentempworld");
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
