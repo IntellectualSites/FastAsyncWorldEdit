@@ -50,9 +50,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             switch (ordinal) {
                 case BlockTypesCache.ReservedIDs.__RESERVED__:
                     ordinal = BlockTypesCache.ReservedIDs.AIR;
-                case BlockTypesCache.ReservedIDs.AIR:
-                case BlockTypesCache.ReservedIDs.CAVE_AIR:
-                case BlockTypesCache.ReservedIDs.VOID_AIR:
+                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR:
                     air++;
                     break;
                 default:
@@ -130,15 +128,12 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                     if (getArr == null) {
                         getArr = get.apply(layer);
                     }
-                    ordinal = getArr[i];
-                    switch (ordinal) {
+                    set[i] = switch (ordinal = getArr[i]) {
                         case BlockTypesCache.ReservedIDs.__RESERVED__:
                             ordinal = BlockTypesCache.ReservedIDs.AIR;
-                        case BlockTypesCache.ReservedIDs.AIR:
-                        case BlockTypesCache.ReservedIDs.CAVE_AIR:
-                        case BlockTypesCache.ReservedIDs.VOID_AIR:
+                        case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR:
                             air++;
-                            break;
+                            yield ordinal;
                         default:
                             if (!fastmode && !tick_placed && tick_existing) {
                                 boolean ticking;
@@ -160,8 +155,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                                     );
                                 }
                             }
-                    }
-                    set[i] = ordinal;
+                            yield ordinal;
+                    };
                 }
                 case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR -> air++;
             }
