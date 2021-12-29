@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R1;
 
-import ca.spottedleaf.starlight.common.light.StarLightEngine;
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
@@ -12,8 +11,6 @@ import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -41,6 +38,9 @@ import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.StringBinaryTag;
 import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -275,7 +275,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
             BlockEntity blockEntity = chunk.getBlockEntity(blockPos, LevelChunk.EntityCreationType.CHECK);
             if (blockEntity != null) {
                 net.minecraft.nbt.CompoundTag tag = blockEntity.saveWithId();
-                return state.toBaseBlock((CompoundTag) toNative(tag));
+                return state.toBaseBlock((CompoundBinaryTag) toNativeBinary(tag));
             }
         }
 
@@ -308,7 +308,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
         levelChunk.removeBlockEntity(blockPos); // Force delete the old tile entity
 
-        CompoundTag compoundTag = state instanceof BaseBlock ? state.getNbtData() : null;
+        CompoundBinaryTag compoundTag = state instanceof BaseBlock ? state.getNbt() : null;
         if (compoundTag != null || existing instanceof TileEntityBlock) {
             level.setBlock(blockPos, blockState, 0);
             // remove tile
@@ -317,7 +317,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 // though we do not do this on the Forge version
                 BlockEntity blockEntity = level.getBlockEntity(blockPos);
                 if (blockEntity != null) {
-                    net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) fromNative(compoundTag);
+                    net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) fromNativeBinary(compoundTag);
                     tag.put("x", IntTag.valueOf(x));
                     tag.put("y", IntTag.valueOf(y));
                     tag.put("z", IntTag.valueOf(z));
@@ -356,14 +356,15 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         if (id != null) {
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
             //TODO 1.18 be a CBT ?
-            Supplier<CompoundTag> saveTag = () -> {
+            Supplier<CompoundBinaryTag> saveTag = () -> {
                 final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
                 readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
-                final CompoundTag tag = (CompoundTag) toNative(minecraftTag);
-                final Map<String, Tag> tags = new HashMap<>(tag.getValue());
-                tags.put("Id", new StringTag(id));
-                return new CompoundTag(tags);
+                final CompoundBinaryTag tag = (CompoundBinaryTag) toNativeBinary(minecraftTag);
+                final Map<String, BinaryTag> tags = new HashMap<>();
+                tag.keySet().forEach(key -> tags.put(key, tag.get(key)));
+                tags.put("Id", StringBinaryTag.of(id));
+                return CompoundBinaryTag.from(tags);
             };
             return new LazyBaseEntity(type, saveTag);
         } else {
@@ -598,7 +599,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
-        weStack.setNbtData(((CompoundTag) toNative(nmsStack.getTag())));
+        weStack.setNbt(((CompoundBinaryTag) toNativeBinary(nmsStack.getTag())));
         return weStack;
     }
 

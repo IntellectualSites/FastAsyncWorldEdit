@@ -85,7 +85,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     public static final Field fieldPalette;
 
 
-    public static final Field fieldTickingFluidContent;
+    public static final Field fieldTickingFluidCount;
     public static final Field fieldTickingBlockCount;
     public static final Field fieldNonEmptyBlockCount;
 
@@ -114,14 +114,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             dataConstructor = dataClazz.getDeclaredConstructors()[0];
             dataConstructor.setAccessible(true);
 
-            //TODO FIXME 1.18
             fieldStorage = dataClazz.getDeclaredField(Refraction.pickName("storage", "b"));
             fieldStorage.setAccessible(true);
             fieldPalette = dataClazz.getDeclaredField(Refraction.pickName("palette", "c"));
             fieldPalette.setAccessible(true);
 
-            fieldTickingFluidContent = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "h"));
-            fieldTickingFluidContent.setAccessible(true);
+            fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "h"));
+            fieldTickingFluidCount.setAccessible(true);
             fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "g"));
             fieldTickingBlockCount.setAccessible(true);
             fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("nonEmptyBlockCount", "f"));
@@ -544,7 +543,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final LevelChunkSection section) throws
             IllegalAccessException {
-        fieldTickingFluidContent.setShort(section, (short) 0); // TODO FIXME
+        fieldTickingFluidCount.setShort(section, (short) 0); // TODO FIXME
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
     }

@@ -56,6 +56,7 @@ import com.sk89q.worldedit.registry.state.IntegerProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.SideEffect;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
@@ -171,11 +172,11 @@ import static com.google.common.base.Preconditions.checkState;
 
 public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft.nbt.Tag> {
 
-    private final Logger logger = Logger.getLogger(getClass().getCanonicalName());
+    private final Logger LOGGER = Logger.getLogger(getClass().getCanonicalName());
 
-    private final Field serverWorldsField;
-    private final Method getChunkFutureMethod;
-    private final Field chunkProviderExecutorField;
+    private final Field worldsField;
+    private final Method getChunkFutureMainThreadMethod;
+    private final Field mainThreadProcessorField;
     private final Watchdog watchdog;
 
     // ------------------------------------------------------------------------
@@ -191,18 +192,18 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             throw new UnsupportedClassVersionError("Not 1.17.1!");
         }
 
-        serverWorldsField = CraftServer.class.getDeclaredField("worlds");
-        serverWorldsField.setAccessible(true);
+        worldsField = CraftServer.class.getDeclaredField("worlds");
+        worldsField.setAccessible(true);
 
-        getChunkFutureMethod = ServerChunkCache.class.getDeclaredMethod("getChunkFutureMainThread",
+        getChunkFutureMainThreadMethod = ServerChunkCache.class.getDeclaredMethod("getChunkFutureMainThread",
                 int.class, int.class, ChunkStatus.class, boolean.class
         );
-        getChunkFutureMethod.setAccessible(true);
+        getChunkFutureMainThreadMethod.setAccessible(true);
 
-        chunkProviderExecutorField = ServerChunkCache.class.getDeclaredField(
+        mainThreadProcessorField = ServerChunkCache.class.getDeclaredField(
                 Refraction.pickName("mainThreadProcessor", "h")
         );
-        chunkProviderExecutorField.setAccessible(true);
+        mainThreadProcessorField.setAccessible(true);
 
         new PaperweightDataConverters(CraftMagicNumbers.INSTANCE.getDataVersion(), this).build(ForkJoinPool.commonPool());
 
@@ -435,7 +436,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         readEntityIntoTag(mcEntity, tag);
-        return new BaseEntity(com.sk89q.worldedit.world.entity.EntityTypes.get(id), (CompoundTag) toNative(tag));
+        return new BaseEntity(
+                com.sk89q.worldedit.world.entity.EntityTypes.get(id),
+                LazyReference.from(() -> (CompoundBinaryTag) toNativeBinary(tag))
+        );
     }
 
     @Nullable
@@ -667,7 +671,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         } finally {
             try {
                 @SuppressWarnings("unchecked")
-                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
+                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) worldsField.get(Bukkit.getServer());
                 map.remove("worldeditregentempworld");
             } catch (IllegalAccessException ignored) {
             }
@@ -740,7 +744,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         List<CompletableFuture<ChunkAccess>> chunkLoadings = submitChunkLoadTasks(region, serverWorld);
         BlockableEventLoop<Runnable> executor;
         try {
-            executor = (BlockableEventLoop<Runnable>) chunkProviderExecutorField.get(serverWorld.getChunkSource());
+            executor = (BlockableEventLoop<Runnable>) mainThreadProcessorField.get(serverWorld.getChunkSource());
         } catch (IllegalAccessException e) {
             throw new IllegalStateException("Couldn't get executor for chunk loading.", e);
         }
@@ -801,7 +805,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 //noinspection unchecked
                 chunkLoadings.add(
                         ((CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>)
-                                getChunkFutureMethod.invoke(chunkManager, chunk.getX(), chunk.getZ(), ChunkStatus.FEATURES, true))
+                                getChunkFutureMainThreadMethod.invoke(chunkManager, chunk.getX(), chunk.getZ(), ChunkStatus.FEATURES, true))
                                 .thenApply(either -> either.left().orElse(null))
                 );
             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -893,7 +897,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             try {
                 return toNativeList((net.minecraft.nbt.ListTag) foreign);
             } catch (Throwable e) {
-                logger.log(Level.WARNING, "Failed to convert net.minecraft.nbt.ListTag", e);
+                LOGGER.log(Level.WARNING, "Failed to convert net.minecraft.nbt.ListTag", e);
                 return ListBinaryTag.empty();
             }
         } else if (foreign instanceof net.minecraft.nbt.LongTag) {
@@ -1012,7 +1016,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                     WatchdogThread.tick();
                 }
             } catch (IllegalAccessException e) {
-                logger.log(Level.WARNING, "Failed to tick watchdog", e);
+                LOGGER.log(Level.WARNING, "Failed to tick watchdog", e);
             }
         }
 

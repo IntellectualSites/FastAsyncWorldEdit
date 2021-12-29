@@ -86,7 +86,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final long fieldLockOffset;
 
     private static final Field fieldGameEventDispatcherSections;
-    private static final MethodHandle methodremoveTickingBlockEntity;
+    private static final MethodHandle methodremoveBlockEntityTicker;
 
     private static final Field fieldRemove;
 
@@ -133,7 +133,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     ), BlockPos.class
             );
             removeBlockEntityTicker.setAccessible(true);
-            methodremoveTickingBlockEntity = MethodHandles.lookup().unreflect(removeBlockEntityTicker);
+            methodremoveBlockEntityTicker = MethodHandles.lookup().unreflect(removeBlockEntityTicker);
 
             fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
@@ -440,7 +440,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     fieldRemove.set(beacon, true);
                 }
             }
-            methodremoveTickingBlockEntity.invoke(levelChunk, beacon.getBlockPos());
+            methodremoveBlockEntityTicker.invoke(levelChunk, beacon.getBlockPos());
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
