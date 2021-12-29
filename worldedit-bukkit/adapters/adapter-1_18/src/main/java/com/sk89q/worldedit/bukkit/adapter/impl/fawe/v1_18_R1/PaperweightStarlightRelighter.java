@@ -70,7 +70,6 @@ public class PaperweightStarlightRelighter implements Relighter {
     private final ReentrantLock areaLock = new ReentrantLock();
     private final NMSRelighter delegate;
 
-    //TODO 1.18 address raw access of IQueueChunk
     public PaperweightStarlightRelighter(ServerLevel serverLevel, IQueueExtent<IQueueChunk> queue) {
         this.serverLevel = serverLevel;
         this.delegate = new NMSRelighter(queue);

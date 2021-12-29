@@ -229,7 +229,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    //TODO 1.18 be CBT?
     public CompoundTag getTile(int x, int y, int z) {
         BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
                 chunkX << 4), y, (z & 15) + (
@@ -314,7 +313,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         Entity entity = serverLevel.getEntity(uuid);
         if (entity != null) {
             org.bukkit.entity.Entity bukkitEnt = entity.getBukkitEntity();
-            //TODO 1.18 CBT & #getNbt?
             return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
         }
         for (List<Entity> entry : /*getChunk().getEntitySlices()*/ new List[0]) {

@@ -26,7 +26,6 @@ public class PaperweightBlockMaterial implements BlockMaterial {
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
     private final int opacity;
-    //TODO 1.18 be a CompoundBinaryTag ?
     private final CompoundTag tile;
 
     public PaperweightBlockMaterial(Block block) {

@@ -354,7 +354,6 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
         if (id != null) {
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
-            //TODO 1.18 be a CBT ?
             Supplier<CompoundBinaryTag> saveTag = () -> {
                 final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
                 readEntityIntoTag(mcEntity, minecraftTag);
