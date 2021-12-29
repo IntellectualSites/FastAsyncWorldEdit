@@ -305,8 +305,8 @@ public class ParserContext {
             minY = extent.getMinY();
             maxY = extent.getMaxY();
         } else {
-            minY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY();
-            maxY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY();
+            minY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY();
+            maxY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY();
         }
 
         return minY;

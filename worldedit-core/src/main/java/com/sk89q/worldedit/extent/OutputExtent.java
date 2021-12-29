@@ -97,8 +97,8 @@ public interface OutputExtent {
     @Deprecated
     default boolean setBiome(BlockVector2 position, BiomeType biome) {
         boolean result = false;
-        int minY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY();
-        int maxY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY();
+        int minY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY();
+        int maxY = WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY();
         for (int y = minY; y < maxY; y++) {
             result |= setBiome(position.toBlockVector3().mutY(y), biome);
         }

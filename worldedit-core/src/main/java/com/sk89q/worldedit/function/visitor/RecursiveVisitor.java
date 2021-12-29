@@ -44,8 +44,8 @@ public class RecursiveVisitor extends BreadthFirstSearch {
      */
     public RecursiveVisitor(Mask mask, RegionFunction function) {
         this(mask, function, Integer.MAX_VALUE, WorldEdit
-                        .getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY(), null
+                        .getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY(), null
         );
         //FAWE end
     }

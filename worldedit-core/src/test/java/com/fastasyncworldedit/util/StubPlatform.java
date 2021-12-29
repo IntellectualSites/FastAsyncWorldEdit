@@ -100,13 +100,13 @@ public class StubPlatform extends AbstractPlatform {
 
     // Use most "extreme" value
     @Override
-    public int getVersionMinY() {
+    public int versionMinY() {
         return -64;
     }
 
     // Use most "extreme" value
     @Override
-    public int getVersionMaxY() {
+    public int versionMaxY() {
         return 319;
     }
 

@@ -113,8 +113,8 @@ public abstract class BreadthFirstSearch implements Operation {
     public BreadthFirstSearch(RegionFunction function) {
         //FAWE start - int depth, min/max y
         this(function, Integer.MAX_VALUE,
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY(), null
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY(), null
         );
     }
 

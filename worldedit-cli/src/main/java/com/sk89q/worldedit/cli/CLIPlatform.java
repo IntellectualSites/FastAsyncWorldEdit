@@ -171,12 +171,12 @@ class CLIPlatform extends AbstractPlatform {
     }
 
     @Override
-    public int getVersionMinY() {
+    public int versionMinY() {
         return dataVersion >= Constants.DATA_VERSION_MC_1_18 ? -64 : 0;
     }
 
     @Override
-    public int getVersionMaxY() {
+    public int versionMaxY() {
         return dataVersion >= Constants.DATA_VERSION_MC_1_18 ? 319 : 255;
     }
 

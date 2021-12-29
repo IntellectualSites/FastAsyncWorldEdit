@@ -68,12 +68,12 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public int getMinY() {
-        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY();
+        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY();
     }
 
     @Override
     public int getMaxY() {
-        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY();
+        return WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY();
     }
 
     @Override

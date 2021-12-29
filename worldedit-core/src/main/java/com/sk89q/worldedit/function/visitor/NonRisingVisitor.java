@@ -42,8 +42,8 @@ public class NonRisingVisitor extends RecursiveVisitor {
     public NonRisingVisitor(Mask mask, RegionFunction function) {
         //FAWE start - int depth, y min/max
         this(mask, function, Integer.MAX_VALUE, WorldEdit
-                        .getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY(), null
+                        .getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY(), null
         );
         //FAWE end
     }

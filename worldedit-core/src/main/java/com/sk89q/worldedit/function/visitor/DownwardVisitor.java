@@ -51,8 +51,8 @@ public class DownwardVisitor extends RecursiveVisitor {
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
         //FAWE start - int depth, min/max y
         this(mask, function, baseY, Integer.MAX_VALUE, WorldEdit
-                        .getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY(), null
+                        .getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY(), null
         );
         //FAWE end
     }

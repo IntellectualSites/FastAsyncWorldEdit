@@ -50,8 +50,8 @@ public class OffsetMask extends AbstractMask {
     @Deprecated
     public OffsetMask(Mask mask, BlockVector3 offset) {
         this(mask, offset,
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY()
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY()
         );
     }
 

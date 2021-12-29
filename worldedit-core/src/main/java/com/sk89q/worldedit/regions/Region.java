@@ -234,12 +234,12 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 .getPlatformManager()
                 .queryCapability(
                         Capability.WORLD_EDITING)
-                .getVersionMinY()
+                .versionMinY()
                 && pos2.getBlockY() >= WorldEdit
                 .getInstance()
                 .getPlatformManager()
                 .queryCapability(Capability.WORLD_EDITING)
-                .getVersionMaxY();
+                .versionMaxY();
     }
 
     default int getMinimumY() {

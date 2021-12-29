@@ -31,8 +31,8 @@ public class RegionWrapper extends CuboidRegion {
     public RegionWrapper(final int minX, final int maxX, final int minZ, final int maxZ) {
         this(minX,
                 maxX,
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMinY(),
-                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).getVersionMaxY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY(),
                 minZ,
                 maxZ
         );

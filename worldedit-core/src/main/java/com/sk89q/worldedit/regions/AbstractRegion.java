@@ -228,7 +228,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
                 .getInstance()
                 .getPlatformManager()
                 .queryCapability(Capability.WORLD_EDITING)
-                .getVersionMinY() : world.getMinY();
+                .versionMinY() : world.getMinY();
         //FAWE end
     }
 
@@ -238,7 +238,7 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
                 .getInstance()
                 .getPlatformManager()
                 .queryCapability(Capability.WORLD_EDITING)
-                .getVersionMaxY() : world.getMaxY();
+                .versionMaxY() : world.getMaxY();
         //FAWE end
     }
 
