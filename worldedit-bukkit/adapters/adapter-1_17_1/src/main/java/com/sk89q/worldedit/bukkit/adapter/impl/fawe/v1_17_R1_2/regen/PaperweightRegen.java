@@ -414,15 +414,11 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     }
 
     private ResourceKey<LevelStem> getWorldDimKey(org.bukkit.World.Environment env) {
-        switch (env) {
-            case NETHER:
-                return LevelStem.NETHER;
-            case THE_END:
-                return LevelStem.END;
-            case NORMAL:
-            default:
-                return LevelStem.OVERWORLD;
-        }
+        return switch (env) {
+            case NETHER -> LevelStem.NETHER;
+            case THE_END -> LevelStem.END;
+            default -> LevelStem.OVERWORLD;
+        };
     }
 
     private BiomeSource fastOverworldBiomeSource(BiomeSource biomeSource) throws Exception {
