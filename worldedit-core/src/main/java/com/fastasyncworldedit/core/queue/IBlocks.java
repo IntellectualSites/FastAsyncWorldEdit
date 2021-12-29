@@ -116,9 +116,7 @@ public interface IBlocks extends Trimable {
                 for (int i = 0; i < ids.length; i++) {
                     char ordinal = ids[i];
                     switch (ordinal) {
-                        case BlockTypesCache.ReservedIDs.__RESERVED__:
-                        case BlockTypesCache.ReservedIDs.CAVE_AIR:
-                        case BlockTypesCache.ReservedIDs.VOID_AIR:
+                        case BlockTypesCache.ReservedIDs.__RESERVED__, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR:
                             ids[i] = BlockTypesCache.ReservedIDs.AIR;
                         case BlockTypesCache.ReservedIDs.AIR:
                             continue;
@@ -140,17 +138,13 @@ public interface IBlocks extends Trimable {
                 for (int i = 0; i < palette.paletteToBlockLength; i++) {
                     int ordinal = palette.paletteToBlock[i];
                     switch (ordinal) {
-                        case BlockTypesCache.ReservedIDs.__RESERVED__:
-                        case BlockTypesCache.ReservedIDs.AIR:
-                        case BlockTypesCache.ReservedIDs.CAVE_AIR:
-                        case BlockTypesCache.ReservedIDs.VOID_AIR:
-                            sectionWriter.write(0);
-                            break;
-                        default:
+                        case BlockTypesCache.ReservedIDs.__RESERVED__, BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR,
+                                BlockTypesCache.ReservedIDs.VOID_AIR -> sectionWriter.write(0);
+                        default -> {
                             BlockState state = BlockState.getFromOrdinal(ordinal);
                             int mcId = registry.getInternalBlockStateId(state).getAsInt();
                             sectionWriter.writeVarInt(mcId);
-                            break;
+                        }
                     }
                 }
                 sectionWriter.writeVarInt(palette.blockStatesLength);

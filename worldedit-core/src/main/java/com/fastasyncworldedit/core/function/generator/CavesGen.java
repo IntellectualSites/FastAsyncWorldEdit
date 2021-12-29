@@ -277,17 +277,10 @@ public class CavesGen extends GenBase {
     }
 
     protected boolean isSuitableBlock(BlockStateHolder material, BlockStateHolder materialAbove) {
-        switch (material.getBlockType().getId()) {
-            case "minecraft:air":
-            case "minecraft:cave_air":
-            case "minecraft:void_air":
-            case "minecraft:water":
-            case "minecraft:lava":
-            case "minecraft:bedrock":
-                return false;
-            default:
-                return true;
-        }
+        return switch (material.getBlockType().getId()) {
+            case "minecraft:air", "minecraft:cave_air", "minecraft:void_air", "minecraft:water", "minecraft:lava", "minecraft:bedrock" -> false;
+            default -> true;
+        };
     }
 
     @Override
