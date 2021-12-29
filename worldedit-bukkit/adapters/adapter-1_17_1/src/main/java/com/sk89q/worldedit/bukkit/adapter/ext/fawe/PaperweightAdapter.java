@@ -436,10 +436,12 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         readEntityIntoTag(mcEntity, tag);
+        //FAWE start - BinaryTag
         return new BaseEntity(
                 com.sk89q.worldedit.world.entity.EntityTypes.get(id),
                 LazyReference.from(() -> (CompoundBinaryTag) toNativeBinary(tag))
         );
+        //FAWE end
     }
 
     @Nullable
