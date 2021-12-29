@@ -1,7 +1,7 @@
 [versions]
 # Minecraft expectations
 fastutil = "8.5.6"
-log4j = "2.17.0"
+log4j = "2.17.1"
 guava = "31.0.1-jre"
 gson = "2.8.9"
 
