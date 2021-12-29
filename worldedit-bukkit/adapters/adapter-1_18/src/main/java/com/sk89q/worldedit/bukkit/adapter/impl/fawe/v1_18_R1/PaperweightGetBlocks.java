@@ -673,7 +673,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     }
 
                     syncTasks[1] = () -> {
-                        //TODO 1.18 be a CBT & ListBinaryTag ?
                         for (final CompoundTag nativeTag : entities) {
                             final Map<String, Tag> entityTagMap = nativeTag.getValue();
                             final StringTag idTag = (StringTag) entityTagMap.get("Id");
@@ -769,7 +768,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     Runnable[] finalSyncTasks = syncTasks;
 
                     // Chain the sync tasks and the callback
-                    //TODO 1.18 address raw access
                     Callable<Future> chain = () -> {
                         try {
                             // Run the sync tasks
@@ -791,6 +789,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             throw e;
                         }
                     };
+                    //noinspection unchecked - required at compile time
                     return (T) (Future) queueHandler.sync(chain);
                 } else {
                     if (callback == null) {
@@ -1089,7 +1088,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocksExisting = existing.getStates();
 
                     final Object dataObject = PaperweightPlatformAdapter.fieldData.get(blocksExisting);
-                    //TODO this field doesn't exist in 1.18
                     final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.fieldPalette.get(
                             dataObject);
                     int paletteSize;

@@ -761,6 +761,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             throw e;
                         }
                     };
+                    //noinspection unchecked - required at compile time
                     return (T) (Future) queueHandler.sync(chain);
                 } else {
                     if (callback == null) {
