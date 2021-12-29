@@ -68,7 +68,6 @@ public class FaweBukkit implements IFawe, Listener {
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
         try {
-            Settings.settings().TICK_LIMITER.ENABLED = !Bukkit.hasWhitelist();
             Fawe.set(this);
             Fawe.setupInjector();
             try {
