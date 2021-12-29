@@ -876,8 +876,7 @@ public class UtilityCommands {
                 }
                 try {
                     if (!MainUtil.isInSubDirectory(root, file)) {
-                        throw new RuntimeException(
-                                new StopExecutionException(TextComponent.of("Invalid path")));
+                        throw new StopExecutionException(TextComponent.of("Invalid path"));
                     }
                 } catch (IOException ignored) {
                 }
