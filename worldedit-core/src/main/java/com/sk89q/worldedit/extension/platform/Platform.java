@@ -239,11 +239,13 @@ public interface Platform extends Keyed {
 
     /**
      * Get the default minimum Y value of worlds based on Minecraft version (inclusive).
+     * @since 2.0.0
      */
     int versionMinY();
 
     /**
      * Get the default maximum Y value of worlds based on Minecraft version (inclusive).
+     * @since 2.0.0
      */
     int versionMaxY();
     //FAWE end
