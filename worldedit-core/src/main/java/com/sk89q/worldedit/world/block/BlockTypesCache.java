@@ -232,9 +232,16 @@ public class BlockTypesCache {
                             defaultState = id;
                         }
                         if (values[internalId] != null) {
-                            throw new IllegalStateException(String.format(
-                                    "Invalid duplicate id for %s! Something has gone very wrong. Are " +
-                                            "any plugins shading FAWE?!", id));
+                            // Ugly way of ensuring a stacktrace is printed so we can see the culprit. Rethrow because we still
+                            // want to cancel whatever initialised the class.
+                            try {
+                                throw new IllegalStateException(String.format(
+                                        "Invalid duplicate id for %s! Something has gone very wrong. Are " +
+                                                "any plugins shading FAWE?!", id));
+                            } catch (IllegalStateException e) {
+                                e.printStackTrace();
+                                throw e;
+                            }
                         }
                         BlockType type = register(defaultState, internalId, stateList, tickList);
                         // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
