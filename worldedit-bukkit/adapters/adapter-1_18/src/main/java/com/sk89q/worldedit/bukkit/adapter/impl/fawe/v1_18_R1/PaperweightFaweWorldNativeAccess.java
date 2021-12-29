@@ -275,7 +275,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         cachedChunksToSend.clear();
     }
 
-    private static final record CachedChange(
+    private record CachedChange(
             LevelChunk levelChunk,
             BlockPos blockPos,
             net.minecraft.world.level.block.state.BlockState blockState
