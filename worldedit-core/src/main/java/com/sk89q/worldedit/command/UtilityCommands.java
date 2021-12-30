@@ -25,6 +25,7 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.function.QuadFunction;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MaskTraverser;
+import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.fastasyncworldedit.core.util.task.DelegateConsumer;
@@ -1034,15 +1035,12 @@ public class UtilityCommands {
             if (listMine) {
                 File playerDir = MainUtil.resolveRelative(new File(dir, actor.getUniqueId() + dirFilter));
                 //FAWE start - Schematic list other permission
-                if (!actor.hasPermission("worldedit.schematic.list.other") && java.util.regex.Pattern
-                        .compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}") // See SchematicCommands: 361
-                        .matcher(dirFilter)
-                        .find()) {
+                if (!actor.hasPermission("worldedit.schematic.list.other") && StringMan.containsUuid(dirFilter)) {
                     return;
                 }
                 if (playerDir.exists()) {
                     if (!actor.hasPermission("worldedit.schematic.list.other")) {
-                        forEachFile = new DelegateConsumer<File>(forEachFile) {
+                        forEachFile = new DelegateConsumer<>(forEachFile) {
                             @Override
                             public void accept(File f) {
                                 try {

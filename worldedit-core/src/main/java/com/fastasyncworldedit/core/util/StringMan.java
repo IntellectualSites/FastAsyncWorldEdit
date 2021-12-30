@@ -9,10 +9,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class StringMan {
+
+    private static final Pattern UUID_PATTERN = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
 
     public static boolean containsAny(CharSequence sequence, String any) {
         return IntStream.range(0, sequence.length())
@@ -540,6 +543,10 @@ public class StringMan {
 
     public static String repeat(String s, int n) {
         return IntStream.range(0, n).mapToObj(i -> s).collect(Collectors.joining());
+    }
+
+    public static boolean containsUuid(String str) {
+        return UUID_PATTERN.matcher(str).find();
     }
 
 }
