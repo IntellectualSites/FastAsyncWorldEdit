@@ -83,7 +83,9 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getServer().shutdown();
         }
 
-        chunksStretched = new MinecraftVersion().isEqualOrHigherThan(MinecraftVersion.NETHER);
+        MinecraftVersion version = new MinecraftVersion();
+
+        chunksStretched = version.isEqualOrHigherThan(MinecraftVersion.NETHER);
 
         platformAdapter = new NMSAdapter();
 
@@ -102,6 +104,11 @@ public class FaweBukkit implements IFawe, Listener {
             // The tick limiter
             new ChunkListener9();
         });
+
+        // Warn if small-edits are enabled with extended world heights
+        if (version.isEqualOrHigherThan(MinecraftVersion.CAVES_18) && Settings.settings().HISTORY.SMALL_EDITS) {
+            LOGGER.warn("Small-edits enabled (maximum y range of 0 -> 256) with 1.18 world heights. Are you sure?");
+        }
     }
 
     @Override
