@@ -1033,7 +1033,30 @@ public class UtilityCommands {
         if (playerFolder) {
             if (listMine) {
                 File playerDir = MainUtil.resolveRelative(new File(dir, actor.getUniqueId() + dirFilter));
+                //FAWE start - Schematic list other permission
+                if (!actor.hasPermission("worldedit.schematic.list.other") && java.util.regex.Pattern
+                        .compile("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}") // See SchematicCommands: 361
+                        .matcher(dirFilter)
+                        .find()) {
+                    return;
+                }
                 if (playerDir.exists()) {
+                    if (!actor.hasPermission("worldedit.schematic.list.other")) {
+                        forEachFile = new DelegateConsumer<File>(forEachFile) {
+                            @Override
+                            public void accept(File f) {
+                                try {
+                                    if (f.isDirectory() && !UUID.fromString(f.getName()).equals(actor.getUniqueId())) { // Ignore
+                                        // directories of other players
+                                        return;
+                                    }
+                                } catch (IllegalArgumentException ignored) {
+                                }
+                                super.accept(f);
+                            }
+                        };
+                    }
+                    //FAWE end
                     allFiles(playerDir.listFiles(), false, forEachFile);
                 }
             }
