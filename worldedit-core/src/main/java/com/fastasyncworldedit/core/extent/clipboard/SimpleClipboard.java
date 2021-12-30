@@ -7,10 +7,10 @@ import com.sk89q.worldedit.regions.Region;
 
 public abstract class SimpleClipboard implements Clipboard {
 
+    protected BlockVector3 offset;
     private final BlockVector3 size;
     private final int area;
     private final int volume;
-    private BlockVector3 offset;
     private BlockVector3 origin;
 
     SimpleClipboard(BlockVector3 dimensions, BlockVector3 offset) {

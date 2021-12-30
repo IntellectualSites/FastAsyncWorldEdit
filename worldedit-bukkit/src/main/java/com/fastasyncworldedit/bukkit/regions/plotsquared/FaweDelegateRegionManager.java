@@ -220,13 +220,17 @@ public class FaweDelegateRegionManager {
                 Clipboard clipB = Clipboard.create(regionB, UUID.randomUUID());
                 ForwardExtentCopy copyA = new ForwardExtentCopy(sessionA, regionA, clipA, clipA.getMinimumPoint());
                 ForwardExtentCopy copyB = new ForwardExtentCopy(sessionB, regionB, clipB, clipB.getMinimumPoint());
+                copyA.setCopyingBiomes(true);
+                copyB.setCopyingBiomes(true);
                 try {
                     Operations.completeLegacy(copyA);
                     Operations.completeLegacy(copyB);
-                    clipA.paste(sessionB, swapPos.getBlockVector3(), true);
-                    clipB.paste(sessionA, pos1.getBlockVector3(), true);
-                    sessionA.flushQueue();
-                    sessionB.flushQueue();
+                    clipA.flush();
+                    clipB.flush();
+                    clipA.paste(sessionB, swapPos.getBlockVector3(), true, true, true);
+                    clipB.paste(sessionA, pos1.getBlockVector3(), true, true, true);
+                    sessionA.close();
+                    sessionB.close();
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }

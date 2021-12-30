@@ -276,7 +276,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             int offsetZ = byteBuffer.getShort(20);
             region.shift(BlockVector3.at(offsetX, offsetY, offsetZ));
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, this);
-            clipboard.setOrigin(getOrigin());
+            clipboard.setOrigin(getOrigin().add(offset));
             return clipboard;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -289,7 +289,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         int ox = byteBuffer.getShort(10);
         int oy = byteBuffer.getShort(12);
         int oz = byteBuffer.getShort(14);
-        return BlockVector3.at(ox, oy, oz);
+        return BlockVector3.at(ox, oy, oz).subtract(offset);
     }
 
     @Override
