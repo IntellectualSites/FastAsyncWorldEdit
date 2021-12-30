@@ -70,6 +70,10 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
     //FAWE end
 
     //FAWE start
+
+    /**
+     * Creates a new {@link ReadOnlyClipboard}.
+     */
     static Clipboard create(Region region) {
         checkNotNull(region);
         checkNotNull(
@@ -85,6 +89,13 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         return ReadOnlyClipboard.of(session, region);
     }
 
+    /**
+     * Create a new {@link com.fastasyncworldedit.core.extent.clipboard.SimpleClipboard} instance.
+     * Will be one of the following, depending on settings:
+     *  - {@link DiskOptimizedClipboard}
+     *  - {@link CPUOptimizedClipboard}
+     *  - {@link MemoryOptimizedClipboard}
+     */
     static Clipboard create(Region region, UUID uuid) {
         if (Settings.settings().CLIPBOARD.USE_DISK) {
             return new DiskOptimizedClipboard(region, uuid);
@@ -249,7 +260,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
      */
     default EditSession paste(
             World world, BlockVector3 to, boolean allowUndo, boolean pasteAir,
-            boolean copyEntities, @Nullable Transform transform
+            boolean pasteEntities, @Nullable Transform transform
     ) {
         checkNotNull(world);
         checkNotNull(to);
@@ -275,7 +286,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         if (transform != null && !transform.isIdentity()) {
             extent = new BlockTransformExtent(this, transform);
         } else if (sourceMask == null) {
-            paste(editSession, to, pasteAir);
+            paste(editSession, to, pasteAir, pasteEntities, hasBiomes());
             editSession.flushQueue();
             return editSession;
         }
@@ -285,7 +296,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
         if (transform != null && !transform.isIdentity()) {
             copy.setTransform(transform);
         }
-        copy.setCopyingEntities(copyEntities);
+        copy.setCopyingEntities(pasteEntities);
         if (sourceMask != null) {
             new MaskTraverser(sourceMask).reset(extent);
             copy.setSourceMask(sourceMask);
