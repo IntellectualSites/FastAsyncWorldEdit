@@ -545,6 +545,13 @@ public class StringMan {
         return IntStream.range(0, n).mapToObj(i -> s).collect(Collectors.joining());
     }
 
+    /**
+     * Returns if there is a valid uuid contained inside the
+     * provided String.
+     *
+     * @param str provided string
+     * @return true if a uuid was found, false if not
+     */
     public static boolean containsUuid(String str) {
         return UUID_PATTERN.matcher(str).find();
     }
