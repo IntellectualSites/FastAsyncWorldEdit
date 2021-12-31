@@ -3,7 +3,7 @@
 fastutil = "8.5.6"
 log4j = "2.17.1"
 guava = "31.0.1-jre"
-gson = "2.8.9"
+gson = "2.8.8"
 
 # Platform expectations
 paper = "1.18.1-R0.1-SNAPSHOT"

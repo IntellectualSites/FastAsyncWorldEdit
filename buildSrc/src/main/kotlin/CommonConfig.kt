@@ -10,12 +10,7 @@ fun Project.applyCommonConfiguration() {
     version = rootProject.version
 
     repositories {
-        mavenLocal()
         mavenCentral()
-        maven {
-            name = "IntellectualSites"
-            url = uri("https://mvn.intellectualsites.com/content/groups/public/")
-        }
         maven {
             name = "EngineHub"
             url = uri("https://maven.enginehub.org/repo/")
@@ -32,6 +27,7 @@ fun Project.applyCommonConfiguration() {
             name = "Athion"
             url = uri("https://ci.athion.net/plugin/repository/tools/")
         }
+        mavenLocal()
     }
 
     configurations.all {
