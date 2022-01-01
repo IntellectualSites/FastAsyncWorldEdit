@@ -155,7 +155,7 @@ public class Fawe {
 
     /**
      * Get the implementation independent class.
-     * @ use {@link #instance()}
+     * @deprecated use {@link #instance()}
      */
     @Deprecated(forRemoval = true, since = "2.0.0")
     public static Fawe get() {
