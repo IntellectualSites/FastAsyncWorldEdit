@@ -44,3 +44,11 @@ If that is done, you can find a `package-info.java` file within the package affe
 */
 package com.sk89q.worldedit.world.block;
 -----------------
+
+== Undocumented annotations
+Specific changes are not annotated:
+
+* `com.fastasyncworldedit.core.configuration.Caption` in `com.sk89q.worldedit` packages have been changed from
+`com.sk89q.worldedit.util.formatting.text.Text` to allow the usage of color codes for messages.
+
+* Certain Log4J loggers have been adjusted to use the proper format of placeholders.

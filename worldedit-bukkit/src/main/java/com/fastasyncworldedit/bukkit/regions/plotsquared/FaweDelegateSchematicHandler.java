@@ -235,10 +235,8 @@ public class FaweDelegateSchematicHandler {
                     Clipboard clip = schematicReader.read();
                     return new Schematic(clip);
                 } catch (IOException e3) {
+                    LOGGER.warn("{} | {} : {}", is, is.getClass().getCanonicalName(), e.getMessage());
                     e.printStackTrace();
-                    LOGGER.warn(
-                            is + " | " + is.getClass().getCanonicalName() + " is not in GZIP format : " + e
-                                    .getMessage());
                 }
             }
         }
