@@ -1,0 +1,46 @@
+:toc:
+:toclevels: 2
+
+= Fawe annotations explained
+
+If we have modified parts of the WorldEdit codebase, we considered annotating it with different styles of comments, which
+are explained in this document.
+
+== In-line annotations
+
+[source,java]
+-----------------
+public static Player adapt(com.sk89q.worldedit.entity.Player player) {
+        //FAWE start - Get player from PlayerProxy instead of BukkitPlayer if null
+        player = PlayerProxy.unwrap(player);
+        return player == null ? null : ((BukkitPlayer) player).getPlayer();
+        //FAWE end
+}
+-----------------
+The `-sources` jar retains comments, if you add the FAWE API to your maven or gradle project, you can view differences between the projects with ease.
+Behind the `//FAWE start - ` you can find a comment what has been changed and why it has been changed.
+
+== Block annotations
+
+[source,java]
+-----------------
+//FAWE start
+    @Override
+    public void setPermission(String permission, boolean value) {
+    }
+//FAWE end
+-----------------
+Annotations can cover whole methods or go beyond the method and wrap around several added methods.
+
+== Package annotations
+Class additions are added under the `com.fastasyncworldedit` namespace, but sometimes classes need to be added in package private.
+If that is done, you can find a `package-info.java` file within the package affected that outlines FAWE added classes:
+[source,java]
+-----------------
+/**
+* The following classes are FAWE additions:
+*
+* @see com.sk89q.worldedit.world.block.BlockTypesCache
+*/
+package com.sk89q.worldedit.world.block;
+-----------------
