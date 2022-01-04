@@ -365,7 +365,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
                 readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
-                final CompoundBinaryTag tag = (CompoundBinaryTag) toNative(minecraftTag);
+                final CompoundBinaryTag tag = (CompoundBinaryTag) toNativeBinary(minecraftTag);
                 final Map<String, BinaryTag> tags = new HashMap<>();
                 tag.keySet().forEach(key -> tags.put(key, tag.get(key)));
                 tags.put("Id", StringBinaryTag.of(id));
