@@ -550,7 +550,8 @@ public class StringMan {
      * provided String.
      *
      * @param str provided string
-     * @return true if a uuid was found, false if not
+     * @return true if an uuid was found, false if not
+     * @since 2.0.0
      */
     public static boolean containsUuid(String str) {
         return UUID_PATTERN.matcher(str).find();
