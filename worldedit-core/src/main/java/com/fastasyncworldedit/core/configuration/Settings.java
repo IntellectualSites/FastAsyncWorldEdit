@@ -672,6 +672,11 @@ public class Settings extends Config {
 
     }
 
+    /**
+     * @deprecated FAWE is not necessarily the tool you want to use to limit certain tick actions, e.g. fireworks or elytra flying.
+     * The code is untouched since the 1.12 era and there is no guarantee that it will work or will be maintained in the future.
+     */
+    @Deprecated(since = "2.0.0")
     @Comment("Generic tick limiter (not necessarily WorldEdit related, but useful to stop abuse)")
     public static class TICK_LIMITER {
 

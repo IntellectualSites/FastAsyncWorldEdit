@@ -45,6 +45,11 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
+/**
+ * @deprecated FAWE is not necessarily the tool you want to use to limit certain tick actions, e.g. fireworks or elytra flying.
+ * The code is untouched since the 1.12 era and there is no guarantee that it will work or will be maintained in the future.
+ */
+@Deprecated(since = "2.0.0")
 public abstract class ChunkListener implements Listener {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -88,7 +93,15 @@ public abstract class ChunkListener implements Listener {
 
     protected abstract StackTraceElement getElement(Exception ex, int index);
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public static boolean physicsFreeze = false;
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public static boolean itemFreeze = false;
 
     protected final Long2ObjectOpenHashMap<Boolean> badChunks = new Long2ObjectOpenHashMap<>();
@@ -97,6 +110,10 @@ public abstract class ChunkListener implements Listener {
     private int lastZ = Integer.MIN_VALUE;
     private int[] lastCount;
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public int[] getCount(int cx, int cz) {
         if (lastX == cx && lastZ == cz) {
             return lastCount;
@@ -112,6 +129,10 @@ public abstract class ChunkListener implements Listener {
         return tmp;
     }
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public void cleanup(Chunk chunk) {
         for (Entity entity : chunk.getEntities()) {
             if (entity.getType() == EntityType.DROPPED_ITEM) {
@@ -128,6 +149,10 @@ public abstract class ChunkListener implements Listener {
     protected long physStart;
     protected long physTick;
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public final void reset() {
         physSkip = 0;
         physStart = System.currentTimeMillis();
