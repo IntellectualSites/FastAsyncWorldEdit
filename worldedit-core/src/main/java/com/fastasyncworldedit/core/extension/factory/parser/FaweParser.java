@@ -33,12 +33,14 @@ public abstract class FaweParser<T> extends InputParser<T> implements AliasedPar
         List<String> inputs = new ArrayList<>();
         List<Boolean> and = new ArrayList<>();
         int last = 0;
-        outer:
+        boolean expression = false;
         for (int i = 0; i < toParse.length(); i++) {
             char c = toParse.charAt(i);
             switch (c) {
-                case ',':
-                case '&':
+                case ',', '&' -> {
+                    if (expression) {
+                        continue;
+                    }
                     String result = toParse.substring(last, i);
                     if (!result.isEmpty()) {
                         inputs.add(result);
@@ -47,8 +49,9 @@ public abstract class FaweParser<T> extends InputParser<T> implements AliasedPar
                         throw new InputParseException(Caption.of("fawe.error.parse.invalid-dangling-character", c));
                     }
                     last = i + 1;
-                    continue outer;
-                default:
+                }
+                case '=' -> expression = true;
+                default -> {
                     if (c == '[') {
                         int next = StringMan.findMatchingBracket(toParse, i);
                         if (next != -1) {
@@ -57,7 +60,9 @@ public abstract class FaweParser<T> extends InputParser<T> implements AliasedPar
                             toParse += "]";
                             i = toParse.length();
                         }
+                        expression = false;
                     }
+                }
             }
         }
         inputs.add(toParse.substring(last));
