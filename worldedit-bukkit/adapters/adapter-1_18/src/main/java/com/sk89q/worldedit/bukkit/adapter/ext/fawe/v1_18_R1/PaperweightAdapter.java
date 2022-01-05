@@ -799,7 +799,6 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         // Pre-gen all the chunks
         for (BlockVector2 chunk : region.getChunks()) {
             try {
-                //noinspection unchecked
                 chunkLoadings.add(
                         ((CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>)
                                 getChunkFutureMainThreadMethod.invoke(chunkManager, chunk.getX(), chunk.getZ(), ChunkStatus.FEATURES, true))

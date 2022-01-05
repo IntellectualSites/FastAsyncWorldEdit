@@ -192,8 +192,8 @@ public class TargetBlock {
      *
      * @return Block
      */
+    @SuppressWarnings("StatementWithEmptyBody")
     public Location getTargetBlock() {
-        //noinspection StatementWithEmptyBody
         while (getNextBlock() != null && !stopMask.test(targetPos)) {
         }
         return getCurrentBlock();
@@ -205,8 +205,8 @@ public class TargetBlock {
      *
      * @return Block
      */
+    @SuppressWarnings("StatementWithEmptyBody")
     public Location getSolidTargetBlock() {
-        //noinspection StatementWithEmptyBody
         while (getNextBlock() != null && !solidMask.test(targetPos)) {
         }
         return getCurrentBlock();

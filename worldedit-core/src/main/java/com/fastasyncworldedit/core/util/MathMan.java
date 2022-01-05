@@ -75,7 +75,7 @@ public class MathMan {
     }
 
     public static float clamp(float check, float min, float max) {
-        return check > max ? max : (Math.max(check, min));
+        return check > max ? max : Math.max(check, min);
     }
 
     public static double hypot(final double... pars) {

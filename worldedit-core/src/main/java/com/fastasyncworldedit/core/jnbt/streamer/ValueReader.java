@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.jnbt.streamer;
 
 import java.io.IOException;
 
+@SuppressWarnings("unchecked")
 public interface ValueReader<T> extends StreamReader<T> {
 
     void apply(int index, T value) throws IOException;

@@ -247,6 +247,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static void sendChunk(ServerLevel nmsWorld, int chunkX, int chunkZ, boolean lighting) {
         ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (chunkHolder == null) {
@@ -279,8 +280,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                         false // last false is to not bother with x-ray
                 );
             } else {
-                // deprecated on paper
-                //noinspection deprecation
+                // deprecated on paper - deprecation suppressed
                 packet = new ClientboundLevelChunkWithLightPacket(
                         levelChunk,
                         nmsWorld.getChunkSource().getLightEngine(),

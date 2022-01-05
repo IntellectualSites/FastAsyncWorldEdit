@@ -804,7 +804,6 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         // Pre-gen all the chunks
         for (BlockVector2 chunk : region.getChunks()) {
             try {
-                //noinspection unchecked
                 chunkLoadings.add(
                         ((CompletableFuture<Either<ChunkAccess, ChunkHolder.ChunkLoadingFailure>>)
                                 getChunkFutureMainThreadMethod.invoke(chunkManager, chunk.getX(), chunk.getZ(), ChunkStatus.FEATURES, true))
@@ -924,7 +923,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      * @throws IllegalArgumentException on error
      */
     private ListBinaryTag toNativeList(net.minecraft.nbt.ListTag foreign) throws SecurityException, IllegalArgumentException {
-        ListBinaryTag.Builder values = ListBinaryTag.builder();
+        ListBinaryTag.Builder<BinaryTag> values = ListBinaryTag.builder();
 
         for (net.minecraft.nbt.Tag tag : foreign) {
             values.add(toNativeBinary(tag));
@@ -964,9 +963,8 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             return new net.minecraft.nbt.IntArrayTag(((IntArrayBinaryTag) foreign).value());
         } else if (foreign instanceof LongArrayBinaryTag) {
             return new net.minecraft.nbt.LongArrayTag(((LongArrayBinaryTag) foreign).value());
-        } else if (foreign instanceof ListBinaryTag) {
+        } else if (foreign instanceof ListBinaryTag foreignList) {
             net.minecraft.nbt.ListTag tag = new net.minecraft.nbt.ListTag();
-            ListBinaryTag foreignList = (ListBinaryTag) foreign;
             for (BinaryTag t : foreignList) {
                 tag.add(fromNativeBinary(t));
             }
