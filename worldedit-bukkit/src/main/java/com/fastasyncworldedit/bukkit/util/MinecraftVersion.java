@@ -12,6 +12,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
 
     public static final MinecraftVersion NETHER = new MinecraftVersion(1, 16);
     public static final MinecraftVersion CAVES_17 = new MinecraftVersion(1, 17);
+    public static final MinecraftVersion CAVES_18 = new MinecraftVersion(1, 18);
 
     private final int major;
     private final int minor;
@@ -68,7 +69,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
      * @param other The other version to compare against.
      * @return {@code true} if this version is higher or equal compared to the other version.
      */
-    public boolean isEqualOrHigher(MinecraftVersion other) {
+    public boolean isEqualOrHigherThan(MinecraftVersion other) {
         return compareTo(other) >= 0;
     }
 
@@ -76,7 +77,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
      * @param other The other version to compare against.
      * @return {@code true} if this version is lower or equal compared to the other version.
      */
-    public boolean isEqualOrLower(MinecraftVersion other) {
+    public boolean isEqualOrLowerThan(MinecraftVersion other) {
         return compareTo(other) <= 0;
     }
 
@@ -84,7 +85,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
      * @param other The other version to compare against.
      * @return {@code true} if this version is higher than the other version.
      */
-    public boolean isHigher(MinecraftVersion other) {
+    public boolean isHigherThan(MinecraftVersion other) {
         return compareTo(other) > 0;
     }
 
@@ -92,7 +93,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
      * @param other The other version to compare against.
      * @return {@code true} if this version is lower than to the other version.
      */
-    public boolean isLower(MinecraftVersion other) {
+    public boolean isLowerThan(MinecraftVersion other) {
         return compareTo(other) < 0;
     }
 
@@ -137,6 +138,11 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
             return false;
         }
         return getRelease() == that.getRelease();
+    }
+
+    @Override
+    public String toString() {
+        return major + "." + minor + "." + release;
     }
 
     /**

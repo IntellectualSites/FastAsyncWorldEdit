@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit.adapter;
 
+import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.io.Closer;
 import org.apache.logging.log4j.Logger;
@@ -39,6 +40,8 @@ public class BukkitImplLoader {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final List<String> adapterCandidates = new ArrayList<>();
+    private final String minorMCVersion = String.valueOf(new MinecraftVersion().getMinor());
+    private int zeroth = 0;
     private String customCandidate;
 
     private static final String SEARCH_PACKAGE = "com.sk89q.worldedit.bukkit.adapter.impl.fawe";
@@ -73,6 +76,7 @@ public class BukkitImplLoader {
         String className = System.getProperty("worldedit.bukkit.adapter");
         if (className != null) {
             customCandidate = className;
+            zeroth = 1;
             adapterCandidates.add(className);
             LOGGER.info("-Dworldedit.bukkit.adapter used to add " + className + " to the list of available Bukkit adapters");
         }
@@ -101,7 +105,11 @@ public class BukkitImplLoader {
                 int beginIndex = 0;
                 int endIndex = className.length() - CLASS_SUFFIX.length();
                 className = className.substring(beginIndex, endIndex);
-                adapterCandidates.add(className);
+                if (className.contains(minorMCVersion)) {
+                    adapterCandidates.add(zeroth, className);
+                } else {
+                    adapterCandidates.add(className);
+                }
             }
         } finally {
             closer.close();
@@ -142,7 +150,11 @@ public class BukkitImplLoader {
             int beginIndex = 0;
             int endIndex = resource.length() - CLASS_SUFFIX.length();
             String className = resource.substring(beginIndex, endIndex);
-            adapterCandidates.add(className);
+            if (className.contains(minorMCVersion)) {
+                adapterCandidates.add(zeroth, className);
+            } else {
+                adapterCandidates.add(className);
+            }
         }
     }
 

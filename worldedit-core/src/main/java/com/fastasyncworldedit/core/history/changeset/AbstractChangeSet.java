@@ -10,7 +10,6 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.google.common.util.concurrent.Futures;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.EditSession;
@@ -31,6 +30,7 @@ import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -65,7 +65,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             return;
         }
         waitingAsync.incrementAndGet();
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             waitingAsync.decrementAndGet();
             synchronized (waitingAsync) {
                 waitingAsync.notifyAll();
@@ -169,7 +169,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             char[] blocksGet;
             char[] tmp = get.load(layer);
             if (tmp == null) {
-                blocksGet = FaweCache.IMP.EMPTY_CHAR_4096;
+                blocksGet = FaweCache.INSTANCE.EMPTY_CHAR_4096;
             } else {
                 System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
             }
@@ -186,8 +186,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                     for (int x = 0; x < 16; x++, index++) {
                         int xx = bx + x;
                         int from = blocksGet[index];
-                        if (from == 0) {
-                            from = BlockID.AIR;
+                        if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                            from = BlockTypesCache.ReservedIDs.AIR;
                         }
                         final int combinedFrom = from;
                         final int combinedTo = blocksSet[index];
@@ -199,22 +199,23 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             }
         }
 
-        BiomeType[] biomes = set.getBiomes();
+        BiomeType[][] biomes = set.getBiomes();
         if (biomes != null) {
-            int index = 0;
             for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
                 if (!set.hasBiomes(layer)) {
                     continue;
                 }
+                BiomeType[] biomeSection = biomes[layer - set.getMinSectionPosition()];
+                int index = 0;
                 int yy = layer << 4;
-                for (int y = 0; y < 4; y++) {
-                    for (int z = 0; z < 4; z++) {
-                        for (int x = 0; x < 4; x++, index++) {
-                            BiomeType newBiome = biomes[index];
+                for (int y = 0; y < 16; y+= 4) {
+                    for (int z = 0; z < 16; z+= 4) {
+                        for (int x = 0; x < 16; x+= 4, index++) {
+                            BiomeType newBiome = biomeSection[index];
                             if (newBiome != null) {
-                                BiomeType oldBiome = get.getBiomeType(x, y, z);
+                                BiomeType oldBiome = get.getBiomeType(x, yy + y, z);
                                 if (oldBiome != newBiome) {
-                                    addBiomeChange(bx + (x << 2), yy + (y << 2), bz + (z << 2), oldBiome, newBiome);
+                                    addBiomeChange(bx + x, yy + y, bz + z, oldBiome, newBiome);
                                 }
                             }
                         }
@@ -379,7 +380,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             wrappedTask.run();
             return Futures.immediateCancelledFuture();
         } else {
-            return Fawe.get().getQueueHandler().submit(wrappedTask);
+            return Fawe.instance().getQueueHandler().submit(wrappedTask);
         }
     }
 

@@ -42,12 +42,6 @@ repositories {
     flatDir { dir(File("src/main/resources")) }
 }
 
-configurations.all {
-    resolutionStrategy {
-        force("com.google.guava:guava:21.0")
-    }
-}
-
 val localImplementation = configurations.create("localImplementation") {
     description = "Dependencies used locally, but provided by the runtime Bukkit implementation"
     isCanBeConsumed = false
@@ -108,7 +102,6 @@ dependencies {
     compileOnly(libs.protocollib) { isTransitive = false }
     compileOnly(libs.plotsquaredV6Bukkit) { isTransitive = false }
     compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
-    compileOnly(libs.plotsquaredV4) { isTransitive = false }
 
     // Third party
     compileOnly(libs.flowmath) {
@@ -187,7 +180,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.1"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            include(dependency("com.intellectualsites.paster:Paster:1.1.1"))
+            include(dependency("com.intellectualsites.paster:Paster:1.1.3"))
         }
         relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
             include(dependency("org.lz4:lz4-java:1.8.0"))

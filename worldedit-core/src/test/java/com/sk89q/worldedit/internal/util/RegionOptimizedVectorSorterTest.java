@@ -19,7 +19,9 @@
 
 package com.sk89q.worldedit.internal.util;
 
+import com.fastasyncworldedit.util.StubPlatform;
 import com.google.common.collect.Lists;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
@@ -71,6 +73,10 @@ public class RegionOptimizedVectorSorterTest {
             0, 1, 10, 100, 1_000, 10_000, 100_000, 1_000_000, 10_000_000
     })
     void checkSorted(int size) {
+        //FAWE start - required for AbstractRegion recalculation testing height limits with null world
+        WorldEdit.getInstance().getPlatformManager().register(new StubPlatform());
+        WorldEdit.getInstance().getPlatformManager().handlePlatformsRegistered(null);
+        //FAWE end
         Random rng = new Random(size);
         List<BlockVector3> toSort;
         if (size == 0) {

@@ -11,6 +11,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,17 +24,17 @@ import java.util.stream.IntStream;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
-    private static final Pool<CharSetBlocks> POOL = FaweCache.IMP.registerPool(
+    private static final Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
             CharSetBlocks.class,
             CharSetBlocks::new,
-            Settings.IMP.QUEUE.POOL
+            Settings.settings().QUEUE.POOL
     );
 
     public static CharSetBlocks newInstance() {
         return POOL.poll();
     }
 
-    public BiomeType[] biomes;
+    public BiomeType[][] biomes;
     public char[][] light;
     public char[][] skyLight;
     public BlockVector3ChunkMap<CompoundTag> tiles;
@@ -54,17 +55,19 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public BiomeType[] getBiomes() {
+    public BiomeType[][] getBiomes() {
         return biomes;
     }
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
+        int layer;
         if (biomes == null || (y >> 4) < minSectionPosition || (y >> 4) > maxSectionPosition) {
             return null;
+        } else if (biomes[(layer = (y >> 4) - minSectionPosition)] == null) {
+            return null;
         }
-        y -= minSectionPosition << 4;
-        return biomes[(y >> 2) << 4 | (z >> 2) << 2 | x >> 2];
+        return biomes[layer][(y & 15) >> 2 | (z >> 2) << 2 | x >> 2];
     }
 
     @Override
@@ -95,11 +98,14 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         updateSectionIndexRange(y >> 4);
-        y -= minSectionPosition << 4;
+        int layer = (y >> 4) - minSectionPosition;
         if (biomes == null) {
-            biomes = new BiomeType[64 * sectionCount];
+            biomes = new BiomeType[sectionCount][];
+            biomes[layer] = new BiomeType[64];
+        } else if (biomes[layer] == null) {
+            biomes[layer] = new BiomeType[64];
         }
-        biomes[(y >> 2) << 4 | (z >> 2) << 2 | x >> 2] = biome;
+        biomes[layer][(y & 12) << 2 | (z & 12) | (x & 12) >> 2] = biome;
         return true;
     }
 
@@ -312,13 +318,18 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (layer < 0 || layer >= sections.length) {
             return false;
         }
-        return biomes != null;
+        return biomes != null && biomes[layer] != null;
     }
 
     @Override
     public char[] load(final int layer) {
         updateSectionIndexRange(layer);
         return super.load(layer);
+    }
+
+    @Override
+    protected char defaultOrdinal() {
+        return BlockTypesCache.ReservedIDs.__RESERVED__;
     }
 
     // Checks and updates the various section arrays against the new layer index
@@ -344,7 +355,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             sectionLocks = tmpSectionLocks;
             minSectionPosition = layer;
             if (biomes != null) {
-                BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
+                BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];
                 System.arraycopy(biomes, 0, tmpBiomes, 64 * diff, biomes.length);
                 biomes = tmpBiomes;
             }
@@ -376,7 +387,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             sectionLocks = tmpSectionLocks;
             maxSectionPosition = layer;
             if (biomes != null) {
-                BiomeType[] tmpBiomes = new BiomeType[sectionCount * 64];
+                BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];
                 System.arraycopy(biomes, 0, tmpBiomes, 0, biomes.length);
                 biomes = tmpBiomes;
             }

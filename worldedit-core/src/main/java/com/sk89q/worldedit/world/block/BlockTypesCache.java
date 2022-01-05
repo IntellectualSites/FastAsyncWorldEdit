@@ -2,7 +2,6 @@ package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
 import com.fastasyncworldedit.core.util.MathMan;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.google.common.primitives.Booleans;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
@@ -218,37 +217,41 @@ public class BlockTypesCache {
                     : item, item -> item));
 
             int size = blockMap.size() + 1;
-            Field[] idFields = BlockID.class.getDeclaredFields();
-            for (Field field : idFields) {
-                size = Math.max(field.getInt(null) + 1, size);
-            }
             BIT_OFFSET = MathMan.log2nlz(size);
             BIT_MASK = ((1 << BIT_OFFSET) - 1);
             values = new BlockType[size];
 
-            // Register the statically declared ones first
-            for (Field field : idFields) {
-                if (field.getType() == int.class) {
-                    int internalId = field.getInt(null);
-                    String id = "minecraft:" + field.getName().toLowerCase(Locale.ROOT);
-                    String defaultState = blockMap.remove(id);
-                    if (defaultState == null) {
-                        if (internalId != 0) {
-                            continue;
+            // Register reserved IDs. Ensure air/reserved are 0/1/2/3
+            {
+                for (Field field : ReservedIDs.class.getDeclaredFields()) {
+                    if (field.getType() == int.class) {
+                        int internalId = field.getInt(null);
+                        String id = "minecraft:" + field.getName().toLowerCase(Locale.ROOT);
+                        String defaultState = blockMap.remove(id);
+                        if (defaultState == null) {
+                            defaultState = id;
                         }
-                        defaultState = id;
+                        if (values[internalId] != null) {
+                            // Ugly way of ensuring a stacktrace is printed so we can see the culprit. Rethrow because we still
+                            // want to cancel whatever initialised the class.
+                            try {
+                                throw new IllegalStateException(String.format(
+                                        "Invalid duplicate id for %s! Something has gone very wrong. Are " +
+                                                "any plugins shading FAWE?!", id));
+                            } catch (IllegalStateException e) {
+                                e.printStackTrace();
+                                throw e;
+                            }
+                        }
+                        BlockType type = register(defaultState, internalId, stateList, tickList);
+                        // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
+                        values[internalId] = type;
                     }
-                    if (values[internalId] != null) {
-                        throw new IllegalStateException("Invalid duplicate id for " + field.getName());
-                    }
-                    BlockType type = register(defaultState, internalId, stateList, tickList);
-                    // Note: Throws IndexOutOfBoundsError if nothing is registered and blocksMap is empty
-                    values[internalId] = type;
                 }
             }
 
-            { // Register new blocks
-                int internalId = 1;
+            { // Register real blocks
+                int internalId = 0;
                 for (Map.Entry<String, String> entry : blockMap.entrySet()) {
                     String defaultState = entry.getValue();
                     // Skip already registered ids
@@ -306,6 +309,17 @@ public class BlockTypesCache {
             }
             return allProperties;
         }
+    }
+
+    /**
+     * Statically-set reserved IDs. Should be used as minimally as possible, and for IDs that will see frequent use
+     */
+    public static class ReservedIDs {
+        public static final int __RESERVED__ = 0;
+        public static final int AIR = 1;
+        public static final int CAVE_AIR = 2;
+        public static final int VOID_AIR = 3;
+
     }
 
 }

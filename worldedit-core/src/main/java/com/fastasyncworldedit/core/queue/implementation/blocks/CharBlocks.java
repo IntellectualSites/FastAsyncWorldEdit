@@ -134,7 +134,7 @@ public abstract class CharBlocks implements IBlocks {
             return new char[4096];
         }
         for (int i = 0; i < 4096; i++) {
-            data[i] = 0;
+            data[i] = defaultOrdinal();
         }
         return data;
     }
@@ -188,10 +188,15 @@ public abstract class CharBlocks implements IBlocks {
         int layer = y >> 4;
         final int index = (y & 15) << 8 | z << 4 | x;
         if (layer > maxSectionPosition || layer < minSectionPosition) {
-            return 0;
+            return defaultOrdinal();
         }
         return get(layer, index);
     }
+
+    /**
+     * Default char value to be used when "updating"/resetting data arrays
+     */
+    protected abstract char defaultOrdinal();
 
     // Not synchronized as it refers to a synchronized method and includes nothing that requires synchronization
     public void set(int x, int y, int z, char value) {
@@ -201,7 +206,7 @@ public abstract class CharBlocks implements IBlocks {
             set(layer, index, value);
         } catch (ArrayIndexOutOfBoundsException exception) {
             LOGGER.error("Tried setting block at coordinates (" + x + "," + y + "," + z + ")");
-            assert Fawe.imp() != null;
+            assert Fawe.platform() != null;
             LOGGER.error("Layer variable was = {}", layer, exception);
         }
     }

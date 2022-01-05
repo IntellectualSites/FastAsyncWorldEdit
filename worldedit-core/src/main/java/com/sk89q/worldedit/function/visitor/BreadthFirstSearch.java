@@ -28,7 +28,9 @@ import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.operation.Operation;
@@ -110,7 +112,10 @@ public abstract class BreadthFirstSearch implements Operation {
      */
     public BreadthFirstSearch(RegionFunction function) {
         //FAWE start - int depth, min/max y
-        this(function, Integer.MAX_VALUE, 0, 255, null);
+        this(function, Integer.MAX_VALUE,
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY(), null
+        );
     }
 
     //FAWE start - int depth, min/max y, preloading
@@ -290,13 +295,13 @@ public abstract class BreadthFirstSearch implements Operation {
         BlockVectorSet chunkLoadSet = new BlockVectorSet();
         for (currentDepth = 0; !queue.isEmpty() && currentDepth <= maxDepth; currentDepth++) {
             int loadCount = 0;
-            if (singleQueue != null && Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT > 1) {
+            if (singleQueue != null && Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT > 1) {
                 int cx = Integer.MIN_VALUE;
                 int cz = Integer.MIN_VALUE;
                 outer:
                 for (BlockVector3 from : queue) {
                     for (BlockVector3 direction : dirs) {
-                        if (loadCount > Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT) {
+                        if (loadCount > Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT) {
                             break outer;
                         }
                         int x = from.getBlockX() + direction.getBlockX();

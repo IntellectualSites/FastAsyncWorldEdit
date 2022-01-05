@@ -45,20 +45,25 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.util.Vector;
 
+/**
+ * @deprecated FAWE is not necessarily the tool you want to use to limit certain tick actions, e.g. fireworks or elytra flying.
+ * The code is untouched since the 1.12 era and there is no guarantee that it will work or will be maintained in the future.
+ */
+@Deprecated(since = "2.0.0")
 public abstract class ChunkListener implements Listener {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     protected int rateLimit = 0;
     protected Location lastCancelPos;
-    private final int[] badLimit = new int[]{Settings.IMP.TICK_LIMITER.PHYSICS_MS,
-            Settings.IMP.TICK_LIMITER.FALLING, Settings.IMP.TICK_LIMITER.ITEMS};
+    private final int[] badLimit = new int[]{Settings.settings().TICK_LIMITER.PHYSICS_MS,
+            Settings.settings().TICK_LIMITER.FALLING, Settings.settings().TICK_LIMITER.ITEMS};
 
     public ChunkListener() {
-        if (Settings.IMP.TICK_LIMITER.ENABLED) {
+        if (Settings.settings().TICK_LIMITER.ENABLED) {
             PluginManager plm = Bukkit.getPluginManager();
-            Plugin plugin = Fawe.<FaweBukkit>imp().getPlugin();
+            Plugin plugin = Fawe.<FaweBukkit>platform().getPlugin();
             plm.registerEvents(this, plugin);
-            TaskManager.IMP.repeat(() -> {
+            TaskManager.taskManager().repeat(() -> {
                 Location tmpLoc = lastCancelPos;
                 if (tmpLoc != null) {
                     LOGGER.info("[FAWE Tick Limiter] Detected and cancelled physics lag source at {}", tmpLoc);
@@ -80,7 +85,7 @@ public abstract class ChunkListener implements Listener {
                     counter.put(key, badLimit);
                 }
                 badChunks.clear();
-            }, Settings.IMP.TICK_LIMITER.INTERVAL);
+            }, Settings.settings().TICK_LIMITER.INTERVAL);
         }
     }
 
@@ -88,7 +93,15 @@ public abstract class ChunkListener implements Listener {
 
     protected abstract StackTraceElement getElement(Exception ex, int index);
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public static boolean physicsFreeze = false;
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public static boolean itemFreeze = false;
 
     protected final Long2ObjectOpenHashMap<Boolean> badChunks = new Long2ObjectOpenHashMap<>();
@@ -97,6 +110,10 @@ public abstract class ChunkListener implements Listener {
     private int lastZ = Integer.MIN_VALUE;
     private int[] lastCount;
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public int[] getCount(int cx, int cz) {
         if (lastX == cx && lastZ == cz) {
             return lastCount;
@@ -112,6 +129,10 @@ public abstract class ChunkListener implements Listener {
         return tmp;
     }
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public void cleanup(Chunk chunk) {
         for (Entity entity : chunk.getEntities()) {
             if (entity.getType() == EntityType.DROPPED_ITEM) {
@@ -128,6 +149,10 @@ public abstract class ChunkListener implements Listener {
     protected long physStart;
     protected long physTick;
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public final void reset() {
         physSkip = 0;
         physStart = System.currentTimeMillis();
@@ -241,13 +266,13 @@ public abstract class ChunkListener implements Listener {
             if ((++physSkip & 1023) != 0) {
                 return;
             }
-            FaweTimer timer = Fawe.get().getTimer();
+            FaweTimer timer = Fawe.instance().getTimer();
             if (timer.getTick() != physTick) {
                 physTick = timer.getTick();
                 physStart = System.currentTimeMillis();
                 return;
             } else if (System.currentTimeMillis() - physStart
-                    < Settings.IMP.TICK_LIMITER.PHYSICS_MS) {
+                    < Settings.settings().TICK_LIMITER.PHYSICS_MS) {
                 return;
             }
         }
@@ -324,15 +349,15 @@ public abstract class ChunkListener implements Listener {
         int cx = x >> 4;
         int cz = z >> 4;
         int[] count = getCount(cx, cz);
-        if (count[1] >= Settings.IMP.TICK_LIMITER.FALLING) {
+        if (count[1] >= Settings.settings().TICK_LIMITER.FALLING) {
             event.setCancelled(true);
             return;
         }
         if (event.getEntityType() == EntityType.FALLING_BLOCK) {
-            if (++count[1] >= Settings.IMP.TICK_LIMITER.FALLING) {
+            if (++count[1] >= Settings.settings().TICK_LIMITER.FALLING) {
 
                 // Only cancel falling blocks when it's lagging
-                if (Fawe.get().getTimer().getTPS() < 18) {
+                if (Fawe.instance().getTimer().getTPS() < 18) {
                     cancelNearby(cx, cz);
                     if (rateLimit <= 0) {
                         rateLimit = 20;
@@ -351,7 +376,7 @@ public abstract class ChunkListener implements Listener {
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void onChunkLoad(ChunkLoadEvent event) {
-        if (!Settings.IMP.TICK_LIMITER.FIREWORKS_LOAD_CHUNKS) {
+        if (!Settings.settings().TICK_LIMITER.FIREWORKS_LOAD_CHUNKS) {
             Chunk chunk = event.getChunk();
             Entity[] entities = chunk.getEntities();
             World world = chunk.getWorld();
@@ -377,8 +402,8 @@ public abstract class ChunkListener implements Listener {
                             if (Math.abs(velocity.getX()) > vertical
                                     || Math.abs(velocity.getZ()) > vertical) {
                                 LOGGER.warn(
-                                        "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at "
-                                                + ent.getLocation());
+                                        "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at {}",
+                                        ent.getLocation());
                                 ent.remove();
                             }
                         }
@@ -398,17 +423,17 @@ public abstract class ChunkListener implements Listener {
         int cx = loc.getBlockX() >> 4;
         int cz = loc.getBlockZ() >> 4;
         int[] count = getCount(cx, cz);
-        if (count[2] >= Settings.IMP.TICK_LIMITER.ITEMS) {
+        if (count[2] >= Settings.settings().TICK_LIMITER.ITEMS) {
             event.setCancelled(true);
             return;
         }
-        if (++count[2] >= Settings.IMP.TICK_LIMITER.ITEMS) {
+        if (++count[2] >= Settings.settings().TICK_LIMITER.ITEMS) {
             cleanup(loc.getChunk());
             cancelNearby(cx, cz);
             if (rateLimit <= 0) {
                 rateLimit = 20;
                 LOGGER.warn(
-                        "[FAWE `tick-limiter`] Detected and cancelled item lag source at " + loc);
+                        "[FAWE `tick-limiter`] Detected and cancelled item lag source at {}", loc);
             }
             event.setCancelled(true);
         }

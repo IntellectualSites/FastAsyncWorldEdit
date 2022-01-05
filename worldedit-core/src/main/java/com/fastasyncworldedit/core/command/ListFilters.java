@@ -95,7 +95,7 @@ public class ListFilters {
                     }
                     String firstArg = finalArg.substring(0, finalArg.length() - File.separator.length());
                     if (firstArg.length() > 3 && firstArg.length() <= 16) {
-                        UUID fromName = Fawe.imp().getUUID(finalArg);
+                        UUID fromName = Fawe.platform().getUUID(finalArg);
                         if (fromName != null) {
                             newRoot = new File(root, finalArg);
                             if (newRoot.exists()) {

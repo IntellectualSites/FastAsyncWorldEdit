@@ -110,7 +110,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
         if (async) {
             asyncNotifyQueue.run(wrapped);
         } else {
-            TaskManager.IMP.taskNow(wrapped, false);
+            TaskManager.taskManager().taskNow(wrapped, false);
         }
         return true;
     }

@@ -29,7 +29,7 @@ public class ConfirmHandler implements CommandCallListener {
         }
         Actor actor = actorOpt.get();
         // don't check confirmation if actor doesn't need to confirm
-        if (!Settings.IMP.getLimit(actor).CONFIRM_LARGE) {
+        if (!Settings.settings().getLimit(actor).CONFIRM_LARGE) {
             return;
         }
         if (!confirmAnnotation.value().passes(actor, parameters, 1)) {

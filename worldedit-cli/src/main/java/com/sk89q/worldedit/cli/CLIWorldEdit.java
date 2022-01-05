@@ -190,7 +190,7 @@ public class CLIWorldEdit {
         this.commandSender = new CLICommandSender(this, LOGGER);
         this.platform = new CLIPlatform(this);
         //FAWE start - identify as Fawe
-        LOGGER.info("FastAsyncWorldEdit CLI (version " + getInternalVersion() + ") is loaded");
+        LOGGER.info("FastAsyncWorldEdit CLI (version {}) is loaded", getInternalVersion());
         //FAWE end
     }
 

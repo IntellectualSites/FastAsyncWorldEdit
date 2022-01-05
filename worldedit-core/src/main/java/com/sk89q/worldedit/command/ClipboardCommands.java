@@ -405,7 +405,7 @@ public class ClipboardCommands {
                     url = null;
                 }
             } else {
-                if (Settings.IMP.WEB.URL.isEmpty()) {
+                if (Settings.settings().WEB.URL.isEmpty()) {
                     actor.print(Caption.of("fawe.error.setting.disable", "web.url"));
                     return;
                 }

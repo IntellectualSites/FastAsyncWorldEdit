@@ -21,6 +21,8 @@ import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.the
+import org.gradle.plugins.signing.SigningExtension
 import javax.inject.Inject
 
 fun Project.applyLibrariesConfiguration() {
@@ -28,6 +30,7 @@ fun Project.applyLibrariesConfiguration() {
     apply(plugin = "java-base")
     apply(plugin = "maven-publish")
     apply(plugin = "com.github.johnrengelman.shadow")
+    apply(plugin = "signing")
 
     configurations {
         create("shade")
@@ -49,6 +52,7 @@ fun Project.applyLibrariesConfiguration() {
         dependencies {
             exclude(dependency("com.google.guava:guava"))
             exclude(dependency("com.google.code.gson:gson"))
+            exclude(dependency("com.google.errorprone:error_prone_annotations"))
             exclude(dependency("org.checkerframework:checker-qual"))
             exclude(dependency("org.apache.logging.log4j:log4j-api"))
             exclude(dependency("com.google.code.findbugs:jsr305"))
@@ -94,8 +98,14 @@ fun Project.applyLibrariesConfiguration() {
         archiveClassifier.set("sources")
     }
 
+    // This a dummy jar to comply with the requirements of the OSSRH,
+    // libs are not API and therefore no "proper" javadoc jar is necessary
+    tasks.register<Jar>("javadocJar") {
+        archiveClassifier.set("javadoc")
+    }
+
     tasks.named("assemble").configure {
-        dependsOn("jar", "sourcesJar")
+        dependsOn("jar", "sourcesJar", "javadocJar")
     }
 
     project.apply<LibsConfigPluginHack>()
@@ -112,7 +122,7 @@ fun Project.applyLibrariesConfiguration() {
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
             attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 11)
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
         }
         outgoing.artifact(tasks.named("jar"))
     }
@@ -127,7 +137,7 @@ fun Project.applyLibrariesConfiguration() {
             attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.LIBRARY))
             attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
             attribute(LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE, project.objects.named(LibraryElements.JAR))
-            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 11)
+            attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
         }
         outgoing.artifact(tasks.named("jar"))
     }
@@ -146,6 +156,20 @@ fun Project.applyLibrariesConfiguration() {
         outgoing.artifact(tasks.named("sourcesJar"))
     }
 
+    val javadocElements = project.configurations.register("javadocElements") {
+        isVisible = false
+        description = "Javadoc elements for libs"
+        isCanBeResolved = false
+        isCanBeConsumed = true
+        attributes {
+            attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage.JAVA_RUNTIME))
+            attribute(Category.CATEGORY_ATTRIBUTE, project.objects.named(Category.DOCUMENTATION))
+            attribute(Bundling.BUNDLING_ATTRIBUTE, project.objects.named(Bundling.SHADOWED))
+            attribute(DocsType.DOCS_TYPE_ATTRIBUTE, project.objects.named(DocsType.JAVADOC))
+        }
+        outgoing.artifact(tasks.named("javadocJar"))
+    }
+
     libsComponent.addVariantsFromConfiguration(apiElements.get()) {
         mapToMavenScope("compile")
     }
@@ -156,6 +180,22 @@ fun Project.applyLibrariesConfiguration() {
 
     libsComponent.addVariantsFromConfiguration(sourcesElements.get()) {
         mapToMavenScope("runtime")
+    }
+
+    libsComponent.addVariantsFromConfiguration(javadocElements.get()) {
+        mapToMavenScope("runtime")
+    }
+
+    val publishingExtension = the<PublishingExtension>()
+
+    configure<SigningExtension> {
+        if (!version.toString().endsWith("-SNAPSHOT")) {
+            val signingKey: String? by project
+            val signingPassword: String? by project
+            useInMemoryPgpKeys(signingKey, signingPassword)
+            isRequired
+            sign(publishingExtension.publications)
+        }
     }
 
     configure<PublishingExtension> {
@@ -210,33 +250,6 @@ fun Project.applyLibrariesConfiguration() {
                         url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit/issues")
                     }
                 }
-            }
-        }
-
-        repositories {
-            mavenLocal()
-            val nexusUsername: String? by project
-            val nexusPassword: String? by project
-            if (nexusUsername != null && nexusPassword != null) {
-                maven {
-                    val releasesRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/releases/"
-                    val snapshotRepositoryUrl = "https://mvn.intellectualsites.com/content/repositories/snapshots/"
-                    /* Commenting this out for now - Fawe currently does not user semver or any sort of versioning that
-                    differentiates between snapshots and releases, API & (past) deployment wise, this will come with a next major release.
-                    url = uri(
-                            if (version.toString().endsWith("-SNAPSHOT")) snapshotRepositoryUrl
-                            else releasesRepositoryUrl
-                    )
-                     */
-                    url = uri(releasesRepositoryUrl)
-
-                    credentials {
-                        username = nexusUsername
-                        password = nexusPassword
-                    }
-                }
-            } else {
-                logger.warn("No nexus repository is added; nexusUsername or nexusPassword is null.")
             }
         }
     }

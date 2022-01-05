@@ -39,7 +39,7 @@ public class SchematicsEventListener {
         try {
             Files.createDirectories(config.resolve(event.getConfiguration().saveDir));
         } catch (FileAlreadyExistsException e) {
-            LOGGER.info("Schematic directory exists as file. Possible symlink.", e);
+            LOGGER.debug("Schematic directory exists as file. Possible symlink.", e);
         } catch (IOException e) {
             LOGGER.warn("Failed to create schematics directory", e);
         }

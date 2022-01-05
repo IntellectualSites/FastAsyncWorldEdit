@@ -166,7 +166,7 @@ public class ConsumeBindings extends Bindings {
         if (argument.length() > 16) {
             uuid = UUID.fromString(argument);
         } else {
-            uuid = Fawe.imp().getUUID(argument);
+            uuid = Fawe.platform().getUUID(argument);
         }
         if (uuid == null) {
             throw new InputParseException(Caption.of("fawe.error.player.not.found", TextComponent.of(argument)));

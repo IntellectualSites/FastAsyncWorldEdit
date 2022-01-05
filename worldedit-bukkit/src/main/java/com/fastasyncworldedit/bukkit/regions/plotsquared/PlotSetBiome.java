@@ -89,7 +89,7 @@ public class PlotSetBiome extends Command {
                 return;
             }
             plot.addRunning();
-            TaskManager.IMP.async(() -> {
+            TaskManager.taskManager().async(() -> {
                 EditSession session =
                         WorldEdit
                                 .getInstance()

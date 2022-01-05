@@ -4,6 +4,7 @@ include("worldedit-libs")
 
 include("worldedit-bukkit:adapters:adapter-legacy")
 include("worldedit-bukkit:adapters:adapter-1_17_1")
+include("worldedit-bukkit:adapters:adapter-1_18")
 
 listOf("bukkit", "core", "cli").forEach {
     include("worldedit-libs:$it")

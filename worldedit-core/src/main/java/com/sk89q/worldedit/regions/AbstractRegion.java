@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.regions;
 
 import com.fastasyncworldedit.core.math.BlockVectorSet;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
@@ -221,14 +223,22 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     // Sub-class utilities
 
     protected final int getWorldMinY() {
-        //FAWE start > Integer.MIN_VALUE -> 0 (to avoid crazy for loops...) TODO: See if there's a way to find a "server default"
-        return world == null ? 0 : world.getMinY();
+        //FAWE start > Server default based on version
+        return world == null ? WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.WORLD_EDITING)
+                .versionMinY() : world.getMinY();
         //FAWE end
     }
 
     protected final int getWorldMaxY() {
-        //FAWE start > Integer.MAX_VALUE -> 255 (to avoid crazy for loops...) TODO: See if there's a way to find a "server default"
-        return world == null ? 255 : world.getMaxY();
+        //FAWE start > Server default based on version
+        return world == null ? WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.WORLD_EDITING)
+                .versionMaxY() : world.getMaxY();
         //FAWE end
     }
 

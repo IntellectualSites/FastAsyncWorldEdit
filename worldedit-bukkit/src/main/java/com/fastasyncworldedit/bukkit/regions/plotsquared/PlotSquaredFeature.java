@@ -4,9 +4,6 @@ import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
-import com.fastasyncworldedit.core.regions.filter.RegionFilter;
-import com.github.intellectualsites.plotsquared.plot.util.UUIDHandler;
-import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.configuration.Settings;
 import com.plotsquared.core.database.DBFunc;
 import com.plotsquared.core.player.PlotPlayer;
@@ -62,6 +59,15 @@ public class PlotSquaredFeature extends FaweMaskManager {
         */
     }
 
+    /**
+     * Whether the player is allowed to use FAWE on a PlotSquared plot.
+     *
+     * @param player the {@link Player}
+     * @param plot   the {@link Plot}
+     * @param type   the {@link MaskType}
+     * @return {@code true} if the player is the plot owner, trusted, has the permission fawe.plotsquared.member
+     * or fawe.plotsquared.admin and the NoWorldeditFlag is not set; otherwise {@code false}
+     */
     public boolean isAllowed(Player player, Plot plot, MaskType type) {
         if (plot == null) {
             return false;
@@ -121,7 +127,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
     }
 
     @Override
-    public FaweMask getMask(Player player, MaskType type) {
+    public FaweMask getMask(Player player, MaskType type, boolean isWhitelist) {
         final PlotPlayer<org.bukkit.entity.Player> pp = PlotPlayer.from(BukkitAdapter.adapt(player));
         if (pp == null) {
             return null;

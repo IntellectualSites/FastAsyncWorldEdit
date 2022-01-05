@@ -80,52 +80,17 @@ public class WorldEditCommands {
     )
     @CommandPermissions(queued = false)
     public void version(Actor actor) {
-        //FAWE start - get own version format
-        FaweVersion fVer = Fawe.get().getVersion();
+        //FAWE start - use own, minimized message that doesn't print "Platforms" and "Capabilities"
+        FaweVersion fVer = Fawe.instance().getVersion();
         String fVerStr = fVer == null ? "unknown" : "-" + fVer.build;
-        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr + " created by Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
-
-        if (fVer != null) {
-            FaweVersion version = Fawe.get().getVersion();
-            Date date = new GregorianCalendar(2000 + version.year, version.month - 1, version.day)
-                    .getTime();
-
-            TextComponent dateArg = TextComponent.of(date.toLocaleString());
-            TextComponent commitArg = TextComponent.of(Integer.toHexString(version.hash));
-            TextComponent buildArg = TextComponent.of(version.build);
-            TextComponent platformArg = TextComponent.of(Settings.IMP.PLATFORM);
-
-            actor.print(Caption.of("worldedit.version.version", dateArg, commitArg, buildArg, platformArg));
-        }
-
-        actor.printInfo(TextComponent.of("Wiki: https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki"));
+        actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr));
+        actor.print(TextComponent.of("Authors: Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
+        actor.print(TextComponent.of("Wiki: https://git.io/JMEPa")
+                .clickEvent(ClickEvent.openUrl("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki")));
+        actor.print(TextComponent.of("Discord: https://discord.gg/intellectualsites")
+                .clickEvent(ClickEvent.openUrl("https://discord.gg/intellectualsites")));
         UpdateNotification.doUpdateNotification(actor);
         //FAWE end
-
-        PlatformManager pm = we.getPlatformManager();
-
-        TextComponentProducer producer = new TextComponentProducer();
-        for (Platform platform : pm.getPlatforms()) {
-            producer.append(
-                    TextComponent.of("* ", TextColor.GRAY)
-                            .append(TextComponent.of(platform.getPlatformName())
-                                    .hoverEvent(HoverEvent.showText(TextComponent.of(platform.getId()))))
-                            .append(TextComponent.of("(" + platform.getPlatformVersion() + ")"))
-            ).newline();
-        }
-        actor.print(new MessageBox("Platforms", producer, TextColor.GRAY).create());
-
-        producer.reset();
-        for (Capability capability : Capability.values()) {
-            Platform platform = pm.queryCapability(capability);
-            producer.append(
-                    TextComponent.of(capability.name(), TextColor.GRAY)
-                            .append(TextComponent.of(": ")
-                                    .append(TextComponent.of(platform != null ? platform.getPlatformName() : "none")))
-            ).newline();
-        }
-        actor.print(new MessageBox("Capabilities", producer, TextColor.GRAY).create());
-
     }
 
     @Command(
@@ -140,7 +105,7 @@ public class WorldEditCommands {
                 .queryCapability(Capability.CONFIGURATION)
                 .getConfiguration()));
         //FAWE start
-        Fawe.get().setupConfigs();
+        Fawe.instance().setupConfigs();
         //FAWE end
         actor.print(Caption.of("worldedit.reload.config"));
     }
@@ -148,16 +113,16 @@ public class WorldEditCommands {
     //FAWE start
     @Command(
             name = "debugpaste",
-            desc = "Writes a report of latest.log, config.yml, config-legacy.yml, strings.json to https://athion.net/ISPaster/paste"
+            desc = "Writes a report of latest.log, config.yml, worldedit-config.yml, strings.json to https://athion.net/ISPaster/paste"
     )
     @CommandPermissions(value = {"worldedit.report", "worldedit.debugpaste"}, queued = false)
     public void report(Actor actor) throws WorldEditException {
         String dest;
         try {
             final File logFile = new File("logs/latest.log");
-            final File config = new File(Fawe.imp().getDirectory(), "config.yml");
-            final File legacyConfig = new File(Fawe.imp().getDirectory(), "config-legacy.yml");
-            dest = IncendoPaster.debugPaste(logFile, Fawe.imp().getDebugInfo(), config, legacyConfig);
+            final File config = new File(Fawe.platform().getDirectory(), "config.yml");
+            final File worldeditConfig = new File(Fawe.platform().getDirectory(), "worldedit-config.yml");
+            dest = IncendoPaster.debugPaste(logFile, Fawe.platform().getDebugInfo(), config, worldeditConfig);
         } catch (IOException e) {
             actor.printInfo(TextComponent.of(e.getMessage()));
             return;

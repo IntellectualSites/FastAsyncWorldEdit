@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -48,7 +50,10 @@ public class DownwardVisitor extends RecursiveVisitor {
     @Deprecated
     public DownwardVisitor(Mask mask, RegionFunction function, int baseY) {
         //FAWE start - int depth, min/max y
-        this(mask, function, baseY, Integer.MAX_VALUE, 0, 255, null);
+        this(mask, function, baseY, Integer.MAX_VALUE, WorldEdit
+                        .getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY(), null
+        );
         //FAWE end
     }
 

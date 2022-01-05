@@ -9,12 +9,15 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     maven {
-        name = "PaperMC"
-        url = uri("https://papermc.io/repo/repository/maven-public/")
-    }
-    maven {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
+    }
+    maven {
+        name = "PaperMC"
+        url = uri("https://papermc.io/repo/repository/maven-public/")
+        content {
+            includeGroupByRegex("io\\.papermc\\..*")
+        }
     }
 }
 
@@ -28,5 +31,11 @@ dependencies {
     implementation(gradleApi())
     implementation("org.ajoberstar.grgit:grgit-gradle:4.1.1")
     implementation("gradle.plugin.com.github.johnrengelman:shadow:7.1.1")
-    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.1.14")
+    implementation("io.papermc.paperweight.userdev:io.papermc.paperweight.userdev.gradle.plugin:1.3.3")
+}
+
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }

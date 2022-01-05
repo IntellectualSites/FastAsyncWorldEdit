@@ -66,8 +66,8 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
 
     public double asDouble(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
-        if (tag instanceof NumericTag) {
-            return ((NumericTag) tag).getAsDouble();
+        if (tag instanceof NumericTag numTag) {
+            return numTag.getAsDouble();
         }
         return 0;
     }
@@ -86,20 +86,19 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
 
     public int asInt(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
-        if (tag instanceof NumericTag) {
-            return ((NumericTag) tag).getAsInt();
+        if (tag instanceof NumericTag numTag) {
+            return numTag.getAsInt();
         }
         return 0;
     }
 
     public List<Tag> getList(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
-        if (tag instanceof net.minecraft.nbt.ListTag) {
+        if (tag instanceof net.minecraft.nbt.ListTag nbtList) {
             ArrayList<Tag> list = new ArrayList<>();
-            net.minecraft.nbt.ListTag nbtList = (net.minecraft.nbt.ListTag) tag;
             for (net.minecraft.nbt.Tag elem : nbtList) {
-                if (elem instanceof net.minecraft.nbt.CompoundTag) {
-                    list.add(new PaperweightLazyCompoundTag((net.minecraft.nbt.CompoundTag) elem));
+                if (elem instanceof net.minecraft.nbt.CompoundTag compoundTag) {
+                    list.add(new PaperweightLazyCompoundTag(compoundTag));
                 } else {
                     list.add(WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(elem));
                 }
@@ -137,8 +136,8 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
 
     public long asLong(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
-        if (tag instanceof NumericTag) {
-            return ((NumericTag) tag).getAsLong();
+        if (tag instanceof NumericTag numTag) {
+            return numTag.getAsLong();
         }
         return 0;
     }

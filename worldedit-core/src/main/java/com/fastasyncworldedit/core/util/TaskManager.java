@@ -21,9 +21,30 @@ public abstract class TaskManager {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
+    /**
+     * @deprecated Use {@link #taskManager()} to get an instance.
+     */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     public static TaskManager IMP;
-
+    static TaskManager INSTANCE;
     private final ForkJoinPool pool = new ForkJoinPool();
+
+    protected TaskManager() {
+        INSTANCE = this;
+    }
+
+    /**
+     * Gets an instance of the TaskManager.
+     *
+     * @return an instance of the TaskManager
+     * @since 2.0.0
+     */
+    public static TaskManager taskManager() {
+        if (INSTANCE == null) {
+            INSTANCE = Fawe.platform().getTaskManager();
+        }
+        return INSTANCE;
+    }
 
     /**
      * Run a repeating task on the main thread.
@@ -68,8 +89,8 @@ public abstract class TaskManager {
     /**
      * Run a bunch of tasks in parallel using the shared thread pool.
      */
-    public void parallel(Collection<Runnable> runnables) {
-        for (Runnable run : runnables) {
+    public void parallel(Collection<Runnable> runables) {
+        for (Runnable run : runables) {
             pool.submit(run);
         }
         pool.awaitQuiescence(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
@@ -87,7 +108,7 @@ public abstract class TaskManager {
             return;
         }
         if (numThreads == null) {
-            numThreads = Settings.IMP.QUEUE.PARALLEL_THREADS;
+            numThreads = Settings.settings().QUEUE.PARALLEL_THREADS;
         }
         if (numThreads <= 1) {
             for (Runnable run : runnables) {
@@ -135,7 +156,7 @@ public abstract class TaskManager {
      * Disable async catching for a specific task.
      */
     public void runUnsafe(Runnable run) {
-        QueueHandler queue = Fawe.get().getQueueHandler();
+        QueueHandler queue = Fawe.instance().getQueueHandler();
         queue.startSet(true);
         try {
             run.run();
@@ -256,7 +277,7 @@ public abstract class TaskManager {
             synchronized (running) {
                 while (running.get()) {
                     running.wait(timeout);
-                    if (running.get() && System.currentTimeMillis() - start > Settings.IMP.QUEUE.DISCARD_AFTER_MS) {
+                    if (running.get() && System.currentTimeMillis() - start > Settings.settings().QUEUE.DISCARD_AFTER_MS) {
                         new RuntimeException("FAWE is taking a long time to execute a task (might just be a symptom): ").printStackTrace();
                         LOGGER.info("For full debug information use: /fawe threads");
                     }
@@ -278,7 +299,7 @@ public abstract class TaskManager {
         if (Fawe.isMainThread()) {
             run.run();
         } else {
-            Fawe.get().getQueueHandler().sync(run);
+            Fawe.instance().getQueueHandler().sync(run);
         }
     }
 
@@ -293,7 +314,7 @@ public abstract class TaskManager {
             return function.value;
         }
         try {
-            return Fawe.get().getQueueHandler().sync((Supplier<T>) function).get();
+            return Fawe.instance().getQueueHandler().sync((Supplier<T>) function).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -309,7 +330,7 @@ public abstract class TaskManager {
             return supplier.get();
         }
         try {
-            return Fawe.get().getQueueHandler().sync(supplier).get();
+            return Fawe.instance().getQueueHandler().sync(supplier).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -334,7 +355,7 @@ public abstract class TaskManager {
             return function.get();
         }
         try {
-            return Fawe.get().getQueueHandler().sync(function).get();
+            return Fawe.instance().getQueueHandler().sync(function).get();
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }

@@ -178,7 +178,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                 try {
                     state = BlockState.get(palettePart);
                 } catch (InputParseException ignored) {
-                    LOGGER.warn("Invalid BlockState in palette: " + palettePart + ". Block will be replaced with air.");
+                    LOGGER.warn("Invalid BlockState in palette: {}. Block will be replaced with air.", palettePart);
                     state = BlockTypes.AIR.getDefaultState();
                 }
                 int index = (int) entry.getValue();
@@ -327,7 +327,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         // tiles
         if (tiles != null && !tiles.isEmpty()) {
             for (Map<String, Object> tileRaw : tiles) {
-                CompoundTag tile = FaweCache.IMP.asTag(tileRaw);
+                CompoundTag tile = FaweCache.INSTANCE.asTag(tileRaw);
 
                 int[] pos = tile.getIntArray("Pos");
                 int x;
@@ -372,7 +372,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         // entities
         if (entities != null && !entities.isEmpty()) {
             for (Map<String, Object> entRaw : entities) {
-                Map<String, Tag> value = new HashMap<>(FaweCache.IMP.asTag(entRaw).getValue());
+                Map<String, Tag> value = new HashMap<>(FaweCache.INSTANCE.asTag(entRaw).getValue());
                 StringTag id = (StringTag) value.get("Id");
                 if (id == null) {
                     id = (StringTag) value.get("id");

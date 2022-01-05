@@ -33,7 +33,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessControlException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -341,7 +340,7 @@ public class TextureUtil implements TextureHolder {
      * Do not use. Use {@link Fawe#getTextureUtil()}
      */
     public TextureUtil() throws FileNotFoundException {
-        this(MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.TEXTURES));
+        this(MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().PATHS.TEXTURES));
     }
 
     /**
@@ -352,12 +351,12 @@ public class TextureUtil implements TextureHolder {
         if (!folder.exists()) {
             try {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
-                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/").mkdirs();
+                new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/").mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar")
+                        new URL("https://launcher.mojang.com/v1/objects/7e46fb47609401970e2818989fa584fd467cd036/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.17.1.jar")) {
+                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.18.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -370,7 +369,7 @@ public class TextureUtil implements TextureHolder {
                                     "folder with a `.minecraft/versions` jar in it.");
                     LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
                 }
-            } catch (AccessControlException e) {
+            } catch (SecurityException e) {
                 LOGGER.error(
                         "Could not download asset jar. It's likely your file permission are setup improperly and do not allow fetching data from the Mojang servers.");
                 LOGGER.error(
@@ -396,7 +395,7 @@ public class TextureUtil implements TextureHolder {
     }
 
     public static TextureUtil fromBlocks(Set<BlockType> blocks) throws FileNotFoundException {
-        return new FilteredTextureUtil(Fawe.get().getTextureUtil(), blocks);
+        return new FilteredTextureUtil(Fawe.instance().getTextureUtil(), blocks);
     }
 
     public static TextureUtil fromMask(Mask mask) throws FileNotFoundException {
@@ -405,7 +404,7 @@ public class TextureUtil implements TextureHolder {
         SingleFilterBlock extent = new SingleFilterBlock();
         new MaskTraverser(mask).reset(extent);
 
-        TextureUtil tu = Fawe.get().getTextureUtil();
+        TextureUtil tu = Fawe.instance().getTextureUtil();
         for (int typeId : tu.getValidBlockIds()) {
             BlockType block = BlockTypes.get(typeId);
             extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
@@ -808,13 +807,13 @@ public class TextureUtil implements TextureHolder {
             // Get all the jar files
             File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
             if (files.length == 0) {
-                new File(Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/")
+                new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/")
                         .mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://launcher.mojang.com/v1/objects/8d9b65467c7913fcf6f5b2e729d44a1e00fde150/client.jar")
+                        new URL("https://launcher.mojang.com/v1/objects/7e46fb47609401970e2818989fa584fd467cd036/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.imp().getDirectory() + "/" + Settings.IMP.PATHS.TEXTURES + "/1.17.1.jar")) {
+                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.18.1.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {

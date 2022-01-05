@@ -32,7 +32,7 @@ public class GriefDefenderFeature extends BukkitMaskManager implements Listener 
     }
 
     @Override
-    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type) {
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
         final Location loc = player.getLocation();
         final Vector3i vector = Vector3i.from(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());

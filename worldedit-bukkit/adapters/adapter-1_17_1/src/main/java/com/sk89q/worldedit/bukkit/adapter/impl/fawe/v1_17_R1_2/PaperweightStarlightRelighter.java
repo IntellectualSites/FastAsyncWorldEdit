@@ -129,7 +129,7 @@ public class PaperweightStarlightRelighter implements Relighter {
         while (iterator.hasNext()) {
             coords.add(new ChunkPos(iterator.nextLong()));
         }
-        TaskManager.IMP.task(() -> {
+        TaskManager.taskManager().task(() -> {
             // trigger chunk load and apply ticket on main thread
             List<CompletableFuture<?>> futures = new ArrayList<>();
             for (ChunkPos pos : coords) {
@@ -153,9 +153,9 @@ public class PaperweightStarlightRelighter implements Relighter {
                                     LOGGER.warn("Processed {} chunks instead of {}", i, coords.size());
                                 }
                                 // post process chunks on main thread
-                                TaskManager.IMP.task(() -> postProcessChunks(coords));
+                                TaskManager.taskManager().task(() -> postProcessChunks(coords));
                                 // call callback on our own threads
-                                TaskManager.IMP.async(andThen);
+                                TaskManager.taskManager().async(andThen);
                             }
                     )
             );
@@ -184,7 +184,7 @@ public class PaperweightStarlightRelighter implements Relighter {
      * Also, if chunk packets are sent delayed, we need to do that here
      */
     private void postProcessChunks(Set<ChunkPos> coords) {
-        boolean delay = Settings.IMP.LIGHTING.DELAY_PACKET_SENDING;
+        boolean delay = Settings.settings().LIGHTING.DELAY_PACKET_SENDING;
         for (ChunkPos pos : coords) {
             int x = pos.x;
             int z = pos.z;

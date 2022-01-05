@@ -22,6 +22,7 @@ package com.sk89q.worldedit.extension.platform;
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
 import com.sk89q.worldedit.registry.Keyed;
@@ -235,5 +236,17 @@ public interface Platform extends Keyed {
      */
     @Nonnull
     RelighterFactory getRelighterFactory();
+
+    /**
+     * Get the default minimum Y value of worlds based on Minecraft version (inclusive).
+     * @since 2.0.0
+     */
+    int versionMinY();
+
+    /**
+     * Get the default maximum Y value of worlds based on Minecraft version (inclusive).
+     * @since 2.0.0
+     */
+    int versionMaxY();
     //FAWE end
 }

@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.function.visitor;
 
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -41,7 +43,10 @@ public class RecursiveVisitor extends BreadthFirstSearch {
      * @param function the function
      */
     public RecursiveVisitor(Mask mask, RegionFunction function) {
-        this(mask, function, Integer.MAX_VALUE, 0, 255, null);
+        this(mask, function, Integer.MAX_VALUE, WorldEdit
+                        .getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY(), null
+        );
         //FAWE end
     }
 

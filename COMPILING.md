@@ -1,12 +1,12 @@
 Compiling
 =========
 
-You can compile FastAsyncWorldEdit as long as you have some version of Java greater than or equal to 16 installed. Gradle will download JDK 16 specifically if needed,
+You can compile FastAsyncWorldEdit as long as you have some version of Java greater than or equal to 17 installed. Gradle will download JDK 17 specifically if needed,
 but it needs some version of Java to bootstrap from.
 
 Note that if you have JRE 8 installed, Gradle will currently attempt to use that to compile, which will not work. It is easiest to uninstall JRE 8 and replace it with JDK 16.
 
-You can get the JDK 16 [here](https://adoptium.net/).
+You can get the JDK 17 [here](https://adoptium.net/).
 
 The build process uses Gradle, which you do *not* need to download. FastAsyncWorldEdit is a multi-module project with three active modules:
 
@@ -15,10 +15,6 @@ The build process uses Gradle, which you do *not* need to download. FastAsyncWor
 * `worldedit-cli` is the command line interface
 
 ## To compile...
-
-### NMS
-FastAsyncWorldEdit uses NMS (net.minecraft.server) code in a variety of spots. NMS is not distributed via maven and therefore FastAsyncWorldEdit may not build without errors if you didn't install it into your local repository beforehand.
-You can do that by either running Spigot's [BuildTools](https://www.spigotmc.org/wiki/buildtools/) targeting the versions needed or using Paper's [paperclip](https://papermc.io/downloads) with `java -Dpaperclip.install=true -jar paperclip.jar`.
 
 ### On Windows
 
@@ -38,13 +34,13 @@ You will find:
 * FastAsyncWorldEdit for Bukkit in **worldedit-bukkit/build/libs**
 * the CLI version in **worldedit-cli/build/libs**
 
-If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-1.17-<commitHash>` version obtained in **worldedit-bukkit/build/libs**.
+If you want to use FastAsyncWorldEdit, use the `FastAsyncWorldEdit-<identifier>` version obtained in **worldedit-bukkit/build/libs**.
 
 (The `-#` version includes FastAsyncWorldEdit + necessary libraries.)
 
 ## Other commands
 
-* `gradlew idea` will generate an [IntelliJ IDEA](http://www.jetbrains.com/idea/) module for each folder.
+* `gradlew idea` will generate an [IntelliJ IDEA](https://www.jetbrains.com/idea/) module for each folder.
 
 _Possibly broken_:
 * `gradlew eclipse` will generate an [Eclipse](https://www.eclipse.org/downloads/) project for each folder.

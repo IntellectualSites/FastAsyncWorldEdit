@@ -34,7 +34,7 @@ public class BukkitItemStack extends BaseItemStack {
     @Nullable
     @Override
     public Object getNativeItem() {
-        ItemUtil util = Fawe.<FaweBukkit>imp().getItemUtil();
+        ItemUtil util = Fawe.<FaweBukkit>platform().getItemUtil();
         if (util != null && nativeItem == null) {
             return nativeItem = util.getNMSItem(stack);
         }
@@ -58,7 +58,7 @@ public class BukkitItemStack extends BaseItemStack {
     public CompoundTag getNbtData() {
         if (!loadedNBT) {
             loadedNBT = true;
-            ItemUtil util = Fawe.<FaweBukkit>imp().getItemUtil();
+            ItemUtil util = Fawe.<FaweBukkit>platform().getItemUtil();
             if (util != null) {
                 super.setNbtData(util.getNBT(stack));
             }
@@ -68,7 +68,7 @@ public class BukkitItemStack extends BaseItemStack {
 
     @Override
     public void setNbtData(@Nullable CompoundTag nbtData) {
-        ItemUtil util = Fawe.<FaweBukkit>imp().getItemUtil();
+        ItemUtil util = Fawe.<FaweBukkit>platform().getItemUtil();
         if (util != null) {
             stack = util.setNBT(stack, nbtData);
             nativeItem = null;

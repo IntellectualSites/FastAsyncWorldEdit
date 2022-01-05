@@ -10,12 +10,7 @@ fun Project.applyCommonConfiguration() {
     version = rootProject.version
 
     repositories {
-        mavenLocal()
         mavenCentral()
-        maven {
-            name = "IntellectualSites"
-            url = uri("https://mvn.intellectualsites.com/content/groups/public/")
-        }
         maven {
             name = "EngineHub"
             url = uri("https://maven.enginehub.org/repo/")
@@ -32,6 +27,7 @@ fun Project.applyCommonConfiguration() {
             name = "Athion"
             url = uri("https://ci.athion.net/plugin/repository/tools/")
         }
+        mavenLocal()
     }
 
     configurations.all {
@@ -42,7 +38,7 @@ fun Project.applyCommonConfiguration() {
 
     plugins.withId("java") {
         the<JavaPluginExtension>().toolchain {
-            languageVersion.set(JavaLanguageVersion.of(16))
+            languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
 
@@ -54,15 +50,15 @@ fun Project.applyCommonConfiguration() {
                     continue
                 }
                 add(conf.name, "com.google.guava:guava") {
-                    version { require("21.0") }
+                    version { require("31.0.1-jre") }
                     because("Mojang provides Guava")
                 }
                 add(conf.name, "com.google.code.gson:gson") {
-                    version { require("2.8.0") }
+                    version { require("2.8.8") }
                     because("Mojang provides Gson")
                 }
                 add(conf.name, "it.unimi.dsi:fastutil") {
-                    version { require("8.2.1") }
+                    version { require("8.5.6") }
                     because("Mojang provides FastUtil")
                 }
             }

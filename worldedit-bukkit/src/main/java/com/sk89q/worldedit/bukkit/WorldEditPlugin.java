@@ -138,12 +138,12 @@ public class WorldEditPlugin extends JavaPlugin {
         platform = new BukkitServerInterface(this, getServer());
         worldEdit.getPlatformManager().register(platform);
 
-        //FAWE start - Rename config to config-legacy.yml TODO: Chose a better name in the future
-        createDefaultConfiguration("config-legacy.yml"); // Create the default configuration file for WorldEdit, for us it's 'config-legacy.yml'
+        //FAWE start - Migrate from config-legacy to worldedit-config
+        migrateLegacyConfig();
         //FAWE end
 
         //FAWE start - Modify WorldEdit config name
-        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "config-legacy.yml"), true), this);
+        config = new BukkitConfiguration(new YAMLProcessor(new File(getDataFolder(), "worldedit-config.yml"), true), this);
         //FAWE end
 
         //FAWE start - Setup permission attachments
@@ -220,8 +220,6 @@ public class WorldEditPlugin extends JavaPlugin {
         // Enable metrics
         new Metrics(this, BSTATS_ID);
 
-        // Check whether the server runs on 11 or greater
-        ServerLib.checkJavaLTS();
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
         // Check if a new build is available
@@ -369,8 +367,8 @@ public class WorldEditPlugin extends JavaPlugin {
             } else {
                 //FAWE start - Identify as FAWE
                 LOGGER.info("FastAsyncWorldEdit could not find a Bukkit adapter for this MC version, "
-                        + "but it seems that you have another implementation of FastAsyncWorldEdit installed (" + platform.getPlatformName() + ") "
-                        + "that handles the world editing.");
+                        + "but it seems that you have another implementation of FastAsyncWorldEdit installed ({}) "
+                        + "that handles the world editing.", platform.getPlatformName());
                 //FAWE end
             }
             this.adapter.invalidate();
@@ -382,7 +380,7 @@ public class WorldEditPlugin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        Fawe.get().onDisable();
+        Fawe.instance().onDisable();
         WorldEdit worldEdit = WorldEdit.getInstance();
         worldEdit.getSessionManager().unload();
         if (platform != null) {
@@ -422,6 +420,19 @@ public class WorldEditPlugin extends JavaPlugin {
                 LOGGER.error("Unable to read default configuration: " + name);
             }
         }
+    }
+
+    private void migrateLegacyConfig() {
+        File legacy = new File(getDataFolder(), "config-legacy.yml");
+        if (legacy.exists()) {
+            try {
+                legacy.renameTo(new File(getDataFolder(), "worldedit-config.yml"));
+                LOGGER.info("Migrated config-legacy.yml to worldedit-config.yml");
+            } catch (Exception e) {
+                LOGGER.error("Unable to rename legacy config file", e);
+            }
+        }
+        createDefaultConfiguration("worldedit-config.yml");
     }
 
     private void copyDefaultConfig(InputStream input, File actual, String name) {

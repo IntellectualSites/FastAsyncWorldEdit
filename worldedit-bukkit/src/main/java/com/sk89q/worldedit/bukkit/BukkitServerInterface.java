@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.google.common.collect.Sets;
 import com.sk89q.bukkit.util.CommandInfo;
@@ -274,9 +275,19 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     RelighterFactory getRelighterFactory() {
         if (this.relighterFactory == null) {
             this.relighterFactory = this.plugin.getBukkitImplAdapter().getRelighterFactory();
-            LOGGER.info("Using " + this.relighterFactory.getClass().getCanonicalName() + " as relighter factory.");
+            LOGGER.info("Using {} as relighter factory.", this.relighterFactory.getClass().getCanonicalName());
         }
         return this.relighterFactory;
+    }
+
+    @Override
+    public int versionMinY() {
+        return new MinecraftVersion().isEqualOrHigherThan(MinecraftVersion.CAVES_18) ? -64 : 0;
+    }
+
+    @Override
+    public int versionMaxY() {
+        return new MinecraftVersion().isEqualOrHigherThan(MinecraftVersion.CAVES_18) ? 319 : 255;
     }
     //FAWE end
 }

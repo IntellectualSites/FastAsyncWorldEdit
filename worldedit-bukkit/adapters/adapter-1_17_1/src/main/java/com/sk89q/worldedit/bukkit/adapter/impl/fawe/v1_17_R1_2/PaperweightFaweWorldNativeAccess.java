@@ -250,7 +250,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 }
             }
         };
-        TaskManager.IMP.async(() -> TaskManager.IMP.sync(runnableVal));
+        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnableVal));
     }
 
     @Override
@@ -269,27 +269,17 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         if (Fawe.isMainThread()) {
             runnableVal.run();
         } else {
-            TaskManager.IMP.sync(runnableVal);
+            TaskManager.taskManager().sync(runnableVal);
         }
         cachedChanges.clear();
         cachedChunksToSend.clear();
     }
 
-    private static final class CachedChange {
-
-        private final LevelChunk levelChunk;
-        private final BlockPos blockPos;
-        private final net.minecraft.world.level.block.state.BlockState blockState;
-
-        private CachedChange(
-                LevelChunk levelChunk,
-                BlockPos blockPos,
-                net.minecraft.world.level.block.state.BlockState blockState
-        ) {
-            this.levelChunk = levelChunk;
-            this.blockPos = blockPos;
-            this.blockState = blockState;
-        }
+    private record CachedChange(
+            LevelChunk levelChunk,
+            BlockPos blockPos,
+            net.minecraft.world.level.block.state.BlockState blockState
+    ) {
 
     }
 

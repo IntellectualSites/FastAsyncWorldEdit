@@ -33,13 +33,13 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
         return residence != null &&
                 (residence.getOwner().equals(player.getName()) ||
                         residence.getOwner().equals(player.getUniqueId().toString()) ||
-                        type == MaskType.MEMBER && TaskManager.IMP.sync(() -> residence
+                        type == MaskType.MEMBER && TaskManager.taskManager().sync(() -> residence
                                 .getPermissions()
                                 .playerHas(player, "build", false)));
     }
 
     @Override
-    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, final MaskType type) {
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, final MaskType type, boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
         final Location location = player.getLocation();
         ClaimedResidence residence = Residence.getInstance().getResidenceManager().getByLoc(location);

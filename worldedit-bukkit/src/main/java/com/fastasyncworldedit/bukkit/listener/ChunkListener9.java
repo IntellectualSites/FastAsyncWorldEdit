@@ -9,11 +9,20 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
+/**
+ * @deprecated FAWE is not necessarily the tool you want to use to limit certain tick actions, e.g. fireworks or elytra flying.
+ * The code is untouched since the 1.12 era and there is no guarantee that it will work or will be maintained in the future.
+ */
+@Deprecated(since = "2.0.0")
 public class ChunkListener9 extends ChunkListener {
 
     private Exception exception;
     private StackTraceElement[] elements;
 
+    /**
+     * @deprecated see {@link com.fastasyncworldedit.bukkit.listener.ChunkListener9} for an explanation of the deprecation
+     */
+    @Deprecated(since = "2.0.0")
     public ChunkListener9() {
         super();
     }
@@ -37,13 +46,13 @@ public class ChunkListener9 extends ChunkListener {
                 event.setCancelled(true);
                 return;
             }
-            if (System.currentTimeMillis() - physStart > Settings.IMP.TICK_LIMITER.PHYSICS_MS) {
+            if (System.currentTimeMillis() - physStart > Settings.settings().TICK_LIMITER.PHYSICS_MS) {
                 physCancelPair = pair;
                 event.setCancelled(true);
                 return;
             }
         }
-        FaweTimer timer = Fawe.get().getTimer();
+        FaweTimer timer = Fawe.instance().getTimer();
         if (timer.getTick() != physTick) {
             physTick = timer.getTick();
             physStart = System.currentTimeMillis();
@@ -52,7 +61,7 @@ public class ChunkListener9 extends ChunkListener {
             return;
         }
         if ((++physSkip & 1023) == 0) {
-            if (System.currentTimeMillis() - physStart > Settings.IMP.TICK_LIMITER.PHYSICS_MS) {
+            if (System.currentTimeMillis() - physStart > Settings.settings().TICK_LIMITER.PHYSICS_MS) {
                 Block block = event.getBlock();
                 int cx = block.getX() >> 4;
                 int cz = block.getZ() >> 4;

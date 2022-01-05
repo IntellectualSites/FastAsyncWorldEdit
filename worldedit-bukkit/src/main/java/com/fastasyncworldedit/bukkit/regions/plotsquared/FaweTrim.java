@@ -37,7 +37,7 @@ public class FaweTrim extends SubCommand {
             return false;
         }
         ran = true;
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             try {
                 // TODO NOT IMPLEMENTED
                 //PlotTrim trim = new PlotTrim(plotPlayer, plotPlayer.getPlotAreaAbs(), strings[0], Boolean.parseBoolean(strings[1]));

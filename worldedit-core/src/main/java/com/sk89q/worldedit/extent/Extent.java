@@ -870,7 +870,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default Extent enableHistory(AbstractChangeSet changeSet) {
-        if (Settings.IMP.HISTORY.SEND_BEFORE_HISTORY) {
+        if (Settings.settings().HISTORY.SEND_BEFORE_HISTORY) {
             return addPostProcessor(changeSet);
         } else {
             return addProcessor(changeSet);

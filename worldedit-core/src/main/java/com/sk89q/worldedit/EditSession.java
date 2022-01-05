@@ -258,47 +258,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Nullable
     private final Region[] allowedRegions;
 
-    @Deprecated(forRemoval = true)
-    public EditSession(
-            @Nonnull EventBus bus, World world, @Nullable Player actor,
-            @Nullable FaweLimit limit, @Nullable AbstractChangeSet changeSet,
-            @Nullable RegionWrapper[] allowedRegions, @Nullable Boolean autoQueue,
-            @Nullable Boolean fastmode, @Nullable Boolean checkMemory, @Nullable Boolean combineStages,
-            @Nullable BlockBag blockBag, @Nullable EditSessionEvent event
-    ) {
-        this(new EditSessionBuilder(bus).world(world).actor(actor)
-                .limit(limit)
-                .changeSet(changeSet)
-                .allowedRegions(allowedRegions)
-                .fastMode(fastmode)
-                .checkMemory(checkMemory)
-                .combineStages(combineStages)
-                .blockBag(blockBag)
-                .event(event));
-    }
-    //FAWE end
-
-    /**
-     * Construct the object with a maximum number of blocks and a block bag.
-     *
-     * @param eventBus  the event bus
-     * @param world     the world
-     * @param maxBlocks the maximum number of blocks that can be changed, or -1 to use no limit
-     * @param blockBag  an optional {@link BlockBag} to use, otherwise null
-     * @param event     the event to call with the extent
-     */
-    //FAWE start - EditSessionEvent
-    @Deprecated(forRemoval = true)
-    public EditSession(
-            @Nonnull EventBus eventBus,
-            World world,
-            int maxBlocks,
-            @Nullable BlockBag blockBag,
-            EditSessionEvent event
-    ) {
-        this(eventBus, world, null, null, null, null, true, null, null, null, blockBag, event);
-    }
-
     EditSession(EditSessionBuilder builder) {
         super(builder.compile().getExtent());
         this.world = builder.getWorld();
@@ -320,27 +279,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         } else {
             this.tracingExtents = null;
         }
-
-        this.allowedRegions = builder.getAllowedRegions() != null ? builder.getAllowedRegions().clone() : null;
-    }
-
-    @Deprecated(forRemoval = true)
-    public EditSession(com.fastasyncworldedit.core.util.EditSessionBuilder builder) {
-        super(builder.compile().getExtent());
-        this.world = builder.getWorld();
-        this.bypassHistory = builder.getBypassHistory();
-        this.bypassAll = builder.getBypassAll();
-        this.originalLimit = builder.getLimit();
-        this.limit = builder.getLimit().copy();
-        this.actor = builder.getPlayer();
-        this.changeSet = builder.getChangeTask();
-        this.minY = world.getMinY();
-        this.maxY = world.getMaxY();
-        this.blockBag = builder.getBlockBag();
-        this.history = changeSet != null;
-        this.relighter = builder.getRelighter();
-        this.wnaMode = builder.isWNAMode();
-        this.tracingExtents = null;
 
         this.allowedRegions = builder.getAllowedRegions() != null ? builder.getAllowedRegions().clone() : null;
     }
@@ -434,9 +372,8 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         return output;
     }
 
-    // pkg private for TracedEditSession only, may later become public API
-    boolean commitRequired() {
-        //FAWE start
+    private boolean commitRequired() {
+    //FAWE start - false for us, returning true if the reorder extent != null for upstream
         return false;
     }
     //FAWE end
@@ -1352,7 +1289,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 // Don't relight twice!
                 if (!relighter.isFinished() && relighter.getLock().tryLock()) {
                     try {
-                        if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                        if (Settings.settings().LIGHTING.REMOVE_FIRST) {
                             relighter.removeAndRelight(true);
                         } else {
                             relighter.fixLightingSafe(true);
@@ -1368,14 +1305,14 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         // Cancel any preloader associated with the actor if present
         if (getActor() instanceof Player) {
-            Preloader preloader = Fawe.imp().getPreloader(false);
+            Preloader preloader = Fawe.platform().getPreloader(false);
             if (preloader != null) {
                 preloader.cancel(getActor());
             }
         }
         // Enqueue it
         if (getChangeSet() != null) {
-            if (Settings.IMP.HISTORY.COMBINE_STAGES) {
+            if (Settings.settings().HISTORY.COMBINE_STAGES) {
                 ((AbstractChangeSet) getChangeSet()).closeAsync();
             } else {
                 try {
@@ -3712,7 +3649,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
             if (containsAny) {
                 changes++;
-                TaskManager.IMP.sync(new RunnableVal<Object>() {
+                TaskManager.taskManager().sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
                         regenerateChunk(cx, cz, biome, seed);

@@ -28,7 +28,7 @@ public class RenderListener implements Listener {
 
     public RenderListener(Plugin plugin) {
         Bukkit.getPluginManager().registerEvents(this, plugin);
-        TaskManager.IMP.repeat(new Runnable() {
+        TaskManager.taskManager().repeat(new Runnable() {
             private long last = 0;
 
             @Override
@@ -38,7 +38,7 @@ public class RenderListener implements Listener {
                 }
 
                 long now = System.currentTimeMillis();
-                int tps32 = (int) (Math.round(Fawe.get().getTimer().getTPS()) * 32);
+                int tps32 = (int) (Math.round(Fawe.instance().getTimer().getTPS()) * 32);
                 long diff = now - last;
                 last = now;
                 if (diff > 75) {
@@ -56,7 +56,7 @@ public class RenderListener implements Listener {
                 if (entrySet == null || !entrySet.hasNext()) {
                     entrySet = views.entrySet().iterator();
                 }
-                int nowTick = (int) (Fawe.get().getTimer().getTick());
+                int nowTick = (int) (Fawe.instance().getTimer().getTick());
                 while (entrySet.hasNext()) {
                     Map.Entry<UUID, int[]> entry = entrySet.next();
                     Player player = Bukkit.getPlayer(entry.getKey());
@@ -81,17 +81,17 @@ public class RenderListener implements Listener {
 
     private void setViewDistance(Player player, int value) {
         UUID uuid = player.getUniqueId();
-        if (value == Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING) {
+        if (value == Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING) {
             views.remove(uuid);
         } else {
             int[] val = views.get(uuid);
             if (val == null) {
-                val = new int[]{value, (int) Fawe.get().getTimer().getTick()};
+                val = new int[]{value, (int) Fawe.instance().getTimer().getTick()};
                 UUID uid = player.getUniqueId();
                 views.put(uid, val);
             } else {
                 if (value <= val[0]) {
-                    val[1] = (int) Fawe.get().getTimer().getTick();
+                    val[1] = (int) Fawe.instance().getTimer().getTick();
                 }
                 if (val[0] == value) {
                     return;
@@ -105,7 +105,7 @@ public class RenderListener implements Listener {
 
     private int getViewDistance(Player player) {
         int[] value = views.get(player.getUniqueId());
-        return value == null ? Settings.IMP.EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING : value[0];
+        return value == null ? Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING : value[0];
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

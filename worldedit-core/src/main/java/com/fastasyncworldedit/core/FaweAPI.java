@@ -11,7 +11,6 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.regions.RegionWrapper;
-import com.fastasyncworldedit.core.util.EditSessionBuilder;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -61,23 +60,12 @@ public class FaweAPI {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     /**
-     * Offers a lot of options for building an EditSession.
-     *
-     * @return A new EditSessionBuilder
-     * @deprecated See {@link WorldEdit#newEditSessionBuilder()}
-     */
-    @Deprecated(forRemoval = true)
-    public static EditSessionBuilder getEditSessionBuilder(World world) {
-        return new EditSessionBuilder(world);
-    }
-
-    /**
      * The TaskManager has some useful methods for doing things asynchronously.
      *
      * @return TaskManager
      */
     public static TaskManager getTaskManager() {
-        return TaskManager.IMP;
+        return TaskManager.taskManager();
     }
 
     /**
@@ -93,7 +81,7 @@ public class FaweAPI {
      * @return the queue extent
      */
     public static IQueueExtent<IQueueChunk> createQueue(World world, boolean autoQueue) {
-        IQueueExtent<IQueueChunk> queue = Fawe.get().getQueueHandler().getQueue(world);
+        IQueueExtent<IQueueChunk> queue = Fawe.instance().getQueueHandler().getQueue(world);
         if (!autoQueue) {
             queue.disableQueue();
         }
@@ -139,7 +127,7 @@ public class FaweAPI {
      * @return Set of FaweMaskManager
      */
     public static Set<FaweMaskManager> getMaskManagers() {
-        return new HashSet<>(WEManager.IMP.getManagers());
+        return new HashSet<>(WEManager.weManager().getManagers());
     }
 
     /**
@@ -155,7 +143,7 @@ public class FaweAPI {
      * Get a player's allowed WorldEdit region(s).
      */
     public static Region[] getRegions(Player player) {
-        return WEManager.IMP.getMask(player);
+        return WEManager.weManager().getMask(player);
     }
 
     /**
@@ -167,7 +155,7 @@ public class FaweAPI {
      * @return array of allowed regions if whitelist, else of disallowed regions.
      */
     public static Region[] getRegions(Player player, FaweMaskManager.MaskType type, boolean isWhiteList) {
-        return WEManager.IMP.getMask(player, type, isWhiteList);
+        return WEManager.weManager().getMask(player, type, isWhiteList);
     }
 
     /**
@@ -182,13 +170,13 @@ public class FaweAPI {
      */
     public static void cancelEdit(AbstractDelegateExtent extent, Component reason) {
         try {
-            WEManager.IMP.cancelEdit(extent, new FaweException(reason));
+            WEManager.weManager().cancelEdit(extent, new FaweException(reason));
         } catch (WorldEditException ignored) {
         }
     }
 
     public static void addMaskManager(FaweMaskManager maskMan) {
-        WEManager.IMP.addManager(maskMan);
+        WEManager.weManager().addManager(maskMan);
     }
 
     /**
@@ -198,7 +186,7 @@ public class FaweAPI {
         if (!file.exists() || file.isDirectory()) {
             throw new IllegalArgumentException("Not a file!");
         }
-        if (Settings.IMP.HISTORY.USE_DISK) {
+        if (Settings.settings().HISTORY.USE_DISK) {
             throw new IllegalArgumentException("History on disk not enabled!");
         }
         if (!file.getName().toLowerCase(Locale.ROOT).endsWith(".bd")) {
@@ -236,11 +224,10 @@ public class FaweAPI {
      */
     public static List<DiskStorageHistory> getBDFiles(Location origin, UUID user, int radius, long timediff, boolean shallow) {
         Extent extent = origin.getExtent();
-        if (!(extent instanceof World)) {
+        if (!(extent instanceof World world)) {
             throw new IllegalArgumentException("Origin is not a valid world");
         }
-        World world = (World) extent;
-        File history = MainUtil.getFile(Fawe.imp().getDirectory(), Settings.IMP.PATHS.HISTORY + File.separator + world.getName());
+        File history = MainUtil.getFile(Fawe.platform().getDirectory(), Settings.settings().PATHS.HISTORY + File.separator + world.getName());
         if (!history.exists()) {
             return new ArrayList<>();
         }
@@ -364,12 +351,12 @@ public class FaweAPI {
             World unwrapped = WorldWrapper.unwrap(world);
             if (unwrapped instanceof IQueueExtent) {
                 queue = (IQueueExtent) unwrapped;
-            } else if (Settings.IMP.QUEUE.PARALLEL_THREADS > 1) {
+            } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1) {
                 ParallelQueueExtent parallel =
-                        new ParallelQueueExtent(Fawe.get().getQueueHandler(), world, true);
+                        new ParallelQueueExtent(Fawe.instance().getQueueHandler(), world, true);
                 queue = parallel.getExtent();
             } else {
-                queue = Fawe.get().getQueueHandler().getQueue(world);
+                queue = Fawe.instance().getQueueHandler().getQueue(world);
             }
         }
 
@@ -384,7 +371,7 @@ public class FaweAPI {
                 }
             }
             if (mode != RelightMode.NONE) {
-                if (Settings.IMP.LIGHTING.REMOVE_FIRST) {
+                if (Settings.settings().LIGHTING.REMOVE_FIRST) {
                     relighter.removeAndRelight(true);
                 } else {
                     relighter.fixSkyLighting();

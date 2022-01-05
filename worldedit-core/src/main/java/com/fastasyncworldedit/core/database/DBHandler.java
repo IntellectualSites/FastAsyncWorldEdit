@@ -9,11 +9,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class DBHandler {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-
+    /**
+     * @deprecated Use {@link #dbHandler()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     public static final DBHandler IMP = new DBHandler();
-
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static DBHandler INSTANCE;
     private final Map<World, RollbackDatabase> databases = new ConcurrentHashMap<>(8, 0.9f, 1);
+
+    /**
+     * Get an instance of the DBHandler.
+     *
+     * @return an instance of the DBHandler.
+     * @since 2.0.0
+     */
+    public static DBHandler dbHandler() {
+        if (INSTANCE == null) {
+            INSTANCE = new DBHandler();
+        }
+        return INSTANCE;
+    }
 
     public RollbackDatabase getDatabase(World world) {
         RollbackDatabase database = databases.get(world);

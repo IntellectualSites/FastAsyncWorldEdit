@@ -22,7 +22,7 @@ import java.util.Set;
 public final class MemBlockSet extends BlockSet {
 
     public static final int BITS_PER_WORD = 6;
-    public static final int WORDS = FaweCache.IMP.BLOCKS_PER_LAYER >> BITS_PER_WORD;
+    public static final int WORDS = FaweCache.INSTANCE.BLOCKS_PER_LAYER >> BITS_PER_WORD;
     public static final IRow NULL_ROW_X = new NullRowX();
     public static final IRow NULL_ROW_Z = new NullRowZ();
     public static final IRow NULL_ROW_Y = new NullRowY();

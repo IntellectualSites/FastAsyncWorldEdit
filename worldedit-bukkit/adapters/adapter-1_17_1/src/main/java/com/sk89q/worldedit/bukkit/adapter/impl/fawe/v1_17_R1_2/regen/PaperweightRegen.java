@@ -90,13 +90,13 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private static final Field serverWorldsField;
-    private static final Field worldPaperConfigField;
-    private static final Field flatBedrockField;
+    private static final Field worldsField;
+    private static final Field paperConfigField;
+    private static final Field generateFlatBedrockField;
     private static final Field generatorSettingFlatField;
     private static final Field generatorSettingBaseSupplierField;
     private static final Field delegateField;
-    private static final Field chunkProviderField;
+    private static final Field chunkSourceField;
 
     //list of chunk stati in correct order without FULL
     private static final Map<ChunkStatus, Concurrency> chunkStati = new LinkedHashMap<>();
@@ -125,8 +125,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         chunkStati.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
 
         try {
-            serverWorldsField = CraftServer.class.getDeclaredField("worlds");
-            serverWorldsField.setAccessible(true);
+            worldsField = CraftServer.class.getDeclaredField("worlds");
+            worldsField.setAccessible(true);
 
             Field tmpPaperConfigField;
             Field tmpFlatBedrockField;
@@ -140,8 +140,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 tmpPaperConfigField = null;
                 tmpFlatBedrockField = null;
             }
-            worldPaperConfigField = tmpPaperConfigField;
-            flatBedrockField = tmpFlatBedrockField;
+            paperConfigField = tmpPaperConfigField;
+            generateFlatBedrockField = tmpFlatBedrockField;
 
             generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
                     "settings", "g"));
@@ -153,8 +153,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
             delegateField.setAccessible(true);
 
-            chunkProviderField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "C"));
-            chunkProviderField.setAccessible(true);
+            chunkSourceField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "C"));
+            chunkSourceField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -187,9 +187,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         //flat bedrock? (only on paper)
-        if (worldPaperConfigField != null) {
+        if (paperConfigField != null) {
             try {
-                generateFlatBedrock = flatBedrockField.getBoolean(worldPaperConfigField.get(originalServerWorld));
+                generateFlatBedrock = generateFlatBedrockField.getBoolean(paperConfigField.get(originalServerWorld));
             } catch (Exception ignored) {
             }
         }
@@ -210,7 +210,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         org.bukkit.generator.ChunkGenerator generator = originalBukkitWorld.getGenerator();
         LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(tempDir);
         ResourceKey<LevelStem> levelStemResourceKey = getWorldDimKey(environment);
-        session = levelStorageSource.createAccess("worldeditregentempworld", levelStemResourceKey);
+        session = levelStorageSource.createAccess("faweregentempworld", levelStemResourceKey);
         PrimaryLevelData originalWorldData = originalServerWorld.serverLevelData;
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
@@ -221,7 +221,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 ? PaperweightAdapter.replaceSeed(originalServerWorld, seed, originalOpts)
                 : originalOpts;
         LevelSettings newWorldSettings = new LevelSettings(
-                "worldeditregentempworld",
+                "faweregentempworld",
                 originalWorldData.settings.gameType(),
                 originalWorldData.settings.hardcore(),
                 originalWorldData.settings.difficulty(),
@@ -232,7 +232,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         PrimaryLevelData newWorldData = new PrimaryLevelData(newWorldSettings, newOpts, Lifecycle.stable());
 
         //init world
-        freshWorld = Fawe.get().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
+        freshWorld = Fawe.instance().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
                 server,
                 server.executor,
                 session,
@@ -270,8 +270,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         freshWorld.noSave = true;
         removeWorldFromWorldsMap();
         newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
-        if (worldPaperConfigField != null) {
-            worldPaperConfigField.set(freshWorld, originalServerWorld.paperConfig);
+        if (paperConfigField != null) {
+            paperConfigField.set(freshWorld, originalServerWorld.paperConfig);
         }
 
         //generator
@@ -319,7 +319,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             }
         };
 
-        ReflectionUtils.unsafeSet(chunkProviderField, freshWorld, freshChunkProvider);
+        ReflectionUtils.unsafeSet(chunkSourceField, freshWorld, freshChunkProvider);
         //let's start then
         structureManager = server.getStructureManager();
         threadedLevelLightEngine = freshChunkProvider.getLightEngine();
@@ -336,7 +336,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         //shutdown chunk provider
         try {
-            Fawe.get().getQueueHandler().sync(() -> {
+            Fawe.instance().getQueueHandler().sync(() -> {
                 try {
                     freshChunkProvider.close(false);
                 } catch (IOException e) {
@@ -348,7 +348,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         //remove world from server
         try {
-            Fawe.get().getQueueHandler().sync(this::removeWorldFromWorldsMap);
+            Fawe.instance().getQueueHandler().sync(this::removeWorldFromWorldsMap);
         } catch (Exception ignored) {
         }
 
@@ -388,7 +388,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     @Override
     protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
         // BlockPopulator#populate has to be called synchronously for TileEntity access
-        TaskManager.IMP.task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
+        TaskManager.taskManager().task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
     }
 
     @Override
@@ -403,10 +403,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     //util
     private void removeWorldFromWorldsMap() {
-        Fawe.get().getQueueHandler().sync(() -> {
+        Fawe.instance().getQueueHandler().sync(() -> {
             try {
-                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) serverWorldsField.get(Bukkit.getServer());
-                map.remove("worldeditregentempworld");
+                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) worldsField.get(Bukkit.getServer());
+                map.remove("faweregentempworld");
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -414,15 +414,11 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     }
 
     private ResourceKey<LevelStem> getWorldDimKey(org.bukkit.World.Environment env) {
-        switch (env) {
-            case NETHER:
-                return LevelStem.NETHER;
-            case THE_END:
-                return LevelStem.END;
-            case NORMAL:
-            default:
-                return LevelStem.OVERWORLD;
-        }
+        return switch (env) {
+            case NETHER -> LevelStem.NETHER;
+            case THE_END -> LevelStem.END;
+            default -> LevelStem.OVERWORLD;
+        };
     }
 
     private BiomeSource fastOverworldBiomeSource(BiomeSource biomeSource) throws Exception {

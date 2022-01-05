@@ -44,18 +44,17 @@ public final class Constants {
 
     /**
      * The DataVersion for Minecraft 1.13
+     * @deprecated If Fawe drops interaction with 1.13, this method is subject to removal.
      */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     public static final int DATA_VERSION_MC_1_13 = 1519;
 
     /**
      * The DataVersion for Minecraft 1.13.2
+     * @deprecated If Fawe drops interaction with 1.13, this method is subject to removal.
      */
+    @Deprecated(forRemoval = true, since = "2.0.0")
     public static final int DATA_VERSION_MC_1_13_2 = 1631;
-
-    /**
-     * The DataVersion for Minecraft 1.14
-     */
-    public static final int DATA_VERSION_MC_1_14 = 1952;
 
     /**
      * The DataVersion for Minecraft 1.15
@@ -71,5 +70,10 @@ public final class Constants {
      * The DataVersion for Minecraft 1.17
      */
     public static final int DATA_VERSION_MC_1_17 = 2724;
+
+    /**
+     * The DataVersion for Minecraft 1.18
+     */
+    public static final int DATA_VERSION_MC_1_18 = 2860;
 
 }

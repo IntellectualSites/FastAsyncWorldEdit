@@ -3,13 +3,13 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
-import com.fastasyncworldedit.core.world.block.BlockID;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 
 import javax.annotation.Nullable;
@@ -116,11 +116,9 @@ public interface IBlocks extends Trimable {
                 for (int i = 0; i < ids.length; i++) {
                     char ordinal = ids[i];
                     switch (ordinal) {
-                        case BlockID.__RESERVED__:
-                        case BlockID.CAVE_AIR:
-                        case BlockID.VOID_AIR:
-                            ids[i] = BlockID.AIR;
-                        case BlockID.AIR:
+                        case BlockTypesCache.ReservedIDs.__RESERVED__, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR:
+                            ids[i] = BlockTypesCache.ReservedIDs.AIR;
+                        case BlockTypesCache.ReservedIDs.AIR:
                             continue;
                         default:
                             nonEmpty++;
@@ -130,9 +128,9 @@ public interface IBlocks extends Trimable {
                 sectionWriter.writeShort(nonEmpty); // non empty
                 FaweCache.Palette palette;
                 if (stretched) {
-                    palette = FaweCache.IMP.toPalette(0, ids);
+                    palette = FaweCache.INSTANCE.toPalette(0, ids);
                 } else {
-                    palette = FaweCache.IMP.toPaletteUnstretched(0, ids);
+                    palette = FaweCache.INSTANCE.toPaletteUnstretched(0, ids);
                 }
 
                 sectionWriter.writeByte(palette.bitsPerEntry); // bits per block
@@ -140,17 +138,13 @@ public interface IBlocks extends Trimable {
                 for (int i = 0; i < palette.paletteToBlockLength; i++) {
                     int ordinal = palette.paletteToBlock[i];
                     switch (ordinal) {
-                        case BlockID.__RESERVED__:
-                        case BlockID.CAVE_AIR:
-                        case BlockID.VOID_AIR:
-                        case BlockID.AIR:
-                            sectionWriter.write(0);
-                            break;
-                        default:
+                        case BlockTypesCache.ReservedIDs.__RESERVED__, BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR,
+                                BlockTypesCache.ReservedIDs.VOID_AIR -> sectionWriter.write(0);
+                        default -> {
                             BlockState state = BlockState.getFromOrdinal(ordinal);
                             int mcId = registry.getInternalBlockStateId(state).getAsInt();
                             sectionWriter.writeVarInt(mcId);
-                            break;
+                        }
                     }
                 }
                 sectionWriter.writeVarInt(palette.blockStatesLength);

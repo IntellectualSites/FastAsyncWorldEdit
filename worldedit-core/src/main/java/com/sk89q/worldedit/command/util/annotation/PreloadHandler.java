@@ -29,7 +29,7 @@ public class PreloadHandler implements CommandCallListener {
         }
         Actor actor = actorOpt.get();
         // Don't attempt to preload if effectively disabled
-        if (Settings.IMP.QUEUE.PRELOAD_CHUNK_COUNT <= 1) {
+        if (Settings.settings().QUEUE.PRELOAD_CHUNK_COUNT <= 1) {
             return;
         }
         preloadAnnotation.value().preload(actor, parameters);

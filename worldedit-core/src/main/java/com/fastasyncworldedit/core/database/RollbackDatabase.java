@@ -11,7 +11,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
-import org.intellij.lang.annotations.Language;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -37,63 +36,22 @@ public class RollbackDatabase extends AsyncNotifyQueue {
     private final String prefix;
     private final File dbLocation;
     private final World world;
-    private Connection connection;
-
-    @Language("SQLite")
-    private String createTable = "CREATE TABLE IF NOT EXISTS `{0}edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL, `time` INT NOT NULL,`x1` INT NOT NULL,`x2` INT NOT NULL,`z1` INT NOT NULL,`z2` INT NOT NULL,`y1` INT NOT NULL, `y2` INT NOT NULL, `size` INT NOT NULL, `command` VARCHAR, PRIMARY KEY (player, id))";
-    @Language("SQLite")
-    private String updateTable1 = "ALTER TABLE `{0}edits` ADD COLUMN `command` VARCHAR";
-    @Language("SQLite")
-    private String updateTable2 = "alter table `{0}edits` add size int default 0 not null";
-    @Language("SQLite")
-    private String insertEdit = "INSERT OR REPLACE INTO `{0}edits` (`player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)";
-    @Language("SQLite")
-    private String purge = "DELETE FROM `{0}edits` WHERE `time`<?";
-    @Language("SQLite")
-    private String getEditsUser = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
-    @Language("SQLite")
-    private String getEditsUserAsc = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
-    @Language("SQLite")
-    private String getEdits = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` DESC, `id` DESC";
-    @Language("SQLite")
-    private String getEditsAsc = "SELECT * FROM `{0}edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` , `id` ";
-    @Language("SQLite")
-    private String getEditUser = "SELECT * FROM `{0}edits` WHERE `player`=? AND `id`=?";
-
-    @Language("SQLite")
-    private String deleteEditsUser = "DELETE FROM `{0}edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?";
-    @Language("SQLite")
-    private String deleteEditUser = "DELETE FROM `{0}edits` WHERE `player`=? AND `id`=?";
-
     private final ConcurrentLinkedQueue<RollbackOptimizedHistory> historyChanges = new ConcurrentLinkedQueue<>();
+    private Connection connection;
 
     RollbackDatabase(World world) throws SQLException, ClassNotFoundException {
         super((t, e) -> e.printStackTrace());
         this.prefix = "";
         this.world = world;
         this.dbLocation = MainUtil.getFile(
-                Fawe.imp().getDirectory(),
-                Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + "summary.db"
+                Fawe.platform().getDirectory(),
+                Settings.settings().PATHS.HISTORY + File.separator + world.getName() + File.separator + "summary.db"
         );
         connection = openConnection();
 
-        // update vars
-        createTable = createTable.replace("{0}", prefix);
-        updateTable1 = updateTable1.replace("{0}", prefix);
-        updateTable2 = updateTable2.replace("{0}", prefix);
-        insertEdit = insertEdit.replace("{0}", prefix);
-        purge = purge.replace("{0}", prefix);
-        getEditsUser = getEditsUser.replace("{0}", prefix);
-        getEditsUserAsc = getEditsUserAsc.replace("{0}", prefix);
-        getEdits = getEdits.replace("{0}", prefix);
-        getEditsAsc = getEditsAsc.replace("{0}", prefix);
-        getEditUser = getEditUser.replace("{0}", prefix);
-        deleteEditsUser = deleteEditsUser.replace("{0}", prefix);
-        deleteEditUser = deleteEditUser.replace("{0}", prefix);
-
         try {
             init().get();
-            purge((int) TimeUnit.DAYS.toSeconds(Settings.IMP.HISTORY.DELETE_AFTER_DAYS));
+            purge((int) TimeUnit.DAYS.toSeconds(Settings.settings().HISTORY.DELETE_AFTER_DAYS));
         } catch (InterruptedException | ExecutionException e) {
             throw new RuntimeException(e);
         }
@@ -105,14 +63,17 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
     public Future<Boolean> init() {
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement(createTable)) {
+            try (PreparedStatement stmt = connection.prepareStatement("CREATE TABLE IF NOT EXISTS`" + this.prefix +
+                    "edits` (`player` BLOB(16) NOT NULL,`id` INT NOT NULL, `time` INT NOT NULL,`x1`" +
+                    "INT NOT NULL,`x2` INT NOT NULL,`z1` INT NOT NULL,`z2` INT NOT NULL,`y1`" +
+                    "INT NOT NULL, `y2` INT NOT NULL, `size` INT NOT NULL, `command` VARCHAR, PRIMARY KEY (player, id))")) {
                 stmt.executeUpdate();
             }
-            try (PreparedStatement stmt = connection.prepareStatement(updateTable1)) {
+            try (PreparedStatement stmt = connection.prepareStatement("ALTER TABLE`" + this.prefix + "edits` ADD COLUMN `command` VARCHAR")) {
                 stmt.executeUpdate();
             } catch (SQLException ignored) {
             } // Already updated
-            try (PreparedStatement stmt = connection.prepareStatement(updateTable2)) {
+            try (PreparedStatement stmt = connection.prepareStatement("ALTER TABLE`" + this.prefix + "edits` ADD SIZE INT DEFAULT 0 NOT NULL")) {
                 stmt.executeUpdate();
             } catch (SQLException ignored) {
             } // Already updated
@@ -122,7 +83,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
     public Future<Integer> delete(UUID uuid, int id) {
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement(deleteEditUser)) {
+            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix + "edits` WHERE `player`=? AND `id`=?")) {
                 stmt.setBytes(1, toBytes(uuid));
                 stmt.setInt(2, id);
                 return stmt.executeUpdate();
@@ -132,7 +93,8 @@ public class RollbackDatabase extends AsyncNotifyQueue {
 
     public Future<RollbackOptimizedHistory> getEdit(@Nonnull UUID uuid, int id) {
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement(getEditUser)) {
+            try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM`" + this.prefix +
+                    "edits` WHERE `player`=? AND `id`=?")) {
                 stmt.setBytes(1, toBytes(uuid));
                 stmt.setInt(2, id);
                 ResultSet result = stmt.executeQuery();
@@ -172,7 +134,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         long now = System.currentTimeMillis() / 1000;
         final int then = (int) (now - diff);
         return call(() -> {
-            try (PreparedStatement stmt = connection.prepareStatement(purge)) {
+            try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix + "edits` WHERE `time`<?")) {
                 stmt.setInt(1, then);
                 return stmt.executeUpdate();
             }
@@ -196,8 +158,14 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         Future<Integer> future = call(() -> {
             try {
                 int count = 0;
-                String stmtStr = ascending ? uuid == null ? getEditsAsc : getEditsUserAsc :
-                        uuid == null ? getEdits : getEditsUser;
+                String stmtStr = ascending ? uuid == null ? "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND" +
+                        " `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` , `id`" :
+                        "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND" +
+                                " `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC" :
+                        uuid == null ? "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? " +
+                                "AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` DESC, `id` DESC" :
+                                "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND" +
+                                        " `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
                 try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
                     stmt.setInt(1, (int) (minTime / 1000));
                     stmt.setInt(2, pos1.getBlockX());
@@ -221,7 +189,8 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                     } while (result.next());
                 }
                 if (delete && uuid != null) {
-                    try (PreparedStatement stmt = connection.prepareStatement(deleteEditsUser)) {
+                    try (PreparedStatement stmt = connection.prepareStatement("DELETE FROM`" + this.prefix +
+                            "edits` WHERE `player`=? AND `time`>? AND `x2`>=? AND `x1`<=? AND `y2`>=? AND `y1`<=? AND `z2`>=? AND `z1`<=?")) {
                         stmt.setInt(1, (int) (minTime / 1000));
                         stmt.setInt(2, pos1.getBlockX());
                         stmt.setInt(3, pos2.getBlockX());
@@ -267,7 +236,8 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         RollbackOptimizedHistory[] copy = IntStream.range(0, size)
                 .mapToObj(i -> historyChanges.poll()).toArray(RollbackOptimizedHistory[]::new);
 
-        try (PreparedStatement stmt = connection.prepareStatement(insertEdit)) {
+        try (PreparedStatement stmt = connection.prepareStatement("INSERT OR REPLACE INTO`" + this.prefix + "edits`" +
+                " (`player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)")) {
             // `player`,`id`,`time`,`x1`,`x2`,`z1`,`z2`,`y1`,`y2`,`command`,`size`) VALUES(?,?,?,?,?,?,?,?,?,?,?)"
             for (RollbackOptimizedHistory change : copy) {
                 UUID uuid = change.getUUID();
@@ -314,8 +284,8 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         if (checkConnection()) {
             return connection;
         }
-        if (!Fawe.imp().getDirectory().exists()) {
-            Fawe.imp().getDirectory().mkdirs();
+        if (!Fawe.platform().getDirectory().exists()) {
+            Fawe.platform().getDirectory().mkdirs();
         }
         if (!dbLocation.exists()) {
             try {

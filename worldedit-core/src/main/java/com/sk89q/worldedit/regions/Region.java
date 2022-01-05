@@ -29,6 +29,8 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.DeprecationUtil;
 import com.sk89q.worldedit.internal.util.NonAbstractForCompatibility;
@@ -226,7 +228,18 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         BlockVector3 pos1 = getMinimumPoint();
         BlockVector3 pos2 = getMaximumPoint();
         return pos1.getBlockX() == Integer.MIN_VALUE && pos1.getBlockZ() == Integer.MIN_VALUE && pos2.getBlockX() == Integer.MAX_VALUE && pos2
-                .getBlockZ() == Integer.MAX_VALUE && pos1.getBlockY() <= 0 && pos2.getBlockY() >= 255;
+                .getBlockZ() == Integer.MAX_VALUE
+                && pos1.getBlockY() <= WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(
+                        Capability.WORLD_EDITING)
+                .versionMinY()
+                && pos2.getBlockY() >= WorldEdit
+                .getInstance()
+                .getPlatformManager()
+                .queryCapability(Capability.WORLD_EDITING)
+                .versionMaxY();
     }
 
     default int getMinimumY() {
@@ -430,7 +443,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 int by = layer << 4;
                 int ty = by + 15;
                 if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
-                    set.setBlocks(layer, FaweCache.IMP.EMPTY_CHAR_4096);
+                    set.setBlocks(layer, FaweCache.INSTANCE.EMPTY_CHAR_4096);
                     processExtra = true;
                     continue;
                 }

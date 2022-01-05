@@ -19,7 +19,7 @@ public abstract class SingleThreadIntervalQueue<T> {
         this.task = new Runnable() {
             @Override
             public void run() {
-                long allowedTick = Fawe.get().getTimer().getTick() - 1;
+                long allowedTick = Fawe.instance().getTimer().getTick() - 1;
                 Iterator<Map.Entry<T, Long>> iter = objMap.entrySet().iterator();
                 while (iter.hasNext()) {
                     Map.Entry<T, Long> entry = iter.next();
@@ -32,7 +32,7 @@ public abstract class SingleThreadIntervalQueue<T> {
                 }
                 synchronized (objMap) {
                     if (!objMap.isEmpty()) {
-                        TaskManager.IMP.laterAsync(this, interval);
+                        TaskManager.taskManager().laterAsync(this, interval);
                     } else {
                         queued.set(false);
                     }
@@ -51,10 +51,10 @@ public abstract class SingleThreadIntervalQueue<T> {
 
     public void queue(T obj) {
         synchronized (objMap) {
-            objMap.put(obj, Fawe.get().getTimer().getTick());
+            objMap.put(obj, Fawe.instance().getTimer().getTick());
             if (!queued.get()) {
                 queued.set(true);
-                TaskManager.IMP.laterAsync(task, 3);
+                TaskManager.taskManager().laterAsync(task, 3);
             }
         }
     }

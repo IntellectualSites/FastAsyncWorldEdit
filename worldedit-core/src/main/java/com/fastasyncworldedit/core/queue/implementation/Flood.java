@@ -45,7 +45,7 @@ public class Flood {
     }
 
     public synchronized void run(World world) {
-        QueueHandler queueHandler = Fawe.get().getQueueHandler();
+        QueueHandler queueHandler = Fawe.instance().getQueueHandler();
         IQueueExtent<IQueueChunk> fq = queueHandler.getQueue(world);
         while (!chunkQueues.isEmpty()) {
             long firstKey = chunkQueues.firstLongKey();

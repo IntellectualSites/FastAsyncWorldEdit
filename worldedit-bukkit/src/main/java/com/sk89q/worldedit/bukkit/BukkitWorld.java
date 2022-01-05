@@ -301,10 +301,10 @@ public class BukkitWorld extends AbstractWorld {
             if (treeTypeMapping.get(type) == null) {
                 LOGGER.error("No TreeType mapping for TreeGenerator.TreeType." + type);
                 //FAWE start
-                LOGGER.info("The above message is displayed because your FAWE version is newer than " + Bukkit.getVersion() +
-                        " and contains features of future minecraft versions which do not exist in "
-                        + Bukkit.getVersion() + ", hence the tree type " + type + " is not available. This is not an error. " +
-                        "This version will work on your version of Minecraft. This is an informative message only");
+                LOGGER.info("The above message is displayed because your FAWE version is newer than {}" +
+                        " and contains features of future minecraft versions which do not exist in {} hence the tree type" +
+                        "{} is not available. This is not an error. This version will work on your version of Minecraft." +
+                        "This is an informative message only.", Bukkit.getVersion(), Bukkit.getVersion(), type);
                 //FAWE end
             }
         }
@@ -317,7 +317,7 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
         //FAWE start - allow tree commands to be undone and obey region restrictions
-        return TaskManager.IMP.sync(() -> WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt,
+        return TaskManager.taskManager().sync(() -> WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt,
                 getWorld()
         ));
         //FAWE end
@@ -520,7 +520,7 @@ public class BukkitWorld extends AbstractWorld {
     public BaseBlock getFullBlock(BlockVector3 position) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
-            return adapter.getBlock(BukkitAdapter.adapt(getWorld(), position));
+            return adapter.getFullBlock(BukkitAdapter.adapt(getWorld(), position));
         } else {
             return getBlock(position).toBaseBlock();
         }
@@ -555,7 +555,7 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean fullySupports3DBiomes() {
         // Supports if API does and we're not in the overworld
-        return HAS_3D_BIOMES && getWorld().getEnvironment() != World.Environment.NORMAL;
+        return HAS_3D_BIOMES && getWorld().getEnvironment() != World.Environment.NORMAL || PaperLib.isVersion(18);
     }
 
     @SuppressWarnings("deprecation")

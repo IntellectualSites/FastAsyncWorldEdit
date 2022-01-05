@@ -106,7 +106,15 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * @param location the location
      * @return the block
      */
-    BaseBlock getBlock(Location location);
+    BlockState getBlock(Location location);
+
+    /**
+     * Get the block at the given location.
+     *
+     * @param location the location
+     * @return the block
+     */
+    BaseBlock getFullBlock(Location location);
 
     /**
      * Create a {@link WorldNativeAccess} for the given world reference.
@@ -306,7 +314,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     @Nullable
     default World createWorld(WorldCreator creator) {
-        return ((FaweBukkit) Fawe.imp()).createWorldUnloaded(creator::createWorld);
+        return ((FaweBukkit) Fawe.platform()).createWorldUnloaded(creator::createWorld);
     }
 
     /**

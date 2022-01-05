@@ -26,9 +26,26 @@ import java.util.Set;
 
 public class WEManager {
 
-    public static final WEManager IMP = new WEManager();
     private static final Logger LOGGER = LogManagerCompat.getLogger();
+    private static WEManager INSTANCE;
+    /**
+     * @deprecated Use {@link #weManager()} instead.
+     */
+    @Deprecated(forRemoval = true, since = "2.0.0")
+    public static WEManager IMP = new WEManager();
     private final ArrayDeque<FaweMaskManager> managers = new ArrayDeque<>();
+
+    /**
+     * Get an instance of the WEManager.
+     *
+     * @return an instance of the WEManager
+     */
+    public static WEManager weManager() {
+        if (INSTANCE == null) {
+            INSTANCE = new WEManager();
+        }
+        return INSTANCE;
+    }
 
     public ArrayDeque<FaweMaskManager> getManagers() {
         return managers;
@@ -81,7 +98,7 @@ public class WEManager {
      * @return array of allowed regions if whitelist, else of disallowed regions.
      */
     public Region[] getMask(Player player, FaweMaskManager.MaskType type, final boolean isWhitelist) {
-        if (!Settings.IMP.REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
+        if (!Settings.settings().REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
         Location loc = player.getLocation();

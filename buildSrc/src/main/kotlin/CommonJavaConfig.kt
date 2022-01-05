@@ -24,7 +24,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                 val disabledLint = listOf(
                         "processing", "path", "fallthrough", "serial"
                 )
-                options.release.set(11)
+                options.release.set(17)
                 options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
                 options.isDeprecation = true
                 options.encoding = "UTF-8"
@@ -32,7 +32,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
             }
 
     configurations.all {
-        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 16)
+        attributes.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
     }
 
     tasks.withType<Test>().configureEach {
@@ -60,13 +60,12 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
             options.encoding = "UTF-8"
             links(
                     "https://javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.2/",
-                    "https://jd.adventure.kyori.net/api/4.9.1/",
-                    "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/2.14.1/",
-                    "https://javadoc.io/doc/com.google.guava/guava/21.0/",
+                    "https://jd.adventure.kyori.net/api/latest/",
+                    "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/latest/index.html",
                     "https://www.antlr.org/api/Java/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/core/0.5.7/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/default-impl/0.5.7/",
-                    "https://papermc.io/javadocs/paper/1.17/",
+                    "https://papermc.io/javadocs/paper/1.18/",
                     "https://ci.athion.net/job/FastAsyncWorldEdit-1.17-Core-Javadocs/javadoc/" // needed for other module linking
             )
         }

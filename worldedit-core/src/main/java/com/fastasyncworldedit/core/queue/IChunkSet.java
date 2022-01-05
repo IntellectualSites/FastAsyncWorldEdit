@@ -64,7 +64,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
      *
      * @return Array of biomes set
      */
-    BiomeType[] getBiomes();
+    BiomeType[][] getBiomes();
 
     default boolean hasBiomes() {
         return getBiomes() != null;

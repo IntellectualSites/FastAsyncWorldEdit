@@ -53,7 +53,7 @@ public class FaweDelegateRegionManager {
             int maxY,
             Runnable whenDone
     ) {
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
                 EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).
@@ -67,14 +67,14 @@ public class FaweDelegateRegionManager {
                     session.flushQueue();
                     for (CuboidRegion region : regions) {
                         FaweAPI.fixLighting(world, region, null,
-                                RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE)
+                                RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                         );
                     }
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 } finally {
                     if (whenDone != null) {
-                        TaskManager.IMP.task(whenDone);
+                        TaskManager.taskManager().task(whenDone);
                     }
                 }
             }
@@ -92,7 +92,7 @@ public class FaweDelegateRegionManager {
             @Nullable Runnable whenDone,
             @Nonnull PlotManager manager
     ) {
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 final HybridPlotWorld hybridPlotWorld = ((HybridPlotManager) manager).getHybridPlotWorld();
                 World world = BukkitAdapter.adapt(getWorld(hybridPlotWorld.getWorldName()));
@@ -176,10 +176,10 @@ public class FaweDelegateRegionManager {
                         world,
                         new CuboidRegion(plot.getBottomAbs().getBlockVector3(), plot.getTopAbs().getBlockVector3()),
                         null,
-                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE)
+                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                 );
                 if (whenDone != null) {
-                    TaskManager.IMP.task(whenDone);
+                    TaskManager.taskManager().task(whenDone);
                 }
             }
         });
@@ -192,7 +192,7 @@ public class FaweDelegateRegionManager {
             Location swapPos,
             final Runnable whenDone
     ) {
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 //todo because of the following code this should proably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
@@ -220,18 +220,22 @@ public class FaweDelegateRegionManager {
                 Clipboard clipB = Clipboard.create(regionB, UUID.randomUUID());
                 ForwardExtentCopy copyA = new ForwardExtentCopy(sessionA, regionA, clipA, clipA.getMinimumPoint());
                 ForwardExtentCopy copyB = new ForwardExtentCopy(sessionB, regionB, clipB, clipB.getMinimumPoint());
+                copyA.setCopyingBiomes(true);
+                copyB.setCopyingBiomes(true);
                 try {
                     Operations.completeLegacy(copyA);
                     Operations.completeLegacy(copyB);
-                    clipA.paste(sessionB, swapPos.getBlockVector3(), true);
-                    clipB.paste(sessionA, pos1.getBlockVector3(), true);
-                    sessionA.flushQueue();
-                    sessionB.flushQueue();
+                    clipA.flush();
+                    clipB.flush();
+                    clipA.paste(sessionB, swapPos.getBlockVector3(), true, true, true);
+                    clipB.paste(sessionA, pos1.getBlockVector3(), true, true, true);
+                    sessionA.close();
+                    sessionB.close();
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }
                 FaweAPI.fixLighting(pos1World, new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3()), null,
-                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE)
+                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                 );
                 FaweAPI.fixLighting(pos1World, new CuboidRegion(
                                 swapPos.getBlockVector3(),
@@ -241,10 +245,10 @@ public class FaweDelegateRegionManager {
                                         swapPos.getZ() + pos2.getZ() - pos1.getZ()
                                 )
                         ), null,
-                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE)
+                        RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                 );
                 if (whenDone != null) {
-                    TaskManager.IMP.task(whenDone);
+                    TaskManager.taskManager().task(whenDone);
                 }
             }
         });
@@ -253,7 +257,7 @@ public class FaweDelegateRegionManager {
     public void setBiome(CuboidRegion region, int extendBiome, BiomeType biome, String world, Runnable whenDone) {
         region.expand(BlockVector3.at(extendBiome, 0, extendBiome));
         region.expand(BlockVector3.at(-extendBiome, 0, -extendBiome));
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 EditSession editSession = WorldEdit
                         .getInstance()
@@ -273,7 +277,7 @@ public class FaweDelegateRegionManager {
                     e.printStackTrace();
                 }
                 if (whenDone != null) {
-                    TaskManager.IMP.task(whenDone);
+                    TaskManager.taskManager().task(whenDone);
                 }
             }
         });
@@ -285,7 +289,7 @@ public class FaweDelegateRegionManager {
             final @NonNull Location pos3,
             final @NonNull Runnable whenDone
     ) {
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 World pos3World = BukkitAdapter.adapt(getWorld(pos3.getWorldName()));
@@ -319,21 +323,21 @@ public class FaweDelegateRegionManager {
                                     pos3.getBlockVector3(),
                                     pos3.getBlockVector3().add(pos2.getBlockVector3().subtract(pos1.getBlockVector3()))
                             ),
-                            null, RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.IMP.LIGHTING.MODE)
+                            null, RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
                     );
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
                 }
             }
             if (whenDone != null) {
-                TaskManager.IMP.task(whenDone);
+                TaskManager.taskManager().task(whenDone);
             }
         });
         return true;
     }
 
     public boolean regenerateRegion(final Location pos1, final Location pos2, boolean ignore, final Runnable whenDone) {
-        TaskManager.IMP.async(() -> {
+        TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
@@ -350,7 +354,7 @@ public class FaweDelegateRegionManager {
                     editSession.flushQueue();
                 }
                 if (whenDone != null) {
-                    TaskManager.IMP.task(whenDone);
+                    TaskManager.taskManager().task(whenDone);
                 }
             }
         });

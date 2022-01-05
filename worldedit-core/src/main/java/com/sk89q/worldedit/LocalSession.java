@@ -225,7 +225,7 @@ public class LocalSession implements TextureHolder {
         if (world == null || uuid == null) {
             return false;
         }
-        if (Settings.IMP.HISTORY.USE_DISK) {
+        if (Settings.settings().HISTORY.USE_DISK) {
             MAX_HISTORY_SIZE = Integer.MAX_VALUE;
         }
         world = WorldWrapper.unwrap(world);
@@ -248,8 +248,8 @@ public class LocalSession implements TextureHolder {
     private boolean loadHistoryChangeSets(UUID uuid, World world) {
         SparseBitSet set = new SparseBitSet();
         final File folder = MainUtil.getFile(
-                Fawe.imp().getDirectory(),
-                Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid
+                Fawe.platform().getDirectory(),
+                Settings.settings().PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid
         );
         if (folder.isDirectory()) {
             folder.listFiles(pathname -> {
@@ -282,12 +282,12 @@ public class LocalSession implements TextureHolder {
     }
 
     private void loadHistoryNegativeIndex(UUID uuid, World world) {
-        if (!Settings.IMP.HISTORY.USE_DISK) {
+        if (!Settings.settings().HISTORY.USE_DISK) {
             return;
         }
         File file = MainUtil.getFile(
-                Fawe.imp().getDirectory(),
-                Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index"
+                Fawe.platform().getDirectory(),
+                Settings.settings().PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index"
         );
         if (file.exists()) {
             try (FaweInputStream is = new FaweInputStream(new FileInputStream(file))) {
@@ -301,12 +301,12 @@ public class LocalSession implements TextureHolder {
     }
 
     private void saveHistoryNegativeIndex(UUID uuid, World world) {
-        if (world == null || !Settings.IMP.HISTORY.USE_DISK) {
+        if (world == null || !Settings.settings().HISTORY.USE_DISK) {
             return;
         }
         File file = MainUtil.getFile(
-                Fawe.imp().getDirectory(),
-                Settings.IMP.PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index"
+                Fawe.platform().getDirectory(),
+                Settings.settings().PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index"
         );
         if (getHistoryNegativeIndex() != 0) {
             try {
@@ -450,8 +450,8 @@ public class LocalSession implements TextureHolder {
         }
         if (o instanceof Integer) {
             File folder = MainUtil.getFile(
-                    Fawe.imp().getDirectory(),
-                    Settings.IMP.PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid
+                    Fawe.platform().getDirectory(),
+                    Settings.settings().PATHS.HISTORY + File.separator + currentWorld.getName() + File.separator + uuid
             );
             File specific = new File(folder, o.toString());
             if (specific.isDirectory()) {
@@ -467,7 +467,7 @@ public class LocalSession implements TextureHolder {
     public void remember(Identifiable player, World world, ChangeSet changeSet, FaweLimit limit) {
         historyWriteLock.lock();
         try {
-            if (Settings.IMP.HISTORY.USE_DISK) {
+            if (Settings.settings().HISTORY.USE_DISK) {
                 LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
             }
             if (changeSet.size() == 0) {
@@ -500,7 +500,7 @@ public class LocalSession implements TextureHolder {
             }
             if (limit != null) {
                 int limitMb = limit.MAX_HISTORY;
-                while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
+                while (((!Settings.settings().HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
                         .size() > 1) {
                     ChangeSet item = (ChangeSet) history.remove(0);
                     item.delete();
@@ -516,7 +516,7 @@ public class LocalSession implements TextureHolder {
     public void remember(EditSession editSession, boolean append, int limitMb) {
         historyWriteLock.lock();
         try {
-            if (Settings.IMP.HISTORY.USE_DISK) {
+            if (Settings.settings().HISTORY.USE_DISK) {
                 LocalSession.MAX_HISTORY_SIZE = Integer.MAX_VALUE;
             }
             // It should have already been flushed, but just in case!
@@ -564,7 +564,7 @@ public class LocalSession implements TextureHolder {
             } else {
                 history.add(0, changeSet);
             }
-            while (((!Settings.IMP.HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
+            while (((!Settings.settings().HISTORY.USE_DISK && history.size() > MAX_HISTORY_SIZE) || (historySize >> 20) > limitMb) && history
                     .size() > 1) {
                 ChangeSet item = (ChangeSet) history.remove(0);
                 item.delete();
@@ -1146,7 +1146,7 @@ public class LocalSession implements TextureHolder {
     @Nullable
     public Tool getTool(Player player) {
         loadDefaults(player, false);
-        if (!Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && tools.isEmpty()) {
+        if (!Settings.settings().EXPERIMENTAL.PERSISTENT_BRUSHES && tools.isEmpty()) {
             return null;
         }
         BaseItem item = player.getItemInHand(HandSide.MAIN_HAND);
@@ -1157,7 +1157,7 @@ public class LocalSession implements TextureHolder {
 
     public Tool getTool(BaseItem item, Player player) {
         loadDefaults(player, false);
-        if (Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
+        if (Settings.settings().EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             BrushTool tool = BrushCache.getTool(player, this, item);
             if (tool != null) {
                 return tool;
@@ -1192,13 +1192,13 @@ public class LocalSession implements TextureHolder {
 
     /**
      * Get the brush tool assigned to the item. If there is no tool assigned
-     * or the tool is not assigned, the slot will be replaced with the
+     * or the tool is not a brush tool, the slot will be replaced with the
      * brush tool.
      *
      * @param item the item type
      * @return the tool, or {@code null}
      * @throws InvalidToolBindException if the item can't be bound to that item
-     * @deprecated FAWE binds to the item, not the type - this allows brushes to persist
+     * @deprecated FAWE binds to the item, not the type - this allows brushes to persist, also deprecated in upstream
      */
     @Deprecated
     public BrushTool getBrushTool(ItemType item) throws InvalidToolBindException {
@@ -1231,6 +1231,17 @@ public class LocalSession implements TextureHolder {
         return (BrushTool) tool;
     }
     //FAWE end
+
+    /**
+     * Get the brush tool assigned to this item.
+     *
+     * @param item the item type
+     * @return the brush tool assigned to the item type
+     */
+    @Nullable
+    public BrushTool getBrush(ItemType item) {
+        return getTool(item) instanceof BrushTool tool ? tool : null;
+    }
 
     //FAWE start - see note of getBrushTool
 
@@ -1292,7 +1303,7 @@ public class LocalSession implements TextureHolder {
         }
 
         Tool previous;
-        if (player != null && (tool instanceof BrushTool || tool == null) && Settings.IMP.EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
+        if (player != null && (tool instanceof BrushTool || tool == null) && Settings.settings().EXPERIMENTAL.PERSISTENT_BRUSHES && item.getNativeItem() != null) {
             previous = BrushCache.getCachedTool(item);
             BrushCache.setTool(item, (BrushTool) tool);
             if (tool != null) {
@@ -1771,7 +1782,7 @@ public class LocalSession implements TextureHolder {
         TextureUtil tmp = texture;
         if (tmp == null) {
             synchronized (this) {
-                tmp = Fawe.get().getCachedTextureUtil(true, 0, 100);
+                tmp = Fawe.instance().getCachedTextureUtil(true, 0, 100);
                 this.texture = tmp;
             }
         }

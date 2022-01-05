@@ -5,9 +5,7 @@ import org.gradle.kotlin.dsl.dependencies
 
 // For specific version pinning, see
 // https://papermc.io/repo/service/rest/repository/browse/maven-public/io/papermc/paper/dev-bundle/
-fun Project.applyPaperweightAdapterConfiguration(
-        paperVersion: String
-) {
+fun Project.applyPaperweightAdapterConfiguration() {
     applyCommonConfiguration()
     apply(plugin = "java-library")
     applyCommonJavaConfiguration(
@@ -17,7 +15,6 @@ fun Project.applyPaperweightAdapterConfiguration(
     apply(plugin = "io.papermc.paperweight.userdev")
 
     dependencies {
-        paperDevBundle(paperVersion)
         "implementation"(project(":worldedit-bukkit"))
     }
 

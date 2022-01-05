@@ -149,7 +149,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         }
         synchronized (this) {
             setOrigin(x, z);
-            idsStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
+            idsStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
             idsStreamZip = getCompressedOS(idsStream);
             writeHeader(idsStreamZip, x, y, z);
             return idsStreamZip;
@@ -170,7 +170,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
             return biomeStreamZip;
         }
         synchronized (this) {
-            biomeStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
+            biomeStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
             biomeStreamZip = getCompressedOS(biomeStream);
             return biomeStreamZip;
         }
@@ -191,7 +191,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         if (entCStreamZip != null) {
             return entCStreamZip;
         }
-        entCStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
+        entCStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
         return entCStreamZip = new NBTOutputStream(getCompressedOS(entCStream));
     }
 
@@ -200,7 +200,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         if (entRStreamZip != null) {
             return entRStreamZip;
         }
-        entRStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
+        entRStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
         return entRStreamZip = new NBTOutputStream(getCompressedOS(entRStream));
     }
 
@@ -209,7 +209,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         if (tileCStreamZip != null) {
             return tileCStreamZip;
         }
-        tileCStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
+        tileCStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
         return tileCStreamZip = new NBTOutputStream(getCompressedOS(tileCStream));
     }
 
@@ -218,7 +218,7 @@ public class MemoryOptimizedHistory extends FaweStreamChangeSet {
         if (tileRStreamZip != null) {
             return tileRStreamZip;
         }
-        tileRStream = new FastByteArrayOutputStream(Settings.IMP.HISTORY.BUFFER_SIZE);
+        tileRStream = new FastByteArrayOutputStream(Settings.settings().HISTORY.BUFFER_SIZE);
         return tileRStreamZip = new NBTOutputStream(getCompressedOS(tileRStream));
     }
 

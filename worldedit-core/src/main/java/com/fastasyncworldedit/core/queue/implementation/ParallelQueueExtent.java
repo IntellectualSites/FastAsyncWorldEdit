@@ -99,7 +99,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
         final Iterator<BlockVector2> chunksIter = chunks.iterator();
 
         // Get a pool, to operate on the chunks in parallel
-        final int size = Math.min(chunks.size(), Settings.IMP.QUEUE.PARALLEL_THREADS);
+        final int size = Math.min(chunks.size(), Settings.settings().QUEUE.PARALLEL_THREADS);
         if (size <= 1 && chunksIter.hasNext()) {
             BlockVector2 pos = chunksIter.next();
             getExtent().apply(null, filter, region, pos.getX(), pos.getZ(), full);
@@ -147,7 +147,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
                         lastException = hash;
                         exceptionCount = 0;
                         LOGGER.catching(e);
-                    } else if (exceptionCount < Settings.IMP.QUEUE.PARALLEL_THREADS) {
+                    } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
                         exceptionCount++;
                         LOGGER.warn(message);
                     }

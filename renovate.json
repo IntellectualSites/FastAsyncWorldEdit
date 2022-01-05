@@ -10,7 +10,6 @@
     "mockito-core",
     "org.antlr",
     "antlr4-runtime",
-    "paranamer",
     "fastutil",
     "it.unimi.dsi:fastutil",  
     "auto-value-annotations",

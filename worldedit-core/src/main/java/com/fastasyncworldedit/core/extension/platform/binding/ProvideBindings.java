@@ -68,7 +68,7 @@ public class ProvideBindings extends Bindings {
 
     @Binding
     public RollbackDatabase database(World world) {
-        return DBHandler.IMP.getDatabase(world);
+        return DBHandler.dbHandler().getDatabase(world);
     }
 
     @AllowedRegion(FaweMaskManager.MaskType.OWNER)

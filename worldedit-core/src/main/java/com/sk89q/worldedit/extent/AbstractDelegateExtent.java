@@ -244,7 +244,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public Extent addProcessor(IBatchProcessor processor) {
-        if (Settings.IMP.EXPERIMENTAL.OTHER) {
+        if (Settings.settings().EXPERIMENTAL.OTHER) {
             LOGGER.info("addProcessor Info: \t " + processor.getClass().getName());
             LOGGER.info("The following is not an error or a crash:");
             StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -262,7 +262,7 @@ public class AbstractDelegateExtent implements Extent {
 
     @Override
     public Extent addPostProcessor(IBatchProcessor processor) {
-        if (Settings.IMP.EXPERIMENTAL.OTHER) {
+        if (Settings.settings().EXPERIMENTAL.OTHER) {
             LOGGER.info("addPostProcessor Info: \t " + processor.getClass().getName());
             LOGGER.info("The following is not an error or a crash:");
             StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();

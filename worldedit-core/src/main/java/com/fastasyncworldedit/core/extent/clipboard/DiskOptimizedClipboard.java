@@ -72,8 +72,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         this(
                 region.getDimensions(),
                 MainUtil.getFile(
-                        Fawe.get() != null ? Fawe.imp().getDirectory() : new File("."),
-                        Settings.IMP.PATHS.CLIPBOARD + File.separator + uuid + ".bd"
+                        Fawe.instance() != null ? Fawe.platform().getDirectory() : new File("."),
+                        Settings.settings().PATHS.CLIPBOARD + File.separator + uuid + ".bd"
                 )
         );
         setOffset(region.getMinimumPoint());
@@ -84,8 +84,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         this(
                 dimensions,
                 MainUtil.getFile(
-                        Fawe.imp() != null ? Fawe.imp().getDirectory() : new File("."),
-                        Settings.IMP.PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"
+                        Fawe.platform() != null ? Fawe.platform().getDirectory() : new File("."),
+                        Settings.settings().PATHS.CLIPBOARD + File.separator + UUID.randomUUID() + ".bd"
                 )
         );
     }
@@ -276,7 +276,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             int offsetZ = byteBuffer.getShort(20);
             region.shift(BlockVector3.at(offsetX, offsetY, offsetZ));
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, this);
-            clipboard.setOrigin(getOrigin());
+            clipboard.setOrigin(getOrigin().add(offset));
             return clipboard;
         } catch (Throwable e) {
             e.printStackTrace();
@@ -289,7 +289,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         int ox = byteBuffer.getShort(10);
         int oy = byteBuffer.getShort(12);
         int oz = byteBuffer.getShort(14);
-        return BlockVector3.at(ox, oy, oz);
+        return BlockVector3.at(ox, oy, oz).subtract(offset);
     }
 
     @Override

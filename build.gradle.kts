@@ -2,6 +2,11 @@ import org.ajoberstar.grgit.Grgit
 import java.time.format.DateTimeFormatter
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import java.net.URI
+
+plugins {
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+}
 
 logger.lifecycle("""
 *******************************************
@@ -17,7 +22,8 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("1.17")
+var rootVersion by extra("2.0.0")
+var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
 var date: String by extra("")
@@ -27,11 +33,10 @@ ext {
     }
     date = git.head().dateTime.format(DateTimeFormatter.ofPattern("yy.MM.dd"))
     revision = "-${git.head().abbreviatedId}"
-    val commit: String? = git.head().abbreviatedId
     buildNumber = if (project.hasProperty("buildnumber")) {
-        project.properties["buildnumber"] as String
+        snapshot + "-" + project.properties["buildnumber"] as String
     } else {
-        commit.toString()
+        project.properties["snapshot"] as String
     }
 }
 
@@ -66,3 +71,12 @@ allprojects {
 }
 
 applyCommonConfiguration()
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+        }
+    }
+}

@@ -75,7 +75,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
             throws WorldEditException {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
+                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return false;
         }
@@ -86,7 +86,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
+                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return false;
         }
@@ -97,7 +97,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     public BiomeType getBiome(BlockVector3 position) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
+                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return null;
         }
@@ -108,7 +108,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     public BiomeType getBiomeType(int x, int y, int z) {
         if (!contains(x, z)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
+                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return null;
         }
@@ -119,7 +119,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     public BaseBlock getFullBlock(BlockVector3 position) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
+                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
@@ -130,7 +130,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     public BlockState getBlock(BlockVector3 position) {
         if (!contains(position)) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
+                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return BlockTypes.AIR.getDefaultState();
         }
@@ -142,7 +142,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
     public Entity createEntity(Location location, BaseEntity entity) {
         if (!contains(location.getBlockX(), location.getBlockY(), location.getBlockZ())) {
             if (!limit.MAX_FAILS()) {
-                WEManager.IMP.cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
+                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return null;
         }

@@ -45,7 +45,7 @@
 //            PlotPlayer player = PlotPlayer.get(actor.getName());
 //
 //            actor.print("Claiming world");
-//            Plot plot = TaskManager.IMP.sync(new RunnableVal<Plot>() {
+//            Plot plot = TaskManager.taskManager().sync(new RunnableVal<Plot>() {
 //                @Override
 //                public void run(Plot o) {
 //                    int currentPlots = Settings.Limit.GLOBAL ? player.getPlotCount()
@@ -73,7 +73,7 @@
 //                File folder = CFICommands.getFolder(plot.getWorldName());
 //                Boolean result = createTask.apply(folder);
 //                if (result == Boolean.TRUE) {
-//                    TaskManager.IMP.sync(() -> plot.teleportPlayer(player));
+//                    TaskManager.taskManager().sync(() -> plot.teleportPlayer(player));
 //                }
 //                return;
 //            }

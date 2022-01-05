@@ -1,34 +1,47 @@
-name: "build"
+name: build
 
-on: ["pull_request", "push"]
+on: [pull_request, push]
 
 jobs:
   build:
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
-      - name: "Checkout Repository"
-        uses: "actions/checkout@v2.3.4"
-      - name : "Validate Gradle Wrapper"
-        uses : "gradle/wrapper-validation-action@v1.0.4"
-      - name: "Grab SHA"
-        uses: "benjlevesque/short-sha@v1.2"
-        id: "short-sha"
+      - name: Checkout Repository
+        uses: actions/checkout@v2.4.0
+      - name : Validate Gradle Wrapper
+        uses : gradle/wrapper-validation-action@v1.0.4
+      - name: Setup Java
+        uses: actions/setup-java@v2.4.0
         with:
-          length: "7"
-      - name: "Echo SHA"    
-        run: "echo $SHA"
+          distribution: temurin
+          cache: gradle
+          java-version: 17
+      - name: Clean Build
+        run: ./gradlew clean build --no-daemon
+      - name: Determine release status
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
+            echo "STATUS=snapshot" >> $GITHUB_ENV
+          else
+            echo "STATUS=release" >> $GITHUB_ENV
+          fi
+      - name: Publish Release
+        if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/major/2.0.0/1.18'}}
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository
         env:
-          SHA: "${{ steps.short-sha.outputs.sha }}"
-      - name: "Setup Java"
-        uses: "actions/setup-java@v2.3.1"
-        with:
-          distribution: "temurin"
-          cache: 'gradle'
-          java-version: "17"
-      - name: "Clean Build"
-        run: "./gradlew clean build --no-daemon"
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+      - name: Publish Snapshot
+        if: ${{ runner.os == 'Linux' && env.STATUS != 'release' && github.event_name == 'push' && github.ref == 'refs/heads/major/2.0.0/1.18' }}
+        run: ./gradlew publishToSonatype
+        env:
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
       - name: Archive Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v2.3.1
         with:
-          name: FastAsyncWorldEdit-Bukkit-1.17-${{ env.SHA }}
-          path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-1.17-${{ env.SHA }}.jar
+          name: FastAsyncWorldEdit-Bukkit-SNAPSHOT
+          path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar
