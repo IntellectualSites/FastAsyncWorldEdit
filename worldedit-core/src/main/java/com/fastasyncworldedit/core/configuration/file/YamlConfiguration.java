@@ -3,10 +3,10 @@ package com.fastasyncworldedit.core.configuration.file;
 import com.fastasyncworldedit.core.configuration.Configuration;
 import com.fastasyncworldedit.core.configuration.ConfigurationSection;
 import com.fastasyncworldedit.core.configuration.InvalidConfigurationException;
-import com.fastasyncworldedit.core.configuration.Yaml;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
