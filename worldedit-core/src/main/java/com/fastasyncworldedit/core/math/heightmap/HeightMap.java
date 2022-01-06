@@ -115,7 +115,7 @@ public interface HeightMap {
                         height = tmpY = session.getNearestSurfaceLayer(xx, zz, tmpY, minY, maxY);
                     } else {
                         height = tmpY = session.getNearestSurfaceTerrainBlock(xx, zz, tmpY, minY, maxY);
-                        if (height == -1) {
+                        if (height < minY) {
                             continue;
                         }
                     }
@@ -129,9 +129,9 @@ public interface HeightMap {
                     double raiseScaled = diff * (raisePow * sizePowInv);
                     double raiseScaledAbs = Math.abs(raiseScaled);
                     int random =
-                            ThreadLocalRandom
+                            (ThreadLocalRandom
                                     .current()
-                                    .nextInt(maxY + 1 - minY) - minY < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(
+                                    .nextInt(maxY + 1 - minY) - minY) < (int) ((Math.ceil(raiseScaledAbs) - Math.floor(
                                     raiseScaledAbs)) * (maxY + 1 - minY)) ? (diff > 0 ? 1 : -1) : 0;
                     int raiseScaledInt = (int) raiseScaled + random;
                     newData[index] = height + raiseScaledInt;
@@ -154,7 +154,7 @@ public interface HeightMap {
                         height = session.getNearestSurfaceLayer(xx, zz, height, minY, maxY);
                     } else {
                         height = session.getNearestSurfaceTerrainBlock(xx, zz, height, minY, maxY);
-                        if (height == minY - 1) {
+                        if (height < minY) {
                             continue;
                         }
                     }
@@ -165,9 +165,9 @@ public interface HeightMap {
                     }
                     raise = (yscale * raise);
                     int random =
-                            ThreadLocalRandom
+                            (ThreadLocalRandom
                                     .current()
-                                    .nextInt(maxY + 1 - minY) - minY < (int) ((raise - (int) raise) * (maxY - minY + 1))
+                                    .nextInt(maxY + 1 - minY) - minY) < (int) ((raise - (int) raise) * (maxY - minY + 1))
                                     ? 1 : 0;
                     int newHeight = height + (int) raise + random;
                     newData[index] = newHeight;
