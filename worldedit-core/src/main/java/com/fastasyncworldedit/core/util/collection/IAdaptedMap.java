@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("unchecked")
 public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
 
     Map<K2, V2> getParent();

@@ -340,6 +340,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
     //FAWE end
 
     @Override
+    @SuppressWarnings("RedundantCast")
     public Map<Property<?>, Object> getStates() {
         //FAWE end
         BlockType type = this.getBlockType();
@@ -348,7 +349,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                 type.getPropertiesSet(),
                 (Function<Property<?>, Object>) this::getState
         );
-        //noinspection RedundantCast - This is required for compilation, etc.
+        //This is required for compilation, etc.
         return Collections.unmodifiableMap((Map<Property<?>, Object>) map);
         //FAWE end
     }

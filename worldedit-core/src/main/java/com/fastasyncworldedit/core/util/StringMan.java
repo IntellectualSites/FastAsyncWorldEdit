@@ -71,11 +71,11 @@ public class StringMan {
         long b = bytes == Long.MIN_VALUE ? Long.MAX_VALUE : Math.abs(bytes);
         return b < 1024L ? bytes + " B"
                 : b <= 0xfffccccccccccccL >> 40 ? String.format("%.1f KiB", bytes / 0x1p10)
-                        : b <= 0xfffccccccccccccL >> 30 ? String.format("%.1f MiB", bytes / 0x1p20)
-                                : b <= 0xfffccccccccccccL >> 20 ? String.format("%.1f GiB", bytes / 0x1p30)
-                                        : b <= 0xfffccccccccccccL >> 10 ? String.format("%.1f TiB", bytes / 0x1p40)
-                                                : b <= 0xfffccccccccccccL ? String.format("%.1f PiB", (bytes >> 10) / 0x1p40)
-                                                        : String.format("%.1f EiB", (bytes >> 20) / 0x1p40);
+                : b <= 0xfffccccccccccccL >> 30 ? String.format("%.1f MiB", bytes / 0x1p20)
+                : b <= 0xfffccccccccccccL >> 20 ? String.format("%.1f GiB", bytes / 0x1p30)
+                : b <= 0xfffccccccccccccL >> 10 ? String.format("%.1f TiB", bytes / 0x1p40)
+                : b <= 0xfffccccccccccccL ? String.format("%.1f PiB", (bytes >> 10) / 0x1p40)
+                : String.format("%.1f EiB", (bytes >> 20) / 0x1p40);
     }
 
     public static String prettyFormat(double d) {
@@ -93,43 +93,28 @@ public class StringMan {
     }
 
     public static boolean isBracketForwards(char c) {
-        switch (c) {
-            case '[':
-            case '(':
-            case '{':
-            case '<':
-                return true;
-            default:
-                return false;
-        }
+        return switch (c) {
+            case '[', '(', '{', '<' -> true;
+            default -> false;
+        };
     }
 
     public static char getMatchingBracket(char c) {
-        switch (c) {
-            case '[':
-                return ']';
-            case '(':
-                return ')';
-            case '{':
-                return '}';
-            case '<':
-                return '>';
-            case ']':
-                return '[';
-            case ')':
-                return '(';
-            case '}':
-                return '{';
-            case '>':
-                return '<';
-            default:
-                return c;
-        }
+        return switch (c) {
+            case '[' -> ']';
+            case '(' -> ')';
+            case '{' -> '}';
+            case '<' -> '>';
+            case ']' -> '[';
+            case ')' -> '(';
+            case '}' -> '{';
+            case '>' -> '<';
+            default -> c;
+        };
     }
 
     public static int parseInt(CharSequence string) {
         int val = 0;
-        boolean neg = false;
         int numIndex = 1;
         int len = string.length();
         for (int i = len - 1; i >= 0; i--) {
@@ -377,13 +362,13 @@ public class StringMan {
                 char bj = item.charAt(j++);
                 if (sequentail) {
                     switch (bj) {
-                        case ':':
-                        case '_':
+                        case ':', '_' -> {
                             sequentail = false;
                             if (bj == ai) {
                                 break outer;
                             }
                             continue;
+                        }
                     }
                     continue;
                 }
@@ -531,13 +516,13 @@ public class StringMan {
     }
 
     public static boolean isEqual(String a, String b) {
-        return a == b || a != null && b != null && a.length() == b.length()
+        return a.equals(b) || a != null && b != null && a.length() == b.length()
                 && a.hashCode() == b.hashCode()
                 && a.equals(b);
     }
 
     public static boolean isEqualIgnoreCase(String a, String b) {
-        return a == b ||
+        return a.equals(b) ||
                 a != null && b != null && a.length() == b.length() && a.equalsIgnoreCase(b);
     }
 
