@@ -104,11 +104,12 @@ public class ExpandCommands {
 
     private static void expandVert(LocalSession session, Actor actor, World world) throws IncompleteRegionException {
         Region region = session.getSelection(world);
+        int height = world.getMaxY() - world.getMinY();
         try {
             long oldSize = region.getVolume();
             region.expand(
-                    BlockVector3.at(0, (world.getMaxY() + 1), 0),
-                    BlockVector3.at(0, -(world.getMaxY() + 1), 0)
+                    BlockVector3.at(0, height, 0),
+                    BlockVector3.at(0, -height, 0)
             );
             session.getRegionSelector(world).learnChanges();
             long newSize = region.getVolume();
