@@ -22,6 +22,7 @@ public class SurfaceSpline implements Brush {
     private final double bias;
     private final double continuity;
     private final double quality;
+    private final ArrayList<BlockVector3> path = new ArrayList<>();
 
     public SurfaceSpline(double tension, double bias, double continuity, double quality) {
         this.tension = tension;
@@ -29,8 +30,6 @@ public class SurfaceSpline implements Brush {
         this.continuity = continuity;
         this.quality = quality;
     }
-
-    private final ArrayList<BlockVector3> path = new ArrayList<>();
 
     @Override
     public void build(EditSession editSession, BlockVector3 pos, Pattern pattern, double radius) throws
@@ -90,7 +89,6 @@ public class SurfaceSpline implements Brush {
             final int ceilrad = (int) Math.ceil(radius);
             for (BlockVector3 v : vset) {
                 final int tipx = v.getBlockX();
-                final int tipy = v.getBlockY();
                 final int tipz = v.getBlockZ();
                 for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
                     for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
@@ -105,8 +103,8 @@ public class SurfaceSpline implements Brush {
                 }
             }
             editSession.setBlocks(newSet, pattern);
-            path.clear();
         }
+        path.clear();
         if (editSession.getActor() != null) {
             editSession.getActor().print(Caption.of("fawe.worldedit.brush.spline.secondary"));
         }

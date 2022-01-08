@@ -21,6 +21,7 @@ package com.sk89q.worldedit.util.logging;
 
 import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 import java.util.logging.Filter;
 import java.util.logging.Formatter;
 import java.util.logging.Level;
@@ -131,11 +132,7 @@ public class DynamicStreamHandler extends StreamHandler {
         Formatter formatter = this.formatter;
         if (handler != null) {
             return handler.getFormatter();
-        } else if (formatter != null) {
-            return formatter;
-        } else {
-            return new SimpleFormatter();
-        }
+        } else return Objects.requireNonNullElseGet(formatter, SimpleFormatter::new);
     }
 
     @Override

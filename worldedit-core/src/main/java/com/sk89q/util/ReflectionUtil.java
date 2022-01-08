@@ -27,10 +27,9 @@ public final class ReflectionUtil {
     }
 
     //FAWE start
-    @SuppressWarnings("unchecked")
     public static <T> T getField(Object from, String name) {
         if (from instanceof Class) {
-            return getField((Class) from, null, name);
+            return getField((Class<?>) from, null, name);
         } else {
             return getField(from.getClass(), from, name);
         }
@@ -38,7 +37,7 @@ public final class ReflectionUtil {
     //FAWE end
 
     @SuppressWarnings("unchecked")
-    public static <T> T getField(Class checkClass, Object from, String name) {
+    public static <T> T getField(Class<?> checkClass, Object from, String name) {
         do {
             try {
                 Field field = checkClass.getDeclaredField(name);

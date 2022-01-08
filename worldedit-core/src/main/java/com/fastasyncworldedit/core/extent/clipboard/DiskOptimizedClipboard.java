@@ -336,13 +336,13 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     @Override
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void close() {
         try {
             if (byteBuffer != null) {
                 byteBuffer.force();
                 fileChannel.close();
                 braf.close();
-                //noinspection ResultOfMethodCallIgnored
                 file.setWritable(true);
                 closeDirectBuffer(byteBuffer);
                 byteBuffer = null;
@@ -494,10 +494,9 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        return new ArrayList<>(entities
+        return entities
                 .stream()
-                .filter(e -> region.contains(e.getLocation().toBlockPoint()))
-                .collect(Collectors.toList()));
+                .filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList());
     }
 
     @Override

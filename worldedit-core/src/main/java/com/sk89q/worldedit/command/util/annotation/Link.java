@@ -6,7 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Link {
 
-    Class clazz() default Link.class;
+    //FAWE start - address rawtypes
+    Class<?> clazz() default Link.class;
+    //FAWE end
 
     String value();
 
