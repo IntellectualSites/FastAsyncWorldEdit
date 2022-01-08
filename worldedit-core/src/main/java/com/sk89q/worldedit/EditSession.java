@@ -52,7 +52,6 @@ import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.math.MutableVector3;
 import com.fastasyncworldedit.core.math.random.SimplexNoise;
 import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
-import com.fastasyncworldedit.core.regions.RegionWrapper;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -61,7 +60,6 @@ import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
-import com.sk89q.worldedit.event.extent.EditSessionEvent;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
@@ -137,7 +135,6 @@ import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.TreeGenerator;
 import com.sk89q.worldedit.util.collection.BlockMap;
-import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -149,7 +146,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -1116,6 +1112,11 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     @Override
     public int setBlocks(Region region, Pattern pattern) throws MaxChangedBlocksException {
         return this.changes = super.setBlocks(region, pattern);
+    }
+
+    @Override
+    public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
+        return this.changes = super.setBlocks(vset, pattern);
     }
     //FAWE end
 
