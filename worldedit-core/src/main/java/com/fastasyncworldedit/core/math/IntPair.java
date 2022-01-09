@@ -1,14 +1,6 @@
 package com.fastasyncworldedit.core.math;
 
-public final class IntPair {
-
-    public int x;
-    public int z;
-
-    public IntPair(final int x, final int z) {
-        this.x = x;
-        this.z = z;
-    }
+public record IntPair(int x, int z) {
 
     @Override
     public int hashCode() {

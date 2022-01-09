@@ -38,10 +38,9 @@ public class CatenaryBrush implements Brush, ResettableTool {
     public void build(EditSession editSession, BlockVector3 pos2, final Pattern pattern, double size) throws
             MaxChangedBlocksException {
         Actor actor = editSession.getActor();
-        if (!(actor instanceof Player)) {
+        if (!(actor instanceof Player player)) {
             throw FaweCache.PLAYER_ONLY;
         }
-        Player player = (Player) actor;
         if (pos1 == null || pos2.equals(pos1)) {
             pos1 = pos2;
             actor.print(Caption.of("fawe.worldedit.brush.brush.line.primary", pos2));

@@ -43,6 +43,7 @@ import java.util.UUID;
 
 import static org.bukkit.Bukkit.getWorld;
 
+@SuppressWarnings("unused")
 public class FaweDelegateRegionManager {
 
     public boolean setCuboids(

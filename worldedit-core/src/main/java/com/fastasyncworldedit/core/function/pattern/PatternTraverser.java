@@ -19,6 +19,7 @@ public class PatternTraverser {
         reset(pattern, newExtent);
     }
 
+    @SuppressWarnings({"unchecked"})
     private void reset(Object pattern, Extent newExtent) {
         if (pattern == null) {
             return;

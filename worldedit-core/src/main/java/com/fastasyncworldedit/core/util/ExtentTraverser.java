@@ -49,11 +49,13 @@ public class ExtentTraverser<T extends Extent> {
         return last;
     }
 
+    @SuppressWarnings("unchecked")
     public <U> U findAndGet(Class<U> clazz) {
         ExtentTraverser<Extent> traverser = find(clazz);
         return (traverser != null) ? (U) traverser.get() : null;
     }
 
+    @SuppressWarnings("unchecked")
     public <U extends Extent> ExtentTraverser<U> find(Class<U> clazz) {
         try {
             ExtentTraverser<T> value = this;
@@ -70,6 +72,7 @@ public class ExtentTraverser<T extends Extent> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <U extends Extent> ExtentTraverser<U> find(Object object) {
         try {
             ExtentTraverser<T> value = this;
@@ -90,6 +93,7 @@ public class ExtentTraverser<T extends Extent> {
         return parent;
     }
 
+    @SuppressWarnings("unchecked")
     public ExtentTraverser<T> next() {
         try {
             if (root instanceof AbstractDelegateExtent) {

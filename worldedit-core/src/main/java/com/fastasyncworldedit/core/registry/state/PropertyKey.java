@@ -9,6 +9,7 @@ import java.util.Map;
 /**
  * This class will be generated at runtime - these are just example values.
  */
+@SuppressWarnings("unused")
 public class PropertyKey implements Comparable<PropertyKey> {
 
     // needs to be declared before constants

@@ -65,8 +65,7 @@ public class PasteEvent extends Event implements Cancellable {
      * @return a new event
      */
     public PasteEvent clone(Stage stage) {
-        PasteEvent clone = new PasteEvent(actor, clipboard, uri, extent, to);
-        return clone;
+        return new PasteEvent(actor, clipboard, uri, extent, to);
     }
 
 }

@@ -51,10 +51,9 @@ public class StencilBrush extends HeightBrush {
         final SolidBlockMask solid = new SolidBlockMask(editSession);
 
         Actor actor = editSession.getActor();
-        if (!(actor instanceof Player)) {
+        if (!(actor instanceof Player player)) {
             throw FaweCache.PLAYER_ONLY;
         }
-        Player player = (Player) actor;
         Location loc = player.getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();

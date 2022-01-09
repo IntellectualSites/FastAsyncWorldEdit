@@ -34,8 +34,6 @@ import java.util.function.Supplier;
 
 public class InspectBrush extends BrushTool {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-
     /**
      * Construct the tool.
      */

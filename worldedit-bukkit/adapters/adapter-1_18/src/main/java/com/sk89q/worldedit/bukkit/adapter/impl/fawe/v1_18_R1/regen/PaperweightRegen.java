@@ -184,6 +184,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected boolean initNewWorld() throws Exception {
         //world folder
         tempDir = java.nio.file.Files.createTempDirectory("FastAsyncWorldEditWorldGen");
@@ -385,6 +386,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     }
 
     //util
+    @SuppressWarnings("unchecked")
     private void removeWorldFromWorldsMap() {
         Fawe.instance().getQueueHandler().sync(() -> {
             try {

@@ -71,8 +71,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
 
     @Override
     public boolean contains(Object o) {
-        if (o instanceof BlockVector3) {
-            BlockVector3 v = (BlockVector3) o;
+        if (o instanceof BlockVector3 v) {
             return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;
@@ -89,7 +88,6 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
      * @param x      x radius center
      * @param y      y radius center
      * @param z      z radius center
-     * @param radius
      * @return if radius is contained by the set
      */
     public boolean containsRadius(int x, int y, int z, int radius) {
@@ -163,7 +161,7 @@ public class LocalBlockVectorSet implements Set<BlockVector3> {
     @Nonnull
     @Override
     public Iterator<BlockVector3> iterator() {
-        return new Iterator<BlockVector3>() {
+        return new Iterator<>() {
             final MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
             int index = set.nextSetBit(0);
             int previous = -1;

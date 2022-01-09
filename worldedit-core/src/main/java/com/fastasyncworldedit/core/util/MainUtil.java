@@ -104,15 +104,6 @@ public class MainUtil {
         return suggestions;
     }
 
-    public static <T> T getOf(Object[] arr, Class<T> ofType) {
-        for (Object a : arr) {
-            if (a != null && a.getClass() == ofType) {
-                return (T) a;
-            }
-        }
-        return null;
-    }
-
     public static long getTotalSize(Path path) {
         final AtomicLong size = new AtomicLong(0);
         traverse(path, new RunnableVal2<>() {
@@ -176,26 +167,6 @@ public class MainUtil {
             }
         }
         return out.toString();
-    }
-
-    public static void forEachFile(Path path, final RunnableVal2<Path, BasicFileAttributes> onEach, Comparator<File> comparator) {
-        File dir = path.toFile();
-        if (!dir.exists()) {
-            return;
-        }
-        File[] files = path.toFile().listFiles();
-        if (comparator != null) {
-            Arrays.sort(files, comparator);
-        }
-        for (File file : files) {
-            Path filePath = file.toPath();
-            try {
-                BasicFileAttributes attr = Files.readAttributes(filePath, BasicFileAttributes.class);
-                onEach.run(file.toPath(), attr);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public static int getMaxFileId(File folder) {
@@ -274,26 +245,6 @@ public class MainUtil {
             }
         }
         return written;
-    }
-
-    public static byte[] decompress(byte[] bytes, byte[] buffer, Inflater inflater) throws DataFormatException {
-        if (buffer == null) {
-            buffer = new byte[8192];
-        }
-        if (inflater == null) {
-            inflater = new Inflater(false);
-        } else {
-            inflater.reset();
-        }
-        inflater.setInput(bytes);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        while (!inflater.finished()) {
-            int n = inflater.inflate(buffer);
-            if (n != 0) {
-                baos.write(buffer, 0, n);
-            }
-        }
-        return baos.toByteArray();
     }
 
     public static byte[] compress(byte[] bytes, byte[] buffer, int level) {

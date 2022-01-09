@@ -67,6 +67,7 @@ public class YieldIterable<T> implements Iterable<T>, Consumer<T>, Closeable {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void close() {
         queue.add((T) END_MARKER);
     }

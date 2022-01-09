@@ -18,9 +18,6 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 
 /**
  * An implementation of a {@link Spline} using a Clipboard as source for the structure.
- *
- * @author Schuwi
- * @version 1.0
  */
 public class ClipboardSpline extends Spline {
 

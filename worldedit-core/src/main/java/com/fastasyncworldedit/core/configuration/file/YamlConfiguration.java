@@ -127,7 +127,7 @@ public class YamlConfiguration extends FileConfiguration {
 
         Map<?, ?> input;
         try {
-            input = (Map<?, ?>) yaml.load(contents);
+            input = yaml.load(contents);
         } catch (final YAMLException e) {
             throw new InvalidConfigurationException(e);
         } catch (final ClassCastException e) {
@@ -193,8 +193,7 @@ public class YamlConfiguration extends FileConfiguration {
         if (options().copyHeader()) {
             final Configuration def = getDefaults();
 
-            if (def != null && def instanceof FileConfiguration) {
-                final FileConfiguration filedefaults = (FileConfiguration) def;
+            if (def != null && def instanceof final FileConfiguration filedefaults) {
                 final String defaultsHeader = filedefaults.buildHeader();
 
                 if ((defaultsHeader != null) && !defaultsHeader.isEmpty()) {

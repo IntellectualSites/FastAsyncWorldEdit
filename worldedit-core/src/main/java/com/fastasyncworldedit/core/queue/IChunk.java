@@ -16,10 +16,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      * Initialize at the location
      * (allows for reuse)
      * - It's expected initialization will clear any set fields
-     *
-     * @param extent
-     * @param x
-     * @param z
      */
     default <V extends IChunk> void init(IQueueExtent<V> extent, int x, int z) {
     }

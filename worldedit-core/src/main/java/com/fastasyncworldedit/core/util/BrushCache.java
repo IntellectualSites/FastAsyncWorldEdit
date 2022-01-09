@@ -19,7 +19,7 @@ public final class BrushCache {
     private static final WeakHashMap<Object, BrushTool> brushCache = new WeakHashMap<>();
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private static final CompoundTag getNBT(BaseItem item) {
+    private static CompoundTag getNBT(BaseItem item) {
         return item.hasNbtData() ? item.getNbtData() : null;
     }
 
@@ -29,7 +29,7 @@ public final class BrushCache {
 
     private static final ThreadLocal<Boolean> RECURSION = new ThreadLocal<>();
 
-    public static final BrushTool getTool(Player player, LocalSession session, BaseItem item) {
+    public static BrushTool getTool(Player player, LocalSession session, BaseItem item) {
         if (!item.hasNbtData()) {
             return null;
         }

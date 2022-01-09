@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class PropertyGroup<G, A> {
 
     public static final PropertyGroup<Integer, Integer> LEVEL = new PropertyGroupBuilder<Integer, Integer>()

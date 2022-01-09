@@ -14,13 +14,7 @@ import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 
-public class RecurseBrush implements Brush {
-
-    private final boolean dfs;
-
-    public RecurseBrush(boolean dfs) {
-        this.dfs = dfs;
-    }
+public record RecurseBrush(boolean dfs) implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern to, double size) throws MaxChangedBlocksException {

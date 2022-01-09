@@ -230,9 +230,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     /**
      * Submit without first checking that it has been removed from the chunk map
-     *
-     * @param chunk
-     * @return
      */
     private <V extends Future<V>> V submitUnchecked(IQueueChunk chunk) {
         if (chunk.isEmpty()) {

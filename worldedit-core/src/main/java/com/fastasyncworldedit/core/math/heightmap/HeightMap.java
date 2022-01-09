@@ -104,21 +104,12 @@ public interface HeightMap {
                 for (int z = -size; z <= size; z++) {
                     int index = (z + size) * diameter + (x + size);
                     int zz = centerZ + z;
-                    double raise;
-                    switch (rotationMode) {
-                        default:
-                            raise = getHeight(x, z);
-                            break;
-                        case 1:
-                            raise = getHeight(z, x);
-                            break;
-                        case 2:
-                            raise = getHeight(-x, -z);
-                            break;
-                        case 3:
-                            raise = getHeight(-z, -x);
-                            break;
-                    }
+                    double raise = switch (rotationMode) {
+                        default -> getHeight(x, z);
+                        case 1 -> getHeight(z, x);
+                        case 2 -> getHeight(-x, -z);
+                        case 3 -> getHeight(-z, -x);
+                    };
                     int height;
                     if (layers) {
                         height = tmpY = session.getNearestSurfaceLayer(xx, zz, tmpY, minY, maxY);
@@ -153,21 +144,12 @@ public interface HeightMap {
                 for (int z = -size; z <= size; z++) {
                     int index = (z + size) * diameter + (x + size);
                     int zz = centerZ + z;
-                    double raise;
-                    switch (rotationMode) {
-                        default:
-                            raise = getHeight(x, z);
-                            break;
-                        case 1:
-                            raise = getHeight(z, x);
-                            break;
-                        case 2:
-                            raise = getHeight(-x, -z);
-                            break;
-                        case 3:
-                            raise = getHeight(-z, -x);
-                            break;
-                    }
+                    double raise = switch (rotationMode) {
+                        default -> getHeight(x, z);
+                        case 1 -> getHeight(z, x);
+                        case 2 -> getHeight(-x, -z);
+                        case 3 -> getHeight(-z, -x);
+                    };
                     if (layers) {
                         height = session.getNearestSurfaceLayer(xx, zz, height, minY, maxY);
                     } else {

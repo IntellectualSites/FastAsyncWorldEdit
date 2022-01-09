@@ -3,10 +3,7 @@ package com.fastasyncworldedit.core.math.random;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.noise.NoiseGenerator;
 
-public class NoiseRandom implements SimpleRandom {
-
-    private final NoiseGenerator generator;
-    private final double scale;
+public record NoiseRandom(NoiseGenerator generator, double scale) implements SimpleRandom {
 
     /**
      * Create a new NoiseRandom instance using a specific {@link NoiseGenerator} and a scale.
@@ -14,9 +11,7 @@ public class NoiseRandom implements SimpleRandom {
      * @param generator The generator to use for the noise
      * @param scale     The scale of the noise
      */
-    public NoiseRandom(NoiseGenerator generator, double scale) {
-        this.generator = generator;
-        this.scale = scale;
+    public NoiseRandom {
     }
 
     @Override

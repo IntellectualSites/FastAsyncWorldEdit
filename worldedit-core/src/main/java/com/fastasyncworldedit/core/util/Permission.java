@@ -10,8 +10,8 @@ public enum Permission {
      */
     ADMIN("fawe.admin", "admin");
 
-    public String permission;
-    public String cat;
+    public final String permission;
+    public final String cat;
 
     Permission(String permission, String category) {
         this.permission = permission;

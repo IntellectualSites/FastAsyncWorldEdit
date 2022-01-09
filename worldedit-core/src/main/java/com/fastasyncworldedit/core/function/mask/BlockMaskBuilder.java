@@ -161,16 +161,13 @@ public class BlockMaskBuilder {
                 for (int i = last; i < length; i++) {
                     char c = input.charAt(i);
                     switch (c) {
-                        case '[':
-                        case '{':
-                        case '(':
+                        case '[', '{', '(' -> {
                             int next = StringMan.findMatchingBracket(input, i);
                             if (next != -1) {
                                 i = next;
                             }
-                            break;
-                        case ']':
-                        case ',': {
+                        }
+                        case ']', ',' -> {
                             charSequence.setSubstring(last, i);
                             if (key == null && PropertyKey.getByName(charSequence) == null) {
                                 suggest(
@@ -218,35 +215,21 @@ public class BlockMaskBuilder {
                             key = null;
                             operator = null;
                             last = i + 1;
-                            break;
                         }
-                        case '~':
-                        case '!':
-                        case '=':
-                        case '<':
-                        case '>': {
+                        case '~', '!', '=', '<', '>' -> {
                             charSequence.setSubstring(last, i);
                             boolean extra = input.charAt(i + 1) == '=';
                             if (extra) {
                                 i++;
                             }
-                            switch (c) {
-                                case '~':
-                                    operator = EQUAL_OR_NULL;
-                                    break;
-                                case '!':
-                                    operator = NOT;
-                                    break;
-                                case '=':
-                                    operator = EQUAL;
-                                    break;
-                                case '<':
-                                    operator = extra ? LESS_EQUAL : LESS;
-                                    break;
-                                case '>':
-                                    operator = extra ? GREATER_EQUAL : GREATER;
-                                    break;
-                            }
+                            operator = switch (c) {
+                                case '~' -> EQUAL_OR_NULL;
+                                case '!' -> NOT;
+                                case '=' -> EQUAL;
+                                case '<' -> extra ? LESS_EQUAL : LESS;
+                                case '>' -> extra ? GREATER_EQUAL : GREATER;
+                                default -> operator;
+                            };
                             if (charSequence.length() > 0 || key == null) {
                                 key = PropertyKey.getByName(charSequence);
                                 if (key == null) {
@@ -258,10 +241,9 @@ public class BlockMaskBuilder {
                                 }
                             }
                             last = i + 1;
-                            break;
                         }
-                        default:
-                            break;
+                        default -> {
+                        }
                     }
                 }
             } else {
@@ -395,6 +377,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> BlockMaskBuilder filter(
             Predicate<BlockType> typePredicate,
             BiPredicate<BlockType, Map.Entry<Property<T>, T>> allowed
@@ -491,6 +474,7 @@ public class BlockMaskBuilder {
         return this;
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public BlockMaskBuilder addAll(
             Predicate<BlockType> typePredicate,
             BiPredicate<BlockType, Map.Entry<Property<?>, ?>> propPredicate

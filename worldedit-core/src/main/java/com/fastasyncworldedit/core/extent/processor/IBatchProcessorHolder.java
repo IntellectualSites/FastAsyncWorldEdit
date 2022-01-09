@@ -20,8 +20,6 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
 
     /**
      * Set the held processor
-     *
-     * @param set
      */
     void setProcessor(IBatchProcessor set);
 

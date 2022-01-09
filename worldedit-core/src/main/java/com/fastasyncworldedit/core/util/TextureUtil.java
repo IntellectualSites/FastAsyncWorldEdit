@@ -882,7 +882,7 @@ public class TextureUtil implements TextureHolder {
                                 if (value instanceof String) {
                                     models.add((String) value);
                                 } else if (value instanceof Map) {
-                                    value = ((Map) value).get("model");
+                                    value = ((Map<?, ?>) value).get("model");
                                     if (value != null) {
                                         models.add((String) value);
                                     }

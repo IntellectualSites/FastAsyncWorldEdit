@@ -21,7 +21,6 @@ public class SurfaceSphereBrush implements Brush {
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
             MaxChangedBlocksException {
         SurfaceMask surface = new SurfaceMask(editSession);
-        final SolidBlockMask solid = new SolidBlockMask(editSession);
         final RadiusMask radius = new RadiusMask(0, (int) size);
         RecursiveVisitor visitor = new RecursiveVisitor(
                 new MaskIntersection(surface, radius),

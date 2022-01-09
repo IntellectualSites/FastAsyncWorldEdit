@@ -74,6 +74,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public IQueueExtent<IQueueChunk> getExtent() {
         return (IQueueExtent<IQueueChunk>) super.getExtent();
     }
@@ -88,11 +89,13 @@ public class ParallelQueueExtent extends PassthroughExtent {
         return false;
     }
 
+    @SuppressWarnings("rawtypes")
     private IQueueExtent<IQueueChunk> getNewQueue() {
         return handler.getQueue(world, this.processor, this.postProcessor);
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public <T extends Filter> T apply(Region region, T filter, boolean full) {
         // The chunks positions to iterate over
         final Set<BlockVector2> chunks = region.getChunks();
@@ -219,9 +222,6 @@ public class ParallelQueueExtent extends PassthroughExtent {
 
     /**
      * Lazily copy a region
-     *
-     * @param region
-     * @return
      */
     @Override
     public Clipboard lazyCopy(Region region) {

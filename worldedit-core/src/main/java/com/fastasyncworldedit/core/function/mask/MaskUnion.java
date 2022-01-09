@@ -55,14 +55,11 @@ public class MaskUnion extends MaskIntersection {
                 }
             }
         }
-        switch (set.size()) {
-            case 0:
-                return Masks.alwaysTrue();
-            case 1:
-                return set.iterator().next();
-            default:
-                return new MaskUnion(masks).optimize();
-        }
+        return switch (set.size()) {
+            case 0 -> Masks.alwaysTrue();
+            case 1 -> set.iterator().next();
+            default -> new MaskUnion(masks).optimize();
+        };
     }
 
     @Override

@@ -26,16 +26,11 @@ public class SolidRandomOffsetPatternParser extends RichParser<Pattern> {
 
     @Override
     protected Stream<String> getSuggestions(String argumentInput, int index) {
-        switch (index) {
-            case 0:
-                return this.worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
-            case 1:
-            case 2:
-            case 3:
-                return SuggestionHelper.suggestPositiveIntegers(argumentInput);
-            default:
-                return Stream.empty();
-        }
+        return switch (index) {
+            case 0 -> this.worldEdit.getPatternFactory().getSuggestions(argumentInput).stream();
+            case 1, 2, 3 -> SuggestionHelper.suggestPositiveIntegers(argumentInput);
+            default -> Stream.empty();
+        };
     }
 
     @Override

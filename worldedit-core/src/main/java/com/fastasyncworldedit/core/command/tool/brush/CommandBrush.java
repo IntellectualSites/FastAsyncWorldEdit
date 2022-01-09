@@ -43,10 +43,9 @@ public class CommandBrush implements Brush {
                 .replace("{size}", Integer.toString(radius));
 
         Actor actor = editSession.getActor();
-        if (!(actor instanceof Player)) {
+        if (!(actor instanceof Player player)) {
             throw FaweCache.PLAYER_ONLY;
         }
-        Player player = (Player) actor;
         //Use max world height to allow full coverage of the world height
         Location face = player.getBlockTraceFace(editSession.getWorld().getMaxY(), true);
         if (face == null) {

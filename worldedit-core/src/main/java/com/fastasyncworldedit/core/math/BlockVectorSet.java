@@ -77,8 +77,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
 
     @Override
     public boolean contains(Object o) {
-        if (o instanceof BlockVector3) {
-            BlockVector3 v = (BlockVector3) o;
+        if (o instanceof BlockVector3 v) {
             return contains(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;
@@ -161,8 +160,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
 
     @Override
     public boolean remove(Object o) {
-        if (o instanceof BlockVector3) {
-            BlockVector3 v = (BlockVector3) o;
+        if (o instanceof BlockVector3 v) {
             return remove(v.getBlockX(), v.getBlockY(), v.getBlockZ());
         }
         return false;

@@ -15,6 +15,7 @@ import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import javax.annotation.Nullable;
 import java.util.Locale;
 
+@SuppressWarnings("unused")
 public class PrimitiveBindings extends Bindings {
 
     public PrimitiveBindings(WorldEdit worldEdit) {
@@ -48,26 +49,12 @@ public class PrimitiveBindings extends Bindings {
      */
     @Binding
     public Boolean getBoolean(String argument) {
-        switch (argument.toLowerCase(Locale.ROOT)) {
-            case "":
-                throw new InputParseException(Caption.of("fawe.error.input-parser-exception"));
-            case "true":
-            case "yes":
-            case "on":
-            case "y":
-            case "1":
-            case "t":
-                return true;
-            case "false":
-            case "no":
-            case "off":
-            case "f":
-            case "n":
-            case "0":
-                return false;
-            default:
-                throw new InputParseException(Caption.of("fawe.error.invalid-boolean", TextComponent.of(argument)));
-        }
+        return switch (argument.toLowerCase(Locale.ROOT)) {
+            case "" -> throw new InputParseException(Caption.of("fawe.error.input-parser-exception"));
+            case "true", "yes", "on", "y", "1", "t" -> true;
+            case "false", "no", "off", "f", "n", "0" -> false;
+            default -> throw new InputParseException(Caption.of("fawe.error.invalid-boolean", TextComponent.of(argument)));
+        };
     }
 
     /**
@@ -84,18 +71,13 @@ public class PrimitiveBindings extends Bindings {
         final double radiusY;
         final double radiusZ;
         switch (radii.length) {
-            case 1:
-                radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
-                break;
-
-            case 3:
+            case 1 -> radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
+            case 3 -> {
                 radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
                 radiusY = PrimitiveBindings.parseNumericInput(radii[1]);
                 radiusZ = PrimitiveBindings.parseNumericInput(radii[2]);
-                break;
-
-            default:
-                throw new InputParseException("You must either specify 1 or 3 radius values.");
+            }
+            default -> throw new InputParseException("You must either specify 1 or 3 radius values.");
         }
         return Vector3.at(radiusX, radiusY, radiusZ);
     }
@@ -115,17 +97,12 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX;
         final double radiusZ;
         switch (radii.length) {
-            case 1:
-                radiusX = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
-                break;
-
-            case 2:
+            case 1 -> radiusX = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
+            case 2 -> {
                 radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
                 radiusZ = PrimitiveBindings.parseNumericInput(radii[1]);
-                break;
-
-            default:
-                throw new InputParseException("You must either specify 1 or 2 radius values.");
+            }
+            default -> throw new InputParseException("You must either specify 1 or 2 radius values.");
         }
         return Vector2.at(radiusX, radiusZ);
     }
@@ -145,18 +122,13 @@ public class PrimitiveBindings extends Bindings {
         final double radiusY;
         final double radiusZ;
         switch (radii.length) {
-            case 1:
-                radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
-                break;
-
-            case 3:
+            case 1 -> radiusX = radiusY = radiusZ = PrimitiveBindings.parseNumericInput(radii[0]);
+            case 3 -> {
                 radiusX = PrimitiveBindings.parseNumericInput(radii[0]);
                 radiusY = PrimitiveBindings.parseNumericInput(radii[1]);
                 radiusZ = PrimitiveBindings.parseNumericInput(radii[2]);
-                break;
-
-            default:
-                throw new InputParseException("You must either specify 1 or 3 radius values.");
+            }
+            default -> throw new InputParseException("You must either specify 1 or 3 radius values.");
         }
         return BlockVector3.at(radiusX, radiusY, radiusZ);
     }
@@ -175,17 +147,12 @@ public class PrimitiveBindings extends Bindings {
         final double radiusX;
         final double radiusZ;
         switch (radii.length) {
-            case 1:
-                radiusX = radiusZ = parseNumericInput(radii[0]);
-                break;
-
-            case 2:
+            case 1 -> radiusX = radiusZ = parseNumericInput(radii[0]);
+            case 2 -> {
                 radiusX = parseNumericInput(radii[0]);
                 radiusZ = parseNumericInput(radii[1]);
-                break;
-
-            default:
-                throw new InputParseException("You must either specify 1 or 2 radius values.");
+            }
+            default -> throw new InputParseException("You must either specify 1 or 2 radius values.");
         }
         return BlockVector2.at(radiusX, radiusZ);
     }

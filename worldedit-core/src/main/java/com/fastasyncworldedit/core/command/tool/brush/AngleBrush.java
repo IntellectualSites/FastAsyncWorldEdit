@@ -9,13 +9,7 @@ import com.sk89q.worldedit.function.mask.SolidBlockMask;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 
-public class AngleBrush implements Brush {
-
-    private final int distance;
-
-    public AngleBrush(int distance) {
-        this.distance = distance;
-    }
+public record AngleBrush(int distance) implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws

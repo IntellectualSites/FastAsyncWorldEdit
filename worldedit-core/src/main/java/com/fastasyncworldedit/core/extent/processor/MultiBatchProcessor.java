@@ -55,14 +55,11 @@ public class MultiBatchProcessor implements IBatchProcessor {
                 list.add(processor);
             }
         }
-        switch (list.size()) {
-            case 0:
-                return EmptyBatchProcessor.getInstance();
-            case 1:
-                return list.get(0);
-            default:
-                return new MultiBatchProcessor(list.toArray(new IBatchProcessor[0]));
-        }
+        return switch (list.size()) {
+            case 0 -> EmptyBatchProcessor.getInstance();
+            case 1 -> list.get(0);
+            default -> new MultiBatchProcessor(list.toArray(new IBatchProcessor[0]));
+        };
     }
 
     public void addBatchProcessor(IBatchProcessor processor) {

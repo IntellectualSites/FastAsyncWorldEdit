@@ -15,9 +15,6 @@ import java.util.List;
  * Embodies an abstract implementation for pasting structures along a spline.<br>
  * A curve is being interpolated by the provided {@link Interpolation} implementation
  * and the structure is pasted along this curve by the specific Spline implementation.
- *
- * @author Schuwi
- * @version 1.0
  */
 public abstract class Spline {
 
@@ -202,19 +199,7 @@ public abstract class Spline {
         return finalPosition;
     }
 
-    private class Section {
-
-        final double uniStart;
-        final double uniLength;
-        final double flexStart;
-        final double flexLength;
-
-        Section(double uniStart, double uniLength, double flexStart, double flexLength) {
-            this.uniStart = uniStart;
-            this.uniLength = uniLength;
-            this.flexStart = flexStart;
-            this.flexLength = flexLength;
-        }
+    private record Section(double uniStart, double uniLength, double flexStart, double flexLength) {
 
     }
 

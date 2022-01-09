@@ -69,8 +69,7 @@ public class MultiClipboardHolder extends URIClipboardHolder {
     @Override
     public URI getURI(Clipboard clipboard) {
         for (ClipboardHolder holder : getHolders()) {
-            if (holder instanceof URIClipboardHolder) {
-                URIClipboardHolder uriHolder = (URIClipboardHolder) holder;
+            if (holder instanceof URIClipboardHolder uriHolder) {
                 URI uri = uriHolder.getURI(clipboard);
                 if (uri != null) {
                     return uri;

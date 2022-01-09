@@ -94,7 +94,7 @@ public interface IAdaptedMap<K, V, K2, V2> extends Map<K, V> {
         if (isEmpty()) {
             return Collections.emptySet();
         }
-        return new AdaptedSetCollection<>(getParent().entrySet(), new Function<Entry<K2, V2>, Entry<K, V>>() {
+        return new AdaptedSetCollection<>(getParent().entrySet(), new Function<>() {
             private final MutablePair<K, V> entry = new MutablePair<>();
 
             @Override

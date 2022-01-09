@@ -1,6 +1,5 @@
 package com.fastasyncworldedit.core.function.mask;
 
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -9,7 +8,7 @@ public class YAxisMask extends AbstractMask implements ResettableMask {
 
     private transient int layer = -1;
 
-    public YAxisMask(Extent extent) {
+    public YAxisMask() {
     }
 
     @Override
@@ -27,7 +26,7 @@ public class YAxisMask extends AbstractMask implements ResettableMask {
 
     @Override
     public Mask copy() {
-        return new YAxisMask(null);
+        return new YAxisMask();
     }
 
 }

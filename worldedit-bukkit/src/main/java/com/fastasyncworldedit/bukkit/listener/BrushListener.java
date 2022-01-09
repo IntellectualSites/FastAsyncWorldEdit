@@ -34,7 +34,7 @@ public class BrushListener implements Listener {
         BukkitPlayer player = BukkitAdapter.adapt(bukkitPlayer);
         LocalSession session = player.getSession();
         Tool tool = session.getTool(player);
-        if (tool instanceof ScrollTool) {
+        if (tool instanceof ScrollTool scrollable) {
             final int slot = event.getNewSlot();
             final int oldSlot = event.getPreviousSlot();
             final int ri;
@@ -43,7 +43,6 @@ public class BrushListener implements Listener {
             } else {
                 ri = -1;
             }
-            ScrollTool scrollable = (ScrollTool) tool;
             if (scrollable.increment(player, ri)) {
                 bukkitPlayer.getInventory().setHeldItemSlot(oldSlot);
             }

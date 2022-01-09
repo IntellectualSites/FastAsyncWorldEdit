@@ -50,6 +50,7 @@ public class MutableEntityChange implements Change {
         }
     }
 
+    @SuppressWarnings({"unchecked"})
     public void delete(UndoContext context) {
         Map<String, Tag> map = tag.getValue();
         long most;

@@ -77,6 +77,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBlocks {
 
@@ -320,6 +322,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public CompoundTag getEntity(UUID uuid) {
         Entity entity = serverLevel.getEntity(uuid);
         if (entity != null) {
@@ -365,10 +368,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
             @Override
             public boolean contains(Object get) {
-                if (!(get instanceof CompoundTag)) {
+                if (!(get instanceof CompoundTag getTag)) {
                     return false;
                 }
-                CompoundTag getTag = (CompoundTag) get;
                 Map<String, Tag> value = getTag.getValue();
                 CompoundTag getParts = (CompoundTag) value.get("UUID");
                 UUID getUUID = new UUID(getParts.getLong("Most"), getParts.getLong("Least"));
@@ -388,17 +390,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             @NotNull
             @Override
             public Iterator<CompoundTag> iterator() {
-                Iterable<CompoundTag> result = Iterables.transform(
-                        Iterables.concat(slices),
-                        new com.google.common.base.Function<Entity, CompoundTag>() {
-                            @Nullable
-                            @Override
-                            public CompoundTag apply(@Nullable Entity input) {
-                                net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                                return (CompoundTag) adapter.toNative(input.saveWithoutId(tag));
-                            }
-                        }
-                );
+                Iterable<CompoundTag> result = StreamSupport.stream(Iterables.concat(slices).spliterator(), false).map(input -> {
+                    net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
+                    return (CompoundTag) adapter.toNative(input.saveWithoutId(tag));
+                }).collect(Collectors.toList());
                 return result.iterator();
             }
         };
@@ -842,6 +837,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
      * @return the given array to be filled with data, or a new array if null is given.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public char[] update(int layer, char[] data, boolean aggressive) {
         LevelChunkSection section = getSections(aggressive)[layer];
         // Section is null, return empty array
@@ -1005,6 +1001,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public synchronized boolean trim(boolean aggressive) {
         skyLight = new DataLayer[getSectionCount()];
         blockLight = new DataLayer[getSectionCount()];

@@ -32,6 +32,7 @@ import org.enginehub.piston.inject.InjectedValueAccess;
 
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class ConsumeBindings extends Bindings {
 
     private final PlatformCommandManager manager;

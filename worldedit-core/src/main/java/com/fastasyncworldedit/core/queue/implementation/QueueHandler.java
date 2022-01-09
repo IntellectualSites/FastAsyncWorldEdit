@@ -36,7 +36,7 @@ import java.util.function.Supplier;
 /**
  * Class which handles all the queues {@link IQueueExtent}
  */
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public abstract class QueueHandler implements Trimable, Runnable {
 
     private final ForkJoinPool forkJoinPoolPrimary = new ForkJoinPool();
@@ -238,9 +238,6 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     /**
      * Get or create the WorldChunkCache for a world
-     *
-     * @param world
-     * @return
      */
     public IChunkCache<IChunkGet> getOrCreateWorldCache(World world) {
         world = WorldWrapper.unwrap(world);

@@ -99,7 +99,7 @@ public class MinecraftStructure implements ClipboardReader, ClipboardWriter {
                     for (Map.Entry<String, Tag> entry : properties.getValue().entrySet()) {
                         String key = entry.getKey();
                         String value = ((StringTag) entry.getValue()).getValue();
-                        Property property = type.getProperty(key);
+                        Property<Object> property = type.getProperty(key);
                         state = state.with(property, property.getValueFor(value));
                     }
                 }

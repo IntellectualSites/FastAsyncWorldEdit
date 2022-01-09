@@ -109,17 +109,13 @@ public class RichMaskParser extends FaweParser<Mask> {
                     // Legacy syntax
                     if (charMask) {
                         switch (char0) {
-                            case '\\':
-                            case '/':
-                            case '{':
-                            case '|':
-                            case '~': {
+                            case '\\', '/', '{', '|', '~' -> {
                                 String value = command.substring(1) + ((entry.getValue().isEmpty())
                                         ? ""
                                         : "[" + StringMan.join(
-                                                entry.getValue(),
-                                                "]["
-                                        ) + "]");
+                                        entry.getValue(),
+                                        "]["
+                                ) + "]");
                                 if (value.contains(":")) {
                                     if (value.charAt(0) == ':') {
                                         value = value.replaceFirst(":", "");
@@ -127,15 +123,11 @@ public class RichMaskParser extends FaweParser<Mask> {
                                     value = value.replaceAll(":", "][");
                                 }
                                 mask = parseFromInput(char0 + "[" + value + "]", context);
-                                break;
                             }
-                            case '%':
-                            case '$':
-                            case '<':
-                            case '>':
-                            case '!':
+                            case '%', '$', '<', '>', '!' -> {
                                 input = input.substring(input.indexOf(char0) + 1);
                                 mask = parseFromInput(char0 + "[" + input + "]", context);
+                            }
                         }
                     }
                     if (mask == null) {

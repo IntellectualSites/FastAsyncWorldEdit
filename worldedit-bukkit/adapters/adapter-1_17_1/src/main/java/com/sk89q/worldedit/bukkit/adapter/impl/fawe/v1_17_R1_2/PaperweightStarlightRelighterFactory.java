@@ -16,6 +16,7 @@ public class PaperweightStarlightRelighterFactory implements RelighterFactory {
 
     @Override
     public @Nonnull
+    @SuppressWarnings("rawtypes")
     Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue) {
         org.bukkit.World w = Bukkit.getWorld(world.getName());
         if (w == null) {

@@ -56,13 +56,10 @@ public class ScalableHeightMap implements HeightMap {
     }
 
     public static ScalableHeightMap fromShape(Shape shape, int minY, int maxY) {
-        switch (shape) {
-            default:
-            case CONE:
-                return new ScalableHeightMap(minY, maxY);
-            case CYLINDER:
-                return new FlatScalableHeightMap(minY, maxY);
-        }
+        return switch (shape) {
+            case CONE -> new ScalableHeightMap(minY, maxY);
+            case CYLINDER -> new FlatScalableHeightMap(minY, maxY);
+        };
     }
 
     public static ScalableHeightMap fromClipboard(Clipboard clipboard, int minY, int maxY) {

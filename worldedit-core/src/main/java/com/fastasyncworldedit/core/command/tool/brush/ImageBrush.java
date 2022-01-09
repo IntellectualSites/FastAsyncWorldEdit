@@ -39,7 +39,7 @@ public class ImageBrush implements Brush {
 
     private final ColorFunction colorFunction;
 
-    public ImageBrush(BufferedImage image, LocalSession session, boolean alpha /*, boolean glass */) throws IOException {
+    public ImageBrush(BufferedImage image, LocalSession session, boolean alpha /*, boolean glass */) {
         this.session = session;
         this.table = new SummedColorTable(image, alpha);
         this.width = image.getWidth();
@@ -89,10 +89,9 @@ public class ImageBrush implements Brush {
         double scale = Math.max(width, height) / sizeDouble;
 
         Actor actor = editSession.getActor();
-        if (!(actor instanceof Player)) {
+        if (!(actor instanceof Player player)) {
             throw FaweCache.PLAYER_ONLY;
         }
-        Player player = (Player) actor;
         Location loc = player.getLocation();
         float yaw = loc.getYaw();
         float pitch = loc.getPitch();

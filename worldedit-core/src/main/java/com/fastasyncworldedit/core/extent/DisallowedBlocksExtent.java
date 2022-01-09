@@ -101,6 +101,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
         return super.setBlock(x, y, z, block);
     }
 
+    @SuppressWarnings("unchecked")
     private <B extends BlockStateHolder<B>> B checkBlock(B block) {
         if (blockedBlocks != null) {
             if (blockedBlocks.contains(block.getBlockType().getId())) {

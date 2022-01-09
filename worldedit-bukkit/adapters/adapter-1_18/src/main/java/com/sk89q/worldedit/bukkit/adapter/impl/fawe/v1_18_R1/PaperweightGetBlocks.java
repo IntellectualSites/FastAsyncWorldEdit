@@ -309,6 +309,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public CompoundTag getEntity(UUID uuid) {
         Entity entity = serverLevel.getEntity(uuid);
         if (entity != null) {
@@ -868,6 +869,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
      * @return the given array to be filled with data, or a new array if null is given.
      */
     @Override
+    @SuppressWarnings("unchecked")
     public char[] update(int layer, char[] data, boolean aggressive) {
         LevelChunkSection section = getSections(aggressive)[layer];
         // Section is null, return empty array
@@ -1064,6 +1066,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public synchronized boolean trim(boolean aggressive) {
         skyLight = new DataLayer[getSectionCount()];
         blockLight = new DataLayer[getSectionCount()];

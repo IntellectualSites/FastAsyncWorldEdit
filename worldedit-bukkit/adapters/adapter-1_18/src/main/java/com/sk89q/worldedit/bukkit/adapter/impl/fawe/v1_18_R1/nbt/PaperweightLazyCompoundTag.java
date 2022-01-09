@@ -35,6 +35,7 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<String, Tag> getValue() {
         if (compoundTag == null) {
             compoundTag = (CompoundTag) WorldEditPlugin.getInstance().getBukkitImplAdapter().toNative(compoundTagSupplier.get());
@@ -92,6 +93,7 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
         return 0;
     }
 
+    @SuppressWarnings("unchecked")
     public List<Tag> getList(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
         if (tag instanceof net.minecraft.nbt.ListTag nbtList) {
@@ -108,6 +110,7 @@ public class PaperweightLazyCompoundTag extends LazyCompoundTag {
         return Collections.emptyList();
     }
 
+    @SuppressWarnings("unchecked")
     public ListTag getListTag(String key) {
         net.minecraft.nbt.Tag tag = compoundTagSupplier.get().get(key);
         if (tag instanceof net.minecraft.nbt.ListTag) {

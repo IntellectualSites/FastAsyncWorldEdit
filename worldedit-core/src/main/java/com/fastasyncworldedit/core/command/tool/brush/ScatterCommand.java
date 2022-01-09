@@ -50,10 +50,9 @@ public class ScatterCommand extends ScatterBrush {
                 .replace("{size}", Integer.toString(radius));
 
         Actor actor = editSession.getActor();
-        if (!(actor instanceof Player)) {
+        if (!(actor instanceof Player player)) {
             throw FaweCache.PLAYER_ONLY;
         }
-        Player player = (Player) actor;
         player.setSelection(selector);
         List<String> cmds = StringMan.split(replaced, ';');
         for (String cmd : cmds) {

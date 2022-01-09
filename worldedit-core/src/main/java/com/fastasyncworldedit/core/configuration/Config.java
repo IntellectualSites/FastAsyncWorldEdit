@@ -100,7 +100,6 @@ public class Config {
      * Set all values in the file (load first to avoid overwriting).
      */
     public void save(File file) {
-        Class<? extends Config> root = getClass();
         try {
             if (!file.exists()) {
                 File parent = file.getParentFile();
@@ -196,23 +195,6 @@ public class Config {
             return INSTANCES;
         }
 
-    }
-
-    /**
-     * Get the static fields in a section.
-     */
-    private Map<String, Object> getFields(Class<?> clazz) {
-        HashMap<String, Object> map = new HashMap<>();
-        for (Field field : clazz.getFields()) {
-            if (Modifier.isStatic(field.getModifiers())) {
-                try {
-                    map.put(toNodeName(field.getName()), field.get(null));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return map;
     }
 
     private String toYamlString(Object value, String spacing) {
@@ -312,19 +294,6 @@ public class Config {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Get the field for a specific config node.
-     *
-     * @param split the node (split by period)
-     */
-    private Field getField(String[] split, Class<?> root) {
-        Object instance = getInstance(split, root);
-        if (instance == null) {
-            return null;
-        }
-        return getField(split, instance);
     }
 
     /**

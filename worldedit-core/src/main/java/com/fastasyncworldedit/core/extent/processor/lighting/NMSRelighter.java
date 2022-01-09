@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+@SuppressWarnings("rawtypes")
 public class NMSRelighter implements Relighter {
 
     private static final int DISPATCH_SIZE = 64;
@@ -988,11 +989,10 @@ public class NMSRelighter implements Relighter {
             return;
         }
         switch (reason) {
-            case SkipReason.SOLID: {
+            case SkipReason.SOLID -> {
                 Arrays.fill(mask, (byte) 0);
-                return;
             }
-            case SkipReason.AIR: {
+            case SkipReason.AIR -> {
                 int index = 0;
                 for (int z = 0; z < 16; z++) {
                     for (int x = 0; x < 16; x++) {

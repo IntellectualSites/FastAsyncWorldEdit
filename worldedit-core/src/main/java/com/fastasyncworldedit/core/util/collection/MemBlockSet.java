@@ -107,8 +107,7 @@ public final class MemBlockSet extends BlockSet {
                     private void init() {
                         for (; X < rows.length; X++) {
                             IRow nullRowX = rows[X];
-                            if (nullRowX instanceof RowX) {
-                                RowX rowx = (RowX) nullRowX;
+                            if (nullRowX instanceof RowX rowx) {
                                 for (; Z < rowx.rows.length; Z++) {
                                     IRow nullRowZ = rowx.rows[Z];
                                     if (nullRowZ instanceof RowZ) {
@@ -148,8 +147,7 @@ public final class MemBlockSet extends BlockSet {
             public int size() {
                 int size = 0;
                 for (IRow nullRowX : rows) {
-                    if (nullRowX instanceof RowX) {
-                        RowX rowx = (RowX) nullRowX;
+                    if (nullRowX instanceof RowX rowx) {
                         for (int Z = 0; Z < rowx.rows.length; Z++) {
                             IRow nullRowZ = rowx.rows[Z];
                             if (nullRowZ instanceof RowZ) {
@@ -168,8 +166,7 @@ public final class MemBlockSet extends BlockSet {
 
             @Override
             public boolean contains(Object o) {
-                if (o instanceof BlockVector2) {
-                    BlockVector2 other = (BlockVector2) o;
+                if (o instanceof BlockVector2 other) {
                     IRow rowx = rows[other.getX() - getChunkOffsetX()];
                     if (rowx instanceof RowX) {
                         return ((RowX) rowx).rows[other.getZ() - getChunkOffsetZ()] instanceof RowZ;
@@ -201,12 +198,10 @@ public final class MemBlockSet extends BlockSet {
                     private void init() {
                         for (; X < rows.length; X++) {
                             IRow nullRowX = rows[X];
-                            if (nullRowX instanceof RowX) {
-                                RowX rowx = (RowX) nullRowX;
+                            if (nullRowX instanceof RowX rowx) {
                                 for (; Z < rowx.rows.length; Z++) {
                                     IRow nullRowZ = rowx.rows[Z];
-                                    if (nullRowZ instanceof RowZ) {
-                                        RowZ rowz = (RowZ) nullRowZ;
+                                    if (nullRowZ instanceof RowZ rowz) {
                                         for (; Y < rowz.rows.length; Y++) {
                                             IRow nullRowY = rowz.rows[Y];
                                             if (nullRowY instanceof RowY) {
@@ -214,7 +209,6 @@ public final class MemBlockSet extends BlockSet {
                                                 setY = Y;
                                                 setZ = Z;
                                                 Z++;
-                                                hasNext = true;
                                             }
                                         }
                                         Y = 0;
@@ -250,12 +244,10 @@ public final class MemBlockSet extends BlockSet {
             public int size() {
                 int size = 0;
                 for (IRow nullRowX : rows) {
-                    if (nullRowX instanceof RowX) {
-                        RowX rowx = (RowX) nullRowX;
+                    if (nullRowX instanceof RowX rowx) {
                         for (int Z = 0; Z < rowx.rows.length; Z++) {
                             IRow nullRowZ = rowx.rows[Z];
-                            if (nullRowZ instanceof RowZ) {
-                                RowZ rowz = (RowZ) nullRowZ;
+                            if (nullRowZ instanceof RowZ rowz) {
                                 for (int Y = 0; Y < rowz.rows.length; Y++) {
                                     IRow nullRowY = rowz.rows[Y];
                                     if (nullRowY instanceof RowY) {
@@ -276,8 +268,7 @@ public final class MemBlockSet extends BlockSet {
 
             @Override
             public boolean contains(Object o) {
-                if (o instanceof BlockVector3) {
-                    BlockVector3 other = (BlockVector3) o;
+                if (o instanceof BlockVector3 other) {
                     IRow rowx = rows[other.getX() - getChunkOffsetX()];
                     if (rowx instanceof RowX) {
                         IRow rowz = ((RowX) rowx).rows[other.getZ()];
@@ -297,23 +288,20 @@ public final class MemBlockSet extends BlockSet {
         int maxy = 16;
         int by = Integer.MAX_VALUE;
         for (IRow nullRowX : rows) {
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
-            RowX rowx = (RowX) nullRowX;
             for (int Z = 0; Z < rowx.rows.length; Z++) {
                 IRow nullRowZ = rowx.rows[Z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
-                RowZ rowz = (RowZ) nullRowZ;
                 outer:
                 for (int Y = 0; Y <= maxY; Y++) {
                     IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
-                    RowY rowY = (RowY) nullRowY;
                     int localMaxy = Y == maxY ? maxy : 15;
                     for (int y = 0, i = 0; y < localMaxy; y++) {
                         for (int xz = 0; xz < 4; xz++, i++) {
@@ -346,23 +334,20 @@ public final class MemBlockSet extends BlockSet {
         int maxy = 0;
         int by = Integer.MIN_VALUE;
         for (IRow nullRowX : rows) {
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
-            RowX rowx = (RowX) nullRowX;
             for (int Z = 0; Z < rowx.rows.length; Z++) {
                 IRow nullRowZ = rowx.rows[Z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
-                RowZ rowz = (RowZ) nullRowZ;
                 outer:
                 for (int Y = maxSectionPosition; Y >= maxY; Y--) {
                     IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
-                    RowY rowY = (RowY) nullRowY;
                     int localMaxy = Y == maxY ? maxy : 0;
                     for (int y = 15, i = 63; y >= localMaxy; y--) {
                         for (int xz = 3; xz >= 0; xz--, i--) {
@@ -395,27 +380,24 @@ public final class MemBlockSet extends BlockSet {
         int tz = Integer.MIN_VALUE;
         for (int X = rows.length - 1; X >= 0; X--) {
             IRow nullRowX = rows[X];
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
-            RowX rowx = (RowX) nullRowX;
             outer:
             for (int Z = rowx.rows.length - 1; Z >= maxChunkZ; Z--) {
                 IRow nullRowZ = rowx.rows[Z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
-                RowZ rowz = (RowZ) nullRowZ;
                 if (Z != maxChunkZ) {
                     maxChunkZ = Z;
                     maxz = -1;
                 }
                 for (int Y = rowz.rows.length - 1; Y >= 0; Y--) {
                     IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
-                    RowY rowY = (RowY) nullRowY;
                     for (int y = 15, i1 = 63; y >= 0; y--, i1 -= 4) {
                         for (int z = 12, i = i1; z > maxz - 3; z -= 4, i--) {
                             long bitBuffer = rowY.bits[i];
@@ -443,24 +425,21 @@ public final class MemBlockSet extends BlockSet {
     public int getMaxX() {
         for (int X = rows.length - 1; X >= 0; X--) {
             IRow nullRowX = rows[X];
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
             int tx = (X << 4);
-            RowX rowx = (RowX) nullRowX;
             long or = 0;
             for (int Z = rowx.rows.length - 1; Z >= 0; Z--) {
                 IRow nullRowZ = rowx.rows[Z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
-                RowZ rowz = (RowZ) nullRowZ;
                 for (int Y = rowz.rows.length - 1; Y >= 0; Y--) {
                     IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
-                    RowY rowY = (RowY) nullRowY;
                     or |= Arrays.stream(rowY.bits).reduce(0, (a, b) -> a | b);
                     or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48) & 0xFFFF);
                     if (highestBit(or) == 15) {
@@ -481,27 +460,24 @@ public final class MemBlockSet extends BlockSet {
         int maxz = 16;
         int bz = Integer.MAX_VALUE;
         for (IRow nullRowX : rows) {
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
-            RowX rowx = (RowX) nullRowX;
             outer:
             for (int Z = 0; Z <= maxChunkZ; Z++) {
                 IRow nullRowZ = rowx.rows[Z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
-                RowZ rowz = (RowZ) nullRowZ;
                 if (Z != maxChunkZ) {
                     maxChunkZ = Z;
                     maxz = 16;
                 }
                 for (int Y = 0; Y < rowz.rows.length; Y++) {
                     IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
-                    RowY rowY = (RowY) nullRowY;
                     for (int y = 0, i1 = 0; y < 16; y++, i1 += 4) {
                         for (int z = 0, i = i1; z < maxz; z += 4, i++) {
                             long bitBuffer = rowY.bits[i];
@@ -529,24 +505,21 @@ public final class MemBlockSet extends BlockSet {
     public int getMinX() {
         for (int X = 0; X < rows.length; X++) {
             IRow nullRowX = rows[X];
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
             int bx = X << 4;
-            RowX rowx = (RowX) nullRowX;
             long or = 0;
             for (int Z = 0; Z < rowx.rows.length; Z++) {
                 IRow nullRowZ = rowx.rows[Z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
-                RowZ rowz = (RowZ) nullRowZ;
                 for (int Y = 0; Y < rowz.rows.length; Y++) {
                     IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
-                    RowY rowY = (RowY) nullRowY;
                     or |= Arrays.stream(rowY.bits).reduce(0, (a, b) -> a | b);
                     or = (or & 0xFFFF) | ((or >> 16) & 0xFFFF) | ((or >> 32) & 0xFFFF) | ((or >> 48) & 0xFFFF);
                     if (lowestBit(or) == 0) {
@@ -565,25 +538,22 @@ public final class MemBlockSet extends BlockSet {
     public void iterate(BlockIterator iterator) {
         for (int X = 0; X < rows.length; X++) {
             IRow nullRowX = rows[X];
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
             int bx = getBlockOffsetX() + (X << 4);
-            RowX rowx = (RowX) nullRowX;
             for (int Z = 0; Z < rowx.rows.length; Z++) {
                 IRow nullRowZ = rowx.rows[Z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
                 int bz = getBlockOffsetZ() + (Z << 4);
-                RowZ rowz = (RowZ) nullRowZ;
                 for (int Y = 0; Y < rowz.rows.length; Y++) {
                     IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
                     int by = ((Y - minSectionPosition) << 4);
-                    RowY rowY = (RowY) nullRowY;
                     for (int y = 0, i = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z += 4, i++) {
                             long bitBuffer = rowY.bits[i];
@@ -673,8 +643,7 @@ public final class MemBlockSet extends BlockSet {
                 while (yIndex < rowZ.rows.length) {
                     by = yIndex << 4;
                     IRow nullRowY = rowZ.rows[yIndex++];
-                    if (nullRowY instanceof RowY) {
-                        RowY rowY = (RowY) nullRowY;
+                    if (nullRowY instanceof RowY rowY) {
                         bits = rowY.bits;
                         return true;
                     }
@@ -729,22 +698,19 @@ public final class MemBlockSet extends BlockSet {
     @Override
     public boolean isEmpty() {
         for (IRow nullRowX : rows) {
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
-            RowX rowx = (RowX) nullRowX;
             for (int Z = 0; Z < rowx.rows.length; Z++) {
                 IRow nullRowZ = rowx.rows[Z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
-                RowZ rowz = (RowZ) nullRowZ;
                 for (int Y = 0; Y < 16; Y++) {
                     IRow nullRowY = rowz.rows[Y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
-                    RowY rowY = (RowY) nullRowY;
                     for (long bit : rowY.bits) {
                         if (bit != 0) {
                             return true;
@@ -766,22 +732,19 @@ public final class MemBlockSet extends BlockSet {
         long lastBit = 0;
         int lastCount = 0;
         for (IRow nullRowX : rows) {
-            if (!(nullRowX instanceof RowX)) {
+            if (!(nullRowX instanceof RowX rowx)) {
                 continue;
             }
-            RowX rowx = (RowX) nullRowX;
             for (int z = 0; z < rowx.rows.length; z++) {
                 IRow nullRowZ = rowx.rows[z];
-                if (!(nullRowZ instanceof RowZ)) {
+                if (!(nullRowZ instanceof RowZ rowz)) {
                     continue;
                 }
-                RowZ rowz = (RowZ) nullRowZ;
                 for (int y = 0; y < 16; y++) {
                     IRow nullRowY = rowz.rows[y];
-                    if (!(nullRowY instanceof RowY)) {
+                    if (!(nullRowY instanceof RowY rowY)) {
                         continue;
                     }
-                    RowY rowY = (RowY) nullRowY;
                     for (long bit : rowY.bits) {
                         if (bit == 0) {
                             continue;

@@ -95,9 +95,9 @@ public abstract class DFSVisitor implements Operation {
             int countAdd = 0;
             int countAttempt = 0;
             for (IntTriple direction : dirs) {
-                mutable2.mutX(from.getX() + direction.getX());
-                mutable2.mutY(from.getY() + direction.getY());
-                mutable2.mutZ(from.getZ() + direction.getZ());
+                mutable2.mutX(from.getX() + direction.x());
+                mutable2.mutY(from.getY() + direction.y());
+                mutable2.mutZ(from.getZ() + direction.z());
                 if (isVisitable(mutable, mutable2)) {
                     Node adjacent = new Node(mutable2.getBlockX(), mutable2.getBlockY(), mutable2.getBlockZ());
                     if (!adjacent.equals(current.from)) {
@@ -175,7 +175,7 @@ public abstract class DFSVisitor implements Operation {
         }
 
         @Override
-        public final int hashCode() {
+        public int hashCode() {
             return (x ^ (z << 12)) ^ (y << 24);
         }
 
@@ -208,17 +208,7 @@ public abstract class DFSVisitor implements Operation {
 
     }
 
-    public static class NodePair {
-
-        public final Node to;
-        public final Node from;
-        private final int depth;
-
-        NodePair(Node from, Node to, int depth) {
-            this.from = from;
-            this.to = to;
-            this.depth = depth;
-        }
+    public record NodePair(Node from, Node to, int depth) {
 
     }
 

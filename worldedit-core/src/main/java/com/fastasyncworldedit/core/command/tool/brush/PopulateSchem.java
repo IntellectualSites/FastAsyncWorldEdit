@@ -14,19 +14,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 
 import java.util.List;
 
-public class PopulateSchem implements Brush {
-
-    private final Mask mask;
-    private final boolean randomRotate;
-    private final List<ClipboardHolder> clipboards;
-    private final int rarity;
-
-    public PopulateSchem(Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean randomRotate) {
-        this.mask = mask;
-        this.clipboards = clipboards;
-        this.rarity = rarity;
-        this.randomRotate = randomRotate;
-    }
+public record PopulateSchem(Mask mask, List<ClipboardHolder> clipboards, int rarity, boolean randomRotate) implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
