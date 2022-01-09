@@ -1,4 +1,3 @@
-import io.papermc.paperweight.userdev.attribute.Obfuscation
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.dependencies

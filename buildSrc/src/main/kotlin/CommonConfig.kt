@@ -20,14 +20,9 @@ fun Project.applyCommonConfiguration() {
             url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
         }
         maven {
-            name = "OSS Sonatype Releases"
-            url = uri("https://oss.sonatype.org/content/repositories/releases/")
-        }
-        maven {
             name = "Athion"
             url = uri("https://ci.athion.net/plugin/repository/tools/")
         }
-        mavenLocal()
     }
 
     configurations.all {
