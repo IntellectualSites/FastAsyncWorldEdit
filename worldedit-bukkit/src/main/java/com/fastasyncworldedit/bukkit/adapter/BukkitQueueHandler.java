@@ -11,8 +11,6 @@ import java.lang.reflect.Method;
 
 public class BukkitQueueHandler extends QueueHandler {
 
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
-
     private volatile boolean timingsEnabled;
     private static boolean alertTimingsChange = true;
 

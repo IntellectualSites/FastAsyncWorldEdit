@@ -65,20 +65,21 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
     @Override
     public void accept(ProgressType type, Integer amount) {
         switch (type) {
-            case DISPATCH:
+            case DISPATCH -> {
                 amountDispatch++;
                 amountQueue = amount;
-                break;
-            case QUEUE:
+            }
+            case QUEUE -> {
                 totalQueue++;
                 amountQueue = amount;
-                break;
-            case DONE:
+            }
+            case DONE -> {
                 if (totalQueue > 64 && !done) {
                     done = true;
                     done();
                 }
                 return;
+            }
         }
         // Only send a message after 64 chunks (i.e. ignore smaller edits)
         long now = System.currentTimeMillis();

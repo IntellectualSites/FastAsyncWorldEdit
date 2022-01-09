@@ -29,28 +29,6 @@ public class ConfigurationSerialization {
 
     /**
      * Attempts to deserialize the given arguments into a new instance of the
-     * given class.
-     * <p>
-     * <p>The class must implement {@link ConfigurationSerializable}, including
-     * the extra methods as specified in the javadoc of
-     * ConfigurationSerializable.</p>
-     * <p>
-     * <p>If a new instance could not be made, an example being the class not
-     * fully implementing the interface, null will be returned.</p>
-     *
-     * @param args  Arguments for deserialization
-     * @param clazz Class to deserialize into
-     * @return New instance of the specified class
-     */
-    public static ConfigurationSerializable deserializeObject(
-            Map<String, ?> args,
-            Class<? extends ConfigurationSerializable> clazz
-    ) {
-        return new ConfigurationSerialization(clazz).deserialize(args);
-    }
-
-    /**
-     * Attempts to deserialize the given arguments into a new instance of the
      * <p>
      * given class.
      * <p>
@@ -66,7 +44,7 @@ public class ConfigurationSerialization {
      * @return New instance of the specified class
      */
     public static ConfigurationSerializable deserializeObject(Map<String, ?> args) {
-        Class<? extends ConfigurationSerializable> clazz = null;
+        Class<? extends ConfigurationSerializable> clazz;
 
         if (args.containsKey(SERIALIZED_TYPE_KEY)) {
             try {
@@ -114,25 +92,6 @@ public class ConfigurationSerialization {
      */
     public static void registerClass(Class<? extends ConfigurationSerializable> clazz, String alias) {
         aliases.put(alias, clazz);
-    }
-
-    /**
-     * Unregisters the specified alias to a {@link ConfigurationSerializable}
-     *
-     * @param alias Alias to unregister
-     */
-    public static void unregisterClass(String alias) {
-        aliases.remove(alias);
-    }
-
-    /**
-     * Unregisters any aliases for the specified {@link ConfigurationSerializable} class.
-     *
-     * @param clazz Class to unregister
-     */
-    public static void unregisterClass(Class<? extends ConfigurationSerializable> clazz) {
-        while (aliases.values().remove(clazz)) {
-        }
     }
 
     /**

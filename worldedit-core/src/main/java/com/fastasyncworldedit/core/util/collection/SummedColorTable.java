@@ -46,19 +46,17 @@ public class SummedColorTable {
                     int green;
                     int blue;
                     switch (alpha) {
-                        case 0:
-                            red = green = blue = 0;
-                            break;
-                        case 255:
+                        case 0 -> red = green = blue = 0;
+                        case 255 -> {
                             red = (color >> 16) & 0xFF;
                             green = (color >> 8) & 0xFF;
                             blue = (color >> 0) & 0xFF;
-                            break;
-                        default:
+                        }
+                        default -> {
                             red = (((color >> 16) & 0xFF) * alpha) >> 8;
                             green = (((color >> 8) & 0xFF) * alpha) >> 8;
                             blue = (((color >> 0) & 0xFF) * alpha) >> 8;
-                            break;
+                        }
                     }
                     this.reds[index] = getVal(i, j, index, red, this.reds);
                     this.greens[index] = getVal(i, j, index, green, this.greens);

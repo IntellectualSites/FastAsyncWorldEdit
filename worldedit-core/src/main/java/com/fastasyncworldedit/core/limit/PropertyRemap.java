@@ -4,11 +4,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 
-public class PropertyRemap<T> {
-
-    private final Property<T> property;
-    private final T oldValue;
-    private final T newValue;
+public record PropertyRemap<T>(Property<T> property, T oldValue, T newValue) {
 
     /**
      * New instance
@@ -17,10 +13,7 @@ public class PropertyRemap<T> {
      * @param oldValue value to remap from
      * @param newValue value to remap to
      */
-    public PropertyRemap(Property<T> property, T oldValue, T newValue) {
-        this.property = property;
-        this.oldValue = oldValue;
-        this.newValue = newValue;
+    public PropertyRemap {
     }
 
     /**

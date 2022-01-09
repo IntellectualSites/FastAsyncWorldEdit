@@ -13,7 +13,6 @@ public class ExtremaMask extends AngleMask {
     protected boolean testSlope(Extent extent, int x, int y, int z) {
         double slope;
         double tmp;
-        boolean aboveMin;
         lastY = y;
 
         int base = getHeight(extent, x, y, z);

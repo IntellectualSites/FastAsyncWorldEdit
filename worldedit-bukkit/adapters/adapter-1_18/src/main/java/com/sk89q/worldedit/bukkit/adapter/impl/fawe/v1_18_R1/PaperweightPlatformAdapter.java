@@ -559,6 +559,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return BiomeTypes.get(resourceLocation.toString().toLowerCase(Locale.ROOT));
     }
 
+    @SuppressWarnings("unchecked")
     static void removeBeacon(BlockEntity beacon, LevelChunk levelChunk) {
         try {
             // Do the method ourselves to avoid trying to reflect generic method parameters
@@ -594,13 +595,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
-    static class FakeIdMapBlock implements IdMap<net.minecraft.world.level.block.state.BlockState> {
-
-        private final int size;
-
-        FakeIdMapBlock(int size) {
-            this.size = size;
-        }
+    record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
 
         @Override
         public int getId(final net.minecraft.world.level.block.state.BlockState entry) {
@@ -613,11 +608,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             return null;
         }
 
-        @Override
-        public int size() {
-            return size;
-        }
-
         @NotNull
         @Override
         public Iterator<net.minecraft.world.level.block.state.BlockState> iterator() {
@@ -626,13 +616,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     }
 
-    static class FakeIdMapBiome implements IdMap<Biome> {
-
-        private final int size;
-
-        FakeIdMapBiome(int size) {
-            this.size = size;
-        }
+    record FakeIdMapBiome(int size) implements IdMap<Biome> {
 
         @Override
         public int getId(final Biome entry) {
@@ -643,11 +627,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         @Override
         public Biome byId(final int index) {
             return null;
-        }
-
-        @Override
-        public int size() {
-            return size;
         }
 
         @NotNull

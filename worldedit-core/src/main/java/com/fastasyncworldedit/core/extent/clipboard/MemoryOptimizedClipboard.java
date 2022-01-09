@@ -215,7 +215,7 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
                 nbt = null;
                 for (Map.Entry<IntTriple, CompoundTag> entry : nbtMap.entrySet()) {
                     IntTriple trio = entry.getKey();
-                    int index = getIndex(trio.getX(), trio.getY(), trio.getZ());
+                    int index = getIndex(trio.x(), trio.y(), trio.z());
                     if (index == i) {
                         nbt = entry.getValue();
                         break;
@@ -308,10 +308,9 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        return new ArrayList<>(entities
+        return entities
                 .stream()
-                .filter(e -> region.contains(e.getLocation().toBlockPoint()))
-                .collect(Collectors.toList()));
+                .filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList());
     }
 
     @Override

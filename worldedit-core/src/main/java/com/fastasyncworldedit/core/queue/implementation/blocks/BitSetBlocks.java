@@ -127,9 +127,8 @@ public class BitSetBlocks implements IChunkSet {
         layer -= minSectionPosition;
         char[] arr = FaweCache.INSTANCE.SECTION_BITS_TO_CHAR.get();
         MemBlockSet.IRow nullRowY = row.getRow(layer);
-        if (nullRowY instanceof MemBlockSet.RowY) {
+        if (nullRowY instanceof MemBlockSet.RowY rowY) {
             char value = blockState.getOrdinalChar();
-            MemBlockSet.RowY rowY = (MemBlockSet.RowY) nullRowY;
             long[] bits = rowY.getBits();
             for (int y = 0, longIndex = 0, blockIndex = 0; y < 16; y++) {
                 for (int z = 0; z < 16; z += 4, longIndex++, blockIndex += 64) {

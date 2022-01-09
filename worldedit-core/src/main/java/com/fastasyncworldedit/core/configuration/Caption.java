@@ -42,7 +42,7 @@ public class Caption {
     private static Component color(TextComponent text) {
         String content = text.content();
         if (colorCodes.matcher(content).find()) {
-            TextComponent legacy = LegacyComponentSerializer.INSTANCE.deserialize(content, '&');
+            TextComponent legacy = LegacyComponentSerializer.legacy().deserialize(content, '&');
             legacy.style().merge(text.style(), Style.Merge.Strategy.IF_ABSENT_ON_TARGET);
             if (!text.children().isEmpty()) {
                 text = TextComponent.builder().append(legacy).append(text.children()).build();
@@ -86,8 +86,7 @@ public class Caption {
         if (children != (children = color(parent, children))) {
             parent = parent.children(children);
         }
-        if (parent instanceof TranslatableComponent) {
-            TranslatableComponent tc = (TranslatableComponent) parent;
+        if (parent instanceof TranslatableComponent tc) {
             List<Component> args = tc.args();
             if (args != (args = color(parent, args))) {
                 parent = tc.args(args);

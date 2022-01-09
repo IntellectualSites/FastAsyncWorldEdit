@@ -107,7 +107,7 @@ public class CPUOptimizedClipboard extends LinearClipboard {
         }
         for (Map.Entry<IntTriple, CompoundTag> entry : nbtMapLoc.entrySet()) {
             IntTriple key = entry.getKey();
-            setTile(getIndex(key.getX(), key.getY(), key.getZ()), entry.getValue());
+            setTile(getIndex(key.x(), key.y(), key.z()), entry.getValue());
         }
         nbtMapLoc.clear();
     }

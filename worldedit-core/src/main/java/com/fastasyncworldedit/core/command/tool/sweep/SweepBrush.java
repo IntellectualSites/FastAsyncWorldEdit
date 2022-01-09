@@ -90,23 +90,20 @@ public class SweepBrush implements Brush, ResettableTool {
         }
 
         switch (copies) {
-            case 1: {
+            case 1 -> {
                 spline.pastePosition(0D);
-                break;
             }
-            case -1: {
+            case -1 -> {
                 double length = interpol.arcLength(0, 1);
                 double step = 1 / (length * quality);
                 for (double pos = 0; pos <= 1; pos += step) {
                     spline.pastePosition(pos);
                 }
-                break;
             }
-            default: {
+            default -> {
                 for (double pos = 0D; pos <= 1D; pos += 1D / (copies - 1)) {
                     spline.pastePosition(pos);
                 }
-                break;
             }
         }
         actor.print(Caption.of("fawe.worldedit.brush.spline.secondary"));

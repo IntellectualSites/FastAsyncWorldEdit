@@ -8,8 +8,6 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
 
     /**
      * Reset (defaults to just calling init)
-     *
-     * @return
      */
     @Override
     default IQueueChunk<T> reset() {
@@ -30,9 +28,6 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
     /**
      * Call and join
      * - Should be done async, if at all
-     *
-     * @throws ExecutionException
-     * @throws InterruptedException
      */
     default void join() throws ExecutionException, InterruptedException {
         T future = call();

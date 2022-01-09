@@ -67,7 +67,7 @@ public class FuzzyRegion extends AbstractRegion {
         return set.iterator();
     }
 
-    private final void setMinMax(int x, int y, int z) {
+    private void setMinMax(int x, int y, int z) {
         if (x > maxX) {
             maxX = x;
         }

@@ -31,8 +31,10 @@ public class Settings extends Config {
     public boolean PROTOCOL_SUPPORT_FIX = false;
     @Comment("These first 6 aren't configurable") // This is a comment
     @Final // Indicates that this value isn't configurable
+    @SuppressWarnings("unused")
     public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues";
     @Final
+    @SuppressWarnings("unused")
     public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki";
     @Final
     public String DATE; // These values are set from FAWE before loading

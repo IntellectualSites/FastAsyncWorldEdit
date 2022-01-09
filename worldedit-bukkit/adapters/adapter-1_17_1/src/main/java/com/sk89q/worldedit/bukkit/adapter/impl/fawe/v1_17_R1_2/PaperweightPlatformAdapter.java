@@ -227,6 +227,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static void sendChunk(ServerLevel nmsWorld, int chunkX, int chunkZ, boolean lighting) {
         ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (chunkHolder == null) {
@@ -412,6 +413,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return BiomeTypes.get(resourceLocation.toString().toLowerCase(Locale.ROOT));
     }
 
+    @SuppressWarnings("unchecked")
     static void removeBeacon(BlockEntity beacon, LevelChunk levelChunk) {
         try {
             // Do the method ourselves to avoid trying to reflect generic method parameters

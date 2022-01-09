@@ -402,6 +402,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     }
 
     //util
+    @SuppressWarnings("unchecked")
     private void removeWorldFromWorldsMap() {
         Fawe.instance().getQueueHandler().sync(() -> {
             try {
@@ -421,6 +422,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         };
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private BiomeSource fastOverworldBiomeSource(BiomeSource biomeSource) throws Exception {
         Field legacyBiomeInitLayerField = OverworldBiomeSource.class.getDeclaredField(
                 Refraction.pickName("legacyBiomeInitLayer", "i"));
@@ -584,17 +586,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     }
 
-    private static class FastAreaLazy implements Area {
-
-        private final PixelTransformer transformer;
-        //ConcurrentHashMap is 50% faster that Long2IntLinkedOpenHashMap in a synchronized context
-        //using a map for each thread worsens the performance significantly due to cache misses (factor 5)
-        private final ConcurrentHashMap<Long, Integer> sharedMap;
-
-        public FastAreaLazy(ConcurrentHashMap<Long, Integer> sharedMap, PixelTransformer transformer) {
-            this.sharedMap = sharedMap;
-            this.transformer = transformer;
-        }
+    private record FastAreaLazy(ConcurrentHashMap<Long, Integer> sharedMap, PixelTransformer transformer) implements Area {
 
         @Override
         public int get(int x, int z) {

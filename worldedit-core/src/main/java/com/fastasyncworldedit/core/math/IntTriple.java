@@ -1,32 +1,10 @@
 package com.fastasyncworldedit.core.math;
 
-public final class IntTriple {
-
-    private final int x;
-    private final int y;
-    private final int z;
-
-    public IntTriple(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
+public record IntTriple(int x, int y, int z) {
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return x ^ (z << 12) ^ (y << 24);
-    }
-
-    public final int getX() {
-        return x;
-    }
-
-    public final int getY() {
-        return y;
-    }
-
-    public final int getZ() {
-        return z;
     }
 
     @Override
@@ -36,8 +14,7 @@ public final class IntTriple {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof IntTriple) {
-            IntTriple other = (IntTriple) obj;
+        if (obj instanceof IntTriple other) {
             return other.x == x && other.z == z && other.y == y;
         }
         return false;

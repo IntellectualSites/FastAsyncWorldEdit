@@ -7,19 +7,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 
-public class BlobBrush implements Brush {
-
-    private final double amplitude;
-    private final double frequency;
-    private final Vector3 radius;
-    private final double sphericity;
-
-    public BlobBrush(Vector3 radius, double frequency, double amplitude, double sphericity) {
-        this.frequency = frequency;
-        this.amplitude = amplitude;
-        this.radius = radius;
-        this.sphericity = sphericity;
-    }
+public record BlobBrush(Vector3 radius, double frequency, double amplitude, double sphericity) implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws

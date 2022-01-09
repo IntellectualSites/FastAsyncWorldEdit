@@ -93,6 +93,7 @@ public class TransformExtent extends BlockTransformExtent {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
         return super.setBlock(getPos(x, y, z), transformInverse(block));
@@ -100,6 +101,7 @@ public class TransformExtent extends BlockTransformExtent {
 
 
     @Override
+    @SuppressWarnings("unchecked")
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 location, B block)
             throws WorldEditException {
         return super.setBlock(getPos(location), transformInverse(block));

@@ -9,6 +9,7 @@ public abstract class ForkedFilter<T extends ForkedFilter<T>> implements Filter 
 
     protected final Map<Thread, T> children;
 
+    @SuppressWarnings("unchecked")
     public ForkedFilter(T root) {
         if (root != null) {
             children = root.children;

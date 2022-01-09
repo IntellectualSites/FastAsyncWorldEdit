@@ -120,7 +120,7 @@ public enum FaweCache implements Trimable {
     }
 
     public <T, V> LoadingCache<T, V> createCache(Supplier<V> withInitial) {
-        return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
+        return CacheBuilder.newBuilder().build(new CacheLoader<>() {
             @Override
             public V load(@Nonnull T key) {
                 return withInitial.get();
@@ -129,7 +129,7 @@ public enum FaweCache implements Trimable {
     }
 
     public <T, V> LoadingCache<T, V> createCache(Function<T, V> withInitial) {
-        return CacheBuilder.newBuilder().build(new CacheLoader<T, V>() {
+        return CacheBuilder.newBuilder().build(new CacheLoader<>() {
             @Override
             public V load(@Nonnull T key) {
                 return withInitial.apply(key);
@@ -246,9 +246,6 @@ public enum FaweCache implements Trimable {
 
     /**
      * Convert raw char array to palette
-     *
-     * @param layerOffset
-     * @param blocks
      * @return palette
      */
     public Palette toPalette(int layerOffset, char[] blocks) {
@@ -257,9 +254,6 @@ public enum FaweCache implements Trimable {
 
     /**
      * Convert raw int array to palette
-     *
-     * @param layerOffset
-     * @param blocks
      * @return palette
      */
     public Palette toPalette(int layerOffset, int[] blocks) {
@@ -344,8 +338,6 @@ public enum FaweCache implements Trimable {
     /**
      * Convert raw int array to unstretched palette (1.16)
      *
-     * @param layerOffset
-     * @param blocks
      * @return palette
      */
     public Palette toPaletteUnstretched(int layerOffset, char[] blocks) {

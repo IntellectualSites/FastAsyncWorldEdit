@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.Function;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class Bindings {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();

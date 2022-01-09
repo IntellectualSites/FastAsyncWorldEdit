@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+@SuppressWarnings({"unused", "rawtypes"})
 public class FaweQueueCoordinator extends QueueCoordinator {
 
     public final IQueueExtent<IQueueChunk> instance;

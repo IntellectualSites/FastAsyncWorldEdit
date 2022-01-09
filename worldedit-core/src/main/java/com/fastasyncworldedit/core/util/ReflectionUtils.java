@@ -33,8 +33,7 @@ public class ReflectionUtils {
         return t.isInstance(o) ? t.cast(o) : null;
     }
 
-    public static void setAccessibleNonFinal(Field field) throws IllegalAccessException, NoSuchMethodException,
-            InvocationTargetException {
+    public static void setAccessibleNonFinal(Field field) {
         // let's make the field accessible
         field.setAccessible(true);
 
@@ -56,8 +55,7 @@ public class ReflectionUtils {
         }
     }
 
-    public static void setFailsafeFieldValue(Field field, Object target, Object value) throws IllegalAccessException,
-            NoSuchMethodException, InvocationTargetException {
+    public static void setFailsafeFieldValue(Field field, Object target, Object value) throws IllegalAccessException {
         setAccessibleNonFinal(field);
         field.set(target, value);
     }
@@ -93,11 +91,6 @@ public class ReflectionUtils {
         }
     }
 
-    public static Field[] sortFields(Field[] fields) {
-        Arrays.sort(fields, Comparator.comparing(Field::getName));
-        return fields;
-    }
-
     public static <T extends AccessibleObject> T setAccessible(T ao) {
         ao.setAccessible(true);
         return ao;
@@ -127,10 +120,6 @@ public class ReflectionUtils {
         } catch (ClassCastException | ClassNotFoundException ex) {
             return null;
         }
-    }
-
-    public static void unsafeSet(Object base, long offset, Object value) {
-        UNSAFE.putObject(base, offset, value);
     }
 
     public static void unsafeSet(Field field, Object base, Object value) {

@@ -42,8 +42,6 @@ public abstract class LinearClipboard extends SimpleClipboard {
 
     /**
      * The locations provided are relative to the clipboard min
-     *
-     * @param task
      */
     public abstract void streamBiomes(IntValueReader task);
 
@@ -63,27 +61,25 @@ public abstract class LinearClipboard extends SimpleClipboard {
     @Override
     public Iterator<BlockVector3> iterator(Order order) {
         Region region = getRegion();
-        switch (order) {
-            case YZX:
-                if (region instanceof CuboidRegion) {
-                    Iterator<BlockVector3> iter = ((CuboidRegion) region).iterator_old();
-                    LinearFilter filter = new LinearFilter();
+        if (order == Order.YZX) {
+            if (region instanceof CuboidRegion) {
+                Iterator<BlockVector3> iter = ((CuboidRegion) region).iterator_old();
+                LinearFilter filter = new LinearFilter();
 
-                    return new ForwardingIterator<BlockVector3>() {
-                        @Override
-                        protected Iterator<BlockVector3> delegate() {
-                            return iter;
-                        }
+                return new ForwardingIterator<>() {
+                    @Override
+                    protected Iterator<BlockVector3> delegate() {
+                        return iter;
+                    }
 
-                        @Override
-                        public BlockVector3 next() {
-                            return filter.next(super.next());
-                        }
-                    };
-                }
-            default:
-                return order.create(region);
+                    @Override
+                    public BlockVector3 next() {
+                        return filter.next(super.next());
+                    }
+                };
+            }
         }
+        return order.create(region);
 
     }
 

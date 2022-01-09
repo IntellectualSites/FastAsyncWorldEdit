@@ -48,6 +48,7 @@ public class FuzzyRegionSelector extends PassthroughExtent implements RegionSele
     }
 
     @Override
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public void setWorld(@Nullable World world) {
         EditSession extent = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                 .actor(actor)

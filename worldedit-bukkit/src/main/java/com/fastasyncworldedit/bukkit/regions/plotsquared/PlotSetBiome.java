@@ -33,6 +33,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 @CommandDeclaration(command = "generatebiome",
         permission = "plots.generatebiome",
         category = CommandCategory.APPEARANCE,

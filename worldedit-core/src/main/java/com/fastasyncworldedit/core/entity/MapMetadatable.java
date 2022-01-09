@@ -20,6 +20,7 @@ public interface MapMetadatable extends Metadatable {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("unchecked")
     default <T> T getAndSetMeta(String key, T value) {
         return (T) getRawMeta().put(key, value);
     }
@@ -40,6 +41,7 @@ public interface MapMetadatable extends Metadatable {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("unchecked")
     default <V> V getMeta(String key) {
         return (V) getRawMeta().get(key);
     }
@@ -49,6 +51,7 @@ public interface MapMetadatable extends Metadatable {
      */
     @Nonnull
     @Override
+    @SuppressWarnings("unchecked")
     default <V> V getMeta(String key, @Nonnull V def) {
         V value = (V) getRawMeta().get(key);
         return value == null ? def : value;
@@ -58,6 +61,7 @@ public interface MapMetadatable extends Metadatable {
      * {@inheritDoc}
      */
     @Override
+    @SuppressWarnings("unchecked")
     default <V> V deleteMeta(String key) {
         return (V) getRawMeta().remove(key);
     }

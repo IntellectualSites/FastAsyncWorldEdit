@@ -50,6 +50,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.zip.GZIPInputStream;
 
+@SuppressWarnings("unused")
 public class FaweDelegateSchematicHandler {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();

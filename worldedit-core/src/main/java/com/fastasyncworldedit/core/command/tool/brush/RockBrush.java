@@ -10,17 +10,7 @@ import com.sk89q.worldedit.math.Vector3;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class RockBrush implements Brush {
-
-    private final double amplitude;
-    private final double frequency;
-    private final Vector3 radius;
-
-    public RockBrush(Vector3 radius, double frequency, double amplitude) {
-        this.frequency = frequency;
-        this.amplitude = amplitude;
-        this.radius = radius;
-    }
+public record RockBrush(double amplitude, double frequency, Vector3 radius) implements Brush {
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws

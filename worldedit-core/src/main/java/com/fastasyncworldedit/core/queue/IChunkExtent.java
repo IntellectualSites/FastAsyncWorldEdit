@@ -29,8 +29,6 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
     /**
      * Get the IChunk at a position (and cache it if it's not already)
      *
-     * @param chunkX
-     * @param chunkZ
      * @return IChunk
      */
     T getOrCreateChunk(int chunkX, int chunkZ);
@@ -157,19 +155,7 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         chunk.removeEntity(uuid);
     }
 
-    class IChunkEntity implements Entity {
-
-        private final Extent extent;
-        private final Location location;
-        private final UUID uuid;
-        private final BaseEntity base;
-
-        public IChunkEntity(Extent extent, Location location, UUID uuid, BaseEntity base) {
-            this.extent = extent;
-            this.location = location;
-            this.uuid = uuid;
-            this.base = base;
-        }
+    record IChunkEntity(Extent extent, Location location, UUID uuid, BaseEntity base) implements Entity {
 
         @Override
         public BaseEntity getState() {

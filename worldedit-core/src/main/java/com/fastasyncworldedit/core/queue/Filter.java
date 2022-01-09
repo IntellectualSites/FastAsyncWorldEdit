@@ -16,7 +16,6 @@ public interface Filter {
      *
      * @param chunkX the x coordinate in the chunk
      * @param chunkZ the z coordinate in the chunk
-     * @return
      */
     default boolean appliesChunk(
             @Range(from = 0, to = 15) int chunkX,
@@ -28,9 +27,6 @@ public interface Filter {
     /**
      * Do something with the IChunk<br> - Return null if you don't want to filter blocks<br> -
      * Return the chunk if you do want to filter blocks<br>
-     *
-     * @param chunk
-     * @return
      */
     default <T extends IChunk> T applyChunk(T chunk, @Nullable Region region) {
         return chunk;
@@ -43,16 +39,12 @@ public interface Filter {
     /**
      * Make changes to the block here<br> - e.g., block.setId(...)<br> - Note: Performance is
      * critical here<br>
-     *
-     * @param block
      */
     default void applyBlock(FilterBlock block) {
     }
 
     /**
      * Do something with the IChunk after block filtering.
-     *
-     * @param chunk
      */
     default void finishChunk(IChunk chunk) {
     }

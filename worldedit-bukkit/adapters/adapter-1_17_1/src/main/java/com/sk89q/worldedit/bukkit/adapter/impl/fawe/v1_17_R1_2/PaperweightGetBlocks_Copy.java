@@ -67,6 +67,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         return tiles.get(BlockVector3.at(x, y, z));
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void storeEntity(Entity entity) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         net.minecraft.nbt.CompoundTag compoundTag = new net.minecraft.nbt.CompoundTag();

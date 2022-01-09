@@ -76,8 +76,7 @@ public class MemorySection implements ConfigurationSection {
                 return Double.parseDouble((String) obj);
             } catch (NumberFormatException ignored) {
             }
-        } else if (obj instanceof List) {
-            List<?> val = (List<?>) obj;
+        } else if (obj instanceof List<?> val) {
             if (!val.isEmpty()) {
                 return toDouble(val.get(0), def);
             }
@@ -94,8 +93,7 @@ public class MemorySection implements ConfigurationSection {
                 return Integer.parseInt((String) obj);
             } catch (NumberFormatException ignored) {
             }
-        } else if (obj instanceof List) {
-            List<?> val = (List<?>) obj;
+        } else if (obj instanceof List<?> val) {
             if (!val.isEmpty()) {
                 return toInt(val.get(0), def);
             }
@@ -112,8 +110,7 @@ public class MemorySection implements ConfigurationSection {
                 return Long.parseLong((String) obj);
             } catch (NumberFormatException ignored) {
             }
-        } else if (obj instanceof List) {
-            List<?> val = (List<?>) obj;
+        } else if (obj instanceof List<?> val) {
             if (!val.isEmpty()) {
                 return toLong(val.get(0), def);
             }
@@ -706,8 +703,7 @@ public class MemorySection implements ConfigurationSection {
         for (Object object : list) {
             if (object instanceof Character) {
                 result.add((Character) object);
-            } else if (object instanceof String) {
-                String str = (String) object;
+            } else if (object instanceof String str) {
 
                 if (str.length() == 1) {
                     result.add(str.charAt(0));
@@ -797,14 +793,12 @@ public class MemorySection implements ConfigurationSection {
     }
 
     protected void mapChildrenKeys(Set<String> output, ConfigurationSection section, boolean deep) {
-        if (section instanceof MemorySection) {
-            MemorySection sec = (MemorySection) section;
+        if (section instanceof MemorySection sec) {
 
             for (Map.Entry<String, Object> entry : sec.map.entrySet()) {
                 output.add(createPath(section, entry.getKey(), this));
 
-                if (deep && (entry.getValue() instanceof ConfigurationSection)) {
-                    ConfigurationSection subsection = (ConfigurationSection) entry.getValue();
+                if (deep && (entry.getValue() instanceof ConfigurationSection subsection)) {
                     mapChildrenKeys(output, subsection, deep);
                 }
             }
@@ -818,8 +812,7 @@ public class MemorySection implements ConfigurationSection {
     }
 
     protected void mapChildrenValues(Map<String, Object> output, ConfigurationSection section, boolean deep) {
-        if (section instanceof MemorySection) {
-            MemorySection sec = (MemorySection) section;
+        if (section instanceof MemorySection sec) {
 
             for (Map.Entry<String, Object> entry : sec.map.entrySet()) {
                 output.put(createPath(section, entry.getKey(), this), entry.getValue());

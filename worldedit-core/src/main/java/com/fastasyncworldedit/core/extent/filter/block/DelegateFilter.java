@@ -12,6 +12,7 @@ public abstract class DelegateFilter<T extends Filter> implements IDelegateFilte
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public final T getParent() {
         return (T) parent;
     }

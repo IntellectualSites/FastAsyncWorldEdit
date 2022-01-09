@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
 
     private final Map<K2, V2> parent;
@@ -84,7 +85,7 @@ public class AdaptedMap<K, V, K2, V2> implements IAdaptedMap<K, V, K2, V2> {
         }
         return new AdaptedSetCollection<>(
                 getParent().entrySet(),
-                new com.google.common.base.Function<Entry<K2, V2>, Entry<K, V>>() {
+                new com.google.common.base.Function<>() {
                     private final AdaptedPair entry = new AdaptedPair();
 
                     @Override

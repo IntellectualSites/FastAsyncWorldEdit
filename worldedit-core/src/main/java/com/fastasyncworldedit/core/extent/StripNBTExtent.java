@@ -65,11 +65,11 @@ public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProc
         return super.createEntity(location, stripEntityNBT(entity));
     }
 
+    @SuppressWarnings("unchecked")
     public <B extends BlockStateHolder<B>> B stripBlockNBT(B block) {
-        if (!(block instanceof BaseBlock)) {
+        if (!(block instanceof BaseBlock localBlock)) {
             return block;
         }
-        BaseBlock localBlock = (BaseBlock) block;
         if (!localBlock.hasNbtData()) {
             return block;
         }

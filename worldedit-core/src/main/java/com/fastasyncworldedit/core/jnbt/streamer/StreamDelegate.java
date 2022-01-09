@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.DataInputStream;
 import java.io.IOException;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class StreamDelegate {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();

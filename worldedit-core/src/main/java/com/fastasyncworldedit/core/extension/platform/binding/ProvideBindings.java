@@ -125,8 +125,7 @@ public class ProvideBindings extends Bindings {
             return extent;
         }
         EditSession editSession = editSession(getLocalSession(actor), actor, access);
-        if (access instanceof InjectedValueStore) {
-            InjectedValueStore store = (InjectedValueStore) access;
+        if (access instanceof InjectedValueStore store) {
             store.injectValue(Key.of(EditSession.class), ValueProvider.constant(editSession));
         }
         return editSession;

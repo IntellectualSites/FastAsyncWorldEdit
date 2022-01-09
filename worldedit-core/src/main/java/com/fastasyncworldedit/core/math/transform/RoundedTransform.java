@@ -3,13 +3,7 @@ package com.fastasyncworldedit.core.math.transform;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.math.transform.Transform;
 
-public class RoundedTransform implements Transform {
-
-    private final Transform transform;
-
-    public RoundedTransform(Transform transform) {
-        this.transform = transform;
-    }
+public record RoundedTransform(Transform transform) implements Transform {
 
     @Override
     public boolean isIdentity() {

@@ -3,10 +3,10 @@ package com.fastasyncworldedit.core.configuration.file;
 import com.fastasyncworldedit.core.configuration.Configuration;
 import com.fastasyncworldedit.core.configuration.ConfigurationSection;
 import com.fastasyncworldedit.core.configuration.InvalidConfigurationException;
-import com.fastasyncworldedit.core.configuration.Yaml;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.representer.Representer;
 
@@ -127,7 +127,7 @@ public class YamlConfiguration extends FileConfiguration {
 
         Map<?, ?> input;
         try {
-            input = (Map<?, ?>) yaml.load(contents);
+            input = yaml.load(contents);
         } catch (final YAMLException e) {
             throw new InvalidConfigurationException(e);
         } catch (final ClassCastException e) {
@@ -193,8 +193,7 @@ public class YamlConfiguration extends FileConfiguration {
         if (options().copyHeader()) {
             final Configuration def = getDefaults();
 
-            if (def != null && def instanceof FileConfiguration) {
-                final FileConfiguration filedefaults = (FileConfiguration) def;
+            if (def != null && def instanceof final FileConfiguration filedefaults) {
                 final String defaultsHeader = filedefaults.buildHeader();
 
                 if ((defaultsHeader != null) && !defaultsHeader.isEmpty()) {

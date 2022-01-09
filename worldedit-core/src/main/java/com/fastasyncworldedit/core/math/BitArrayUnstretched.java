@@ -39,7 +39,7 @@ public final class BitArrayUnstretched {
         return data;
     }
 
-    public final void set(int index, int value) {
+    public void set(int index, int value) {
         if (longLen == 0) {
             return;
         }
@@ -49,7 +49,7 @@ public final class BitArrayUnstretched {
         this.data[longIndexStart] = this.data[longIndexStart] & ~(mask << localBitIndexStart) | (long) value << localBitIndexStart;
     }
 
-    public final int get(int index) {
+    public int get(int index) {
         if (longLen == 0) {
             return 0;
         }
@@ -65,7 +65,7 @@ public final class BitArrayUnstretched {
         return longLen;
     }
 
-    public final void fromRaw(int[] arr) {
+    public void fromRaw(int[] arr) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;
         final int maxSeqLocIndex = this.maxSeqLocIndex;
@@ -85,11 +85,11 @@ public final class BitArrayUnstretched {
         }
     }
 
-    public final int[] toRaw() {
+    public int[] toRaw() {
         return toRaw(new int[4096]);
     }
 
-    public final int[] toRaw(int[] buffer) {
+    public int[] toRaw(int[] buffer) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;
         final int maxSeqLocIndex = this.maxSeqLocIndex;
@@ -108,7 +108,7 @@ public final class BitArrayUnstretched {
         return buffer;
     }
 
-    public final char[] toRaw(char[] buffer) {
+    public char[] toRaw(char[] buffer) {
         final long[] data = this.data;
         final int bitsPerEntry = this.bitsPerEntry;
         final int maxSeqLocIndex = this.maxSeqLocIndex;

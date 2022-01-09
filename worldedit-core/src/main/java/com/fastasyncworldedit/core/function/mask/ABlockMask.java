@@ -55,8 +55,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
 
     @Override
     public Mask tryCombine(Mask mask) {
-        if (mask instanceof ABlockMask) {
-            ABlockMask other = (ABlockMask) mask;
+        if (mask instanceof ABlockMask other) {
             BlockMask newMask = new BlockMask(getExtent());
             for (BlockState state : BlockTypesCache.states) {
                 if (state != null) {
@@ -76,8 +75,7 @@ public abstract class ABlockMask extends AbstractExtentMask {
 
     @Override
     public Mask tryOr(Mask mask) {
-        if (mask instanceof ABlockMask) {
-            ABlockMask other = (ABlockMask) mask;
+        if (mask instanceof ABlockMask other) {
             BlockMask newMask = new BlockMask(getExtent());
             for (BlockState state : BlockTypesCache.states) {
                 if (state != null) {

@@ -275,8 +275,7 @@ public class FastSchematicReader extends NBTSchematicReader {
 
         if (blocksOut != null && blocksOut.getSize() != 0) {
             try (FaweInputStream fis = new FaweInputStream(new LZ4BlockInputStream(new FastByteArraysInputStream(blocksOut.toByteArrays())))) {
-                if (clipboard instanceof LinearClipboard) {
-                    LinearClipboard linear = (LinearClipboard) clipboard;
+                if (clipboard instanceof LinearClipboard linear) {
                     int volume = width * height * length;
                     if (palette.length < 128) {
                         for (int index = 0; index < volume; index++) {

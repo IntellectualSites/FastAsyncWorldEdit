@@ -38,9 +38,7 @@ public abstract class CompressedCompoundTag<T> extends CompoundTag {
             CompoundTag tag = (CompoundTag) nbtIn.readTag();
             Map<String, Tag> value = tag.getValue();
             Map<String, Tag> raw = super.getValue();
-            for (Map.Entry<String, Tag> entry : value.entrySet()) {
-                raw.put(entry.getKey(), entry.getValue());
-            }
+            raw.putAll(value);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

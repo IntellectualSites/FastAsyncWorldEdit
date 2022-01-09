@@ -141,6 +141,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         return parent;
     }
 
+    @SuppressWarnings("unchecked")
     private synchronized boolean init() {
         if (ibdToStateOrdinal != null && ibdToStateOrdinal[1] != 0) {
             return false;
@@ -159,10 +160,9 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         try {
             for (Field field : BlockStateProperties.class.getDeclaredFields()) {
                 Object obj = field.get(null);
-                if (!(obj instanceof net.minecraft.world.level.block.state.properties.Property)) {
+                if (!(obj instanceof net.minecraft.world.level.block.state.properties.Property<?> state)) {
                     continue;
                 }
-                net.minecraft.world.level.block.state.properties.Property<?> state = (net.minecraft.world.level.block.state.properties.Property<?>) obj;
                 Property<?> property;
                 if (state instanceof net.minecraft.world.level.block.state.properties.BooleanProperty) {
                     property = new BooleanProperty(
@@ -288,6 +288,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         return SideEffectSet.defaults().getSideEffectsToApply();
     }
 
+    @SuppressWarnings("rawtypes")
     public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
         CraftChunk craftChunk = (CraftChunk) chunk;
         LevelChunk levelChunk = craftChunk.getHandle();
