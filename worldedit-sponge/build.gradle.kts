@@ -20,7 +20,7 @@ repositories {
 dependencies {
     api(project(":worldedit-core"))
     api(project(":worldedit-libs:sponge"))
-    api("org.spongepowered:spongeapi:7.1.0") {
+    api("org.spongepowered:spongeapi:8.0.0") {
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
     implementation(enforcedPlatform("org.apache.logging.log4j:log4j-bom:2.8.1") {
