@@ -158,6 +158,9 @@ public class FaweBukkit implements IFawe, Listener {
     public String getDebugInfo() {
         StringBuilder msg = new StringBuilder();
 
+        msg.append("# FastAsyncWorldEdit Information\n");
+        msg.append(Fawe.instance().getVersion()).append("\n\n");
+
         List<Plugin> plugins = new ArrayList<>();
         Collections.addAll(plugins, Bukkit.getServer().getPluginManager().getPlugins());
         plugins.sort(Comparator.comparing(Plugin::getName));
