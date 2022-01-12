@@ -12,10 +12,6 @@ applyShadowConfiguration()
 
 repositories {
     maven {
-        name = "SpigotMC"
-        url = uri("https://hub.spigotmc.org/nexus/content/groups/public")
-    }
-    maven {
         name = "PaperMC"
         url = uri("https://papermc.io/repo/repository/maven-public/")
     }
@@ -34,10 +30,6 @@ repositories {
     maven {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
-    }
-    maven {
-        name = "OSS Sonatype Releases"
-        url = uri("https://oss.sonatype.org/content/repositories/releases/")
     }
     flatDir { dir(File("src/main/resources")) }
 }

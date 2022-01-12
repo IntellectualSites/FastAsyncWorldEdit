@@ -1,7 +1,6 @@
 import org.gradle.api.Project
 import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.plugins.quality.CheckstyleExtension
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.api.tasks.testing.Test
@@ -59,7 +58,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
             )
             options.encoding = "UTF-8"
             links(
-                    "https://javadoc.io/doc/com.google.code.findbugs/jsr305/3.0.2/",
+                    "https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/index.html",
                     "https://jd.adventure.kyori.net/api/latest/",
                     "https://javadoc.io/doc/org.apache.logging.log4j/log4j-api/latest/index.html",
                     "https://www.antlr.org/api/Java/",
