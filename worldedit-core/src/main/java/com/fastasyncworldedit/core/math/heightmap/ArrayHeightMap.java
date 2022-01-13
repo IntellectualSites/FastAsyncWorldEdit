@@ -38,7 +38,7 @@ public class ArrayHeightMap extends ScalableHeightMap {
     public double getHeight(int x, int z) {
         x = (int) Math.max(0, Math.min(width - 1, (x + size) * rx));
         z = (int) Math.max(0, Math.min(length - 1, (z + size) * rz));
-        return ((height[x][z] & 0xFFFF) * size) / scale;
+        return (height[x][z] * size) / scale;
 
     }
 
