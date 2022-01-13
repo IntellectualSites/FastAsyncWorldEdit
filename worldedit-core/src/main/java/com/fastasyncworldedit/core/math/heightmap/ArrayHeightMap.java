@@ -17,6 +17,8 @@ public class ArrayHeightMap extends ScalableHeightMap {
      * Limited 0->65535
      *
      * @param height array of height values
+     * @param scale  "scale" of the heightmap. Typically the normalised height of the world, or the maximum possible value (256
+     *               for a PNG heightmap)
      */
     public ArrayHeightMap(char[][] height, double scale) {
         setSize(5);
