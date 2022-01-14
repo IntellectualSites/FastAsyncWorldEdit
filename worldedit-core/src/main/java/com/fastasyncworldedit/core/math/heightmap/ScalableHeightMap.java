@@ -9,7 +9,6 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
@@ -18,8 +17,6 @@ public class ScalableHeightMap implements HeightMap {
 
     public int size2;
     public int size;
-    protected int minY;
-    protected int maxY;
 
     public enum Shape {
         CONE,
@@ -27,14 +24,9 @@ public class ScalableHeightMap implements HeightMap {
     }
 
     /**
-     * New height map.
-     *
-     * @param minY min y value allowed to be set. Inclusive.
-     * @param maxY max y value allowed to be set. Inclusive.
+     * New height map. "Normalised" to a min Y of zero.
      */
-    public ScalableHeightMap(final int minY, final int maxY) {
-        this.minY = minY;
-        this.maxY = maxY;
+    public ScalableHeightMap() {
         setSize(5);
     }
 
@@ -50,21 +42,21 @@ public class ScalableHeightMap implements HeightMap {
         int dz = Math.abs(z);
         int d2 = dx * dx + dz * dz;
         if (d2 > size2) {
-            return minY;
+            return 0;
         }
-        return Math.max(minY, size - MathMan.sqrtApprox(d2));
+        return Math.max(0, size - MathMan.sqrtApprox(d2));
     }
 
-    public static ScalableHeightMap fromShape(Shape shape, int minY, int maxY) {
+    public static ScalableHeightMap fromShape(Shape shape) {
         return switch (shape) {
-            case CONE -> new ScalableHeightMap(minY, maxY);
-            case CYLINDER -> new FlatScalableHeightMap(minY, maxY);
+            case CONE -> new ScalableHeightMap();
+            case CYLINDER -> new FlatScalableHeightMap();
         };
     }
 
     public static ScalableHeightMap fromClipboard(Clipboard clipboard, int minY, int maxY) {
         BlockVector3 dim = clipboard.getDimensions();
-        byte[][] heightArray = new byte[dim.getBlockX()][dim.getBlockZ()];
+        char[][] heightArray = new char[dim.getBlockX()][dim.getBlockZ()];
         int clipMinX = clipboard.getMinimumPoint().getBlockX();
         int clipMinZ = clipboard.getMinimumPoint().getBlockZ();
         int clipMinY = clipboard.getMinimumPoint().getBlockY();
@@ -89,20 +81,18 @@ public class ScalableHeightMap implements HeightMap {
                     highestY = y + 1;
                 }
             }
-            int pointHeight = Math.min(clipMaxY, ((maxY - minY + 1) * (highestY - clipMinY)) / clipHeight);
             int x = xx - clipMinX;
             int z = zz - clipMinZ;
-            heightArray[x][z] = (byte) pointHeight;
+            heightArray[x][z] = (char) Math.min(clipMaxY, ((maxY - minY + 1) * (highestY - clipMinY)) / clipHeight);
         }
-        return new ArrayHeightMap(heightArray, minY, maxY);
+        return new ArrayHeightMap(heightArray, maxY - minY + 1);
     }
 
-    public static ScalableHeightMap fromPNG(InputStream stream, int minY, int maxY) throws IOException {
+    public static ScalableHeightMap fromPNG(InputStream stream) throws IOException {
         BufferedImage heightFile = MainUtil.readImage(stream);
         int width = heightFile.getWidth();
         int length = heightFile.getHeight();
-        Raster data = heightFile.getData();
-        byte[][] array = new byte[width][length];
+        char[][] array = new char[width][length];
         double third = 1 / 3.0;
         double alphaInverse = 1 / 255.0;
         for (int x = 0; x < width; x++) {
@@ -110,13 +100,12 @@ public class ScalableHeightMap implements HeightMap {
                 int pixel = heightFile.getRGB(x, z);
                 int red = pixel >> 16 & 0xFF;
                 int green = pixel >> 8 & 0xFF;
-                int blue = pixel >> 0 & 0xFF;
+                int blue = pixel & 0xFF;
                 int alpha = pixel >> 24 & 0xFF;
-                int intensity = (int) (alpha * ((red + green + blue) * third) * alphaInverse);
-                array[x][z] = (byte) intensity;
+                array[x][z] = (char) (alpha * ((red + green + blue) * third) * alphaInverse);
             }
         }
-        return new ArrayHeightMap(array, minY, maxY);
+        return new ArrayHeightMap(array, 256d);
     }
 
 }
