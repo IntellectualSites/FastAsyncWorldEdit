@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.core.regions.FaweMask;
-import com.flowpowered.math.vector.Vector3i;
 import com.griefdefender.api.GriefDefender;
 import com.griefdefender.api.claim.Claim;
 import com.griefdefender.api.claim.TrustTypes;
@@ -10,7 +9,6 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -25,21 +23,15 @@ public class GriefDefenderFeature extends BukkitMaskManager implements Listener 
     }
 
     public boolean isAllowed(Player player, Claim claim, MaskType type) {
-        return GriefDefender.getCore().isEnabled(player.getWorld().getUID()) && !claim.isWilderness() && (claim
-                .getOwnerName()
-                .equalsIgnoreCase(player.getName()) || claim.getOwnerUniqueId().equals(player.getUniqueId()) ||
-                type == MaskType.MEMBER && claim.getUserTrusts(TrustTypes.BUILDER).contains(player.getUniqueId()));
+        return type == MaskType.MEMBER && claim.isUserTrusted(player.getUniqueId(), TrustTypes.BUILDER);
     }
 
     @Override
     public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
-        final Location loc = player.getLocation();
-        final Vector3i vector = Vector3i.from(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-        final Claim claim = GriefDefender.getCore().getClaimManager(loc.getWorld().getUID()).getClaimAt(vector);
-        if (!claim.isWilderness()) {
+        Claim claim = GriefDefender.getCore().getClaimAt(player.getLocation());
+        if (claim != null && !claim.isWilderness()) {
             if (isAllowed(player, claim, type)) {
-                claim.getGreaterBoundaryCorner().getX();
                 final BlockVector3 pos1 = BlockVector3.at(
                         claim.getLesserBoundaryCorner().getX(),
                         claim.getLesserBoundaryCorner().getY(),

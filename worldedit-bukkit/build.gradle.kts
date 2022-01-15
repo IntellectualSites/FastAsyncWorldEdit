@@ -28,6 +28,10 @@ repositories {
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
     }
     maven {
+        name = "GriefDefender"
+        url = uri("https://repo.glaremasters.me/repository/bloodshot/")
+    }
+    maven {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
     }
@@ -96,10 +100,6 @@ dependencies {
     compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
 
     // Third party
-    compileOnly(libs.flowmath) {
-        because("This dependency is needed by GriefDefender but not exposed transitively.")
-        isTransitive = false
-    }
     implementation(libs.paperlib)
     implementation(libs.bstatsBukkit) { isTransitive = false }
     implementation(libs.bstatsBase) { isTransitive = false }
@@ -150,6 +150,8 @@ tasks.named<ShadowJar>("shadowJar") {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
         relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
+        // GriefDefender provide flow-math
+        relocate( "com.flowpowered", "com.griefdefender.lib.flowpowered")
         include(dependency(":worldedit-core"))
         include(dependency(":worldedit-libs:bukkit"))
         // Purposefully not included, we assume (even though no API exposes it) that Log4J will be present at runtime
