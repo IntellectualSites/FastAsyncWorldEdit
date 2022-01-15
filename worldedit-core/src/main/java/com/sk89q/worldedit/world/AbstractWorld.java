@@ -111,14 +111,18 @@ public abstract class AbstractWorld implements World {
     public boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
         if (taskId == -1) {
             taskId = server.schedule(0, 1, () -> {
-                int max = Math.max(1, Math.min(30, effectQueue.size() / 3));
-                for (int i = 0; i < max; ++i) {
-                    if (effectQueue.isEmpty()) {
-                        return;
-                    }
+                //FAWE start - access to PriorityQueue is not thread-safe
+                synchronized (effectQueue) {
+                    int max = Math.max(1, Math.min(30, effectQueue.size() / 3));
+                    for (int i = 0; i < max; ++i) {
+                        if (effectQueue.isEmpty()) {
+                            return;
+                        }
 
-                    effectQueue.poll().play();
+                        effectQueue.poll().play();
+                    }
                 }
+                //FAWE end
             });
         }
 
@@ -126,7 +130,11 @@ public abstract class AbstractWorld implements World {
             return false;
         }
 
-        effectQueue.offer(new QueuedEffect(position.toVector3(), blockType, priority));
+        //FAWE start - access to PriorityQueue is not thread-safe
+        synchronized (effectQueue) {
+            effectQueue.offer(new QueuedEffect(position.toVector3(), blockType, priority));
+        }
+        //FAWE end
 
         return true;
     }
