@@ -77,7 +77,7 @@ public class CommandRegistration {
             DynamicPluginCommand cmd = new DynamicPluginCommand(
                     command.getAliases(),
                     command.getDesc(),
-                    "/" + command.getAliases()[0] + " " + command.getUsage(),
+                    command.getUsage(),
                     executor,
                     command.getRegisteredWith(),
                     plugin
