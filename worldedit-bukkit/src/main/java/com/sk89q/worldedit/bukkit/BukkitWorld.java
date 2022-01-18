@@ -85,7 +85,9 @@ public class BukkitWorld extends AbstractWorld {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final boolean HAS_3D_BIOMES;
-    private static final boolean HAS_MIN_Y;
+    //FAWE start - allow access for easy checking if World#getMin/MaxHeight exists
+    public static final boolean HAS_MIN_Y;
+    //FAWE end
 
     private static final Map<Integer, Effect> effects = new HashMap<>();
 

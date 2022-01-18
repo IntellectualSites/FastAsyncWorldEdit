@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -283,7 +284,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
             });
         }
 
-        source = new SingleThreadQueueExtent(originalBukkitWorld.getMinHeight(), originalBukkitWorld.getMaxHeight());
+        source = new SingleThreadQueueExtent(BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMinHeight() : 0,
+                BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMaxHeight() : 256);
         source.init(target, initSourceQueueCache(), null);
         return true;
     }
