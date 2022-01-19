@@ -198,6 +198,9 @@ public class BlockTypesCache {
 
     public static final BlockType[] values;
     public static final BlockState[] states;
+    /**
+     * Array of blockstates in order of ordinal indicating if the block ticks, e.g. leaves, water
+     */
     public static final boolean[] ticking;
     private static final Map<String, List<Property<?>>> allProperties = new HashMap<>();
 
@@ -283,7 +286,8 @@ public class BlockTypesCache {
         String enumName = (typeName.startsWith("minecraft:") ? typeName.substring(10) : typeName).toUpperCase(Locale.ROOT);
         int oldsize = states.size();
         BlockType existing = new BlockType(id, internalId, states);
-        tickList.addAll(Collections.nCopies(states.size() - oldsize, existing.getMaterial().isTicksRandomly()));
+        tickList.addAll(Collections.nCopies(states.size() - oldsize,
+                existing.getMaterial().isTicksRandomly() || existing.getMaterial().isLiquid()));
         // register states
         BlockType.REGISTRY.register(typeName, existing);
         String nameSpace = typeName.substring(0, typeName.indexOf(':'));

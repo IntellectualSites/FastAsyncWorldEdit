@@ -625,10 +625,16 @@ public class Settings extends Config {
         public boolean OTHER = false;
 
         @Comment({
-                "Allow blocks placed by WorldEdit to tick. This could cause the big lags.",
+                "Allow blocks placed by FAWE to tick. This could cause the big lags.",
                 "This has no effect on existing blocks one way or the other."
         })
         public boolean ALLOW_TICK_PLACED = false;
+
+        @Comment({
+                "Allow fluids placed by FAWE to tick (flow). This could cause the big lags.",
+                "This has no effect on existing blocks one way or the other."
+        })
+        public boolean ALLOW_TICK_FLUIDS = false;
 
         @Comment({
                 "Force re-ticking of existing blocks not edited by FAWE.",

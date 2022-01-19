@@ -398,11 +398,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     @SuppressWarnings("rawtypes")
     public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         forceLoadSections = false;
-        copy = createCopy ? new PaperweightGetBlocks_Copy(serverLevel) : null;
+        copy = createCopy ? new PaperweightGetBlocks_Copy(levelChunk) : null;
         try {
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
-            boolean fastmode = set.isFastMode() && Settings.settings().QUEUE.NO_TICK_FASTMODE;
 
             // Remove existing tiles. Create a copy so that we can remove blocks
             Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
@@ -470,7 +469,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     LevelChunkSection newSection = PaperweightPlatformAdapter.newChunkSection(
                                             layerNo,
                                             new char[4096],
-                                            fastmode,
                                             adapter,
                                             biomeRegistry,
                                             biomeData
@@ -498,6 +496,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                     bitMask |= 1 << getSectionIndex;
 
+                    // Changes may still be written to chunk SET
                     char[] tmp = set.load(layerNo);
                     char[] setArr = new char[4096];
                     System.arraycopy(tmp, 0, setArr, 0, 4096);
@@ -529,7 +528,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             newSection = PaperweightPlatformAdapter.newChunkSection(
                                     layerNo,
                                     setArr,
-                                    fastmode,
                                     adapter,
                                     biomeRegistry,
                                     biomeData
@@ -583,7 +581,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             layerNo,
                                             this::loadPrivately,
                                             setArr,
-                                            fastmode,
                                             adapter,
                                             biomeRegistry,
                                             biomeData

@@ -6,6 +6,7 @@ import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.NbtUtils;
@@ -692,6 +693,11 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
             init();
             return allBlockProperties;
         }
+    }
+
+    @Override
+    public IBatchProcessor getTickingPostProcessor() {
+        return new PaperweightPostProcesssor();
     }
 
 }

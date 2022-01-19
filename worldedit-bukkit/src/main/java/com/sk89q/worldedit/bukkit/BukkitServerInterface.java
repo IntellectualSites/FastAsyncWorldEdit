@@ -20,7 +20,9 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.google.common.collect.Sets;
 import com.sk89q.bukkit.util.CommandInfo;
 import com.sk89q.bukkit.util.CommandRegistration;
@@ -288,6 +290,20 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
     @Override
     public int versionMaxY() {
         return MinecraftVersion.getCurrent().isEqualOrHigherThan(MinecraftVersion.CAVES_18) ? 319 : 255;
+    }
+
+    @Override
+    public IBatchProcessor getPlatformPostProcessor(boolean fastMode) {
+        boolean tickExisting = Settings.settings().EXPERIMENTAL.ALLOW_TICK_EXISTING;
+        boolean tickPlaced = Settings.settings().EXPERIMENTAL.ALLOW_TICK_PLACED;
+        boolean tickFluid = Settings.settings().EXPERIMENTAL.ALLOW_TICK_FLUIDS;
+        if (!tickExisting && !tickPlaced && !tickFluid) {
+            return null;
+        }
+        if (Settings.settings().QUEUE.NO_TICK_FASTMODE && fastMode) {
+            return null;
+        }
+        return this.plugin.getBukkitImplAdapter().getTickingPostProcessor();
     }
     //FAWE end
 }

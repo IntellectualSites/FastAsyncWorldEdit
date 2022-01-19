@@ -24,6 +24,7 @@ import com.fastasyncworldedit.bukkit.adapter.IBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.sk89q.jnbt.AdventureNBTConverter;
@@ -349,6 +350,10 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
 
     default Map<String, List<Property<?>>> getAllProperties() {
         return Collections.emptyMap();
+    }
+
+    default IBatchProcessor getTickingPostProcessor() {
+        return null;
     }
     //FAWE end
 }

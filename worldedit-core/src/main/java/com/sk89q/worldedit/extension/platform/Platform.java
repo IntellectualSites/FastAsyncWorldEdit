@@ -21,6 +21,7 @@ package com.sk89q.worldedit.extension.platform;
 
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.entity.Player;
@@ -248,5 +249,24 @@ public interface Platform extends Keyed {
      * @since 2.0.0
      */
     int versionMaxY();
+
+    /**
+     * Get a {@link IBatchProcessor} to be used in edit processing. Null if not required.
+     * @since TODO
+     */
+    @Nullable
+    default IBatchProcessor getPlatformProcessor(boolean fastMode) {
+        return null;
+    }
+
+    /**
+     * Get a {@link IBatchProcessor} to be used in edit post-processing. Used for things such as tick-placed and tick fluids.
+     * Null if not required.
+     * @since TODO
+     */
+    @Nullable
+    default IBatchProcessor getPlatformPostProcessor(boolean fastMode) {
+        return null;
+    }
     //FAWE end
 }

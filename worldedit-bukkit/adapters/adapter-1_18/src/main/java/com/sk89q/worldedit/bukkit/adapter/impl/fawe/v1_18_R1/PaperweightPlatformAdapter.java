@@ -11,7 +11,6 @@ import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -301,16 +300,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     NMS conversion
      */
     public static LevelChunkSection newChunkSection(
-            final int layer, final char[] blocks, boolean fastmode,
-            CachedBukkitAdapter adapter, Registry<Biome> biomeRegistry,
+            final int layer,
+            final char[] blocks,
+            CachedBukkitAdapter adapter,
+            Registry<Biome> biomeRegistry,
             @Nullable PalettedContainer<Biome> biomes
     ) {
-        return newChunkSection(layer, null, blocks, fastmode, adapter, biomeRegistry, biomes);
+        return newChunkSection(layer, null, blocks, adapter, biomeRegistry, biomes);
     }
 
     public static LevelChunkSection newChunkSection(
-            final int layer, final Function<Integer, char[]> get, char[] set,
-            boolean fastmode, CachedBukkitAdapter adapter, Registry<Biome> biomeRegistry,
+            final int layer,
+            final Function<Integer, char[]> get,
+            char[] set,
+            CachedBukkitAdapter adapter,
+            Registry<Biome> biomeRegistry,
             @Nullable PalettedContainer<Biome> biomes
     ) {
         if (set == null) {
@@ -322,16 +326,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         final int[] blocksCopy = FaweCache.INSTANCE.SECTION_BLOCKS.get();
         try {
             int[] num_palette_buffer = new int[1];
-            Map<BlockVector3, Integer> ticking_blocks = new HashMap<>();
             int air;
             if (get == null) {
-                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer,
-                        set, ticking_blocks, fastmode, adapter
-                );
+                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, set, adapter);
             } else {
-                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy,
-                        num_palette_buffer, get, set, ticking_blocks, fastmode, adapter
-                );
+                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, get, set, adapter);
             }
             int num_palette = num_palette_buffer[0];
             // BlockStates
@@ -402,15 +401,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     );
                 }
                 levelChunkSection = new LevelChunkSection(layer, blockStatePalettedContainer, biomes);
-                setCount(ticking_blocks.size(), 4096 - air, levelChunkSection);
-                if (!fastmode) {
-                    ticking_blocks.forEach((pos, ordinal) -> levelChunkSection.setBlockState(
-                            pos.getBlockX(),
-                            pos.getBlockY(),
-                            pos.getBlockZ(),
-                            Block.stateById(ordinal)
-                    ));
-                }
+                // Set these to zero for now (PaperweightPostProcessor will update them)
+                setCounts(0, 4096 - air, 0, levelChunkSection);
             } catch (final IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -541,11 +533,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return biomePalettedContainer;
     }
 
-    public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final LevelChunkSection section) throws
-            IllegalAccessException {
-        fieldTickingFluidCount.setShort(section, (short) 0); // TODO FIXME
+    public static void setCounts(
+            final int tickingBlockCount,
+            final int nonEmptyBlockCount,
+            final int fluidCount,
+            final LevelChunkSection section
+    ) throws IllegalAccessException {
+        fieldTickingFluidCount.setShort(section, (short) fluidCount);
         fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
-        fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+        if (nonEmptyBlockCount > -1) {
+            fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+        }
     }
 
     public static BiomeType adapt(Biome biome, LevelAccessor levelAccessor) {

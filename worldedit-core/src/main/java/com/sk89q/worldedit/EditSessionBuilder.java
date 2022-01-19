@@ -45,6 +45,7 @@ import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
 import com.fastasyncworldedit.core.history.changeset.NullChangeSet;
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.limit.PropertyRemap;
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
@@ -560,7 +561,7 @@ public final class EditSessionBuilder {
                     }
                 }
             }
-            // There's no need to do lighting (and it'll also just be a pain to implement) if we're not placing chunks
+            // There's no need to do the below (and it'll also just be a pain to implement) if we're not placing chunks
             if (placeChunks) {
                 if (((relightMode != null && relightMode != RelightMode.NONE) || (relightMode == null && Settings.settings().LIGHTING.MODE > 0))) {
                     relighter = WorldEdit.getInstance().getPlatformManager()
@@ -569,6 +570,22 @@ public final class EditSessionBuilder {
                     extent.addProcessor(new RelightProcessor(relighter));
                 }
                 extent.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
+                IBatchProcessor platformProcessor = WorldEdit
+                        .getInstance()
+                        .getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getPlatformProcessor(fastMode);
+                if (platformProcessor != null) {
+                    extent.addProcessor(platformProcessor);
+                }
+                IBatchProcessor platformPostProcessor = WorldEdit
+                        .getInstance()
+                        .getPlatformManager()
+                        .queryCapability(Capability.WORLD_EDITING)
+                        .getPlatformPostProcessor(fastMode);
+                if (platformPostProcessor != null) {
+                    extent.addPostProcessor(platformPostProcessor);
+                }
             } else {
                 relighter = NullRelighter.INSTANCE;
             }
