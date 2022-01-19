@@ -696,8 +696,10 @@ public class RegionCommands {
         boolean success;
         try {
             session.setMask(null);
+            //FAWE start
             session.setSourceMask(null);
             actor.print(Caption.of("fawe.regen.time"));
+            //FAWE end
             RegenOptions options = RegenOptions.builder()
                     .seed(seed)
                     .regenBiomes(regenBiomes)
@@ -706,7 +708,9 @@ public class RegionCommands {
             success = world.regenerate(region, editSession, options);
         } finally {
             session.setMask(mask);
+            //FAWE start
             session.setSourceMask(mask);
+            //FAWE end
         }
         if (success) {
             actor.print(Caption.of("worldedit.regen.regenerated"));
