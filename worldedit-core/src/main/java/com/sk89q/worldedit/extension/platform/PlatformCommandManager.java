@@ -474,7 +474,9 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                     "superpickaxe",
-                    ImmutableList.of("pickaxe", "sp"),
+                    //FAWE start - register /<command> commands
+                    ImmutableList.of("pickaxe", "/pickaxe", "sp", "/sp"),
+                    //FAWE end
                     "Super-pickaxe commands",
                     SuperPickaxeCommandsRegistration.builder(),
                     new SuperPickaxeCommands(worldEdit)
