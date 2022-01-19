@@ -401,7 +401,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                                 Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause(), LOGGER);
                             } else {
                                 String message = e.getMessage();
-                                int hash = message.hashCode();
+                                int hash = message != null ? message.hashCode() : 0;
                                 if (lastException != hash) {
                                     lastException = hash;
                                     exceptionCount = 0;
@@ -441,7 +441,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                 Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause(), LOGGER);
             } else {
                 String message = e.getMessage();
-                int hash = message.hashCode();
+                int hash = message != null ? message.hashCode() : 0;
                 if (lastException != hash) {
                     lastException = hash;
                     exceptionCount = 0;
