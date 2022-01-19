@@ -112,12 +112,6 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     }
 
     @Override
-    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        // This should not do anything otherwise dangerous...
-        return CompletableFuture.completedFuture(set);
-    }
-
-    @Override
     public void applyBlock(final FilterBlock block) {
         if (!this.mask.test(block)) {
             block.setOrdinal(0);

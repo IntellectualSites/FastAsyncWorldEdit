@@ -137,11 +137,6 @@ public class HeightmapProcessor implements IBatchProcessor {
     }
 
     @Override
-    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        return CompletableFuture.completedFuture(set);
-    }
-
-    @Override
     @Nullable
     public Extent construct(Extent child) {
         throw new UnsupportedOperationException("Processing only");

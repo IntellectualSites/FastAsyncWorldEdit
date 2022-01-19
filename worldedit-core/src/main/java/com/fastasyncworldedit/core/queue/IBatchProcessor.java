@@ -23,7 +23,11 @@ public interface IBatchProcessor {
      */
     IChunkSet processSet(IChunk chunk, IChunkGet get, IChunkSet set);
 
-    Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set);
+    /**
+     * Post-process a chunk that has been edited. Set should NOT be modified here, changes will NOT be flushed to the world,
+     * but MAY be flushed to history. Defaults to nothing as most Processors will not use it.
+     */
+    default void postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {}
 
     default boolean processGet(int chunkX, int chunkZ) {
         return true;

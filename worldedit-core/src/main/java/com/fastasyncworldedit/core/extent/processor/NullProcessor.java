@@ -24,11 +24,6 @@ public final class NullProcessor implements IBatchProcessor {
         return null;
     }
 
-    @Nullable
-    public Future<IChunkSet> postProcessSet(@Nonnull IChunk chunk, @Nonnull IChunkGet get, @Nonnull IChunkSet set) {
-        return null;
-    }
-
     @Nonnull
     public Extent construct(@Nonnull Extent child) {
         return new NullExtent();

@@ -9,7 +9,6 @@ import com.sk89q.worldedit.regions.Region;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.Future;
 
 public class SingleRegionExtent extends FaweRegionExtent {
 
@@ -46,8 +45,9 @@ public class SingleRegionExtent extends FaweRegionExtent {
     }
 
     @Override
-    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        return region.postProcessSet(chunk, get, set);
+    public void postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Most likely will do nothing, but perhaps people will find some fun way of using this via API (though doubtful)
+        region.postProcessSet(chunk, get, set);
     }
 
     @Override

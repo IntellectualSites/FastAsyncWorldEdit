@@ -47,11 +47,6 @@ public class RelightProcessor implements IBatchProcessor {
     }
 
     @Override
-    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        return CompletableFuture.completedFuture(set);
-    }
-
-    @Override
     public @Nullable
     Extent construct(Extent child) {
         throw new UnsupportedOperationException("Processing only");

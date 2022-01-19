@@ -24,9 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
 public class MultiBatchProcessor implements IBatchProcessor {
@@ -129,37 +127,32 @@ public class MultiBatchProcessor implements IBatchProcessor {
     }
 
     @Override
-    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        try {
-            for (IBatchProcessor processor : processors) {
+    public void postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        for (IBatchProcessor processor : processors) {
+            try {
                 // We do NOT want to edit blocks in post processing
                 if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
                     continue;
                 }
-                set = processor.postProcessSet(chunk, get, set).get();
-                if (set == null) {
-                    return null;
+                processor.postProcessSet(chunk, get, set);
+            } catch (Throwable e) {
+                if (e instanceof FaweException) {
+                    Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e, LOGGER);
+                } else if (e.getCause() instanceof FaweException) {
+                    Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause(), LOGGER);
+                } else {
+                    String message = e.getMessage();
+                    int hash = message != null ? message.hashCode() : 0;
+                    if (lastException != hash) {
+                        lastException = hash;
+                        exceptionCount = 0;
+                        LOGGER.catching(e);
+                    } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
+                        exceptionCount++;
+                        LOGGER.warn(message);
+                    }
                 }
             }
-            return CompletableFuture.completedFuture(set);
-        } catch (Throwable e) {
-            if (e instanceof FaweException) {
-                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e, LOGGER);
-            } else if (e.getCause() instanceof FaweException) {
-                Fawe.handleFaweException(faweExceptionReasonsUsed, (FaweException) e.getCause(), LOGGER);
-            } else {
-                String message = e.getMessage();
-                int hash = message.hashCode();
-                if (lastException != hash) {
-                    lastException = hash;
-                    exceptionCount = 0;
-                    LOGGER.catching(e);
-                } else if (exceptionCount < Settings.settings().QUEUE.PARALLEL_THREADS) {
-                    exceptionCount++;
-                    LOGGER.warn(message);
-                }
-            }
-            return null;
         }
     }
 
