@@ -178,8 +178,13 @@ public class MultiRegionExtent extends FaweRegionExtent {
     }
 
     @Override
-    public void postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        intersection.postProcessSet(chunk, get, set);
+    public Future<?> postProcessSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
+        return intersection.postProcessSet(chunk, get, set);
+    }
+
+    @Override
+    public void postProcess(IChunk chunk, IChunkGet get, IChunkSet set) {
+        intersection.postProcess(chunk, get, set);
     }
 
 }

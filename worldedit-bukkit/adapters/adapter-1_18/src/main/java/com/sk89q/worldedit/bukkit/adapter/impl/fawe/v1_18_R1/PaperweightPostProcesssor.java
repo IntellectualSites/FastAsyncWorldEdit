@@ -30,7 +30,7 @@ public class PaperweightPostProcesssor implements IBatchProcessor {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void postProcessSet(final IChunk chunk, final IChunkGet iChunkGet, final IChunkSet iChunkSet) {
+    public void postProcess(final IChunk chunk, final IChunkGet iChunkGet, final IChunkSet iChunkSet) {
         boolean tickExisting = Settings.settings().EXPERIMENTAL.ALLOW_TICK_EXISTING;
         boolean tickPlaced = Settings.settings().EXPERIMENTAL.ALLOW_TICK_PLACED;
         boolean tickFluid = Settings.settings().EXPERIMENTAL.ALLOW_TICK_FLUIDS;

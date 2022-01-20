@@ -228,8 +228,13 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     @Override
-    public void postProcessSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
+    public void postProcess(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
         addWriteTask(() -> processSet(chunk, get, set));
+    }
+
+    @Override
+    public Future<?> postProcessSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
+        return addWriteTask(() -> processSet(chunk, get, set));
     }
 
     @Override

@@ -6,13 +6,12 @@ import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
-import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
@@ -25,9 +24,25 @@ public interface IBatchProcessor {
 
     /**
      * Post-process a chunk that has been edited. Set should NOT be modified here, changes will NOT be flushed to the world,
-     * but MAY be flushed to history. Defaults to nothing as most Processors will not use it.
+     * but MAY be flushed to history. Defaults to nothing as most Processors will not use it. Post-processors that are not
+     * technically blocking should override this method to allow post-processors to become blocking if required.
      */
-    default void postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {}
+    default Future<?> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Do not need to default to below method. FAWE itself by default will only call the method below.
+        return CompletableFuture.completedFuture(null);
+    }
+
+    /**
+     * Post-process a chunk that has been edited. Set should NOT be modified here, changes will NOT be flushed to the world,
+     * but MAY be flushed to history. Defaults to nothing as most Processors will not use it. If the post-processor will run
+     * tasks asynchronously/not be blocking, use {@link IBatchProcessor#postProcessSet} to return a Future.
+     *
+     * @since TODO
+     */
+    default void postProcess(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Default to above for compatibility and to ensure whatever method is overridden by child classes is called
+        postProcessSet(chunk, get, set);
+    }
 
     default boolean processGet(int chunkX, int chunkZ) {
         return true;

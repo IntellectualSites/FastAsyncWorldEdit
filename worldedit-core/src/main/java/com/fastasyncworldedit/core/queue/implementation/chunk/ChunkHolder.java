@@ -1010,7 +1010,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
                 return get.call(set, finalize);
             } finally {
                 if (postProcess) {
-                    getExtent().postProcessSet(this, get.getCopy(), set);
+                    getExtent().postProcess(this, get.getCopy(), set);
                 }
             }
         }

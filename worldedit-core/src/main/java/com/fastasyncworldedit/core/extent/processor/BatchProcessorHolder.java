@@ -28,8 +28,13 @@ public class BatchProcessorHolder implements IBatchProcessorHolder {
     }
 
     @Override
-    public void postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
-        getPostProcessor().postProcessSet(chunk, get, set);
+    public Future<?> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        return getPostProcessor().postProcessSet(chunk, get, set);
+    }
+
+    @Override
+    public void postProcess(IChunk chunk, IChunkGet get, IChunkSet set) {
+        getPostProcessor().postProcess(chunk, get, set);
     }
 
     @Override
