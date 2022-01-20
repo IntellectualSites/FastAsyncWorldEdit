@@ -28,6 +28,7 @@ public class PaperweightPostProcesssor implements IBatchProcessor {
         return set;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void postProcessSet(final IChunk chunk, final IChunkGet iChunkGet, final IChunkSet iChunkSet) {
         boolean tickExisting = Settings.settings().EXPERIMENTAL.ALLOW_TICK_EXISTING;
@@ -196,10 +197,12 @@ public class PaperweightPostProcesssor implements IBatchProcessor {
         return false;
     }
 
+    @SuppressWarnings("deprecation")
     private boolean isFluid(char ordinal) {
         return BlockState.getFromOrdinal(ordinal).getMaterial().isLiquid();
     }
 
+    @SuppressWarnings("deprecation")
     private void addFluid(final Map<BlockPos, Fluid> fluidBlocks, final BlockState replacedState, final BlockPos position) {
         Fluid type;
         if (replacedState.getBlockType() == BlockTypes.LAVA) {
