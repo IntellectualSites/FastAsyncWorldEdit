@@ -41,12 +41,12 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
                 claim.getGreaterBoundaryCorner().getBlockX();
                 final BlockVector3 pos1 = BlockVector3.at(
                         claim.getLesserBoundaryCorner().getBlockX(),
-                        BukkitWorld.HAS_MIN_Y ? player.getWorld().getMinHeight() : 0,
+                        wePlayer.getWorld().getMinY(),
                         claim.getLesserBoundaryCorner().getBlockZ()
                 );
                 final BlockVector3 pos2 = BlockVector3.at(
                         claim.getGreaterBoundaryCorner().getBlockX(),
-                        BukkitWorld.HAS_MIN_Y ? player.getWorld().getMaxHeight() : 256,
+                        wePlayer.getWorld().getMaxY(),
                         claim.getGreaterBoundaryCorner().getBlockZ()
                 );
                 return new FaweMask(new CuboidRegion(pos1, pos2)) {
