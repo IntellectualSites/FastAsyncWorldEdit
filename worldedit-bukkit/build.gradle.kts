@@ -150,8 +150,6 @@ tasks.named<ShadowJar>("shadowJar") {
         // In tandem with not bundling log4j, we shouldn't relocate base package here.
         // relocate("org.apache.logging", "com.sk89q.worldedit.log4j")
         relocate("org.antlr.v4", "com.sk89q.worldedit.antlr4")
-        // GriefDefender provide flow-math
-        relocate( "com.flowpowered", "com.griefdefender.lib.flowpowered")
         include(dependency(":worldedit-core"))
         include(dependency(":worldedit-libs:bukkit"))
         // Purposefully not included, we assume (even though no API exposes it) that Log4J will be present at runtime
