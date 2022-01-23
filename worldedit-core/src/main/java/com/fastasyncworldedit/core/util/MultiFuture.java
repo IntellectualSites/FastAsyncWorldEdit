@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.util;
 
-import org.jetbrains.annotations.NotNull;
-
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -43,7 +42,7 @@ public class MultiFuture implements Future<Object[]> {
     }
 
     @Override
-    public Object[] get(final long timeout, @NotNull final TimeUnit unit) {
+    public Object[] get(final long timeout, @Nonnull final TimeUnit unit) {
         return futures.stream().map(f -> {
             try {
                 return f.get(timeout / futures.size(), unit);
