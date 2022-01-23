@@ -14,7 +14,7 @@ dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.6"
 mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "16.17.1"
-griefdefender = "920a610"
+griefdefender = "2.1.0-SNAPSHOT"
 mcore = "7.0.1"
 residence = "4.5._13.1"
 towny = "0.97.5.0"
@@ -23,7 +23,6 @@ plotsquaredV6 = "6.3.0"
 redprotect = "1.9.6"
 
 # Third party
-flow-math = "1.0.3"
 paperlib = "1.0.8-SNAPSHOT"
 bstats = "2.2.1"
 serverlib = "2.3.1"
@@ -72,7 +71,7 @@ dummypermscompat = { group = "com.sk89q", name = "dummypermscompat", version.ref
 worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard-bukkit" }
 mapmanager = { group = "com.github.InventivetalentDev", name = "MapManager", version.ref = "mapmanager" }
 griefprevention = { group = "com.github.TechFortress", name = "GriefPrevention", version.ref = "griefprevention" }
-griefdefender = { group = "com.github.bloodmc", name = "GriefDefenderApi", version.ref = "griefdefender" }
+griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
 mcore = { group = "com.massivecraft", name = "mcore", version.ref = "mcore" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
 towny = { group = "com.github.TownyAdvanced", name = "Towny", version.ref = "towny" }
@@ -82,7 +81,6 @@ plotsquaredV6Core = { group = "com.plotsquared", name = "PlotSquared-Core", vers
 redprotect = { group = "net.fabiozumbi12", name = "redprotect", version.ref = "redprotect" }
 
 # Third Party
-flowmath = { group = "com.flowpowered", name = "flow-math", version.ref = "flow-math" }
 paperlib = { group = "io.papermc", name = "paperlib", version.ref = "paperlib" }
 bstatsBukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
 bstatsBase = { group = "org.bstats", name = "bstats-base", version.ref = "bstats" }

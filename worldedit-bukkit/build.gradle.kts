@@ -28,6 +28,10 @@ repositories {
         url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
     }
     maven {
+        name = "GriefDefender"
+        url = uri("https://repo.glaremasters.me/repository/bloodshot/")
+    }
+    maven {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
     }
@@ -96,10 +100,6 @@ dependencies {
     compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
 
     // Third party
-    compileOnly(libs.flowmath) {
-        because("This dependency is needed by GriefDefender but not exposed transitively.")
-        isTransitive = false
-    }
     implementation(libs.paperlib)
     implementation(libs.bstatsBukkit) { isTransitive = false }
     implementation(libs.bstatsBase) { isTransitive = false }
