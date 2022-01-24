@@ -114,8 +114,6 @@ public class ChunkCommands {
                         TextComponent.of(actor.getName())
                 )
         );
-        actor.print(new ChunkListPaginationBox(region).create(page));
-        actor.print(Caption.of("worldedit.listchunks.listfor", TextComponent.of(actor.getName())));
     }
 
     @Command(

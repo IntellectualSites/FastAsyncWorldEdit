@@ -769,13 +769,6 @@ public final class PlatformCommandManager {
         } catch (FaweException e) {
             actor.print(Caption.of("fawe.cancel.reason", e.getComponent()));
         } catch (UsageException e) {
-            ImmutableList<Command> cmd = e.getCommands();
-            if (!cmd.isEmpty()) {
-                actor.print(Caption.of(
-                        "fawe.error.command.syntax",
-                        HelpGenerator.create(e.getCommandParseResult()).getFullHelp()
-                ));
-            }
             actor.printError(e.getRichMessage());
         } catch (CommandExecutionException e) {
             handleUnknownException(actor, e.getCause());
