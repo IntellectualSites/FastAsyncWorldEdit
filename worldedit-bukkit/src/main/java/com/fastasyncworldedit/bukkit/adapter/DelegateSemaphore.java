@@ -13,7 +13,7 @@ public class DelegateSemaphore extends Semaphore {
 
     // this is bad
     @Override
-    public synchronized boolean tryAcquire() {
+    public boolean tryAcquire() {
         try {
             this.delegate.acquire();
             return true;
@@ -23,12 +23,12 @@ public class DelegateSemaphore extends Semaphore {
     }
 
     @Override
-    public synchronized void acquire() throws InterruptedException {
+    public void acquire() throws InterruptedException {
         this.delegate.acquire();
     }
 
     @Override
-    public synchronized void release() {
+    public void release() {
         this.delegate.release();
     }
 
