@@ -1,0 +1,44 @@
+image::fawe-logo.png[150,150,align=center]
+
+'''
+
+FastAsyncWorldEdit is a fork of WorldEdit that has huge speed and memory improvements and considerably more features
+
+== A Minecraft Map Editor... that runs in-game!
+
+* With selections, schematics, copy and paste, brushes, and scripting!
+* Use it in creative, survival in single player or on your server.
+* Use it on your Minecraft server to fix grieving and mistakes.
+
+Java Edition required. FastAsyncWorldEdit is compatible with Bukkit, Spigot and Paper.
+
+=== Download FastAsyncWorldEdit
+* Spigot: https://www.spigotmc.org/resources/fast-async-worldedit.13932/
+* Older, unsupported, versions: https://intellectualsites.github.io/download/fawe.html
+
+=== Links
+
+* link:https://discord.gg/intellectualsites[Discord]
+* link:https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki[Wiki]
+* link:https://github.com/IntellectualSites/FastAsyncWorldEdit/issues[Report Issue]
+* link:https://intellectualsites.crowdin.com/fastasyncworldedit[Crowdin (Translations)]
+* link:https://javadoc.io/doc/com.fastasyncworldedit/FastAsyncWorldEdit-Bukkit/latest/index.html[JavaDocs for the -bukkit module]
+* link:https://javadoc.io/doc/com.fastasyncworldedit/FastAsyncWorldEdit-Core/latest/index.html[JavaDocs for the -core module]
+
+=== Edit The Code
+
+Want to add new features to FastAsyncWorldEdit or fix bugs yourself? You can get the game running, with FastAsyncWorldEdit, from the code here:
+
+For additional information about compiling FastAsyncWorldEdit, see link:COMPILING.adoc[COMPILING.adoc].
+
+=== Submitting Your Changes
+FastAsyncWorldEdit is open source (specifically licensed under GPL v3), so note that your contributions will also be open source. The best way to submit a change is to create a fork on GitHub, put your changes there, and then create a "pull request" on our FastAsyncWorldEdit repository.
+
+Please read link:https://github.com/IntellectualSites/.github/blob/main/CONTRIBUTING.md[CONTRIBUTING.md] for important guidelines to follow.
+
+=== YourKit
+image::https://www.yourkit.com/images/yklogo.png[200,200,align=left]
+
+Thank you to YourKit for supporting our product by providing us with their innovative and intelligent tools
+for monitoring and profiling Java and .NET applications.
+YourKit is the creator of link:https://www.yourkit.com/java/profiler/[YourKit Java Profiler], link:https://www.yourkit.com/.net/profiler/[YourKit .NET Profiler], and link:https://www.yourkit.com/youmonitor/[YourKit YouMonitor].
