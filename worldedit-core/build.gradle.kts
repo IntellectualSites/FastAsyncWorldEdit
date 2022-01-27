@@ -37,7 +37,7 @@ dependencies {
 
     // Plugins
     compileOnly(libs.redprotect) { isTransitive = false }
-    compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
+    compileOnly(libs.plotsquaredCore) { isTransitive = false }
 
     // ensure this is on the classpath for the AP
     annotationProcessor(libs.guava)

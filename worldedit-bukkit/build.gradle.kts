@@ -96,8 +96,8 @@ dependencies {
     compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
     compileOnly(libs.protocollib) { isTransitive = false }
-    compileOnly(libs.plotsquaredV6Bukkit) { isTransitive = false }
-    compileOnly(libs.plotsquaredV6Core) { isTransitive = false }
+    compileOnly(libs.plotsquaredBukkit) { isTransitive = false }
+    compileOnly(libs.plotsquaredCore) { isTransitive = false }
 
     // Third party
     implementation(libs.paperlib)

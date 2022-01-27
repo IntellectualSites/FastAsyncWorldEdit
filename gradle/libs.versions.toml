@@ -19,7 +19,7 @@ mcore = "7.0.1"
 residence = "4.5._13.1"
 towny = "0.97.5.0"
 protocollib = "4.7.0"
-plotsquaredV6 = "6.3.0"
+plotsquared = "6.4.0"
 redprotect = "1.9.6"
 
 # Third party
@@ -76,8 +76,8 @@ mcore = { group = "com.massivecraft", name = "mcore", version.ref = "mcore" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
 towny = { group = "com.github.TownyAdvanced", name = "Towny", version.ref = "towny" }
 protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
-plotsquaredV6Bukkit = { group = "com.plotsquared", name = "PlotSquared-Bukkit", version.ref = "plotsquaredV6" }
-plotsquaredV6Core = { group = "com.plotsquared", name = "PlotSquared-Core", version.ref = "plotsquaredV6" }
+plotsquaredBukkit = { group = "com.plotsquared", name = "PlotSquared-Bukkit", version.ref = "plotsquared" }
+plotsquaredCore = { group = "com.plotsquared", name = "PlotSquared-Core", version.ref = "plotsquared" }
 redprotect = { group = "net.fabiozumbi12", name = "redprotect", version.ref = "redprotect" }
 
 # Third Party
