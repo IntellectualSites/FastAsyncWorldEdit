@@ -24,7 +24,7 @@ redprotect = "1.9.6"
 
 # Third party
 paperlib = "1.0.8-SNAPSHOT"
-bstats = "2.2.1"
+bstats = "3.0.0"
 serverlib = "2.3.1"
 paster = "1.1.4"
 sparsebitset = "1.2"
