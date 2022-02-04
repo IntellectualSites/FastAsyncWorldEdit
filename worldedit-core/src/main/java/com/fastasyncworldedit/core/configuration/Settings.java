@@ -35,7 +35,7 @@ public class Settings extends Config {
     public String ISSUES = "https://github.com/IntellectualSites/FastAsyncWorldEdit/issues";
     @Final
     @SuppressWarnings("unused")
-    public String WIKI = "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki";
+    public String WIKI = "https://intellectualsites.github.io/fastasyncworldedit-documentation/";
     @Final
     public String DATE; // These values are set from FAWE before loading
     @Final

@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this feature request for FastAsyncWorldEdit! Fill out the following form to your best ability to help us understand your feature request and greately improve the change of it getting added.
-        For anything else than a feature request, use: [our Discord server](https://discord.gg/intellectualsites) or [the wiki](https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki).
+        For anything else than a feature request, use: [our Discord server](https://discord.gg/intellectualsites) or [the wiki](https://intellectualsites.github.io/fastasyncworldedit-documentation/).
 
   - type: textarea
     attributes:

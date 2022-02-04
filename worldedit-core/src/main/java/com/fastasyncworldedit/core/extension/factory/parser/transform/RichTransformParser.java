@@ -78,10 +78,12 @@ public class RichTransformParser extends FaweParser<ResettableExtent> {
                     } else {
                         throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", pe.getFull(),
                                 TextComponent
-                                        .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                        .of("https://intellectualsites.github" +
+                                                ".io/fastasyncworldedit-documentation/transforms/transforms"
                                         )
                                         .clickEvent(ClickEvent.openUrl(
-                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                "https://intellectualsites.github" +
+                                                        ".io/fastasyncworldedit-documentation/transforms/transforms"
                                         ))
                         ));
                     }
@@ -93,10 +95,12 @@ public class RichTransformParser extends FaweParser<ResettableExtent> {
                     } catch (Throwable e) {
                         throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", pe.getFull(),
                                 TextComponent
-                                        .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                        .of("https://intellectualsites.github" +
+                                                ".io/fastasyncworldedit-documentation/transforms/transforms"
                                         )
                                         .clickEvent(ClickEvent.openUrl(
-                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                                                "https://intellectualsites.github" +
+                                                        ".io/fastasyncworldedit-documentation/transforms/transforms"
                                         ))
                         ));
                     }
@@ -146,9 +150,9 @@ public class RichTransformParser extends FaweParser<ResettableExtent> {
         }
         if (union.isEmpty()) {
             throw new NoMatchException(Caption.of("fawe.error.parse.unknown-transform", input,
-                    TextComponent.of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                    TextComponent.of("https://intellectualsites.github.io/fastasyncworldedit-documentation/transforms/transforms"
                     ).clickEvent(ClickEvent.openUrl(
-                            "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Transforms"
+                            "https://intellectualsites.github.io/fastasyncworldedit-documentation/transforms/transforms"
                     ))
             ));
         } else if (union.size() == 1) {

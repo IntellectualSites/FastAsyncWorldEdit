@@ -33,7 +33,7 @@ import java.net.URISyntaxException;
 
 public class InfoEntryPoint {
 
-    private static final String INSTALL_URL = "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki";
+    private static final String INSTALL_URL = "https://intellectualsites.github.io/fastasyncworldedit-documentation/";
     private static final String SUPPORT_URL = "https://discord.gg/intellectualsites";
 
     private static String getMessage(boolean html) {

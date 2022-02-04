@@ -77,7 +77,7 @@ public class WorldEditCommands {
         actor.print(TextComponent.of("FastAsyncWorldEdit" + fVerStr));
         actor.print(TextComponent.of("Authors: Empire92, MattBDev, IronApollo, dordsor21 and NotMyFault"));
         actor.print(TextComponent.of("Wiki: https://git.io/JMEPa")
-                .clickEvent(ClickEvent.openUrl("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki")));
+                .clickEvent(ClickEvent.openUrl("https://intellectualsites.github.io/fastasyncworldedit-documentation/")));
         actor.print(TextComponent.of("Discord: https://discord.gg/intellectualsites")
                 .clickEvent(ClickEvent.openUrl("https://discord.gg/intellectualsites")));
         UpdateNotification.doUpdateNotification(actor);

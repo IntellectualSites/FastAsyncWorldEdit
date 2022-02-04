@@ -89,10 +89,10 @@ public class RichMaskParser extends FaweParser<Mask> {
                         throw new SuggestInputParseException(
                                 new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
                                         TextComponent
-                                                .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
+                                                .of("https://intellectualsites.github.io/fastasyncworldedit-documentation/patterns/patterns"
                                                 )
                                                 .clickEvent(ClickEvent.openUrl(
-                                                        "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Patterns"
+                                                        "https://intellectualsites.github.io/fastasyncworldedit-documentation/patterns/patterns"
                                                 ))
                                 )),
                                 full,
@@ -143,10 +143,10 @@ public class RichMaskParser extends FaweParser<Mask> {
                                 throw new SuggestInputParseException(
                                         new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
                                                 TextComponent
-                                                        .of("https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Masks"
+                                                        .of("https://intellectualsites.github.io/fastasyncworldedit-documentation/masks/masks"
                                                         )
                                                         .clickEvent(ClickEvent.openUrl(
-                                                                "https://github.com/IntellectualSites/FastAsyncWorldEdit-Documentation/wiki/Masks"
+                                                                "https://intellectualsites.github.io/fastasyncworldedit-documentation/masks/masks"
                                                         ))
                                         )),
                                         full,
@@ -178,7 +178,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                             try {
                                 String cmdArgs = ((args.isEmpty()) ? "" : " " + StringMan.join(args, " "));
                                 List<Substring> split =
-                                        CommandArgParser.forArgString(cmdArgs).parseArgs().collect(Collectors.toList());
+                                        CommandArgParser.forArgString(cmdArgs).parseArgs().toList();
                                 List<String> argStrings = split
                                         .stream()
                                         .map(Substring::getSubstring)
