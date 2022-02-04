@@ -609,6 +609,11 @@ public class StubServer implements Server {
     }
 
     @Override
+    public @NotNull CommandSender createCommandSender(@NotNull final Consumer<? super Component> feedback) {
+        return null;
+    }
+
+    @Override
     public @NotNull
     File getWorldContainer() {
         return null;
