@@ -136,7 +136,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 BlockState fromBlock = get.getBlock(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
                 BlockState toBlock = set.getBlock(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
                 if (fromBlock != toBlock || tilesTo.containsKey(pos)) {
-                    addTileRemove(entry.getValue());
+                    addTileRemove(MainUtil.setPosition(entry.getValue(), entry.getKey().getX(), entry.getKey().getY(),
+                            entry.getKey().getZ()));
                 }
             }
         }
