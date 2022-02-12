@@ -400,23 +400,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
+    @SuppressWarnings("deprecation") // Only deprecated in paper
     private static LevelChunkSection newChunkSection(
             int layer, Registry<Biome> biomeRegistry,
             @Nullable PalettedContainer<Biome> biomes
     ) {
+        if (biomes == null) {
+            return new LevelChunkSection(layer, biomeRegistry);
+        }
         PalettedContainer<net.minecraft.world.level.block.state.BlockState> dataPaletteBlocks = new PalettedContainer<>(
                 Block.BLOCK_STATE_REGISTRY,
                 Blocks.AIR.defaultBlockState(),
                 PalettedContainer.Strategy.SECTION_STATES,
                 null
         );
-        PalettedContainer<Biome> biomesPalette = biomes != null ? biomes : new PalettedContainer<>(
-                biomeRegistry,
-                biomeRegistry.getOrThrow(Biomes.PLAINS),
-                PalettedContainer.Strategy.SECTION_BIOMES,
-                null
-        );
-        return new LevelChunkSection(layer, dataPaletteBlocks, biomesPalette);
+        return new LevelChunkSection(layer, dataPaletteBlocks, biomes);
     }
 
     /**
