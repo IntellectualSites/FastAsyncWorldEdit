@@ -13,11 +13,9 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blockToPalette,
             int[] paletteToBlock,
             int[] blocksCopy,
-            int[] num_palette_buffer,
             char[] set,
             CachedBukkitAdapter adapter
     ) {
-        int air = 0;
         int num_palette = 0;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
@@ -42,17 +40,13 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         }
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
-            switch (ordinal) {
-                case BlockTypesCache.ReservedIDs.__RESERVED__:
-                    ordinal = BlockTypesCache.ReservedIDs.AIR;
-                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR:
-                    air++;
+            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                ordinal = BlockTypesCache.ReservedIDs.AIR;
             }
             int palette = blockToPalette[ordinal];
             blocksCopy[i] = palette;
         }
-        num_palette_buffer[0] = num_palette;
-        return air;
+        return num_palette;
     }
 
     public static int createPalette(
@@ -60,12 +54,10 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blockToPalette,
             int[] paletteToBlock,
             int[] blocksCopy,
-            int[] num_palette_buffer,
             Function<Integer, char[]> get,
             char[] set,
             CachedBukkitAdapter adapter
     ) {
-        int air = 0;
         int num_palette = 0;
         char[] getArr = null;
         for (int i = 0; i < 4096; i++) {
@@ -97,27 +89,19 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
         }
         for (int i = 0; i < 4096; i++) {
             char ordinal= set[i];
-            switch (ordinal) {
-                case BlockTypesCache.ReservedIDs.__RESERVED__:
-                    if (getArr == null) {
-                        getArr = get.apply(layer);
-                    }
-                    switch (ordinal = getArr[i]) {
-                        case BlockTypesCache.ReservedIDs.__RESERVED__:
-                            ordinal = BlockTypesCache.ReservedIDs.AIR;
-                        case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR:
-                            air++;
-                    }
-                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR,
-                        BlockTypesCache.ReservedIDs.VOID_AIR:
-                    air++;
+            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                if (getArr == null) {
+                    getArr = get.apply(layer);
+                }
+                if ((ordinal = getArr[i]) == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                    ordinal = BlockTypesCache.ReservedIDs.AIR;
+                }
             }
             int palette = blockToPalette[ordinal];
             blocksCopy[i] = palette;
         }
 
-        num_palette_buffer[0] = num_palette;
-        return air;
+        return num_palette;
     }
 
     @Override

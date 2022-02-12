@@ -285,15 +285,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         final long[] blockStates = FaweCache.INSTANCE.BLOCK_STATES.get();
         final int[] blocksCopy = FaweCache.INSTANCE.SECTION_BLOCKS.get();
         try {
-            int[] num_palette_buffer = new int[1];
-            int air;
+            int num_palette;
             if (get == null) {
-                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, set, adapter
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter
                 );
             } else {
-                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer, get, set, adapter);
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter);
             }
-            int num_palette = num_palette_buffer[0];
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
             if (Settings.settings().PROTOCOL_SUPPORT_FIX || num_palette != 1) {
@@ -356,8 +354,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 fieldStorage.set(dataPaletteBlocks, nmsBits);
                 fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
                 fieldBits.set(dataPaletteBlocks, bitsPerEntry);
-                // Set these to zero for now (PaperweightPostProcessor will update them)
-                setCounts(0, 0, 4096 - air, levelChunkSection);
             } catch (final IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -374,18 +370,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return new LevelChunkSection(layer);
     }
 
-    public static void setCounts(
-            final int tickingBlockCount,
-            final int nonEmptyBlockCount,
-            final int fluidCount,
-            final LevelChunkSection section
-    ) throws
-            IllegalAccessException {
-        fieldTickingFluidContent.setShort(section, (short) fluidCount);
-        fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
-        if (nonEmptyBlockCount > -1) {
-            fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
-        }
+    public static void clearCounts(final LevelChunkSection section) throws IllegalAccessException {
+        fieldTickingFluidContent.setShort(section, (short) 0);
+        fieldTickingBlockCount.setShort(section, (short) 0);
     }
 
     public static Biome[] getBiomeArray(ChunkBiomeContainer chunkBiomeContainer) {
