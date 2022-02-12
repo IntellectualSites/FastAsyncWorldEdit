@@ -267,14 +267,20 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     /*
     NMS conversion
      */
-    public static LevelChunkSection newChunkSection(final int layer, final char[] blocks, CachedBukkitAdapter adapter) {
-        return newChunkSection(layer, null, blocks, adapter);
+    public static LevelChunkSection newChunkSection(
+            final int layer,
+            final char[] blocks,
+            boolean fastMode,
+            CachedBukkitAdapter adapter
+    ) {
+        return newChunkSection(layer, null, blocks, fastMode, adapter);
     }
 
     public static LevelChunkSection newChunkSection(
             final int layer,
             final Function<Integer, char[]> get,
             char[] set,
+            boolean fastMode,
             CachedBukkitAdapter adapter
     ) {
         if (set == null) {
@@ -358,7 +364,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 throw new RuntimeException(e);
             }
 
-            levelChunkSection.recalcBlockCounts();
+            if (!fastMode) {
+                levelChunkSection.recalcBlockCounts();
+            }
             return levelChunkSection;
         } catch (final Throwable e) {
             Arrays.fill(blockToPalette, Integer.MAX_VALUE);

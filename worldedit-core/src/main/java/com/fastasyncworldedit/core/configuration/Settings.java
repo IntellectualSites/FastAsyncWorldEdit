@@ -567,7 +567,8 @@ public class Settings extends Config {
         public int DISCARD_AFTER_MS = 60000;
 
         @Comment({
-                "When using fastmode also do not bother to fix existing ticking blocks"
+                "When using fastmode also do not bother to fix existing ticking blocks",
+                "Only works in versions up to 1.17.2"
         })
         public boolean NO_TICK_FASTMODE = true;
 

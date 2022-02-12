@@ -414,6 +414,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         try {
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
+            boolean fastmode = set.isFastMode() && Settings.settings().QUEUE.NO_TICK_FASTMODE;
 
             // Remove existing tiles. Create a copy so that we can remove blocks
             Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
@@ -484,7 +485,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         }
 
                         if (existingSection == null) {
-                            newSection = PaperweightPlatformAdapter.newChunkSection(layerNo, setArr, adapter);
+                            newSection = PaperweightPlatformAdapter.newChunkSection(layerNo, setArr, fastmode, adapter);
                             if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, layer)) {
                                 updateGet(nmsChunk, levelChunkSections, newSection, setArr, layer);
                                 continue;
@@ -501,11 +502,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                         //ensure that the server doesn't try to tick the chunksection while we're editing it (again).
                         DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
-                        // Don't attempt to tick section whilst we're editing
-                        if (existingSection != null) {
-                            PaperweightPlatformAdapter.clearCounts(existingSection);
-                            existingSection.tickingList.clear();
-                        }
+                        PaperweightPlatformAdapter.clearCounts(existingSection);
+                        existingSection.tickingList.clear();
 
                         synchronized (lock) {
                             // lock.acquire();
@@ -531,6 +529,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             layerNo,
                                             this::loadPrivately,
                                             setArr,
+                                            fastmode,
                                             adapter
                                     );
                             if (!PaperweightPlatformAdapter.setSectionAtomic(
