@@ -568,7 +568,7 @@ public class Settings extends Config {
 
         @Comment({
                 "When using fastmode do not bother to tick existing/placed blocks/fluids",
-                "Only works in versions up to 1.17.2"
+                "Only works in versions up to 1.17.1"
         })
         public boolean NO_TICK_FASTMODE = true;
 
