@@ -294,10 +294,8 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public IBatchProcessor getPlatformPostProcessor(boolean fastMode) {
-        boolean tickExisting = Settings.settings().EXPERIMENTAL.ALLOW_TICK_EXISTING;
-        boolean tickPlaced = Settings.settings().EXPERIMENTAL.ALLOW_TICK_PLACED;
         boolean tickFluid = Settings.settings().EXPERIMENTAL.ALLOW_TICK_FLUIDS;
-        if (!tickExisting && !tickPlaced && !tickFluid) {
+        if (!tickFluid) {
             return null;
         }
         if (Settings.settings().QUEUE.NO_TICK_FASTMODE && fastMode) {

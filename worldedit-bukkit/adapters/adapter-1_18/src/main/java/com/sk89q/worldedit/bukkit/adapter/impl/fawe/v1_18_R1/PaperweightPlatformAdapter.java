@@ -84,9 +84,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     public static final Field fieldPalette;
 
 
-    public static final Field fieldTickingFluidCount;
-    public static final Field fieldTickingBlockCount;
-    public static final Field fieldNonEmptyBlockCount;
+    private static final Field fieldTickingFluidCount;
+    private static final Field fieldTickingBlockCount;
+    private static final Field fieldNonEmptyBlockCount;
 
     private static final MethodHandle methodGetVisibleChunk;
 

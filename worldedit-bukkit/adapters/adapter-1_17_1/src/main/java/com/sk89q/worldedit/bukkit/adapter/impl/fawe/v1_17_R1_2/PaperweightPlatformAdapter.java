@@ -68,9 +68,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static final Field fieldBitsPerEntry;
 
-    public static final Field fieldTickingFluidContent;
-    public static final Field fieldTickingBlockCount;
-    public static final Field fieldNonEmptyBlockCount;
+    private static final Field fieldTickingFluidContent;
+    private static final Field fieldTickingBlockCount;
+    private static final Field fieldNonEmptyBlockCount;
 
     private static final Field fieldBiomes;
 
@@ -362,6 +362,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 throw new RuntimeException(e);
             }
 
+            levelChunkSection.recalcBlockCounts();
             return levelChunkSection;
         } catch (final Throwable e) {
             Arrays.fill(blockToPalette, Integer.MAX_VALUE);

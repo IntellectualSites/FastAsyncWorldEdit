@@ -625,22 +625,10 @@ public class Settings extends Config {
         public boolean OTHER = false;
 
         @Comment({
-                "Allow blocks placed by FAWE to tick. This could cause the big lags.",
-                "This has no effect on existing blocks one way or the other."
-        })
-        public boolean ALLOW_TICK_PLACED = false;
-
-        @Comment({
                 "Allow fluids placed by FAWE to tick (flow). This could cause the big lags.",
                 "This has no effect on existing blocks one way or the other."
         })
         public boolean ALLOW_TICK_FLUIDS = false;
-
-        @Comment({
-                "Force re-ticking of existing blocks not edited by FAWE.",
-                "This will increase time taken slightly."
-        })
-        public boolean ALLOW_TICK_EXISTING = true;
 
         @Comment({
                 "Sets a maximum limit (in kb) for the size of a player's schematics directory (per-player mode only)",
