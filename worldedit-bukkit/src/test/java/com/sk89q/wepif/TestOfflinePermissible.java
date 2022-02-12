@@ -30,6 +30,8 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.profile.PlayerProfile;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -144,6 +146,11 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
 
     public UUID getUniqueId() {
         return randomUuid;
+    }
+
+    @Override
+    public @NotNull PlayerProfile getPlayerProfile() {
+        return null;
     }
 
     @Override

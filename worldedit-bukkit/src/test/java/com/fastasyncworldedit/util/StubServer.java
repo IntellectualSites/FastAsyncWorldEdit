@@ -33,6 +33,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.help.HelpMap;
@@ -259,6 +260,11 @@ public class StubServer implements Server {
 
     @Override
     public int getTicksPerAmbientSpawns() {
+        return 0;
+    }
+
+    @Override
+    public int getTicksPerSpawns(@NotNull final SpawnCategory spawnCategory) {
         return 0;
     }
 
@@ -558,6 +564,24 @@ public class StubServer implements Server {
     }
 
     @Override
+    public org.bukkit.profile.@NotNull PlayerProfile createPlayerProfile(
+            @Nullable final UUID uniqueId,
+            @Nullable final String name
+    ) {
+        return null;
+    }
+
+    @Override
+    public org.bukkit.profile.@NotNull PlayerProfile createPlayerProfile(@NotNull final UUID uniqueId) {
+        return null;
+    }
+
+    @Override
+    public org.bukkit.profile.@NotNull PlayerProfile createPlayerProfile(@NotNull final String name) {
+        return null;
+    }
+
+    @Override
     public @NotNull
     Set<String> getIPBans() {
         return null;
@@ -741,6 +765,11 @@ public class StubServer implements Server {
 
     @Override
     public int getAmbientSpawnLimit() {
+        return 0;
+    }
+
+    @Override
+    public int getSpawnLimit(@NotNull final SpawnCategory spawnCategory) {
         return 0;
     }
 
