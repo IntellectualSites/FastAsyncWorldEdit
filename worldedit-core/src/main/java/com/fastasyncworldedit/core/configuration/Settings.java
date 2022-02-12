@@ -567,7 +567,7 @@ public class Settings extends Config {
         public int DISCARD_AFTER_MS = 60000;
 
         @Comment({
-                "When using fastmode also do not bother to fix existing ticking blocks",
+                "When using fastmode do not bother to tick existing/placed blocks/fluids",
                 "Only works in versions up to 1.17.2"
         })
         public boolean NO_TICK_FASTMODE = true;
@@ -627,7 +627,8 @@ public class Settings extends Config {
 
         @Comment({
                 "Allow fluids placed by FAWE to tick (flow). This could cause the big lags.",
-                "This has no effect on existing blocks one way or the other."
+                "This has no effect on existing blocks one way or the other.",
+                "Changes due to fluid flow will not be tracked by history, thus may have unintended consequences"
         })
         public boolean ALLOW_TICK_FLUIDS = false;
 
