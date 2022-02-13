@@ -172,7 +172,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         if (this.fileChannel == null) {
             this.fileChannel = braf.getChannel();
             this.fileChannel.lock();
-            this.byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, file.length());
+            this.byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, braf.length());
         }
     }
 
