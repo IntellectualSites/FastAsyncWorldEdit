@@ -37,30 +37,14 @@ public abstract class AnglePattern extends AbstractPattern {
         if (!block.getBlockType().getMaterial().isMovementBlocker()) {
             return -1;
         }
-        int slope = Math.abs(
-                extent.getNearestSurfaceTerrainBlock(x + distance, z, y, minY, maxY) - extent
-                        .getNearestSurfaceTerrainBlock(x - distance, z, y, minY, maxY)) * 7;
-        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(
-                x,
-                z + distance,
-                y,
-                minY,
-                maxY
-        ) - extent.getNearestSurfaceTerrainBlock(x, z - distance, y, minY, maxY)) * 7;
-        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(
-                x + distance,
-                z + distance,
-                y,
-                minY,
-                maxY
-        ) - extent.getNearestSurfaceTerrainBlock(x - distance, z - distance, y, minY, maxY)) * 5;
-        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(
-                x - distance,
-                z + distance,
-                y,
-                minY,
-                maxY
-        ) - extent.getNearestSurfaceTerrainBlock(x + distance, z - distance, y, minY, maxY)) * 5;
+        int slope = Math.abs(extent.getNearestSurfaceTerrainBlock(x + distance, z, y, minY, maxY) -
+                extent.getNearestSurfaceTerrainBlock(x - distance, z, y, minY, maxY)) * 7;
+        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x, z + distance, y, minY, maxY) -
+                extent.getNearestSurfaceTerrainBlock(x, z - distance, y, minY, maxY)) * 7;
+        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x + distance, z + distance, y, minY, maxY) -
+                extent.getNearestSurfaceTerrainBlock(x - distance, z - distance, y, minY, maxY)) * 5;
+        slope += Math.abs(extent.getNearestSurfaceTerrainBlock(x - distance, z + distance, y, minY, maxY) -
+                extent.getNearestSurfaceTerrainBlock(x + distance, z - distance, y, minY, maxY)) * 5;
         return slope;
     }
 
