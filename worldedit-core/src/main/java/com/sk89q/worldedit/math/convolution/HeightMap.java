@@ -168,9 +168,9 @@ public class HeightMap {
     public int applyLayers(int[] data) {
         checkNotNull(data);
 
-        BlockVector3 minY = region.getMinimumPoint();
-        int originX = minY.getBlockX();
-        int originZ = minY.getBlockZ();
+        BlockVector3 min = region.getMinimumPoint();
+        int originX = min.getBlockX();
+        int originZ = min.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();
 
@@ -260,10 +260,10 @@ public class HeightMap {
     public int apply(int[] data) throws MaxChangedBlocksException {
         checkNotNull(data);
 
-        BlockVector3 minY = region.getMinimumPoint();
-        int originX = minY.getBlockX();
-        int originY = minY.getBlockY();
-        int originZ = minY.getBlockZ();
+        BlockVector3 min = region.getMinimumPoint();
+        int originX = min.getBlockX();
+        int originY = min.getBlockY();
+        int originZ = min.getBlockZ();
 
         int maxY = region.getMaximumPoint().getBlockY();
         BlockState fillerAir = BlockTypes.AIR.getDefaultState();
