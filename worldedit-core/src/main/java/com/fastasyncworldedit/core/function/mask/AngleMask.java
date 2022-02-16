@@ -89,30 +89,38 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
             if (slope >= min) {
                 return lastValue = true;
             }
-            slope = Math.max(slope, Math.abs(
-                    getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance))
-                    * ADJACENT_MOD);
-            slope = Math.max(slope, Math.abs(
-                    getHeight(extent, x + distance, y, z + distance) - getHeight(extent,
-                            x - distance, y, z - distance
-                    )) * DIAGONAL_MOD);
-            slope = Math.max(slope, Math.abs(
-                    getHeight(extent, x - distance, y, z + distance) - getHeight(extent,
-                            x + distance, y, z - distance
-                    )) * DIAGONAL_MOD);
+            slope = Math.max(
+                    slope,
+                    Math.abs(getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance)) * ADJACENT_MOD
+            );
+            slope = Math.max(
+                    slope,
+                    Math.abs(
+                            getHeight(extent, x + distance, y, z + distance) -
+                                    getHeight(extent, x - distance, y, z - distance)) * DIAGONAL_MOD
+            );
+            slope = Math.max(
+                    slope,
+                    Math.abs(
+                            getHeight(extent, x - distance, y, z + distance) -
+                                    getHeight(extent, x + distance, y, z - distance)) * DIAGONAL_MOD
+            );
             return lastValue = (slope >= min);
         } else {
-            slope = Math.max(slope, Math.abs(
-                    getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance))
-                    * ADJACENT_MOD);
-            slope = Math.max(slope, Math.abs(
-                    getHeight(extent, x + distance, y, z + distance) - getHeight(extent,
-                            x - distance, y, z - distance
-                    )) * DIAGONAL_MOD);
-            slope = Math.max(slope, Math.abs(
-                    getHeight(extent, x - distance, y, z + distance) - getHeight(extent,
-                            x + distance, y, z - distance
-                    )) * DIAGONAL_MOD);
+            slope = Math.max(
+                    slope,
+                    Math.abs(getHeight(extent, x, y, z + distance) - getHeight(extent, x, y, z - distance)) * ADJACENT_MOD
+            );
+            slope = Math.max(
+                    slope,
+                    Math.abs(getHeight(extent, x + distance, y, z + distance) -
+                            getHeight(extent, x - distance, y, z - distance)) * DIAGONAL_MOD
+            );
+            slope = Math.max(
+                    slope,
+                    Math.abs(getHeight(extent, x - distance, y, z + distance) -
+                            getHeight(extent, x + distance, y, z - distance)) * DIAGONAL_MOD
+            );
             return lastValue = (slope >= min && slope <= max);
         }
     }
