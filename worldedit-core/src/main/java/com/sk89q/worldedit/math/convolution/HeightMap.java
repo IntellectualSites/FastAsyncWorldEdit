@@ -124,9 +124,10 @@ public class HeightMap {
                 }
             }
         }
+        //FAWE end
     }
 
-    @Deprecated
+    //FAWE start - allow HeightMap creation with data
     public HeightMap(EditSession session, Region region, int[] data, boolean layers) {
         this.session = session;
         this.region = region;
