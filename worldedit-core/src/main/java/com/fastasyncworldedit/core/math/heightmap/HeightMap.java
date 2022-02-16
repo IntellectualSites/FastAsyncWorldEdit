@@ -46,7 +46,7 @@ public interface HeightMap {
     ) throws MaxChangedBlocksException {
         BlockVector3 top = session.getMaximumPoint();
         int maxY = top.getBlockY();
-        Location min = new Location(session.getWorld(), pos.subtract(size, maxY, size).toVector3());
+        Location min = new Location(session.getWorld(), pos.subtract(size, size, size).toVector3());
         BlockVector3 max = pos.add(size, maxY, size);
         Region region = new CuboidRegion(session.getWorld(), min.toBlockPoint(), max);
         com.sk89q.worldedit.math.convolution.HeightMap heightMap = new com.sk89q.worldedit.math.convolution.HeightMap(
