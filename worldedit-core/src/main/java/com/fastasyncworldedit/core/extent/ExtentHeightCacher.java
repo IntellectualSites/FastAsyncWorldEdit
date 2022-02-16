@@ -8,7 +8,7 @@ public class ExtentHeightCacher extends PassthroughExtent {
 
     private transient int cacheBotX = Integer.MIN_VALUE;
     private transient int cacheBotZ = Integer.MIN_VALUE;
-    private transient byte[] cacheHeights;
+    private transient short[] cacheHeights;
     private transient int lastY;
 
     public ExtentHeightCacher(Extent extent) {
@@ -19,7 +19,7 @@ public class ExtentHeightCacher extends PassthroughExtent {
         cacheBotX = Integer.MIN_VALUE;
         cacheBotZ = Integer.MIN_VALUE;
         if (cacheHeights != null) {
-            Arrays.fill(cacheHeights, (byte) 0);
+            Arrays.fill(cacheHeights, (short) 0);
         }
     }
 
@@ -36,9 +36,10 @@ public class ExtentHeightCacher extends PassthroughExtent {
             rz = z - cacheBotZ + 16;
             index = rx + (rz << 8);
             if (cacheHeights == null) {
-                cacheHeights = new byte[65536];
+                cacheHeights = new short[65536];
+                Arrays.fill(cacheHeights, (short) minY);
             } else {
-                Arrays.fill(cacheHeights, (byte) 0);
+                Arrays.fill(cacheHeights, (short) minY);
             }
         } else {
             index = rx + (rz << 8);
