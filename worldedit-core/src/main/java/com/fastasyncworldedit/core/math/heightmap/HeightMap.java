@@ -56,14 +56,9 @@ public interface HeightMap {
                 layers
         );
         if (smooth) {
-            try {
-                HeightMapFilter filter = (HeightMapFilter) HeightMapFilter.class.getConstructors()[0].newInstance(GaussianKernel.class
-                        .getConstructors()[0].newInstance(5, 1));
-                int diameter = 2 * size + 1;
-                data[1] = filter.filter(data[1], diameter, diameter);
-            } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                e.printStackTrace();
-            }
+            HeightMapFilter filter = new HeightMapFilter(new GaussianKernel(5, 1));
+            int diameter = 2 * size + 1;
+            data[1] = filter.filter(data[1], diameter, diameter);
         }
         if (layers) {
             heightMap.applyLayers(data[1]);
