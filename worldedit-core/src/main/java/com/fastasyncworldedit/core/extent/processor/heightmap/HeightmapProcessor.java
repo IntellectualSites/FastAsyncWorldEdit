@@ -86,8 +86,9 @@ public class HeightmapProcessor implements IBatchProcessor {
                         } else if (getSection == null) {
                             getSection = get.load(layer);
                             // skip empty layer
-                            if (Arrays.equals(getSection, FaweCache.INSTANCE.EMPTY_CHAR_4096)
-                                    || Arrays.equals(getSection, AIR_LAYER)) {
+                            if (getSection == null ||
+                                    Arrays.equals(getSection, FaweCache.INSTANCE.EMPTY_CHAR_4096) ||
+                                    Arrays.equals(getSection, AIR_LAYER)) {
                                 hasSectionGet = false;
                                 if (!hasSectionSet) {
                                     continue layer;
