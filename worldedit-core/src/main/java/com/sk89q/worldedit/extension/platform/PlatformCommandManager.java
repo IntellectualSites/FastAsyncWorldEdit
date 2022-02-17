@@ -467,7 +467,7 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                     "snapshot",
-                    ImmutableList.of("snap"),
+                    ImmutableList.of("snap", "/snapshot", "/snap"),
                     "Snapshot commands for restoring backups",
                     SnapshotCommandsRegistration.builder(),
                     new SnapshotCommands(worldEdit)
