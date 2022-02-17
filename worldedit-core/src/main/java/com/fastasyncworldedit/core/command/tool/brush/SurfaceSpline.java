@@ -72,8 +72,8 @@ public class SurfaceSpline implements Brush {
             final int tipx = MathMan.roundInt(tipv.getX());
             final int tipz = (int) tipv.getZ();
             int tipy = MathMan.roundInt(tipv.getY());
-            tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, minY, maxY);
-            if (tipy == -1) {
+            tipy = editSession.getNearestSurfaceTerrainBlock(tipx, tipz, tipy, minY, maxY, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            if (tipy == Integer.MIN_VALUE || tipy == Integer.MAX_VALUE) {
                 continue;
             }
             if (radius == 0) {
@@ -93,8 +93,16 @@ public class SurfaceSpline implements Brush {
                 for (int loopx = tipx - ceilrad; loopx <= tipx + ceilrad; loopx++) {
                     for (int loopz = tipz - ceilrad; loopz <= tipz + ceilrad; loopz++) {
                         if (MathMan.hypot2(loopx - tipx, 0, loopz - tipz) <= radius2) {
-                            int y = editSession.getNearestSurfaceTerrainBlock(loopx, loopz, v.getBlockY(), 0, maxY);
-                            if (y == -1) {
+                            int y = editSession.getNearestSurfaceTerrainBlock(
+                                    loopx,
+                                    loopz,
+                                    v.getBlockY(),
+                                    minY,
+                                    maxY,
+                                    Integer.MIN_VALUE,
+                                    Integer.MAX_VALUE
+                            );
+                            if (y == Integer.MIN_VALUE || y == Integer.MAX_VALUE) {
                                 continue;
                             }
                             newSet.add(loopx, y, loopz);

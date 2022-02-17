@@ -33,8 +33,16 @@ public class SchemGen implements Resource {
     public boolean spawn(Random random, int x, int z) throws WorldEditException {
         mutable.mutX(x);
         mutable.mutZ(z);
-        int y = extent.getNearestSurfaceTerrainBlock(x, z, mutable.getBlockY(), this.extent.getMinY(), this.extent.getMaxY());
-        if (y == -1) {
+        int y = extent.getNearestSurfaceTerrainBlock(
+                x,
+                z,
+                mutable.getBlockY(),
+                this.extent.getMinY(),
+                this.extent.getMaxY(),
+                Integer.MIN_VALUE,
+                Integer.MAX_VALUE
+        );
+        if (y == Integer.MIN_VALUE || y == Integer.MAX_VALUE) {
             return false;
         }
         mutable.mutY(y);
