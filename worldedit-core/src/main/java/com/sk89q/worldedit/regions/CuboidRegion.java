@@ -85,6 +85,28 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         recalculate();
     }
 
+    //FAWE start - allow region to be created without clamping Y
+    /**
+     * Construct a new instance of this cuboid using two corners of the cuboid.
+     *
+     * @param world the world
+     * @param pos1  the first position
+     * @param pos2  the second position
+     */
+    public CuboidRegion(World world, BlockVector3 pos1, BlockVector3 pos2, boolean clampY) {
+        super(world);
+        checkNotNull(pos1);
+        checkNotNull(pos2);
+        this.pos1 = pos1;
+        this.pos2 = pos2;
+        if (clampY) {
+            recalculate();
+        } else {
+            recalculateNoClamp();
+        }
+    }
+    //FAWE end
+
     /**
      * Get the first cuboid-defining corner.
      *
@@ -128,7 +150,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     /**
-     * Clamps the cuboid according to boundaries of the world.
+     * Sets the cached min and max x/y/z and clamps Y to world y min/max
      */
     protected void recalculate() {
         if (pos1 == null || pos2 == null) {
@@ -143,6 +165,23 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         maxY = Math.max(pos1.getY(), pos2.getY());
         maxZ = Math.max(pos1.getZ(), pos2.getZ());
     }
+
+    //FAWE start - allow region to be created without clamping Y
+    /**
+     * Sets the cached min and max x/y/z
+     */
+    protected void recalculateNoClamp() {
+        if (pos1 == null || pos2 == null) {
+            return;
+        }
+        minX = Math.min(pos1.getX(), pos2.getX());
+        minY = Math.min(pos1.getY(), pos2.getY());
+        minZ = Math.min(pos1.getZ(), pos2.getZ());
+        maxX = Math.max(pos1.getX(), pos2.getX());
+        maxY = Math.max(pos1.getY(), pos2.getY());
+        maxZ = Math.max(pos1.getZ(), pos2.getZ());
+    }
+    //FAWE end
 
     /**
      * Get a region that contains the faces of this cuboid.

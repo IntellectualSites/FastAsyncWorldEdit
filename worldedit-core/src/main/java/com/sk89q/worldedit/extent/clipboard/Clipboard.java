@@ -340,8 +340,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
             copy.setTransform(transform);
         }
         copy.setCopyingBiomes(this.hasBiomes());
-        if (extent instanceof EditSession) {
-            EditSession editSession = (EditSession) extent;
+        if (extent instanceof EditSession editSession) {
             Mask sourceMask = editSession.getSourceMask();
             if (sourceMask != null) {
                 new MaskTraverser(sourceMask).reset(extent);
@@ -393,7 +392,7 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
                 continue;
             }
             if (pos.getY() < extent.getMinY()) {
-                throw new RuntimeException("Y-Position cannot be less than 0!");
+                throw new RuntimeException("Y-Position cannot be less than the extent's minimum Y!");
             }
             extent.setBlock(xx, yy, zz, block);
         }

@@ -13,6 +13,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
     public static final MinecraftVersion NETHER = new MinecraftVersion(1, 16);
     public static final MinecraftVersion CAVES_17 = new MinecraftVersion(1, 17);
     public static final MinecraftVersion CAVES_18 = new MinecraftVersion(1, 18);
+    private static MinecraftVersion current = null;
 
     private final int major;
     private final int minor;
@@ -55,6 +56,27 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
         this.major = Integer.parseInt(versionParts[0].substring(1));
         this.minor = Integer.parseInt(versionParts[1]);
         this.release = Integer.parseInt(versionParts[2].substring(1));
+    }
+
+    /**
+     * Get the minecraft version that the server is currently running
+     */
+    public static MinecraftVersion getCurrent() {
+        if (current == null) {
+            return current = new MinecraftVersion();
+        }
+        return current;
+    }
+
+    /**
+     * Determines the server version based on the CraftBukkit package path, e.g. {@code org.bukkit.craftbukkit.v1_16_R3},
+     * where v1_16_R3 is the resolved version.
+     *
+     * @return The package version.
+     */
+    private static String getPackageVersion() {
+        String fullPackagePath = Bukkit.getServer().getClass().getPackage().getName();
+        return fullPackagePath.substring(fullPackagePath.lastIndexOf('.') + 1);
     }
 
     /**
@@ -143,17 +165,6 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
     @Override
     public String toString() {
         return major + "." + minor + "." + release;
-    }
-
-    /**
-     * Determines the server version based on the CraftBukkit package path, e.g. {@code org.bukkit.craftbukkit.v1_16_R3},
-     * where v1_16_R3 is the resolved version.
-     *
-     * @return The package version.
-     */
-    private static String getPackageVersion() {
-        String fullPackagePath = Bukkit.getServer().getClass().getPackage().getName();
-        return fullPackagePath.substring(fullPackagePath.lastIndexOf('.') + 1);
     }
 
 }

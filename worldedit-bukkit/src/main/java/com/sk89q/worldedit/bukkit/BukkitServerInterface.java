@@ -282,12 +282,12 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
 
     @Override
     public int versionMinY() {
-        return new MinecraftVersion().isEqualOrHigherThan(MinecraftVersion.CAVES_18) ? -64 : 0;
+        return MinecraftVersion.getCurrent().isEqualOrHigherThan(MinecraftVersion.CAVES_18) ? -64 : 0;
     }
 
     @Override
     public int versionMaxY() {
-        return new MinecraftVersion().isEqualOrHigherThan(MinecraftVersion.CAVES_18) ? 319 : 255;
+        return MinecraftVersion.getCurrent().isEqualOrHigherThan(MinecraftVersion.CAVES_18) ? 319 : 255;
     }
     //FAWE end
 }

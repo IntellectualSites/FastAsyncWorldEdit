@@ -27,7 +27,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,7 +50,7 @@ import java.util.stream.Collectors;
  * - Uses an auto closable RandomAccessFile for getting / setting id / data
  * - I don't know how to reduce nbt / entities to O(2) complexity, so it is stored in memory.
  */
-public class DiskOptimizedClipboard extends LinearClipboard implements Closeable {
+public class DiskOptimizedClipboard extends LinearClipboard {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -139,7 +138,7 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
             if (braf.length() - HEADER_SIZE == ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)) {
                 hasBiomes = true;
             }
-            getOffset();
+            getAndSetOffsetAndOrigin();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -267,14 +266,8 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
 
     public BlockArrayClipboard toClipboard() {
         try {
-            CuboidRegion region = new CuboidRegion(
-                    BlockVector3.at(0, 0, 0),
-                    BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1)
-            );
-            int offsetX = byteBuffer.getShort(16);
-            int offsetY = byteBuffer.getShort(18);
-            int offsetZ = byteBuffer.getShort(20);
-            region.shift(BlockVector3.at(offsetX, offsetY, offsetZ));
+            Region region = getRegion();
+            region.shift(offset);
             BlockArrayClipboard clipboard = new BlockArrayClipboard(region, this);
             clipboard.setOrigin(getOrigin().add(offset));
             return clipboard;
@@ -285,20 +278,13 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
     }
 
     @Override
-    public BlockVector3 getOrigin() {
-        int ox = byteBuffer.getShort(10);
-        int oy = byteBuffer.getShort(12);
-        int oz = byteBuffer.getShort(14);
-        return BlockVector3.at(ox, oy, oz).subtract(offset);
-    }
-
-    @Override
-    public void setOrigin(BlockVector3 offset) {
-        super.setOrigin(offset);
+    public void setOrigin(BlockVector3 origin) {
+        super.setOrigin(origin);
+        origin = origin.subtract(offset);
         try {
-            byteBuffer.putShort(10, (short) offset.getBlockX());
-            byteBuffer.putShort(12, (short) offset.getBlockY());
-            byteBuffer.putShort(14, (short) offset.getBlockZ());
+            byteBuffer.putShort(10, (short) origin.getBlockX());
+            byteBuffer.putShort(12, (short) origin.getBlockY());
+            byteBuffer.putShort(14, (short) origin.getBlockZ());
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -316,11 +302,15 @@ public class DiskOptimizedClipboard extends LinearClipboard implements Closeable
         }
     }
 
-    private void getOffset() {
+    private void getAndSetOffsetAndOrigin() {
         int x = byteBuffer.getShort(16);
         int y = byteBuffer.getShort(18);
         int z = byteBuffer.getShort(20);
         super.setOffset(BlockVector3.at(x, y, z));
+        int ox = byteBuffer.getShort(10);
+        int oy = byteBuffer.getShort(12);
+        int oz = byteBuffer.getShort(14);
+        super.setOrigin(BlockVector3.at(ox, oy, oz).add(offset));
     }
 
     @Override
