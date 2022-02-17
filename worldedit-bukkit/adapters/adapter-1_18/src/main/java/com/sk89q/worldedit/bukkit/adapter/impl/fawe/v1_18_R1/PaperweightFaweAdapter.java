@@ -8,6 +8,7 @@ import com.fastasyncworldedit.core.entity.LazyBaseEntity;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -359,8 +360,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
                 final CompoundBinaryTag tag = (CompoundBinaryTag) toNativeBinary(minecraftTag);
-                final Map<String, BinaryTag> tags = new HashMap<>();
-                tag.keySet().forEach(key -> tags.put(key, tag.get(key)));
+                final Map<String, BinaryTag> tags = NbtUtils.getCompoundBinaryTagValues(tag);
                 tags.put("Id", StringBinaryTag.of(id));
                 return CompoundBinaryTag.from(tags);
             };

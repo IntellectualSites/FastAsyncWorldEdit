@@ -31,9 +31,7 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 /**
  * The chunk format for Minecraft 1.15 and newer
  */
-//FAWE start - biome and entity restore
 public class AnvilChunk15 extends AnvilChunk13 {
-    //FAWE end
 
     /**
      * Construct the chunk with a compound tag.

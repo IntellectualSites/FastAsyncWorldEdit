@@ -108,7 +108,7 @@ public class ChunkStoreHelper {
         }
 
         if (dataVersion >= Constants.DATA_VERSION_MC_1_18) {
-            return new AnvilChunk18(rootTag);
+            return new AnvilChunk18(rootTag, entitiesTag);
         }
 
         Map<String, Tag> children = rootTag.getValue();

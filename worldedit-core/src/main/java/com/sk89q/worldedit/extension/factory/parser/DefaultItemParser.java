@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.factory.parser;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
@@ -132,9 +133,7 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                     if (itemNbtData == null) {
                         itemNbtData = otherTag;
                     } else {
-                        for (String key : otherTag.keySet()) {
-                            itemNbtData.put(key, otherTag.get(key));
-                        }
+                        itemNbtData.put(NbtUtils.getCompoundBinaryTagValues(otherTag));
                     }
                 } catch (IOException e) {
                     throw new NoMatchException(TranslatableComponent.of(
