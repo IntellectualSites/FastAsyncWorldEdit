@@ -306,6 +306,9 @@ public class AnvilChunk18 implements Chunk {
 
                 // parse block states
                 long[] biomesSerialized = biomeTypesTag.getLongArray("data");
+                if (biomesSerialized.length == 0) {
+                    throw new InvalidFormatException("Biome data not present.");
+                }
 
                 BiomeType[] chunkSectionBiomes = new BiomeType[64];
                 biomes.put(y, chunkSectionBiomes);
@@ -317,13 +320,13 @@ public class AnvilChunk18 implements Chunk {
 
     protected void readBiomes(BiomeType[] palette, long[] biomesSerialized, BiomeType[] chunkSectionBiomes) throws
             InvalidFormatException {
-        PackedIntArrayReader reader = new PackedIntArrayReader(biomesSerialized);
-        for (int blockPos = 0; blockPos < chunkSectionBiomes.length; blockPos++) {
-            int index = reader.get(blockPos);
+        PackedIntArrayReader reader = new PackedIntArrayReader(biomesSerialized, 64);
+        for (int biomePos = 0; biomePos < chunkSectionBiomes.length; biomePos++) {
+            int index = reader.get(biomePos);
             if (index >= palette.length) {
-                throw new InvalidFormatException("Invalid block state table entry: " + index);
+                throw new InvalidFormatException("Invalid biome table entry: " + index);
             }
-            chunkSectionBiomes[blockPos] = palette[index];
+            chunkSectionBiomes[biomePos] = palette[index];
         }
     }
 

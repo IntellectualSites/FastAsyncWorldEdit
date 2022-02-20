@@ -32,28 +32,56 @@ public class PackedIntArrayReader {
         }
     }
 
-    private static final int SIZE = 4096;
-
     private final long[] data;
     private final int elementBits;
     private final long maxValue;
     private final int elementsPerLong;
     private final int factor;
+    //FAWE start - allow other sizes of data to be parsed
+    private final int storedSize;
+    //FAWE end
 
+    /**
+     * Create a new PackedIntArrayReader instance based on an array of longs containing 4096 integers.
+     *
+     * @param data long array containing data
+     */
     public PackedIntArrayReader(long[] data) {
         this.data = data;
+        this.storedSize = 4096;
         this.elementBits = data.length * 64 / 4096;
         this.maxValue = (1L << elementBits) - 1L;
         this.elementsPerLong = 64 / elementBits;
         this.factor = FACTORS[elementsPerLong - 1];
-        int j = (SIZE + this.elementsPerLong - 1) / this.elementsPerLong;
+        int j = (storedSize + this.elementsPerLong - 1) / this.elementsPerLong;
         if (j != data.length) {
             throw new IllegalStateException("Invalid packed-int array provided, should be of length " + j);
         }
     }
 
+    //FAWE start - allow other sizes of data to be parsed
+    /**
+     * Create a new PackedIntArrayReader instance based on an array of longs containing a certain number of integers.
+     *
+     * @param data       long array containing data
+     * @param storedSize the amount of integers stored in the long array
+     */
+    public PackedIntArrayReader(long[] data, int storedSize) {
+        this.data = data;
+        this.storedSize = storedSize;
+        this.elementBits = data.length * 64 / storedSize;
+        this.maxValue = (1L << elementBits) - 1L;
+        this.elementsPerLong = 64 / elementBits;
+        this.factor = FACTORS[elementsPerLong - 1];
+        int j = (storedSize + this.elementsPerLong - 1) / this.elementsPerLong;
+        if (j != data.length) {
+            throw new IllegalStateException("Invalid packed-int array provided, should be of length " + j);
+        }
+    }
+    //FAWE end
+
     public int get(int index) {
-        checkElementIndex(index, SIZE);
+        checkElementIndex(index, storedSize);
         int i = this.adjustIndex(index);
         long l = this.data[i];
         int j = (index - i * this.elementsPerLong) * this.elementBits;
