@@ -348,7 +348,7 @@ public class GenerationCommands {
             name = "/generate",
             aliases = {"/gen", "/g"},
             desc = "Generates a shape according to a formula.",
-            descFooter = "See also https://tinyurl.com/weexpr."
+            descFooter = "For details, see https://ehub.to/we/expr"
     )
     @CommandPermissions("worldedit.generation.shape")
     @Logging(ALL)
@@ -432,7 +432,7 @@ public class GenerationCommands {
             desc = "Sets biome according to a formula.",
             descFooter = "Formula must return positive numbers (true) if the point is inside the shape\n"
                     + "Sets the biome of blocks in that shape.\n"
-                    + "See also https://tinyurl.com/weexpr."
+                    + "For details, see https://ehub.to/we/expr"
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
