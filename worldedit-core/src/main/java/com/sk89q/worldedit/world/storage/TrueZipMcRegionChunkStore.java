@@ -80,14 +80,13 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
     protected InputStream getInputStream(String name, String worldName, @Nullable String folderOverride) throws IOException,
             DataException {
         // Detect subfolder for the world's files
-        if (folderOverride != null) {
-            if (!folderOverride.isEmpty()) {
-                name = folderOverride + "/" + name;
-            }
-        } else if (folder != null) {
-            //FAWE end
+        if (folder != null) {
             if (!folder.isEmpty()) {
+                //FAWE end
                 name = folder + "/" + name;
+                if (folderOverride != null) {
+                    name = name.replace("region", folderOverride);
+                }
             }
         } else {
             Pattern pattern = Pattern.compile(".*\\.mc[ra]$");
@@ -105,6 +104,12 @@ public class TrueZipMcRegionChunkStore extends McRegionChunkStore {
                             endIndex = entryName.lastIndexOf('\\');
                         }
                         folder = entryName.substring(0, endIndex);
+                        //FAWE start - biome and entity restore
+                        if (folderOverride != null && folder.endsWith(folderOverride)) {
+                            name = folder + "/" + name;
+                            break;
+                        }
+                        //FAWE end
                         if (folder.endsWith("poi") || folder.endsWith("entities")) {
                             continue;
                         }
