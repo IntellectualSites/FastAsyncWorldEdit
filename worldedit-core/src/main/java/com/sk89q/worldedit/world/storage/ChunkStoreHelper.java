@@ -75,7 +75,6 @@ public class ChunkStoreHelper {
     public static Chunk getChunk(CompoundTag rootTag) throws DataException {
         //FAWE start - biome and entity restore
         return getChunk(rootTag, () -> null);
-        //FAWE end
     }
 
     /**
@@ -86,6 +85,7 @@ public class ChunkStoreHelper {
      *                    location
      * @return a Chunk implementation
      * @throws DataException if the rootTag is not valid chunk data
+     * @since TODO
      */
     public static Chunk getChunk(CompoundTag rootTag, Supplier<CompoundTag> entitiesTag) throws DataException {
         //FAWE end

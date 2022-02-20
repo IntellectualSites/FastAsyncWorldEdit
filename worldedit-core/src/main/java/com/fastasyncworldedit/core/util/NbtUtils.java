@@ -46,6 +46,7 @@ public class NbtUtils {
      * @param key the key to look for
      * @return child tag
      * @throws InvalidFormatException if the format of the items is invalid
+     * @since TODO
      */
     public static int getInt(CompoundBinaryTag tag, String key) throws InvalidFormatException {
         BinaryTag childTag = tag.get(key);
@@ -71,6 +72,7 @@ public class NbtUtils {
      *
      * @param tag {@link CompoundBinaryTag} to get values for
      * @return Mutable map of values
+     * @since TODO
      */
     public static Map<String, BinaryTag> getCompoundBinaryTagValues(CompoundBinaryTag tag) {
         Map<String, BinaryTag> value = new HashMap<>();

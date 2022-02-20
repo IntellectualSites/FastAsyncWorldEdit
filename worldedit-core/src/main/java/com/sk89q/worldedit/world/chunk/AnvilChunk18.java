@@ -83,6 +83,7 @@ public class AnvilChunk18 implements Chunk {
      * @param tag the tag to read
      * @throws DataException on a data error
      * @deprecated Use {@link AnvilChunk18#AnvilChunk18(CompoundBinaryTag, Supplier)}
+     * @since TODO
      */
     @Deprecated
     public AnvilChunk18(CompoundTag tag, Supplier<CompoundTag> entitiesTag) throws DataException {
@@ -98,6 +99,7 @@ public class AnvilChunk18 implements Chunk {
      *
      * @param tag the tag to read
      * @throws DataException on a data error
+     * @since TODO
      */
     public AnvilChunk18(CompoundBinaryTag tag, Supplier<CompoundBinaryTag> entityTag) throws DataException {
         //FAWE end
@@ -345,11 +347,9 @@ public class AnvilChunk18 implements Chunk {
         ListBinaryTag tags = NbtUtils.getChildTag(entityTag, "Entities", BinaryTagTypes.LIST);
 
         for (BinaryTag tag : tags) {
-            if (!(tag instanceof CompoundBinaryTag)) {
+            if (!(tag instanceof CompoundBinaryTag t)) {
                 throw new InvalidFormatException("CompoundTag expected in Entities");
             }
-
-            CompoundBinaryTag t = (CompoundBinaryTag) tag;
 
             entities.add(new BaseEntity(EntityTypes.get(t.getString("id")), LazyReference.computed(t)));
         }
