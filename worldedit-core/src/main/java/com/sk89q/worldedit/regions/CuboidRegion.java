@@ -89,9 +89,10 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     /**
      * Construct a new instance of this cuboid using two corners of the cuboid.
      *
-     * @param world the world
-     * @param pos1  the first position
-     * @param pos2  the second position
+     * @param world  the world
+     * @param pos1   the first position
+     * @param pos2   the second position
+     * @param clampY if the min/max Y of the region should be clamped to the world
      * @since TODO
      */
     public CuboidRegion(World world, BlockVector3 pos1, BlockVector3 pos2, boolean clampY) {
