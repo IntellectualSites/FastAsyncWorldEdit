@@ -55,7 +55,12 @@ public abstract class SimpleClipboard implements Clipboard {
 
     @Override
     public Region getRegion() {
-        return new CuboidRegion(BlockVector3.ZERO, BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1));
+        return new CuboidRegion(
+                null,
+                BlockVector3.ZERO,
+                BlockVector3.at(getWidth() - 1, getHeight() - 1, getLength() - 1),
+                false
+        );
     }
 
     @Override

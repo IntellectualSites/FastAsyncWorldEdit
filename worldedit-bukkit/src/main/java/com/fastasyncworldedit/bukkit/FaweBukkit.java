@@ -83,7 +83,7 @@ public class FaweBukkit implements IFawe, Listener {
             Bukkit.getServer().shutdown();
         }
 
-        MinecraftVersion version = new MinecraftVersion();
+        MinecraftVersion version = MinecraftVersion.getCurrent();
 
         chunksStretched = version.isEqualOrHigherThan(MinecraftVersion.NETHER);
 

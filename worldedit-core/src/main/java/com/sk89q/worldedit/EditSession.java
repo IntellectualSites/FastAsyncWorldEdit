@@ -61,6 +61,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.ChangeSetExtent;
 import com.sk89q.worldedit.extent.Extent;
@@ -263,8 +264,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         this.limit = builder.getLimit().copy();
         this.actor = builder.getActor();
         this.changeSet = builder.getChangeTask();
-        this.minY = world.getMinY();
-        this.maxY = world.getMaxY();
+        this.minY = world != null ? world.getMinY() :
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY();
+        this.maxY = world != null ? world.getMaxY() :
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY();
         this.blockBag = builder.getBlockBag();
         this.history = changeSet != null;
         this.relighter = builder.getRelighter();

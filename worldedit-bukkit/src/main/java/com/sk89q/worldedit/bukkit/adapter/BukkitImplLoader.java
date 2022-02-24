@@ -40,7 +40,7 @@ public class BukkitImplLoader {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private final List<String> adapterCandidates = new ArrayList<>();
-    private final String minorMCVersion = String.valueOf(new MinecraftVersion().getMinor());
+    private final String minorMCVersion = String.valueOf(MinecraftVersion.getCurrent().getMinor());
     private int zeroth = 0;
     private String customCandidate;
 
