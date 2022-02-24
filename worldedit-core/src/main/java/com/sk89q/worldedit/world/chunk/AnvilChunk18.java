@@ -19,91 +19,134 @@
 
 package com.sk89q.worldedit.world.chunk;
 
+import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.LongArrayTag;
-import com.sk89q.jnbt.NBTUtils;
-import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.nbt.BinaryTag;
+import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
+import com.sk89q.worldedit.util.nbt.ListBinaryTag;
 import com.sk89q.worldedit.world.DataException;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.entity.EntityTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * The chunk format for Minecraft 1.18 and newer
  */
 public class AnvilChunk18 implements Chunk {
 
-    private final CompoundTag rootTag;
+    //FAWE start - CBT
+    private final CompoundBinaryTag rootTag;
+    //FAWE end
     private final Int2ObjectOpenHashMap<BlockState[]> blocks;
-    private final int rootX;
-    private final int rootZ;
+    //FAWE start - entity and biome restore
+    private final int sectionCount;
+    private final Supplier<CompoundBinaryTag> entityTagSupplier;
+    private Int2ObjectOpenHashMap<BiomeType[]> biomes = null;
+    private List<BaseEntity> entities;
+    private Map<BlockVector3, CompoundBinaryTag> tileEntities;
+    //FAWE end
 
-    private Map<BlockVector3, Map<String, Tag>> tileEntities;
 
     /**
      * Construct the chunk with a compound tag.
      *
      * @param tag the tag to read
      * @throws DataException on a data error
+     * @deprecated Use {@link AnvilChunk18#AnvilChunk18(CompoundBinaryTag, Supplier)}
      */
+    @Deprecated
     public AnvilChunk18(CompoundTag tag) throws DataException {
+        //FAWE start - CBT
+        this(tag.asBinaryTag(), () -> null);
+    }
+
+    /**
+     * Construct the chunk with a compound tag.
+     *
+     * @param tag the tag to read
+     * @throws DataException on a data error
+     * @deprecated Use {@link AnvilChunk18#AnvilChunk18(CompoundBinaryTag, Supplier)}
+     * @since TODO
+     */
+    @Deprecated
+    public AnvilChunk18(CompoundTag tag, Supplier<CompoundTag> entitiesTag) throws DataException {
+        //FAWE start - CBT
+        this(tag.asBinaryTag(), () -> {
+            CompoundTag compoundTag = entitiesTag.get();
+            return compoundTag == null ? null : compoundTag.asBinaryTag();
+        });
+    }
+
+    /**
+     * Construct the chunk with a compound tag.
+     *
+     * @param tag the tag to read
+     * @throws DataException on a data error
+     * @since TODO
+     */
+    public AnvilChunk18(CompoundBinaryTag tag, Supplier<CompoundBinaryTag> entityTag) throws DataException {
+        //FAWE end
         rootTag = tag;
+        entityTagSupplier = entityTag;
 
-        rootX = NBTUtils.getChildTag(rootTag.getValue(), "xPos", IntTag.class).getValue();
-        rootZ = NBTUtils.getChildTag(rootTag.getValue(), "zPos", IntTag.class).getValue();
+        //FAWE start - CBT
+        ListBinaryTag sections = rootTag.getList("sections");
+        this.sectionCount = sections.size();
 
-        List<Tag> sections = NBTUtils.getChildTag(rootTag.getValue(), "sections", ListTag.class).getValue();
         blocks = new Int2ObjectOpenHashMap<>(sections.size());
 
-        for (Tag rawSectionTag : sections) {
-            if (!(rawSectionTag instanceof CompoundTag sectionTag)) {
+        for (BinaryTag rawSectionTag : sections) {
+            if (!(rawSectionTag instanceof CompoundBinaryTag sectionTag)) {
                 continue;
             }
 
-            Object yValue = sectionTag.getValue().get("Y").getValue(); // sometimes a byte, sometimes an int
-            if (!(yValue instanceof Number)) {
-                throw new InvalidFormatException("Y is not numeric: " + yValue);
-            }
-            int y = ((Number) yValue).intValue();
+            int y = NbtUtils.getInt(sectionTag, "Y"); // sometimes a byte, sometimes an int
 
-            Tag rawBlockStatesTag = sectionTag.getValue().get("block_states"); // null for sections outside of the world limits
-            if (rawBlockStatesTag instanceof CompoundTag blockStatesTag) {
+            BinaryTag rawBlockStatesTag = sectionTag.get("block_states"); // null for sections outside of the world limits
+            if (rawBlockStatesTag instanceof CompoundBinaryTag blockStatesTag) {
 
                 // parse palette
-                List<CompoundTag> paletteEntries = blockStatesTag.getList("palette", CompoundTag.class);
+                ListBinaryTag paletteEntries = blockStatesTag.getList("palette");
                 int paletteSize = paletteEntries.size();
                 if (paletteSize == 0) {
                     continue;
                 }
                 BlockState[] palette = new BlockState[paletteSize];
                 for (int paletteEntryId = 0; paletteEntryId < paletteSize; paletteEntryId++) {
-                    CompoundTag paletteEntry = paletteEntries.get(paletteEntryId);
+                    CompoundBinaryTag paletteEntry = (CompoundBinaryTag) paletteEntries.get(paletteEntryId);
                     BlockType type = BlockTypes.get(paletteEntry.getString("Name"));
                     if (type == null) {
                         throw new InvalidFormatException("Invalid block type: " + paletteEntry.getString("Name"));
                     }
                     BlockState blockState = type.getDefaultState();
-                    if (paletteEntry.containsKey("Properties")) {
-                        CompoundTag properties = NBTUtils.getChildTag(paletteEntry.getValue(), "Properties", CompoundTag.class);
+                    BinaryTag propertiesTag = paletteEntry.get("Properties");
+                    if (propertiesTag instanceof CompoundBinaryTag properties) {
                         for (Property<?> property : blockState.getStates().keySet()) {
-                            if (properties.containsKey(property.getName())) {
-                                String value = properties.getString(property.getName());
+                            String value;
+                            if (!(value = properties.getString(property.getName())).isEmpty()) {
                                 try {
                                     blockState = getBlockStateWith(blockState, property, value);
                                 } catch (IllegalArgumentException e) {
-                                    throw new InvalidFormatException("Invalid block state for " + blockState.getBlockType().getId() + ", " + property.getName() + ": " + value);
+                                    throw new InvalidFormatException("Invalid block state for " + blockState
+                                            .getBlockType()
+                                            .getId() + ", " + property.getName() + ": " + value);
                                 }
                             }
                         }
@@ -117,7 +160,7 @@ public class AnvilChunk18 implements Chunk {
                 }
 
                 // parse block states
-                long[] blockStatesSerialized = NBTUtils.getChildTag(blockStatesTag.getValue(), "data", LongArrayTag.class).getValue();
+                long[] blockStatesSerialized = blockStatesTag.getLongArray("data");
 
                 BlockState[] chunkSectionBlocks = new BlockState[16 * 16 * 16];
                 blocks.put(y, chunkSectionBlocks);
@@ -125,6 +168,7 @@ public class AnvilChunk18 implements Chunk {
                 readBlockStates(palette, blockStatesSerialized, chunkSectionBlocks);
             }
         }
+        //FAWE end
     }
 
     protected void readBlockStates(BlockState[] palette, long[] blockStatesSerialized, BlockState[] chunkSectionBlocks) throws InvalidFormatException {
@@ -146,26 +190,24 @@ public class AnvilChunk18 implements Chunk {
      * Used to load the tile entities.
      */
     private void populateTileEntities() throws DataException {
+        //FAWE start - CBT
         tileEntities = new HashMap<>();
-        if (!rootTag.getValue().containsKey("block_entities")) {
+        if (!(rootTag.get("block_entities") instanceof ListBinaryTag tags)) {
             return;
         }
-        List<Tag> tags = NBTUtils.getChildTag(rootTag.getValue(),
-                "block_entities", ListTag.class).getValue();
-
-        for (Tag tag : tags) {
-            if (!(tag instanceof CompoundTag t)) {
+        for (BinaryTag tag : tags) {
+            if (!(tag instanceof CompoundBinaryTag t)) {
                 throw new InvalidFormatException("CompoundTag expected in block_entities");
             }
 
-            Map<String, Tag> values = new HashMap<>(t.getValue());
-            int x = ((IntTag) values.get("x")).getValue();
-            int y = ((IntTag) values.get("y")).getValue();
-            int z = ((IntTag) values.get("z")).getValue();
+            int x = t.getInt("x");
+            int y = t.getInt("y");
+            int z = t.getInt("z");
 
             BlockVector3 vec = BlockVector3.at(x, y, z);
-            tileEntities.put(vec, values);
+            tileEntities.put(vec, t);
         }
+        //FAWE end
     }
 
     /**
@@ -178,24 +220,21 @@ public class AnvilChunk18 implements Chunk {
      * @throws DataException thrown if there is a data error
      */
     @Nullable
-    private CompoundTag getBlockTileEntity(BlockVector3 position) throws DataException {
+    private CompoundBinaryTag getBlockTileEntity(BlockVector3 position) throws DataException {
+        //FAWE start - CBT
         if (tileEntities == null) {
             populateTileEntities();
         }
 
-        Map<String, Tag> values = tileEntities.get(position);
-        if (values == null) {
-            return null;
-        }
-
-        return new CompoundTag(values);
+        return tileEntities.get(position);
+        //FAWE end
     }
 
     @Override
     public BaseBlock getBlock(BlockVector3 position) throws DataException {
-        int x = position.getX() - rootX * 16;
+        int x = position.getX() & 15;
         int y = position.getY();
-        int z = position.getZ() - rootZ * 16;
+        int z = position.getZ() & 15;
 
         int section = y >> 4;
         int yIndex = y & 0x0F;
@@ -206,7 +245,7 @@ public class AnvilChunk18 implements Chunk {
         }
         BlockState state = sectionBlocks[sectionBlocks.length == 1 ? 0 : ((yIndex << 8) | (z << 4) | x)];
 
-        CompoundTag tileEntity = getBlockTileEntity(position);
+        CompoundBinaryTag tileEntity = getBlockTileEntity(position);
 
         if (tileEntity != null) {
             return state.toBaseBlock(tileEntity);
@@ -214,5 +253,111 @@ public class AnvilChunk18 implements Chunk {
 
         return state.toBaseBlock();
     }
+
+    @Override
+    public BiomeType getBiome(final BlockVector3 position) throws DataException {
+        if (biomes == null) {
+            populateBiomes();
+        }
+        int x = (position.getX() & 15) >> 2;
+        int y = (position.getY() & 15) >> 2;
+        int z = (position.getZ() & 15) >> 2;
+        int section = position.getY() >> 4;
+        BiomeType[] sectionBiomes = biomes.get(section);
+        if (sectionBiomes.length == 1) {
+            return sectionBiomes[0];
+        }
+        return biomes.get(section)[y << 4 | z << 2 | x];
+    }
+
+    private void populateBiomes() throws DataException {
+        biomes = new Int2ObjectOpenHashMap<>(sectionCount);
+        ListBinaryTag sections = rootTag.getList("sections");
+        for (BinaryTag rawSectionTag : sections) {
+            if (!(rawSectionTag instanceof CompoundBinaryTag sectionTag)) {
+                continue;
+            }
+
+            int y = NbtUtils.getInt(sectionTag, "Y"); // sometimes a byte, sometimes an int
+
+            BinaryTag rawBlockStatesTag = sectionTag.get("biomes"); // null for sections outside of the world limits
+            if (rawBlockStatesTag instanceof CompoundBinaryTag biomeTypesTag) {
+
+                // parse palette
+                ListBinaryTag paletteEntries = biomeTypesTag.getList("palette");
+                int paletteSize = paletteEntries.size();
+                if (paletteSize == 0) {
+                    continue;
+                }
+                BiomeType[] palette = new BiomeType[paletteSize];
+                for (int paletteEntryId = 0; paletteEntryId < paletteSize; paletteEntryId++) {
+                    String paletteEntry = paletteEntries.getString(paletteEntryId);
+                    BiomeType type = BiomeType.REGISTRY.get(paletteEntry);
+                    if (type == null) {
+                        throw new InvalidFormatException("Invalid biome type: " + paletteEntry);
+                    }
+                    palette[paletteEntryId] = type;
+                }
+                if (paletteSize == 1) {
+                    // the same block everywhere
+                    biomes.put(y, palette);
+                    continue;
+                }
+
+                // parse block states
+                long[] biomesSerialized = biomeTypesTag.getLongArray("data");
+                if (biomesSerialized.length == 0) {
+                    throw new InvalidFormatException("Biome data not present.");
+                }
+
+                BiomeType[] chunkSectionBiomes = new BiomeType[64];
+                biomes.put(y, chunkSectionBiomes);
+
+                readBiomes(palette, biomesSerialized, chunkSectionBiomes);
+            }
+        }
+    }
+
+    protected void readBiomes(BiomeType[] palette, long[] biomesSerialized, BiomeType[] chunkSectionBiomes) throws
+            InvalidFormatException {
+        PackedIntArrayReader reader = new PackedIntArrayReader(biomesSerialized, 64);
+        for (int biomePos = 0; biomePos < chunkSectionBiomes.length; biomePos++) {
+            int index = reader.get(biomePos);
+            if (index >= palette.length) {
+                throw new InvalidFormatException("Invalid biome table entry: " + index);
+            }
+            chunkSectionBiomes[biomePos] = palette[index];
+        }
+    }
+
+    @Override
+    public List<BaseEntity> getEntities() throws DataException {
+        if (entities == null) {
+            populateEntities();
+        }
+        return entities;
+    }
+
+    /**
+     * Used to load the biomes.
+     */
+    private void populateEntities() throws DataException {
+        entities = new ArrayList<>();
+        CompoundBinaryTag entityTag;
+        if (entityTagSupplier == null || (entityTag = entityTagSupplier.get()) == null) {
+            return;
+        }
+        ListBinaryTag tags = NbtUtils.getChildTag(entityTag, "Entities", BinaryTagTypes.LIST);
+
+        for (BinaryTag tag : tags) {
+            if (!(tag instanceof CompoundBinaryTag t)) {
+                throw new InvalidFormatException("CompoundTag expected in Entities");
+            }
+
+            entities.add(new BaseEntity(EntityTypes.get(t.getString("id")), LazyReference.computed(t)));
+        }
+
+    }
+
 
 }

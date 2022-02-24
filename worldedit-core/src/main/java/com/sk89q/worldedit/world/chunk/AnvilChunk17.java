@@ -95,7 +95,7 @@ public class AnvilChunk17 implements Chunk {
 
         blocks = new BlockState[16][]; // initialise with default length
 
-        ListBinaryTag sections = NbtUtils.getChildTag(rootTag, "Sections", BinaryTagTypes.LIST);
+        ListBinaryTag sections = rootTag.getList("Sections");
 
         for (BinaryTag rawSectionTag : sections) {
             if (!(rawSectionTag instanceof CompoundBinaryTag)) {
@@ -107,7 +107,7 @@ public class AnvilChunk17 implements Chunk {
                 continue; // Empty section.
             }
 
-            int y = NbtUtils.getChildTag(sectionTag, "Y", BinaryTagTypes.BYTE).value();
+            int y = NbtUtils.getInt(tag, "Y");
             updateSectionIndexRange(y);
 
             // parse palette
@@ -143,7 +143,7 @@ public class AnvilChunk17 implements Chunk {
             }
 
             // parse block states
-            long[] blockStatesSerialized = NbtUtils.getChildTag(sectionTag, "BlockStates", BinaryTagTypes.LONG_ARRAY).value();
+            long[] blockStatesSerialized = sectionTag.getLongArray("BlockStates");
 
             BlockState[] chunkSectionBlocks = new BlockState[4096];
             blocks[y - minSectionPosition] = chunkSectionBlocks;
@@ -197,7 +197,7 @@ public class AnvilChunk17 implements Chunk {
         if (rootTag.get("TileEntities") == null) {
             return;
         }
-        ListBinaryTag tags = NbtUtils.getChildTag(rootTag, "TileEntities", BinaryTagTypes.LIST);
+        ListBinaryTag tags = rootTag.getList("TileEntities");
 
         for (BinaryTag tag : tags) {
             if (!(tag instanceof CompoundBinaryTag)) {
@@ -274,7 +274,7 @@ public class AnvilChunk17 implements Chunk {
         if (rootTag.get("Biomes") == null) {
             return;
         }
-        int[] stored = NbtUtils.getChildTag(rootTag, "Biomes", BinaryTagTypes.INT_ARRAY).value();
+        int[] stored = rootTag.getIntArray("Biomes");
         for (int i = 0; i < 1024; i++) {
             biomes[i] = BiomeTypes.getLegacy(stored[i]);
         }
@@ -297,7 +297,7 @@ public class AnvilChunk17 implements Chunk {
         if (entityTagSupplier == null || (entityTag = entityTagSupplier.get()) == null) {
             return;
         }
-        ListBinaryTag tags = NbtUtils.getChildTag(entityTag, "Entities", BinaryTagTypes.LIST);
+        ListBinaryTag tags = entityTag.getList("Entities");
 
         for (BinaryTag tag : tags) {
             if (!(tag instanceof CompoundBinaryTag)) {

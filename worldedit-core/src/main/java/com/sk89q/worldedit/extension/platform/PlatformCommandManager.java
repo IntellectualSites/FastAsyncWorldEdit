@@ -467,7 +467,9 @@ public final class PlatformCommandManager {
             );
             registerSubCommands(
                     "snapshot",
-                    ImmutableList.of("snap"),
+                    //FAWE start - add "/" aliases as well
+                    ImmutableList.of("snap", "/snapshot", "/snap"),
+                    //FAWE end
                     "Snapshot commands for restoring backups",
                     SnapshotCommandsRegistration.builder(),
                     new SnapshotCommands(worldEdit)
