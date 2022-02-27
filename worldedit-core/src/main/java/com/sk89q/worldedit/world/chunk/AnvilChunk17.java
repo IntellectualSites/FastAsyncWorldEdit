@@ -98,16 +98,15 @@ public class AnvilChunk17 implements Chunk {
         ListBinaryTag sections = rootTag.getList("Sections");
 
         for (BinaryTag rawSectionTag : sections) {
-            if (!(rawSectionTag instanceof CompoundBinaryTag)) {
+            if (!(rawSectionTag instanceof CompoundBinaryTag sectionTag)) {
                 continue;
             }
 
-            CompoundBinaryTag sectionTag = (CompoundBinaryTag) rawSectionTag;
             if (sectionTag.get("Y") == null || sectionTag.get("BlockStates") == null) {
                 continue; // Empty section.
             }
 
-            int y = NbtUtils.getInt(tag, "Y");
+            int y = NbtUtils.getInt(sectionTag, "Y");
             updateSectionIndexRange(y);
 
             // parse palette
