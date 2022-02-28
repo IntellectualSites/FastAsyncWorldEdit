@@ -19,7 +19,7 @@ mcore = "7.0.1"
 residence = "4.5._13.1"
 towny = "0.97.5.0"
 protocollib = "4.7.0"
-plotsquared = "6.5.0"
+plotsquared = "6.5.1"
 redprotect = "1.9.6"
 
 # Third party
