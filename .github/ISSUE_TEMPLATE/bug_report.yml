@@ -18,8 +18,6 @@ body:
       options:
         - Paper
         - Spigot
-        - Tuinity
-        - Purpur
     validations:
       required: true
 
@@ -29,6 +27,7 @@ body:
       description: Which server version version you using? If your server version is not listed, it is not supported. Update to a supported version first.
       multiple: false
       options:
+        - '1.18.2'
         - '1.18.1'
         - '1.17.1'
         - '1.16.5'
