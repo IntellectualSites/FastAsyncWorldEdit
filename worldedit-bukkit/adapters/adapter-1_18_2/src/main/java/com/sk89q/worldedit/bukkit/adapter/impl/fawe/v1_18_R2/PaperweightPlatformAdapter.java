@@ -147,7 +147,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
                     Refraction.pickName(
                             "removeBlockEntityTicker",
-                            "m"
+                            "l"
                     ), BlockPos.class
             );
             removeBlockEntityTicker.setAccessible(true);
