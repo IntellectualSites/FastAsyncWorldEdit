@@ -129,16 +129,16 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             flatBedrockField = tmpFlatBedrockField;
 
             generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
-                    "settings", "f"));
+                    "settings", "h"));
             generatorSettingBaseSupplierField.setAccessible(true);
 
-            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "e"));
+            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "g"));
             generatorSettingFlatField.setAccessible(true);
 
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
             delegateField.setAccessible(true);
 
-            chunkSourceField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "L"));
+            chunkSourceField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "K"));
             chunkSourceField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);

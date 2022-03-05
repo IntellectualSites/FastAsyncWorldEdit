@@ -39,9 +39,9 @@ public class PaperweightBlockMaterial implements BlockMaterial {
         this.craftBlockData = CraftBlockData.fromData(blockState);
         this.craftMaterial = craftBlockData.getMaterial();
         BlockBehaviour.Properties blockInfo = ReflectionUtil.getField(BlockBehaviour.class, block, Refraction.pickName(
-                "properties", "aP"));
+                "properties", "aO"));
         this.isTranslucent = !(boolean) ReflectionUtil.getField(BlockBehaviour.Properties.class, blockInfo,
-                Refraction.pickName("canOcclude", "n")
+                Refraction.pickName("canOcclude", "m")
         );
         opacity = blockState.getLightBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
         BlockEntity tileEntity = !(block instanceof EntityBlock) ? null : ((EntityBlock) block).newBlockEntity(
