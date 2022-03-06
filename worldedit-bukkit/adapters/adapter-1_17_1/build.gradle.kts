@@ -22,6 +22,6 @@ configurations.all {
 
 
 dependencies {
-    paperDevBundle("1.17.1-R0.1-20220103.100533-207")
+    paperDevBundle("1.17.1-R0.1-20220220.213420-208")
     compileOnly(libs.paperlib)
 }
