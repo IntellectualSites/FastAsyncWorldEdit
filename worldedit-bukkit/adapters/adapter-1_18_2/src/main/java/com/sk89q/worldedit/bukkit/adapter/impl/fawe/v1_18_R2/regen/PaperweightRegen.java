@@ -9,8 +9,8 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
-import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_18_R2.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2.PaperweightGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -22,7 +22,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -223,10 +222,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 session,
                 newWorldData,
                 originalServerWorld.dimension(),
-                originalServerWorld.dimensionType(),
+                originalServerWorld.dimensionTypeRegistration(),
                 new RegenNoOpWorldLoadListener(),
                 // placeholder. Required for new ChunkProviderServer, but we create and then set it later
-                newOpts.dimensions().get(levelStemResourceKey).generator(),
+                newOpts.dimensions().getOrThrow(levelStemResourceKey).generator(),
                 originalServerWorld.isDebug(),
                 seed,
                 ImmutableList.of(),
@@ -235,10 +234,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 generator,
                 originalBukkitWorld.getBiomeProvider()
         ) {
-            private final Holder<Biome> singleBiome = options.hasBiomeType() ? BuiltinRegistries.BIOME.get(ResourceLocation.tryParse(
-                    options
-                            .getBiomeType()
-                            .getId())) : null;
+            private final Holder<Biome> singleBiome = options.hasBiomeType() ? BuiltinRegistries.BIOME.asHolderIdMap().byId(
+                    WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBiomeId(options.getBiomeType())
+            ) : null;
 
             @Override
             public void tick(BooleanSupplier shouldKeepTicking) { //no ticking
@@ -264,12 +262,14 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         //generator
         if (originalChunkProvider.getGenerator() instanceof FlatLevelSource flatLevelSource) {
             FlatLevelGeneratorSettings generatorSettingFlat = flatLevelSource.settings();
-            chunkGenerator = new FlatLevelSource(generatorSettingFlat);
+            chunkGenerator = new FlatLevelSource(originalChunkProvider.getGenerator().structureSets, generatorSettingFlat);
         } else if (originalChunkProvider.getGenerator() instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
-            Supplier<NoiseGeneratorSettings> generatorSettingBaseSupplier = (Supplier<NoiseGeneratorSettings>) generatorSettingBaseSupplierField
-                    .get(originalChunkProvider.getGenerator());
+            Holder<NoiseGeneratorSettings> generatorSettingBaseSupplier =
+                    (Holder<NoiseGeneratorSettings>) generatorSettingBaseSupplierField
+                            .get(originalChunkProvider.getGenerator());
             BiomeSource biomeSource = originalChunkProvider.getGenerator().getBiomeSource();
-            chunkGenerator = new NoiseBasedChunkGenerator(noiseBasedChunkGenerator.noises, biomeSource, seed,
+            chunkGenerator = new NoiseBasedChunkGenerator(originalChunkProvider.getGenerator().structureSets, noiseBasedChunkGenerator.noises,
+                    biomeSource, seed,
                     generatorSettingBaseSupplier
             );
         } else if (originalChunkProvider.getGenerator() instanceof CustomChunkGenerator customChunkGenerator) {
@@ -283,6 +283,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             generateConcurrent = generator.isParallelCapable();
         }
 
+        chunkGenerator.conf = originalServerWorld.spigotConfig;
         freshChunkProvider = new ServerChunkCache(
                 freshWorld,
                 session,

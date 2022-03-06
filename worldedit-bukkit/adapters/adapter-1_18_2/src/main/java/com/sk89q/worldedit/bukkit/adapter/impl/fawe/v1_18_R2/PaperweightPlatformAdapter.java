@@ -10,6 +10,8 @@ import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -24,6 +26,7 @@ import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
@@ -188,9 +191,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             synchronized (section) {
                 Unsafe unsafe = ReflectionUtils.getUnsafe();
                 PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.getStates();
-                ThreadingDetector currentThreadingDetector = (ThreadingDetector) unsafe.getObject(blocks,
-                        fieldThreadingDetectorOffset) ;
-                synchronized(currentThreadingDetector) {
+                ThreadingDetector currentThreadingDetector = (ThreadingDetector) unsafe.getObject(
+                        blocks,
+                        fieldThreadingDetectorOffset
+                );
+                synchronized (currentThreadingDetector) {
                     Semaphore currentLock = (Semaphore) unsafe.getObject(currentThreadingDetector, fieldLockOffset);
                     if (currentLock instanceof DelegateSemaphore) {
                         return (DelegateSemaphore) currentLock;
@@ -303,7 +308,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
      */
     public static LevelChunkSection newChunkSection(
             final int layer, final char[] blocks, boolean fastmode,
-            CachedBukkitAdapter adapter, Registry<Holder<Biome>> biomeRegistry,
+            CachedBukkitAdapter adapter, IdMap<Holder<Biome>> biomeRegistry,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
         return newChunkSection(layer, null, blocks, fastmode, adapter, biomeRegistry, biomes);
@@ -311,7 +316,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static LevelChunkSection newChunkSection(
             final int layer, final Function<Integer, char[]> get, char[] set,
-            boolean fastmode, CachedBukkitAdapter adapter, Registry<Holder<Biome>> biomeRegistry,
+            boolean fastmode, CachedBukkitAdapter adapter, IdMap<Holder<Biome>> biomeRegistry,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
         if (set == null) {
@@ -397,7 +402,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 if (biomes == null) {
                     biomes = new PalettedContainer<>(
                             biomeRegistry,
-                            biomeRegistry.getOrThrow(Biomes.PLAINS),
+                            biomeRegistry.byIdOrThrow(WorldEditPlugin
+                                    .getInstance()
+                                    .getBukkitImplAdapter()
+                                    .getInternalBiomeId(BiomeTypes.PLAINS)),
                             PalettedContainer.Strategy.SECTION_BIOMES,
                             null
                     );
@@ -424,7 +432,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     private static LevelChunkSection newChunkSection(
-            int layer, Registry<Holder<Biome>> biomeRegistry,
+            int layer, IdMap<Holder<Biome>> biomeRegistry,
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
         PalettedContainer<net.minecraft.world.level.block.state.BlockState> dataPaletteBlocks = new PalettedContainer<>(
@@ -435,7 +443,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         );
         PalettedContainer<Holder<Biome>> biomesPalette = biomes != null ? biomes : new PalettedContainer<>(
                 biomeRegistry,
-                biomeRegistry.getOrThrow(Biomes.PLAINS),
+                biomeRegistry.byIdOrThrow(WorldEditPlugin
+                        .getInstance()
+                        .getBukkitImplAdapter()
+                        .getInternalBiomeId(BiomeTypes.PLAINS)),
                 PalettedContainer.Strategy.SECTION_BIOMES,
                 null
         );
@@ -445,18 +456,22 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     /**
      * Create a new {@link PalettedContainer<Biome>}. Should only be used if no biome container existed beforehand.
      */
-    public static PalettedContainer<Holder<Biome>> getBiomePalettedContainer(BiomeType[] biomes, Registry<Holder<Biome>> biomeRegistry) {
+    public static PalettedContainer<Holder<Biome>> getBiomePalettedContainer(
+            BiomeType[] biomes,
+            IdMap<Holder<Biome>> biomeRegistry
+    ) {
         if (biomes == null) {
             return null;
         }
+        BukkitImplAdapter<?> adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         // Don't stream this as typically will see 1-4 biomes; stream overhead is large for the small length
         Map<BiomeType, Holder<Biome>> palette = new HashMap<>();
         for (BiomeType biomeType : new LinkedList<>(Arrays.asList(biomes))) {
             Holder<Biome> biome;
             if (biomeType == null) {
-                biome = biomeRegistry.getOrThrow(Biomes.PLAINS);
+                biome = biomeRegistry.byId(adapter.getInternalBiomeId(BiomeTypes.PLAINS));
             } else {
-                biome = biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()));
+                biome = biomeRegistry.byId(adapter.getInternalBiomeId(biomeType));
             }
             palette.put(biomeType, biome);
         }
@@ -471,7 +486,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         PalettedContainer<Holder<Biome>> biomePalettedContainer = new PalettedContainer<>(
                 biomeRegistry,
-                biomeRegistry.getOrThrow(Biomes.PLAINS),
+                biomeRegistry.byIdOrThrow(adapter.getInternalBiomeId(BiomeTypes.PLAINS)),
                 PalettedContainer.Strategy.SECTION_BIOMES,
                 null
         );
@@ -528,7 +543,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                         if (biomeType == null) {
                             continue;
                         }
-                        Holder<Biome> biome = biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()));
+                        Holder<Biome> biome = biomeRegistry.byId(WorldEditPlugin
+                                .getInstance()
+                                .getBukkitImplAdapter()
+                                .getInternalBiomeId(biomeType));
                         if (biome == null) {
                             continue;
                         }
@@ -550,14 +568,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     public static Holder<Biome> adapt(Holder<Biome> biome, LevelAccessor levelAccessor) {
-        ResourceLocation resourceLocation = levelAccessor.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).getKey(
-                biome);
+        final Registry<Biome> biomeRegistry = levelAccessor.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
+        final IdMap<Holder<Biome>> holders = biomeRegistry.asHolderIdMap();
+        ResourceLocation resourceLocation = biomeRegistry.getKey(biome.value());
         if (resourceLocation == null) {
-            return levelAccessor.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).getId(biome) == -1
-                    ? (Holder<Biome>) BiomeTypes.OCEAN
+            return holders.getId(biome) == -1 ? Holder.Reference.createStandAlone(biomeRegistry, Biomes.OCEAN)
                     : null;
         }
-        return (Holder<Biome>) BiomeTypes.get(resourceLocation.toString().toLowerCase(Locale.ROOT));
+        return Holder.Reference.createStandAlone(biomeRegistry, ResourceKey.create(biomeRegistry.key(), resourceLocation));
     }
 
     @SuppressWarnings("unchecked")

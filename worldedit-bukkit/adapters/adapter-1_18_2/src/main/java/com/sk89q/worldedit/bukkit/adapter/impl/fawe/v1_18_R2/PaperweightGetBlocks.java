@@ -25,15 +25,16 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.BitStorage;
@@ -99,7 +100,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private final int maxHeight;
     private final int minSectionPosition;
     private final int maxSectionPosition;
-    private final Registry<Holder<Biome>> biomeRegistry;
+    private final IdMap<Holder<Biome>> biomeRegistry;
     private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
     private DataLayer[] blockLight;
@@ -124,7 +125,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.maxSectionPosition = maxHeight >> 4;
         this.skyLight = new DataLayer[getSectionCount()];
         this.blockLight = new DataLayer[getSectionCount()];
-        this.biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+        this.biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).asHolderIdMap();
     }
 
     public int getChunkX() {
@@ -476,7 +477,12 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             biomeRegistry,
                                             biomeData
                                     );
-                                    if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, getSectionIndex)) {
+                                    if (PaperweightPlatformAdapter.setSectionAtomic(
+                                            levelChunkSections,
+                                            null,
+                                            newSection,
+                                            getSectionIndex
+                                    )) {
                                         updateGet(nmsChunk, levelChunkSections, newSection, new char[4096], getSectionIndex);
                                         continue;
                                     } else {
@@ -523,7 +529,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         if (existingSection == null) {
                             PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer(
                                     biomeRegistry,
-                                    biomeRegistry.getOrThrow(Biomes.PLAINS),
+                                    biomeRegistry.byIdOrThrow(WorldEditPlugin
+                                            .getInstance()
+                                            .getBukkitImplAdapter()
+                                            .getInternalBiomeId(
+                                                    BiomeTypes.PLAINS)),
                                     PalettedContainer.Strategy.SECTION_BIOMES,
                                     null
                             ) : PaperweightPlatformAdapter.getBiomePalettedContainer(biomes[setSectionIndex], biomeRegistry);
@@ -535,7 +545,12 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     biomeRegistry,
                                     biomeData
                             );
-                            if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, getSectionIndex)) {
+                            if (PaperweightPlatformAdapter.setSectionAtomic(
+                                    levelChunkSections,
+                                    null,
+                                    newSection,
+                                    getSectionIndex
+                            )) {
                                 updateGet(nmsChunk, levelChunkSections, newSection, setArr, getSectionIndex);
                                 continue;
                             } else {
@@ -564,7 +579,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 } else if (existingSection != getSections(false)[getSectionIndex]) {
                                     this.sections[getSectionIndex] = existingSection;
                                     this.reset();
-                                } else if (!Arrays.equals(update(getSectionIndex, new char[4096], true), loadPrivately(layerNo))) {
+                                } else if (!Arrays.equals(
+                                        update(getSectionIndex, new char[4096], true),
+                                        loadPrivately(layerNo)
+                                )) {
                                     this.reset(layerNo);
                             /*} else if (lock.isModified()) {
                                 this.reset(layerNo);*/
@@ -1053,7 +1071,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             x,
                             y,
                             z,
-                            biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()))
+                            biomeRegistry.byIdOrThrow(WorldEditPlugin
+                                    .getInstance()
+                                    .getBukkitImplAdapter()
+                                    .getInternalBiomeId(biomeType))
                     );
                 }
             }

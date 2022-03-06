@@ -609,6 +609,11 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     }
 
     @Override
+    public BinaryTag toNativeBinary(final net.minecraft.nbt.Tag foreign) {
+        return parent.toNativeBinary(foreign);
+    }
+
+    @Override
     public net.minecraft.nbt.Tag fromNative(Tag foreign) {
         if (foreign instanceof PaperweightLazyCompoundTag) {
             return ((PaperweightLazyCompoundTag) foreign).get();
@@ -628,20 +633,18 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public int getInternalBiomeId(BiomeType biomeType) {
+        final Registry<Biome> registry = MinecraftServer
+                .getServer()
+                .registryAccess()
+                .ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
         if (biomeType.getId().startsWith("minecraft:")) {
-            Holder<Biome> biomeBase = CraftBlock.biomeToBiomeBase(
-                    MinecraftServer.getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY),
-                    BukkitAdapter.adapt(biomeType)
-            );
-            return MinecraftServer.getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).getId(biomeBase);
+            Holder<Biome> biomeBase = CraftBlock.biomeToBiomeBase(registry, BukkitAdapter.adapt(biomeType));
+            return registry.asHolderIdMap().getId(biomeBase);
         } else {
-            WritableRegistry<Biome> biomeRegistry = (WritableRegistry<Biome>) MinecraftServer.getServer().registryAccess()
-                    .ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
-
+            WritableRegistry<Biome> biomeRegistry = (WritableRegistry<Biome>) registry;
             ResourceLocation resourceLocation = biomeRegistry.keySet().stream()
                     .filter(resource -> resource.toString().equals(biomeType.getId()))
                     .findAny().orElse(null);
-
             return biomeRegistry.getId(biomeRegistry.get(resourceLocation));
         }
     }
