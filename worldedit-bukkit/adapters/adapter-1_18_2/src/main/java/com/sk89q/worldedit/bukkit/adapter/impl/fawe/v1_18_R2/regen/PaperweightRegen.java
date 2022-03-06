@@ -262,13 +262,13 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         //generator
         if (originalChunkProvider.getGenerator() instanceof FlatLevelSource flatLevelSource) {
             FlatLevelGeneratorSettings generatorSettingFlat = flatLevelSource.settings();
-            chunkGenerator = new FlatLevelSource(BuiltinRegistries.STRUCTURE_SETS, generatorSettingFlat);
+            chunkGenerator = new FlatLevelSource(originalChunkProvider.getGenerator().structureSets, generatorSettingFlat);
         } else if (originalChunkProvider.getGenerator() instanceof NoiseBasedChunkGenerator noiseBasedChunkGenerator) {
             Holder<NoiseGeneratorSettings> generatorSettingBaseSupplier =
                     (Holder<NoiseGeneratorSettings>) generatorSettingBaseSupplierField
                             .get(originalChunkProvider.getGenerator());
             BiomeSource biomeSource = originalChunkProvider.getGenerator().getBiomeSource();
-            chunkGenerator = new NoiseBasedChunkGenerator(BuiltinRegistries.STRUCTURE_SETS, noiseBasedChunkGenerator.noises,
+            chunkGenerator = new NoiseBasedChunkGenerator(originalChunkProvider.getGenerator().structureSets, noiseBasedChunkGenerator.noises,
                     biomeSource, seed,
                     generatorSettingBaseSupplier
             );
