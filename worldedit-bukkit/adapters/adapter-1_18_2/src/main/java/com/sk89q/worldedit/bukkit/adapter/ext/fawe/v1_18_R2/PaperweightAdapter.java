@@ -162,7 +162,7 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-public final class PaperweightAdapter implements BukkitImplAdapter {
+public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft.nbt.Tag> {
 
     private static final Set<SideEffect> SUPPORTED_SIDE_EFFECTS = Sets.immutableEnumSet(
             SideEffect.NEIGHBORS,
@@ -172,7 +172,6 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
             SideEffect.EVENTS,
             SideEffect.UPDATE
     );
-    private final Logger logger = Logger.getLogger(getClass().getCanonicalName());
     private final Field serverWorldsField;
     private final Method getChunkFutureMethod;
     private final Field chunkProviderExecutorField;
@@ -430,7 +429,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
 
         net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
         readEntityIntoTag(mcEntity, tag);
-        //FAWE start - BinaryTag
+        //FAWE start - CompoundBinaryTag
         return new BaseEntity(
                 com.sk89q.worldedit.world.entity.EntityTypes.get(id),
                 LazyReference.from(() -> (CompoundBinaryTag) toNativeBinary(tag))
@@ -517,7 +516,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
             } else if (state instanceof net.minecraft.world.level.block.state.properties.IntegerProperty) {
                 property = new IntegerProperty(state.getName(), ImmutableList.copyOf(state.getPossibleValues()));
             } else {
-                throw new IllegalArgumentException("WorldEdit needs an update to support " + state.getClass().getSimpleName());
+                throw new IllegalArgumentException("FastAsyncWorldEdit needs an update to support " + state.getClass().getSimpleName());
             }
 
             properties.put(property.getName(), property);
@@ -557,7 +556,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
         //FAWE start - CBT > CT
-        weStack.setNbt(((CompoundBinaryTag) toNative(nmsStack.getTag())));
+        weStack.setNbt(((CompoundBinaryTag) toNativeBinary(nmsStack.getTag())));
         //FAWE end
         return weStack;
     }
@@ -803,6 +802,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
      * @return native WorldEdit NBT structure
      */
     //FAWE start - BinaryTag
+    @Override
     public BinaryTag toNativeBinary(net.minecraft.nbt.Tag foreign) {
         if (foreign == null) {
             return null;
@@ -1000,7 +1000,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter {
                     WatchdogThread.tick();
                 }
             } catch (IllegalAccessException e) {
-                logger.log(Level.WARNING, "Failed to tick watchdog", e);
+                LOGGER.log(Level.WARNING, "Failed to tick watchdog", e);
             }
         }
 
