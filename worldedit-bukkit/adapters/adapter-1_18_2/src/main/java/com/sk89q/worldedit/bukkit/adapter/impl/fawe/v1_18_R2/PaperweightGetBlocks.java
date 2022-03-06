@@ -43,7 +43,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -527,7 +526,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         }
 
                         if (existingSection == null) {
-                            PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer(
+                            PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer<>(
                                     biomeRegistry,
                                     biomeRegistry.byIdOrThrow(WorldEditPlugin
                                             .getInstance()

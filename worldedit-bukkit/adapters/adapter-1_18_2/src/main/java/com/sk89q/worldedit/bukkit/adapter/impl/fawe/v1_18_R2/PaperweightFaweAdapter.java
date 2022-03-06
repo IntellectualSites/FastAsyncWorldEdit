@@ -491,7 +491,6 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         ServerLevel nmsWorld = ((CraftWorld) world).getHandle();
         ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(), chunkPacket.getChunkZ());
         if (map != null && map.wasAccessibleSinceLastSave()) {
-            boolean flag = false;
             // PlayerChunk.d players = map.players;
             Stream<ServerPlayer> stream = /*players.a(new ChunkCoordIntPair(packet.getChunkX(), packet.getChunkZ()), flag)
              */ Stream.empty();

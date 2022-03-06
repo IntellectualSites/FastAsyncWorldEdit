@@ -1935,23 +1935,20 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
                                     if (object == null) {
                                         object = new TextComponent("");
                                     }
-                                } catch (JsonParseException jsonparseexception) {
-                                    ;
+                                } catch (JsonParseException ignored) {
                                 }
 
                                 if (object == null) {
                                     try {
                                         object = Component.Serializer.fromJson(s);
-                                    } catch (JsonParseException jsonparseexception1) {
-                                        ;
+                                    } catch (JsonParseException ignored) {
                                     }
                                 }
 
                                 if (object == null) {
                                     try {
                                         object = Component.Serializer.fromJsonLenient(s);
-                                    } catch (JsonParseException jsonparseexception2) {
-                                        ;
+                                    } catch (JsonParseException ignored) {
                                     }
                                 }
 
@@ -2015,8 +2012,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
                     if (cmp.contains("VillagerProfession", 99)) {
                         try {
                             i = this.convert(cmp.getInt("VillagerProfession"));
-                        } catch (RuntimeException runtimeexception) {
-                            ;
+                        } catch (RuntimeException ignored) {
                         }
                     }
 
@@ -2562,10 +2558,8 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
                 } else if (jsonelement.isJsonArray()) {
                     JsonArray jsonarray = jsonelement.getAsJsonArray();
                     MutableComponent ichatbasecomponent = null;
-                    Iterator iterator = jsonarray.iterator();
 
-                    while (iterator.hasNext()) {
-                        JsonElement jsonelement1 = (JsonElement) iterator.next();
+                    for (final JsonElement jsonelement1 : jsonarray) {
                         MutableComponent ichatbasecomponent1 = this.a(
                                 jsonelement1,
                                 jsonelement1.getClass(),
@@ -2625,23 +2619,20 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
                         if (object == null) {
                             object = new TextComponent("");
                         }
-                    } catch (JsonParseException jsonparseexception) {
-                        ;
+                    } catch (JsonParseException ignored) {
                     }
 
                     if (object == null) {
                         try {
                             object = Component.Serializer.fromJson(s1);
-                        } catch (JsonParseException jsonparseexception1) {
-                            ;
+                        } catch (JsonParseException ignored) {
                         }
                     }
 
                     if (object == null) {
                         try {
                             object = Component.Serializer.fromJsonLenient(s1);
-                        } catch (JsonParseException jsonparseexception2) {
-                            ;
+                        } catch (JsonParseException ignored) {
                         }
                     }
 
