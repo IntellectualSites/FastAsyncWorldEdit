@@ -117,29 +117,34 @@ public class FaweDelegateRegionManager {
                     final Pattern plotfloor = hybridPlotWorld.TOP_BLOCK.toPattern();
                     final BiomeType biome = hybridPlotWorld.getPlotBiome();
 
-                    BlockVector3 pos1 = plot.getBottomAbs().getBlockVector3().withY(0);
+                    BlockVector3 pos1 = plot.getBottomAbs().getBlockVector3();
                     BlockVector3 pos2 = pos1.add(BlockVector3.at(
                             hybridPlotWorld.PLOT_WIDTH - 1,
-                            255,
+                            hybridPlotWorld.getMaxGenHeight(),
                             hybridPlotWorld.PLOT_WIDTH - 1
                     ));
 
-                    Region bedrockRegion = new CuboidRegion(pos1, pos2.withY(0));
-                    Region fillingRegion = new CuboidRegion(pos1.withY(1), pos2.withY(hybridPlotWorld.PLOT_HEIGHT - 1));
+                    if (hybridPlotWorld.PLOT_BEDROCK) {
+                        Region bedrockRegion = new CuboidRegion(pos1, pos2.withY(hybridPlotWorld.getMinGenHeight()));
+                        editSession.setBlocks(bedrockRegion, bedrock);
+                    }
+
+                    Region fillingRegion = new CuboidRegion(
+                            pos1.withY(hybridPlotWorld.getMinGenHeight() + 1),
+                            pos2.withY(hybridPlotWorld.PLOT_HEIGHT - 1)
+                    );
                     Region floorRegion = new CuboidRegion(
                             pos1.withY(hybridPlotWorld.PLOT_HEIGHT),
                             pos2.withY(hybridPlotWorld.PLOT_HEIGHT)
                     );
                     Region airRegion = new CuboidRegion(
                             pos1.withY(hybridPlotWorld.PLOT_HEIGHT + 1),
-                            pos2.withY(manager.getWorldHeight())
+                            pos2.withY(hybridPlotWorld.getMaxGenHeight())
                     );
 
-                    editSession.setBlocks(bedrockRegion, bedrock);
                     editSession.setBlocks(fillingRegion, filling);
                     editSession.setBlocks(floorRegion, plotfloor);
                     editSession.setBlocks(airRegion, air);
-                    editSession.flushQueue();
                 }
 
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {
@@ -157,7 +162,7 @@ public class FaweDelegateRegionManager {
                     }
                     BlockVector3 to = plot.getBottomAbs().getBlockVector3().withY(Settings.Schematics.PASTE_ON_TOP
                             ? hybridPlotWorld.SCHEM_Y
-                            : 1);
+                            : hybridPlotWorld.getMinBuildHeight());
                     try {
                         Clipboard clip = ClipboardFormats
                                 .findByFile(schematicFile)
@@ -171,7 +176,6 @@ public class FaweDelegateRegionManager {
                     scheditsession.flushQueue();
                 }
 
-                // Be verbose in editsession flushing
                 editSession.flushQueue();
                 FaweAPI.fixLighting(
                         world,
@@ -210,13 +214,12 @@ public class FaweDelegateRegionManager {
                         .limitUnlimited()
                         .changeSetNull()
                         .build();
-                CuboidRegion regionA = new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3());
+                CuboidRegion regionA = new CuboidRegion(pos1World, pos1.getBlockVector3(), pos2.getBlockVector3());
                 CuboidRegion regionB = new CuboidRegion(
+                        pos3World,
                         swapPos.getBlockVector3(),
                         swapPos.getBlockVector3().add(pos2.getBlockVector3()).subtract(pos1.getBlockVector3())
                 );
-                regionA.setWorld(pos1World);
-                regionB.setWorld(pos3World);
                 Clipboard clipA = Clipboard.create(regionA, UUID.randomUUID());
                 Clipboard clipB = Clipboard.create(regionB, UUID.randomUUID());
                 ForwardExtentCopy copyA = new ForwardExtentCopy(sessionA, regionA, clipA, clipA.getMinimumPoint());
@@ -230,10 +233,11 @@ public class FaweDelegateRegionManager {
                     clipB.flush();
                     clipA.paste(sessionB, swapPos.getBlockVector3(), true, true, true);
                     clipB.paste(sessionA, pos1.getBlockVector3(), true, true, true);
-                    sessionA.close();
-                    sessionB.close();
                 } catch (MaxChangedBlocksException e) {
                     e.printStackTrace();
+                } finally {
+                    sessionA.close();
+                    sessionB.close();
                 }
                 FaweAPI.fixLighting(pos1World, new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3()), null,
                         RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)

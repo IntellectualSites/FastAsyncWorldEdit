@@ -73,7 +73,7 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     @Override
     public boolean setBiome(int x, int z, BiomeType biomeType) {
         setbiome = true;
-        return instance.setBiome(x, 0, z, biomeType);
+        return instance.setBiome(BlockVector2.at(x, z), biomeType);
     }
 
     @Override

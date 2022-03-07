@@ -9,7 +9,10 @@ import com.fastasyncworldedit.core.jnbt.CompressedCompoundTag;
 import com.fastasyncworldedit.core.jnbt.CompressedSchematicTag;
 import com.fastasyncworldedit.core.util.IOUtil;
 import com.plotsquared.core.PlotSquared;
+import com.plotsquared.core.configuration.Settings;
+import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.generator.ClassicPlotWorld;
+import com.plotsquared.core.player.PlotPlayer;
 import com.plotsquared.core.plot.Plot;
 import com.plotsquared.core.plot.PlotArea;
 import com.plotsquared.core.plot.schematic.Schematic;
@@ -57,6 +60,7 @@ public class FaweDelegateSchematicHandler {
 
     private static final AtomicBoolean exportingAll = new AtomicBoolean();
 
+    @Deprecated
     public void paste(
             final Schematic schematic,
             final Plot plot,
@@ -64,6 +68,19 @@ public class FaweDelegateSchematicHandler {
             final int yOffset,
             final int zOffset,
             final boolean autoHeight,
+            final RunnableVal<Boolean> whenDone
+    ) {
+        paste(schematic, plot , xOffset, yOffset, zOffset, autoHeight, null, whenDone);
+    }
+
+    public void paste(
+            final Schematic schematic,
+            final Plot plot,
+            final int xOffset,
+            final int yOffset,
+            final int zOffset,
+            final boolean autoHeight,
+            final PlotPlayer<?> actor,
             final RunnableVal<Boolean> whenDone
     ) {
         Runnable r = () -> {
@@ -80,8 +97,20 @@ public class FaweDelegateSchematicHandler {
             final int WIDTH = dimension.getX();
             final int LENGTH = dimension.getZ();
             final int HEIGHT = dimension.getY();
+            final int worldHeight = plot.getArea().getMaxGenHeight() - plot.getArea().getMinGenHeight() + 1;
             // Validate dimensions
             CuboidRegion region = plot.getLargestRegion();
+            boolean sizeMismatch =
+                    ((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
+                            (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
+                            > worldHeight);
+            if (!Settings.Schematics.PASTE_MISMATCHES && sizeMismatch) {
+                if (actor != null) {
+                    actor.sendMessage(TranslatableCaption.of("schematics.schematic_size_mismatch"));
+                }
+                TaskManager.runTask(whenDone);
+                return;
+            }
             if (((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
                     (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
                     > 256)) {
@@ -90,28 +119,6 @@ public class FaweDelegateSchematicHandler {
                 }
                 return;
             }
-            // Calculate the optimal height to paste the schematic at
-            final int y_offset_actual;
-            if (autoHeight) {
-                if (HEIGHT >= 256) {
-                    y_offset_actual = yOffset;
-                } else {
-                    PlotArea pw = plot.getArea();
-                    if (pw instanceof ClassicPlotWorld) {
-                        y_offset_actual = yOffset + ((ClassicPlotWorld) pw).PLOT_HEIGHT;
-                    } else {
-                        y_offset_actual = yOffset + 1 + PlotSquared.platform().worldUtil()
-                                .getHighestBlockSynchronous(plot.getWorldName(), region.getMinimumPoint().getX() + 1,
-                                        region.getMinimumPoint().getZ() + 1
-                                );
-                    }
-                }
-            } else {
-                y_offset_actual = yOffset;
-            }
-
-            final BlockVector3 to = BlockVector3
-                    .at(region.getMinimumPoint().getX() + xOffset, y_offset_actual, region.getMinimumPoint().getZ() + zOffset);
 
             try (EditSession editSession = WorldEdit
                     .getInstance()
@@ -122,13 +129,33 @@ public class FaweDelegateSchematicHandler {
                     .limitUnlimited()
                     .changeSetNull()
                     .build()) {
+                // Calculate the optimal height to paste the schematic at
+                final int y_offset_actual;
+                if (autoHeight) {
+                    if (HEIGHT >= worldHeight) {
+                        y_offset_actual = yOffset;
+                    } else {
+                        PlotArea pw = plot.getArea();
+                        if (pw instanceof ClassicPlotWorld) {
+                            y_offset_actual = yOffset + pw.getMinBuildHeight() + ((ClassicPlotWorld) pw).PLOT_HEIGHT;
+                        } else {
+                            y_offset_actual = yOffset + pw.getMinBuildHeight() + editSession.getHighestTerrainBlock(region
+                                    .getMinimumPoint()
+                                    .getX() + 1, region.getMinimumPoint().getZ() + 1, pw.getMinGenHeight(), pw.getMaxGenHeight()
+                            );
+                        }
+                    }
+                } else {
+                    y_offset_actual = yOffset;
+                }
+
+                final BlockVector3 to = BlockVector3
+                        .at(region.getMinimumPoint().getX() + xOffset, y_offset_actual, region.getMinimumPoint().getZ() + zOffset);
                 final Clipboard clipboard = schematic.getClipboard();
                 clipboard.paste(editSession, to, true, false, true);
                 if (whenDone != null) {
                     whenDone.value = true;
-                    if (whenDone != null) {
-                        TaskManager.runTask(whenDone);
-                    }
+                    TaskManager.runTask(whenDone);
                 }
             }
         };
