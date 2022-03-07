@@ -215,11 +215,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
         PrimaryLevelData levelProperties = (PrimaryLevelData) server.getWorldData();
-        WorldGenSettings originalOpts = levelProperties.worldGenSettings();
 
-        WorldGenSettings newOpts = options.getSeed().isPresent()
-                ? PaperweightAdapter.replaceSeed(originalServerWorld, seed, originalOpts)
-                : originalOpts;
+        WorldGenSettings newOpts = levelProperties.worldGenSettings()
+                .withSeed(originalWorldData.settings.hardcore(), options.getSeed());
         LevelSettings newWorldSettings = new LevelSettings(
                 "faweregentempworld",
                 originalWorldData.settings.gameType(),
