@@ -197,7 +197,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     public BiomeType getBiomeType(int x, int y, int z) {
         LevelChunkSection section = getSections(false)[(y >> 4) - getMinSectionPosition()];
         Holder<Biome> biomes = section.getNoiseBiome(x >> 2, (y & 15) >> 2, z >> 2);
-        return (BiomeType) PaperweightPlatformAdapter.adapt(biomes, serverLevel);
+        return BiomeTypes.get(PaperweightPlatformAdapter.adapt(biomes, serverLevel).unwrapKey().get().location().toString());
     }
 
     @Override
