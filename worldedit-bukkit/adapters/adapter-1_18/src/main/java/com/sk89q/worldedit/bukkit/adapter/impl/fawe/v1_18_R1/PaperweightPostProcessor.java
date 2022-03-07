@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R1;
 
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
@@ -18,7 +18,7 @@ import net.minecraft.world.level.material.Fluids;
 
 import javax.annotation.Nullable;
 
-public class PaperweightPostProcesssor implements IBatchProcessor {
+public class PaperweightPostProcessor implements IBatchProcessor {
 
     @Override
     public IChunkSet processSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
@@ -165,7 +165,7 @@ public class PaperweightPostProcesssor implements IBatchProcessor {
         } else {
             type = (int) replacedState.getState(PropertyKey.LEVEL) == 0 ? Fluids.WATER : Fluids.FLOWING_WATER;
         }
-        serverLevel.getLiquidTicks().scheduleTick(
+        serverLevel.scheduleTick(
                 position,
                 type,
                 type.getTickDelay(serverLevel)

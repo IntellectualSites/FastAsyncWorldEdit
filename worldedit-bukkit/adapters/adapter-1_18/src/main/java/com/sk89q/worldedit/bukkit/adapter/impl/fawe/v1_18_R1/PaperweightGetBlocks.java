@@ -1055,7 +1055,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             x,
                             y,
                             z,
-                            biomeRegistry.get(ResourceLocation.tryParse(biomeType.getId()))
+                            biomeRegistry.getOptional(ResourceLocation.tryParse(biomeType.getId())).orElseThrow()
                     );
                 }
             }

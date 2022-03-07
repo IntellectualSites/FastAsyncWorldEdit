@@ -697,7 +697,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public IBatchProcessor getTickingPostProcessor() {
-        return new PaperweightPostProcesssor();
+        return new PaperweightPostProcessor();
     }
 
 }
