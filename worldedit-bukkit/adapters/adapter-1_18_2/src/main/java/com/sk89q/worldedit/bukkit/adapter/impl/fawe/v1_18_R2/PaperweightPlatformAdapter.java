@@ -83,11 +83,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     public static final Field fieldStorage;
     public static final Field fieldPalette;
 
-    public static final int plainsBiomeID = WorldEditPlugin
-            .getInstance()
-            .getBukkitImplAdapter()
-            .getInternalBiomeId(BiomeTypes.PLAINS);
-
     private static final Field fieldTickingFluidCount;
     private static final Field fieldTickingBlockCount;
     private static final Field fieldNonEmptyBlockCount;
@@ -392,7 +387,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 IdMap<Holder<Biome>> biomeHolderIdMap = biomeRegistry.asHolderIdMap();
                 biomes = new PalettedContainer<>(
                         biomeHolderIdMap,
-                        biomeHolderIdMap.byIdOrThrow(plainsBiomeID),
+                        biomeHolderIdMap.byIdOrThrow(WorldEditPlugin
+                                .getInstance()
+                                .getBukkitImplAdapter()
+                                .getInternalBiomeId(
+                                        BiomeTypes.PLAINS)),
                         PalettedContainer.Strategy.SECTION_BIOMES,
                         null
                 );

@@ -25,6 +25,7 @@ import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
@@ -527,7 +528,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         if (existingSection == null) {
                             PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer<>(
                                     biomeHolderIdMap,
-                                    biomeHolderIdMap.byIdOrThrow(PaperweightPlatformAdapter.plainsBiomeID),
+                                    biomeHolderIdMap.byIdOrThrow(WorldEditPlugin
+                                            .getInstance()
+                                            .getBukkitImplAdapter()
+                                            .getInternalBiomeId(
+                                                    BiomeTypes.PLAINS)),
                                     PalettedContainer.Strategy.SECTION_BIOMES,
                                     null
                             ) : PaperweightPlatformAdapter.getBiomePalettedContainer(biomes[setSectionIndex], biomeHolderIdMap);
