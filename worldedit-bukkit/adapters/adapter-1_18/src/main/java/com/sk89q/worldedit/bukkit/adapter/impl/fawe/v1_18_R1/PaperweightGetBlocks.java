@@ -59,8 +59,8 @@ import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -374,7 +374,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 return false;
             }
 
-            @NotNull
+            @Nonnull
             @Override
             public Iterator<CompoundTag> iterator() {
                 Iterable<CompoundTag> result = StreamSupport.stream(Iterables.concat(slices).spliterator(), false).map(input -> {

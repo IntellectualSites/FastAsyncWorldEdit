@@ -7,8 +7,8 @@ import com.fastasyncworldedit.core.extent.transform.RandomTransform;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
 public class Linear3DTransformParser extends RichParser<ResettableExtent> {
@@ -31,7 +31,7 @@ public class Linear3DTransformParser extends RichParser<ResettableExtent> {
     }
 
     @Override
-    protected ResettableExtent parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
+    protected ResettableExtent parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length != 1) {
             return null;
         }

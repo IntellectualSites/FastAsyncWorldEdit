@@ -51,10 +51,10 @@ import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.gameevent.GameEventDispatcher;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import org.bukkit.craftbukkit.v1_18_R1.CraftChunk;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import sun.misc.Unsafe;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -608,7 +608,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             return null;
         }
 
-        @NotNull
+        @Nonnull
         @Override
         public Iterator<net.minecraft.world.level.block.state.BlockState> iterator() {
             return Collections.emptyIterator();
@@ -629,7 +629,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             return null;
         }
 
-        @NotNull
+        @Nonnull
         @Override
         public Iterator<Biome> iterator() {
             return Collections.emptyIterator();
