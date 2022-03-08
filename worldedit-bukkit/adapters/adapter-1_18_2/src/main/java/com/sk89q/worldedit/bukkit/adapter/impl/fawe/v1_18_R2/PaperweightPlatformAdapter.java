@@ -26,8 +26,6 @@ import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
@@ -39,7 +37,6 @@ import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
@@ -566,15 +563,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
     }
 
-    public static Holder<Biome> adapt(Holder<Biome> biome, LevelAccessor levelAccessor) {
+    public static BiomeType adapt(Holder<Biome> biome, LevelAccessor levelAccessor) {
         final Registry<Biome> biomeRegistry = levelAccessor.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
-        final IdMap<Holder<Biome>> holders = biomeRegistry.asHolderIdMap();
-        ResourceLocation resourceLocation = biomeRegistry.getKey(biome.value());
-        if (resourceLocation == null) {
-            return holders.getId(biome) == -1 ? Holder.Reference.createStandAlone(biomeRegistry, Biomes.OCEAN)
+        if (biomeRegistry.getKey(biome.value()) == null) {
+            return biomeRegistry.asHolderIdMap().getId(biome) == -1 ? BiomeTypes.OCEAN
                     : null;
         }
-        return Holder.Reference.createStandAlone(biomeRegistry, ResourceKey.create(biomeRegistry.key(), resourceLocation));
+        return BiomeTypes.get(biome.unwrapKey().orElseThrow().location().toString());
     }
 
     @SuppressWarnings("unchecked")

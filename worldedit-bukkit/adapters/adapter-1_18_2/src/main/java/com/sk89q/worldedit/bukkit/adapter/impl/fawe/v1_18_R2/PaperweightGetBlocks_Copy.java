@@ -146,8 +146,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         Holder<Biome> biome = biomes[(y >> 4) - getMinSectionPosition()].get(x >> 2, (y & 15) >> 2, z >> 2);
-        return biome != null ?
-                BiomeTypes.get(PaperweightPlatformAdapter.adapt(biome, serverLevel).unwrapKey().get().location().toString()) : null;
+        return PaperweightPlatformAdapter.adapt(biome, serverLevel);
     }
 
     @Override
