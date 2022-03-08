@@ -11,6 +11,7 @@ import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
+import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -145,7 +146,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         Holder<Biome> biome = biomes[(y >> 4) - getMinSectionPosition()].get(x >> 2, (y & 15) >> 2, z >> 2);
-        return biome != null ? (BiomeType) PaperweightPlatformAdapter.adapt(biome, serverLevel) : null;
+        return PaperweightPlatformAdapter.adapt(biome, serverLevel);
     }
 
     @Override
