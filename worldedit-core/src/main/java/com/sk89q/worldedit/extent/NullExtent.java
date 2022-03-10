@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.extent;
 
+import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -117,6 +118,16 @@ public class NullExtent implements Extent {
     public <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T block)
             throws WorldEditException {
         return false;
+    }
+
+    @Override
+    public Extent addProcessor(final IBatchProcessor processor) {
+        return this;
+    }
+
+    @Override
+    public Extent addPostProcessor(final IBatchProcessor processor) {
+        return this;
     }
     //FAWE end
 
