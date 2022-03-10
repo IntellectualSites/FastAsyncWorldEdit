@@ -9,8 +9,8 @@ import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.extent.transform.BlockTransformExtent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
 public class RotateTransformParser extends RichParser<ResettableExtent> {
@@ -36,7 +36,7 @@ public class RotateTransformParser extends RichParser<ResettableExtent> {
     }
 
     @Override
-    protected ResettableExtent parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
+    protected ResettableExtent parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
         AffineTransform transform = new AffineTransform();
         Extent extent;
         if (arguments.length == 1) {

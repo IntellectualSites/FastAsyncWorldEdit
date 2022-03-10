@@ -990,7 +990,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         }
 
         @Override
-        public void onStatusChange(ChunkPos pos, @org.jetbrains.annotations.Nullable ChunkStatus status) {
+        public void onStatusChange(ChunkPos pos, @Nullable ChunkStatus status) {
         }
 
         @Override

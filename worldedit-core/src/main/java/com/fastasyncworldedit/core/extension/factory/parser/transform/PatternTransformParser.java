@@ -8,8 +8,8 @@ import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.stream.Stream;
 
 public class PatternTransformParser extends RichParser<ResettableExtent> {
@@ -34,7 +34,7 @@ public class PatternTransformParser extends RichParser<ResettableExtent> {
     }
 
     @Override
-    protected ResettableExtent parseFromInput(@NotNull String[] arguments, ParserContext context) throws InputParseException {
+    protected ResettableExtent parseFromInput(@Nonnull String[] arguments, ParserContext context) throws InputParseException {
         if (arguments.length > 2) {
             return null;
         }
