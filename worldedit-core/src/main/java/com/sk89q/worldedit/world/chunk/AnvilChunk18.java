@@ -83,7 +83,7 @@ public class AnvilChunk18 implements Chunk {
      * @param tag the tag to read
      * @throws DataException on a data error
      * @deprecated Use {@link AnvilChunk18#AnvilChunk18(CompoundBinaryTag, Supplier)}
-     * @since TODO
+     * @since 2.1.0
      */
     @Deprecated
     public AnvilChunk18(CompoundTag tag, Supplier<CompoundTag> entitiesTag) throws DataException {
@@ -99,7 +99,7 @@ public class AnvilChunk18 implements Chunk {
      *
      * @param tag the tag to read
      * @throws DataException on a data error
-     * @since TODO
+     * @since 2.1.0
      */
     public AnvilChunk18(CompoundBinaryTag tag, Supplier<CompoundBinaryTag> entityTag) throws DataException {
         //FAWE end

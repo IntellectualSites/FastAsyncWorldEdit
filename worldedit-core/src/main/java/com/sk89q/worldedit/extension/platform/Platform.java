@@ -252,7 +252,7 @@ public interface Platform extends Keyed {
 
     /**
      * Get a {@link IBatchProcessor} to be used in edit processing. Null if not required.
-     * @since TODO
+     * @since 2.1.0
      */
     @Nullable
     default IBatchProcessor getPlatformProcessor(boolean fastMode) {
@@ -262,7 +262,7 @@ public interface Platform extends Keyed {
     /**
      * Get a {@link IBatchProcessor} to be used in edit post-processing. Used for things such as tick-placed and tick fluids.
      * Null if not required.
-     * @since TODO
+     * @since 2.1.0
      */
     @Nullable
     default IBatchProcessor getPlatformPostProcessor(boolean fastMode) {

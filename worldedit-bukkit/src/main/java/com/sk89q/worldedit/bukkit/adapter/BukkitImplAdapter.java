@@ -356,7 +356,7 @@ public interface BukkitImplAdapter<T> extends IBukkitAdapter {
      * Returns an {@link IBatchProcessor} instance for post-processing of chunks to sort ticking of placed/existing blocks and
      * fluids if the plugin is configured to do so
      *
-     * @since TODO
+     * @since 2.1.0
      */
     default IBatchProcessor getTickingPostProcessor() {
         return null;

@@ -85,7 +85,7 @@ public class ChunkStoreHelper {
      *                    location
      * @return a Chunk implementation
      * @throws DataException if the rootTag is not valid chunk data
-     * @since TODO
+     * @since 2.1.0
      */
     public static Chunk getChunk(CompoundTag rootTag, Supplier<CompoundTag> entitiesTag) throws DataException {
         //FAWE end

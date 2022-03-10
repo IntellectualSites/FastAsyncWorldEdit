@@ -61,7 +61,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
     /**
      * Get the minecraft version that the server is currently running
      *
-     * @since TODO
+     * @since 2.1.0
      */
     public static MinecraftVersion getCurrent() {
         if (current == null) {
