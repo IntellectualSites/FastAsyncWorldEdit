@@ -145,7 +145,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
                     }
                 } catch (Throwable e) {
                     String message = e.getMessage();
-                    int hash = message.hashCode();
+                    int hash = message != null ? message.hashCode() : 0;
                     if (lastException != hash) {
                         lastException = hash;
                         exceptionCount = 0;

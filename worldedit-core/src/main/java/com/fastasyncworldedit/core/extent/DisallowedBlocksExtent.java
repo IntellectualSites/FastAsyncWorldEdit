@@ -167,11 +167,6 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
         return set;
     }
 
-    @Override
-    public Future<IChunkSet> postProcessSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
-        return CompletableFuture.completedFuture(set);
-    }
-
     @Nullable
     @Override
     public Extent construct(final Extent child) {

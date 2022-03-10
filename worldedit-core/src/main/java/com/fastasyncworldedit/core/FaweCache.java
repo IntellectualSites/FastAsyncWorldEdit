@@ -604,7 +604,7 @@ public enum FaweCache implements Trimable {
                     } else if (throwable.getCause() instanceof FaweException) {
                         handleFaweException((FaweException) throwable.getCause());
                     } else {
-                        int hash = throwable.getMessage().hashCode();
+                        int hash = throwable.getMessage() != null ? throwable.getMessage().hashCode() : 0;
                         if (hash != lastException) {
                             lastException = hash;
                             LOGGER.catching(throwable);

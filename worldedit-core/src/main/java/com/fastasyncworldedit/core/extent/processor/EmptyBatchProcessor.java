@@ -29,13 +29,6 @@ public final class EmptyBatchProcessor implements IBatchProcessor {
         return set;
     }
 
-    @Override
-    @Nonnull
-    public Future<IChunkSet> postProcessSet(@Nullable IChunk chunk, @Nullable IChunkGet get, @Nullable IChunkSet set) {
-        // Doesn't need to do anything
-        return CompletableFuture.completedFuture(set);
-    }
-
     @Nonnull
     public IBatchProcessor join(@Nullable IBatchProcessor other) {
         return other;

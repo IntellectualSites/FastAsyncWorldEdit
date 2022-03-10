@@ -410,7 +410,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     @SuppressWarnings("rawtypes")
     public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         forceLoadSections = false;
-        copy = createCopy ? new PaperweightGetBlocks_Copy(serverLevel) : null;
+        copy = createCopy ? new PaperweightGetBlocks_Copy(levelChunk) : null;
         try {
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
@@ -461,6 +461,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                     bitMask |= 1 << layer;
 
+                    // Changes may still be written to chunk SET
                     char[] tmp = set.load(layerNo);
                     char[] setArr = new char[4096];
                     System.arraycopy(tmp, 0, setArr, 0, 4096);
@@ -477,6 +478,12 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                         LevelChunkSection newSection;
                         LevelChunkSection existingSection = levelChunkSections[layer];
+                        // Don't attempt to tick section whilst we're editing
+                        if (existingSection != null) {
+                            PaperweightPlatformAdapter.clearCounts(existingSection);
+                            existingSection.tickingList.clear();
+                        }
+
                         if (existingSection == null) {
                             newSection = PaperweightPlatformAdapter.newChunkSection(layerNo, setArr, fastmode, adapter);
                             if (PaperweightPlatformAdapter.setSectionAtomic(levelChunkSections, null, newSection, layer)) {
@@ -492,10 +499,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 }
                             }
                         }
-                        PaperweightPlatformAdapter.fieldTickingBlockCount.set(existingSection, (short) 0);
 
-                        //ensure that the server doesn't try to tick the chunksection while we're editing it.
+                        //ensure that the server doesn't try to tick the chunksection while we're editing it (again).
                         DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
+                        PaperweightPlatformAdapter.clearCounts(existingSection);
+                        existingSection.tickingList.clear();
 
                         synchronized (lock) {
                             // lock.acquire();

@@ -12,7 +12,6 @@ import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -54,9 +53,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
@@ -71,9 +68,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static final Field fieldBitsPerEntry;
 
-    public static final Field fieldTickingFluidContent;
-    public static final Field fieldTickingBlockCount;
-    public static final Field fieldNonEmptyBlockCount;
+    private static final Field fieldTickingFluidContent;
+    private static final Field fieldTickingBlockCount;
+    private static final Field fieldNonEmptyBlockCount;
 
     private static final Field fieldBiomes;
 
@@ -271,15 +268,20 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     NMS conversion
      */
     public static LevelChunkSection newChunkSection(
-            final int layer, final char[] blocks, boolean fastmode,
+            final int layer,
+            final char[] blocks,
+            boolean fastMode,
             CachedBukkitAdapter adapter
     ) {
-        return newChunkSection(layer, null, blocks, fastmode, adapter);
+        return newChunkSection(layer, null, blocks, fastMode, adapter);
     }
 
     public static LevelChunkSection newChunkSection(
-            final int layer, final Function<Integer, char[]> get, char[] set,
-            boolean fastmode, CachedBukkitAdapter adapter
+            final int layer,
+            final Function<Integer, char[]> get,
+            char[] set,
+            boolean fastMode,
+            CachedBukkitAdapter adapter
     ) {
         if (set == null) {
             return newChunkSection(layer);
@@ -289,19 +291,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         final long[] blockStates = FaweCache.INSTANCE.BLOCK_STATES.get();
         final int[] blocksCopy = FaweCache.INSTANCE.SECTION_BLOCKS.get();
         try {
-            int[] num_palette_buffer = new int[1];
-            Map<BlockVector3, Integer> ticking_blocks = new HashMap<>();
-            int air;
+            int num_palette;
             if (get == null) {
-                air = createPalette(blockToPalette, paletteToBlock, blocksCopy, num_palette_buffer,
-                        set, ticking_blocks, fastmode, adapter
+                num_palette = createPalette(blockToPalette, paletteToBlock, blocksCopy, set, adapter
                 );
             } else {
-                air = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy,
-                        num_palette_buffer, get, set, ticking_blocks, fastmode, adapter
-                );
+                num_palette = createPalette(layer, blockToPalette, paletteToBlock, blocksCopy, get, set, adapter);
             }
-            int num_palette = num_palette_buffer[0];
             // BlockStates
             int bitsPerEntry = MathMan.log2nlz(num_palette - 1);
             if (Settings.settings().PROTOCOL_SUPPORT_FIX || num_palette != 1) {
@@ -364,17 +360,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 fieldStorage.set(dataPaletteBlocks, nmsBits);
                 fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
                 fieldBits.set(dataPaletteBlocks, bitsPerEntry);
-                setCount(ticking_blocks.size(), 4096 - air, levelChunkSection);
-                if (!fastmode) {
-                    ticking_blocks.forEach((pos, ordinal) -> levelChunkSection
-                            .setBlockState(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ(),
-                                    Block.stateById(ordinal)
-                            ));
-                }
             } catch (final IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
 
+            if (!fastMode) {
+                levelChunkSection.recalcBlockCounts();
+            }
             return levelChunkSection;
         } catch (final Throwable e) {
             Arrays.fill(blockToPalette, Integer.MAX_VALUE);
@@ -386,11 +378,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return new LevelChunkSection(layer);
     }
 
-    public static void setCount(final int tickingBlockCount, final int nonEmptyBlockCount, final LevelChunkSection section) throws
-            IllegalAccessException {
-        fieldTickingFluidContent.setShort(section, (short) 0); // TODO FIXME
-        fieldTickingBlockCount.setShort(section, (short) tickingBlockCount);
-        fieldNonEmptyBlockCount.setShort(section, (short) nonEmptyBlockCount);
+    public static void clearCounts(final LevelChunkSection section) throws IllegalAccessException {
+        fieldTickingFluidContent.setShort(section, (short) 0);
+        fieldTickingBlockCount.setShort(section, (short) 0);
     }
 
     public static Biome[] getBiomeArray(ChunkBiomeContainer chunkBiomeContainer) {

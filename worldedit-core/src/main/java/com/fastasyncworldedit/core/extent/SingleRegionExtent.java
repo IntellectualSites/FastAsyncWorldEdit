@@ -46,8 +46,15 @@ public class SingleRegionExtent extends FaweRegionExtent {
     }
 
     @Override
-    public Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+    public Future<?> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Most likely will do nothing, but perhaps people will find some fun way of using this via API (though doubtful)
         return region.postProcessSet(chunk, get, set);
+    }
+
+    @Override
+    public void postProcess(IChunk chunk, IChunkGet get, IChunkSet set) {
+        // Most likely will do nothing, but perhaps people will find some fun way of using this via API (though doubtful)
+        region.postProcess(chunk, get, set);
     }
 
     @Override

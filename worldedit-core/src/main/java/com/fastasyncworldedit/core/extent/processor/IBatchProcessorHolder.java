@@ -31,8 +31,13 @@ public interface IBatchProcessorHolder extends IBatchProcessor {
     }
 
     @Override
-    default Future<IChunkSet> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
+    default Future<?> postProcessSet(IChunk chunk, IChunkGet get, IChunkSet set) {
         return getPostProcessor().postProcessSet(chunk, get, set);
+    }
+
+    @Override
+    default void postProcess(IChunk chunk, IChunkGet get, IChunkSet set) {
+        getPostProcessor().postProcess(chunk, get, set);
     }
 
     @Override

@@ -19,6 +19,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkBiomeContainer;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -35,13 +36,15 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     private final char[][] blocks;
     private final int minHeight;
     private final int maxHeight;
-    private final ServerLevel serverLevel;
+    final ServerLevel serverLevel;
+    final LevelChunk levelChunk;
     private ChunkBiomeContainer chunkBiomeContainer;
 
-    protected PaperweightGetBlocks_Copy(ServerLevel world) {
-        this.serverLevel = world;
-        this.minHeight = world.getMinBuildHeight();
-        this.maxHeight = world.getMaxBuildHeight() - 1; // Minecraft max limit is exclusive.
+    protected PaperweightGetBlocks_Copy(LevelChunk levelChunk) {
+        this.levelChunk = levelChunk;
+        this.serverLevel = levelChunk.level;
+        this.minHeight = serverLevel.getMinBuildHeight();
+        this.maxHeight = serverLevel.getMaxBuildHeight() - 1; // Minecraft max limit is exclusive.
         this.blocks = new char[getSectionCount()][];
     }
 

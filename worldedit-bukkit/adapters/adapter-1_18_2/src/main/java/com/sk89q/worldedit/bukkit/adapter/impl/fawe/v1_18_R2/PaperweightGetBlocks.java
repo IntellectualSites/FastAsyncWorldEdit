@@ -99,7 +99,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private final int maxHeight;
     private final int minSectionPosition;
     private final int maxSectionPosition;
-    private final IdMap<Holder<Biome>> biomeRegistry;
+    private final Registry<Biome> biomeRegistry;
+    private final IdMap<Holder<Biome>> biomeHolderIdMap;
     private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
     private DataLayer[] blockLight;
@@ -124,7 +125,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.maxSectionPosition = maxHeight >> 4;
         this.skyLight = new DataLayer[getSectionCount()];
         this.blockLight = new DataLayer[getSectionCount()];
-        this.biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).asHolderIdMap();
+        this.biomeRegistry = serverLevel.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY);
+        this.biomeHolderIdMap = biomeRegistry.asHolderIdMap();
     }
 
     public int getChunkX() {
@@ -399,11 +401,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     @SuppressWarnings("rawtypes")
     public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         forceLoadSections = false;
-        copy = createCopy ? new PaperweightGetBlocks_Copy(serverLevel) : null;
+        copy = createCopy ? new PaperweightGetBlocks_Copy(levelChunk) : null;
         try {
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
-            boolean fastmode = set.isFastMode() && Settings.settings().QUEUE.NO_TICK_FASTMODE;
 
             // Remove existing tiles. Create a copy so that we can remove blocks
             Map<BlockPos, BlockEntity> chunkTiles = new HashMap<>(nmsChunk.getBlockEntities());
@@ -466,12 +467,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 if (existingSection == null) {
                                     PalettedContainer<Holder<Biome>> biomeData = PaperweightPlatformAdapter.getBiomePalettedContainer(
                                             biomes[setSectionIndex],
-                                            biomeRegistry
+                                            biomeHolderIdMap
                                     );
                                     LevelChunkSection newSection = PaperweightPlatformAdapter.newChunkSection(
                                             layerNo,
                                             new char[4096],
-                                            fastmode,
                                             adapter,
                                             biomeRegistry,
                                             biomeData
@@ -527,19 +527,18 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                         if (existingSection == null) {
                             PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer<>(
-                                    biomeRegistry,
-                                    biomeRegistry.byIdOrThrow(WorldEditPlugin
+                                    biomeHolderIdMap,
+                                    biomeHolderIdMap.byIdOrThrow(WorldEditPlugin
                                             .getInstance()
                                             .getBukkitImplAdapter()
                                             .getInternalBiomeId(
                                                     BiomeTypes.PLAINS)),
                                     PalettedContainer.Strategy.SECTION_BIOMES,
                                     null
-                            ) : PaperweightPlatformAdapter.getBiomePalettedContainer(biomes[setSectionIndex], biomeRegistry);
+                            ) : PaperweightPlatformAdapter.getBiomePalettedContainer(biomes[setSectionIndex], biomeHolderIdMap);
                             newSection = PaperweightPlatformAdapter.newChunkSection(
                                     layerNo,
                                     setArr,
-                                    fastmode,
                                     adapter,
                                     biomeRegistry,
                                     biomeData
@@ -562,9 +561,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 }
                             }
                         }
-                        PaperweightPlatformAdapter.fieldTickingBlockCount.set(existingSection, (short) 0);
 
-                        //ensure that the server doesn't try to tick the chunksection while we're editing it.
+                        //ensure that the server doesn't try to tick the chunksection while we're editing it. (Again)
+                        PaperweightPlatformAdapter.clearCounts(existingSection);
+                        existingSection.tickingList.clear();
                         DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
 
                         synchronized (lock) {
@@ -601,7 +601,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             layerNo,
                                             this::loadPrivately,
                                             setArr,
-                                            fastmode,
                                             adapter,
                                             biomeRegistry,
                                             biomeData
@@ -1070,7 +1069,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             x,
                             y,
                             z,
-                            biomeRegistry.byIdOrThrow(WorldEditPlugin
+                            biomeHolderIdMap.byIdOrThrow(WorldEditPlugin
                                     .getInstance()
                                     .getBukkitImplAdapter()
                                     .getInternalBiomeId(biomeType))

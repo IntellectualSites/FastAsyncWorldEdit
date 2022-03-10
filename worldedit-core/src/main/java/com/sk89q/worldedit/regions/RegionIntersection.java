@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.util.MultiFuture;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -170,6 +172,15 @@ public class RegionIntersection extends AbstractRegion {
             }
         }
         return null;
+    }
+
+    @Override
+    public Future<?> postProcessSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
+        final ArrayList<Future<?>> futures = new ArrayList<>();
+        for (Region region : regions) {
+            futures.add(region.postProcessSet(chunk, get, set));
+        }
+        return new MultiFuture(futures);
     }
 
     @Override
