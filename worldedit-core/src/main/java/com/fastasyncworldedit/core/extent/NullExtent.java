@@ -220,6 +220,16 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     }
 
     @Override
+    public Extent addProcessor(final IBatchProcessor processor) {
+        return this;
+    }
+
+    @Override
+    public Extent addPostProcessor(final IBatchProcessor processor) {
+        return this;
+    }
+
+    @Override
     public BlockArrayClipboard lazyCopy(Region region) {
         throw reason;
     }
