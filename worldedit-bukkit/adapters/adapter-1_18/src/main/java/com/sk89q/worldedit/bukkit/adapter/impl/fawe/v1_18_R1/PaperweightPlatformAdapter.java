@@ -395,8 +395,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             return levelChunkSection;
         } catch (final Throwable e) {
-            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
             throw e;
+        } finally {
+            Arrays.fill(blockToPalette, Integer.MAX_VALUE);
+            Arrays.fill(paletteToBlock, Integer.MAX_VALUE);
+            Arrays.fill(blockStates, 0);
+            Arrays.fill(blocksCopy, 0);
         }
     }
 
