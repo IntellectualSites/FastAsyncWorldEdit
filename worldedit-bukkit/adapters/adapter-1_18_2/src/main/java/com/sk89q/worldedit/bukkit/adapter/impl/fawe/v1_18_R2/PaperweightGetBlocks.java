@@ -514,6 +514,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                         LevelChunkSection newSection;
                         LevelChunkSection existingSection = levelChunkSections[getSectionIndex];
+                        // Don't attempt to tick section whilst we're editing
+                        if (existingSection != null) {
+                            PaperweightPlatformAdapter.clearCounts(existingSection);
+                            if (PaperLib.isPaper()) {
+                                existingSection.tickingList.clear();
+                            }
+                        }
 
                         if (createCopy) {
                             char[] tmpLoad = loadPrivately(layerNo);
@@ -564,7 +571,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                         //ensure that the server doesn't try to tick the chunksection while we're editing it. (Again)
                         PaperweightPlatformAdapter.clearCounts(existingSection);
-                        existingSection.tickingList.clear();
+                        if (PaperLib.isPaper()) {
+                            existingSection.tickingList.clear();
+                        }
                         DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
 
                         synchronized (lock) {
