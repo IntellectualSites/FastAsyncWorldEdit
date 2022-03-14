@@ -18,7 +18,6 @@ griefdefender = "2.1.0-SNAPSHOT"
 mcore = "7.0.1"
 residence = "4.5._13.1"
 towny = "0.97.5.0"
-protocollib = "4.7.0"
 plotsquared = "6.6.1"
 redprotect = "1.9.6"
 
@@ -75,7 +74,6 @@ griefdefender = { group = "com.griefdefender", name = "api", version.ref = "grie
 mcore = { group = "com.massivecraft", name = "mcore", version.ref = "mcore" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
 towny = { group = "com.github.TownyAdvanced", name = "Towny", version.ref = "towny" }
-protocollib = { group = "com.comphenix.protocol", name = "ProtocolLib", version.ref = "protocollib" }
 plotsquaredBukkit = { group = "com.plotsquared", name = "PlotSquared-Bukkit", version.ref = "plotsquared" }
 plotsquaredCore = { group = "com.plotsquared", name = "PlotSquared-Core", version.ref = "plotsquared" }
 redprotect = { group = "net.fabiozumbi12", name = "redprotect", version.ref = "redprotect" }

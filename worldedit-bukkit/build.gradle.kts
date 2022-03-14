@@ -24,10 +24,6 @@ repositories {
         url = uri("https://jitpack.io")
     }
     maven {
-        name = "ProtocolLib"
-        url = uri("https://repo.dmulloy2.net/nexus/repository/public/")
-    }
-    maven {
         name = "GriefDefender"
         url = uri("https://repo.glaremasters.me/repository/bloodshot/")
     }
@@ -95,7 +91,6 @@ dependencies {
     compileOnly(libs.mcore) { isTransitive = false }
     compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
-    compileOnly(libs.protocollib) { isTransitive = false }
     compileOnly(libs.plotsquaredBukkit) { isTransitive = false }
     compileOnly(libs.plotsquaredCore) { isTransitive = false }
 
