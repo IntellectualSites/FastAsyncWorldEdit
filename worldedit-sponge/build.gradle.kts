@@ -28,7 +28,7 @@ dependencies {
     })
     api("org.apache.logging.log4j:log4j-api")
     api("org.bstats:bstats-sponge:1.7")
-    testImplementation("org.mockito:mockito-core:4.3.1")
+    testImplementation("org.mockito:mockito-core:4.4.0")
 }
 
 <<<<<<< HEAD

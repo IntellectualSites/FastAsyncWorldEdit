@@ -17,7 +17,8 @@
     "com.google.code.gson:gson",
     "net.fabricmc:fabric-loader",
     "net.fabricmc.fabric-api:fabric-api",
-    "com.github.luben:zstd-jni"  
+    "com.github.luben:zstd-jni",
+    "net.kyori"
   ],
   "timezone": "Europe/Berlin",
   "schedule": [
