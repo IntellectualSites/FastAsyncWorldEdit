@@ -11,6 +11,7 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
+import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
@@ -175,7 +176,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public void setHeightmapToGet(HeightMapType type, int[] data) {
-        BitArrayUnstretched bitArray = new BitArrayUnstretched(9, 256);
+        // height + 1 to match server internal
+        BitArrayUnstretched bitArray = new BitArrayUnstretched(MathMan.log2nlz(getChunk().getHeight() + 1), 256);
         bitArray.fromRaw(data);
         Heightmap.Types nativeType = Heightmap.Types.valueOf(type.name());
         Heightmap heightMap = getChunk().heightmaps.get(nativeType);
