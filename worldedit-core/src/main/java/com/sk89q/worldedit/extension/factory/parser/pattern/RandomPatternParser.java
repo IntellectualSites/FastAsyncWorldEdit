@@ -30,34 +30,20 @@ public class RandomPatternParser extends InputParser<Pattern> {
     public Stream<String> getSuggestions(String input) {
         //FAWE start
         List<String> patterns = StringUtil.split(input, ',', '[', ']');
-        if (patterns.size() == 0) {
-            return Stream.empty();
-        }
-        // get suggestions for the last token only
-        String token = patterns.get(patterns.size() - 1);
-        String percent;
-        String previous;
-        if (patterns.size() != 1) {
-            previous = String.join(",", patterns.subList(0, patterns.size() - 1));
-            percent = ",";
-        } else {
-            previous = "";
-            percent = "";
-        }
-        if (regex.matcher(token).matches()) {
-            String[] p = token.split("%");
-            if (p.length < 2) {
-                return Stream.empty();
-            } else {
-                percent += p[0] + "%";
-                token = p[1];
-            }
-        } else {
-            return Stream.empty();
-        }
-        final List<String> innerSuggestions = worldEdit.getPatternFactory().getSuggestions(token);
-        String prefix = previous + percent;
         //FAWE end
+        // get suggestions for the last token only
+        String percent = null;
+        String token = patterns.get(patterns.size() - 1);
+        if (regex.matcher(token).matches()) {
+            String[] p = token.split("%", 2);
+            percent = p[0];
+            token = p[1];
+        } else if (patterns.size() == 1) {
+            return Stream.empty(); // handled by DefaultBlockParser
+        }
+        String previous = patterns.size() == 1 ? "" : String.join(",", patterns.subList(0, patterns.size() - 1)) + ",";
+        String prefix = previous + (percent == null ? "" : percent + "%");
+        final List<String> innerSuggestions = worldEdit.getPatternFactory().getSuggestions(token);
         return innerSuggestions.stream().map(s -> prefix + s);
     }
 
