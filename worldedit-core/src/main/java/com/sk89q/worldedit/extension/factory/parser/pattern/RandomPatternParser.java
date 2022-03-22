@@ -30,6 +30,9 @@ public class RandomPatternParser extends InputParser<Pattern> {
     public Stream<String> getSuggestions(String input) {
         //FAWE start
         List<String> patterns = StringUtil.split(input, ',', '[', ']');
+        if (patterns.isEmpty()) {
+            return Stream.empty();
+        }
         //FAWE end
         // get suggestions for the last token only
         String percent = null;
