@@ -55,7 +55,6 @@ import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.nbt.IntTag;
@@ -86,7 +85,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_18_R2.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
@@ -637,16 +635,9 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 .getServer()
                 .registryAccess()
                 .ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
-        if (biomeType.getId().startsWith("minecraft:")) {
-            Holder<Biome> biomeBase = CraftBlock.biomeToBiomeBase(registry, BukkitAdapter.adapt(biomeType));
-            return registry.asHolderIdMap().getId(biomeBase);
-        } else {
-            WritableRegistry<Biome> biomeRegistry = (WritableRegistry<Biome>) registry;
-            ResourceLocation resourceLocation = biomeRegistry.keySet().stream()
-                    .filter(resource -> resource.toString().equals(biomeType.getId()))
-                    .findAny().orElse(null);
-            return biomeRegistry.getId(biomeRegistry.get(resourceLocation));
-        }
+        ResourceLocation resourceLocation = ResourceLocation.tryParse(biomeType.getId());
+        Biome biome = registry.get(resourceLocation);
+        return registry.getId(biome);
     }
 
     @Override
