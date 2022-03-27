@@ -1,7 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2;
 
 import com.fastasyncworldedit.bukkit.adapter.BukkitGetBlocks;
-import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
@@ -76,6 +75,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
@@ -576,7 +576,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         if (PaperLib.isPaper()) {
                             existingSection.tickingList.clear();
                         }
-                        DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
+                        Semaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
 
                         synchronized (lock) {
                             // lock.acquire();
@@ -914,7 +914,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             data = new char[4096];
             Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
         }
-        DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(section);
+        Semaphore lock = PaperweightPlatformAdapter.applyLock(section);
         synchronized (lock) {
             // Efficiently convert ChunkSection to raw data
             try {
