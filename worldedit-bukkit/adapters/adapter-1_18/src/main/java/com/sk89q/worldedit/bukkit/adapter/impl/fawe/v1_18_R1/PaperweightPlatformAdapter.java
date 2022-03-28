@@ -133,11 +133,20 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
 
             Unsafe unsafe = ReflectionUtils.getUnsafe();
-            fieldThreadingDetector = PalettedContainer.class.getDeclaredField(Refraction.pickName("threadingDetector", "f"));
-            fieldThreadingDetectorOffset = unsafe.objectFieldOffset(fieldThreadingDetector);
+            if (!PaperLib.isPaper()) {
+                fieldThreadingDetector = PalettedContainer.class.getDeclaredField(Refraction.pickName("threadingDetector", "f"));
+                fieldThreadingDetectorOffset = unsafe.objectFieldOffset(fieldThreadingDetector);
 
-            fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "c"));
-            fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
+                fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "c"));
+                fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
+            } else {
+                // in paper, the used methods are synchronized properly
+                fieldThreadingDetector = null;
+                fieldThreadingDetectorOffset = -1;
+
+                fieldLock = null;
+                fieldLockOffset = -1;
+            }
 
             fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField(Refraction.pickName(
                     "gameEventDispatcherSections", "t"));
@@ -181,7 +190,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return false;
     }
 
-    static DelegateSemaphore applyLock(LevelChunkSection section) {
+    private static final ThreadLocal<Semaphore> SEMAPHORE_THREAD_LOCAL = ThreadLocal.withInitial(() -> new Semaphore(1));
+
+    static Semaphore applyLock(LevelChunkSection section) {
+        if (PaperLib.isPaper()) {
+            return SEMAPHORE_THREAD_LOCAL.get();
+        }
         try {
             synchronized (section) {
                 Unsafe unsafe = ReflectionUtils.getUnsafe();

@@ -30,6 +30,7 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
+import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -117,8 +118,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
 
             Unsafe unsafe = ReflectionUtils.getUnsafe();
-            fieldLock = PalettedContainer.class.getDeclaredField(Refraction.pickName("lock", "m"));
-            fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
+            if (!PaperLib.isPaper()) {
+
+                fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "m"));
+                fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
+            } else {
+                // in paper, the used methods are synchronized properly
+                fieldLock = null;
+                fieldLockOffset = -1;
+            }
 
             fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField(Refraction.pickName(
                     "gameEventDispatcherSections", "x"));
@@ -162,8 +170,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return false;
     }
 
-    static DelegateSemaphore applyLock(LevelChunkSection section) {
-        //todo there has to be a better way to do this. Maybe using a() in DataPaletteBlock which acquires the lock in NMS?
+    private static final ThreadLocal<Semaphore> SEMAPHORE_THREAD_LOCAL = ThreadLocal.withInitial(() -> new Semaphore(1));
+
+    static Semaphore applyLock(LevelChunkSection section) {
+        if (PaperLib.isPaper()) {
+            return SEMAPHORE_THREAD_LOCAL.get();
+        }
         try {
             synchronized (section) {
                 Unsafe unsafe = ReflectionUtils.getUnsafe();
