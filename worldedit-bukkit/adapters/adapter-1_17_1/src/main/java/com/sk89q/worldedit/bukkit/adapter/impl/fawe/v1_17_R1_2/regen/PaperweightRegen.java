@@ -312,8 +312,12 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         ) {
             // redirect to LevelChunks created in #createChunks
             @Override
-            public ChunkAccess getChunk(int x, int z, ChunkStatus chunkstatus, boolean flag) {
-                return getChunkAt(x, z);
+            public ChunkAccess getChunk(int x, int z, ChunkStatus chunkstatus, boolean create) {
+                ChunkAccess chunkAccess = getChunkAt(x, z);
+                if (chunkAccess == null && create) {
+                    chunkAccess = createChunk(getProtoChunkAt(x, z));
+                }
+                return chunkAccess;
             }
         };
 
