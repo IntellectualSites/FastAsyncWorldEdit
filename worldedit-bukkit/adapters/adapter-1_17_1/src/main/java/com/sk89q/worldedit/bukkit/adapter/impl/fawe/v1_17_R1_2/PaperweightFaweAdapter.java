@@ -85,7 +85,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlock;
 import org.bukkit.craftbukkit.v1_17_R1.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_17_R1.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftEntity;
@@ -635,22 +634,13 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public int getInternalBiomeId(BiomeType biomeType) {
-        if (biomeType.getId().startsWith("minecraft:")) {
-            Biome biomeBase = CraftBlock.biomeToBiomeBase(
-                    MinecraftServer.getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY),
-                    BukkitAdapter.adapt(biomeType)
-            );
-            return MinecraftServer.getServer().registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).getId(biomeBase);
-        } else {
-            WritableRegistry<Biome> biomeRegistry = MinecraftServer.getServer().registryAccess()
-                    .ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
-
-            ResourceLocation resourceLocation = biomeRegistry.keySet().stream()
-                    .filter(resource -> resource.toString().equals(biomeType.getId()))
-                    .findAny().orElse(null);
-
-            return biomeRegistry.getId(biomeRegistry.get(resourceLocation));
-        }
+        final Registry<Biome> registry = MinecraftServer
+                .getServer()
+                .registryAccess()
+                .ownedRegistryOrThrow(Registry.BIOME_REGISTRY);
+        ResourceLocation resourceLocation = ResourceLocation.tryParse(biomeType.getId());
+        Biome biome = registry.get(resourceLocation);
+        return registry.getId(biome);
     }
 
     @Override
