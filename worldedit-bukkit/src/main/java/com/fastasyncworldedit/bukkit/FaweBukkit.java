@@ -61,7 +61,6 @@ public class FaweBukkit implements IFawe, Listener {
     private final boolean chunksStretched;
     private final FAWEPlatformAdapterImpl platformAdapter;
     private ItemUtil itemUtil;
-    private boolean listeningImages;
     private Preloader preloader;
     private volatile boolean keepUnloaded;
 
@@ -119,7 +118,6 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public synchronized ImageViewer getImageViewer(com.sk89q.worldedit.entity.Player player) {
         try {
-            listeningImages = true;
             PluginManager manager = Bukkit.getPluginManager();
 
             if (manager.getPlugin("PacketListenerApi") == null) {
