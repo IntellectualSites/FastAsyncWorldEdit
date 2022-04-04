@@ -48,7 +48,7 @@ piston = "0.5.7"
 
 # Tests
 mockito = "4.4.0"
-checker-qual = "3.21.3"
+checker-qual = "3.21.4"
 
 # Gradle plugins
 pluginyml = "0.5.1"
