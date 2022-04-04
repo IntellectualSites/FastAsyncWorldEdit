@@ -2,7 +2,6 @@ package com.fastasyncworldedit.bukkit;
 
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.PermissibleBase;
 import org.bukkit.permissions.PermissionAttachment;
 
@@ -14,11 +13,10 @@ public class BukkitPermissionAttachmentManager {
 
     private final WorldEditPlugin plugin;
     private final Map<Player, PermissionAttachment> attachments = new ConcurrentHashMap<>();
-    private final PermissionAttachment noopAttachment;
+    private PermissionAttachment noopAttachment;
 
     public BukkitPermissionAttachmentManager(WorldEditPlugin plugin) {
         this.plugin = plugin;
-        this.noopAttachment = new PermissionAttachment(plugin, new PermissibleBase(null));
     }
 
     public PermissionAttachment getOrAddAttachment(@Nullable final Player p) {
@@ -26,6 +24,9 @@ public class BukkitPermissionAttachmentManager {
             return null;
         }
         if (p.getUniqueId().version() == 2) {
+            if (this.noopAttachment == null) {
+                this.noopAttachment = new PermissionAttachment(plugin, new PermissibleBase(null));
+            }
             return noopAttachment;
         }
         return attachments.computeIfAbsent(p, k -> k.addAttachment(plugin));
@@ -35,7 +36,7 @@ public class BukkitPermissionAttachmentManager {
         if (p == null) {
             return;
         }
-        if (p.getUniqueId().version() == 2) {
+        if (p.getUniqueId().version() == 2 && noopAttachment != null) {
             p.removeAttachment(noopAttachment);
             return;
         }
