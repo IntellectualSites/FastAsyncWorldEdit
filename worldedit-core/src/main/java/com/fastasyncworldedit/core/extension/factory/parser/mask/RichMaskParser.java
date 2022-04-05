@@ -85,7 +85,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                     if (charMask && input.charAt(0) == '=') {
                         mask = parseFromInput(char0 + "[" + input.substring(1) + "]", context);
                     }
-                    if (char0 == '#') {
+                    if (char0 == '#' && command.length() > 1 && command.charAt(1) != '#') {
                         throw new SuggestInputParseException(
                                 new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
                                         TextComponent
@@ -127,6 +127,12 @@ public class RichMaskParser extends FaweParser<Mask> {
                             case '%', '$', '<', '>', '!' -> {
                                 input = input.substring(input.indexOf(char0) + 1);
                                 mask = parseFromInput(char0 + "[" + input + "]", context);
+                            }
+                            case '#' -> {
+                                if (!(input.charAt(1) == '#')) {
+                                    break;
+                                }
+                                mask = worldEdit.getMaskFactory().parseWithoutRich(full, context);
                             }
                         }
                     }
