@@ -23,7 +23,7 @@ public class BukkitPermissionAttachmentManager {
         if (p == null) {
             return null;
         }
-        if (p.getUniqueId().version() == 2) {
+        if (p.hasMetadata("NPC")) {
             if (this.noopAttachment == null) {
                 this.noopAttachment = new PermissionAttachment(plugin, new PermissibleBase(null));
             }
@@ -36,7 +36,7 @@ public class BukkitPermissionAttachmentManager {
         if (p == null) {
             return;
         }
-        if (p.getUniqueId().version() == 2 && noopAttachment != null) {
+        if (p.hasMetadata("NPC") && noopAttachment != null) {
             p.removeAttachment(noopAttachment);
             return;
         }
