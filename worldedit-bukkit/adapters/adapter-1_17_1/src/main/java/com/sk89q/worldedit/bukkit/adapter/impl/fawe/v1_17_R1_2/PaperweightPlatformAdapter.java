@@ -30,7 +30,6 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
-import net.minecraft.util.ThreadingDetector;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -120,7 +119,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             Unsafe unsafe = ReflectionUtils.getUnsafe();
             if (!PaperLib.isPaper()) {
 
-                fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "m"));
+                fieldLock = PalettedContainer.class.getDeclaredField(Refraction.pickName("lock", "m"));
                 fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
             } else {
                 // in paper, the used methods are synchronized properly
