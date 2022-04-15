@@ -116,7 +116,7 @@ public class RegionCommands {
     ) {
         int affected = editSession.setBlocks(region, pattern);
         if (affected != 0) {
-            actor.print(Caption.of("worldedit.set.done", TextComponent.of(blocksChanged)));
+            actor.print(Caption.of("worldedit.set.done", TextComponent.of(affected)));
 
         }
         return affected;
