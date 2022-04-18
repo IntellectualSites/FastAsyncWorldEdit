@@ -2,7 +2,8 @@
 .project
 .settings
 eclipse
-.idea
+/.idea/*
+!/.idea/icon.svg
 *.iml
 *.ipr
 *.iws
