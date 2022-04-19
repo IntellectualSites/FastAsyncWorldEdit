@@ -444,7 +444,7 @@
   "worldedit.rotate.rotated": "The clipboard copy has been rotated.",
   "worldedit.flip.flipped": "The clipboard copy has been flipped.",
   "worldedit.clearclipboard.cleared": "Clipboard cleared.",
-  "worldedit.set.done": "Operation completed.",
+  "worldedit.set.done": "Operation completed ({0}).",
   "worldedit.set.done.verbose": "Operation completed ({0}).",
   "worldedit.line.changed": "{0} blocks have been changed.",
   "worldedit.line.invalid-type": "//line only works with cuboid selections or convex polyhedral selections",
