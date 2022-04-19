@@ -14,13 +14,19 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] paletteToBlock,
             int[] blocksCopy,
             char[] set,
-            CachedBukkitAdapter adapter
+            CachedBukkitAdapter adapter,
+            short[] nonEmptyBlockCount
     ) {
+        short nonAir = 4096;
         int num_palette = 0;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
-            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
-                ordinal = BlockTypesCache.ReservedIDs.AIR;
+            switch (ordinal) {
+                case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
+                    ordinal = BlockTypesCache.ReservedIDs.AIR;
+                    nonAir--;
+                }
+                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR -> nonAir--;
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -46,6 +52,10 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int palette = blockToPalette[ordinal];
             blocksCopy[i] = palette;
         }
+
+        if (nonEmptyBlockCount != null) {
+            nonEmptyBlockCount[0] = nonAir;
+        }
         return num_palette;
     }
 
@@ -56,20 +66,29 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             int[] blocksCopy,
             Function<Integer, char[]> get,
             char[] set,
-            CachedBukkitAdapter adapter
+            CachedBukkitAdapter adapter,
+            short[] nonEmptyBlockCount
     ) {
+        short nonAir = 4096;
         int num_palette = 0;
         char[] getArr = null;
         for (int i = 0; i < 4096; i++) {
             char ordinal = set[i];
-            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
-                if (getArr == null) {
-                    getArr = get.apply(layer);
+            switch (ordinal) {
+                case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
+                    if (getArr == null) {
+                        getArr = get.apply(layer);
+                    }
+                    ordinal = getArr[i];
+                    switch (ordinal) {
+                        case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
+                            ordinal = BlockTypesCache.ReservedIDs.AIR;
+                            nonAir--;
+                        }
+                        case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR -> nonAir--;
+                    }
                 }
-                ordinal = getArr[i];
-                if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
-                    ordinal = BlockTypesCache.ReservedIDs.AIR;
-                }
+                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR -> nonAir--;
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -88,7 +107,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
         for (int i = 0; i < 4096; i++) {
-            char ordinal= set[i];
+            char ordinal = set[i];
             if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                 if (getArr == null) {
                     getArr = get.apply(layer);
@@ -101,6 +120,9 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             blocksCopy[i] = palette;
         }
 
+        if (nonEmptyBlockCount != null) {
+            nonEmptyBlockCount[0] = nonAir;
+        }
         return num_palette;
     }
 
