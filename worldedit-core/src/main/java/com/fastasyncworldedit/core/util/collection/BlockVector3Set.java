@@ -8,4 +8,6 @@ public interface BlockVector3Set extends Set<BlockVector3> {
 
     boolean add(int x, int y, int z);
 
+    boolean contains(int x, int y, int z);
+
 }

@@ -1,6 +1,6 @@
 package com.fastasyncworldedit.core.function.mask;
 
-import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
     private final boolean hasExtent;
-    private transient LocalBlockVectorSet cache_checked = new LocalBlockVectorSet();
-    private transient LocalBlockVectorSet cache_results = new LocalBlockVectorSet();
+    private transient BlockVectorSet cache_checked = new BlockVectorSet();
+    private transient BlockVectorSet cache_results = new BlockVectorSet();
 
     public CachedMask(Mask mask) {
         super(mask);
@@ -28,8 +28,8 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
     @Override
     public void reset() {
-        cache_checked = new LocalBlockVectorSet();
-        cache_results = new LocalBlockVectorSet();
+        cache_checked = new BlockVectorSet();
+        cache_results = new BlockVectorSet();
         resetCache();
     }
 

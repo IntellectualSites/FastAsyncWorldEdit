@@ -3054,7 +3054,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public int hollowOutRegion(Region region, int thickness, Pattern pattern, Mask mask) {
         try {
-            final Set<BlockVector3> outside = new LocalBlockVectorSet();
+            final Set<BlockVector3> outside;
+            if (region.getDimensions().getBlockX() > 2048 || region.getDimensions().getBlockZ() > 2048) {
+                outside = new BlockVectorSet();
+            } else {
+                outside = new LocalBlockVectorSet();
+            }
 
             final BlockVector3 min = region.getMinimumPoint();
             final BlockVector3 max = region.getMaximumPoint();
@@ -3098,7 +3103,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
 
             for (int i = 1; i < thickness; ++i) {
-                final Set<BlockVector3> newOutside = new LocalBlockVectorSet();
+                final Set<BlockVector3> newOutside;
+                if (region.getDimensions().getBlockX() > 2048 || region.getDimensions().getBlockZ() > 2048) {
+                    newOutside = new BlockVectorSet();
+                } else {
+                    newOutside = new LocalBlockVectorSet();
+                }
                 outer:
                 for (BlockVector3 position : region) {
                     for (BlockVector3 recurseDirection : recurseDirections) {
