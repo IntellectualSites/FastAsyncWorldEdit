@@ -50,7 +50,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
         lastY = Integer.MIN_VALUE;
         lastZ = Integer.MIN_VALUE;
         if (cacheHeights != null) {
-            Arrays.fill(cacheHeights, (byte) 0);
+            Arrays.fill(cacheHeights, (short) 0);
         }
     }
 
@@ -75,7 +75,7 @@ public class AngleMask extends AbstractExtentMask implements ResettableMask {
         }
         int result = cacheHeights[index];
         if (y > result) {
-            cacheHeights[index] = (byte) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
+            cacheHeights[index] = (short) (result = lastY = extent.getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
         }
         return result;
     }

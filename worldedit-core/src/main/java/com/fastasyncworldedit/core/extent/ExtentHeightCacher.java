@@ -46,7 +46,7 @@ public class ExtentHeightCacher extends PassthroughExtent {
         }
         int result = cacheHeights[index] & 0xFF;
         if (result == minY) {
-            cacheHeights[index] = (byte) (result = lastY = super
+            cacheHeights[index] = (short) (result = lastY = super
                     .getNearestSurfaceTerrainBlock(x, z, lastY, minY, maxY));
         }
         return result;
