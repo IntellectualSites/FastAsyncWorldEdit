@@ -15,4 +15,11 @@ public class WorldUnloadedException extends WorldEditException {
         super(Caption.of("worldedit.error.world-unloaded"));
     }
 
+    /**
+     * Create a new instance.
+     */
+    public WorldUnloadedException(String name) {
+        super(Caption.of("worldedit.error.named-world-unloaded", name));
+    }
+
 }

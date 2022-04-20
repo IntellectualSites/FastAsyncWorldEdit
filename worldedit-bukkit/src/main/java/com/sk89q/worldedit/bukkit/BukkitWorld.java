@@ -193,18 +193,33 @@ public class BukkitWorld extends AbstractWorld {
      * @return the world
      */
     protected World getWorldChecked() throws WorldEditException {
-        World world = worldRef.get();
-        if (world == null) {
-            throw new WorldUnloadedException();
+        World tmp = worldRef.get();
+        if (tmp == null) {
+            tmp = Bukkit.getWorld(worldNameRef);
+            if (tmp != null) {
+                worldRef = new WeakReference<>(tmp);
+            }
         }
-        return world;
+        if (tmp == null) {
+            throw new WorldUnloadedException(worldNameRef);
+        }
+        return tmp;
     }
     //FAWE end
 
     @Override
     public String getName() {
-        return getWorld().getName();
+        //FAWE start - Throw WorldUnloadedException rather than NPE when world unloaded and attempted to be accessed
+        return getWorldChecked().getName();
+        //FAWE end
     }
+
+    //FAWE start - allow history to read an unloaded world's name
+    @Override
+    public String getNameUnsafe() {
+        return worldNameRef;
+    }
+    //FAWE end
 
     @Override
     public String getId() {

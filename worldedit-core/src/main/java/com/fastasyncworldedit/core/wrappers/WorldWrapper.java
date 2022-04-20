@@ -198,6 +198,13 @@ public class WorldWrapper extends AbstractWorld {
         return parent.getName();
     }
 
+    //FAWE start - allow history to read an unloaded world's name
+    @Override
+    public String getNameUnsafe() {
+        return parent.getNameUnsafe();
+    }
+    //FAWE end
+
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, boolean notifyAndLight) throws
             WorldEditException {

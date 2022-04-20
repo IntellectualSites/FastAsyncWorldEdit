@@ -69,6 +69,13 @@ public class NullWorld extends AbstractWorld {
         return "null";
     }
 
+    //FAWE start - allow history to read an unloaded world's name
+    @Override
+    public String getNameUnsafe() {
+        return "null";
+    }
+    //FAWE end
+
     @Override
     public String getId() {
         return "null";
