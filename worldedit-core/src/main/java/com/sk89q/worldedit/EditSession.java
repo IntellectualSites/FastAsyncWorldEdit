@@ -46,6 +46,7 @@ import com.fastasyncworldedit.core.function.visitor.DirectionalVisitor;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
 import com.fastasyncworldedit.core.limit.FaweLimit;
+import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
@@ -56,6 +57,7 @@ import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -3151,11 +3153,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int drawLine(Pattern pattern, BlockVector3 pos1, BlockVector3 pos2, double radius, boolean filled, boolean flat)
             throws MaxChangedBlocksException {
 
-        //FAWE start - LocalBlockVectorSet
-        LocalBlockVectorSet vset = new LocalBlockVectorSet();
-        boolean notdrawn = true;
-        //FAWE end
-
         int x1 = pos1.getBlockX();
         int y1 = pos1.getBlockY();
         int z1 = pos1.getBlockZ();
@@ -3168,6 +3165,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         int dz = Math.abs(z2 - z1);
+
+        //FAWE start - LocalBlockVectorSet
+        BlockVector3Set vset;
+        if (Math.abs(x1 - x2) > 2048 || (Math.abs(z1 - z2) > 2048)) {
+            vset = new BlockVectorSet();
+        } else {
+            vset = new LocalBlockVectorSet();
+        }
+        boolean notdrawn = true;
+        //FAWE end
 
         if (dx + dy + dz == 0) {
             //FAWE start - LocalBlockVectorSet

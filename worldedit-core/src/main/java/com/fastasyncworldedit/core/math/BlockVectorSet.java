@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.math;
 
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.math.BlockVector3;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -13,7 +14,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * The BlockVectorSet is a memory optimized Set for storing {@link BlockVector3}'s.
@@ -23,7 +23,7 @@ import java.util.Set;
  * {@code HashSet}.
  * </p>
  */
-public class BlockVectorSet extends AbstractCollection<BlockVector3> implements Set<BlockVector3> {
+public class BlockVectorSet extends AbstractCollection<BlockVector3> implements BlockVector3Set {
 
     private final Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
 

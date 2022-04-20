@@ -1,20 +1,20 @@
 package com.fastasyncworldedit.core.math;
 
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.zaxxer.sparsebits.SparseBitSet;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  * The LocalBlockVectorSet is a Memory and CPU optimized Set for storing BlockVectors which are all in a local region
  * - All vectors must be in a 2048 * 512 * 2048 area centered around the first entry
  * - This will use 8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
  */
-public class LocalBlockVectorSet implements Set<BlockVector3> {
+public class LocalBlockVectorSet implements BlockVector3Set {
 
     private final SparseBitSet set;
     private int offsetX;
