@@ -121,8 +121,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public void setBlocks(int layer, char[] data) {
         updateSectionIndexRange(layer);
         layer -= minSectionPosition;
+        this.sections[layer] = data == null ? EMPTY : FULL;
         this.blocks[layer] = data;
-        this.sections[layer] = data == null ? empty : FULL;
     }
 
     @Override
@@ -347,7 +347,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             System.arraycopy(sections, 0, tmpSections, diff, sections.length);
             System.arraycopy(sectionLocks, 0, tmpSectionLocks, diff, sections.length);
             for (int i = 0; i < diff; i++) {
-                tmpSections[i] = empty;
+                tmpSections[i] = EMPTY;
                 tmpSectionLocks[i] = new Object();
             }
             blocks = tmpBlocks;
@@ -379,7 +379,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             System.arraycopy(sections, 0, tmpSections, 0, sections.length);
             System.arraycopy(sectionLocks, 0, tmpSectionLocks, 0, sections.length);
             for (int i = sectionCount - diff; i < sectionCount; i++) {
-                tmpSections[i] = empty;
+                tmpSections[i] = EMPTY;
                 tmpSectionLocks[i] = new Object();
             }
             blocks = tmpBlocks;
