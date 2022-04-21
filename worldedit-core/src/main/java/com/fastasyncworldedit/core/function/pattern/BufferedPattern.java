@@ -39,6 +39,7 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
      * @param actor    actor associated with the pattern
      * @param parent   pattern to set
      * @param areaSize anticipated size of the edit
+     * @since TODO
      */
     public BufferedPattern(Actor actor, Pattern parent, @Nullable BlockVector3 areaSize) {
         long[] tmp = actor.getMeta("lastActionTime");
