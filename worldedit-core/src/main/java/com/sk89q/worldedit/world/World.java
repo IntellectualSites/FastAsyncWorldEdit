@@ -74,6 +74,7 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * Get the name of the world. If the world referenced has been unloaded, this will still return the name.
      *
      * @return a name for the world
+     * @since TODO
      */
     String getNameUnsafe();
     //FAWE end
