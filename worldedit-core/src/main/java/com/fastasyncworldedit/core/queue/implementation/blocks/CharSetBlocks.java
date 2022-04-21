@@ -299,7 +299,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (biomes != null || light != null || skyLight != null) {
             return false;
         }
-        return IntStream.range(minSectionPosition, maxSectionPosition + 1).noneMatch(this::hasSection);
+        //noinspection SimplifyStreamApiCallChains - this is faster than using #noneMatch
+        return !IntStream.range(minSectionPosition, maxSectionPosition + 1).anyMatch(this::hasSection);
     }
 
     @Override
