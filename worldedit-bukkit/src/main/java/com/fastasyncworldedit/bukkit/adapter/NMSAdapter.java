@@ -88,7 +88,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                     set[i] = switch (ordinal = getArr[i]) {
                         case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
                             nonAir--;
-                            yield BlockTypesCache.ReservedIDs.AIR;
+                            yield (ordinal = BlockTypesCache.ReservedIDs.AIR);
                         }
                         case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR,
                                 BlockTypesCache.ReservedIDs.VOID_AIR -> {
