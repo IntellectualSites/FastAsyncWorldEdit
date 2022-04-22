@@ -65,12 +65,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         this.delegate = delegate;
     }
 
-    private void checkAndWaitOnCalledLock() {
-        if (calledLock.tryLock()) {
-            calledLock.unlock();
-        }
-    }
-
     @Override
     public synchronized void recycle() {
         delegate = NULL;
@@ -79,6 +73,15 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     public synchronized IBlockDelegate getDelegate() {
         return delegate;
+    }
+
+    /**
+     * If the chunk is currently being "called", this method will block until completed.
+     */
+    private void checkAndWaitOnCalledLock() {
+        if (calledLock.tryLock()) {
+            calledLock.unlock();
+        }
     }
 
     @Override
