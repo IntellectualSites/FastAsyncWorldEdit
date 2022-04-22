@@ -3,8 +3,9 @@ package com.fastasyncworldedit.core.math;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.math.BlockVector3;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import com.sk89q.worldedit.regions.Region;
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import javax.annotation.Nonnull;
@@ -25,12 +26,34 @@ import java.util.Objects;
  */
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements BlockVector3Set {
 
-    private final Int2ObjectMap<LocalBlockVectorSet> localSets = new Int2ObjectOpenHashMap<>();
+    private final Long2ObjectLinkedOpenHashMap<LocalBlockVectorSet> localSets = new Long2ObjectLinkedOpenHashMap<>(4);
+
+    public static BlockVector3Set getAppropriateVectorSet(Region region) {
+        BlockVector3 max = region.getMaximumPoint();
+        BlockVector3 min = region.getMinimumPoint();
+        BlockVector3 size = region.getDimensions();
+        if (size.getBlockX() > 2048 || size.getBlockZ() > 2048 || size.getBlockY() > 512) {
+            return new BlockVectorSet();
+        } else {
+            // Set default offset as many operations utilising a region are likely to start in a corner, this initialising the
+            // LocalBlockVectorSet poorly
+            // This needs to be ceiling as LocalBlockVector extends 1 block further "negative"
+            int offsetX = (int) Math.ceil((min.getX() + max.getX()) / 2d);
+            int offsetZ = (int) Math.ceil((min.getZ() + max.getZ()) / 2d);
+            int offsetY;
+            if (region.getMinimumY() < -128 || region.getMaximumY() > 320) {
+                offsetY = (min.getY() + max.getY()) / 2;
+            } else {
+                offsetY = 128;
+            }
+            return new LocalBlockVectorSet(offsetX, offsetY, offsetZ);
+        }
+    }
 
     @Override
     public int size() {
         int size = 0;
-        for (Int2ObjectMap.Entry<LocalBlockVectorSet> entry : localSets.int2ObjectEntrySet()) {
+        for (Long2ObjectMap.Entry<LocalBlockVectorSet> entry : localSets.long2ObjectEntrySet()) {
             size += entry.getValue().size();
         }
         return size;
@@ -38,7 +61,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
 
     public BlockVector3 get(int index) {
         int count = 0;
-        for (Int2ObjectMap.Entry<LocalBlockVectorSet> entry : localSets.int2ObjectEntrySet()) {
+        for (Long2ObjectMap.Entry<LocalBlockVectorSet> entry : localSets.long2ObjectEntrySet()) {
             LocalBlockVectorSet set = entry.getValue();
             int size = set.size();
             int newSize = count + size;
@@ -46,10 +69,12 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
                 int localIndex = index - count;
                 MutableBlockVector3 pos = set.getIndex(localIndex);
                 if (pos != null) {
-                    int pair = entry.getIntKey();
-                    int cx = MathMan.unpairX(pair);
-                    int cz = MathMan.unpairY(pair);
+                    long triple = entry.getLongKey();
+                    int cx = (int) MathMan.untripleWorldCoordX(triple);
+                    int cy = (int) MathMan.untripleWorldCoordY(triple);
+                    int cz = (int) MathMan.untripleWorldCoordZ(triple);
                     pos.mutX((cx << 11) + pos.getBlockX());
+                    pos.mutY((cy << 9) + pos.getBlockY());
                     pos.mutZ((cz << 11) + pos.getBlockZ());
                     return pos.toImmutable();
                 }
@@ -61,7 +86,7 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
 
     @Override
     public boolean isEmpty() {
-        for (Int2ObjectMap.Entry<LocalBlockVectorSet> entry : localSets.int2ObjectEntrySet()) {
+        for (Long2ObjectMap.Entry<LocalBlockVectorSet> entry : localSets.long2ObjectEntrySet()) {
             if (!entry.getValue().isEmpty()) {
                 return false;
             }
@@ -70,9 +95,10 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     }
 
     public boolean contains(int x, int y, int z) {
-        int pair = MathMan.pair((short) (x >> 11), (short) (z >> 11));
-        LocalBlockVectorSet localMap = localSets.get(pair);
-        return localMap != null && localMap.contains(x & 2047, y, z & 2047);
+        int indexedY = (y + 128) >> 9;
+        long triple = MathMan.tripleWorldCoord((x >> 11), indexedY, (z >> 11));
+        LocalBlockVectorSet localMap = localSets.get(triple);
+        return localMap != null && localMap.contains(x & 2047, ((y + 128) & 511) - 128, z & 2047);
     }
 
     @Override
@@ -86,12 +112,12 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     @Nonnull
     @Override
     public Iterator<BlockVector3> iterator() {
-        final ObjectIterator<Int2ObjectMap.Entry<LocalBlockVectorSet>> entries = localSets.int2ObjectEntrySet().iterator();
+        final ObjectIterator<Long2ObjectMap.Entry<LocalBlockVectorSet>> entries = localSets.long2ObjectEntrySet().iterator();
         if (!entries.hasNext()) {
             return Collections.emptyIterator();
         }
         return new Iterator<>() {
-            Int2ObjectMap.Entry<LocalBlockVectorSet> entry = entries.next();
+            Long2ObjectMap.Entry<LocalBlockVectorSet> entry = entries.next();
             Iterator<BlockVector3> entryIter = entry.getValue().iterator();
             final MutableBlockVector3 mutable = new MutableBlockVector3();
 
@@ -115,12 +141,13 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
                     entryIter = entry.getValue().iterator();
                 }
                 BlockVector3 localPos = entryIter.next();
-                int pair = entry.getIntKey();
-                int cx = MathMan.unpairX(pair);
-                int cz = MathMan.unpairY(pair);
+                long triple = entry.getLongKey();
+                int cx = (int) MathMan.untripleWorldCoordX(triple);
+                int cy = (int) MathMan.untripleWorldCoordY(triple);
+                int cz = (int) MathMan.untripleWorldCoordZ(triple);
                 return mutable.setComponents(
                         (cx << 11) + localPos.getBlockX(),
-                        localPos.getBlockY(),
+                        (cy << 9) + localPos.getBlockY(),
                         (cz << 11) + localPos.getBlockZ()
                 );
             }
@@ -133,14 +160,15 @@ public class BlockVectorSet extends AbstractCollection<BlockVector3> implements 
     }
 
     public boolean add(int x, int y, int z) {
-        int pair = MathMan.pair((short) (x >> 11), (short) (z >> 11));
-        LocalBlockVectorSet localMap = localSets.get(pair);
+        int indexedY = (y + 128) >> 9;
+        long triple = MathMan.tripleWorldCoord((x >> 11), indexedY, (z >> 11));
+        LocalBlockVectorSet localMap = localSets.get(triple);
         if (localMap == null) {
             localMap = new LocalBlockVectorSet();
             localMap.setOffset(1024, 1024);
-            localSets.put(pair, localMap);
+            localSets.put(triple, localMap);
         }
-        return localMap.add(x & 2047, y, z & 2047);
+        return localMap.add(x & 2047, ((y + 128) & 511) - 128, z & 2047);
     }
 
     public boolean remove(int x, int y, int z) {

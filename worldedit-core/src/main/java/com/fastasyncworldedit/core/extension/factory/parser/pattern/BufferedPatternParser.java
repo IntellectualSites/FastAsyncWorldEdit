@@ -49,7 +49,7 @@ public class BufferedPatternParser extends RichParser<Pattern> {
             ));
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(arguments[0], context);
-        return new BufferedPattern(context.requireActor(), inner, selection != null ? selection.getDimensions() : null);
+        return new BufferedPattern(context.requireActor(), inner, selection);
     }
 
 }

@@ -19,9 +19,11 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     private final SparseBitSet set;
     private int offsetX;
     private int offsetZ;
+    private int offsetY = 128;
 
     /**
-     * New LocalBlockVectorSet that will set the offset x and z to the first value given
+     * New LocalBlockVectorSet that will set the offset x and z to the first value given. The y offset will default to 128 to
+     * allow -64 -> 320 world height.
      */
     public LocalBlockVectorSet() {
         offsetX = offsetZ = Integer.MAX_VALUE;
@@ -29,7 +31,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     }
 
     /**
-     * New LocalBlockVectorSet with a given offset
+     * New LocalBlockVectorSet with a given offset. Defaults y offset to 128.
      *
      * @param x x offset
      * @param z z offset
@@ -40,8 +42,23 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         this.set = new SparseBitSet();
     }
 
-    private LocalBlockVectorSet(int x, int z, SparseBitSet set) {
+    /**
+     * New LocalBlockVectorSet with a given offset
+     *
+     * @param x x offset
+     * @param y y offset
+     * @param z z offset
+     */
+    public LocalBlockVectorSet(int x, int y, int z) {
         this.offsetX = x;
+        this.offsetY = y;
+        this.offsetZ = z;
+        this.set = new SparseBitSet();
+    }
+
+    private LocalBlockVectorSet(int x, int y, int z, SparseBitSet set) {
+        this.offsetX = x;
+        this.offsetY = y;
         this.offsetZ = z;
         this.set = set;
     }
@@ -65,8 +82,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      * @return if the set contains the position
      */
     public boolean contains(int x, int y, int z) {
-        // take 128 to fit -256<y<255
-        return set.get(MathMan.tripleSearchCoords(x - offsetX, y - 128, z - offsetZ));
+        return set.get(MathMan.tripleSearchCoords(x - offsetX, y - offsetY, z - offsetZ));
     }
 
     @Override
@@ -79,7 +95,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
 
     @Override
     public LocalBlockVectorSet clone() {
-        return new LocalBlockVectorSet(offsetX, offsetZ, set.clone());
+        return new LocalBlockVectorSet(offsetX, offsetY, offsetZ, set.clone());
     }
 
     /**
@@ -103,8 +119,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
                 int b3 = (index >> 15) & 0xFF;
                 int b4 = (index >> 23) & 0xFF;
                 int ix = offsetX + (((b3 + (((b2 & 0x7)) << 8)) << 21) >> 21);
-                // Add 128 as we shift y by 128 to fit -256<y<255
-                int iy = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
+                int iy = offsetY + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
                 int iz = offsetZ + (((b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21);
                 if (Math.abs(ix - x) <= radius && Math.abs(iz - z) <= radius && Math.abs(iy - y) <= radius) {
                     return true;
@@ -125,13 +140,28 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     }
 
     /**
-     * Set the offset applied to values when storing and reading to keep the values within -1024 to 1023
+     * Set the offset applied to values when storing and reading to keep the values within -1024 to 1023. Uses default y offset
+     * of 128 to allow -64 -> 320 world height use.
      *
      * @param x x offset
      * @param z z offset
      */
     public void setOffset(int x, int z) {
         this.offsetX = x;
+        this.offsetZ = z;
+    }
+
+    /**
+     * Set the offset applied to values when storing and reading to keep the x and z values within -1024 to 1023. Y values
+     * require keeping withing -256 and 255.
+     *
+     * @param x x offset
+     * @param y y offset
+     * @param z z offset
+     */
+    public void setOffset(int x, int y, int z) {
+        this.offsetX = x;
+        this.offsetY = y;
         this.offsetZ = z;
     }
 
@@ -150,8 +180,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
             int b3 = (index >> 15) & 0xFF;
             int b4 = (index >> 23) & 0xFF;
             int x = offsetX + (((b3 + (((b2 & 0x7)) << 8)) << 21) >> 21);
-            // Add 128 as we shift y by 128 to fit -256<y<255
-            int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
+            int y = offsetY + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
             int z = offsetZ + (((b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21);
             return MutableBlockVector3.get(x, y, z);
         }
@@ -184,8 +213,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
                     int b3 = (index >> 15) & 0xFF;
                     int b4 = (index >> 23) & 0xFF;
                     int x = offsetX + (((b3 + (((b2 & 0x7)) << 8)) << 21) >> 21);
-                    // Add 128 as we shift y by 128 to fit -256<y<255
-                    int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
+                    int y = offsetY + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
                     int z = offsetZ + (((b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21);
                     mutable.mutX(x);
                     mutable.mutY(y);
@@ -220,8 +248,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
             int b3 = (index >> 15) & 0xFF;
             int b4 = (index >> 23) & 0xFF;
             int x = offsetX + (((b3 + (((b2 & 0x7)) << 8)) << 21) >> 21);
-            // Add 128 as we shift y by 128 to fit -256<y<255
-            int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
+            int y = offsetY + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
             int z = offsetZ + (((b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21);
             array[i] = (T) BlockVector3.at(x, y, z);
             index++;
@@ -246,7 +273,8 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024) {
             return false;
         }
-        return y >= -128 && y <= 383;
+        int relY = y - offsetY;
+        return relY >= -256 && relY <= 255;
     }
 
     /**
@@ -264,13 +292,11 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         }
         int relX = x - offsetX;
         int relZ = z - offsetZ;
-        if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024) {
+        int relY = y - offsetY;
+        if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024 || relY < -256 || relY > 255) {
             throw new UnsupportedOperationException(
                     "LocalVectorSet can only contain vectors within 1024 blocks (cuboid) of the first entry. Attempted to set " +
-                            "block at " + x + ", " + y + ", " + z + ". With origin " + offsetX + " " + offsetZ);
-        }
-        if (y < -128 || y > 383) {
-            throw new UnsupportedOperationException("LocalVectorSet can only contain vectors from y elem:[-128,383]");
+                            "block at " + x + ", " + y + ", " + z + ". With origin " + offsetX + " " + offsetY + " " + offsetZ);
         }
         int index = getIndex(x, y, z);
         if (set.get(index)) {
@@ -293,17 +319,15 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     }
 
     private int getIndex(BlockVector3 vector) {
-        // take 128 to fit -256<y<255
         return MathMan.tripleSearchCoords(
                 vector.getBlockX() - offsetX,
-                vector.getBlockY() - 128,
+                vector.getBlockY() - offsetY,
                 vector.getBlockZ() - offsetZ
         );
     }
 
     private int getIndex(int x, int y, int z) {
-        // take 128 to fit -256<y<255
-        return MathMan.tripleSearchCoords(x - offsetX, y - 128, z - offsetZ);
+        return MathMan.tripleSearchCoords(x - offsetX, y - offsetY, z - offsetZ);
     }
 
     /**
@@ -317,11 +341,11 @@ public class LocalBlockVectorSet implements BlockVector3Set {
     public boolean remove(int x, int y, int z) {
         int relX = x - offsetX;
         int relZ = z - offsetZ;
-        if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024) {
+        int relY = y - offsetY;
+        if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024 || relY < -256 || relY > 255) {
             return false;
         }
-        // take 128 to fit -256<y<255
-        int index = MathMan.tripleSearchCoords(relX, y - 128, relZ);
+        int index = MathMan.tripleSearchCoords(relX, relY, relZ);
         boolean value = set.get(index);
         set.clear(index);
         return value;
@@ -368,8 +392,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
             int b3 = (index >> 15) & 0xFF;
             int b4 = (index >> 23) & 0xFF;
             int x = offsetX + (((b3 + (((b2 & 0x7)) << 8)) << 21) >> 21);
-            // Add 128 as we shift y by 128 to fit -256<y<255
-            int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
+            int y = offsetY + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
             int z = offsetZ + (((b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21);
             mVec.mutX(x);
             mVec.mutY(y);
@@ -406,8 +429,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
             int b3 = (index >> 15) & 0xFF;
             int b4 = (index >> 23) & 0xFF;
             int x = offsetX + (((b3 + (((b2 & 0x7)) << 8)) << 21) >> 21);
-            // Add 128 as we shift y by 128 to fit -256<y<255
-            int y = 128 + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
+            int y = offsetY + b1 * (((b2 >> 6) & 0x1) == 0 ? 1 : -1);
             int z = offsetZ + (((b4 + (((b2 >> 3) & 0x7) << 8)) << 21) >> 21);
             visitor.run(x, y, z, index);
         }

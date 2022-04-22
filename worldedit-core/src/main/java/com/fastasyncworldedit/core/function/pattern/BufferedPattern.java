@@ -11,6 +11,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 import javax.annotation.Nullable;
@@ -38,10 +39,10 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
      *
      * @param actor    actor associated with the pattern
      * @param parent   pattern to set
-     * @param areaSize anticipated size of the edit
+     * @param region  anticipated area of the edit
      * @since TODO
      */
-    public BufferedPattern(Actor actor, Pattern parent, @Nullable BlockVector3 areaSize) {
+    public BufferedPattern(Actor actor, Pattern parent, @Nullable Region region) {
         long[] tmp = actor.getMeta("lastActionTime");
         if (tmp == null) {
             actor.setMeta("lastActionTime", tmp = new long[2]);
@@ -49,11 +50,8 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
         actionTime = tmp;
         this.pattern = parent;
         this.timer = Fawe.instance().getTimer();
-        if (areaSize != null && (areaSize.getBlockX() > 2048 || areaSize.getBlockZ() > 2048)) {
-            set = new BlockVectorSet();
-        } else {
-            set = new LocalBlockVectorSet();
-        }
+        // Assume brush is used if no region provided, i.e. unlikely to required BlockVectorSet
+        set = region == null ? new LocalBlockVectorSet() : BlockVectorSet.getAppropriateVectorSet(region);
     }
 
     @Override
