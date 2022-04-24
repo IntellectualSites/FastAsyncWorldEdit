@@ -70,56 +70,56 @@ public class LocationMaskedPlayerWrapper extends AsyncPlayer {
 
     @Override
     public boolean ascendLevel() {
-        if (allowTeleport) {
-            super.ascendLevel();
+        if (allowTeleport && super.ascendLevel()) {
             update();
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean descendLevel() {
-        if (allowTeleport) {
-            super.descendLevel();
+        if (allowTeleport && super.descendLevel()) {
             update();
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean ascendToCeiling(int clearance) {
-        if (allowTeleport) {
-            super.ascendToCeiling(clearance);
+        if (allowTeleport && super.ascendToCeiling(clearance)) {
             update();
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
-        if (allowTeleport) {
-            super.ascendToCeiling(clearance, alwaysGlass);
+        if (allowTeleport && super.ascendToCeiling(clearance, alwaysGlass)) {
             update();
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean ascendUpwards(int distance) {
-        if (allowTeleport) {
-            super.ascendUpwards(distance);
+        if (allowTeleport && super.ascendUpwards(distance)) {
             update();
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
     public boolean ascendUpwards(int distance, boolean alwaysGlass) {
-        if (allowTeleport) {
-            super.ascendUpwards(distance, alwaysGlass);
+        if (allowTeleport && super.ascendUpwards(distance, alwaysGlass)) {
             update();
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
