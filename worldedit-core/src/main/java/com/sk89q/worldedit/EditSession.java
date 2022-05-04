@@ -46,7 +46,6 @@ import com.fastasyncworldedit.core.function.visitor.DirectionalVisitor;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.history.changeset.BlockBagChangeSet;
 import com.fastasyncworldedit.core.limit.FaweLimit;
-import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
@@ -3054,7 +3053,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public int hollowOutRegion(Region region, int thickness, Pattern pattern, Mask mask) {
         try {
-            final Set<BlockVector3> outside = BlockVectorSet.getAppropriateVectorSet(region);
+            final Set<BlockVector3> outside = BlockVector3Set.getAppropriateVectorSet(region);
 
             final BlockVector3 min = region.getMinimumPoint();
             final BlockVector3 max = region.getMaximumPoint();
@@ -3098,7 +3097,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
 
             for (int i = 1; i < thickness; ++i) {
-                final Set<BlockVector3> newOutside = BlockVectorSet.getAppropriateVectorSet(region);
+                final Set<BlockVector3> newOutside = BlockVector3Set.getAppropriateVectorSet(region);
                 outer:
                 for (BlockVector3 position : region) {
                     for (BlockVector3 recurseDirection : recurseDirections) {
@@ -3167,7 +3166,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int dz = Math.abs(z2 - z1);
 
         //FAWE start - LocalBlockVectorSet
-        BlockVector3Set vset = BlockVectorSet.getAppropriateVectorSet(new CuboidRegion(pos1, pos2));
+        BlockVector3Set vset = BlockVector3Set.getAppropriateVectorSet(new CuboidRegion(pos1, pos2));
 
         boolean notdrawn = true;
         //FAWE end

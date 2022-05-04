@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.math;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.Region;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -27,28 +26,6 @@ import java.util.Objects;
 public class BlockVectorSet extends AbstractCollection<BlockVector3> implements BlockVector3Set {
 
     private final Long2ObjectLinkedOpenHashMap<LocalBlockVectorSet> localSets = new Long2ObjectLinkedOpenHashMap<>(4);
-
-    public static BlockVector3Set getAppropriateVectorSet(Region region) {
-        BlockVector3 max = region.getMaximumPoint();
-        BlockVector3 min = region.getMinimumPoint();
-        BlockVector3 size = region.getDimensions();
-        if (size.getBlockX() > 2048 || size.getBlockZ() > 2048 || size.getBlockY() > 512) {
-            return new BlockVectorSet();
-        } else {
-            // Set default offset as many operations utilising a region are likely to start in a corner, this initialising the
-            // LocalBlockVectorSet poorly
-            // This needs to be ceiling as LocalBlockVector extends 1 block further "negative"
-            int offsetX = (int) Math.ceil((min.getX() + max.getX()) / 2d);
-            int offsetZ = (int) Math.ceil((min.getZ() + max.getZ()) / 2d);
-            int offsetY;
-            if (region.getMinimumY() < -128 || region.getMaximumY() > 320) {
-                offsetY = (min.getY() + max.getY()) / 2;
-            } else {
-                offsetY = 128;
-            }
-            return new LocalBlockVectorSet(offsetX, offsetY, offsetZ);
-        }
-    }
 
     @Override
     public int size() {

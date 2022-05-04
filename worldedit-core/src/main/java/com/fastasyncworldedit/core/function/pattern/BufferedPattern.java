@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.function.pattern;
 
 import com.fastasyncworldedit.core.Fawe;
-import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.util.FaweTimer;
 import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
@@ -51,7 +50,7 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
         this.pattern = parent;
         this.timer = Fawe.instance().getTimer();
         // Assume brush is used if no region provided, i.e. unlikely to required BlockVectorSet
-        set = region == null ? new LocalBlockVectorSet() : BlockVectorSet.getAppropriateVectorSet(region);
+        set = region == null ? new LocalBlockVectorSet() : BlockVector3Set.getAppropriateVectorSet(region);
     }
 
     @Override
