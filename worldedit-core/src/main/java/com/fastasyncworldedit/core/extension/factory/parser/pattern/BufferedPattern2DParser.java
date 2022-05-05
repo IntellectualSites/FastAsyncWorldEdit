@@ -35,13 +35,6 @@ public class BufferedPattern2DParser extends RichParser<Pattern> {
 
     @Override
     public Pattern parseFromInput(@Nonnull String[] input, ParserContext context) throws InputParseException {
-        Region selection = null;
-        if (context.getSession() != null) {
-            try {
-                selection = context.getSession().getSelection();
-            } catch (IncompleteRegionException ignored) {
-            }
-        }
         if (input.length != 1) {
             throw new InputParseException(Caption.of(
                     "fawe.error.command.syntax",
@@ -49,7 +42,7 @@ public class BufferedPattern2DParser extends RichParser<Pattern> {
             ));
         }
         Pattern inner = this.worldEdit.getPatternFactory().parseFromInput(input[0], context);
-        return new BufferedPattern2D(context.requireActor(), inner, selection);
+        return new BufferedPattern2D(context.requireActor(), inner, context.getSelection());
     }
 
 }
