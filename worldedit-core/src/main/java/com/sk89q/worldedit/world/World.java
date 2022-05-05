@@ -63,11 +63,22 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
 //FAWE end
 
     /**
-     * Get the name of the world.
+     * Get the name of the world. This will error if world has been unloaded by the server.
      *
      * @return a name for the world
      */
     String getName();
+
+    //FAWE start - allow history to read an unloaded world's name
+    /**
+     * Get the name of the world. If the world referenced has been unloaded, this will still return the name.
+     *
+     * @return a name for the world
+     * @since TODO
+     */
+    String getNameUnsafe();
+    //FAWE end
+
 
     /**
      * Get the folder in which this world is stored. May return null if unknown

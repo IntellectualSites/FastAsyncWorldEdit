@@ -306,7 +306,8 @@ public class LocalSession implements TextureHolder {
         }
         File file = MainUtil.getFile(
                 Fawe.platform().getDirectory(),
-                Settings.settings().PATHS.HISTORY + File.separator + world.getName() + File.separator + uuid + File.separator + "index"
+                // Use "unsafe" method here as world does not need to be loaded to save this information.
+                Settings.settings().PATHS.HISTORY + File.separator + world.getNameUnsafe() + File.separator + uuid + File.separator + "index"
         );
         if (getHistoryNegativeIndex() != 0) {
             try {

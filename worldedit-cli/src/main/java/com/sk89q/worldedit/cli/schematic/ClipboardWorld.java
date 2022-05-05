@@ -76,6 +76,13 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
         return this.name;
     }
 
+    //FAWE start - allow history to read an unloaded world's name
+    @Override
+    public String getNameUnsafe() {
+        return this.name;
+    }
+    //FAWE end
+
     @Override
     public String getId() {
         return getName().replace(" ", "_").toLowerCase(Locale.ROOT);
