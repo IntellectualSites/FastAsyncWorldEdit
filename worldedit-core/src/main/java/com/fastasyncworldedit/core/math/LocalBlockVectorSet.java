@@ -48,6 +48,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      * @param x x offset
      * @param y y offset
      * @param z z offset
+     * @since TODO
      */
     public LocalBlockVectorSet(int x, int y, int z) {
         this.offsetX = x;
@@ -158,6 +159,7 @@ public class LocalBlockVectorSet implements BlockVector3Set {
      * @param x x offset
      * @param y y offset
      * @param z z offset
+     * @since TODO
      */
     public void setOffset(int x, int y, int z) {
         this.offsetX = x;
