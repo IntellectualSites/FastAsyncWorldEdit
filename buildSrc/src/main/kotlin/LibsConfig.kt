@@ -223,7 +223,7 @@ fun Project.applyLibrariesConfiguration() {
                     developers {
                         developer {
                             id.set("NotMyFault")
-                            name.set("NotMyFault")
+                            name.set("Alexander Brandes")
                             email.set("contact@notmyfault.dev")
                             organization.set("IntellectualSites")
                         }
