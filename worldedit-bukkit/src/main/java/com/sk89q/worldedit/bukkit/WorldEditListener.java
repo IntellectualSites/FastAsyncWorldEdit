@@ -86,7 +86,10 @@ public class WorldEditListener implements Listener {
             return;
         }
 
-        Player player = plugin.wrapPlayer(event.getPlayer());
+        BukkitPlayer player = plugin.wrapPlayer(event.getPlayer());
+        if (player.getPlayer() != event.getPlayer()) {
+            player = plugin.reCachePlayer(event.getPlayer());
+        }
         LocalSession session;
         if ((session = WorldEdit.getInstance().getSessionManager().getIfPresent(player)) != null) {
             session.loadDefaults(player, true);

@@ -575,6 +575,14 @@ public class WorldEditPlugin extends JavaPlugin {
     }
     //FAWE end
 
+    public BukkitPlayer reCachePlayer(Player player) {
+        synchronized (player) {
+            BukkitPlayer wePlayer = new BukkitPlayer(this, player);
+            player.setMetadata("WE", new FixedMetadataValue(this, wePlayer));
+            return wePlayer;
+        }
+    }
+
     public Actor wrapCommandSender(CommandSender sender) {
         if (sender instanceof Player) {
             return wrapPlayer((Player) sender);
