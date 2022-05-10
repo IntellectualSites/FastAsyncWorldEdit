@@ -86,7 +86,15 @@ public class WorldEditListener implements Listener {
             return;
         }
 
-        Player player = plugin.wrapPlayer(event.getPlayer());
+        BukkitPlayer player = plugin.wrapPlayer(event.getPlayer());
+        //If plugins do silly things like teleport, deop (anything that requires a perm-recheck) (anything that ultimately
+        // requires a BukkitPlayer at some point) then the retention of metadata by the server (as it's stored based on a
+        // string value indescriminate of player a player relogging) means that a BukkitPlayer caching an old player object
+        // will be kept, cached and retrieved by FAWE. Adding a simple memory-based equality check when the player rejoins,
+        // and then "invaliding" (redoing) the cache if the players are not equal, fixes this.
+        if (player.getPlayer() != event.getPlayer()) {
+            player = plugin.reCachePlayer(event.getPlayer());
+        }
         LocalSession session;
         if ((session = WorldEdit.getInstance().getSessionManager().getIfPresent(player)) != null) {
             session.loadDefaults(player, true);
