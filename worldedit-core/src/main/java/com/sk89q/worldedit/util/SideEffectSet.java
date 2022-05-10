@@ -56,7 +56,9 @@ public class SideEffectSet {
                 .filter(entry -> entry.getValue() != SideEffect.State.OFF)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toSet());
-        appliesAny = !appliedSideEffects.isEmpty();
+        //FAWE start
+        appliesAny = sideEffects.isEmpty() || !appliedSideEffects.isEmpty(); // Empty side effects implies default
+        //FAWE end
     }
 
     public SideEffectSet with(SideEffect sideEffect, SideEffect.State state) {
