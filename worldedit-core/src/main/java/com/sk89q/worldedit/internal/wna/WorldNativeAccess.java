@@ -174,7 +174,7 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         if (isChunkTicking(chunk)) {
             if (sideEffectSet.shouldApply(SideEffect.ENTITY_AI)) {
                 notifyBlockUpdate(chunk, pos, oldState, newState);
-            } else {
+            } else if (sideEffectSet.shouldApply(SideEffect.NETWORK)) {
                 // If we want to skip entity AI, just mark the block for sending
                 markBlockChanged(chunk, pos);
             }
@@ -190,7 +190,9 @@ public interface WorldNativeAccess<NC, NBS, NP> {
         }
 
         // Seems used only for PoI updates
-        onBlockStateChange(pos, oldState, newState);
+        if (sideEffectSet.shouldApply(SideEffect.POI_UPDATE)) {
+            onBlockStateChange(pos, oldState, blockState1);
+        }
     }
 
     //FAWE start

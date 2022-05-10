@@ -23,8 +23,11 @@ import com.fastasyncworldedit.core.configuration.Caption;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.formatting.WorldEditText;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.util.formatting.text.TranslatableComponent;
 import com.sk89q.worldedit.util.formatting.text.event.ClickEvent;
 import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
@@ -36,21 +39,23 @@ import java.util.stream.Collectors;
 
 public class SideEffectBox extends PaginationBox {
 
-    private static List<SideEffect> sideEffects;
+    private static final LazyReference<List<SideEffect>> SIDE_EFFECTS = LazyReference.from(() ->
+        WorldEdit.getInstance().getPlatformManager().getSupportedSideEffects()
+            .stream()
+            .filter(SideEffect::isExposed)
+            .sorted(Comparator.comparing(effect ->
+                WorldEditText.reduceToText(
+                    TranslatableComponent.of(effect.getDisplayName()),
+                    Locale.US
+                )
+            ))
+            .collect(Collectors.toList())
+    );
 
     private final SideEffectSet sideEffectSet;
 
     private static List<SideEffect> getSideEffects() {
-        //FAWE start
-        if (sideEffects == null) {
-            sideEffects = WorldEdit.getInstance().getPlatformManager().getSupportedSideEffects()
-                    .stream()
-                    .sorted(Comparator.comparing(Enum::name))
-                    .collect(Collectors.toList());
-        }
-        //FAWE end
-
-        return sideEffects;
+        return SIDE_EFFECTS.getValue();
     }
 
     public SideEffectBox(SideEffectSet sideEffectSet) {

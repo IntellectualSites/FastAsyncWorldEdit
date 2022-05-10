@@ -31,10 +31,12 @@ import java.util.stream.Collectors;
 
 public class SideEffectSet {
 
-    private static final SideEffectSet DEFAULT = new SideEffectSet(
-            Arrays.stream(SideEffect.values()).collect(Collectors.toMap(Function.identity(), SideEffect::getDefaultValue))
+    private static final SideEffectSet DEFAULT = new SideEffectSet();
+    private static final SideEffectSet NONE = new SideEffectSet(
+        Arrays.stream(SideEffect.values())
+            .filter(SideEffect::isExposed)
+            .collect(Collectors.toMap(Function.identity(), state -> SideEffect.State.OFF))
     );
-    private static final SideEffectSet NONE = new SideEffectSet();
 
     private final Map<SideEffect, SideEffect.State> sideEffects;
     private final Set<SideEffect> appliedSideEffects;
