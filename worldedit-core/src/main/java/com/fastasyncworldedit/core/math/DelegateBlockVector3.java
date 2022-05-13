@@ -5,6 +5,7 @@ import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
@@ -346,6 +347,16 @@ public class DelegateBlockVector3 extends BlockVector3 {
     @Override
     public BaseBlock getFullBlock(Extent orDefault) {
         return parent.getFullBlock(orDefault);
+    }
+
+    @Override
+    public boolean setBiome(Extent orDefault, BiomeType type) {
+        return parent.setBiome(orDefault, type);
+    }
+
+    @Override
+    public BiomeType getBiome(Extent orDefault) {
+        return parent.getBiome(orDefault);
     }
 
     @Override

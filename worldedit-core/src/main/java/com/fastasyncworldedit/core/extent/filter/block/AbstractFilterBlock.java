@@ -19,6 +19,12 @@ public abstract class AbstractFilterBlock extends FilterBlock {
     @Override
     public abstract void setFullBlock(BaseBlock block);
 
+    @Override
+    public abstract BiomeType getBiome();
+
+    @Override
+    public abstract void setBiome(BiomeType type);
+
     public abstract BlockVector3 getPosition();
 
     @Override
@@ -91,6 +97,10 @@ public abstract class AbstractFilterBlock extends FilterBlock {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        if (x == this.getX() && y == this.getY() && z == this.getZ()) {
+            setBiome(biome);
+            return true;
+        }
         return getExtent().setBiome(x, y, z, biome);
     }
 
