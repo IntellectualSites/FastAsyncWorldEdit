@@ -59,7 +59,10 @@ public interface ClipboardReader extends Closeable {
 
     //FAWE start
     default Clipboard read(UUID uuid) throws IOException {
-        return read(uuid, (dimensions) -> Clipboard.create(new CuboidRegion(BlockVector3.ZERO, dimensions), uuid));
+        return read(
+                uuid,
+                (dimensions) -> Clipboard.create(new CuboidRegion(BlockVector3.ZERO, dimensions.subtract(BlockVector3.ONE)), uuid)
+        );
     }
 
     default Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
