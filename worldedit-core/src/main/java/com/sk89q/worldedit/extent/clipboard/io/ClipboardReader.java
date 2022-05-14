@@ -19,9 +19,9 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.CuboidRegion;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -59,7 +59,10 @@ public interface ClipboardReader extends Closeable {
 
     //FAWE start
     default Clipboard read(UUID uuid) throws IOException {
-        return read(uuid, DiskOptimizedClipboard::new);
+        return read(
+                uuid,
+                (dimensions) -> Clipboard.create(new CuboidRegion(BlockVector3.ZERO, dimensions.subtract(BlockVector3.ONE)), uuid)
+        );
     }
 
     default Clipboard read(UUID uuid, Function<BlockVector3, Clipboard> createOutput) throws IOException {
