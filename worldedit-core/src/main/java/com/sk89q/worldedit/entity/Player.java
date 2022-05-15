@@ -475,7 +475,7 @@ public interface Player extends Entity, Actor {
                     //noinspection resource - We do not want to close it straight away.
                     doc = new DiskOptimizedClipboard(file);
                 } catch (FaweClipboardVersionMismatchException e) { // Attempt to recover
-                    int version = e.getVersion();
+                    int version = e.getClipboardVersion();
                     //noinspection resource - We do not want to close it straight away.
                     doc = new DiskOptimizedClipboard(file, version);
                 }
@@ -484,7 +484,7 @@ public interface Player extends Entity, Actor {
                 session.setClipboard(holder);
             }
         } catch (FaweClipboardVersionMismatchException e) {
-            print(Caption.of("fawe.error.clipboard.on.disk.version.mismatch"));
+            print(e.getComponent());
         } catch (RuntimeException e) {
             print(Caption.of("fawe.error.clipboard.invalid"));
             e.printStackTrace();

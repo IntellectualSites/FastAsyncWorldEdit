@@ -7,7 +7,6 @@ import com.fastasyncworldedit.core.internal.io.ByteBufferInputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.fastasyncworldedit.core.math.IntTriple;
 import com.fastasyncworldedit.core.util.MainUtil;
-import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
@@ -15,7 +14,6 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
-import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -30,7 +28,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
-import kotlin.coroutines.jvm.internal.SuspendFunction;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -45,7 +42,6 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,9 +57,8 @@ import java.util.stream.Collectors;
  */
 public class DiskOptimizedClipboard extends LinearClipboard {
 
+    public static final int VERSION = 2;
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-
-    private static final int VERSION = 2;
     private static final int HEADER_SIZE = 27; // Current header size
     private static final int VERSION_1_HEADER_SIZE = 22; // Header size of "version 1"
     private static final int VERSION_2_HEADER_SIZE = 27; // Header size of "version 2" i.e. when NBT/entities could be saved
@@ -97,7 +92,12 @@ public class DiskOptimizedClipboard extends LinearClipboard {
 
     /**
      * Creates a new DiskOptimizedClipboard with the given dimensions. Creates a new file with a random UUID name.
+     *
+     * @deprecated Use {@link DiskOptimizedClipboard#DiskOptimizedClipboard(Region, UUID)} or
+     *         {@link DiskOptimizedClipboard#DiskOptimizedClipboard(BlockVector3, File)} to avoid creating a large number of clipboard
+     *         files that won't be cleaned until `clipboard.delete-after-days` and a server restart.
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
         this(
                 dimensions,
@@ -209,7 +209,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                             double y = pos.get(1).getValue();
                             double z = pos.get(2).getValue();
                             BaseEntity entity = new BaseEntity(tag);
-                            BlockArrayClipboard.ClipboardEntity clipboardEntity = new BlockArrayClipboard.ClipboardEntity(this,
+                            BlockArrayClipboard.ClipboardEntity clipboardEntity = new BlockArrayClipboard.ClipboardEntity(
+                                    this,
                                     x,
                                     y,
                                     z,
@@ -238,7 +239,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             is.skipBytes(2);
             int version = is.readChar();
             if (version != expectedVersion) {
-                throw new FaweClipboardVersionMismatchException(version);
+                throw new FaweClipboardVersionMismatchException(expectedVersion, version);
             }
             return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
         } catch (IOException e) {
