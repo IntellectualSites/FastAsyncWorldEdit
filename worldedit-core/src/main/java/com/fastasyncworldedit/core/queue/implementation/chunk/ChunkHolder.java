@@ -1048,7 +1048,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
                 });
             } catch (Throwable t) {
                 calledLock.unlock();
-                t.printStackTrace();
                 throw t;
             }
         }
