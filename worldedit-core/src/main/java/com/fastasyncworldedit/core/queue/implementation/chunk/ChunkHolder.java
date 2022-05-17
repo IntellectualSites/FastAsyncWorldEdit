@@ -145,15 +145,16 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public char[] load(int layer) {
-        checkAndWaitOnCalledLock();
         return getOrCreateGet().load(layer);
     }
 
     @Nullable
     @Override
     public char[] loadIfPresent(final int layer) {
-        checkAndWaitOnCalledLock();
-        return getOrCreateGet().loadIfPresent(layer);
+        if (chunkExisting == null) {
+            return null;
+        }
+        return chunkExisting.loadIfPresent(layer);
     }
 
     @Override
@@ -224,25 +225,21 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public int getMaxY() {
-        checkAndWaitOnCalledLock();
         return getOrCreateGet().getMaxY();
     }
 
     @Override
     public int getMinY() {
-        checkAndWaitOnCalledLock();
         return getOrCreateGet().getMinY();
     }
 
     @Override
     public int getMaxSectionPosition() {
-        checkAndWaitOnCalledLock();
         return getOrCreateGet().getMaxSectionPosition();
     }
 
     @Override
     public int getMinSectionPosition() {
-        checkAndWaitOnCalledLock();
         return getOrCreateGet().getMinSectionPosition();
     }
 
@@ -973,7 +970,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public int getSectionCount() {
-        checkAndWaitOnCalledLock();
         return getOrCreateGet().getSectionCount();
     }
 
@@ -1012,7 +1008,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * - e.g., caching, optimizations, filtering
      */
     private IChunkSet newWrappedSet() {
-        checkAndWaitOnCalledLock();
         return extent.getCachedSet(chunkX, chunkZ);
     }
 
