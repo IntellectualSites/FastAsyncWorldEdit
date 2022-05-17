@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.queue.implementation.chunk;
 
 import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.concurrent.ReentrantWrappedStampedLock;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
@@ -25,8 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks.
@@ -44,7 +43,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return POOL.poll();
     }
 
-    private final Lock calledLock = new ReentrantLock();
+    private final ReentrantWrappedStampedLock calledLock = new ReentrantWrappedStampedLock();
 
     private IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private IChunkSet chunkSet; // The blocks to be set to the chunkExisting
@@ -79,8 +78,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * If the chunk is currently being "called", this method will block until completed.
      */
     private void checkAndWaitOnCalledLock() {
-        if (calledLock.tryLock()) {
-            calledLock.unlock();
+        if (calledLock.isLocked()) {
+            synchronized (this) {
+                if (calledLock.isLocked()) {
+                    calledLock.lock();
+                    calledLock.unlock();
+                }
+            }
         }
     }
 
@@ -1039,12 +1043,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public synchronized T call() {
         calledLock.lock();
+        final long stamp = calledLock.getStampChecked();
         if (chunkSet != null && !chunkSet.isEmpty()) {
             chunkSet.setBitMask(bitMask);
             try {
                 return this.call(chunkSet, () -> {
                     recycle();
-                    calledLock.unlock();
+                    calledLock.unlock(stamp);
                 });
             } catch (Throwable t) {
                 calledLock.unlock();
