@@ -79,12 +79,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      */
     private void checkAndWaitOnCalledLock() {
         if (calledLock.isLocked()) {
-            synchronized (this) {
-                if (calledLock.isLocked()) {
-                    calledLock.lock();
-                    calledLock.unlock();
-                }
-            }
+            calledLock.lock();
+            calledLock.unlock();
         }
     }
 
