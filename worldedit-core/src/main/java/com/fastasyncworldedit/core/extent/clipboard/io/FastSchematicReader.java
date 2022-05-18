@@ -266,7 +266,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         BlockVector3 dimensions = BlockVector3.at(width, height, length);
         BlockVector3 origin;
         if (offsetX != Integer.MIN_VALUE && offsetY != Integer.MIN_VALUE && offsetZ != Integer.MIN_VALUE) {
-            origin = BlockVector3.at(-offsetX, -offsetY, -offsetZ);
+            origin = min.subtract(offsetX, offsetY, offsetZ);
         } else {
             origin = BlockVector3.ZERO;
         }
