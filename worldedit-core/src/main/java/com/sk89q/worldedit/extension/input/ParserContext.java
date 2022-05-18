@@ -351,7 +351,7 @@ public class ParserContext {
      * supplied.
      *
      * @return Region representing the selection for this context or null if it cannot be retrieved.
-     * @since 2.3.0
+     * @since 2.2.0
      */
     public Region getSelection() {
         if (session != null) {

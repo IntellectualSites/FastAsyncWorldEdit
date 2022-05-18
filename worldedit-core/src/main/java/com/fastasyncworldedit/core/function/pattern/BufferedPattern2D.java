@@ -25,7 +25,7 @@ public class BufferedPattern2D extends BufferedPattern {
      * @param actor    actor associated with the pattern
      * @param parent   pattern to set
      * @param region  anticipated area of the edit
-     * @since 2.3.0
+     * @since 2.2.0
      */
     public BufferedPattern2D(Actor actor, Pattern parent, @Nullable Region region) {
         super(actor, parent, region);

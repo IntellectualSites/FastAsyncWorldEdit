@@ -39,7 +39,7 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
      * @param actor    actor associated with the pattern
      * @param parent   pattern to set
      * @param region  anticipated area of the edit
-     * @since 2.3.0
+     * @since 2.2.0
      */
     public BufferedPattern(Actor actor, Pattern parent, @Nullable Region region) {
         long[] tmp = actor.getMeta("lastActionTime");
