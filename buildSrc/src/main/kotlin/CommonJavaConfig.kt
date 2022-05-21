@@ -64,7 +64,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                     "https://www.antlr.org/api/Java/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/core/0.5.7/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/default-impl/0.5.7/",
-                    "https://papermc.io/javadocs/paper/1.18/",
+                    "https://jd.papermc.io/paper/1.18/",
                     "https://javadoc.io/doc/com.fastasyncworldedit/FastAsyncWorldEdit-Core" // needed for other module linking
             )
         }
