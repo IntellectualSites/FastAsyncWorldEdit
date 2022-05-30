@@ -20,7 +20,6 @@
     "com.github.luben:zstd-jni",
     "net.kyori"
   ],
-  "timezone": "Europe/Berlin",
   "schedule": [
     "every monday"
   ],
