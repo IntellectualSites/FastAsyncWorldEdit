@@ -1,4 +1,4 @@
-image::fawe-logo.png[150,150,align=center]
+image::https://raw.githubusercontent.com/IntellectualSites/Assets/main/plugins/FastAsyncWorldEdit/FastAsyncWorldEdit.svg[200,200,align=center]
 
 '''
 
