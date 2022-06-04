@@ -195,7 +195,7 @@ public class SnowHeightMap {
                     }
                 } else {
                     // Shrink -- start from bottom
-                    for (int y = 0; y < (int) Math.floor(newHeight - originY); ++y) {
+                    for (int y = session.getMinY(); y < (int) Math.floor(newHeight - originY); ++y) { // FAWE - Use world bottom
                         if (y >= (int) Math.floor(newHeight - originY - layerBlocks)) {
                             //FAWE start - avoid BlockVector3 creation for no reason
                             session.setBlock(xr, originY + y, zr, fillerSnow);
