@@ -232,8 +232,7 @@ public class SnowHeightMap {
         int y = (int) Math.floor(newHeight);
         int numOfLayers = (int) ((newHeight - y) * 8) + 1;
         //FAWE start - avoid BlockVector3 creation for no reason
-        session.setBlock(x, (int) newHeight, z, BlockTypes.SNOW.getDefaultState().with(LAYERS, numOfLayers));
+        session.setBlock(x, y, z, BlockTypes.SNOW.getDefaultState().with(LAYERS, numOfLayers));
         //FAWE end
     }
-
 }
