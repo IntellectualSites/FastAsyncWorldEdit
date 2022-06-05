@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 
@@ -803,6 +804,14 @@ public abstract class BlockVector3 {
 
     public BaseBlock getFullBlock(Extent orDefault) {
         return orDefault.getFullBlock(this);
+    }
+
+    public boolean setBiome(Extent orDefault, BiomeType type) {
+        return orDefault.setBiome(this, type);
+    }
+
+    public BiomeType getBiome(Extent orDefault) {
+        return orDefault.getBiome(this);
     }
 
     public CompoundTag getNbtData(Extent orDefault) {

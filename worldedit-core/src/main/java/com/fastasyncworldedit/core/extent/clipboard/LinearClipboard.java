@@ -118,6 +118,16 @@ public abstract class LinearClipboard extends SimpleClipboard {
         }
 
         @Override
+        public BiomeType getBiome() {
+            return LinearClipboard.this.getBiome(position);
+        }
+
+        @Override
+        public void setBiome(final BiomeType type) {
+            LinearClipboard.this.setBiome(position, type);
+        }
+
+        @Override
         public BlockVector3 getPosition() {
             return position;
         }
