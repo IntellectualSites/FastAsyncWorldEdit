@@ -519,7 +519,8 @@ public class Settings extends Config {
                 " - A larger value will use slightly less CPU time",
                 " - A smaller value will reduce memory usage",
                 " - A value too small may break some operations (deform?)",
-                " - Values smaller than the configurated parallel threads are not accepted"
+                " - Values smaller than the configurated parallel-threads are not accepted",
+                " - It is recommended this option be at least 2x greater than parallel-threads"
 
         })
         public int TARGET_SIZE = 64;
