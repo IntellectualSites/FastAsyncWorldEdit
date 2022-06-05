@@ -235,4 +235,5 @@ public class SnowHeightMap {
         session.setBlock(x, y, z, BlockTypes.SNOW.getDefaultState().with(LAYERS, numOfLayers));
         //FAWE end
     }
+
 }
