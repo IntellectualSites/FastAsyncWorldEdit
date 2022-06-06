@@ -470,15 +470,7 @@ public interface Player extends Entity, Actor {
                     }
                 } catch (EmptyClipboardException ignored) {
                 }
-                DiskOptimizedClipboard doc;
-                try {
-                    //noinspection resource - We do not want to close it straight away.
-                    doc = new DiskOptimizedClipboard(file);
-                } catch (FaweClipboardVersionMismatchException e) { // Attempt to recover
-                    int version = e.getClipboardVersion();
-                    //noinspection resource - We do not want to close it straight away.
-                    doc = new DiskOptimizedClipboard(file, version);
-                }
+                DiskOptimizedClipboard doc = DiskOptimizedClipboard.loadFromFile(file);
                 Clipboard clip = doc.toClipboard();
                 ClipboardHolder holder = new ClipboardHolder(clip);
                 session.setClipboard(holder);

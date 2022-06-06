@@ -234,6 +234,24 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         }
     }
 
+    /**
+     * Attempt to load a file into a new {@link DiskOptimizedClipboard} instance. Will attempt to recover on version mismatch
+     * failure.
+     *
+     * @param file File to load
+     * @return new {@link DiskOptimizedClipboard} instance.
+     */
+    public static DiskOptimizedClipboard loadFromFile(final File file) {
+        DiskOptimizedClipboard doc;
+        try {
+            doc = new DiskOptimizedClipboard(file);
+        } catch (FaweClipboardVersionMismatchException e) { // Attempt to recover
+            int version = e.getClipboardVersion();
+            doc = new DiskOptimizedClipboard(file, version);
+        }
+        return doc;
+    }
+
     private static BlockVector3 readSize(File file, int expectedVersion) {
         try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
             is.skipBytes(2);
