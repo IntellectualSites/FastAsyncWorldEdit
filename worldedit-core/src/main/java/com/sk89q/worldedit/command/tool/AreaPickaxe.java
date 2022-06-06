@@ -75,12 +75,14 @@ public class AreaPickaxe implements BlockTool {
                             if (!initialType.equals(editSession.getBlock(x, y, z).getBlockType())) {
                                 continue;
                             }
+                            // FAWE start
+                            if (editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState())) {
 
-                            editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
-
-                            BlockVector3 pos = BlockVector3.at(x, y, z);
-                            ((World) clicked.getExtent()).queueBlockBreakEffect(server, pos, initialType,
-                                    clicked.toVector().toBlockPoint().distanceSq(pos));
+                                BlockVector3 pos = BlockVector3.at(x, y, z);
+                                ((World) clicked.getExtent()).queueBlockBreakEffect(server, pos, initialType,
+                                        clicked.toVector().toBlockPoint().distanceSq(pos));
+                            }
+                            // FAWE end
                         }
                     }
                 }
