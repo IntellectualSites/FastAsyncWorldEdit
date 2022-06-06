@@ -75,7 +75,7 @@ public class AreaPickaxe implements BlockTool {
                             if (!initialType.equals(editSession.getBlock(x, y, z).getBlockType())) {
                                 continue;
                             }
-                            // FAWE start
+                            // FAWE start - Only queue the block break effect if setting the block is successful
                             if (editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState())) {
 
                                 BlockVector3 pos = BlockVector3.at(x, y, z);
