@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.extent.filter.block;
 
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
 public class ExtentFilterBlock extends AbstractFilterBlock {
@@ -27,6 +28,16 @@ public class ExtentFilterBlock extends AbstractFilterBlock {
     @Override
     public void setFullBlock(BaseBlock block) {
         pos.setFullBlock(extent, block);
+    }
+
+    @Override
+    public BiomeType getBiome() {
+        return pos.getBiome(extent);
+    }
+
+    @Override
+    public void setBiome(final BiomeType type) {
+        pos.setBiome(extent, type);
     }
 
     @Override

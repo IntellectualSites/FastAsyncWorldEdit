@@ -1,4 +1,4 @@
-image::fawe-logo.png[150,150,align=center]
+image::https://raw.githubusercontent.com/IntellectualSites/Assets/main/plugins/FastAsyncWorldEdit/FastAsyncWorldEdit.svg[200,200,align=center]
 
 '''
 
@@ -13,6 +13,7 @@ FastAsyncWorldEdit is a fork of WorldEdit that has huge speed and memory improve
 Java Edition required. FastAsyncWorldEdit is compatible with Bukkit, Spigot and Paper.
 
 === Download FastAsyncWorldEdit
+* Snapshot builds: https://ci.athion.net/job/FastAsyncWorldEdit/
 * Spigot: https://www.spigotmc.org/resources/fast-async-worldedit.13932/
 * Older, unsupported, versions: https://intellectualsites.github.io/download/fawe.html
 

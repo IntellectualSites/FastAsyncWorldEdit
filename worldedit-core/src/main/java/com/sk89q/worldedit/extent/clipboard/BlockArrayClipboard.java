@@ -227,8 +227,13 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        BlockVector3 v = position.subtract(offset);
-        return getParent().getBiomeType(v.getX(), v.getY(), v.getZ());
+        if (!region.contains(position)) {
+            return null;
+        }
+        int x = position.getBlockX() - offset.getX();
+        int y = position.getBlockY() - offset.getY();
+        int z = position.getBlockZ() - offset.getZ();
+        return getParent().getBiomeType(x, y, z);
     }
 
     @Override
@@ -326,6 +331,7 @@ public class BlockArrayClipboard implements Clipboard {
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
         x -= offset.getX();
+        y -= offset.getY();
         z -= offset.getZ();
         return getParent().getBiomeType(x, y, z);
     }

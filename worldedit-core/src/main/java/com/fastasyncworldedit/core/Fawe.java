@@ -335,7 +335,17 @@ public class Fawe {
         } catch (Throwable e) {
             LOGGER.error("Failed to load config.", e);
         }
-        Settings.settings().QUEUE.TARGET_SIZE = Math.max(Settings.settings().QUEUE.TARGET_SIZE, Settings.settings().QUEUE.PARALLEL_THREADS);
+        Settings.settings().QUEUE.TARGET_SIZE = Math.max(
+                Settings.settings().QUEUE.TARGET_SIZE,
+                Settings.settings().QUEUE.PARALLEL_THREADS
+        );
+        if (Settings.settings().QUEUE.TARGET_SIZE < 2 * Settings.settings().QUEUE.PARALLEL_THREADS) {
+            LOGGER.error(
+                    "queue.target_size is {}, and queue.parallel_threads is {}. It is HIGHLY recommended that queue" + ".target_size be at least twice queue.parallel_threads or higher.",
+                    Settings.settings().QUEUE.TARGET_SIZE,
+                    Settings.settings().QUEUE.PARALLEL_THREADS
+            );
+        }
         try {
             byte[] in = new byte[0];
             byte[] compressed = LZ4Factory.fastestJavaInstance().fastCompressor().compress(in);

@@ -19,10 +19,6 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
 
     public abstract Extent getExtent();
 
-    public void setBiome(BiomeType biome) {
-        setBiome(getX(), getY(), getZ(), biome);
-    }
-
     public abstract int getOrdinal();
 
     public abstract void setOrdinal(int ordinal);
@@ -34,6 +30,10 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     public abstract BaseBlock getFullBlock();
 
     public abstract void setFullBlock(BaseBlock block);
+
+    public abstract void setBiome(BiomeType biome);
+
+    public abstract BiomeType getBiome();
 
     @Override
     public abstract CompoundTag getNbtData();
@@ -163,6 +163,17 @@ public abstract class FilterBlock extends BlockVector3 implements Extent, TileEn
     @Override
     public BaseBlock getFullBlock(Extent orDefault) {
         return getFullBlock();
+    }
+
+    @Override
+    public boolean setBiome(Extent orDefault, BiomeType type) {
+        setBiome(type);
+        return true;
+    }
+
+    @Override
+    public BiomeType getBiome(Extent orDefault) {
+        return getBiome();
     }
 
     @Override

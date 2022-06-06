@@ -20,9 +20,8 @@
     "com.github.luben:zstd-jni",
     "net.kyori"
   ],
-  "timezone": "Europe/Berlin",
   "schedule": [
-    "on monday after 9am"
+    "every monday"
   ],
   "labels": ["Renovate"],
   "commitMessagePrefix": "build: ",

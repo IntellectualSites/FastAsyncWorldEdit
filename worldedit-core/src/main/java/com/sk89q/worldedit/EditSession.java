@@ -1459,10 +1459,17 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkArgument(radius >= 0, "radius >= 0");
         checkArgument(depth >= 1, "depth >= 1");
 
+        // Avoid int overflow (negative coordinate space allows for overflow back round to positive if the depth is large enough).
+        // Depth is always 1 or greater, thus the lower bound should always be <= origin y.
+        int lowerBound = origin.getBlockY() - depth + 1;
+        if (lowerBound > origin.getBlockY()) {
+            lowerBound = Integer.MIN_VALUE;
+        }
+
         Mask mask = new MaskIntersection(
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 new BoundedHeightMask(
-                        Math.max(origin.getBlockY() - depth + 1, minY),
+                        Math.max(lowerBound, minY),
                         Math.min(maxY, origin.getBlockY())
                 ),
                 Masks.negate(new ExistingBlockMask(this))

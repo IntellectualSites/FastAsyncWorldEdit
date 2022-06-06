@@ -32,3 +32,5 @@ worldedit-core/src/main/resources/lang/*
 **/*.eml
 /worldedit-core/FastAsyncWorldEdit.worldedit-core.eml
 /worldedit-core/.factorypath
+
+.DS_Store

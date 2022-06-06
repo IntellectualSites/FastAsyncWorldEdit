@@ -87,6 +87,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
@@ -399,7 +400,7 @@ public class SchematicCommands {
         } catch (IllegalArgumentException e) {
             actor.print(Caption.of("worldedit.schematic.unknown-filename", TextComponent.of(filename)));
         } catch (URISyntaxException | IOException e) {
-            actor.print(Caption.of("worldedit.schematic.file-not-exist", TextComponent.of(e.getMessage())));
+            actor.print(Caption.of("worldedit.schematic.file-not-exist", TextComponent.of(Objects.toString(e.getMessage()))));
             LOGGER.warn("Failed to load a saved clipboard", e);
         } finally {
             if (in != null) {

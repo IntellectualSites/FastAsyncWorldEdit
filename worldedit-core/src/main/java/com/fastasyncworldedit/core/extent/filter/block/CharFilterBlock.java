@@ -185,6 +185,11 @@ public class CharFilterBlock extends ChunkFilterBlock {
     }
 
     @Override
+    public BiomeType getBiome() {
+        return get.getBiomeType(x, y, z);
+    }
+
+    @Override
     public final int getX() {
         return xx + x;
     }

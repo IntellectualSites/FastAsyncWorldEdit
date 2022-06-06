@@ -31,7 +31,7 @@ public abstract class CharBlocks implements IBlocks {
             return true;
         }
     };
-    protected final Section empty = new Section() {
+    protected static final Section EMPTY = new Section() {
         @Override
         public char[] get(CharBlocks blocks, int layer) {
             // Defaults to aggressive as it should only be avoided where we know we've reset a chunk during an edit
@@ -41,6 +41,9 @@ public abstract class CharBlocks implements IBlocks {
         @Override
         public char[] get(CharBlocks blocks, int layer, boolean aggressive) {
             synchronized (blocks.sectionLocks[layer]) {
+                if (blocks.sections[layer] == FULL) {
+                    return FULL.get(blocks, layer);
+                }
                 char[] arr = blocks.blocks[layer];
                 if (arr == null) {
                     arr = blocks.blocks[layer] = blocks.update(layer, null, aggressive);
@@ -83,7 +86,7 @@ public abstract class CharBlocks implements IBlocks {
         sections = new Section[sectionCount];
         sectionLocks = new Object[sectionCount];
         for (int i = 0; i < sectionCount; i++) {
-            sections[i] = empty;
+            sections[i] = EMPTY;
             sectionLocks[i] = new Object();
         }
     }
@@ -117,7 +120,7 @@ public abstract class CharBlocks implements IBlocks {
     @Override
     public synchronized IChunkSet reset() {
         for (int i = 0; i < sectionCount; i++) {
-            sections[i] = empty;
+            sections[i] = EMPTY;
         }
         return null;
     }
@@ -125,7 +128,7 @@ public abstract class CharBlocks implements IBlocks {
     public void reset(int layer) {
         layer -= minSectionPosition;
         synchronized (sectionLocks[layer]) {
-            sections[layer] = empty;
+            sections[layer] = EMPTY;
         }
     }
 
@@ -235,8 +238,10 @@ public abstract class CharBlocks implements IBlocks {
             int normalized = layer - blocks.minSectionPosition;
             char[] section = get(blocks, normalized);
             if (section == null) {
-                blocks.reset(layer);
-                section = blocks.empty.get(blocks, normalized, false);
+                synchronized (blocks.sectionLocks[normalized]) {
+                    blocks.reset(layer);
+                    section = EMPTY.get(blocks, normalized, false);
+                }
             }
             return section[index];
         }
