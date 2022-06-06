@@ -177,53 +177,13 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             braf.setLength(file.length());
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) file.length();
             init();
-            long length = braf.length();
             long biomeLength = (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
             if (headerSize >= VERSION_2_HEADER_SIZE) {
                 readBiomeStatusFromHeader();
                 int nbtCount = readNBTSavedCountFromHeader();
                 int entitiesCount = readEntitiesSavedCountFromHeader();
                 if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK && nbtCount + entitiesCount > 0) {
-                    int biomeBlocksLength = (int) (headerSize + (getVolume() << 1) + (hasBiomes ? biomeLength : 0));
-                    MappedByteBuffer tmp = fileChannel.map(FileChannel.MapMode.READ_ONLY, biomeBlocksLength, length);
-                    try (NBTInputStream nbtIS = new NBTInputStream(MainUtil.getCompressedIS(new ByteBufferInputStream(tmp)))) {
-                        Iterator<CompoundTag> iter = nbtIS.toIterator();
-                        while (nbtCount > 0 && iter.hasNext()) { // TileEntities are stored "before" entities
-                            CompoundTag tag = iter.next();
-                            int x = tag.getInt("x");
-                            int y = tag.getInt("y");
-                            int z = tag.getInt("z");
-                            IntTriple pos = new IntTriple(x, y, z);
-                            nbtMap.put(pos, tag);
-                            nbtCount--;
-                        }
-                        while (entitiesCount > 0 && iter.hasNext()) {
-                            CompoundTag tag = iter.next();
-                            Tag posTag = tag.getValue().get("Pos");
-                            if (posTag == null) {
-                                LOGGER.warn("Missing pos tag: {}", tag);
-                                return;
-                            }
-                            List<DoubleTag> pos = (List<DoubleTag>) posTag.getValue();
-                            double x = pos.get(0).getValue();
-                            double y = pos.get(1).getValue();
-                            double z = pos.get(2).getValue();
-                            BaseEntity entity = new BaseEntity(tag);
-                            BlockArrayClipboard.ClipboardEntity clipboardEntity = new BlockArrayClipboard.ClipboardEntity(
-                                    this,
-                                    x,
-                                    y,
-                                    z,
-                                    0f,
-                                    0f,
-                                    entity
-                            );
-                            this.entities.add(clipboardEntity);
-                            entitiesCount--;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    loadNBTFromFileFooter(nbtCount, entitiesCount, biomeLength);
                 }
             } else if (braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
                 hasBiomes = true;
@@ -263,6 +223,49 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
+        }
+    }
+
+    private void loadNBTFromFileFooter(int nbtCount, int entitiesCount, long biomeLength) throws IOException {
+        int biomeBlocksLength = headerSize + (getVolume() << 1) + (hasBiomes ? (int) biomeLength : 0);
+        MappedByteBuffer tmp = fileChannel.map(FileChannel.MapMode.READ_ONLY, biomeBlocksLength, braf.length());
+        try (NBTInputStream nbtIS = new NBTInputStream(MainUtil.getCompressedIS(new ByteBufferInputStream(tmp)))) {
+            Iterator<CompoundTag> iter = nbtIS.toIterator();
+            while (nbtCount > 0 && iter.hasNext()) { // TileEntities are stored "before" entities
+                CompoundTag tag = iter.next();
+                int x = tag.getInt("x");
+                int y = tag.getInt("y");
+                int z = tag.getInt("z");
+                IntTriple pos = new IntTriple(x, y, z);
+                nbtMap.put(pos, tag);
+                nbtCount--;
+            }
+            while (entitiesCount > 0 && iter.hasNext()) {
+                CompoundTag tag = iter.next();
+                Tag posTag = tag.getValue().get("Pos");
+                if (posTag == null) {
+                    LOGGER.warn("Missing pos tag: {}", tag);
+                    return;
+                }
+                List<DoubleTag> pos = (List<DoubleTag>) posTag.getValue();
+                double x = pos.get(0).getValue();
+                double y = pos.get(1).getValue();
+                double z = pos.get(2).getValue();
+                BaseEntity entity = new BaseEntity(tag);
+                BlockArrayClipboard.ClipboardEntity clipboardEntity = new BlockArrayClipboard.ClipboardEntity(
+                        this,
+                        x,
+                        y,
+                        z,
+                        0f,
+                        0f,
+                        entity
+                );
+                this.entities.add(clipboardEntity);
+                entitiesCount--;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
