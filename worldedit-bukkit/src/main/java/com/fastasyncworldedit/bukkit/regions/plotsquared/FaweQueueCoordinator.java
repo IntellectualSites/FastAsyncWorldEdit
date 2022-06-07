@@ -14,6 +14,7 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -84,6 +85,11 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     @Override
     public boolean isSettingBiomes() {
         return false;
+    }
+
+    @Override
+    public void setBiomesEnabled(final boolean enabled) {
+
     }
 
     @Override
@@ -179,6 +185,16 @@ public class FaweQueueCoordinator extends QueueCoordinator {
 
     @Override
     public void setLightingMode(@Nullable LightingMode mode) {
+
+    }
+
+    @Override
+    public @org.checkerframework.checker.nullness.qual.Nullable SideEffectSet getSideEffectSet() {
+        return null;
+    }
+
+    @Override
+    public void setSideEffectSet(@org.checkerframework.checker.nullness.qual.Nullable final SideEffectSet sideEffectSet) {
 
     }
 

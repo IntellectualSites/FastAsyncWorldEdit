@@ -1,15 +1,10 @@
 [versions]
 # Minecraft expectations
 fastutil = "8.5.6"
-log4j = "2.17.0"
 guava = "31.0.1-jre"
-gson = "2.8.9"
-
-# Platform expectations
-paper = "1.18.1-R0.1-SNAPSHOT"
+log4j = "2.17.1"
 
 # Plugins
-vault = "1.7.1"
 dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.7"
 mapmanager = "1.8.0-SNAPSHOT"
@@ -18,14 +13,10 @@ griefdefender = "2.1.0-SNAPSHOT"
 mcore = "7.0.1"
 residence = "4.5._13.1"
 towny = "0.98.2.2"
-plotsquared = "6.7.0"
 redprotect = "1.9.6"
 
 # Third party
-paperlib = "1.0.8-SNAPSHOT"
 bstats = "3.0.0"
-serverlib = "2.3.1"
-paster = "1.1.4"
 sparsebitset = "1.2"
 parallelgzip = "1.0.5"
 adventure = "4.9.3"
@@ -48,7 +39,6 @@ piston = "0.5.7"
 
 # Tests
 mockito = "4.6.1"
-checker-qual = "3.22.0"
 
 # Gradle plugins
 pluginyml = "0.5.1"
@@ -56,16 +46,10 @@ pluginyml = "0.5.1"
 [libraries]
 # Minecraft expectations
 fastutil = { group = "it.unimi.dsi", name = "fastutil", version.ref = "fastutil" }
-log4j = { group = "org.apache.logging.log4j", name = "log4j-api", version.ref = "log4j" }
 log4jBom = { group = "org.apache.logging.log4j", name = "log4j-bom", version.ref = "log4j" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
-gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
-
-#Platform expectations
-paper = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper" }
 
 # Plugins
-vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 dummypermscompat = { group = "com.sk89q", name = "dummypermscompat", version.ref = "dummypermscompat" }
 worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard-bukkit" }
 mapmanager = { group = "com.github.InventivetalentDev", name = "MapManager", version.ref = "mapmanager" }
@@ -74,19 +58,12 @@ griefdefender = { group = "com.griefdefender", name = "api", version.ref = "grie
 mcore = { group = "com.massivecraft", name = "mcore", version.ref = "mcore" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
 towny = { group = "com.github.TownyAdvanced", name = "Towny", version.ref = "towny" }
-plotsquaredBukkit = { group = "com.plotsquared", name = "PlotSquared-Bukkit", version.ref = "plotsquared" }
-plotsquaredCore = { group = "com.plotsquared", name = "PlotSquared-Core", version.ref = "plotsquared" }
 redprotect = { group = "net.fabiozumbi12", name = "redprotect", version.ref = "redprotect" }
 
 # Third Party
-paperlib = { group = "io.papermc", name = "paperlib", version.ref = "paperlib" }
-bstatsBukkit = { group = "org.bstats", name = "bstats-bukkit", version.ref = "bstats" }
 bstatsBase = { group = "org.bstats", name = "bstats-base", version.ref = "bstats" }
-serverlib = { group = "dev.notmyfault.serverlib", name = "ServerLib", version.ref = "serverlib" }
-paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref = "paster" }
 sparsebitset = { group = "com.zaxxer", name = "SparseBitSet", version.ref = "sparsebitset" }
 parallelgzip = { group = "org.anarres", name = "parallelgzip", version.ref = "parallelgzip" }
-adventure = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventureNbt = { group = "net.kyori", name = "adventure-nbt", version.ref = "adventure" }
 truezip = { group = "de.schlichtherle", name = "truezip", version.ref = "truezip" }
 autoValueAnnotations = { group = "com.google.auto.value", name = "auto-value-annotations", version.ref = "auto-value" }
@@ -105,7 +82,6 @@ lz4JavaStream = { group = "net.jpountz", name = "lz4-java-stream", version.ref =
 # Internal
 ## Text
 adventureTextAdapterBukkit = { group = "net.kyori", name = "text-adapter-bukkit", version.ref = "text-adapter" }
-adventureTextMiniMessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure-text-minimessage" }
 adventureTextApi = { group = "net.kyori", name = "text-api", version.ref = "text" }
 adventureTextSerializerGson = { group = "net.kyori", name = "text-serializer-gson", version.ref = "text" }
 adventureTextSerializerLegacy = { group = "net.kyori", name = "text-serializer-legacy", version.ref = "text" }
@@ -119,7 +95,6 @@ pistonRuntime = { group = "org.enginehub.piston.core-ap", name = "runtime", vers
 
 # Tests
 mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
-checkerqual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checker-qual" }
 log4jCore = { group = "org.apache.logging.log4j", name = "log4j-core", version.ref = "log4j" }
 
 [plugins]
