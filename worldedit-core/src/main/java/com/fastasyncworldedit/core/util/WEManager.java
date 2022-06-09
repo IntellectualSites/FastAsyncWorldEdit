@@ -66,7 +66,6 @@ public class WEManager {
     }
 
     public void cancelEditSafe(AbstractDelegateExtent parent, FaweException reason) throws FaweException {
-        LOGGER.warn("CancelEditSafe was hit. Please ignore this message.");
         Extent currentExtent = parent.getExtent();
         if (!(currentExtent instanceof NullExtent)) {
             parent.extent = new NullExtent(parent.extent, reason);
