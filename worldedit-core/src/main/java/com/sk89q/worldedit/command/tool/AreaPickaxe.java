@@ -27,7 +27,9 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Platform;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
@@ -73,9 +75,14 @@ public class AreaPickaxe implements BlockTool {
                             if (!initialType.equals(editSession.getBlock(x, y, z).getBlockType())) {
                                 continue;
                             }
+                            // FAWE start - Only queue the block break effect if setting the block is successful
+                            if (editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState())) {
 
-                            editSession.setBlock(x, y, z, BlockTypes.AIR.getDefaultState());
-
+                                BlockVector3 pos = BlockVector3.at(x, y, z);
+                                ((World) clicked.getExtent()).queueBlockBreakEffect(server, pos, initialType,
+                                        clicked.toVector().toBlockPoint().distanceSq(pos));
+                            }
+                            // FAWE end
                         }
                     }
                 }
