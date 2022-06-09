@@ -721,6 +721,11 @@ public class Settings extends Config {
                 "If a player's clipboard should be deleted upon logout"
         })
         public boolean DELETE_ON_LOGOUT = false;
+        @Comment({
+                "Allows NBT stored in a clipboard to be written to disk",
+                " - Requires clipboard.use-disk to be enabled"
+        })
+        public boolean SAVE_CLIPBOARD_NBT_TO_DISK = true;
 
     }
 

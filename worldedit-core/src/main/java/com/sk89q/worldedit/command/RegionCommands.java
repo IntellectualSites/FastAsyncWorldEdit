@@ -558,7 +558,7 @@ public class RegionCommands {
             @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air")
                     Mask mask
     ) throws WorldEditException {
-        checkCommandArgument(count >= 1, "Count must be >= 1");
+        checkCommandArgument(count >= 1, "Multiplier must be >= 1");
 
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
         new MaskTraverser(mask).setNewExtent(editSession);
@@ -639,6 +639,7 @@ public class RegionCommands {
             @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air")
                     Mask mask
     ) throws WorldEditException {
+        checkCommandArgument(count >= 1, "Count must be >= 1");
 
         //FAWE start > the mask will have been initialised with a WorldWrapper extent (very bad/slow)
         new MaskTraverser(mask).setNewExtent(editSession);

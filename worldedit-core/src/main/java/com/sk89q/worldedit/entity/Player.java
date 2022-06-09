@@ -470,13 +470,13 @@ public interface Player extends Entity, Actor {
                     }
                 } catch (EmptyClipboardException ignored) {
                 }
-                DiskOptimizedClipboard doc = new DiskOptimizedClipboard(file);
+                DiskOptimizedClipboard doc = DiskOptimizedClipboard.loadFromFile(file);
                 Clipboard clip = doc.toClipboard();
                 ClipboardHolder holder = new ClipboardHolder(clip);
                 session.setClipboard(holder);
             }
         } catch (FaweClipboardVersionMismatchException e) {
-            print(Caption.of("fawe.error.clipboard.on.disk.version.mismatch"));
+            print(e.getComponent());
         } catch (RuntimeException e) {
             print(Caption.of("fawe.error.clipboard.invalid"));
             e.printStackTrace();

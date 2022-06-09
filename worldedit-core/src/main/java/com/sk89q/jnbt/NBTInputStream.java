@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -651,5 +652,47 @@ public final class NBTInputStream implements Closeable {
     public void close() throws IOException {
         is.close();
     }
+
+    //FAWE start - Copied from FaweStreamChangeSet
+    public Iterator<CompoundTag> toIterator() {
+        return new Iterator<CompoundTag>() {
+            private CompoundTag last = read();
+
+            public CompoundTag read() {
+                try {
+                    return (CompoundTag) NBTInputStream.this.readTag();
+                } catch (Exception ignored) {
+                    // Assume input is complete
+                }
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return last != null || ((last = read()) != null);
+            }
+
+            @Override
+            public CompoundTag next() {
+                CompoundTag tmp = last;
+                if (tmp == null) {
+                    tmp = read();
+                }
+                last = null;
+                return tmp;
+            }
+
+            @Override
+            public void remove() {
+                throw new IllegalArgumentException("CANNOT REMOVE");
+            }
+        };
+    }
+    //FAWE end
 
 }

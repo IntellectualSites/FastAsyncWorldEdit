@@ -3,19 +3,23 @@ package com.fastasyncworldedit.core.extent.clipboard;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismatchException;
+import com.fastasyncworldedit.core.internal.io.ByteBufferInputStream;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.fastasyncworldedit.core.math.IntTriple;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.DoubleTag;
 import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -27,6 +31,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -52,21 +57,27 @@ import java.util.stream.Collectors;
  */
 public class DiskOptimizedClipboard extends LinearClipboard {
 
+    public static final int VERSION = 2;
     private static final Logger LOGGER = LogManagerCompat.getLogger();
-
-    private static final int VERSION = 1;
-    private static final int HEADER_SIZE = 22;
+    private static final int HEADER_SIZE = 27; // Current header size
+    private static final int VERSION_1_HEADER_SIZE = 22; // Header size of "version 1"
+    private static final int VERSION_2_HEADER_SIZE = 27; // Header size of "version 2" i.e. when NBT/entities could be saved
 
     private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
+    private final int headerSize;
 
     private RandomAccessFile braf;
     private MappedByteBuffer byteBuffer;
 
     private FileChannel fileChannel;
-    private boolean hasBiomes;
+    private boolean hasBiomes = false;
     private boolean canHaveBiomes = true;
+    private int nbtBytesRemaining;
 
+    /**
+     * Creates a new DiskOptimizedClipboard for the given region. Creates or overwrites a file using the given UUID as a name.
+     */
     public DiskOptimizedClipboard(Region region, UUID uuid) {
         this(
                 region.getDimensions(),
@@ -79,6 +90,14 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         setOrigin(region.getMinimumPoint());
     }
 
+    /**
+     * Creates a new DiskOptimizedClipboard with the given dimensions. Creates a new file with a random UUID name.
+     *
+     * @deprecated Use {@link DiskOptimizedClipboard#DiskOptimizedClipboard(Region, UUID)} or
+     *         {@link DiskOptimizedClipboard#DiskOptimizedClipboard(BlockVector3, File)} to avoid creating a large number of clipboard
+     *         files that won't be cleaned until `clipboard.delete-after-days` and a server restart.
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
         this(
                 dimensions,
@@ -89,12 +108,17 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         );
     }
 
+    /**
+     * New DiskOptimizedClipboard. If the file specified exists, then it will be completely overwritten. To load an existing
+     * clipboard, use {@link DiskOptimizedClipboard#DiskOptimizedClipboard(File)}.
+     */
     public DiskOptimizedClipboard(BlockVector3 dimensions, File file) {
         super(dimensions, BlockVector3.ZERO);
-        if (HEADER_SIZE + ((long) getVolume() << 1) >= Integer.MAX_VALUE) {
+        headerSize = HEADER_SIZE;
+        if (headerSize + ((long) getVolume() << 1) >= Integer.MAX_VALUE) {
             throw new IllegalArgumentException(
                     "Dimensions too large for this clipboard format. Use //lazycopy for large selections.");
-        } else if (HEADER_SIZE + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1) >= Integer.MAX_VALUE) {
+        } else if (headerSize + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1) >= Integer.MAX_VALUE) {
             LOGGER.error("Dimensions are too large for biomes to be stored in a DiskOptimizedClipboard");
             canHaveBiomes = false;
         }
@@ -113,9 +137,10 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 e.printStackTrace();
             }
             this.braf = new RandomAccessFile(file, "rw");
-            long fileLength = (long) getVolume() * 2L + (long) HEADER_SIZE;
+            long fileLength = (long) getVolume() * 2L + (long) headerSize;
             braf.setLength(0);
             braf.setLength(fileLength);
+            this.nbtBytesRemaining = Integer.MAX_VALUE - (int) fileLength;
             init();
             // write getLength() etc
             byteBuffer.putChar(2, (char) (VERSION));
@@ -127,15 +152,40 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         }
     }
 
+    /**
+     * Load an existing file as a DiskOptimizedClipboard. The file MUST exist and MUST be created as a DiskOptimizedClipboard
+     * with data written to it.
+     */
     public DiskOptimizedClipboard(File file) {
-        super(readSize(file), BlockVector3.ZERO);
+        this(file, VERSION);
+    }
+
+    /**
+     * Load an existing file as a DiskOptimizedClipboard. The file MUST exist and MUST be created as a DiskOptimizedClipboard
+     * with data written to it.
+     *
+     * @param file            File to read from
+     * @param versionOverride An override version to allow loading of older clipboards if required
+     */
+    public DiskOptimizedClipboard(File file, int versionOverride) {
+        super(readSize(file, versionOverride), BlockVector3.ZERO);
+        headerSize = getHeaderSizeOverrideFromVersion(versionOverride);
         nbtMap = new HashMap<>();
         try {
             this.file = file;
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
+            this.nbtBytesRemaining = Integer.MAX_VALUE - (int) file.length();
             init();
-            if (braf.length() - HEADER_SIZE == ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1)) {
+            long biomeLength = (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
+            if (headerSize >= VERSION_2_HEADER_SIZE) {
+                readBiomeStatusFromHeader();
+                int nbtCount = readNBTSavedCountFromHeader();
+                int entitiesCount = readEntitiesSavedCountFromHeader();
+                if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK && nbtCount + entitiesCount > 0) {
+                    loadNBTFromFileFooter(nbtCount, entitiesCount, biomeLength);
+                }
+            } else if (braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
                 hasBiomes = true;
             }
             getAndSetOffsetAndOrigin();
@@ -144,18 +194,87 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         }
     }
 
-    private static BlockVector3 readSize(File file) {
+    /**
+     * Attempt to load a file into a new {@link DiskOptimizedClipboard} instance. Will attempt to recover on version mismatch
+     * failure.
+     *
+     * @param file File to load
+     * @return new {@link DiskOptimizedClipboard} instance.
+     */
+    public static DiskOptimizedClipboard loadFromFile(final File file) {
+        DiskOptimizedClipboard doc;
+        try {
+            doc = new DiskOptimizedClipboard(file);
+        } catch (FaweClipboardVersionMismatchException e) { // Attempt to recover
+            int version = e.getClipboardVersion();
+            doc = new DiskOptimizedClipboard(file, version);
+        }
+        return doc;
+    }
+
+    private static BlockVector3 readSize(File file, int expectedVersion) {
         try (DataInputStream is = new DataInputStream(new FileInputStream(file))) {
             is.skipBytes(2);
             int version = is.readChar();
-            if (version != VERSION) {
-                throw new FaweClipboardVersionMismatchException();
+            if (version != expectedVersion) {
+                throw new FaweClipboardVersionMismatchException(expectedVersion, version);
             }
             return BlockVector3.at(is.readChar(), is.readChar(), is.readChar());
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    private void loadNBTFromFileFooter(int nbtCount, int entitiesCount, long biomeLength) throws IOException {
+        int biomeBlocksLength = headerSize + (getVolume() << 1) + (hasBiomes ? (int) biomeLength : 0);
+        MappedByteBuffer tmp = fileChannel.map(FileChannel.MapMode.READ_ONLY, biomeBlocksLength, braf.length());
+        try (NBTInputStream nbtIS = new NBTInputStream(MainUtil.getCompressedIS(new ByteBufferInputStream(tmp)))) {
+            Iterator<CompoundTag> iter = nbtIS.toIterator();
+            while (nbtCount > 0 && iter.hasNext()) { // TileEntities are stored "before" entities
+                CompoundTag tag = iter.next();
+                int x = tag.getInt("x");
+                int y = tag.getInt("y");
+                int z = tag.getInt("z");
+                IntTriple pos = new IntTriple(x, y, z);
+                nbtMap.put(pos, tag);
+                nbtCount--;
+            }
+            while (entitiesCount > 0 && iter.hasNext()) {
+                CompoundTag tag = iter.next();
+                Tag posTag = tag.getValue().get("Pos");
+                if (posTag == null) {
+                    LOGGER.warn("Missing pos tag: {}", tag);
+                    return;
+                }
+                List<DoubleTag> pos = (List<DoubleTag>) posTag.getValue();
+                double x = pos.get(0).getValue();
+                double y = pos.get(1).getValue();
+                double z = pos.get(2).getValue();
+                BaseEntity entity = new BaseEntity(tag);
+                BlockArrayClipboard.ClipboardEntity clipboardEntity = new BlockArrayClipboard.ClipboardEntity(
+                        this,
+                        x,
+                        y,
+                        z,
+                        0f,
+                        0f,
+                        entity
+                );
+                this.entities.add(clipboardEntity);
+                entitiesCount--;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int getHeaderSizeOverrideFromVersion(int versionOverride) {
+        return switch (versionOverride) {
+            case 1 -> VERSION_1_HEADER_SIZE;
+            case 2 -> VERSION_2_HEADER_SIZE;
+            default -> HEADER_SIZE;
+        };
     }
 
     @Override
@@ -185,8 +304,11 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 close();
                 this.braf = new RandomAccessFile(file, "rw");
                 // Since biomes represent a 4x4x4 cube, we store fewer biome bytes that volume at 1 byte per biome
-                // +1 to each too allow for cubes that lie across the region boundary
-                this.braf.setLength(HEADER_SIZE + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1));
+                // +1 to each to allow for cubes that lie across the region boundary
+                long length =
+                        headerSize + ((long) getVolume() << 1) + (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
+                this.braf.setLength(length);
+                this.nbtBytesRemaining = Integer.MAX_VALUE - (int) length;
                 init();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -216,7 +338,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     public void setBiome(int index, BiomeType biome) {
         if (initBiome()) {
             try {
-                byteBuffer.put(HEADER_SIZE + (getVolume() << 1) + index, (byte) biome.getInternalId());
+                byteBuffer.put(headerSize + (getVolume() << 1) + index, (byte) biome.getInternalId());
             } catch (IndexOutOfBoundsException e) {
                 LOGGER.info((long) (getHeight() >> 2) * (getLength() >> 2) * (getWidth() >> 2));
                 LOGGER.info(index);
@@ -230,7 +352,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         if (!hasBiomes()) {
             return null;
         }
-        int biomeId = byteBuffer.get(HEADER_SIZE + (getVolume() << 1) + index) & 0xFF;
+        int biomeId = byteBuffer.get(headerSize + (getVolume() << 1) + index) & 0xFF;
         return BiomeTypes.get(biomeId);
     }
 
@@ -239,7 +361,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         if (!hasBiomes()) {
             return;
         }
-        int mbbIndex = HEADER_SIZE + (getVolume() << 1);
+        int mbbIndex = headerSize + (getVolume() << 1);
         try {
             for (int y = 0; y < getHeight(); y++) {
                 for (int z = 0; z < getLength(); z++) {
@@ -325,11 +447,45 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         ReflectionUtils.getUnsafe().invokeCleaner(cb);
     }
 
+    private void writeBiomeStatusToHeader() {
+        byteBuffer.put(22, (byte) (hasBiomes ? 1 : 0));
+    }
+
+    private void writeNBTSavedCountToHeader(int count) {
+        byteBuffer.putChar(23, (char) count);
+    }
+
+    private void writeEntitiesSavedCountToHeader(int count) {
+        byteBuffer.putChar(25, (char) count);
+    }
+
+    private boolean readBiomeStatusFromHeader() {
+        return this.hasBiomes = byteBuffer.get(22) == 1;
+    }
+
+    private int readNBTSavedCountFromHeader() {
+        return byteBuffer.getChar(23);
+    }
+
+    private int readEntitiesSavedCountFromHeader() {
+        return byteBuffer.getChar(25);
+    }
+
     @Override
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void close() {
         try {
             if (byteBuffer != null) {
+                if (headerSize >= VERSION_2_HEADER_SIZE) {
+                    if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK) {
+                        try {
+                            writeNBTToDisk();
+                        } catch (Exception e) {
+                            LOGGER.error("Unable to save NBT data to disk.", e);
+                        }
+                    }
+                    writeBiomeStatusToHeader();
+                }
                 byteBuffer.force();
                 fileChannel.close();
                 braf.close();
@@ -341,6 +497,94 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void writeNBTToDisk() throws IOException {
+        if (!nbtMap.isEmpty() || !entities.isEmpty()) {
+            byte[] output = null;
+            boolean entitiesFit = false;
+            // Closing a BAOS does nothing
+            ByteArrayOutputStream baOS = new ByteArrayOutputStream();
+            try (NBTOutputStream nbtOS = new NBTOutputStream(MainUtil.getCompressedOS(
+                    baOS,
+                    Settings.settings().CLIPBOARD.COMPRESSION_LEVEL
+            ))) {
+                if (!nbtMap.isEmpty()) {
+                    try {
+                        for (CompoundTag tag : nbtMap.values()) {
+                            nbtOS.writeTag(tag);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    nbtOS.flush();
+                    if (baOS.size() > nbtBytesRemaining) {
+                        LOGGER.warn(
+                                "Clipboard file {} does not have enough remaining space to store NBT data on disk.",
+                                file.getName()
+                        );
+                        writeNBTSavedCountToHeader(0);
+                        writeEntitiesSavedCountToHeader(0);
+                        return;
+                    } else {
+                        writeNBTSavedCountToHeader(nbtMap.size());
+                        nbtBytesRemaining -= baOS.size();
+                    }
+                    output = baOS.toByteArray(); //Keep this in case entities are unable to fit.
+                }
+
+                if (!entities.isEmpty()) {
+                    try {
+                        for (BlockArrayClipboard.ClipboardEntity entity : entities) {
+                            if (entity.getState() != null && entity.getState().getNbtData() != null) {
+                                CompoundTag data = entity.getState().getNbtData();
+                                HashMap<String, Tag> value = new HashMap<>(data.getValue());
+                                List<DoubleTag> pos = new ArrayList<>(3);
+                                pos.add(new DoubleTag(entity.getLocation().getX()));
+                                pos.add(new DoubleTag(entity.getLocation().getX()));
+                                pos.add(new DoubleTag(entity.getLocation().getX()));
+                                value.put("Pos", new ListTag(DoubleTag.class, pos));
+                                nbtOS.writeTag(new CompoundTag(value));
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (baOS.size() > nbtBytesRemaining) {
+                        LOGGER.warn(
+                                "Clipboard file {} does not have enough remaining space to store entity data on disk.",
+                                file.getName()
+                        );
+                        writeEntitiesSavedCountToHeader(0);
+                    } else {
+                        entitiesFit = true;
+                        writeEntitiesSavedCountToHeader(entities.size());
+                    }
+                }
+            }
+
+            if (output == null) {
+                return;
+            }
+
+            if (entitiesFit) {
+                output = baOS.toByteArray();
+            }
+
+            long currentLength = this.braf.length();
+            this.braf.setLength(currentLength + baOS.size());
+            MappedByteBuffer tempBuffer = fileChannel.map(
+                    FileChannel.MapMode.READ_WRITE,
+                    currentLength,
+                    baOS.size()
+            );
+            tempBuffer.put(output);
+            tempBuffer.force();
+            closeDirectBuffer(tempBuffer);
+        } else {
+            writeNBTSavedCountToHeader(0);
+            writeEntitiesSavedCountToHeader(0);
         }
     }
 
@@ -403,7 +647,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     @Override
     public BlockState getBlock(int index) {
         try {
-            int diskIndex = HEADER_SIZE + (index << 1);
+            int diskIndex = headerSize + (index << 1);
             char ordinal = byteBuffer.getChar(diskIndex);
             return BlockState.getFromOrdinal(ordinal);
         } catch (IndexOutOfBoundsException ignored) {
@@ -431,7 +675,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
         try {
-            int index = HEADER_SIZE + (getIndex(x, y, z) << 1);
+            int index = headerSize + (getIndex(x, y, z) << 1);
             char ordinal = block.getOrdinalChar();
             if (ordinal == 0) {
                 ordinal = 1;
@@ -452,7 +696,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     public <B extends BlockStateHolder<B>> boolean setBlock(int i, B block) {
         try {
             char ordinal = block.getOrdinalChar();
-            int index = HEADER_SIZE + (i << 1);
+            int index = headerSize + (i << 1);
             byteBuffer.putChar(index, ordinal);
             boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();
             if (hasNbt) {
