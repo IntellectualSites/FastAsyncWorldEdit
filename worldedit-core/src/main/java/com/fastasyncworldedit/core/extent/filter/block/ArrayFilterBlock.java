@@ -11,6 +11,10 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 
+/**
+ * @deprecated Unused internally
+ */
+@Deprecated(forRemoval = true, since = "TODO")
 public class ArrayFilterBlock extends AbstractExtentFilterBlock {
 
     private final char[] blocks;
@@ -104,6 +108,16 @@ public class ArrayFilterBlock extends AbstractExtentFilterBlock {
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return getExtent().setBiome(x, y, z, biome);
+    }
+
+    @Override
+    public void setBiome(final BiomeType biome) {
+        getExtent().setBiome(getX(), getY(), getZ(), biome);
+    }
+
+    @Override
+    public BiomeType getBiome() {
+        return getExtent().getBiomeType(getX(), getY(), getZ());
     }
 
 }

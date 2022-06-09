@@ -3,17 +3,21 @@ package com.fastasyncworldedit.core.function.pattern;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.util.FaweTimer;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.AbstractPattern;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.block.BaseBlock;
+
+import javax.annotation.Nullable;
 
 public class BufferedPattern extends AbstractPattern implements ResettablePattern {
 
-    protected final LocalBlockVectorSet set = new LocalBlockVectorSet();
+    protected final BlockVector3Set set;
     protected final FaweTimer timer;
     protected final long[] actionTime;
 
@@ -26,6 +30,18 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
      * @param parent pattern to set
      */
     public BufferedPattern(Actor actor, Pattern parent) {
+        this(actor, parent, null);
+    }
+
+    /**
+     * Create a new {@link Pattern} instance
+     *
+     * @param actor    actor associated with the pattern
+     * @param parent   pattern to set
+     * @param region  anticipated area of the edit
+     * @since 2.2.0
+     */
+    public BufferedPattern(Actor actor, Pattern parent, @Nullable Region region) {
         long[] tmp = actor.getMeta("lastActionTime");
         if (tmp == null) {
             actor.setMeta("lastActionTime", tmp = new long[2]);
@@ -33,6 +49,8 @@ public class BufferedPattern extends AbstractPattern implements ResettablePatter
         actionTime = tmp;
         this.pattern = parent;
         this.timer = Fawe.instance().getTimer();
+        // Assume brush is used if no region provided, i.e. unlikely to required BlockVectorSet
+        set = region == null ? new LocalBlockVectorSet() : BlockVector3Set.getAppropriateVectorSet(region);
     }
 
     @Override

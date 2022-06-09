@@ -56,6 +56,7 @@ import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -1458,10 +1459,17 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkArgument(radius >= 0, "radius >= 0");
         checkArgument(depth >= 1, "depth >= 1");
 
+        // Avoid int overflow (negative coordinate space allows for overflow back round to positive if the depth is large enough).
+        // Depth is always 1 or greater, thus the lower bound should always be <= origin y.
+        int lowerBound = origin.getBlockY() - depth + 1;
+        if (lowerBound > origin.getBlockY()) {
+            lowerBound = Integer.MIN_VALUE;
+        }
+
         Mask mask = new MaskIntersection(
                 new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
                 new BoundedHeightMask(
-                        Math.max(origin.getBlockY() - depth + 1, minY),
+                        Math.max(lowerBound, minY),
                         Math.min(maxY, origin.getBlockY())
                 ),
                 Masks.negate(new ExistingBlockMask(this))
@@ -3052,7 +3060,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      */
     public int hollowOutRegion(Region region, int thickness, Pattern pattern, Mask mask) {
         try {
-            final Set<BlockVector3> outside = new LocalBlockVectorSet();
+            final Set<BlockVector3> outside = BlockVector3Set.getAppropriateVectorSet(region);
 
             final BlockVector3 min = region.getMinimumPoint();
             final BlockVector3 max = region.getMaximumPoint();
@@ -3096,7 +3104,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
 
             for (int i = 1; i < thickness; ++i) {
-                final Set<BlockVector3> newOutside = new LocalBlockVectorSet();
+                final Set<BlockVector3> newOutside = BlockVector3Set.getAppropriateVectorSet(region);
                 outer:
                 for (BlockVector3 position : region) {
                     for (BlockVector3 recurseDirection : recurseDirections) {
@@ -3151,11 +3159,6 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public int drawLine(Pattern pattern, BlockVector3 pos1, BlockVector3 pos2, double radius, boolean filled, boolean flat)
             throws MaxChangedBlocksException {
 
-        //FAWE start - LocalBlockVectorSet
-        LocalBlockVectorSet vset = new LocalBlockVectorSet();
-        boolean notdrawn = true;
-        //FAWE end
-
         int x1 = pos1.getBlockX();
         int y1 = pos1.getBlockY();
         int z1 = pos1.getBlockZ();
@@ -3168,6 +3171,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         int dx = Math.abs(x2 - x1);
         int dy = Math.abs(y2 - y1);
         int dz = Math.abs(z2 - z1);
+
+        //FAWE start - LocalBlockVectorSet
+        BlockVector3Set vset = BlockVector3Set.getAppropriateVectorSet(new CuboidRegion(pos1, pos2));
+
+        boolean notdrawn = true;
+        //FAWE end
 
         if (dx + dy + dz == 0) {
             //FAWE start - LocalBlockVectorSet

@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extension.input;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.factory.MaskFactory;
@@ -27,6 +28,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extension.platform.Locatable;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import org.enginehub.piston.inject.InjectedValueAccess;
 
@@ -343,5 +345,29 @@ public class ParserContext {
 
         return maxY;
     }
+
+    /**
+     * Attempts to retrieve the selection associated with this context. Requires an {@link Actor} or {@link LocalSession} be
+     * supplied.
+     *
+     * @return Region representing the selection for this context or null if it cannot be retrieved.
+     * @since 2.2.0
+     */
+    public Region getSelection() {
+        if (session != null) {
+            try {
+                return session.getSelection();
+            } catch (IncompleteRegionException ignored) {
+            }
+        }
+        if (actor != null) {
+            try {
+                return actor.getSession().getSelection();
+            } catch (IncompleteRegionException ignored) {
+            }
+        }
+        return null;
+    }
+
     //FAWE end
 }

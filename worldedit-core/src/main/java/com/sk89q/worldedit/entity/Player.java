@@ -463,7 +463,6 @@ public interface Player extends Entity, Actor {
         );
         try {
             if (file.exists() && file.length() > 5) {
-                DiskOptimizedClipboard doc = new DiskOptimizedClipboard(file);
                 LocalSession session = getSession();
                 try {
                     if (session.getClipboard() != null) {
@@ -471,12 +470,13 @@ public interface Player extends Entity, Actor {
                     }
                 } catch (EmptyClipboardException ignored) {
                 }
+                DiskOptimizedClipboard doc = DiskOptimizedClipboard.loadFromFile(file);
                 Clipboard clip = doc.toClipboard();
                 ClipboardHolder holder = new ClipboardHolder(clip);
-                getSession().setClipboard(holder);
+                session.setClipboard(holder);
             }
         } catch (FaweClipboardVersionMismatchException e) {
-            print(Caption.of("fawe.error.clipboard.on.disk.version.mismatch"));
+            print(e.getComponent());
         } catch (RuntimeException e) {
             print(Caption.of("fawe.error.clipboard.invalid"));
             e.printStackTrace();

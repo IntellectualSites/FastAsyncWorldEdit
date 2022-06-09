@@ -1,0 +1,28 @@
+name: Upload release assets
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  upload_asset:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name : Validate Gradle Wrapper
+        uses : gradle/wrapper-validation-action@v1
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          cache: gradle
+          java-version: 17
+      - name: Clean Build
+        run: ./gradlew clean build --no-daemon
+      - name: Upload Release Assets
+        uses: AButler/upload-release-assets@v2.0
+        with:
+          files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          release-tag: ${{ github.event.release.tag_name }}

@@ -14,9 +14,15 @@ import javax.annotation.Nullable;
 public abstract class AbstractSingleFilterBlock extends FilterBlock {
 
     private BaseBlock block;
+    private BiomeType biome;
 
     public AbstractSingleFilterBlock init(BaseBlock block) {
         this.block = block;
+        return this;
+    }
+
+    public AbstractSingleFilterBlock init(BiomeType type) {
+        this.biome = type;
         return this;
     }
 
@@ -53,6 +59,16 @@ public abstract class AbstractSingleFilterBlock extends FilterBlock {
     @Override
     public void setFullBlock(BaseBlock block) {
         this.block = block;
+    }
+
+    @Override
+    public void setBiome(BiomeType type) {
+        this.biome = type;
+    }
+
+    @Override
+    public BiomeType getBiome() {
+        return biome;
     }
 
     @Override
