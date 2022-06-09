@@ -24,20 +24,18 @@ dependencies {
 
     // Minecraft expectations
     implementation(libs.fastutil)
-    implementation(libs.guava)
-    implementation(libs.gson)
+    implementation("com.google.guava:guava")
+    implementation("com.google.code.gson:gson")
 
     // Platform expectations
     implementation("org.yaml:snakeyaml")
 
     // Logging
-    implementation(libs.log4j) {
-        because("Mojang provides Log4J 2.14.1")
-    }
+    implementation("org.apache.logging.log4j:log4j-api")
 
     // Plugins
     compileOnly(libs.redprotect) { isTransitive = false }
-    compileOnly(libs.plotsquaredCore) { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Core") { isTransitive = false }
 
     // ensure this is on the classpath for the AP
     annotationProcessor(libs.guava)
@@ -48,11 +46,11 @@ dependencies {
     compileOnly(libs.truezip)
     implementation(libs.findbugs)
     implementation(libs.rhino)
-    compileOnly(libs.adventure)
+    compileOnly("net.kyori:adventure-api")
     compileOnlyApi(libs.adventureNbt)
-    compileOnlyApi(libs.adventureTextMiniMessage)
+    compileOnlyApi("net.kyori:adventure-text-minimessage")
     implementation(libs.zstd) { isTransitive = false }
-    api(libs.paster)
+    api("com.intellectualsites.paster:Paster")
     compileOnly(libs.lz4Java) { isTransitive = false }
     compileOnly(libs.sparsebitset)
     compileOnly(libs.parallelgzip) { isTransitive = false }

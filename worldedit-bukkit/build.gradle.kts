@@ -63,19 +63,19 @@ dependencies {
     implementation(libs.fastutil)
 
     // Platform expectations
-    compileOnly(libs.paper) {
+    compileOnly("io.papermc.paper:paper-api") {
         exclude("junit", "junit")
         exclude(group = "org.slf4j", module = "slf4j-api")
     }
 
     // Logging
-    localImplementation(libs.log4j)
+    localImplementation("org.apache.logging.log4j:log4j-api")
     localImplementation(libs.log4jBom) {
         because("Spigot provides Log4J (sort of, not in API, implicitly part of server)")
     }
 
     // Plugins
-    compileOnly(libs.vault) { isTransitive = false }
+    compileOnly("com.github.MilkBowl:VaultAPI") { isTransitive = false }
     compileOnly(libs.dummypermscompat) {
         exclude("com.github.MilkBowl", "VaultAPI")
     }
@@ -91,26 +91,26 @@ dependencies {
     compileOnly(libs.mcore) { isTransitive = false }
     compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
-    compileOnly(libs.plotsquaredBukkit) { isTransitive = false }
-    compileOnly(libs.plotsquaredCore) { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Bukkit") { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Core") { isTransitive = false }
 
     // Third party
-    implementation(libs.paperlib)
-    implementation(libs.bstatsBukkit) { isTransitive = false }
+    implementation("io.papermc:paperlib")
+    implementation("org.bstats:bstats-bukkit") { isTransitive = false }
     implementation(libs.bstatsBase) { isTransitive = false }
-    implementation(libs.serverlib)
-    api(libs.paster) { isTransitive = false }
+    implementation("dev.notmyfault.serverlib:ServerLib")
+    api("com.intellectualsites.paster:Paster") { isTransitive = false }
     api(libs.lz4Java) { isTransitive = false }
     api(libs.sparsebitset) { isTransitive = false }
     api(libs.parallelgzip) { isTransitive = false }
-    compileOnly(libs.adventure)
-    compileOnlyApi(libs.checkerqual)
+    compileOnly("net.kyori:adventure-api")
+    compileOnlyApi("org.checkerframework:checker-qual")
 
     // Tests
     testImplementation(libs.mockito)
-    testImplementation(libs.adventure)
-    testImplementation(libs.checkerqual)
-    testImplementation(libs.paper) { isTransitive = true }
+    testImplementation("net.kyori:adventure-api")
+    testImplementation("org.checkerframework:checker-qual")
+    testImplementation("io.papermc.paper:paper-api") { isTransitive = true }
 }
 
 tasks.named<Copy>("processResources") {
