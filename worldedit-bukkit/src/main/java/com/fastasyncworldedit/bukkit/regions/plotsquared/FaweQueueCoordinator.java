@@ -189,12 +189,12 @@ public class FaweQueueCoordinator extends QueueCoordinator {
     }
 
     @Override
-    public @org.checkerframework.checker.nullness.qual.Nullable SideEffectSet getSideEffectSet() {
+    public @Nullable SideEffectSet getSideEffectSet() {
         return null;
     }
 
     @Override
-    public void setSideEffectSet(@org.checkerframework.checker.nullness.qual.Nullable final SideEffectSet sideEffectSet) {
+    public void setSideEffectSet(@Nullable final SideEffectSet sideEffectSet) {
 
     }
 
