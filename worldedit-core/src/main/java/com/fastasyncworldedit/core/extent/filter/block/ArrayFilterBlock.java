@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 /**
  * @deprecated Unused internally
  */
-@Deprecated(forRemoval = true, since = "TODO")
+@Deprecated(forRemoval = true, since = "2.3.0")
 public class ArrayFilterBlock extends AbstractExtentFilterBlock {
 
     private final char[] blocks;

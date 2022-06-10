@@ -15,7 +15,7 @@ public class FaweClipboardVersionMismatchException extends FaweException {
     /**
      * @deprecated Use {@link FaweClipboardVersionMismatchException#FaweClipboardVersionMismatchException(int, int)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.3.0")
     public FaweClipboardVersionMismatchException() {
         this(DiskOptimizedClipboard.VERSION, -1);
     }
@@ -25,7 +25,7 @@ public class FaweClipboardVersionMismatchException extends FaweException {
      *
      * @param version  version of clipboard attempting to be loaded
      * @param expected expected version of clipboard
-     * @since TODO
+     * @since 2.3.0
      */
     public FaweClipboardVersionMismatchException(int expected, int version) {
         super(
@@ -44,7 +44,7 @@ public class FaweClipboardVersionMismatchException extends FaweException {
     /**
      * Get the version specified in the clipboard attempting to be loaded.
      *
-     * @since TODO
+     * @since 2.3.0
      */
     public int getClipboardVersion() {
         return version;
@@ -53,7 +53,7 @@ public class FaweClipboardVersionMismatchException extends FaweException {
     /**
      * Get the version that was expected of the clipboard
      *
-     * @since TODO
+     * @since 2.3.0
      */
     public int getExpectedVersion() {
         return expected;

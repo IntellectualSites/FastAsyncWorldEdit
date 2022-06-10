@@ -10,7 +10,7 @@ import java.util.concurrent.locks.StampedLock;
 /**
  * Allows for reentrant behaviour of a wrapped {@link StampedLock}. Will not count the number of times it is re-entered.
  *
- * @since TODO
+ * @since 2.3.0
  */
 public class ReentrantWrappedStampedLock implements Lock {
 
@@ -84,7 +84,7 @@ public class ReentrantWrappedStampedLock implements Lock {
      *
      * @return lock stam[ or 0 if not locked.
      * @throws IllegalCallerException if the {@link StampedLock} is write-locked and the calling thread is not the lock owner
-     * @since TODO
+     * @since 2.3.0
      */
     public long getStampChecked() {
         if (stamp != 0 && owner != Thread.currentThread()) {
@@ -98,7 +98,7 @@ public class ReentrantWrappedStampedLock implements Lock {
      *
      * @param stamp Stamp to unlock with
      * @throws IllegalMonitorStateException if the given stamp does not match the lock's stamp
-     * @since TODO
+     * @since 2.3.0
      */
     public void unlock(final long stamp) {
         parent.unlockWrite(stamp);
@@ -110,7 +110,7 @@ public class ReentrantWrappedStampedLock implements Lock {
      * Returns true if the lock is currently held.
      *
      * @return true if the lock is currently held.
-     * @since TODO
+     * @since 2.3.0
      */
     public boolean isLocked() {
         return owner == null && this.stamp == 0 && parent.isWriteLocked(); // Be verbose

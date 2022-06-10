@@ -97,7 +97,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
      *         {@link DiskOptimizedClipboard#DiskOptimizedClipboard(BlockVector3, File)} to avoid creating a large number of clipboard
      *         files that won't be cleaned until `clipboard.delete-after-days` and a server restart.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.3.0")
     public DiskOptimizedClipboard(BlockVector3 dimensions) {
         this(
                 dimensions,
