@@ -28,7 +28,7 @@ public class DelegateSemaphore extends Semaphore {
     @Override
     public synchronized void acquire() throws InterruptedException {
         if (delegate == null) {
-            return true;
+            return;
         }
         this.delegate.acquire();
     }
@@ -36,7 +36,7 @@ public class DelegateSemaphore extends Semaphore {
     @Override
     public void release() {
         if (delegate == null) {
-            return true;
+            return;
         }
         this.delegate.release();
     }
