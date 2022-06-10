@@ -1,6 +1,8 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
+import java.util.Collection;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class DelegateSemaphore extends Semaphore {
 
@@ -14,6 +16,9 @@ public class DelegateSemaphore extends Semaphore {
     // this is bad
     @Override
     public synchronized boolean tryAcquire() {
+        if (delegate == null) {
+            return true;
+        }
         try {
             this.delegate.acquire();
             return true;
@@ -24,11 +29,17 @@ public class DelegateSemaphore extends Semaphore {
 
     @Override
     public synchronized void acquire() throws InterruptedException {
+        if (delegate == null) {
+            return;
+        }
         this.delegate.acquire();
     }
 
     @Override
-    public synchronized void release() {
+    public void release() {
+        if (delegate == null) {
+            return;
+        }
         this.delegate.release();
     }
 

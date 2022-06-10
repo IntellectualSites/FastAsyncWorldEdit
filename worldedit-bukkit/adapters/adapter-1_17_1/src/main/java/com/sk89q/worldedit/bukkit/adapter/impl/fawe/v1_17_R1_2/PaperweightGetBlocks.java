@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2;
 
 import com.fastasyncworldedit.bukkit.adapter.BukkitGetBlocks;
+import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
@@ -505,14 +506,16 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         }
 
                         //ensure that the server doesn't try to tick the chunksection while we're editing it (again).
-                        Semaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
                         PaperweightPlatformAdapter.clearCounts(existingSection);
                         if (PaperLib.isPaper()) {
                             existingSection.tickingList.clear();
                         }
+                        DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
 
+                        // Synchronize to prevent further acquisitions
                         synchronized (lock) {
-                            // lock.acquire();
+                            lock.acquire(); // Wait until we have the lock
+                            lock.release();
                             try {
                                 sectionLock.writeLock().lock();
                                 if (this.getChunk() != nmsChunk) {
