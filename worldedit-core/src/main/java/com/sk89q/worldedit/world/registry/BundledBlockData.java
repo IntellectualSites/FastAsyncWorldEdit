@@ -57,7 +57,6 @@ public final class BundledBlockData {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static BundledBlockData INSTANCE;
-    private final ResourceLoader resourceLoader;
 
     private final Map<String, BlockEntry> idMap = new HashMap<>();
 
@@ -65,12 +64,6 @@ public final class BundledBlockData {
      * Create a new instance.
      */
     private BundledBlockData() {
-        this.resourceLoader = WorldEdit
-                .getInstance()
-                .getPlatformManager()
-                .queryCapability(Capability.CONFIGURATION)
-                .getResourceLoader();
-
         try {
             loadFromResource();
         } catch (Throwable e) {
@@ -100,25 +93,7 @@ public final class BundledBlockData {
         });
         //FAWE end
         Gson gson = gsonBuilder.create();
-        URL url = null;
-        final int dataVersion = WorldEdit
-                .getInstance()
-                .getPlatformManager()
-                .queryCapability(Capability.WORLD_EDITING)
-                .getDataVersion();
-        if (dataVersion >= Constants.DATA_VERSION_MC_1_17) {
-            url = resourceLoader.getResource(BundledBlockData.class, "blocks.117.json");
-        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_16) {
-            url = resourceLoader.getResource(BundledBlockData.class, "blocks.116.json");
-        } else if (dataVersion >= Constants.DATA_VERSION_MC_1_15) {
-            url = resourceLoader.getResource(BundledBlockData.class, "blocks.115.json");
-        }
-        if (url == null) {
-            url = resourceLoader.getResource(BundledBlockData.class, "blocks.json");
-        }
-        if (url == null) {
-            throw new IOException("Could not find blocks.json");
-        }
+        URL url = BundledRegistries.loadRegistry("blocks");
         String data = Resources.toString(url, Charset.defaultCharset());
         List<BlockEntry> entries = gson.fromJson(data, new TypeToken<List<BlockEntry>>() {
         }.getType());
