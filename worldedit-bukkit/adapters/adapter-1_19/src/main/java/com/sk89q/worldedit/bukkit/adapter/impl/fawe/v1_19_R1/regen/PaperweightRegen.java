@@ -23,10 +23,13 @@ import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ChunkTaskPriorityQueueSorter.Message;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.progress.ChunkProgressListener;
+import net.minecraft.util.thread.ProcessorHandle;
+import net.minecraft.util.thread.ProcessorMailbox;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -315,7 +318,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         ReflectionUtils.unsafeSet(chunkSourceField, freshWorld, freshChunkProvider);
         //let's start then
         structureTemplateManager = server.getStructureManager();
-        threadedLevelLightEngine = freshChunkProvider.getLightEngine();
+        threadedLevelLightEngine = new NoOpLightEngine(freshChunkProvider);
 
         return true;
     }
@@ -503,6 +506,29 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             );
         }
 
+    }
+
+    /**
+     * A light engine that does nothing. As light is calculated after pasting anyway, we can avoid
+     * work this way.
+     */
+    static class NoOpLightEngine extends ThreadedLevelLightEngine {
+        private static final ProcessorMailbox<Runnable> MAILBOX = ProcessorMailbox.create(task -> {}, "fawe-no-op");
+        private static final ProcessorHandle<Message<Runnable>> HANDLE = ProcessorHandle.of("fawe-no-op", m -> {});
+
+        public NoOpLightEngine(final ServerChunkCache chunkProvider) {
+            super(chunkProvider, chunkProvider.chunkMap, false, MAILBOX, HANDLE);
+        }
+
+        @Override
+        public CompletableFuture<ChunkAccess> retainData(final ChunkAccess chunk) {
+            return CompletableFuture.completedFuture(chunk);
+        }
+
+        @Override
+        public CompletableFuture<ChunkAccess> lightChunk(final ChunkAccess chunk, final boolean excludeBlocks) {
+            return CompletableFuture.completedFuture(chunk);
+        }
     }
 
 }
