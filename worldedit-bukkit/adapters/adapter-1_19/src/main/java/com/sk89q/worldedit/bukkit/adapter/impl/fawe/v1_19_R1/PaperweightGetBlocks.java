@@ -576,10 +576,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         if (PaperLib.isPaper()) {
                             existingSection.tickingList.clear();
                         }
-                        Semaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
+                        DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
 
                         synchronized (lock) {
-                            // lock.acquire();
+                            lock.acquire(); // Wait until we have the lock
+                            lock.release();
                             try {
                                 sectionLock.writeLock().lock();
                                 if (this.getChunk() != nmsChunk) {
