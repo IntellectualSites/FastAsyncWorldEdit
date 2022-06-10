@@ -1,8 +1,6 @@
 package com.fastasyncworldedit.bukkit.adapter;
 
-import java.util.Collection;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 public class DelegateSemaphore extends Semaphore {
 
