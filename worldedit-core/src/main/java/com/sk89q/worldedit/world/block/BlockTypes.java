@@ -687,6 +687,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType FLOWERING_AZALEA_LEAVES = init();
     @Nullable
+    public static final BlockType FROGSPAWN = init();
+    @Nullable
     public static final BlockType FLOWER_POT = init();
     @Nullable
     public static final BlockType FROSTED_ICE = init();
@@ -1015,6 +1017,38 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType MAGMA_BLOCK = init();
     @Nullable
+    public static final BlockType MANGROVE_BUTTON = init();
+    @Nullable
+    public static final BlockType MANGROVE_DOOR = init();
+    @Nullable
+    public static final BlockType MANGROVE_FENCE = init();
+    @Nullable
+    public static final BlockType MANGROVE_FENCE_GATE = init();
+    @Nullable
+    public static final BlockType MANGROVE_LEAVES = init();
+    @Nullable
+    public static final BlockType MANGROVE_LOG = init();
+    @Nullable
+    public static final BlockType MANGROVE_PLANKS = init();
+    @Nullable
+    public static final BlockType MANGROVE_PRESSURE_PLATE = init();
+    @Nullable
+    public static final BlockType MANGROVE_PROPAGULE = init();
+    @Nullable
+    public static final BlockType MANGROVE_ROOTS = init();
+    @Nullable
+    public static final BlockType MANGROVE_SIGN = init();
+    @Nullable
+    public static final BlockType MANGROVE_SLAB = init();
+    @Nullable
+    public static final BlockType MANGROVE_STAIRS = init();
+    @Nullable
+    public static final BlockType MANGROVE_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType MANGROVE_WALL_SIGN = init();
+    @Nullable
+    public static final BlockType MANGROVE_WOOD = init();
+    @Nullable
     public static final BlockType MEDIUM_AMETHYST_BUD = init();
     @Nullable
     public static final BlockType MELON = init();
@@ -1042,6 +1076,18 @@ public final class BlockTypes {
     public static final BlockType MOSS_CARPET = init();
     @Nullable
     public static final BlockType MOVING_PISTON = init();
+    @Nullable
+    public static final BlockType MUD = init();
+    @Nullable
+    public static final BlockType MUD_BRICK_SLAB = init();
+    @Nullable
+    public static final BlockType MUD_BRICK_STAIRS = init();
+    @Nullable
+    public static final BlockType MUD_BRICK_WALL = init();
+    @Nullable
+    public static final BlockType MUD_BRICKS = init();
+    @Nullable
+    public static final BlockType MUDDY_MANGROVE_ROOTS = init();
     @Nullable
     public static final BlockType MUSHROOM_STEM = init();
     @Nullable
@@ -1109,6 +1155,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType OBSIDIAN = init();
     @Nullable
+    public static final BlockType OCHRE_FROGLIGHT = init();
+    @Nullable
     public static final BlockType ORANGE_BANNER = init();
     @Nullable
     public static final BlockType ORANGE_BED = init();
@@ -1150,6 +1198,10 @@ public final class BlockTypes {
     public static final BlockType OXIDIZED_CUT_COPPER_STAIRS = init();
     @Nullable
     public static final BlockType PACKED_ICE = init();
+    @Nullable
+    public static final BlockType PACKED_MUD = init();
+    @Nullable
+    public static final BlockType PEARLESCENT_FROGLIGHT = init();
     @Nullable
     public static final BlockType PEONY = init();
     @Nullable
@@ -1293,6 +1345,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType POTTED_LILY_OF_THE_VALLEY = init();
     @Nullable
+    public static final BlockType POTTED_MANGROVE_PROPAGULE = init();
+    @Nullable
     public static final BlockType POTTED_OAK_SAPLING = init();
     @Nullable
     public static final BlockType POTTED_ORANGE_TULIP = init();
@@ -1407,6 +1461,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType REDSTONE_WIRE = init();
     @Nullable
+    public static final BlockType REINFORCED_DEEPSLATE = init();
+    @Nullable
     public static final BlockType RED_BANNER = init();
     @Nullable
     public static final BlockType RED_BED = init();
@@ -1481,7 +1537,15 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType SCAFFOLDING = init();
     @Nullable
+    public static final BlockType SCULK = init();
+    @Nullable
+    public static final BlockType SCULK_CATALYST = init();
+    @Nullable
     public static final BlockType SCULK_SENSOR = init();
+    @Nullable
+    public static final BlockType SCULK_SHRIEKER = init();
+    @Nullable
+    public static final BlockType SCULK_VEIN = init();
     @Nullable
     public static final BlockType SEAGRASS = init();
     @Nullable
@@ -1630,6 +1694,10 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType STRIPPED_JUNGLE_WOOD = init();
     @Nullable
+    public static final BlockType STRIPPED_MANGROVE_LOG = init();
+    @Nullable
+    public static final BlockType STRIPPED_MANGROVE_WOOD = init();
+    @Nullable
     public static final BlockType STRIPPED_OAK_LOG = init();
     @Nullable
     public static final BlockType STRIPPED_OAK_WOOD = init();
@@ -1685,6 +1753,8 @@ public final class BlockTypes {
     public static final BlockType TURTLE_EGG = init();
     @Nullable
     public static final BlockType TWISTING_VINES = init();
+    @Nullable
+    public static final BlockType VERDANT_FROGLIGHT = init();
     @Nullable
     public static final BlockType TWISTING_VINES_PLANT = init();
     @Nullable

@@ -31,6 +31,8 @@ import java.util.Locale;
 public final class EntityTypes {
 
     @Nullable
+    public static final EntityType ALLAY = get("minecraft:allay");
+    @Nullable
     public static final EntityType AREA_EFFECT_CLOUD = get("minecraft:area_effect_cloud");
     @Nullable
     public static final EntityType ARMOR_STAND = get("minecraft:armor_stand");
@@ -50,6 +52,8 @@ public final class EntityTypes {
     public static final EntityType CAT = get("minecraft:cat");
     @Nullable
     public static final EntityType CAVE_SPIDER = get("minecraft:cave_spider");
+    @Nullable
+    public static final EntityType CHEST_BOAT = get("minecraft:chest_boat");
     @Nullable
     public static final EntityType CHEST_MINECART = get("minecraft:chest_minecart");
     @Nullable
@@ -104,6 +108,8 @@ public final class EntityTypes {
     public static final EntityType FISHING_BOBBER = get("minecraft:fishing_bobber");
     @Nullable
     public static final EntityType FOX = get("minecraft:fox");
+    @Nullable
+    public static final EntityType FROG = get("minecraft:frog");
     @Nullable
     public static final EntityType FURNACE_MINECART = get("minecraft:furnace_minecart");
     @Nullable
@@ -217,6 +223,8 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType STRIDER = get("minecraft:strider");
     @Nullable
+    public static final EntityType TADPOLE = get("minecraft:tadpole");
+    @Nullable
     public static final EntityType TNT = get("minecraft:tnt");
     @Nullable
     public static final EntityType TNT_MINECART = get("minecraft:tnt_minecart");
@@ -236,6 +244,8 @@ public final class EntityTypes {
     public static final EntityType VINDICATOR = get("minecraft:vindicator");
     @Nullable
     public static final EntityType WANDERING_TRADER = get("minecraft:wandering_trader");
+    @Nullable
+    public static final EntityType WARDEN = get("minecraft:warden");
     @Nullable
     public static final EntityType WITCH = get("minecraft:witch");
     @Nullable
