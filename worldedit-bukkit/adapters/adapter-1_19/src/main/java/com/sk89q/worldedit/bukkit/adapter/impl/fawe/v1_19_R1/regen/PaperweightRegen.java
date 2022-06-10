@@ -22,7 +22,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -129,10 +128,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             flatBedrockField = tmpFlatBedrockField;
 
             generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
-                    "settings", "f"));
+                    "settings", "g"));
             generatorSettingBaseSupplierField.setAccessible(true);
 
-            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "e"));
+            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "f"));
             generatorSettingFlatField.setAccessible(true);
 
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
@@ -223,10 +222,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 session,
                 newWorldData,
                 originalServerWorld.dimension(),
-                originalServerWorld.dimensionType(),
+                newOpts.dimensions().getOrThrow(levelStemResourceKey),
                 new RegenNoOpWorldLoadListener(),
-                // placeholder. Required for new ChunkProviderServer, but we create and then set it later
-                newOpts.dimensions().get(levelStemResourceKey).generator(),
                 originalServerWorld.isDebug(),
                 seed,
                 ImmutableList.of(),
@@ -248,8 +245,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 if (options.hasBiomeType()) {
                     return singleBiome;
                 }
-                return PaperweightRegen.this.chunkGenerator.getBiomeSource().getNoiseBiome(biomeX, biomeY, biomeZ,
-                        PaperweightRegen.this.chunkGenerator.climateSampler()
+                return PaperweightRegen.this.chunkGenerator.getBiomeSource().getNoiseBiome(
+                        biomeX, biomeY, biomeZ, getChunkSource().randomState().sampler()
                 );
             }
         }).get();
@@ -269,8 +266,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                     (Holder<NoiseGeneratorSettings>) generatorSettingBaseSupplierField
                             .get(originalChunkProvider.getGenerator());
             BiomeSource biomeSource = originalChunkProvider.getGenerator().getBiomeSource();
-            chunkGenerator = new NoiseBasedChunkGenerator(originalChunkProvider.getGenerator().structureSets, noiseBasedChunkGenerator.noises,
-                    biomeSource, seed,
+            chunkGenerator = new NoiseBasedChunkGenerator(originalChunkProvider.getGenerator().structureSets,
+                    noiseBasedChunkGenerator.noises,
+                    biomeSource,
                     generatorSettingBaseSupplier
             );
         } else if (originalChunkProvider.getGenerator() instanceof CustomChunkGenerator customChunkGenerator) {

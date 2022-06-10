@@ -720,7 +720,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             }
             extent.setBlock(vec, state.toBaseBlock());
             if (options.shouldRegenBiomes()) {
-                Biome origBiome = chunk.getNoiseBiome(vec.getX(), vec.getY(), vec.getZ());
+                Biome origBiome = chunk.getNoiseBiome(vec.getX(), vec.getY(), vec.getZ()).value();
                 BiomeType adaptedBiome = adapt(serverWorld, origBiome);
                 if (adaptedBiome != null) {
                     extent.setBiome(vec, adaptedBiome);
