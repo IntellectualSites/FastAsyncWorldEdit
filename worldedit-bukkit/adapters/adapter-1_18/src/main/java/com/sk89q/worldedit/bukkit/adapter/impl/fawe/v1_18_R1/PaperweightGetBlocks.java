@@ -1,6 +1,7 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R1;
 
 import com.fastasyncworldedit.bukkit.adapter.BukkitGetBlocks;
+import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
@@ -560,10 +561,12 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         if (PaperLib.isPaper()) {
                             existingSection.tickingList.clear();
                         }
-                        Semaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
+                        DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
 
+                        // Synchronize to prevent further acquisitions
                         synchronized (lock) {
-                            // lock.acquire();
+                            lock.acquire(); // Wait until we have the lock
+                            lock.release();
                             try {
                                 sectionLock.writeLock().lock();
                                 if (this.getChunk() != nmsChunk) {

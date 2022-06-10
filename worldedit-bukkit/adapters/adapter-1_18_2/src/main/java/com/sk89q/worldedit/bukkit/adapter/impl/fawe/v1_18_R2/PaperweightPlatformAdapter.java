@@ -189,9 +189,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return false;
     }
 
-    private static final ThreadLocal<Semaphore> SEMAPHORE_THREAD_LOCAL = ThreadLocal.withInitial(() -> new Semaphore(1));
+    // There is no point in having a functional semaphore for paper servers.
+    private static final ThreadLocal<DelegateSemaphore> SEMAPHORE_THREAD_LOCAL =
+            ThreadLocal.withInitial(() -> new DelegateSemaphore(1, null));
 
-    static Semaphore applyLock(LevelChunkSection section) {
+    static DelegateSemaphore applyLock(LevelChunkSection section) {
         if (PaperLib.isPaper()) {
             return SEMAPHORE_THREAD_LOCAL.get();
         }
@@ -205,8 +207,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 );
                 synchronized (currentThreadingDetector) {
                     Semaphore currentLock = (Semaphore) unsafe.getObject(currentThreadingDetector, fieldLockOffset);
-                    if (currentLock instanceof DelegateSemaphore) {
-                        return currentLock;
+                    if (currentLock instanceof DelegateSemaphore delegateSemaphore) {
+                        return delegateSemaphore;
                     }
                     DelegateSemaphore newLock = new DelegateSemaphore(1, currentLock);
                     unsafe.putObject(currentThreadingDetector, fieldLockOffset, newLock);
