@@ -9,6 +9,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R1.nbt.PaperweightLazyCompoundTag;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -21,6 +22,8 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerRO;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -31,6 +34,8 @@ import java.util.UUID;
 import java.util.concurrent.Future;
 
 public class PaperweightGetBlocks_Copy implements IChunkGet {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Map<BlockVector3, CompoundTag> tiles = new HashMap<>();
     private final Set<CompoundTag> entities = new HashSet<>();
@@ -174,11 +179,19 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
         blocks[layer] = data;
     }
 
-    protected void storeBiomes(int layer, PalettedContainer<Holder<Biome>> biomeData) {
+    protected void storeBiomes(int layer, PalettedContainerRO<Holder<Biome>> biomeData) {
         if (biomes == null) {
             biomes = new PalettedContainer[getSectionCount()];
         }
-        biomes[layer] = biomeData;
+        if (biomeData instanceof PalettedContainer<Holder<Biome>> palettedContainer) {
+            biomes[layer] = palettedContainer;
+        } else {
+            LOGGER.error(
+                    "Cannot correctly save biomes to history. Expected class type {} but got {}",
+                    PalettedContainer.class.getSimpleName(),
+                    biomeData.getClass().getSimpleName()
+            );
+        }
     }
 
     @Override
