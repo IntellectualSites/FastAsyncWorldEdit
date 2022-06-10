@@ -258,6 +258,9 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         //generator
+        // TODO figure out if this is needed. We can probably use
+        //  chunkGenerator = newOpts.dimensions().getOrThrow(levelStemResourceKey).generator();
+        //  instead.
         if (originalChunkProvider.getGenerator() instanceof FlatLevelSource flatLevelSource) {
             FlatLevelGeneratorSettings generatorSettingFlat = flatLevelSource.settings();
             chunkGenerator = new FlatLevelSource(originalChunkProvider.getGenerator().structureSets, generatorSettingFlat);
@@ -281,6 +284,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             chunkGenerator = new CustomChunkGenerator(freshWorld, chunkGenerator, generator);
             generateConcurrent = generator.isParallelCapable();
         }
+        chunkGenerator.conf = freshWorld.spigotConfig;
 
         freshChunkProvider = new ServerChunkCache(
                 freshWorld,
