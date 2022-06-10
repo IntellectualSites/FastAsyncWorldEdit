@@ -579,6 +579,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         }
                         DelegateSemaphore lock = PaperweightPlatformAdapter.applyLock(existingSection);
 
+                        // Synchronize to prevent further acquisitions
                         synchronized (lock) {
                             lock.acquire(); // Wait until we have the lock
                             lock.release();
