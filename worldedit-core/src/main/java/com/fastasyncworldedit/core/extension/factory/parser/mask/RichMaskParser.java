@@ -148,6 +148,10 @@ public class RichMaskParser extends FaweParser<Mask> {
                             try {
                                 builder.addRegex(full);
                             } catch (InputParseException ignored) {
+                                context.setPreferringWildcard(false);
+                                context.setRestricted(false);
+                                BaseBlock block = worldEdit.getBlockFactory().parseFromInput(full, context);
+                                builder.add(block);
                             } catch (PatternSyntaxException e) {
                                 throw new SuggestInputParseException(
                                         new NoMatchException(Caption.of("fawe.error.parse.unknown-mask", full,
@@ -169,10 +173,6 @@ public class RichMaskParser extends FaweParser<Mask> {
                                         }
                                 );
                             }
-                            context.setPreferringWildcard(false);
-                            context.setRestricted(false);
-                            BaseBlock block = worldEdit.getBlockFactory().parseFromInput(full, context);
-                            builder.add(block);
                             mask = builder.build(extent);
                         }
                     }

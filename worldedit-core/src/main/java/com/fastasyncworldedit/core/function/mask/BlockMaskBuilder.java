@@ -123,7 +123,7 @@ public class BlockMaskBuilder {
             if (input.charAt(input.length() - 1) == ']') {
                 int propStart = StringMan.findMatchingBracket(input, input.length() - 1);
                 if (propStart == -1) {
-                    return;
+                    throw new InputParseException(Caption.of("fawe.error.no-block-found", TextComponent.of(input)));
                 }
 
                 MutableCharSequence charSequence = MutableCharSequence.getTemporal();
