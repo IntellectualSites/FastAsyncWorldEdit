@@ -273,13 +273,11 @@ public class WorldWrapper extends AbstractWorld {
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
             MaxChangedBlocksException {
-        return TaskManager.taskManager().sync(() -> {
-            try {
-                return parent.generateTree(type, editSession, position);
-            } catch (MaxChangedBlocksException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            return parent.generateTree(type, editSession, position);
+        } catch (MaxChangedBlocksException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
