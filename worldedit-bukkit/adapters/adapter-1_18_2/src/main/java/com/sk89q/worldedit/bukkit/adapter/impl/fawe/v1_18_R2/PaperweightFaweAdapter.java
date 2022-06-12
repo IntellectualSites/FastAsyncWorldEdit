@@ -560,7 +560,9 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
             serverLevel.captureTreeGeneration = true;
             serverLevel.captureBlockStates = true;
             try {
-                bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType);
+                if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
+                    return null;
+                }
                 return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
             } finally {
                 serverLevel.captureBlockStates = false;
@@ -568,7 +570,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 serverLevel.capturedBlockStates.clear();
             }
         });
-        if (placed == null) {
+        if (placed == null || placed.isEmpty()) {
             return false;
         }
         for (CraftBlockState craftBlockState : placed.values()) {
