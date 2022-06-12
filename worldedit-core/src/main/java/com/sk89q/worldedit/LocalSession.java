@@ -1828,6 +1828,7 @@ public class LocalSession implements TextureHolder {
      *
      * @return The reorder mode
      */
+    @Deprecated
     public EditSession.ReorderMode getReorderMode() {
         return EditSession.ReorderMode.FAST;
     }
@@ -1837,6 +1838,7 @@ public class LocalSession implements TextureHolder {
      *
      * @param reorderMode The reorder mode
      */
+    @Deprecated
     public void setReorderMode(EditSession.ReorderMode reorderMode) {
     }
 
