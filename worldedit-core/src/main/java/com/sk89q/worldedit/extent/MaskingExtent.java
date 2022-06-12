@@ -29,15 +29,13 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.google.common.cache.LoadingCache;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
+import java.util.function.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -46,9 +44,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class MaskingExtent extends AbstractDelegateExtent implements IBatchProcessor, Filter {
 
-    private Mask mask;
     //FAWE start
-    private final LoadingCache<Long, ChunkFilterBlock> threadIdToFilter;
+    private final Function<Long, ChunkFilterBlock> getOrCreateFilterBlock;
+    private Mask mask;
     //FAWE end
 
     /**
@@ -62,16 +60,16 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
         checkNotNull(mask);
         this.mask = mask;
         //FAWE start
-        this.threadIdToFilter = FaweCache.INSTANCE.createCache(() -> new CharFilterBlock(getExtent()));
+        this.getOrCreateFilterBlock = FaweCache.INSTANCE.createMainThreadSafeCache(() -> new CharFilterBlock(getExtent()));
         //FAWE end
     }
 
     //FAWE start
-    private MaskingExtent(Extent extent, Mask mask, LoadingCache<Long, ChunkFilterBlock> threadIdToFilter) {
+    private MaskingExtent(Extent extent, Mask mask, Function<Long, ChunkFilterBlock> getOrCreateFilterBlock) {
         super(extent);
         checkNotNull(mask);
         this.mask = mask;
-        this.threadIdToFilter = threadIdToFilter;
+        this.getOrCreateFilterBlock = getOrCreateFilterBlock;
     }
     //FAWE end
 
@@ -107,7 +105,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
 
     @Override
     public IChunkSet processSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
-        final ChunkFilterBlock filter = threadIdToFilter.getUnchecked(Thread.currentThread().getId());
+        final ChunkFilterBlock filter = getOrCreateFilterBlock.apply(Thread.currentThread().getId());
         return filter.filter(chunk, get, set, MaskingExtent.this);
     }
 
@@ -123,12 +121,12 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
         if (child == getExtent()) {
             return this;
         }
-        return new MaskingExtent(child, this.mask.copy(), this.threadIdToFilter);
+        return new MaskingExtent(child, this.mask.copy(), this.getOrCreateFilterBlock);
     }
 
     @Override
     public Filter fork() {
-        return new MaskingExtent(getExtent(), this.mask.copy(), this.threadIdToFilter);
+        return new MaskingExtent(getExtent(), this.mask.copy(), this.getOrCreateFilterBlock);
     }
 
     @Override
