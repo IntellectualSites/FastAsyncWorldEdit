@@ -560,19 +560,19 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
             serverLevel.captureTreeGeneration = true;
             serverLevel.captureBlockStates = true;
-            boolean grownTree = bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType);
-            serverLevel.captureBlockStates = false;
-            serverLevel.captureTreeGeneration = false;
-            if (!grownTree) {
+            try {
+                bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType);
+                return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
+            } finally {
+                serverLevel.captureBlockStates = false;
+                serverLevel.captureTreeGeneration = false;
                 serverLevel.capturedBlockStates.clear();
-                return null;
             }
-            return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
         });
         if (placed == null) {
             return false;
         }
-        for (CraftBlockState craftBlockState : serverLevel.capturedBlockStates.values()) {
+        for (CraftBlockState craftBlockState : placed.values()) {
             if (craftBlockState == null || craftBlockState.getType() == Material.AIR) {
                 continue;
             }
