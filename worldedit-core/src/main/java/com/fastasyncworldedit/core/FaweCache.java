@@ -143,11 +143,11 @@ public enum FaweCache implements Trimable {
      * from the main thread, it will return a {@link Function} referencing the {@link LoadingCache} returned by
      * {@link FaweCache#createCache(Supplier)}. If it is called from the main thread, it will return a {@link Function} that
      * will always return the result of the given {@link Supplier}. It is designed to prevent issues caused by
-     * interally-mutable and resettable classes such as {@link com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock}
+     * internally-mutable and resettable classes such as {@link com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock}
      * from causing issues when used in edits on the main thread.
      *
-     * @param withInitial The supplier used to determine the initial value if a thread cache is created, else to provide the
-     *                    a new instance of the class being cached if on the main thread.
+     * @param withInitial The supplier used to determine the initial value if a thread cache is created, else to provide a new
+     *                    instance of the class being cached if on the main thread.
      * @return a {@link Function} referencing a cache, or the given {@link Supplier}
      * @since TODO
      */
