@@ -212,6 +212,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * NONE = Place blocks without worrying about placement order.
      * </p>
      */
+    @Deprecated
     public enum ReorderMode {
         MULTI_STAGE("multi"),
         FAST("fast"),
@@ -398,6 +399,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      *
      * @param reorderMode The reorder mode
      */
+    @Deprecated
     public void setReorderMode(ReorderMode reorderMode) {
         //FAWE start - we don't do physics so we don't need this
         switch (reorderMode) {
@@ -419,6 +421,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      *
      * @return the reorder mode
      */
+    @Deprecated
     public ReorderMode getReorderMode() {
         if (isQueueEnabled()) {
             return ReorderMode.MULTI_STAGE;
@@ -480,7 +483,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Returns queue status.
      *
      * @return whether the queue is enabled
-     * @deprecated Use {@link EditSession#getReorderMode()} with MULTI_STAGE instead.
+     * @deprecated Use {@link EditSession#isBufferingEnabled()} instead.
      */
     @Deprecated
     public boolean isQueueEnabled() {
@@ -493,7 +496,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * Queue certain types of block for better reproduction of those blocks. Uses
      * {@link ReorderMode#MULTI_STAGE}.
      *
-     * @deprecated Use {@link EditSession#setReorderMode(ReorderMode)} with MULTI_STAGE instead.
+     * @deprecated There is no specific replacement, instead enable what you want specifically.
      */
     @Deprecated
     public void enableQueue() {
@@ -503,7 +506,9 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     /**
-     * Disable the queue. This will close the queue.
+     * Disable the queue. This will flush the session.
+     *
+     * @deprecated Use {@link EditSession#disableBuffering()} instead.
      */
     @Deprecated
     public void disableQueue() {
@@ -839,6 +844,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             disableQueue();
         }
         //FAWE end
+    }
+
+    /**
+     * Check if this session has any buffering extents enabled.
+     *
+     * @return {@code true} if any extents are buffering
+     */
+    public boolean isBufferingEnabled() {
+        return isBatchingChunks();
     }
 
     /**
