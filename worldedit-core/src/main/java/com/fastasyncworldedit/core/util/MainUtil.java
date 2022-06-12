@@ -4,6 +4,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.history.changeset.FaweStreamChangeSet;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.internal.io.AbstractDelegateOutputStream;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
@@ -532,6 +533,8 @@ public class MainUtil {
     public static BufferedImage toRGB(BufferedImage src) {
         if (src == null) {
             return src;
+        } else if ((long) src.getWidth() * src.getHeight() > Settings.settings().WEB.MAX_IMAGE_SIZE) {
+            throw new FaweException(Caption.of("fawe.web.image.load.size.too-large", Settings.settings().WEB.MAX_IMAGE_SIZE));
         }
         BufferedImage img = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
