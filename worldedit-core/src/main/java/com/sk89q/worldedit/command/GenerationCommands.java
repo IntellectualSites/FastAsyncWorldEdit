@@ -594,14 +594,16 @@ public class GenerationCommands {
         if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
             throw new IOException("Only i.imgur.com links are allowed!");
         }
+        if (dimensions != null) {
+            checkCommandArgument(
+                    (long) dimensions.getX() * dimensions.getZ() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
+                    Caption.of("fawe.error.image-dimensions", Settings.settings().WEB.MAX_IMAGE_SIZE)
+            );
+        }
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<BufferedImage> future = executor.submit(() -> {
             BufferedImage image = MainUtil.readImage(url);
             if (dimensions != null) {
-                checkCommandArgument(
-                        (long) dimensions.getX() * dimensions.getZ() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
-                        Caption.of("fawe.error.image-dimensions", Settings.settings().WEB.MAX_IMAGE_SIZE)
-                );
                 image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
                         RenderingHints.VALUE_INTERPOLATION_BILINEAR, false
                 );
