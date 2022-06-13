@@ -40,7 +40,7 @@ public abstract class SimpleClipboard implements Clipboard {
 
     @Override
     public void setOrigin(BlockVector3 origin) {
-        this.origin = origin.subtract(offset);
+        this.origin = origin;
     }
 
     @Override
