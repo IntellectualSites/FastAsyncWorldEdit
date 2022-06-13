@@ -18,7 +18,8 @@
     "net.fabricmc.fabric-api:fabric-api",
     "com.github.luben:zstd-jni",
     "net.kyori",
-    "net.kyori:adventure-nbt"
+    "net.kyori:adventure-nbt",
+    "org.jetbrains.kotlin.jvm"
   ],
   "schedule": [
     "every monday"
