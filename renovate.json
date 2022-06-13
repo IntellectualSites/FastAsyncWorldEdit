@@ -7,7 +7,6 @@
     "guava",  
     "com.google.guava:guava",
     "rhino-runtime",
-    "mockito-core",
     "org.antlr",
     "antlr4-runtime",
     "fastutil",
@@ -18,7 +17,8 @@
     "net.fabricmc:fabric-loader",
     "net.fabricmc.fabric-api:fabric-api",
     "com.github.luben:zstd-jni",
-    "net.kyori"
+    "net.kyori",
+    "net.kyori:adventure-nbt"
   ],
   "schedule": [
     "every monday"
