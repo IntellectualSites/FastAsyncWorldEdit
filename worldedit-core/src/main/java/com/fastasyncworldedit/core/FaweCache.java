@@ -18,6 +18,7 @@ import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.plotsquared.core.util.AnnotationHelper;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
@@ -54,6 +55,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.function.LongFunction;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -135,6 +137,32 @@ public enum FaweCache implements Trimable {
                 return withInitial.apply(key);
             }
         });
+    }
+
+    /**
+     * Create a new cache aimed to act as a thread-cache that is safe to the main server thread. If the method is called away
+     * from the main thread, it will return a {@link Function} referencing the {@link LoadingCache} returned by
+     * {@link FaweCache#createCache(Supplier)}. If it is called from the main thread, it will return a {@link Function} that
+     * will always return the result of the given {@link Supplier}. It is designed to prevent issues caused by
+     * internally-mutable and resettable classes such as {@link com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock}
+     * from causing issues when used in edits on the main thread.
+     *
+     * @param withInitial The supplier used to determine the initial value if a thread cache is created, else to provide a new
+     *                    instance of the class being cached if on the main thread.
+     * @return a {@link Function} referencing a cache, or the given {@link Supplier}
+     * @since TODO
+     */
+    @AnnotationHelper.ApiDescription(info = "Designed for specific internal use.")
+    public <V> LongFunction<V> createMainThreadSafeCache(Supplier<V> withInitial) {
+        return new LongFunction<>() {
+            private final LoadingCache<Long, V> loadingCache = Fawe.isMainThread() ? null : FaweCache.INSTANCE.createCache(
+                    withInitial);
+
+            @Override
+            public V apply(final long input) {
+                return loadingCache != null ? loadingCache.getUnchecked(input) : withInitial.get();
+            }
+        };
     }
 
     /*
