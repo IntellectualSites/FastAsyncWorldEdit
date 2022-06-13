@@ -35,7 +35,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
-import java.util.function.Function;
+import java.util.function.LongFunction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -45,7 +45,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class MaskingExtent extends AbstractDelegateExtent implements IBatchProcessor, Filter {
 
     //FAWE start
-    private final Function<Long, ChunkFilterBlock> getOrCreateFilterBlock;
+    private final LongFunction<ChunkFilterBlock> getOrCreateFilterBlock;
     private Mask mask;
     //FAWE end
 
@@ -65,7 +65,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
     }
 
     //FAWE start
-    private MaskingExtent(Extent extent, Mask mask, Function<Long, ChunkFilterBlock> getOrCreateFilterBlock) {
+    private MaskingExtent(Extent extent, Mask mask, LongFunction<ChunkFilterBlock> getOrCreateFilterBlock) {
         super(extent);
         checkNotNull(mask);
         this.mask = mask;

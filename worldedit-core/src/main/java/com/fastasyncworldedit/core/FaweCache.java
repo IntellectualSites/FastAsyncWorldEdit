@@ -55,6 +55,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.function.LongFunction;
 import java.util.function.Supplier;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -152,13 +153,13 @@ public enum FaweCache implements Trimable {
      * @since TODO
      */
     @AnnotationHelper.ApiDescription(info = "Designed for specific internal use.")
-    public <V> Function<Long, V> createMainThreadSafeCache(Supplier<V> withInitial) {
-        return new com.google.common.base.Function<>() {
+    public <V> LongFunction<V> createMainThreadSafeCache(Supplier<V> withInitial) {
+        return new LongFunction<>() {
             private final LoadingCache<Long, V> loadingCache = Fawe.isMainThread() ? null : FaweCache.INSTANCE.createCache(
                     withInitial);
 
             @Override
-            public V apply(final Long input) {
+            public V apply(final long input) {
                 return loadingCache != null ? loadingCache.getUnchecked(input) : withInitial.get();
             }
         };
