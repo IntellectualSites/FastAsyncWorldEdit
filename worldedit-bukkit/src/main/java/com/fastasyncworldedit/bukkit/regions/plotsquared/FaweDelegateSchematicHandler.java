@@ -113,7 +113,7 @@ public class FaweDelegateSchematicHandler {
             }
             if (((region.getMaximumPoint().getX() - region.getMinimumPoint().getX() + xOffset + 1) < WIDTH) || (
                     (region.getMaximumPoint().getZ() - region.getMinimumPoint().getZ() + zOffset + 1) < LENGTH) || (HEIGHT
-                    > 256)) {
+                    > worldHeight)) {
                 if (whenDone != null) {
                     TaskManager.runTask(whenDone);
                 }
