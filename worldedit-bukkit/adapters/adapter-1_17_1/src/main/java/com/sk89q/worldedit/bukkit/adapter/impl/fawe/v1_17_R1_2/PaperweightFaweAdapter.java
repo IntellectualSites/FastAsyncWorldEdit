@@ -10,6 +10,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.NbtUtils;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -561,27 +562,34 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
             ); // bukkit skips the feature gen which does this offset normally, so we have to add it back
         }
         ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        serverLevel.captureTreeGeneration = true;
-        serverLevel.captureBlockStates = true;
-        boolean grownTree = bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, blockVector3), bukkitType);
-        serverLevel.captureBlockStates = false;
-        serverLevel.captureTreeGeneration = false;
-        if (!grownTree) {
-            serverLevel.capturedBlockStates.clear();
-            return false;
-        } else {
-            for (CraftBlockState craftBlockState : serverLevel.capturedBlockStates.values()) {
-                if (craftBlockState == null || craftBlockState.getType() == Material.AIR) {
-                    continue;
+        final BlockVector3 finalBlockVector = blockVector3;
+        // Sync to main thread to ensure no clashes occur
+        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
+            serverLevel.captureTreeGeneration = true;
+            serverLevel.captureBlockStates = true;
+            try {
+                if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
+                    return null;
                 }
-                editSession.setBlock(craftBlockState.getX(), craftBlockState.getY(), craftBlockState.getZ(),
-                        BukkitAdapter.adapt(((org.bukkit.block.BlockState) craftBlockState).getBlockData())
-                );
+                return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
+            } finally {
+                serverLevel.captureBlockStates = false;
+                serverLevel.captureTreeGeneration = false;
+                serverLevel.capturedBlockStates.clear();
             }
-
-            serverLevel.capturedBlockStates.clear();
-            return true;
+        });
+        if (placed == null || placed.isEmpty()) {
+            return false;
         }
+        for (CraftBlockState craftBlockState : placed.values()) {
+            if (craftBlockState == null || craftBlockState.getType() == Material.AIR) {
+                continue;
+            }
+            editSession.setBlock(craftBlockState.getX(), craftBlockState.getY(), craftBlockState.getZ(),
+                    BukkitAdapter.adapt(((org.bukkit.block.BlockState) craftBlockState).getBlockData())
+            );
+        }
+        return true;
     }
 
     @Override

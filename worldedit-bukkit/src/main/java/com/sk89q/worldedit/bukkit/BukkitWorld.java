@@ -24,7 +24,6 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.sk89q.jnbt.CompoundTag;
@@ -334,9 +333,7 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
         //FAWE start - allow tree commands to be undone and obey region restrictions
-        return TaskManager.taskManager().sync(() -> WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt,
-                getWorld()
-        ));
+        return WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt, getWorld());
         //FAWE end
     }
 

@@ -77,7 +77,7 @@ public class FaweAPI {
      * </p>
      *
      * @param world     The name of the world
-     * @param autoQueue If it should start dispatching before you enqueue it.
+     * @param autoQueue If it should start dispatching before you close/flush it.
      * @return the queue extent
      */
     public static IQueueExtent<IQueueChunk> createQueue(World world, boolean autoQueue) {
