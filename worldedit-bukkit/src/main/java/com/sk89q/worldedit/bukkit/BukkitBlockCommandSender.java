@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.bukkit;
 
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.AbstractNonPlayerActor;
 import com.sk89q.worldedit.extension.platform.Locatable;
@@ -69,38 +70,63 @@ public class BukkitBlockCommandSender extends AbstractNonPlayerActor implements 
     @Override
     @Deprecated
     public void printRaw(String msg) {
-        for (String part : msg.split("\n")) {
-            sender.sendMessage(part);
-        }
+        //FAWE start - ensure executed on main thread
+        TaskManager.taskManager().sync(() -> {
+            for (String part : msg.split("\n")) {
+                sender.sendMessage(part);
+            }
+            return null;
+        });
+        //FAWE end
     }
 
     @Override
     @Deprecated
     public void print(String msg) {
-        for (String part : msg.split("\n")) {
-            print(TextComponent.of(part, TextColor.LIGHT_PURPLE));
-        }
+        //FAWE start - ensure executed on main thread
+        TaskManager.taskManager().sync(() -> {
+            for (String part : msg.split("\n")) {
+                print(TextComponent.of(part, TextColor.LIGHT_PURPLE));
+            }
+            return null;
+        });
+        //FAWE end
     }
 
     @Override
     @Deprecated
     public void printDebug(String msg) {
-        for (String part : msg.split("\n")) {
-            print(TextComponent.of(part, TextColor.GRAY));
-        }
+        //FAWE start - ensure executed on main thread
+        TaskManager.taskManager().sync(() -> {
+            for (String part : msg.split("\n")) {
+                print(TextComponent.of(part, TextColor.GRAY));
+            }
+            return null;
+        });
+        //FAWE end
     }
 
     @Override
     @Deprecated
     public void printError(String msg) {
-        for (String part : msg.split("\n")) {
-            print(TextComponent.of(part, TextColor.RED));
-        }
+        //FAWE start - ensure executed on main thread
+        TaskManager.taskManager().sync(() -> {
+            for (String part : msg.split("\n")) {
+                print(TextComponent.of(part, TextColor.RED));
+            }
+            return null;
+        });
+        //FAWE end
     }
 
     @Override
     public void print(Component component) {
-        TextAdapter.sendMessage(sender, WorldEditText.format(component, getLocale()));
+        //FAWE start - ensure executed on main thread
+        TaskManager.taskManager().sync(() -> {
+            TextAdapter.sendMessage(sender, WorldEditText.format(component, getLocale()));
+            return null;
+        });
+        //FAWE end
     }
 
     @Override
