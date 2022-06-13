@@ -21,7 +21,9 @@ package com.sk89q.worldedit.command;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.function.generator.CavesGen;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -65,6 +67,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
@@ -587,11 +594,33 @@ public class GenerationCommands {
         if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
             throw new IOException("Only i.imgur.com links are allowed!");
         }
-        BufferedImage image = MainUtil.readImage(url);
         if (dimensions != null) {
-            image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
-                    RenderingHints.VALUE_INTERPOLATION_BILINEAR, false
+            checkCommandArgument(
+                    (long) dimensions.getX() * dimensions.getZ() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
+                    Caption.of("fawe.error.image-dimensions", Settings.settings().WEB.MAX_IMAGE_SIZE)
             );
+        }
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Future<BufferedImage> future = executor.submit(() -> {
+            BufferedImage image = MainUtil.readImage(url);
+            if (dimensions != null) {
+                image = ImageUtil.getScaledInstance(image, dimensions.getBlockX(), dimensions.getBlockZ(),
+                        RenderingHints.VALUE_INTERPOLATION_BILINEAR, false
+                );
+            }
+            return image;
+        });
+        BufferedImage image;
+        try {
+            image = future.get(Settings.settings().WEB.MAX_IMAGE_LOAD_TIME, TimeUnit.SECONDS);
+        } catch (InterruptedException | TimeoutException ignored) {
+            actor.printError(Caption.of("fawe.web.image.load.timeout", Settings.settings().WEB.MAX_IMAGE_LOAD_TIME));
+            return;
+        } catch (Throwable t) {
+            if (t.getCause() instanceof FaweException faweException) {
+                throw faweException;
+            }
+            throw new IOException(t.getCause());
         }
 
         BlockVector3 pos1 = session.getPlacementPosition(actor);

@@ -647,15 +647,20 @@ public class Settings extends Config {
 
     }
 
+    @Comment({"Web/HTTP connection related settings"})
     public static class WEB {
 
-        @Comment({
-                "The web interface for clipboards",
-                " - All schematics are anonymous and private",
-                " - Downloads can be deleted by the user",
-                " - Supports clipboard uploads, downloads and saves",
-        })
+        @Comment({"The web interface for clipboards", " - All schematics are anonymous and private", " - Downloads can be deleted by the user", " - Supports clipboard uploads, downloads and saves",})
         public String URL = "https://schem.intellectualsites.com/fawe/";
+
+        @Comment("The maximum amount of time in seconds the plugin can attempt to load images for.")
+        public int MAX_IMAGE_LOAD_TIME = 5;
+
+        @Comment({
+                "The maximum size (width x length) an image being loaded can be.",
+                " - 8294400 is 3840x2160"
+        })
+        public int MAX_IMAGE_SIZE = 8294400;
 
     }
 
