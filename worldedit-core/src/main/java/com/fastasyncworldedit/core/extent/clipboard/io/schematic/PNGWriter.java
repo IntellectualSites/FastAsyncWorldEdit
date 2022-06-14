@@ -68,14 +68,10 @@ public class PNGWriter implements ClipboardWriter {
 
         boolean fill = length * 4 < imageSize && width * 4 < imageSize;
 
-        MutableBlockVector3 mutable;
-        MutableBlockVector3 mutableTop;
-        MutableBlockVector3 mutableRight;
-        MutableBlockVector3 mutableLeft;
-        mutable = mutableTop = mutableRight = mutableLeft = new MutableBlockVector3(0, 0, 0);
-//        Vector mutableTop = new Vector(0, 0, 0);
-//        Vector mutableRight = new Vector(0, 0, 0);
-//        Vector mutableLeft = new Vector(0, 0, 0);
+        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
+        MutableBlockVector3 mutableTop = new MutableBlockVector3(0, 0, 0);
+        MutableBlockVector3 mutableRight = new MutableBlockVector3(0, 0, 0);
+        MutableBlockVector3 mutableLeft = new MutableBlockVector3(0, 0, 0);
 
         BlockVector3 min = clipboard.getMinimumPoint();
         int y0 = min.getBlockY();
