@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.entity;
 
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompoundTagBuilder;
 import com.sk89q.jnbt.FloatTag;
@@ -179,8 +180,8 @@ public class ExtentEntityCopy implements EntityFunction {
                                 uuid
                         );
                     } else {
+                        TaskManager.taskManager().sync(entity::remove);
                         //FAWE end
-                        entity.remove();
                     }
                 }
             }
