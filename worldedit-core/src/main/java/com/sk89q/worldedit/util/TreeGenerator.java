@@ -26,6 +26,7 @@ import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
@@ -80,10 +81,44 @@ public final class TreeGenerator {
             }
         },
         JUNGLE_BUSH("Jungle bush", "junglebush", "jungleshrub"),
-        RED_MUSHROOM("Red mushroom", "redmushroom", "redgiantmushroom"),
-        BROWN_MUSHROOM("Brown mushroom", "brownmushroom", "browngiantmushroom"),
-        CRIMSON_FUNGUS("Crimson fungus", "crimsonfungus", "rednethermushroom"),
-        WARPED_FUNGUS("Warped fungus", "warpedfungus", "greennethermushroom"),
+        //FAWE start - perform sanity check on generation location
+        RED_MUSHROOM("Red mushroom", "redmushroom", "redgiantmushroom"){
+            @Override
+            public boolean canGenerateOn(final BlockType type) {
+                return type == BlockTypes.MYCELIUM
+                        || type == BlockTypes.WARPED_NYLIUM
+                        || type == BlockTypes.CRIMSON_NYLIUM
+                        || super.canGenerateOn(type);
+            }
+        },
+        BROWN_MUSHROOM("Brown mushroom", "brownmushroom", "browngiantmushroom"){
+            @Override
+            public boolean canGenerateOn(final BlockType type) {
+                return type == BlockTypes.MYCELIUM
+                        || type == BlockTypes.WARPED_NYLIUM
+                        || type == BlockTypes.CRIMSON_NYLIUM
+                        || super.canGenerateOn(type);
+            }
+        },
+        CRIMSON_FUNGUS("Crimson fungus", "crimsonfungus", "rednethermushroom"){
+            @Override
+            public boolean canGenerateOn(final BlockType type) {
+                return type == BlockTypes.MYCELIUM
+                        || type == BlockTypes.WARPED_NYLIUM
+                        || type == BlockTypes.CRIMSON_NYLIUM
+                        || super.canGenerateOn(type);
+            }
+        },
+        WARPED_FUNGUS("Warped fungus", "warpedfungus", "greennethermushroom") {
+            @Override
+            public boolean canGenerateOn(final BlockType type) {
+                return type == BlockTypes.MYCELIUM
+                        || type == BlockTypes.WARPED_NYLIUM
+                        || type == BlockTypes.CRIMSON_NYLIUM
+                        || super.canGenerateOn(type);
+            }
+        },
+        //FAWE end
         RANDOM_MUSHROOM("Random mushroom", "randmushroom", "randommushroom") {
             @Override
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
@@ -98,16 +133,33 @@ public final class TreeGenerator {
         PINE("Pine tree", "pine") {
             @Override
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
-                makePineTree(editSession, pos);
-                return true;
+                //FAWE start - perform sanity check on generation location
+                if (editSession
+                        .getBlockType(pos.getX(), pos.getY(), pos.getZ())
+                        .getMaterial()
+                        .isAir() && canGenerateOn(editSession.getBlockType(pos.getX(), pos.getY() - 1, pos.getZ()))) {
+                    makePineTree(editSession, pos);
+                    return true;
+                }
+                return false;
+                //FAWE end
             }
         },
         CHORUS_PLANT("Chorus plant", "chorusplant") {
             @Override
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
+                //FAWE start - ensure canGenerateOn is called.
                 // chorus plants have to generate starting in the end stone itself, not the air above the ground
-                return editSession.getWorld().generateTree(this, editSession, pos.subtract(0, 1, 0));
+                return super.generate(editSession, pos.subtract(0, 1, 0));
+                //FAWE end
             }
+
+            //FAWE start - perform sanity check on generation location
+            @Override
+            public boolean canGenerateOn(BlockType type) {
+                return type == BlockTypes.END_STONE;
+            }
+            //FAWE end
         },
         RANDOM("Random tree", "rand", "random") {
             @Override
@@ -151,8 +203,28 @@ public final class TreeGenerator {
         }
 
         public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
-            return editSession.getWorld().generateTree(this, editSession, pos);
+            //FAWE start - check for ability for tree to generate on block
+            if (editSession
+                    .getBlockType(pos.getX(), pos.getY(), pos.getZ())
+                    .getMaterial()
+                    .isAir() && canGenerateOn(editSession.getBlockType(pos.getX(), pos.getY() - 1, pos.getZ()))) {
+                return editSession.getWorld().generateTree(this, editSession, pos);
+            }
+            return false;
+            //FAWE end
         }
+
+        //FAWE start - check for ability for tree to generate on block
+        public boolean canGenerateOn(BlockType type) {
+            return type == BlockTypes.DIRT
+                    || type == BlockTypes.GRASS_BLOCK
+                    || type == BlockTypes.PODZOL
+                    || type == BlockTypes.COARSE_DIRT
+                    || type == BlockTypes.MOSS_BLOCK
+                    || type == BlockTypes.ROOTED_DIRT
+                    || type == BlockTypes.MUD;
+        }
+        //FAWE end
 
         /**
          * Get user-friendly tree type name.
