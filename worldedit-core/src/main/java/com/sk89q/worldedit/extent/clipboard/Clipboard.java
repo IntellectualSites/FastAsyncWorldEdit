@@ -391,9 +391,6 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
             if (!pasteAir && block.getBlockType().getMaterial().isAir()) {
                 continue;
             }
-            if (pos.getY() < extent.getMinY()) {
-                throw new RuntimeException("Y-Position cannot be less than the extent's minimum Y!");
-            }
             extent.setBlock(xx, yy, zz, block);
         }
         // Entity offset is the paste location subtract the clipboard origin (entity's location is already relative to the world origin)
