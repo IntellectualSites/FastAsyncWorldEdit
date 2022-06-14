@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class BlockMaskBuilder {
@@ -250,10 +251,15 @@ public class BlockMaskBuilder {
                 if (StringMan.isAlphanumericUnd(input)) {
                     add(BlockTypes.parse(input));
                 } else {
+                    boolean success = false;
                     for (BlockType myType : BlockTypesCache.values) {
                         if (myType.getId().matches(input)) {
                             add(myType);
+                            success = true;
                         }
+                    }
+                    if (!success) {
+                        throw new InputParseException(Caption.of("fawe.error.no-block-found", TextComponent.of(input)));
                     }
                 }
             }
