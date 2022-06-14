@@ -142,6 +142,9 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         map.put("UUIDMost", new LongTag(newuuid.getMostSignificantBits()));
         map.put("UUIDLeast", new LongTag(newuuid.getLeastSignificantBits()));
 
+        map.put("WorldUUIDMost", new LongTag(newuuid.getMostSignificantBits()));
+        map.put("WorldUUIDLeast", new LongTag(newuuid.getLeastSignificantBits()));
+
         map.put("PersistentIDMSB", new LongTag(newuuid.getMostSignificantBits()));
         map.put("PersistentIDLSB", new LongTag(newuuid.getLeastSignificantBits()));
 

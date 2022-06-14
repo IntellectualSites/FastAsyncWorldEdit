@@ -53,14 +53,16 @@ public class MutableEntityChange implements Change {
     @SuppressWarnings({"unchecked"})
     public void delete(UndoContext context) {
         Map<String, Tag> map = tag.getValue();
-        long most;
-        long least;
-        if (map.containsKey("UUIDMost")) {
-            most = ((LongTag) map.get("UUIDMost")).getValue();
-            least = ((LongTag) map.get("UUIDLeast")).getValue();
+        UUID uuid;
+        if (tag.containsKey("UUID")) {
+            int[] arr = tag.getIntArray("UUID");
+            uuid = new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
+        } else if (map.containsKey("UUIDMost")) {
+            uuid = new UUID(((LongTag) map.get("UUIDMost")).getValue(), ((LongTag) map.get("UUIDLeast")).getValue());
+        } else if (map.containsKey("WorldUUIDMost")) {
+            uuid = new UUID(((LongTag) map.get("WorldUUIDMost")).getValue(), ((LongTag) map.get("WorldUUIDLeast")).getValue());
         } else if (map.containsKey("PersistentIDMSB")) {
-            most = ((LongTag) map.get("PersistentIDMSB")).getValue();
-            least = ((LongTag) map.get("PersistentIDLSB")).getValue();
+            uuid = new UUID(((LongTag) map.get("PersistentIDMSB")).getValue(), ((LongTag) map.get("PersistentIDLSB")).getValue());
         } else {
             LOGGER.info("Skipping entity without uuid.");
             return;
@@ -69,7 +71,6 @@ public class MutableEntityChange implements Change {
         int x = MathMan.roundInt(pos.get(0).getValue());
         int y = MathMan.roundInt(pos.get(1).getValue());
         int z = MathMan.roundInt(pos.get(2).getValue());
-        UUID uuid = new UUID(most, least);
         context.getExtent().removeEntity(x, y, z, uuid);
     }
 
