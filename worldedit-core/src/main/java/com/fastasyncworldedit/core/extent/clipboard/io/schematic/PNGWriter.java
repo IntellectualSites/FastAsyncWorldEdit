@@ -7,6 +7,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -137,8 +138,9 @@ public class PNGWriter implements ClipboardWriter {
 
                     BlockType type = block.getBlockType();
                     int color;
-                    if (type == BlockTypes.GRASS_BLOCK) {
-                        color = tu.getColor(clipboard.getBiome(mutable));
+                    BiomeType biome;
+                    if (type == BlockTypes.GRASS_BLOCK && (biome = clipboard.getBiome(mutable)) != null) {
+                        color = tu.getColor(biome);
                     } else {
                         color = tu.getColor(type);
                     }
