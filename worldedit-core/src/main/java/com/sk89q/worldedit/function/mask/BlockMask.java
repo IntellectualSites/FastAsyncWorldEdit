@@ -210,9 +210,9 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public boolean replacesAir() {
-        return ordinals[1]
-                || ordinals[2]
-                || ordinals[3];
+        return ordinals[BlockTypesCache.ReservedIDs.AIR]
+                || ordinals[BlockTypesCache.ReservedIDs.CAVE_AIR]
+                || ordinals[BlockTypesCache.ReservedIDs.VOID_AIR];
     }
 
     @Override
