@@ -96,7 +96,7 @@ public class PNGWriter implements ClipboardWriter {
                 for (int y = y0; y < y0 + height; y++) {
                     mutable.mutY(y);
                     BlockState block = clipboard.getBlock(mutable);
-                    if (block.getBlockType().getMaterial().isAir()) {
+                    if (!block.getBlockType().getMaterial().isSolid() || block.getBlockType().getMaterial().isTranslucent()) {
                         continue;
                     }
                     mutableTop.mutY(y + 1);
