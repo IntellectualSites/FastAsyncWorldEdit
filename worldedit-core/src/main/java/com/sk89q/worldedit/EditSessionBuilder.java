@@ -567,16 +567,16 @@ public final class EditSessionBuilder {
                     relighter = WorldEdit.getInstance().getPlatformManager()
                             .queryCapability(Capability.WORLD_EDITING)
                             .getRelighterFactory().createRelighter(relightMode, world, queue);
-                    extent.addProcessor(new RelightProcessor(relighter));
+                    queue.addProcessor(new RelightProcessor(relighter));
                 }
-                extent.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
+                queue.addProcessor(new HeightmapProcessor(world.getMinY(), world.getMaxY()));
                 IBatchProcessor platformProcessor = WorldEdit
                         .getInstance()
                         .getPlatformManager()
                         .queryCapability(Capability.WORLD_EDITING)
                         .getPlatformProcessor(fastMode);
                 if (platformProcessor != null) {
-                    extent.addProcessor(platformProcessor);
+                    queue.addProcessor(platformProcessor);
                 }
                 IBatchProcessor platformPostProcessor = WorldEdit
                         .getInstance()
@@ -584,7 +584,7 @@ public final class EditSessionBuilder {
                         .queryCapability(Capability.WORLD_EDITING)
                         .getPlatformPostProcessor(fastMode);
                 if (platformPostProcessor != null) {
-                    extent.addPostProcessor(platformPostProcessor);
+                    queue.addPostProcessor(platformPostProcessor);
                 }
             } else {
                 relighter = NullRelighter.INSTANCE;
@@ -598,7 +598,7 @@ public final class EditSessionBuilder {
             }
             if (this.limit != null && this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
                 if (placeChunks) {
-                    extent.addProcessor(new StripNBTExtent(this.extent, this.limit.STRIP_NBT));
+                    queue.addProcessor(new StripNBTExtent(this.extent, this.limit.STRIP_NBT));
                 } else {
                     this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
                 }
@@ -614,7 +614,7 @@ public final class EditSessionBuilder {
                 Set<PropertyRemap<?>> remaps = this.limit.REMAP_PROPERTIES;
                 if (!limitBlocks.isEmpty() || (remaps != null && !remaps.isEmpty())) {
                     if (placeChunks) {
-                        extent.addProcessor(new DisallowedBlocksExtent(this.extent, limitBlocks, remaps));
+                        queue.addProcessor(new DisallowedBlocksExtent(this.extent, limitBlocks, remaps));
                     } else {
                         this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, remaps);
                     }
