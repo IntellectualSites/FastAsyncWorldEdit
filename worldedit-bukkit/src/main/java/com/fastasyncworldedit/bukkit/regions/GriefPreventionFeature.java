@@ -27,11 +27,10 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
     }
 
     public boolean isAllowed(Player player, Claim claim, MaskType type) {
-        return TaskManager.taskManager().sync(() -> claim != null && (claim.getOwnerName().equalsIgnoreCase(player.getName()) || claim
+        return claim != null && (claim.getOwnerName().equalsIgnoreCase(player.getName()) || claim
                 .getOwnerName()
-                .equals(player.getUniqueId()) ||
-                type == MaskType.MEMBER && claim.allowBuild(player, Material.AIR) == null));
-
+                .equals(player.getUniqueId()) || TaskManager.taskManager().sync(() -> type == MaskType.MEMBER &&
+                claim.allowBuild(player, Material.AIR) == null));
     }
 
     @Override
