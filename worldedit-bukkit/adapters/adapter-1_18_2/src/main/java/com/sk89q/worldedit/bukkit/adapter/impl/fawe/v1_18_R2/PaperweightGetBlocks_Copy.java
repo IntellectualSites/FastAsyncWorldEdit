@@ -76,7 +76,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     protected void storeEntity(Entity entity) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         net.minecraft.nbt.CompoundTag compoundTag = new net.minecraft.nbt.CompoundTag();
-        entities.add((CompoundTag) adapter.toNative(entity.save(compoundTag)));
+        entity.save(compoundTag);
+        entities.add((CompoundTag) adapter.toNative(compoundTag));
     }
 
     @Override

@@ -67,7 +67,6 @@ import javax.annotation.Nonnull;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -677,21 +676,14 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     }
 
                     syncTasks[2] = () -> {
-                        final List<Entity>[] entities = /*nmsChunk.e()*/ new List[0];
+                        final List<Entity> entities = PaperweightPlatformAdapter.getEntities(nmsChunk);
 
-                        for (final Collection<Entity> ents : entities) {
-                            if (!ents.isEmpty()) {
-                                final Iterator<Entity> iter = ents.iterator();
-                                while (iter.hasNext()) {
-                                    final Entity entity = iter.next();
-                                    if (entityRemoves.contains(entity.getUUID())) {
-                                        if (createCopy) {
-                                            copy.storeEntity(entity);
-                                        }
-                                        iter.remove();
-                                        removeEntity(entity);
-                                    }
+                        for (Entity entity : entities) {
+                            if (entityRemoves.contains(entity.getUUID())) {
+                                if (createCopy) {
+                                    copy.storeEntity(entity);
                                 }
+                                removeEntity(entity);
                             }
                         }
                     };
