@@ -99,7 +99,7 @@ dependencies {
     implementation("org.bstats:bstats-bukkit") { isTransitive = false }
     implementation(libs.bstatsBase) { isTransitive = false }
     implementation("dev.notmyfault.serverlib:ServerLib")
-    api("com.intellectualsites.paster:Paster") { isTransitive = false }
+    implementation("com.intellectualsites.paster:Paster") { isTransitive = false }
     api(libs.lz4Java) { isTransitive = false }
     api(libs.sparsebitset) { isTransitive = false }
     api(libs.parallelgzip) { isTransitive = false }
@@ -167,7 +167,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("dev.notmyfault.serverlib:ServerLib:2.3.1"))
         }
         relocate("com.intellectualsites.paster", "com.fastasyncworldedit.paster") {
-            include(dependency("com.intellectualsites.paster:Paster:1.1.4"))
+            include(dependency("com.intellectualsites.paster:Paster"))
         }
         relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
             include(dependency("org.lz4:lz4-java:1.8.0"))

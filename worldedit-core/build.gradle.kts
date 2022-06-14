@@ -50,7 +50,7 @@ dependencies {
     compileOnlyApi(libs.adventureNbt)
     compileOnlyApi("net.kyori:adventure-text-minimessage")
     implementation(libs.zstd) { isTransitive = false }
-    api("com.intellectualsites.paster:Paster")
+    compileOnly("com.intellectualsites.paster:Paster")
     compileOnly(libs.lz4Java) { isTransitive = false }
     compileOnly(libs.sparsebitset)
     compileOnly(libs.parallelgzip) { isTransitive = false }
