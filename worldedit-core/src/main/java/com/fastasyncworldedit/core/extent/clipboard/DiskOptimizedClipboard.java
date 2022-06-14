@@ -432,7 +432,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         int ox = byteBuffer.getShort(10);
         int oy = byteBuffer.getShort(12);
         int oz = byteBuffer.getShort(14);
-        super.setOrigin(BlockVector3.at(ox, oy, oz).add(offset));
+        super.setOrigin(BlockVector3.at(ox, oy, oz));
     }
 
     @Override
