@@ -55,6 +55,7 @@ public class SnapshotRestore {
     //FAWE start - biome and entity restore
     private final boolean restoreBiomes;
     private final boolean restoreEntities;
+    private final Region region;
     //FAWE end
     private ArrayList<BlockVector2> missingChunks;
     private ArrayList<BlockVector2> errorChunks;
@@ -92,6 +93,7 @@ public class SnapshotRestore {
         this.editSession = editSession;
         this.restoreBiomes = restoreBiomes;
         this.restoreEntities = restoreEntities;
+        this.region = region;
 
         if (region instanceof CuboidRegion) {
             findNeededCuboidChunks(region);
@@ -204,7 +206,11 @@ public class SnapshotRestore {
                             float yRot = rotation.getFloat(0);
                             float xRot = rotation.getFloat(1);
                             Location location = new Location(editSession.getWorld(), x, y, z, yRot, xRot);
-                            editSession.createEntity(location, entity);
+                            BlockVector3 blockVector3 = BlockVector3.at(x, y, z);
+                            if (region.contains(blockVector3) && (editSession.getMask() == null
+                                    || editSession.getMask().test(blockVector3))) {
+                                editSession.createEntity(location, entity);
+                            }
                         }
                     } catch (DataException e) {
                         // this is a workaround: just ignore for now
