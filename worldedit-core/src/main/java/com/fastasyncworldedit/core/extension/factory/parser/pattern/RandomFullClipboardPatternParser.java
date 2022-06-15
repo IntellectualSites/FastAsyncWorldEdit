@@ -38,9 +38,9 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
             case 0:
                 if (argumentInput.equals("#") || argumentInput.equals("#c")) {
                     return Stream.of("#copy", "#clipboard");
-                } else if ("#copy".startsWith(argumentInput.toUpperCase(Locale.ROOT))) {
+                } else if ("#copy".startsWith(argumentInput.toLowerCase(Locale.ROOT))) {
                     return Stream.of("#copy");
-                } else if ("#clipboard".startsWith(argumentInput.toUpperCase(Locale.ROOT))) {
+                } else if ("#clipboard".startsWith(argumentInput.toLowerCase(Locale.ROOT))) {
                     return Stream.of("#clipboard");
                 } else {
                     return Stream.empty();
@@ -65,8 +65,8 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
             boolean rotate = arguments.length >= 2 && Boolean.parseBoolean(arguments[1]);
             boolean flip = arguments.length == 3 && Boolean.parseBoolean(arguments[2]);
             List<ClipboardHolder> clipboards;
-            if ("#copy".startsWith(arguments[0].toUpperCase(Locale.ROOT)) ||
-                    "#clipboard".startsWith(arguments[0].toUpperCase(Locale.ROOT))) {
+            if ("#copy".startsWith(arguments[0].toLowerCase(Locale.ROOT)) ||
+                    "#clipboard".startsWith(arguments[0].toLowerCase(Locale.ROOT))) {
                 ClipboardHolder clipboard = context.requireSession().getExistingClipboard();
                 if (clipboard == null) {
                     throw new InputParseException(Caption.of("fawe.error.parse.no-clipboard", getPrefix()));
