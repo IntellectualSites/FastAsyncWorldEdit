@@ -712,7 +712,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     }
 
                     syncTasks[1] = () -> {
-                        for (final CompoundTag nativeTag : entities) {
+                        Iterator<CompoundTag> iterator = entities.iterator();
+                        while (iterator.hasNext()) {
+                            final CompoundTag nativeTag = iterator.next();
                             final Map<String, Tag> entityTagMap = nativeTag.getValue();
                             final StringTag idTag = (StringTag) entityTagMap.get("Id");
                             final ListTag posTag = (ListTag) entityTagMap.get("Pos");
@@ -739,12 +741,23 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     }
                                     entity.load(tag);
                                     entity.absMoveTo(x, y, z, yaw, pitch);
-                                    nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                                    entity.setUUID(nativeTag.getUUID());
+                                    if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                                        LOGGER.warn(
+                                                "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
+                                                id,
+                                                nmsWorld.getWorld().getName(),
+                                                x,
+                                                y,
+                                                z
+                                        );
+                                        // Unsuccessful create should not be saved to history
+                                        iterator.remove();
+                                    }
                                 }
                             }
                         }
                     };
-
                 }
 
                 // set tiles
