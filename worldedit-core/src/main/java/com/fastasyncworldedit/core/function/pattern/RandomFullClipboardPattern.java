@@ -44,13 +44,12 @@ public class RandomFullClipboardPattern extends AbstractPattern {
         AffineTransform transform = new AffineTransform();
         if (randomRotate) {
             transform = transform.rotateY(ThreadLocalRandom.current().nextInt(4) * 90);
-            holder.setTransform(new AffineTransform().rotateY(ThreadLocalRandom.current().nextInt(4) * 90));
         }
         if (randomFlip && ThreadLocalRandom.current().nextBoolean()) {
             transform = transform.scale(flipVector);
         }
         if (!transform.isIdentity()) {
-            holder.setTransform(transform);
+            holder.setTransform(transform.combine(holder.getTransform()));
         }
         Clipboard clipboard = holder.getClipboard();
         Transform newTransform = holder.getTransform();
