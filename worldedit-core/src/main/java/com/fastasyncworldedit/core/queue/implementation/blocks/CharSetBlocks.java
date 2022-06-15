@@ -296,7 +296,13 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public boolean isEmpty() {
-        if (biomes != null || light != null || skyLight != null) {
+        if (biomes != null
+                || light != null
+                || skyLight != null
+                || (entities != null && !entities.isEmpty())
+                || (tiles != null && !tiles.isEmpty())
+                || (entityRemoves != null && !entityRemoves.isEmpty())
+                || (heightMaps != null && !heightMaps.isEmpty())) {
             return false;
         }
         //noinspection SimplifyStreamApiCallChains - this is faster than using #noneMatch
