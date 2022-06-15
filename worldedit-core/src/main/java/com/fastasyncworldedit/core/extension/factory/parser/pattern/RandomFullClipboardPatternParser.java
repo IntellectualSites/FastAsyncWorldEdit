@@ -62,8 +62,8 @@ public class RandomFullClipboardPatternParser extends RichParser<Pattern> {
             ));
         }
         try {
-            boolean rotate = arguments.length >= 2 && Boolean.getBoolean(arguments[1]);
-            boolean flip = arguments.length == 3 && Boolean.getBoolean(arguments[2]);
+            boolean rotate = arguments.length >= 2 && Boolean.parseBoolean(arguments[1]);
+            boolean flip = arguments.length == 3 && Boolean.parseBoolean(arguments[2]);
             List<ClipboardHolder> clipboards;
             if ("#copy".startsWith(arguments[0].toUpperCase(Locale.ROOT)) ||
                     "#clipboard".startsWith(arguments[0].toUpperCase(Locale.ROOT))) {
