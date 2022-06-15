@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.core.regions.FaweMask;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
@@ -28,8 +29,8 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
     public boolean isAllowed(Player player, Claim claim, MaskType type) {
         return claim != null && (claim.getOwnerName().equalsIgnoreCase(player.getName()) || claim
                 .getOwnerName()
-                .equals(player.getUniqueId()) ||
-                type == MaskType.MEMBER && claim.allowBuild(player, Material.AIR) == null);
+                .equals(player.getUniqueId()) || TaskManager.taskManager().sync(() -> type == MaskType.MEMBER &&
+                claim.allowBuild(player, Material.AIR) == null));
     }
 
     @Override

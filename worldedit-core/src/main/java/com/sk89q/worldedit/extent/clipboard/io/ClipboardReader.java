@@ -61,7 +61,12 @@ public interface ClipboardReader extends Closeable {
     default Clipboard read(UUID uuid) throws IOException {
         return read(
                 uuid,
-                (dimensions) -> Clipboard.create(new CuboidRegion(BlockVector3.ZERO, dimensions.subtract(BlockVector3.ONE)), uuid)
+                (dimensions) -> Clipboard.create(new CuboidRegion(
+                        null,
+                        BlockVector3.ZERO,
+                        dimensions.subtract(BlockVector3.ONE),
+                        false
+                ), uuid)
         );
     }
 
