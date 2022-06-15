@@ -67,6 +67,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -630,16 +631,31 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     }
 
                     syncTasks[2] = () -> {
+                        Set<UUID> entitiesRemoved = new HashSet<>();
                         final List<Entity> entities = PaperweightPlatformAdapter.getEntities(nmsChunk);
 
                         for (Entity entity : entities) {
-                            if (entityRemoves.contains(entity.getUUID())) {
+                            UUID uuid = entity.getUUID();
+                            if (entityRemoves.contains(uuid)) {
                                 if (createCopy) {
                                     copy.storeEntity(entity);
                                 }
                                 removeEntity(entity);
+                                entitiesRemoved.add(uuid);
+                                entityRemoves.remove(uuid);
                             }
                         }
+                        if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
+                            for (UUID uuid : entityRemoves) {
+                                Entity entity = nmsWorld.entityManager.getEntityGetter().get(uuid);
+                                if (entity != null) {
+                                    removeEntity(entity);
+                                }
+                            }
+                        }
+                        // Only save entities that were actually removed to history
+                        set.getEntityRemoves().clear();
+                        set.getEntityRemoves().addAll(entitiesRemoved);
                     };
                 }
 

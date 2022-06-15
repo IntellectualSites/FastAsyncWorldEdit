@@ -622,6 +622,15 @@ public class Settings extends Config {
         public boolean KEEP_ENTITIES_IN_BLOCKS = false;
 
         @Comment({
+                "[SAFE] Attempt to remove entities from the world if they were not present in the expected chunk (default: true)",
+                " - Sometimes an entity may have moved into a different chunk to that which FAWE expected",
+                " - This option allows FAWE to attempt to remove the entity, even if present in a different chunk",
+                " - If the entity is in an unloaded or partially loaded chunk, this will fail",
+                " - If an entity cannot be removed, it is possible duplicate entities may be created when using undo and/or redo"
+        })
+        public boolean REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL = true;
+
+        @Comment({
                 "Other experimental features"
         })
         public boolean OTHER = false;
