@@ -24,6 +24,7 @@ import com.sk89q.worldedit.util.nbt.BinaryTagTypes;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
 import java.util.Map;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -169,5 +170,32 @@ public final class NBTUtils {
         }
         return expected.cast(tag);
     }
+
+    //FAWE start
+    /**
+     * Add a {@link UUID} to a map for use in a {@link CompoundTag}
+     *
+     * @param map  Map to add uuid to
+     * @param uuid {@link UUID} to add
+     * @since TODO
+     */
+    public static void addUUIDToMap(Map<String, Tag> map, UUID uuid) {
+        int[] uuidArray = new int[4];
+        uuidArray[0] = (int) (uuid.getMostSignificantBits() >> 32);
+        uuidArray[1] = (int) uuid.getMostSignificantBits();
+        uuidArray[2] = (int) (uuid.getLeastSignificantBits() >> 32);
+        uuidArray[3] = (int) uuid.getLeastSignificantBits();
+        map.put("UUID", new IntArrayTag(uuidArray));
+
+        map.put("UUIDMost", new LongTag(uuid.getMostSignificantBits()));
+        map.put("UUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
+
+        map.put("WorldUUIDMost", new LongTag(uuid.getMostSignificantBits()));
+        map.put("WorldUUIDLeast", new LongTag(uuid.getLeastSignificantBits()));
+
+        map.put("PersistentIDMSB", new LongTag(uuid.getMostSignificantBits()));
+        map.put("PersistentIDLSB", new LongTag(uuid.getLeastSignificantBits()));
+    }
+    //FAWE end
 
 }
