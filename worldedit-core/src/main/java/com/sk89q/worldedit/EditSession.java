@@ -3697,6 +3697,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     }
 
     @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        try {
+            return this.getExtent().createEntity(location, entity, uuid);
+        } catch (WorldEditException e) {
+            throw new RuntimeException("Unexpected exception", e);
+        }
+    }
+
+    @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
         try {
             this.getExtent().removeEntity(x, y, z, uuid);

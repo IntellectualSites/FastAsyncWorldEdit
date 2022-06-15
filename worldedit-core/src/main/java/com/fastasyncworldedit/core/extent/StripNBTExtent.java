@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -63,6 +64,12 @@ public class StripNBTExtent extends AbstractDelegateExtent implements IBatchProc
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
         return super.createEntity(location, stripEntityNBT(entity));
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        return super.createEntity(location, stripEntityNBT(entity), uuid);
     }
 
     @SuppressWarnings("unchecked")

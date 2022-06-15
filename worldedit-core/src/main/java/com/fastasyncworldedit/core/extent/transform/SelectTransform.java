@@ -14,6 +14,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public abstract class SelectTransform extends ResettableExtent {
 
@@ -50,6 +51,13 @@ public abstract class SelectTransform extends ResettableExtent {
     public Entity createEntity(Location position, BaseEntity entity) {
         return getExtent(position.getBlockX(), position.getBlockY(), position.getBlockZ())
                 .createEntity(position, entity);
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location position, BaseEntity entity, UUID uuid) {
+        return getExtent(position.getBlockX(), position.getBlockY(), position.getBlockZ())
+                .createEntity(position, entity, uuid);
     }
 
     @Override

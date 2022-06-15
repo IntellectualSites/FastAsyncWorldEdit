@@ -305,6 +305,18 @@ public class BlockArrayClipboard implements Clipboard {
     }
 
     @Override
+    @Nullable
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        Location l = new Location(location.getExtent(),
+                location.getX() - offset.getBlockX(),
+                location.getY() - offset.getBlockY(),
+                location.getZ() - offset.getBlockZ(),
+                location.getYaw(), location.getPitch()
+        );
+        return getParent().createEntity(l, entity, uuid);
+    }
+
+    @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
         x -= offset.getX();
         y -= offset.getY();

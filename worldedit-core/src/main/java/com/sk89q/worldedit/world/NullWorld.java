@@ -52,6 +52,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * A null implementation of {@link World} that drops all changes and
@@ -228,6 +229,14 @@ public class NullWorld extends AbstractWorld {
     public Entity createEntity(Location location, BaseEntity entity) {
         return null;
     }
+
+    //FAWE start
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        return null;
+    }
+    //FAWE end
 
     /**
      * Return an instance of this null world.

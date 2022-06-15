@@ -22,6 +22,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.UUID;
 
 public abstract class FaweRegionExtent extends ResettableExtent implements IBatchProcessor {
 
@@ -147,6 +148,18 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
             return null;
         }
         return super.createEntity(location, entity);
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        if (!contains(location.getBlockX(), location.getBlockY(), location.getBlockZ())) {
+            if (!limit.MAX_FAILS()) {
+                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
+            }
+            return null;
+        }
+        return super.createEntity(location, entity, uuid);
     }
 
     @Override

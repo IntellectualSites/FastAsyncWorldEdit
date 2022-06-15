@@ -18,6 +18,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -72,6 +73,16 @@ public class HistoryExtent extends AbstractDelegateExtent {
     @Override
     public Entity createEntity(Location location, BaseEntity state) {
         final Entity entity = super.createEntity(location, state);
+        if (state != null) {
+            this.changeSet.addEntityCreate(state.getNbtData());
+        }
+        return entity;
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity state, UUID uuid) {
+        final Entity entity = super.createEntity(location, state, uuid);
         if (state != null) {
             this.changeSet.addEntityCreate(state.getNbtData());
         }

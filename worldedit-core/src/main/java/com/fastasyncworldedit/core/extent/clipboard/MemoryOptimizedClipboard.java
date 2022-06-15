@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.math.IntTriple;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
+import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -29,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MemoryOptimizedClipboard extends LinearClipboard {
@@ -296,6 +298,17 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
+        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
+        entities.add(ret);
+        return ret;
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue());
+        NBTUtils.addUUIDToMap(map, uuid);
+        entity.setNbtData(new CompoundTag(map));
         BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
         entities.add(ret);
         return ret;

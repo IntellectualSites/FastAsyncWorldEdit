@@ -31,6 +31,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 /**
  * Extent that ticks the watchdog before every world-affecting action.
@@ -85,6 +86,15 @@ public class WatchdogTickingExtent extends AbstractDelegateExtent {
         onOperation();
         return super.createEntity(location, entity);
     }
+
+    //FAWE start
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        onOperation();
+        return super.createEntity(location, entity, uuid);
+    }
+    //FAWE end
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {

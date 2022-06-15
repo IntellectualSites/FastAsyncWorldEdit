@@ -34,6 +34,7 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * An extent that can report back if an operation fails due to the extent(s) below it.
@@ -105,6 +106,20 @@ public class TracingExtent extends AbstractDelegateExtent {
         }
         return result;
     }
+
+    //FAWE start
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        BlockVector3 blockVector3 = location.toVector().toBlockPoint();
+        touchedLocations.add(blockVector3);
+        Entity result = super.createEntity(location, entity, uuid);
+        if (result == null) {
+            failedActions.put(blockVector3, Action.CREATE_ENTITY);
+        }
+        return result;
+    }
+    //FAWE end
 
     @Override
     public String toString() {

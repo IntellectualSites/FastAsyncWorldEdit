@@ -36,6 +36,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.UUID;
 
 public class RequestExtent implements Extent {
 
@@ -74,6 +75,14 @@ public class RequestExtent implements Extent {
     public Entity createEntity(Location location, BaseEntity entity) {
         return getExtent().createEntity(location, entity);
     }
+
+    //FAWE start
+    @Override
+    @Nullable
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        return getExtent().createEntity(location, entity, uuid);
+    }
+    //FAWE end
 
     @Override
     public BlockState getBlock(BlockVector3 position) {

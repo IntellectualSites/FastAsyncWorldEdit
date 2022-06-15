@@ -14,6 +14,7 @@ import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
+import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
@@ -716,6 +717,17 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     @Nullable
     @Override
     public Entity createEntity(Location location, BaseEntity entity) {
+        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
+        entities.add(ret);
+        return ret;
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue());
+        NBTUtils.addUUIDToMap(map, uuid);
+        entity.setNbtData(new CompoundTag(map));
         BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
         entities.add(ret);
         return ret;

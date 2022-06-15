@@ -56,6 +56,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 
 public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld {
 
@@ -166,6 +167,15 @@ public class ClipboardWorld extends AbstractWorld implements Clipboard, CLIWorld
         dirty = true;
         return clipboard.createEntity(location, entity);
     }
+
+    //FAWE start
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        dirty = true;
+        return clipboard.createEntity(location, entity, uuid);
+    }
+    //FAWE end
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
