@@ -239,7 +239,8 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
     },
 
     /**
-     * Isometric PNG writer.
+     * Isometric PNG writer. Only supports solid, full-cube blocks and creates a view of the clipboard looking FROM the south
+     * east of the clipboard
      */
     PNG("png", "image") {
         @Override
