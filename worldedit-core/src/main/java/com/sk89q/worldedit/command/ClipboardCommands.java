@@ -496,7 +496,7 @@ public class ClipboardCommands {
 
         ClipboardHolder holder = session.getClipboard();
         //FAWE start - use place
-        if (holder.getTransform().isIdentity() && (editSession.getSourceMask() == null && sourceMask == null)) {
+        if (holder.getTransform().isIdentity() && sourceMask == null) {
             place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted,
                     pasteEntities, pasteBiomes
             );
