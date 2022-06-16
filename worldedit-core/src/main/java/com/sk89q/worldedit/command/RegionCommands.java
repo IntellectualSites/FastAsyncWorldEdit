@@ -47,6 +47,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.LayerVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
+import com.sk89q.worldedit.internal.annotation.Offset;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -625,8 +626,8 @@ public class RegionCommands {
             @Arg(desc = "# of copies to stack", def = "1")
             @Confirm(Confirm.Processor.REGION)
                     int count,
-            @Arg(desc = "The direction to stack", def = Direction.AIM)
-            @Direction(includeDiagonals = true)
+            @Arg(desc = "How far to move the contents each stack", def = Offset.FORWARD)
+            @Offset
                     BlockVector3 direction,
             @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
                     boolean moveSelection,
