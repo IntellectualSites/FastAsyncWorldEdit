@@ -210,15 +210,14 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public boolean replacesAir() {
-        return ordinals[1]
-                || ordinals[2]
-                || ordinals[3];
+        return ordinals[BlockTypesCache.ReservedIDs.AIR]
+                || ordinals[BlockTypesCache.ReservedIDs.CAVE_AIR]
+                || ordinals[BlockTypesCache.ReservedIDs.VOID_AIR];
     }
 
     @Override
     public Mask tryCombine(Mask mask) {
-        if (mask instanceof ABlockMask) {
-            ABlockMask other = (ABlockMask) mask;
+        if (mask instanceof ABlockMask other) {
             boolean modified = false;
             boolean hasAny = false;
             for (int i = 0; i < ordinals.length; i++) {
@@ -241,8 +240,7 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public Mask tryOr(Mask mask) {
-        if (mask instanceof ABlockMask) {
-            ABlockMask other = (ABlockMask) mask;
+        if (mask instanceof ABlockMask other) {
             boolean modified = false;
             for (int i = 0; i < ordinals.length; i++) {
                 if (!ordinals[i]) {
@@ -273,23 +271,27 @@ public class BlockMask extends ABlockMask {
 
         int setTypes = 0;
         BlockType setType = null;
+        BlockType unsetType = null;
         int totalTypes = 0;
 
         for (BlockType type : BlockTypesCache.values) {
             if (type != null) {
                 totalTypes++;
                 boolean hasAll = true;
+                boolean hasAny = false;
                 List<BlockState> all = type.getAllStates();
                 for (BlockState state : all) {
                     totalStates++;
-                    hasAll &= test(state);
+                    boolean result = test(state);
+                    hasAll &= result;
+                    hasAny |= result;
                 }
                 if (hasAll) {
                     setTypes++;
                     setType = type;
                     setStates += all.size();
                     setState = type.getDefaultState();
-                } else {
+                } else if (hasAny) {
                     for (BlockState state : all) {
                         if (test(state)) {
                             setStates++;
@@ -298,6 +300,10 @@ public class BlockMask extends ABlockMask {
                             unsetState = state;
                         }
                     }
+                } else if (all.size() == 1) {
+                    unsetState = all.get(0);
+                } else {
+                    unsetType = type;
                 }
             }
         }
@@ -313,7 +319,11 @@ public class BlockMask extends ABlockMask {
         }
 
         if (setStates == totalStates - 1) {
-            return new InverseSingleBlockStateMask(getExtent(), unsetState);
+            if (unsetState != null) {
+                return new InverseSingleBlockStateMask(getExtent(), unsetState);
+            } else {
+                throw new IllegalArgumentException("unsetState cannot be null when passed to InverseSingleBlockStateMask");
+            }
         }
 
         if (setTypes == 1) {
@@ -321,7 +331,11 @@ public class BlockMask extends ABlockMask {
         }
 
         if (setTypes == totalTypes - 1) {
-            throw new IllegalArgumentException("unsetType cannot be null when passed to InverseSingleBlockTypeMask");
+            if (unsetType != null) {
+                return new InverseSingleBlockTypeMask(getExtent(), unsetType);
+            } else {
+                throw new IllegalArgumentException("unsetType cannot be null when passed to InverseSingleBlockTypeMask");
+            }
         }
 
         return null;
@@ -329,15 +343,15 @@ public class BlockMask extends ABlockMask {
 
     @Override
     public Mask inverse() {
-        boolean[] cloned = ordinals.clone();
+        boolean[] cloned = new boolean[ordinals.length];
         for (int i = 0; i < cloned.length; i++) {
-            cloned[i] = !cloned[i];
+            cloned[i] = !ordinals[i];
         }
         if (replacesAir()) {
-            cloned[1] = false;
-            cloned[2] = false;
-            cloned[3] = false;
-            cloned[0] = false;
+            cloned[BlockTypesCache.ReservedIDs.__RESERVED__] = false;
+            cloned[BlockTypesCache.ReservedIDs.AIR] = false;
+            cloned[BlockTypesCache.ReservedIDs.CAVE_AIR] = false;
+            cloned[BlockTypesCache.ReservedIDs.VOID_AIR] = false;
         }
         return new BlockMask(getExtent(), cloned);
     }
