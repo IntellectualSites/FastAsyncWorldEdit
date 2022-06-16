@@ -9,6 +9,7 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2.PaperweightGetBlocks;
@@ -33,6 +34,7 @@ import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.FixedBiomeSource;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -54,7 +56,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R2.generator.CustomChunkGenerator;
+import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
+import org.bukkit.generator.WorldInfo;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -198,6 +202,13 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         session = levelStorageSource.createAccess("faweregentempworld", levelStemResourceKey);
         PrimaryLevelData originalWorldData = originalServerWorld.serverLevelData;
 
+        BiomeProvider biomeProvider;
+        if (options.hasBiomeType()) {
+            biomeProvider = new SingleBiomeProvider();
+        } else {
+            biomeProvider = originalBukkitWorld.getBiomeProvider();
+        }
+
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
         PrimaryLevelData levelProperties = (PrimaryLevelData) server.getWorldData();
         WorldGenSettings originalOpts = levelProperties.worldGenSettings();
@@ -232,7 +243,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 false,
                 environment,
                 generator,
-                originalBukkitWorld.getBiomeProvider()
+                biomeProvider
         ) {
             private final Holder<Biome> singleBiome = options.hasBiomeType() ? BuiltinRegistries.BIOME.asHolderIdMap().byId(
                     WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBiomeId(options.getBiomeType())
@@ -267,7 +278,14 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             Holder<NoiseGeneratorSettings> generatorSettingBaseSupplier =
                     (Holder<NoiseGeneratorSettings>) generatorSettingBaseSupplierField
                             .get(originalChunkProvider.getGenerator());
-            BiomeSource biomeSource = originalChunkProvider.getGenerator().getBiomeSource();
+            BiomeSource biomeSource;
+            if (options.hasBiomeType()) {
+                biomeSource = new FixedBiomeSource(BuiltinRegistries.BIOME
+                        .asHolderIdMap()
+                        .byId(WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBiomeId(options.getBiomeType())));
+            } else {
+                biomeSource = originalChunkProvider.getGenerator().getBiomeSource();
+            }
             chunkGenerator = new NoiseBasedChunkGenerator(originalChunkProvider.getGenerator().structureSets, noiseBasedChunkGenerator.noises,
                     biomeSource, seed,
                     generatorSettingBaseSupplier
@@ -502,5 +520,22 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
     }
+
+    private class SingleBiomeProvider extends BiomeProvider {
+
+        private final org.bukkit.block.Biome biome = BukkitAdapter.adapt(options.getBiomeType());
+
+        @Override
+        public org.bukkit.block.Biome getBiome(final WorldInfo worldInfo, final int x, final int y, final int z) {
+            return biome;
+        }
+
+        @Override
+        public List<org.bukkit.block.Biome> getBiomes(final WorldInfo worldInfo) {
+            return Collections.singletonList(biome);
+        }
+
+    }
+
 
 }
