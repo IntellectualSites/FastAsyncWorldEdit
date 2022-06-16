@@ -41,6 +41,28 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
+      - name: Publish core javadoc
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: 'worldedit-core/build/docs/javadoc'
+          destination-github-username: 'IntellectualSites'
+          destination-repository-name: 'fastasyncworldedit-javadocs'
+          user-email: ${{ secrets.USER_EMAIL }}
+          target-branch: main
+          target-directory: worldedit-core
+      - name: Publish bukkit javadoc
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: 'worldedit-bukkit/build/docs/javadoc'
+          destination-github-username: 'IntellectualSites'
+          destination-repository-name: 'fastasyncworldedit-javadocs'
+          user-email: ${{ secrets.USER_EMAIL }}
+          target-branch: main
+          target-directory: worldedit-bukkit
       - name: Archive Artifacts
         uses: actions/upload-artifact@v3
         with:
