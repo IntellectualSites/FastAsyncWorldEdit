@@ -770,6 +770,10 @@ public class SelectionCommands {
         private final List<Countable<BlockState>> distribution;
         private final int totalBlocks;
         private final boolean separateStates;
+        //FAWE start
+        private final int maxDigits;
+        private boolean consoleFormat = false;
+        //FAWE end
 
         public BlockDistributionResult(List<Countable<BlockState>> distribution, boolean separateStates) {
             this(distribution, separateStates, "//distr -p %page%" + (separateStates ? " -d" : ""));
@@ -782,6 +786,9 @@ public class SelectionCommands {
             this.totalBlocks = distribution.stream().mapToInt(Countable::getAmount).sum();
             this.separateStates = separateStates;
             setComponentsPerPage(7);
+            //FAWE start
+            this.maxDigits = (int) (Math.log10(distribution.get(0).getAmount()) + 1);
+            //FAWE end
         }
 
         @Override
@@ -791,17 +798,31 @@ public class SelectionCommands {
 
             final int count = c.getAmount();
 
+            //FAWE start - better formatting, support console
             final double perc = count / (double) totalBlocks * 100;
-            final int maxDigits = (int) (Math.log10(totalBlocks) + 1);
             final int curDigits = (int) (Math.log10(count) + 1);
-            line.append(String.format("%s%.3f%%  ", perc < 10 ? "  " : "", perc), TextColor.GOLD);
-            final int space = maxDigits - curDigits;
-            String pad = Strings.repeat(" ", space == 0 ? 2 : 2 * space + 1);
+            // Assume console uses monospaced font
+            final String space = consoleFormat ? " " : "  ";
+
+            line.append(String.format("%s%.3f%%  ", perc < 10 ? space : "", perc), TextColor.GOLD);
+            final int diff = maxDigits - curDigits;
+            final int multipler;
+            if (consoleFormat) {
+                multipler = diff + 2;
+            } else {
+                multipler = diff == 0 ? 2 : 2 * diff + 1;
+            }
+            String pad = Strings.repeat(" ", multipler);
+            //FAWE end
             line.append(String.format("%s%s", count, pad), TextColor.YELLOW);
 
             final BlockState state = c.getID();
             final BlockType blockType = state.getBlockType();
-            Component blockName = blockType.getRichName();
+
+            //FAWE start - better formatting, support console; Translation keys will not work on console
+            Component blockName = consoleFormat ? TextComponent.of(blockType.getName()) : blockType.getRichName();
+            //FAWE end
+
             TextComponent toolTip;
             if (separateStates && state != blockType.getDefaultState()) {
                 toolTip = TextComponent.of(state.getAsString());
@@ -819,6 +840,14 @@ public class SelectionCommands {
         public int getComponentsSize() {
             return distribution.size();
         }
+
+        //FAWE start - support for console
+        @Override
+        public void formatForConsole() {
+            this.consoleFormat = true;
+            super.formatForConsole();
+        }
+        //FAWE end
 
         @Override
         public Component create(int page) throws InvalidComponentException {
