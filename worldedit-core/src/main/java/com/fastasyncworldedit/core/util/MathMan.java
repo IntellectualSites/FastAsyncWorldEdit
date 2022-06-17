@@ -167,9 +167,20 @@ public class MathMan {
         return (((triple >> 40) & 0xffffff) << 38) >> 38;
     }
 
+    /**
+     * Pack a chunk-block coordinate into an int. Supports x and z 0 -> 15 and y = -2048 -> 2047
+     *
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z coordinate
+     * @return int packed by x, y and z coordinates
+     */
     public static int tripleBlockCoord(int x, int y, int z) {
-        // account for the fact y can be negative now. Assume it won't be less than -256
-        y += 256;
+        // We have 12 bits available to Y value, so keep it 0 -> 4095
+        if (y < -2048 || y > 2047) {
+            throw new UnsupportedOperationException("TripleBlockCoord Y value cannot be outside range -2048 <= y <= 2047");
+        }
+        y += 2048;
         return ((x & 15) << 16 | (z & 15) << 12 | y);
     }
 
@@ -182,7 +193,7 @@ public class MathMan {
     }
 
     public static int untripleBlockCoordY(int triple) {
-        return (triple & 0x1ff) - 256;
+        return (triple & 0xfff) - 2048;
     }
 
     public static int untripleBlockCoordZ(int triple) {
