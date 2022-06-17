@@ -93,7 +93,6 @@ public final class MemBlockSet extends BlockSet {
             @Override
             public Iterator<BlockVector2> iterator() {
                 return new Iterator<>() {
-                    private final MutableBlockVector2 mutable = new MutableBlockVector2();
                     private boolean hasNext;
                     private int X;
                     private int Z;
@@ -131,9 +130,10 @@ public final class MemBlockSet extends BlockSet {
 
                     @Override
                     public BlockVector2 next() {
-                        mutable.setComponents(setX + getBlockOffsetX(), setZ + getBlockOffsetZ());
+                        // Maintain correct order of method call/variable use
+                        BlockVector2 result = BlockVector2.at(setX + getBlockOffsetX(), setZ + getBlockOffsetZ());
                         init();
-                        return mutable;
+                        return result;
                     }
 
                     @Override
