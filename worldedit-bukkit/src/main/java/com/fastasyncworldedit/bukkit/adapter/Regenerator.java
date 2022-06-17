@@ -440,7 +440,6 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         );
         Region adjustedRegion = new CuboidRegion(newMin, newMax);
         return adjustedRegion.getChunks().stream()
-                .map(c -> BlockVector2.at(c.getX(), c.getZ()))
                 .sorted(Comparator
                         .comparingInt(BlockVector2::getZ)
                         .thenComparingInt(BlockVector2::getX)) //needed for RegionLimitedWorldAccess
