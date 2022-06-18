@@ -316,21 +316,15 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public CompoundTag getEntity(UUID uuid) {
         Entity entity = serverLevel.getEntity(uuid);
         if (entity != null) {
             org.bukkit.entity.Entity bukkitEnt = entity.getBukkitEntity();
             return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
         }
-        for (List<Entity> entry : /*getChunk().getEntitySlices()*/ new List[0]) {
-            if (entry != null) {
-                for (Entity ent : entry) {
-                    if (uuid.equals(ent.getUUID())) {
-                        org.bukkit.entity.Entity bukkitEnt = ent.getBukkitEntity();
-                        return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
-                    }
-                }
+        for (CompoundTag tag : getEntities()) {
+            if (uuid.equals(tag.getUUID())) {
+                return tag;
             }
         }
         return null;
@@ -338,21 +332,15 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Set<CompoundTag> getEntities() {
-        List<Entity>[] slices = /*getChunk().getEntitySlices()*/ new List[0];
-        int size = 0;
-        for (List<Entity> slice : slices) {
-            if (slice != null) {
-                size += slice.size();
-            }
-        }
-        if (slices.length == 0) {
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
+        if (entities.isEmpty()) {
             return Collections.emptySet();
         }
-        int finalSize = size;
-        return new AbstractSet<CompoundTag>() {
+        int size = entities.size();
+        return new AbstractSet<>() {
             @Override
             public int size() {
-                return finalSize;
+                return size;
             }
 
             @Override
@@ -365,17 +353,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 if (!(get instanceof CompoundTag getTag)) {
                     return false;
                 }
-                Map<String, Tag> value = getTag.getValue();
-                CompoundTag getParts = (CompoundTag) value.get("UUID");
-                UUID getUUID = new UUID(getParts.getLong("Most"), getParts.getLong("Least"));
-                for (List<Entity> slice : slices) {
-                    if (slice != null) {
-                        for (Entity entity : slice) {
-                            UUID uuid = entity.getUUID();
-                            if (uuid.equals(getUUID)) {
-                                return true;
-                            }
-                        }
+                UUID getUUID = getTag.getUUID();
+                for (Entity entity : entities) {
+                    UUID uuid = entity.getUUID();
+                    if (uuid.equals(getUUID)) {
+                        return true;
                     }
                 }
                 return false;
@@ -384,9 +366,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             @Nonnull
             @Override
             public Iterator<CompoundTag> iterator() {
-                Iterable<CompoundTag> result = StreamSupport.stream(Iterables.concat(slices).spliterator(), false).map(input -> {
+                Iterable<CompoundTag> result = entities.stream().map(input -> {
                     net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                    return (CompoundTag) adapter.toNative(input.saveWithoutId(tag));
+                    input.save(tag);
+                    return (CompoundTag) adapter.toNative(tag);
                 }).collect(Collectors.toList());
                 return result.iterator();
             }
