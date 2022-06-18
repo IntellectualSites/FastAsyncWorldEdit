@@ -339,7 +339,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
 
     private BaseBlock parseLogic(String input, ParserContext context) throws InputParseException {
         //FAWE start
-        String[] blockAndExtraData = input.trim().split("\\|", 2);
+        String[] blockAndExtraData = input.trim().split("\\|");
         blockAndExtraData[0] = woolMapper(blockAndExtraData[0]);
         Map<Property<?>, Object> blockStates = new HashMap<>();
         //FAWE end
