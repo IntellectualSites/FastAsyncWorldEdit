@@ -182,7 +182,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 readBiomeStatusFromHeader();
                 int nbtCount = readNBTSavedCountFromHeader();
                 int entitiesCount = readEntitiesSavedCountFromHeader();
-                if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK && nbtCount + entitiesCount > 0) {
+                if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK && (nbtCount + entitiesCount > 0)) {
                     loadNBTFromFileFooter(nbtCount, entitiesCount, biomeLength);
                 }
             } else if (braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
@@ -551,6 +551,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    nbtOS.flush();
                     if (baOS.size() > nbtBytesRemaining) {
                         LOGGER.warn(
                                 "Clipboard file {} does not have enough remaining space to store entity data on disk.",
@@ -564,12 +565,12 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 }
             }
 
-            if (output == null) {
-                return;
-            }
-
             if (entitiesFit) {
                 output = baOS.toByteArray();
+            }
+
+            if (output == null) {
+                return;
             }
 
             long currentLength = this.braf.length();
