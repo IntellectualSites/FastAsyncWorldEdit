@@ -107,6 +107,13 @@ public abstract class AbstractWorld implements World {
         return false;
     }
 
+    //FAWE start - allow block break effect of non-legacy blocks
+    @Override
+    public boolean playBlockBreakEffect(Vector3 position, BlockType type) {
+        return false;
+    }
+    //FAWE end
+
     @Override
     public boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
         if (taskId == -1) {
@@ -185,10 +192,11 @@ public abstract class AbstractWorld implements World {
             this.priority = priority;
         }
 
-        @SuppressWarnings("deprecation")
+        //FAWE start - allow block break effect of non-legacy blocks
         public void play() {
-            playEffect(position, 2001, blockType.getLegacyId());
+            playBlockBreakEffect(position, blockType);
         }
+        //FAWE end
 
         @Override
         public int compareTo(@Nullable QueuedEffect other) {

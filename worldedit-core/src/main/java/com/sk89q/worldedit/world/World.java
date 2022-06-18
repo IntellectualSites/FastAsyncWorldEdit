@@ -348,6 +348,17 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      */
     boolean playEffect(Vector3 position, int type, int data);
 
+    //FAWE start - allow block break effect of non-legacy blocks
+    /**
+     * Play a block break effect.
+     *
+     * @param position the position
+     * @param type     the effect block type
+     * @return true if the effect was played
+     */
+    boolean playBlockBreakEffect(Vector3 position, BlockType type);
+    //FAWE end
+
     /**
      * Queue a block break effect.
      *
