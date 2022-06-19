@@ -470,7 +470,6 @@ public class SchematicCommands {
             }
         }
 
-        //FAWE end
         File f = worldEdit.getSafeSaveFile(actor, dir, filename, format.getPrimaryFileExtension());
         int i = f.getName().lastIndexOf('.');
         if (i == -1 && f.getName().isEmpty() || i == 0) {
@@ -499,6 +498,7 @@ public class SchematicCommands {
                 return;
             }
         }
+        //FAWE end
 
         // Create parent directories
         File parent = f.getParentFile();
