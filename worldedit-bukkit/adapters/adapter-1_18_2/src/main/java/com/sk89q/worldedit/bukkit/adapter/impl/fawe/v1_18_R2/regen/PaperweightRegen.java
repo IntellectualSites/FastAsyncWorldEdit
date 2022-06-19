@@ -210,12 +210,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         session = levelStorageSource.createAccess("faweregentempworld", levelStemResourceKey);
         PrimaryLevelData originalWorldData = originalServerWorld.serverLevelData;
 
-        BiomeProvider biomeProvider;
-        if (options.hasBiomeType()) {
-            biomeProvider = new SingleBiomeProvider();
-        } else {
-            biomeProvider = originalBukkitWorld.getBiomeProvider();
-        }
+        BiomeProvider biomeProvider = getBiomeProvider();
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
         PrimaryLevelData levelProperties = (PrimaryLevelData) server.getWorldData();

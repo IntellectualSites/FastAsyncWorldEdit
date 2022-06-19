@@ -23,6 +23,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.World;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.WorldInfo;
@@ -524,6 +525,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         }
 
         return tasks;
+    }
+
+    protected BiomeProvider getBiomeProvider() {
+        if (options.hasBiomeType()) {
+            return new SingleBiomeProvider();
+        }
+        return originalBukkitWorld.getBiomeProvider();
     }
 
     //classes

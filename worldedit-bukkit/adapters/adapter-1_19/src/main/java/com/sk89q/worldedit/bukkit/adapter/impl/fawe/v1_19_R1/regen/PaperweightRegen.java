@@ -230,12 +230,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         );
         PrimaryLevelData newWorldData = new PrimaryLevelData(newWorldSettings, newOpts, Lifecycle.stable());
 
-        BiomeProvider biomeProvider;
-        if (options.hasBiomeType()) {
-            biomeProvider = new SingleBiomeProvider();
-        } else {
-            biomeProvider = originalBukkitWorld.getBiomeProvider();
-        }
+        BiomeProvider biomeProvider = getBiomeProvider();
 
         //init world
         freshWorld = Fawe.instance().getQueueHandler().sync((Supplier<ServerLevel>) () -> new ServerLevel(
