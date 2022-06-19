@@ -9,7 +9,6 @@ import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Lifecycle;
-import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2.PaperweightGetBlocks;
@@ -60,7 +59,6 @@ import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R2.generator.CustomChunkGenerator;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
-import org.bukkit.generator.WorldInfo;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -545,22 +543,5 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
     }
-
-    private class SingleBiomeProvider extends BiomeProvider {
-
-        private final org.bukkit.block.Biome biome = BukkitAdapter.adapt(options.getBiomeType());
-
-        @Override
-        public org.bukkit.block.Biome getBiome(final WorldInfo worldInfo, final int x, final int y, final int z) {
-            return biome;
-        }
-
-        @Override
-        public List<org.bukkit.block.Biome> getBiomes(final WorldInfo worldInfo) {
-            return Collections.singletonList(biome);
-        }
-
-    }
-
 
 }
