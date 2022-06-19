@@ -79,6 +79,7 @@ import org.enginehub.piston.annotation.param.Switch;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
@@ -691,6 +692,8 @@ public class RegionCommands {
                     Long seed,
             @Switch(name = 'b', desc = "Regenerate biomes as well")
                     boolean regenBiomes,
+            @Switch(name = 'r', desc = "If the seed should be randomized")
+                    boolean randomSeed,
             @Arg(desc = "Biome to apply for this regeneration (only works in overworld)", def = "")
                     BiomeType biomeType
     ) throws WorldEditException {
@@ -703,7 +706,7 @@ public class RegionCommands {
             actor.print(Caption.of("fawe.regen.time"));
             //FAWE end
             RegenOptions options = RegenOptions.builder()
-                    .seed(seed)
+                    .seed(!randomSeed ? seed : new Long(ThreadLocalRandom.current().nextLong()))
                     .regenBiomes(regenBiomes)
                     .biomeType(biomeType)
                     .build();

@@ -11,7 +11,6 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.Lifecycle;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
-import com.sk89q.worldedit.bukkit.adapter.ext.fawe.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
@@ -38,6 +37,7 @@ import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.LevelSettings;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.FixedBiomeSource;
 import net.minecraft.world.level.biome.OverworldBiomeSource;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -67,6 +67,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.generator.CustomChunkGenerator;
+import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
 
 import javax.annotation.Nullable;
@@ -213,6 +214,8 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         session = levelStorageSource.createAccess("faweregentempworld", levelStemResourceKey);
         PrimaryLevelData originalWorldData = originalServerWorld.serverLevelData;
 
+        BiomeProvider biomeProvider = getBiomeProvider();
+
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
         PrimaryLevelData levelProperties = (PrimaryLevelData) server.getWorldData();
 
@@ -246,7 +249,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 false,
                 environment,
                 generator,
-                originalBukkitWorld.getBiomeProvider()
+                biomeProvider
         ) {
             private final Biome singleBiome = options.hasBiomeType() ? BuiltinRegistries.BIOME.get(ResourceLocation.tryParse(
                     options
@@ -280,9 +283,16 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         } else if (originalChunkProvider.getGenerator() instanceof NoiseBasedChunkGenerator) {
             Supplier<NoiseGeneratorSettings> generatorSettingBaseSupplier = (Supplier<NoiseGeneratorSettings>) generatorSettingBaseSupplierField
                     .get(originalChunkProvider.getGenerator());
-            BiomeSource biomeSource = originalChunkProvider.getGenerator().getBiomeSource();
-            if (biomeSource instanceof OverworldBiomeSource) {
-                biomeSource = fastOverworldBiomeSource(biomeSource);
+            BiomeSource biomeSource;
+            if (options.hasBiomeType()) {
+                biomeSource = new FixedBiomeSource(BuiltinRegistries.BIOME.get(ResourceLocation.tryParse(options
+                        .getBiomeType()
+                        .getId())));
+            } else {
+                biomeSource = originalChunkProvider.getGenerator().getBiomeSource();
+                if (biomeSource instanceof OverworldBiomeSource) {
+                    biomeSource = fastOverworldBiomeSource(biomeSource);
+                }
             }
             chunkGenerator = new NoiseBasedChunkGenerator(biomeSource, seed, generatorSettingBaseSupplier);
         } else if (originalChunkProvider.getGenerator() instanceof CustomChunkGenerator) {

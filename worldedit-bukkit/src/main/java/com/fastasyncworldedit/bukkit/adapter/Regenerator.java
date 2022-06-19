@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.pattern.Pattern;
@@ -22,10 +23,14 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.World;
+import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
+import org.bukkit.generator.WorldInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -521,6 +526,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         return tasks;
     }
 
+    protected BiomeProvider getBiomeProvider() {
+        if (options.hasBiomeType()) {
+            return new SingleBiomeProvider();
+        }
+        return originalBukkitWorld.getBiomeProvider();
+    }
+
     //classes
 
     public enum Concurrency {
@@ -620,6 +632,22 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         @Override
         public String toString() {
             return tasks.toString();
+        }
+
+    }
+
+    public class SingleBiomeProvider extends BiomeProvider {
+
+        private final org.bukkit.block.Biome biome = BukkitAdapter.adapt(options.getBiomeType());
+
+        @Override
+        public org.bukkit.block.Biome getBiome(final WorldInfo worldInfo, final int x, final int y, final int z) {
+            return biome;
+        }
+
+        @Override
+        public List<org.bukkit.block.Biome> getBiomes(final WorldInfo worldInfo) {
+            return Collections.singletonList(biome);
         }
 
     }
