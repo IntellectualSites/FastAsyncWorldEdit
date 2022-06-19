@@ -472,7 +472,17 @@ public class SchematicCommands {
 
         //FAWE end
         File f = worldEdit.getSafeSaveFile(actor, dir, filename, format.getPrimaryFileExtension());
-
+        int i = f.getName().lastIndexOf('.');
+        if (i == -1 && f.getName().isEmpty() || i == 0) {
+            File directory = f.getParentFile();
+            int fileNumber = directory.exists() ? MainUtil.getMaxFileId(directory) : 0;
+            String extension = (i == -1 || f.getName().length() == 0
+                    ? format.getPrimaryFileExtension()
+                    : f.getName().substring(i + 1));
+            String name = String.format("%s.%s", fileNumber, extension);
+            f = new File(directory, name);
+            filename += name;
+        }
         boolean overwrite = f.exists();
         if (overwrite) {
             if (!actor.hasPermission("worldedit.schematic.delete")) {
