@@ -495,14 +495,14 @@ public class ClipboardCommands {
     ) throws WorldEditException {
 
         ClipboardHolder holder = session.getClipboard();
-        if (holder.getTransform().isIdentity() && editSession.getSourceMask() == null) {
-            //FAWE start - use place
+        //FAWE start - use place
+        if (holder.getTransform().isIdentity() && sourceMask == null) {
             place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted,
                     pasteEntities, pasteBiomes
             );
-            //FAWE end
             return;
         }
+        //FAWE end
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
         List<Component> messages = Lists.newArrayList();
