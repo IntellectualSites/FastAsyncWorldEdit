@@ -37,7 +37,6 @@ import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.registry.state.PropertyGroup;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
-import com.plotsquared.core.util.AnnotationHelper;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -152,6 +151,8 @@ public interface Extent extends InputExtent, OutputExtent {
     /**
      * Create an entity at the given location, forcing a UUID onto the entity
      *
+     * Only use if you are aware of the consequences of forcing a UUID to an entity.
+     *
      * @param entity   the entity
      * @param location the location
      * @param uuid     UUID to force the entity to have
@@ -159,7 +160,6 @@ public interface Extent extends InputExtent, OutputExtent {
      * @since TODO
      */
     @Nullable
-    @AnnotationHelper.ApiDescription(info = "Only use if you are aware of the consequences of forcing a UUID to an entity.")
     default Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
         return null;
     }
