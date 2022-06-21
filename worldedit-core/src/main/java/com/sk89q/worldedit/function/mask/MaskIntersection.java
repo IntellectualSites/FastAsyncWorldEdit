@@ -163,6 +163,14 @@ public class MaskIntersection extends AbstractMask {
         while (combineMasks(pairingFunction(), failedCombines)) {
             changed = true;
         }
+        if (masks.isEmpty()) {
+            formArray(); // This MaskIntersection instance may be reused for whatever reason, so ensure the array is correct.
+            return Masks.alwaysTrue();
+        }
+        if (masks.size() == 1) {
+            formArray(); // This MaskIntersection instance may be reused for whatever reason, so ensure the array is correct.
+            return masks.iterator().next();
+        }
         // Optimize / combine
         do {
             changed |= optimizeMasks(optimized);

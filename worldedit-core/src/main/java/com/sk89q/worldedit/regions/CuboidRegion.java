@@ -377,12 +377,11 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
         final int size = (maxX - minX + 1) * (maxZ - minZ + 1);
 
         //FAWE start
-        return new AbstractSet<BlockVector2>() {
+        return new AbstractSet<>() {
             @Nonnull
             @Override
             public Iterator<BlockVector2> iterator() {
-                return new Iterator<BlockVector2>() {
-                    final MutableBlockVector2 mutable = new MutableBlockVector2(0, 0);
+                return new Iterator<>() {
 
                     final int bx = minX;
                     final int bz = minZ;
@@ -410,8 +409,8 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
 
                     @Override
                     public BlockVector2 next() {
-                        mutable.mutX(x);
-                        mutable.mutZ(z);
+                        int curX = x;
+                        int curZ = z;
                         if (++x > rtx) {
                             if (++z > rtz) {
                                 if (x > tx) {
@@ -427,7 +426,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                                         }
                                         x = tx;
                                         hasNext = false;
-                                        return mutable;
+                                        return BlockVector2.at(curX, curZ);
                                     }
                                 } else {
                                     z = rbz;
@@ -442,7 +441,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                                 x = rbx;
                             }
                         }
-                        return mutable;
+                        return BlockVector2.at(curX, curZ);
                     }
                 };
             }

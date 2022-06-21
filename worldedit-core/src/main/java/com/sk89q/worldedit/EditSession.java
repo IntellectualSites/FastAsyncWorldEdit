@@ -2832,13 +2832,16 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     public List<Countable<BlockState>> getBlockDistribution(Region region, boolean separateStates) {
         //FAWE start - get distr
         if (separateStates) {
-            return getBlockDistributionWithData(region);
+            List<Countable<BlockState>> distr = getBlockDistributionWithData(region);
+            Collections.reverse(distr);
+            return distr;
         }
         List<Countable<BlockType>> normalDistr = getBlockDistribution(region);
         List<Countable<BlockState>> distribution = new ArrayList<>();
         for (Countable<BlockType> count : normalDistr) {
             distribution.add(new Countable<>(count.getID().getDefaultState(), count.getAmount()));
         }
+        Collections.reverse(distribution);
         //FAWE end
         return distribution;
     }

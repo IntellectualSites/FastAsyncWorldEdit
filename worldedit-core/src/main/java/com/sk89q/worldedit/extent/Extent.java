@@ -636,7 +636,6 @@ public interface Extent extends InputExtent, OutputExtent {
                 }
             }
         }
-        // Collections.reverse(distribution);
         return distribution;
     }
 

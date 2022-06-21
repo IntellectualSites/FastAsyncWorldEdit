@@ -22,9 +22,8 @@ Java Edition required. FastAsyncWorldEdit is compatible with Bukkit, Spigot and 
 * link:https://discord.gg/intellectualsites[Discord]
 * link:https://intellectualsites.github.io/fastasyncworldedit-documentation/[Wiki]
 * link:https://github.com/IntellectualSites/FastAsyncWorldEdit/issues[Report Issue]
+* link:https://intellectualsites.github.io/fastasyncworldedit-javadocs/[Javadocs]
 * link:https://intellectualsites.crowdin.com/fastasyncworldedit[Crowdin (Translations)]
-* link:https://javadoc.io/doc/com.fastasyncworldedit/FastAsyncWorldEdit-Bukkit/latest/index.html[JavaDocs for the -bukkit module]
-* link:https://javadoc.io/doc/com.fastasyncworldedit/FastAsyncWorldEdit-Core/latest/index.html[JavaDocs for the -core module]
 
 === Edit The Code
 

@@ -7,6 +7,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
@@ -68,14 +69,10 @@ public class PNGWriter implements ClipboardWriter {
 
         boolean fill = length * 4 < imageSize && width * 4 < imageSize;
 
-        MutableBlockVector3 mutable;
-        MutableBlockVector3 mutableTop;
-        MutableBlockVector3 mutableRight;
-        MutableBlockVector3 mutableLeft;
-        mutable = mutableTop = mutableRight = mutableLeft = new MutableBlockVector3(0, 0, 0);
-//        Vector mutableTop = new Vector(0, 0, 0);
-//        Vector mutableRight = new Vector(0, 0, 0);
-//        Vector mutableLeft = new Vector(0, 0, 0);
+        MutableBlockVector3 mutable = new MutableBlockVector3(0, 0, 0);
+        MutableBlockVector3 mutableTop = new MutableBlockVector3(0, 0, 0);
+        MutableBlockVector3 mutableRight = new MutableBlockVector3(0, 0, 0);
+        MutableBlockVector3 mutableLeft = new MutableBlockVector3(0, 0, 0);
 
         BlockVector3 min = clipboard.getMinimumPoint();
         int y0 = min.getBlockY();
@@ -100,7 +97,7 @@ public class PNGWriter implements ClipboardWriter {
                 for (int y = y0; y < y0 + height; y++) {
                     mutable.mutY(y);
                     BlockState block = clipboard.getBlock(mutable);
-                    if (block.getBlockType().getMaterial().isAir()) {
+                    if (!block.getBlockType().getMaterial().isSolid() || block.getBlockType().getMaterial().isTranslucent()) {
                         continue;
                     }
                     mutableTop.mutY(y + 1);
@@ -141,8 +138,9 @@ public class PNGWriter implements ClipboardWriter {
 
                     BlockType type = block.getBlockType();
                     int color;
-                    if (type == BlockTypes.GRASS_BLOCK) {
-                        color = tu.getColor(clipboard.getBiome(mutable));
+                    BiomeType biome;
+                    if (type == BlockTypes.GRASS_BLOCK && (biome = clipboard.getBiome(mutable)) != null) {
+                        color = tu.getColor(biome);
                     } else {
                         color = tu.getColor(type);
                     }

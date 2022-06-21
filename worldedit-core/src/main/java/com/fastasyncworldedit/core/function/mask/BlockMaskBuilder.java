@@ -123,7 +123,7 @@ public class BlockMaskBuilder {
             if (input.charAt(input.length() - 1) == ']') {
                 int propStart = StringMan.findMatchingBracket(input, input.length() - 1);
                 if (propStart == -1) {
-                    return;
+                    throw new InputParseException(Caption.of("fawe.error.no-block-found", TextComponent.of(input)));
                 }
 
                 MutableCharSequence charSequence = MutableCharSequence.getTemporal();
@@ -250,10 +250,15 @@ public class BlockMaskBuilder {
                 if (StringMan.isAlphanumericUnd(input)) {
                     add(BlockTypes.parse(input));
                 } else {
+                    boolean success = false;
                     for (BlockType myType : BlockTypesCache.values) {
                         if (myType.getId().matches(input)) {
                             add(myType);
+                            success = true;
                         }
+                    }
+                    if (!success) {
+                        throw new InputParseException(Caption.of("fawe.error.no-block-found", TextComponent.of(input)));
                     }
                 }
             }

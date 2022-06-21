@@ -47,6 +47,7 @@ import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.function.visitor.LayerVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
+import com.sk89q.worldedit.internal.annotation.Offset;
 import com.sk89q.worldedit.internal.annotation.Selection;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector2;
@@ -79,6 +80,7 @@ import org.enginehub.piston.annotation.param.Switch;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ALL;
 import static com.sk89q.worldedit.command.util.Logging.LogMode.ORIENTATION_REGION;
@@ -625,8 +627,8 @@ public class RegionCommands {
             @Arg(desc = "# of copies to stack", def = "1")
             @Confirm(Confirm.Processor.REGION)
                     int count,
-            @Arg(desc = "The direction to stack", def = Direction.AIM)
-            @Direction(includeDiagonals = true)
+            @Arg(desc = "How far to move the contents each stack", def = Offset.FORWARD)
+            @Offset
                     BlockVector3 direction,
             @Switch(name = 's', desc = "Shift the selection to the last stacked copy")
                     boolean moveSelection,
@@ -691,6 +693,8 @@ public class RegionCommands {
                     Long seed,
             @Switch(name = 'b', desc = "Regenerate biomes as well")
                     boolean regenBiomes,
+            @Switch(name = 'r', desc = "If the seed should be randomized")
+                    boolean randomSeed,
             @Arg(desc = "Biome to apply for this regeneration (only works in overworld)", def = "")
                     BiomeType biomeType
     ) throws WorldEditException {
@@ -703,7 +707,7 @@ public class RegionCommands {
             actor.print(Caption.of("fawe.regen.time"));
             //FAWE end
             RegenOptions options = RegenOptions.builder()
-                    .seed(seed)
+                    .seed(!randomSeed ? seed : new Long(ThreadLocalRandom.current().nextLong()))
                     .regenBiomes(regenBiomes)
                     .biomeType(biomeType)
                     .build();

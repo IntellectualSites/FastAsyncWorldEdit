@@ -6,6 +6,7 @@ import java.net.URI
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("xyz.jpenilla.run-paper") version "1.0.6"
 }
 
 logger.lifecycle("""
@@ -71,6 +72,14 @@ allprojects {
 }
 
 applyCommonConfiguration()
+
+tasks {
+    runServer {
+        minecraftVersion("1.19")
+        pluginJars(project(":worldedit-bukkit").file("build/libs/FastAsyncWorldEdit-Bukkit-$version.jar"))
+
+    }
+}
 
 nexusPublishing {
     repositories {

@@ -174,7 +174,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
             biomes = new PalettedContainer[getSectionCount()];
         }
         if (biomeData instanceof PalettedContainer<Holder<Biome>> palettedContainer) {
-            biomes[layer] = palettedContainer;
+            biomes[layer] = palettedContainer.copy();
         } else {
             LOGGER.error(
                     "Cannot correctly save biomes to history. Expected class type {} but got {}",
