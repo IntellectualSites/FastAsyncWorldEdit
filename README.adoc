@@ -36,7 +36,10 @@ FastAsyncWorldEdit is open source (specifically licensed under GPL v3), so note 
 
 Please read link:https://github.com/IntellectualSites/.github/blob/main/CONTRIBUTING.md[CONTRIBUTING.md] for important guidelines to follow.
 
-=== YourKit
+=== Special thanks to:
+image::https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg[150,150]
+link:https://jb.gg/OpenSourceSupport[JetBrains], creators of the IntelliJ IDEA, supports us with their Open Source Licenses.
+
 image::https://www.yourkit.com/images/yklogo.png[200,200,align=left]
 
 Thank you to YourKit for supporting our product by providing us with their innovative and intelligent tools
