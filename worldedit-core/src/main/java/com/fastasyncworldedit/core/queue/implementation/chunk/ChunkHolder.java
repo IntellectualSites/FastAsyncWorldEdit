@@ -744,14 +744,14 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         @Override
         public IChunkGet get(ChunkHolder chunk) {
             chunk.getOrCreateGet();
-            chunk.delegate = BOTH;
+            chunk.delegate = GET;
             return chunk.chunkExisting;
         }
 
         @Override
         public IChunkSet set(ChunkHolder chunk) {
             chunk.getOrCreateSet();
-            chunk.delegate = BOTH;
+            chunk.delegate = SET;
             return chunk.chunkSet;
         }
 
