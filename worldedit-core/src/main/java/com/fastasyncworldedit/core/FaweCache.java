@@ -18,7 +18,6 @@ import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.plotsquared.core.util.AnnotationHelper;
 import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
