@@ -7,8 +7,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * An implementation of an {@link com.sk89q.worldedit.function.visitor.BreadthFirstSearch} that uses
- * a mask to determine where a block should be visited.
+ * An implementation of an {@link DFSVisitor} that uses a mask to determine where a block should be visited. The visit is
+ * performed using a {@link com.fastasyncworldedit.core.math.MutableBlockVector3}
  */
 public class DFSRecursiveVisitor extends DFSVisitor {
 

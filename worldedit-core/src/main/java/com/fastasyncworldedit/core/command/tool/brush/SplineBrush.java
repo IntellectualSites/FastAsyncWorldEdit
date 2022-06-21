@@ -62,7 +62,7 @@ public class SplineBrush implements Brush, ResettableTool {
             final ArrayList<BlockVector3> points = new ArrayList<>();
             if (size > 0) {
                 DFSRecursiveVisitor visitor = new DFSRecursiveVisitor(mask, p -> {
-                    points.add(p);
+                    points.add(p.toImmutable());
                     return true;
                 }, (int) size, 1);
                 List<BlockVector3> directions = visitor.getDirections();

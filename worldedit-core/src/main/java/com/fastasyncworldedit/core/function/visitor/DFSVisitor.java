@@ -21,6 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Depth-first-search visitor. The visit is performed using a {@link com.fastasyncworldedit.core.math.MutableBlockVector3}
+ */
 public abstract class DFSVisitor implements Operation {
 
     private final RegionFunction function;
