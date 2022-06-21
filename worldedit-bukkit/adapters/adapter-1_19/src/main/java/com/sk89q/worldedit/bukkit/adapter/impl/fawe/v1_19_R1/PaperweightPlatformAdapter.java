@@ -33,6 +33,7 @@ import net.minecraft.util.BitStorage;
 import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.util.ZeroBitStorage;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -597,6 +598,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+    }
+
+    static List<Entity> getEntities(LevelChunk chunk) {
+        return chunk.level.entityManager.getEntities(new ChunkPos(chunk.locX, chunk.locZ));
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {

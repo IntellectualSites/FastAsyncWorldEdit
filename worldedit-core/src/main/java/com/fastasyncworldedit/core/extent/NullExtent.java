@@ -36,6 +36,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 //todo This should be removed in favor of com.sk89q.worldedit.extent.NullExtent
@@ -84,6 +85,12 @@ public class NullExtent extends FaweRegionExtent implements IBatchProcessor {
     @Nullable
     @Override
     public Entity createEntity(Location arg0, BaseEntity arg1) {
+        throw reason;
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location arg0, BaseEntity arg1, UUID arg2) {
         throw reason;
     }
 

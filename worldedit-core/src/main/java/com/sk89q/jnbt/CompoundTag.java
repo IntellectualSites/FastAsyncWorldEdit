@@ -340,9 +340,20 @@ public class CompoundTag extends Tag {
 
     //FAWE start
     public UUID getUUID() {
-        long most = getLong("UUIDMost");
-        long least = getLong("UUIDLeast");
-        return new UUID(most, least);
+        UUID uuid;
+        if (containsKey("UUID")) {
+            int[] arr = getIntArray("UUID");
+            uuid = new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
+        } else if (containsKey("UUIDMost")) {
+            uuid = new UUID(getLong("UUIDMost"), getLong("UUIDLeast"));
+        } else if (containsKey("WorldUUIDMost")) {
+            uuid = new UUID(getLong("WorldUUIDMost"), getLong("WorldUUIDLeast"));
+        } else if (containsKey("PersistentIDMSB")) {
+            uuid = new UUID(getLong("PersistentIDMSB"), getLong("PersistentIDLSB"));
+        } else {
+            return null;
+        }
+        return uuid;
     }
 
     public Vector3 getEntityPosition() {

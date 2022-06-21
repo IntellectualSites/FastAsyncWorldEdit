@@ -5,6 +5,7 @@ import com.sk89q.jnbt.DoubleTag;
 import com.sk89q.jnbt.IntArrayTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.LongTag;
+import com.sk89q.jnbt.NBTUtils;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.WorldEditException;
@@ -119,6 +120,11 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
 
     @Override
     default Entity createEntity(Location location, BaseEntity entity) {
+        return createEntity(location, entity, UUID.randomUUID());
+    }
+
+    @Override
+    default Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
         final IChunk chunk = getOrCreateChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
         Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue()); //do not modify original entity data
         map.put("Id", new StringTag(entity.getType().getName()));
@@ -130,23 +136,10 @@ public interface IChunkExtent<T extends IChunk> extends Extent {
         posList.add(new DoubleTag(location.getZ()));
         map.put("Pos", new ListTag(DoubleTag.class, posList));
 
-        //set new uuid
-        UUID newuuid = UUID.randomUUID();
-        int[] uuidArray = new int[4];
-        uuidArray[0] = (int) (newuuid.getMostSignificantBits() >> 32);
-        uuidArray[1] = (int) newuuid.getMostSignificantBits();
-        uuidArray[2] = (int) (newuuid.getLeastSignificantBits() >> 32);
-        uuidArray[3] = (int) newuuid.getLeastSignificantBits();
-        map.put("UUID", new IntArrayTag(uuidArray));
-
-        map.put("UUIDMost", new LongTag(newuuid.getMostSignificantBits()));
-        map.put("UUIDLeast", new LongTag(newuuid.getLeastSignificantBits()));
-
-        map.put("PersistentIDMSB", new LongTag(newuuid.getMostSignificantBits()));
-        map.put("PersistentIDLSB", new LongTag(newuuid.getLeastSignificantBits()));
+        NBTUtils.addUUIDToMap(map, uuid);
 
         chunk.setEntity(new CompoundTag(map));
-        return new IChunkEntity(this, location, newuuid, entity);
+        return new IChunkEntity(this, location, uuid, entity);
     }
 
     @Override

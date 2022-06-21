@@ -37,6 +37,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -78,10 +79,22 @@ public class ChangeSetExtent extends AbstractDelegateExtent {
     public Entity createEntity(Location location, BaseEntity state) {
         Entity entity = super.createEntity(location, state);
         if (entity != null) {
-            changeSet.add(new EntityCreate(location, state, entity));
+            changeSet.add(new EntityCreate(location, entity.getState(), entity));
         }
         return entity;
     }
+
+    //FAWE start
+    @Override
+    @Nullable
+    public Entity createEntity(Location location, BaseEntity state, UUID uuid) {
+        Entity entity = super.createEntity(location, state, uuid);
+        if (entity != null) {
+            changeSet.add(new EntityCreate(location, entity.getState(), entity));
+        }
+        return entity;
+    }
+    //FAWE end
 
     @Override
     public List<? extends Entity> getEntities() {

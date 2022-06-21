@@ -1056,14 +1056,17 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             IChunkGet get = getOrCreateGet();
             boolean postProcess = !(getExtent().getPostProcessor() instanceof EmptyBatchProcessor);
             get.setCreateCopy(postProcess);
-            set = getExtent().processSet(this, get, set);
-            try {
-                return get.call(set, finalize);
-            } finally {
-                if (postProcess) {
-                    getExtent().postProcess(this, get.getCopy(), set);
-                }
+            final IChunkSet iChunkSet = getExtent().processSet(this, get, set);
+            Runnable finalizer;
+            if (postProcess) {
+                finalizer = () -> {
+                    getExtent().postProcess(this, get.getCopy(), iChunkSet);
+                    finalize.run();
+                };
+            } else {
+                finalizer = finalize;
             }
+            return get.call(set, finalizer);
         }
         return null;
     }

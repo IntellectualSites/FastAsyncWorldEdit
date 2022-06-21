@@ -5,21 +5,33 @@ import com.fastasyncworldedit.core.function.visitor.Order;
 import com.fastasyncworldedit.core.jnbt.streamer.IntValueReader;
 import com.google.common.collect.ForwardingIterator;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.NBTUtils;
+import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.entity.BaseEntity;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class LinearClipboard extends SimpleClipboard {
 
@@ -83,6 +95,25 @@ public abstract class LinearClipboard extends SimpleClipboard {
 
     }
 
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity) {
+        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
+        entities.add(ret);
+        return ret;
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        Map<String, Tag> map = new HashMap<>(entity.getNbtData().getValue());
+        NBTUtils.addUUIDToMap(map, uuid);
+        entity.setNbtData(new CompoundTag(map));
+        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
+        entities.add(ret);
+        return ret;
+    }
+
     @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
         Iterator<ClipboardEntity> iter = this.entities.iterator();
@@ -94,6 +125,28 @@ public abstract class LinearClipboard extends SimpleClipboard {
                 return;
             }
         }
+    }
+
+    @Override
+    public List<? extends Entity> getEntities() {
+        return new ArrayList<>(entities);
+    }
+
+    @Override
+    public void removeEntity(Entity entity) {
+        if (!(entity instanceof BlockArrayClipboard.ClipboardEntity)) {
+            Location loc = entity.getLocation();
+            removeEntity(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), entity.getState().getNbtData().getUUID());
+        } else {
+            this.entities.remove(entity);
+        }
+    }
+
+    @Override
+    public List<? extends Entity> getEntities(Region region) {
+        return entities
+                .stream()
+                .filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList());
     }
 
     private class LinearFilter extends AbstractFilterBlock {

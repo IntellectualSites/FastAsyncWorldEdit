@@ -16,6 +16,8 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
+import java.util.UUID;
+
 public class ProcessedWEExtent extends AbstractDelegateExtent {
 
     private final FaweLimit limit;
@@ -41,6 +43,18 @@ public class ProcessedWEExtent extends AbstractDelegateExtent {
             return null;
         }
         return super.createEntity(location, entity);
+    }
+
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        if (entity == null) {
+            return null;
+        }
+        if (!limit.MAX_ENTITIES()) {
+            WEManager.weManager().cancelEditSafe(this, FaweCache.MAX_ENTITIES);
+            return null;
+        }
+        return super.createEntity(location, entity, uuid);
     }
 
     @Override

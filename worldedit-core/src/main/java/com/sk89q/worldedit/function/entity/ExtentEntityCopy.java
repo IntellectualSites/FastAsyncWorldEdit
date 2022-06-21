@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.function.entity;
 
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.CompoundTagBuilder;
 import com.sk89q.jnbt.FloatTag;
@@ -165,6 +166,8 @@ public class ExtentEntityCopy implements EntityFunction {
                     uuid = new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
                 } else if (tag.containsKey("UUIDMost")) {
                     uuid = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
+                } else if (tag.containsKey("WorldUUIDMost")) {
+                    uuid = new UUID(tag.getLong("WorldUUIDMost"), tag.getLong("WorldUUIDLeast"));
                 } else if (tag.containsKey("PersistentIDMSB")) {
                     uuid = new UUID(tag.getLong("PersistentIDMSB"), tag.getLong("PersistentIDLSB"));
                 }
@@ -177,8 +180,8 @@ public class ExtentEntityCopy implements EntityFunction {
                                 uuid
                         );
                     } else {
+                        TaskManager.taskManager().sync(entity::remove);
                         //FAWE end
-                        entity.remove();
                     }
                 }
             }

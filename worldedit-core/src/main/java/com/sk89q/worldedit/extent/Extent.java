@@ -148,6 +148,21 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     //FAWE start
+    /**
+     * Create an entity at the given location, forcing a UUID onto the entity
+     *
+     * Only use if you are aware of the consequences of forcing a UUID to an entity.
+     *
+     * @param entity   the entity
+     * @param location the location
+     * @param uuid     UUID to force the entity to have
+     * @return a reference to the created entity, or null if the entity could not be created
+     * @since TODO
+     */
+    @Nullable
+    default Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        return null;
+    }
 
     /**
      * Create an entity at the given location.

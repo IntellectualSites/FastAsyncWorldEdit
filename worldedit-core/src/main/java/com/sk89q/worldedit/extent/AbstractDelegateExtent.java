@@ -141,6 +141,14 @@ public class AbstractDelegateExtent implements Extent {
         return extent.createEntity(location, entity);
     }
 
+    //FAWE start
+    @Override
+    @Nullable
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        return extent.createEntity(location, entity, uuid);
+    }
+    //FAWE end
+
     @Override
     @Nullable
     public Operation commit() {

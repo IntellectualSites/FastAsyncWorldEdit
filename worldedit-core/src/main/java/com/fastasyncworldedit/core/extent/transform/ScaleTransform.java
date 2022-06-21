@@ -13,6 +13,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public class ScaleTransform extends ResettableExtent {
 
@@ -179,6 +180,19 @@ public class ScaleTransform extends ResettableExtent {
             return null;
         }
         return super.createEntity(newLoc, entity);
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        Location newLoc = new Location(location.getExtent(),
+                getPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()),
+                location.getYaw(), location.getPitch()
+        );
+        if (!getExtent().contains(newLoc.toBlockPoint())) {
+            return null;
+        }
+        return super.createEntity(newLoc, entity, uuid);
     }
 
 }

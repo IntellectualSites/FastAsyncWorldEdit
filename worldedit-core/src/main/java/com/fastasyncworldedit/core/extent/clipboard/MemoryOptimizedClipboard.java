@@ -7,13 +7,8 @@ import com.fastasyncworldedit.core.util.MainUtil;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.Tag;
-import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard.ClipboardEntity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -22,14 +17,10 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class MemoryOptimizedClipboard extends LinearClipboard {
 
@@ -291,33 +282,6 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
             setTile(x, y, z, block.getNbtData());
         }
         return true;
-    }
-
-    @Nullable
-    @Override
-    public Entity createEntity(Location location, BaseEntity entity) {
-        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
-        entities.add(ret);
-        return ret;
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return new ArrayList<>(entities);
-    }
-
-    @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return entities
-                .stream()
-                .filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList());
-    }
-
-    @Override
-    public void removeEntity(Entity entity) {
-        if (entity instanceof ClipboardEntity) {
-            this.entities.remove(entity);
-        }
     }
 
 }

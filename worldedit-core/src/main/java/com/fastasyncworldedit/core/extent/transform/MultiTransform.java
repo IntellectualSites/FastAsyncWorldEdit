@@ -12,6 +12,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.UUID;
 
 public class MultiTransform extends RandomTransform {
 
@@ -86,6 +87,16 @@ public class MultiTransform extends RandomTransform {
         Entity created = null;
         for (AbstractDelegateExtent extent : extents) {
             created = extent.createEntity(location, entity);
+        }
+        return created;
+    }
+
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        Entity created = null;
+        for (AbstractDelegateExtent extent : extents) {
+            created = extent.createEntity(location, entity, uuid);
         }
         return created;
     }

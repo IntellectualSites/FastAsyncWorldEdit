@@ -38,6 +38,7 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * An extent that returns air blocks for all blocks and does not
@@ -72,6 +73,14 @@ public class NullExtent implements Extent {
     public Entity createEntity(Location location, BaseEntity entity) {
         return null;
     }
+
+    //FAWE start
+    @Nullable
+    @Override
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        return null;
+    }
+    //FAWE end
 
     @Override
     public BlockState getBlock(BlockVector3 position) {

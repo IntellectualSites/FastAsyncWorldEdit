@@ -91,6 +91,21 @@ public class LimitExtent extends AbstractDelegateExtent {
     }
 
     @Override
+    @Nullable
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        limit.THROW_MAX_CHANGES();
+        limit.THROW_MAX_ENTITIES();
+        try {
+            return super.createEntity(location, entity, uuid);
+        } catch (FaweException e) {
+            if (!limit.MAX_FAILS()) {
+                throw e;
+            }
+            return null;
+        }
+    }
+
+    @Override
     public void removeEntity(int x, int y, int z, UUID uuid) {
         limit.THROW_MAX_CHANGES();
         limit.THROW_MAX_ENTITIES();

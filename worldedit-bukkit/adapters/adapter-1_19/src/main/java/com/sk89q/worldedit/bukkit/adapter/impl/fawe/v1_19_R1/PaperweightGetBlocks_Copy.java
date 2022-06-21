@@ -80,7 +80,8 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     protected void storeEntity(Entity entity) {
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         net.minecraft.nbt.CompoundTag compoundTag = new net.minecraft.nbt.CompoundTag();
-        entities.add((CompoundTag) adapter.toNative(entity.save(compoundTag)));
+        entity.save(compoundTag);
+        entities.add((CompoundTag) adapter.toNative(compoundTag));
     }
 
     @Override
@@ -91,18 +92,7 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     @Override
     public CompoundTag getEntity(UUID uuid) {
         for (CompoundTag tag : entities) {
-            UUID tagUUID;
-            if (tag.containsKey("UUID")) {
-                int[] arr = tag.getIntArray("UUID");
-                tagUUID = new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
-            } else if (tag.containsKey("UUIDMost")) {
-                tagUUID = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
-            } else if (tag.containsKey("PersistentIDMSB")) {
-                tagUUID = new UUID(tag.getLong("PersistentIDMSB"), tag.getLong("PersistentIDLSB"));
-            } else {
-                return null;
-            }
-            if (uuid.equals(tagUUID)) {
+            if (uuid.equals(tag.getUUID())) {
                 return tag;
             }
         }

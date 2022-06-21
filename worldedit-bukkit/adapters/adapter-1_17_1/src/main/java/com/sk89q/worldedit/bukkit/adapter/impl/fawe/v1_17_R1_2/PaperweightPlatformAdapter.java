@@ -30,6 +30,7 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -53,6 +54,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -468,6 +470,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
+    }
+
+    static List<Entity> getEntities(LevelChunk chunk) {
+        return chunk.level.entityManager.getEntities(new ChunkPos(chunk.locX, chunk.locZ));
     }
 
 }

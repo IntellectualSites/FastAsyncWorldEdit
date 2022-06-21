@@ -16,12 +16,10 @@ import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.entity.BaseEntity;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -30,7 +28,6 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -48,7 +45,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * A clipboard with disk backed storage. (lower memory + loads on crash)
@@ -712,49 +708,6 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             e.printStackTrace();
         }
         return false;
-    }
-
-    @Nullable
-    @Override
-    public Entity createEntity(Location location, BaseEntity entity) {
-        BlockArrayClipboard.ClipboardEntity ret = new BlockArrayClipboard.ClipboardEntity(location, entity);
-        entities.add(ret);
-        return ret;
-    }
-
-    @Override
-    public List<? extends Entity> getEntities() {
-        return new ArrayList<>(entities);
-    }
-
-    @Override
-    public List<? extends Entity> getEntities(Region region) {
-        return entities
-                .stream()
-                .filter(e -> region.contains(e.getLocation().toBlockPoint())).collect(Collectors.toList());
-    }
-
-    @Override
-    public void removeEntity(Entity entity) {
-        if (!(entity instanceof BlockArrayClipboard.ClipboardEntity)) {
-            Location loc = entity.getLocation();
-            removeEntity(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ(), entity.getState().getNbtData().getUUID());
-        } else {
-            this.entities.remove(entity);
-        }
-    }
-
-    @Override
-    public void removeEntity(int x, int y, int z, UUID uuid) {
-        Iterator<BlockArrayClipboard.ClipboardEntity> iter = this.entities.iterator();
-        while (iter.hasNext()) {
-            BlockArrayClipboard.ClipboardEntity entity = iter.next();
-            UUID entUUID = entity.getState().getNbtData().getUUID();
-            if (uuid.equals(entUUID)) {
-                iter.remove();
-                return;
-            }
-        }
     }
 
 }

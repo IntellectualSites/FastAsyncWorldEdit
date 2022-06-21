@@ -42,6 +42,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class WorldWrapper extends AbstractWorld {
 
@@ -324,6 +325,12 @@ public class WorldWrapper extends AbstractWorld {
     @Nullable
     public Entity createEntity(Location location, BaseEntity entity) {
         return parent.createEntity(location, entity);
+    }
+
+    @Override
+    @Nullable
+    public Entity createEntity(Location location, BaseEntity entity, UUID uuid) {
+        return parent.createEntity(location, entity, uuid);
     }
 
     @Override

@@ -69,6 +69,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -315,21 +316,15 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public CompoundTag getEntity(UUID uuid) {
         Entity entity = serverLevel.getEntity(uuid);
         if (entity != null) {
             org.bukkit.entity.Entity bukkitEnt = entity.getBukkitEntity();
             return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
         }
-        for (List<Entity> entry : /*getChunk().getEntitySlices()*/ new List[0]) {
-            if (entry != null) {
-                for (Entity ent : entry) {
-                    if (uuid.equals(ent.getUUID())) {
-                        org.bukkit.entity.Entity bukkitEnt = ent.getBukkitEntity();
-                        return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
-                    }
-                }
+        for (CompoundTag tag : getEntities()) {
+            if (uuid.equals(tag.getUUID())) {
+                return tag;
             }
         }
         return null;
@@ -337,21 +332,15 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Set<CompoundTag> getEntities() {
-        List<Entity>[] slices = /*getChunk().getEntitySlices()*/ new List[0];
-        int size = 0;
-        for (List<Entity> slice : slices) {
-            if (slice != null) {
-                size += slice.size();
-            }
-        }
-        if (slices.length == 0) {
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
+        if (entities.isEmpty()) {
             return Collections.emptySet();
         }
-        int finalSize = size;
-        return new AbstractSet<CompoundTag>() {
+        int size = entities.size();
+        return new AbstractSet<>() {
             @Override
             public int size() {
-                return finalSize;
+                return size;
             }
 
             @Override
@@ -364,17 +353,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 if (!(get instanceof CompoundTag getTag)) {
                     return false;
                 }
-                Map<String, Tag> value = getTag.getValue();
-                CompoundTag getParts = (CompoundTag) value.get("UUID");
-                UUID getUUID = new UUID(getParts.getLong("Most"), getParts.getLong("Least"));
-                for (List<Entity> slice : slices) {
-                    if (slice != null) {
-                        for (Entity entity : slice) {
-                            UUID uuid = entity.getUUID();
-                            if (uuid.equals(getUUID)) {
-                                return true;
-                            }
-                        }
+                UUID getUUID = getTag.getUUID();
+                for (Entity entity : entities) {
+                    UUID uuid = entity.getUUID();
+                    if (uuid.equals(getUUID)) {
+                        return true;
                     }
                 }
                 return false;
@@ -383,9 +366,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             @Nonnull
             @Override
             public Iterator<CompoundTag> iterator() {
-                Iterable<CompoundTag> result = StreamSupport.stream(Iterables.concat(slices).spliterator(), false).map(input -> {
+                Iterable<CompoundTag> result = entities.stream().map(input -> {
                     net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                    return (CompoundTag) adapter.toNative(input.saveWithoutId(tag));
+                    input.save(tag);
+                    return (CompoundTag) adapter.toNative(tag);
                 }).collect(Collectors.toList());
                 return result.iterator();
             }
@@ -677,23 +661,31 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     }
 
                     syncTasks[2] = () -> {
-                        final List<Entity>[] entities = /*nmsChunk.e()*/ new List[0];
+                        Set<UUID> entitiesRemoved = new HashSet<>();
+                        final List<Entity> entities = PaperweightPlatformAdapter.getEntities(nmsChunk);
 
-                        for (final Collection<Entity> ents : entities) {
-                            if (!ents.isEmpty()) {
-                                final Iterator<Entity> iter = ents.iterator();
-                                while (iter.hasNext()) {
-                                    final Entity entity = iter.next();
-                                    if (entityRemoves.contains(entity.getUUID())) {
-                                        if (createCopy) {
-                                            copy.storeEntity(entity);
-                                        }
-                                        iter.remove();
-                                        removeEntity(entity);
-                                    }
+                        for (Entity entity : entities) {
+                            UUID uuid = entity.getUUID();
+                            if (entityRemoves.contains(uuid)) {
+                                if (createCopy) {
+                                    copy.storeEntity(entity);
+                                }
+                                removeEntity(entity);
+                                entitiesRemoved.add(uuid);
+                                entityRemoves.remove(uuid);
+                            }
+                        }
+                        if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
+                            for (UUID uuid : entityRemoves) {
+                                Entity entity = nmsWorld.entityManager.getEntityGetter().get(uuid);
+                                if (entity != null) {
+                                    removeEntity(entity);
                                 }
                             }
                         }
+                        // Only save entities that were actually removed to history
+                        set.getEntityRemoves().clear();
+                        set.getEntityRemoves().addAll(entitiesRemoved);
                     };
                 }
 
@@ -704,7 +696,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     }
 
                     syncTasks[1] = () -> {
-                        for (final CompoundTag nativeTag : entities) {
+                        Iterator<CompoundTag> iterator = entities.iterator();
+                        while (iterator.hasNext()) {
+                            final CompoundTag nativeTag = iterator.next();
                             final Map<String, Tag> entityTagMap = nativeTag.getValue();
                             final StringTag idTag = (StringTag) entityTagMap.get("Id");
                             final ListTag posTag = (ListTag) entityTagMap.get("Pos");
@@ -731,12 +725,23 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     }
                                     entity.load(tag);
                                     entity.absMoveTo(x, y, z, yaw, pitch);
-                                    nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM);
+                                    entity.setUUID(nativeTag.getUUID());
+                                    if (!nmsWorld.addFreshEntity(entity, CreatureSpawnEvent.SpawnReason.CUSTOM)) {
+                                        LOGGER.warn(
+                                                "Error creating entity of type `{}` in world `{}` at location `{},{},{}`",
+                                                id,
+                                                nmsWorld.getWorld().getName(),
+                                                x,
+                                                y,
+                                                z
+                                        );
+                                        // Unsuccessful create should not be saved to history
+                                        iterator.remove();
+                                    }
                                 }
                             }
                         }
                     };
-
                 }
 
                 // set tiles
