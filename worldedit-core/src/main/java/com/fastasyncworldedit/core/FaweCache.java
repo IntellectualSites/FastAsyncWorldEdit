@@ -147,12 +147,13 @@ public enum FaweCache implements Trimable {
      * internally-mutable and resettable classes such as {@link com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock}
      * from causing issues when used in edits on the main thread.
      *
+     * This method is designed for specific internal use.
+     *
      * @param withInitial The supplier used to determine the initial value if a thread cache is created, else to provide a new
      *                    instance of the class being cached if on the main thread.
      * @return a {@link Function} referencing a cache, or the given {@link Supplier}
      * @since TODO
      */
-    @AnnotationHelper.ApiDescription(info = "Designed for specific internal use.")
     public <V> LongFunction<V> createMainThreadSafeCache(Supplier<V> withInitial) {
         return new LongFunction<>() {
             private final LoadingCache<Long, V> loadingCache = Fawe.isMainThread() ? null : FaweCache.INSTANCE.createCache(
