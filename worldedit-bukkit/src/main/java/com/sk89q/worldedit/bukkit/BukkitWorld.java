@@ -50,6 +50,7 @@ import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
@@ -414,6 +415,15 @@ public class BukkitWorld extends AbstractWorld {
 
         return true;
     }
+
+    //FAWE start - allow block break effect of non-legacy blocks
+    @Override
+    public boolean playBlockBreakEffect(Vector3 position, BlockType type) {
+        World world = getWorld();
+        world.playEffect(BukkitAdapter.adapt(world, position), Effect.STEP_SOUND, BukkitAdapter.adapt(type));
+        return true;
+    }
+    //FAWE end
 
     @Override
     public WeatherType getWeather() {

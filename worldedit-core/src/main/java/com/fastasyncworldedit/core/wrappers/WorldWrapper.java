@@ -132,6 +132,13 @@ public class WorldWrapper extends AbstractWorld {
         return parent.playEffect(position, type, data);
     }
 
+    //FAWE start - allow block break effect of non-legacy blocks
+    @Override
+    public boolean playBlockBreakEffect(Vector3 position, BlockType type) {
+        return parent.playBlockBreakEffect(position, type);
+    }
+    //FAWE end
+
     @Override
     public boolean queueBlockBreakEffect(Platform server, BlockVector3 position, BlockType blockType, double priority) {
         return parent.queueBlockBreakEffect(server, position, blockType, priority);
