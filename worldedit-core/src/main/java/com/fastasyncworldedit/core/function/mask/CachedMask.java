@@ -1,6 +1,8 @@
 package com.fastasyncworldedit.core.function.mask;
 
 import com.fastasyncworldedit.core.math.BlockVectorSet;
+import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
+import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
@@ -11,12 +13,30 @@ import javax.annotation.Nullable;
 public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
     private final boolean hasExtent;
-    private transient BlockVectorSet cache_checked = new BlockVectorSet();
-    private transient BlockVectorSet cache_results = new BlockVectorSet();
+    private transient BlockVector3Set cache_checked;
+    private transient BlockVector3Set cache_results;
 
     public CachedMask(Mask mask) {
+        this(mask, false);
+    }
+
+    /**
+     * Create a new CachedMask instance for the given mask
+     *
+     * @param mask  Mask to cache results of
+     * @param local If the area will be small
+     * @since TODO
+     */
+    public CachedMask(Mask mask, boolean local) {
         super(mask);
         hasExtent = mask instanceof AbstractExtentMask;
+        if (local) {
+            cache_checked = new LocalBlockVectorSet();
+            cache_results = new LocalBlockVectorSet();
+        } else {
+            cache_checked = new BlockVectorSet();
+            cache_results = new BlockVectorSet();
+        }
     }
 
     public static CachedMask cache(Mask mask) {
@@ -95,7 +115,7 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
 
     @Override
     public Mask copy() {
-        return new CachedMask(getMask().copy());
+        return new CachedMask(getMask().copy(), cache_checked instanceof LocalBlockVectorSet);
     }
 
 }

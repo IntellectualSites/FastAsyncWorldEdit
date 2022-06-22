@@ -50,6 +50,7 @@ import com.fastasyncworldedit.core.command.tool.sweep.SweepBrush;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
+import com.fastasyncworldedit.core.function.mask.CachedMask;
 import com.fastasyncworldedit.core.function.mask.IdMask;
 import com.fastasyncworldedit.core.function.mask.SingleBlockTypeMask;
 import com.fastasyncworldedit.core.limit.FaweLimit;
@@ -138,6 +139,7 @@ import java.nio.file.FileSystems;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.sk89q.worldedit.internal.command.CommandUtil.checkCommandArgument;
 
 /**
  * Commands to set brush shape.
@@ -175,10 +177,20 @@ public class BrushCommands {
     public void blendBallBrush(
             InjectedValueAccess context,
             @Arg(desc = "The radius to sample for blending", def = "5")
-                    Expression radius
+                    Expression radius,
+            @Arg(desc = "Minimum difference in frequency to change block", def = "1")
+                    int minFreqDiff,
+            @Switch(name = 'a', desc = "Compare only air vs existing blocks")
+                    boolean onlyAir,
+            @ArgFlag(name = 'm', desc = "Mask to limit blocks being considered", def = "")
+                    Mask mask
     ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
-        set(context, new BlendBall(), "worldedit.brush.blendball").setSize(radius);
+        checkCommandArgument(minFreqDiff >= 0 && minFreqDiff <= 26, "minFreqDiff not in range 0 <= value <= 26");
+        if (mask != null && !(mask instanceof CachedMask)) {
+            mask = new CachedMask(mask, false);
+        }
+        set(context, new BlendBall(minFreqDiff, onlyAir, (CachedMask) mask), "worldedit.brush.blendball").setSize(radius);
     }
 
     @Command(
