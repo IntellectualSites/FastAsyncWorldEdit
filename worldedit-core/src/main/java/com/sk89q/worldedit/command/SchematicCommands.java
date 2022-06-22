@@ -475,9 +475,7 @@ public class SchematicCommands {
         if (i == -1 && f.getName().isEmpty() || i == 0) {
             File directory = f.getParentFile();
             int fileNumber = directory.exists() ? MainUtil.getMaxFileId(directory) : 0;
-            String extension = (i == -1 || f.getName().length() == 0
-                    ? format.getPrimaryFileExtension()
-                    : f.getName().substring(i + 1));
+            String extension = i == 0 ? f.getName().substring(i + 1) : format.getPrimaryFileExtension();
             String name = String.format("%s.%s", fileNumber, extension);
             f = new File(directory, name);
             filename += name;
