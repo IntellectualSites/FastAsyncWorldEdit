@@ -470,9 +470,16 @@ public class SchematicCommands {
             }
         }
 
-        //FAWE end
         File f = worldEdit.getSafeSaveFile(actor, dir, filename, format.getPrimaryFileExtension());
-
+        int i = f.getName().lastIndexOf('.');
+        if (i == -1 && f.getName().isEmpty() || i == 0) {
+            File directory = f.getParentFile();
+            int fileNumber = directory.exists() ? MainUtil.getMaxFileId(directory) : 0;
+            String extension = i == 0 ? f.getName().substring(i + 1) : format.getPrimaryFileExtension();
+            String name = String.format("%s.%s", fileNumber, extension);
+            f = new File(directory, name);
+            filename += name;
+        }
         boolean overwrite = f.exists();
         if (overwrite) {
             if (!actor.hasPermission("worldedit.schematic.delete")) {
@@ -489,6 +496,7 @@ public class SchematicCommands {
                 return;
             }
         }
+        //FAWE end
 
         // Create parent directories
         File parent = f.getParentFile();
