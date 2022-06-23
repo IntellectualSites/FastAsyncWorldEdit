@@ -435,9 +435,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public <T extends BlockStateHolder<T>> boolean setBlock(
+        public <B extends BlockStateHolder<B>> boolean setBlock(
                 ChunkHolder chunk, int x, int y, int z,
-                T block
+                B block
         ) {
             chunk.getOrCreateSet();
             chunk.delegate = BOTH;
@@ -769,7 +769,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         }
 
         @Override
-        public <T extends BlockStateHolder<T>> boolean setBlock(ChunkHolder chunk, int x, int y, int z, T block) {
+        public <B extends BlockStateHolder<B>> boolean setBlock(ChunkHolder chunk, int x, int y, int z, B block) {
             chunk.getOrCreateSet();
             chunk.delegate = SET;
             return chunk.setBlock(x, y, z, block);
