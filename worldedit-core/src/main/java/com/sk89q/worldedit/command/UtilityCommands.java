@@ -71,6 +71,7 @@ import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.formatting.text.format.TextColor;
+import com.sk89q.worldedit.util.io.file.FilenameResolutionException;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.enginehub.piston.annotation.Command;
@@ -78,7 +79,6 @@ import org.enginehub.piston.annotation.CommandContainer;
 import org.enginehub.piston.annotation.param.Arg;
 import org.enginehub.piston.annotation.param.ArgFlag;
 import org.enginehub.piston.annotation.param.Switch;
-import org.enginehub.piston.exception.StopExecutionException;
 
 import javax.imageio.ImageIO;
 import java.awt.RenderingHints;
@@ -876,8 +876,9 @@ public class UtilityCommands {
                     }
                 }
                 try {
-                    if (!MainUtil.isInSubDirectory(root, file)) {
-                        throw new StopExecutionException(TextComponent.of("Invalid path"));
+                    // Assume a file not being in a subdirectory of root means a symlink is used
+                    if (!MainUtil.isInSubDirectory(root, file) && !WorldEdit.getInstance().getConfiguration().allowSymlinks) {
+                        throw new FilenameResolutionException(name, Caption.of("worldedit.error.file-resolution.outside-root"));
                     }
                 } catch (IOException ignored) {
                 }
