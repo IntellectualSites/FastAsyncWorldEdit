@@ -215,9 +215,17 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
      *
      * @return a new complex region
      */
-    public RegionIntersection getWalls() {
+    public Region getWalls() {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
+        BlockVector3 dimensions = getDimensions();
+
+        //FAWE start
+        if (dimensions.getX() <= 2 || dimensions.getZ() <= 2) {
+            // The wall are the region
+            return new RegionIntersection(this);
+        }
+        //FAWE end
 
         return new RegionIntersection(
                 // Project to Z-Y plane
@@ -225,6 +233,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 new CuboidRegion(pos1.withX(max.getX()), pos2.withX(max.getX())),
 
                 // Project to X-Y plane
+                //FAWE start = prevent overlap
                 new CuboidRegion(
                         pos1.withZ(min.getZ()).add(BlockVector3.UNIT_X),
                         pos2.withZ(min.getZ()).subtract(BlockVector3.UNIT_X)
@@ -233,6 +242,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         pos1.withZ(max.getZ()).add(BlockVector3.UNIT_X),
                         pos2.withZ(max.getZ()).subtract(BlockVector3.UNIT_X)
                 )
+                //FAWE end
         );
     }
 

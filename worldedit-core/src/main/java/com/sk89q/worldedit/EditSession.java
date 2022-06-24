@@ -1671,12 +1671,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         checkNotNull(region);
         checkNotNull(pattern);
 
-        //FAWE start
-        int blocksChanged = 0;
-        for (Region wall : CuboidRegion.makeCuboid(region).getWalls().getRegions()) {
-            blocksChanged += setBlocks(wall, pattern);
-        }
-        return blocksChanged;
+        CuboidRegion cuboid = CuboidRegion.makeCuboid(region);
+        //FAWE start - specify RegionIntersection
+        Region faces = cuboid.getWalls();
+        return setBlocks((Set<BlockVector3>) faces, pattern);
         //FAWE end
     }
 
