@@ -51,6 +51,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public synchronized void recycle() {
+        reset();
         POOL.offer(this);
     }
 

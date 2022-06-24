@@ -1046,7 +1046,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             try {
                 return this.call(chunkSet, () -> {
                     this.delegate = NULL;
-                    chunkSet.recycle();
                     chunkSet = null;
                     calledLock.unlock(stamp);
                 });
