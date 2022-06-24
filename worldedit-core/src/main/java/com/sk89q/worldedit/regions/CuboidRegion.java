@@ -215,7 +215,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
      *
      * @return a new complex region
      */
-    public RegionIntersection getWalls() {
+    public Region getWalls() {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
         BlockVector3 dimensions = getDimensions();

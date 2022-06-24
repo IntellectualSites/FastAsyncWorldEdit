@@ -1673,7 +1673,7 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
 
         CuboidRegion cuboid = CuboidRegion.makeCuboid(region);
         //FAWE start - specify RegionIntersection
-        RegionIntersection faces = cuboid.getWalls();
+        Region faces = cuboid.getWalls();
         return setBlocks((Set<BlockVector3>) faces, pattern);
         //FAWE end
     }
