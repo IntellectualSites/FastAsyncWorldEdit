@@ -67,7 +67,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public synchronized void recycle() {
         delegate = NULL;
-        chunkSet = null;
+        if (chunkSet != null) {
+            chunkSet.recycle();
+            chunkSet = null;
+        }
+        chunkExisting = null;
+        extent = null;
+        POOL.offer(this);
     }
 
     public synchronized IBlockDelegate getDelegate() {
@@ -1039,7 +1045,9 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             chunkSet.setBitMask(bitMask);
             try {
                 return this.call(chunkSet, () -> {
-                    recycle();
+                    this.delegate = NULL;
+                    chunkSet.recycle();
+                    chunkSet = null;
                     calledLock.unlock(stamp);
                 });
             } catch (Throwable t) {
