@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongSet;
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 
 /**
  * Class to prevent the above/below being removed from shaded/relocated dependencies via minimization
@@ -17,5 +18,6 @@ final class DoNotMiniseThese {
     private final LongIterator c = null;
     private final LongSet d = null;
     private final Int2ObjectMap<?> e = null;
+    private final Object2ObjectArrayMap<?, ?> f = null;
 
 }
