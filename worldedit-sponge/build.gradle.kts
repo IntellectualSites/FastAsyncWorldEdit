@@ -27,7 +27,7 @@ dependencies {
         because("Sponge 8 provides Log4J at 2.8.1")
     })
     api("org.apache.logging.log4j:log4j-api")
-    api("org.bstats:bstats-sponge:1.7")
+    api("org.bstats:bstats-sponge:3.0.0")
     testImplementation("org.mockito:mockito-core:4.6.1")
 }
 
@@ -45,7 +45,7 @@ tasks.named<Jar>("jar") {
 tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         relocate ("org.bstats", "com.sk89q.worldedit.sponge.bstats") {
-            include(dependency("org.bstats:bstats-sponge:1.5"))
+            include(dependency("org.bstats:bstats-sponge:3.0.0"))
         }
     }
 }
