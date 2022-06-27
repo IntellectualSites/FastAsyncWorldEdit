@@ -157,7 +157,7 @@ public interface Extent extends InputExtent, OutputExtent {
      * @param location the location
      * @param uuid     UUID to force the entity to have
      * @return a reference to the created entity, or null if the entity could not be created
-     * @since TODO
+     * @since 2.4.0
      */
     @Nullable
     default Entity createEntity(Location location, BaseEntity entity, UUID uuid) {

@@ -36,7 +36,7 @@ public class BlendBall implements Brush {
      * @param onlyAir     Only consider air for comparing existing blocks, and for altering existing blocks
      * @param mask        Mask to limit the blocks being considered for alteration. Will also limit blocks types able to be
      *                    placed, and will consider blocks not meeting the mask as air
-     * @since TODO
+     * @since 2.4.0
      */
     public BlendBall(int minFreqDiff, boolean onlyAir, @Nullable CachedMask mask) {
         this.minFreqDiff = minFreqDiff;

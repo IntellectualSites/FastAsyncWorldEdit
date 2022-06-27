@@ -151,7 +151,7 @@ public enum FaweCache implements Trimable {
      * @param withInitial The supplier used to determine the initial value if a thread cache is created, else to provide a new
      *                    instance of the class being cached if on the main thread.
      * @return a {@link Function} referencing a cache, or the given {@link Supplier}
-     * @since TODO
+     * @since 2.4.0
      */
     public <V> LongFunction<V> createMainThreadSafeCache(Supplier<V> withInitial) {
         return new LongFunction<>() {

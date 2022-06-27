@@ -177,7 +177,7 @@ public final class NBTUtils {
      *
      * @param map  Map to add uuid to
      * @param uuid {@link UUID} to add
-     * @since TODO
+     * @since 2.4.0
      */
     public static void addUUIDToMap(Map<String, Tag> map, UUID uuid) {
         int[] uuidArray = new int[4];

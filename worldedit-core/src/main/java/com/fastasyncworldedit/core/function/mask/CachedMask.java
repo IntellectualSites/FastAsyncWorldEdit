@@ -25,7 +25,7 @@ public class CachedMask extends AbstractDelegateMask implements ResettableMask {
      *
      * @param mask  Mask to cache results of
      * @param local If the area will be small
-     * @since TODO
+     * @since 2.4.0
      */
     public CachedMask(Mask mask, boolean local) {
         super(mask);
