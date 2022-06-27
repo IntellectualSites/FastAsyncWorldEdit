@@ -1,27 +1,39 @@
 {
-  "extends": [
-    "config:base",
-    ":disableDependencyDashboard"
-  ],
-  "ignoreDeps": [
-    "guava",  
-    "com.google.guava:guava",
-    "rhino-runtime",
-    "org.antlr",
-    "antlr4-runtime",
-    "fastutil",
-    "it.unimi.dsi:fastutil",  
-    "auto-value-annotations",
-    "auto-value",
-    "com.google.code.gson:gson",
-    "net.fabricmc:fabric-loader",
-    "net.fabricmc.fabric-api:fabric-api",
-    "com.github.luben:zstd-jni",
-    "net.kyori",
-    "net.kyori:adventure-nbt",
-    "org.jetbrains.kotlin.jvm"
-  ],
-  "labels": ["Renovate"],
-  "commitMessagePrefix": "build: ",
-  "rebaseWhen": "conflicted"
+   "extends":[
+      "config:base",
+      ":disableDependencyDashboard"
+   ],
+   "packageRules":[
+      {
+         "matchPaths":[
+            "worldedit-bukkit/**",
+            "worldedit-core/**",
+            "worldedit-cli/**",
+            "worldedit-libs/**",
+            "buildSrc/**",
+            "gradle/**"
+         ],
+         "ignoreDeps":[
+            "guava",
+            "com.google.guava:guava",
+            "rhino-runtime",
+            "org.antlr",
+            "antlr4-runtime",
+            "fastutil",
+            "it.unimi.dsi:fastutil",
+            "auto-value-annotations",
+            "auto-value",
+            "com.google.code.gson:gson",
+            "net.fabricmc:fabric-loader",
+            "net.fabricmc.fabric-api:fabric-api",
+            "com.github.luben:zstd-jni",
+            "net.kyori",
+            "net.kyori:adventure-nbt",
+            "org.jetbrains.kotlin.jvm"
+         ]
+      }
+   ],
+   "labels":["Renovate"],
+   "commitMessagePrefix":"build: ",
+   "rebaseWhen":"conflicted"
 }
