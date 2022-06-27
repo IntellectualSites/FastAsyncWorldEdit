@@ -136,7 +136,7 @@ public class BlendBall implements Brush {
     }
 
     private boolean maskFails(EditSession editSession, MutableBlockVector3 mutable) {
-        return mask == null || !mask.test(editSession, mutable);
+        return mask != null && !mask.test(editSession, mutable);
     }
 
 }
