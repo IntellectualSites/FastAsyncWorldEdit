@@ -31,7 +31,7 @@ val loaderVersion = "0.10.8"
 
 configurations.all {
     resolutionStrategy {
-        force("com.google.guava:guava:21.0")
+        force("com.google.guava:guava:31.1-jre")
     }
 }
 
