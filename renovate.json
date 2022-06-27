@@ -21,9 +21,6 @@
     "net.kyori:adventure-nbt",
     "org.jetbrains.kotlin.jvm"
   ],
-  "schedule": [
-    "every monday"
-  ],
   "labels": ["Renovate"],
   "commitMessagePrefix": "build: ",
   "rebaseWhen": "conflicted"

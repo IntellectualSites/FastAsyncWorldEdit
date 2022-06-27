@@ -15,7 +15,7 @@ fun Project.applyPaperweightAdapterConfiguration() {
 
     dependencies {
         "implementation"(project(":worldedit-bukkit"))
-        "implementation"(platform("com.intellectualsites.bom:bom-1.18.x:1.5"))
+        "implementation"(platform("com.intellectualsites.bom:bom-1.18.x:1.9"))
     }
 
     tasks.named("assemble") {
