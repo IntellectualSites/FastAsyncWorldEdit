@@ -67,6 +67,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                     "https://jd.papermc.io/paper/1.18/",
                     "https://intellectualsites.github.io/fastasyncworldedit-javadocs/worldedit-core/"
             )
+            docTitle = "${rootProject.name}-${project.description}" +  " " + "${rootProject.version}"
         }
     }
 
