@@ -78,7 +78,7 @@ public class MutableEntityChange implements Change {
         double z = pos.get(2).getValue();
         Extent extent = context.getExtent();
         Location location = new Location(extent, x, y, z, 0, 0);
-        String id = tag.getString("Id");
+        String id = tag.getString("id");
         EntityType type = EntityTypes.parse(id);
         BaseEntity entity = new BaseEntity(type, tag);
         extent.createEntity(location, entity, tag.getUUID());
