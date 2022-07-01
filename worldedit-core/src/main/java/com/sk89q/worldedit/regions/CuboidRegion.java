@@ -190,7 +190,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
      *
      * @return a new complex region
      */
-    public RegionIntersection getFaces() {
+    public Region getFaces() {
         BlockVector3 min = getMinimumPoint();
         BlockVector3 max = getMaximumPoint();
 
