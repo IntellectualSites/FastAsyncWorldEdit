@@ -19,7 +19,8 @@
     "com.github.luben:zstd-jni",
     "net.kyori",
     "net.kyori:adventure-nbt",
-    "org.jetbrains.kotlin.jvm"
+    "org.jetbrains.kotlin.jvm",
+    "log4j"
   ],
   "labels": ["Renovate"],
   "commitMessagePrefix": "build: ",
