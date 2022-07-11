@@ -112,7 +112,7 @@ public class BlockBagChangeSet extends AbstractDelegateChangeSet {
     @Override
     public void addTileCreate(CompoundTag nbt) {
         if (nbt.containsKey("items")) {
-            Map<String, Tag> map = new HashMap<>(nbt.getValue());
+            Map<String, Tag<?, ?>> map = new HashMap<>(nbt.getValue());
             map.remove("items");
         }
         super.addTileCreate(nbt);

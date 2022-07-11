@@ -20,6 +20,7 @@
 package com.sk89q.jnbt;
 
 import com.fastasyncworldedit.core.internal.io.LittleEndianOutputStream;
+import org.enginehub.linbus.stream.LinBinaryIO;
 
 import java.io.Closeable;
 import java.io.DataOutput;
@@ -44,8 +45,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * https://minecraft.gamepedia.com/NBT_format</a>.
  * </p>
  *
- * @deprecated JNBT is being removed for adventure-nbt in WorldEdit 8.
+ * @deprecated JNBT is being removed for lin-bus in WorldEdit 8, use {@link LinBinaryIO} instead
  */
+@SuppressWarnings("removal")
 @Deprecated(forRemoval = true)
 public final class NBTOutputStream extends OutputStream implements Closeable, DataOutput {
 
@@ -61,8 +63,8 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      * @param os The output stream.
      * @throws IOException if an I/O error occurs.
      */
-    public NBTOutputStream(OutputStream os) throws IOException {
-        this(os instanceof DataOutput ? (DataOutput) os : new DataOutputStream(os));
+    public NBTOutputStream(OutputStream os) {
+            this(os instanceof DataOutput ? (DataOutput) os : new DataOutputStream(os));
     }
 
     // Don't delete
@@ -91,11 +93,11 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      * @param tag The tag to write.
      * @throws IOException if an I/O error occurs.
      */
-    public void writeNamedTag(String name, Tag tag) throws IOException {
+    public void writeNamedTag(String name, Tag<?, ?> tag) throws IOException {
         checkNotNull(name);
         checkNotNull(tag);
 
-        int type = NBTUtils.getTypeCode(tag.getClass());
+        int type = tag.getTypeCode();
         writeNamedTagName(name, type);
 
         if (type == NBTConstants.TYPE_END) {
@@ -196,7 +198,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
     }
 
     public void writeTag(Tag tag) throws IOException {
-        int type = NBTUtils.getTypeCode(tag.getClass());
+        int type = tag.getTypeCode();
         os.writeByte(type);
         writeTagPayload(tag);
     }
@@ -212,7 +214,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      * @throws IOException if an I/O error occurs.
      */
     public void writeTagPayload(Tag tag) throws IOException {
-        int type = NBTUtils.getTypeCode(tag.getClass());
+        int type = tag.getTypeCode();
         switch (type) {
             case NBTConstants.TYPE_END:
                 writeEndTagPayload((EndTag) tag);
@@ -287,7 +289,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      * @throws IOException if an I/O error occurs.
      */
     private void writeCompoundTagPayload(CompoundTag tag) throws IOException {
-        for (Map.Entry<String, Tag> entry : tag.getValue().entrySet()) {
+        for (Map.Entry<String, Tag<?, ?>> entry : tag.getValue().entrySet()) {
             writeNamedTag(entry.getKey(), entry.getValue());
         }
         os.writeByte((byte) 0); // end tag - better way?
@@ -300,7 +302,7 @@ public final class NBTOutputStream extends OutputStream implements Closeable, Da
      * @throws IOException if an I/O error occurs.
      */
     private void writeListTagPayload(ListTag tag) throws IOException {
-        Class<? extends Tag> clazz = tag.getType();
+        Class<? extends Tag<?, ?>> clazz = tag.getType();
         if (clazz == null) {
             clazz = CompoundTag.class;
         }

@@ -24,7 +24,6 @@ import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.block.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.FullChunkStatus;
@@ -34,10 +33,11 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.enginehub.linbus.tree.LinCompoundTag;
 
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChunk, net.minecraft.world.level.block.state.BlockState, BlockPos> {
     private static final int UPDATE = 1;
@@ -101,7 +101,7 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
     }
 
     @Override
-    public boolean updateTileEntity(final BlockPos position, final CompoundBinaryTag tag) {
+    public boolean updateTileEntity(final BlockPos position, final LinCompoundTag tag) {
         return false;
     }
 

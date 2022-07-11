@@ -186,7 +186,7 @@ public class BlockArrayClipboard implements Clipboard {
     }
 
     @Override
-    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) throws WorldEditException {
+    public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block) {
         if (region.contains(position)) {
             //FAWE - get points
             final int x = position.x();

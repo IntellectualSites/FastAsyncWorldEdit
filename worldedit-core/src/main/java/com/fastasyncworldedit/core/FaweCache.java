@@ -532,7 +532,7 @@ public enum FaweCache implements Trimable {
     }
 
     public CompoundTag asTag(Map<String, Object> value) {
-        HashMap<String, Tag> map = new HashMap<>();
+        HashMap<String, Tag<?, ?>> map = new HashMap<>();
         for (Map.Entry<String, Object> entry : value.entrySet()) {
             Object child = entry.getValue();
             Tag tag = asTag(child);

@@ -109,10 +109,10 @@ public class FastSchematicReader extends NBTSchematicReader {
         if (fixer == null || dataVersion == -1) {
             return tag;
         }
-        //FAWE start - BinaryTag
-        return (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+        //FAWE start - LinTag
+        return (CompoundTag) AdventureNBTConverter.fromLinBus(fixer.fixUp(
                 DataFixer.FixTypes.BLOCK_ENTITY,
-                tag.asBinaryTag(),
+                tag.toLinTag(),
                 dataVersion
         ));
         //FAWE end
@@ -122,10 +122,10 @@ public class FastSchematicReader extends NBTSchematicReader {
         if (fixer == null || dataVersion == -1) {
             return tag;
         }
-        //FAWE start - BinaryTag
-        return (CompoundTag) AdventureNBTConverter.fromAdventure(fixer.fixUp(
+        //FAWE start - LinTag
+        return (CompoundTag) AdventureNBTConverter.fromLinBus(fixer.fixUp(
                 DataFixer.FixTypes.ENTITY,
-                tag.asBinaryTag(),
+                tag.toLinTag(),
                 dataVersion
         ));
         //FAWE end
@@ -344,7 +344,7 @@ public class FastSchematicReader extends NBTSchematicReader {
                     y = pos[1];
                     z = pos[2];
                 }
-                Map<String, Tag> values = new HashMap<>(tile.getValue());
+                Map<String, Tag<?, ?>> values = new HashMap<>(tile.getValue());
                 Tag id = values.get("Id");
                 if (id != null) {
                     values.put("x", new IntTag(x));
@@ -371,7 +371,7 @@ public class FastSchematicReader extends NBTSchematicReader {
         // entities
         if (entities != null && !entities.isEmpty()) {
             for (Map<String, Object> entRaw : entities) {
-                Map<String, Tag> value = new HashMap<>(FaweCache.INSTANCE.asTag(entRaw).getValue());
+                Map<String, Tag<?, ?>> value = new HashMap<>(FaweCache.INSTANCE.asTag(entRaw).getValue());
                 StringTag id = (StringTag) value.get("Id");
                 if (id == null) {
                     id = (StringTag) value.get("id");

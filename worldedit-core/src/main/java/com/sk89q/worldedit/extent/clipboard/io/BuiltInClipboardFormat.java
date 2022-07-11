@@ -118,7 +118,6 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
             return name.endsWith(".schematic") || name.endsWith(".mcedit") || name.endsWith(".mce");
         }
     },
-
     /**
      * @deprecated Slow, resource intensive, but sometimes safer than using the recommended
      *         {@link BuiltInClipboardFormat#FAST}.
@@ -153,7 +152,7 @@ public enum BuiltInClipboardFormat implements ClipboardFormat {
                 CompoundTag schematicTag = (CompoundTag) rootTag.getTag();
 
                 // Check
-                Map<String, Tag> schematic = schematicTag.getValue();
+                Map<String, Tag<?, ?>> schematic = schematicTag.getValue();
                 if (!schematic.containsKey("Version")) {
                     return false;
                 }

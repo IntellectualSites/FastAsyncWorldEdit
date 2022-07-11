@@ -12,5 +12,10 @@ dependencies {
     "shade"(libs.piston)
     "shade"(libs.pistonRuntime)
     "shade"(libs.pistonImpl)
-    "shade"(libs.adventureNbt)
+    // Linbus
+    "shade"(platform(libs.linBus.bom))
+    "shade"(libs.linBus.common)
+    "shade"(libs.linBus.stream)
+    "shade"(libs.linBus.tree)
+    "shade"(libs.linBus.format.snbt)
 }

@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.storage;
 
-import com.sk89q.jnbt.AdventureNBTConverter;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.NBTInputStream;
 import com.sk89q.jnbt.Tag;
@@ -54,7 +53,7 @@ public class ChunkStoreHelper {
 
     public static CompoundTag readCompoundTag(ChunkDataInputSupplier input) throws DataException, IOException {
         try (InputStream stream = input.openInputStream();
-             NBTInputStream nbt = new NBTInputStream(stream)) {
+            NBTInputStream nbt = new NBTInputStream(stream)) {
             Tag tag = nbt.readNamedTag().getTag();
             if (!(tag instanceof CompoundTag)) {
                 throw new ChunkStoreException("CompoundTag expected for chunk; got "
@@ -99,23 +98,20 @@ public class ChunkStoreHelper {
         if ((dataVersion > 0 || hasLevelSections(rootTag)) && dataVersion < currentDataVersion) { // only fix up MCA format, DFU doesn't support MCR chunks
             final DataFixer dataFixer = platform.getDataFixer();
             if (dataFixer != null) {
-                //FAWE start - CBT
-                rootTag = (CompoundTag) AdventureNBTConverter.fromAdventure(dataFixer.fixUp(DataFixer.FixTypes.CHUNK,
-                        rootTag.asBinaryTag(), dataVersion));
-                //FAWE end
+                rootTag = new CompoundTag(dataFixer.fixUp(DataFixer.FixTypes.CHUNK, rootTag.toLinTag(), dataVersion));
                 dataVersion = currentDataVersion;
             }
         }
 
         if (dataVersion >= Constants.DATA_VERSION_MC_1_18) {
-            return new AnvilChunk18(rootTag, entitiesTag);
+            return new AnvilChunk18(rootTag);
         }
 
-        Map<String, Tag> children = rootTag.getValue();
+        Map<String, Tag<?, ?>> children = rootTag.getValue();
         CompoundTag tag = null;
 
         // Find Level tag
-        for (Map.Entry<String, Tag> entry : children.entrySet()) {
+        for (Map.Entry<String, Tag<?, ?>> entry : children.entrySet()) {
             if (entry.getKey().equals("Level")) {
                 if (entry.getValue() instanceof CompoundTag) {
                     tag = (CompoundTag) entry.getValue();
@@ -150,7 +146,7 @@ public class ChunkStoreHelper {
             return new AnvilChunk13(tag);
         }
 
-        Map<String, Tag> tags = tag.getValue();
+        Map<String, Tag<?, ?>> tags = tag.getValue();
         if (tags.containsKey("Sections")) {
             return new AnvilChunk(tag);
         }
@@ -159,8 +155,8 @@ public class ChunkStoreHelper {
     }
 
     private static boolean hasLevelSections(CompoundTag rootTag) {
-        Map<String, Tag> children = rootTag.getValue();
-        Tag levelTag = children.get("Level");
+        Map<String, Tag<?, ?>> children = rootTag.getValue();
+        Tag<?, ?> levelTag = children.get("Level");
         if (levelTag instanceof CompoundTag) {
             return ((CompoundTag) levelTag).getValue().containsKey("Sections");
         }

@@ -178,9 +178,6 @@ tasks.named<ShadowJar>("shadowJar") {
         relocate("org.lz4", "com.fastasyncworldedit.core.lz4") {
             include(dependency("org.lz4:lz4-java:1.8.0"))
         }
-        relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
-            include(dependency("net.kyori:adventure-nbt:4.17.0"))
-        }
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
             include(dependency("com.zaxxer:SparseBitSet:1.3"))
         }
