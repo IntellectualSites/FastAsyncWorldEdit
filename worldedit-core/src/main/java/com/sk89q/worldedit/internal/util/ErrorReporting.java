@@ -29,15 +29,17 @@ import com.sk89q.worldedit.util.formatting.text.event.HoverEvent;
  * Simple class for handling error reporting to users.
  */
 public class ErrorReporting {
+
     private ErrorReporting() {
     }
 
     public static void trigger(Actor actor, Throwable error) {
         actor.printError(Caption.of("worldedit.command.error.report"));
-        actor.print(
-                TextComponent.builder(error.getClass().getName() + ": " + error.getMessage())
-                        .hoverEvent(HoverEvent.showText(TextComponent.of(Throwables.getStackTraceAsString(error))))
-                        .build()
-        );
+        TextComponent.Builder errorBuilder = TextComponent.builder(error.getClass().getName() + ": " + error.getMessage());
+        if (actor.hasPermission("worldedit.error.detailed")) {
+            errorBuilder = errorBuilder.hoverEvent(HoverEvent.showText(TextComponent.of(Throwables.getStackTraceAsString(error))));
+        }
+        actor.print(errorBuilder.build());
     }
+
 }
