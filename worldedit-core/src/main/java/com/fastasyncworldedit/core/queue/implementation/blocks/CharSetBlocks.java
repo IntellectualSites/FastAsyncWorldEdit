@@ -364,7 +364,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             minSectionPosition = layer;
             if (biomes != null) {
                 BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];
-                System.arraycopy(biomes, 0, tmpBiomes, 64 * diff, biomes.length);
+                System.arraycopy(biomes, 0, tmpBiomes, diff, biomes.length);
                 biomes = tmpBiomes;
             }
             if (light != null) {
