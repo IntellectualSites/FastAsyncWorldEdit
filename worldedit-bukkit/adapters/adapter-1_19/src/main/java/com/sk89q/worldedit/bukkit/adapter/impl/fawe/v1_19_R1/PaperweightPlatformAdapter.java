@@ -62,6 +62,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -99,7 +101,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldLock;
     private static final long fieldLockOffset;
 
-    private static final Field fieldGameEventDispatcherSections;
+    private static MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
 
     private static final Field fieldRemove;
@@ -148,9 +150,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 fieldLockOffset = -1;
             }
 
-            fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField(Refraction.pickName(
-                    "gameEventDispatcherSections", "t"));
-            fieldGameEventDispatcherSections.setAccessible(true);
+            Method removeGameEventListener = LevelChunk.class.getDeclaredMethod(
+                    Refraction.pickName("removeGameEventListener", "a"),
+                    BlockEntity.class,
+                    ServerLevel.class
+            );
+            removeGameEventListener.setAccessible(true);
+            methodRemoveGameEventListener = MethodHandles.lookup().unreflect(removeGameEventListener);
+
             Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
                     Refraction.pickName(
                             "removeBlockEntityTicker",
@@ -564,32 +571,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return BiomeTypes.get(biome.unwrapKey().orElseThrow().location().toString());
     }
 
-    @SuppressWarnings("unchecked")
     static void removeBeacon(BlockEntity beacon, LevelChunk levelChunk) {
         try {
-            // Do the method ourselves to avoid trying to reflect generic method parameters
-            // similar to removeGameEventListener
             if (levelChunk.loaded || levelChunk.level.isClientSide()) {
                 BlockEntity blockEntity = levelChunk.blockEntities.remove(beacon.getBlockPos());
                 if (blockEntity != null) {
                     if (!levelChunk.level.isClientSide) {
-                        Block block = beacon.getBlockState().getBlock();
-                        if (block instanceof EntityBlock) {
-                            GameEventListener gameEventListener = ((EntityBlock) block).getListener(levelChunk.level, beacon);
-                            if (gameEventListener != null) {
-                                int i = SectionPos.blockToSectionCoord(beacon.getBlockPos().getY());
-                                GameEventDispatcher gameEventDispatcher = levelChunk.getEventDispatcher(i);
-                                gameEventDispatcher.unregister(gameEventListener);
-                                if (gameEventDispatcher.isEmpty()) {
-                                    try {
-                                        ((Int2ObjectMap<GameEventDispatcher>) fieldGameEventDispatcherSections.get(levelChunk))
-                                                .remove(i);
-                                    } catch (IllegalAccessException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
+                        methodRemoveGameEventListener.invoke(levelChunk, beacon, levelChunk.level);
                     }
                     fieldRemove.set(beacon, true);
                 }
