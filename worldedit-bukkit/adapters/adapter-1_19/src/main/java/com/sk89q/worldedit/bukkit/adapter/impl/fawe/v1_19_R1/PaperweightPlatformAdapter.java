@@ -271,20 +271,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             return;
         }
         ChunkPos coordIntPair = new ChunkPos(chunkX, chunkZ);
-        // UNLOADED_CHUNK
-        Optional<LevelChunk> optional = ((Either) chunkHolder
-                .getTickingChunkFuture()
-                .getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK)).left();
+        LevelChunk levelChunk;
         if (PaperLib.isPaper()) {
             // getChunkAtIfLoadedImmediately is paper only
-            optional = optional.or(() -> Optional.ofNullable(nmsWorld
+            levelChunk = nmsWorld
                     .getChunkSource()
-                    .getChunkAtIfLoadedImmediately(chunkX, chunkZ)));
+                    .getChunkAtIfLoadedImmediately(chunkX, chunkZ);
+        } else {
+            levelChunk = ((Optional<LevelChunk>) ((Either) chunkHolder
+                    .getTickingChunkFuture() // method is not present with new paper chunk system
+                    .getNow(ChunkHolder.UNLOADED_LEVEL_CHUNK)).left())
+                    .orElse(null);
         }
-        if (optional.isEmpty()) {
+        if (levelChunk == null) {
             return;
         }
-        LevelChunk levelChunk = optional.get();
         TaskManager.taskManager().task(() -> {
             ClientboundLevelChunkWithLightPacket packet;
             if (PaperLib.isPaper()) {
