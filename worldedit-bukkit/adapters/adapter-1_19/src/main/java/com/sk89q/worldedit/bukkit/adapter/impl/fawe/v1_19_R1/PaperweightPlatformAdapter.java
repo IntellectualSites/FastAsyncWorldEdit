@@ -101,7 +101,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldLock;
     private static final long fieldLockOffset;
 
-    private static MethodHandle methodRemoveGameEventListener;
+    private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
 
     private static final Field fieldRemove;
