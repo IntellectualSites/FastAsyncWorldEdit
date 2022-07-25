@@ -99,7 +99,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldLock;
     private static final long fieldLockOffset;
 
-    private static final Field fieldGameEventDispatcherSections;
+    private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
 
     private static final Field fieldRemove;
@@ -148,9 +148,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 fieldLockOffset = -1;
             }
 
-            fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField(Refraction.pickName(
-                    "gameEventDispatcherSections", "t"));
-            fieldGameEventDispatcherSections.setAccessible(true);
+            Method removeGameEventListener = LevelChunk.class.getDeclaredMethod(
+                    Refraction.pickName("removeGameEventListener", "d"),
+                    BlockEntity.class
+            );
+            removeGameEventListener.setAccessible(true);
+            methodRemoveGameEventListener = MethodHandles.lookup().unreflect(removeGameEventListener);
             Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
                     Refraction.pickName(
                             "removeBlockEntityTicker",
@@ -573,23 +576,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 BlockEntity blockEntity = levelChunk.blockEntities.remove(beacon.getBlockPos());
                 if (blockEntity != null) {
                     if (!levelChunk.level.isClientSide) {
-                        Block block = beacon.getBlockState().getBlock();
-                        if (block instanceof EntityBlock) {
-                            GameEventListener gameEventListener = ((EntityBlock) block).getListener(levelChunk.level, beacon);
-                            if (gameEventListener != null) {
-                                int i = SectionPos.blockToSectionCoord(beacon.getBlockPos().getY());
-                                GameEventDispatcher gameEventDispatcher = levelChunk.getEventDispatcher(i);
-                                gameEventDispatcher.unregister(gameEventListener);
-                                if (gameEventDispatcher.isEmpty()) {
-                                    try {
-                                        ((Int2ObjectMap<GameEventDispatcher>) fieldGameEventDispatcherSections.get(levelChunk))
-                                                .remove(i);
-                                    } catch (IllegalAccessException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
+                        methodRemoveGameEventListener.invoke(levelChunk, beacon);
                     }
                     fieldRemove.set(beacon, true);
                 }
