@@ -159,18 +159,6 @@ public class RegionCommands {
         actor.print(Caption.of("fawe.info.lighting.propagate.selection", count));
     }
 
-    //    @Command(
-    //        name = "/getlighting",
-    //        desc = "Get the light at a position"
-    //    )
-    //    @CommandPermissions("worldedit.light.fix")
-    //    public void getLighting(Player player, EditSession editSession) throws WorldEditException {
-    //        final Location loc = player.getLocation();
-    //        int block = editSession.getBlockLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-    //        int sky = editSession.getSkyLight(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-    //        player.print(TextComponent.of("Light: " + block + " | " + sky));
-    //    }
-
     @Command(
             name = "/removelighting",
             aliases = "/removelight",
@@ -202,6 +190,7 @@ public class RegionCommands {
         }
     }
 
+    @Deprecated(since = "2.4.2", forRemoval = true)
     @Command(
             name = "/setblocklight",
             aliases = "/setlight",
@@ -209,16 +198,17 @@ public class RegionCommands {
     )
     @CommandPermissions("worldedit.light.set")
     public void setlighting(Actor actor, EditSession editSession, @Selection Region region) {
-        actor.print(Caption.of("fawe.info.temporarily-not-working"));
+        actor.print(Caption.of("fawe.info.light-blocks"));
     }
 
+    @Deprecated(since = "2.4.2", forRemoval = true)
     @Command(
             name = "/setskylight",
             desc = "Set sky lighting in a selection"
     )
     @CommandPermissions("worldedit.light.set")
     public void setskylighting(Actor actor, @Selection Region region) {
-        actor.print(Caption.of("fawe.info.temporarily-not-working"));
+        actor.print(Caption.of("fawe.info.light-blocks"));
     }
 
     @Command(
