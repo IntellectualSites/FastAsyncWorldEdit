@@ -190,7 +190,7 @@ public class RegionCommands {
         }
     }
 
-    @Deprecated(since = "TODO", forRemoval = true)
+    @Deprecated(since = "2.4.2", forRemoval = true)
     @Command(
             name = "/setblocklight",
             aliases = "/setlight",
@@ -201,7 +201,7 @@ public class RegionCommands {
         actor.print(Caption.of("fawe.info.light-blocks"));
     }
 
-    @Deprecated(since = "TODO", forRemoval = true)
+    @Deprecated(since = "2.4.2", forRemoval = true)
     @Command(
             name = "/setskylight",
             desc = "Set sky lighting in a selection"
