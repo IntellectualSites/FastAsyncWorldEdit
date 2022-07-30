@@ -560,18 +560,14 @@ public class MainUtil {
                 return newFile;
             }
             try (InputStream stream = Fawe.class.getResourceAsStream(resource.startsWith("/") ? resource : "/" + resource)) {
-                byte[] buffer = new byte[2048];
                 if (stream == null) {
                     try (ZipInputStream zis = new ZipInputStream(new FileInputStream(jar))) {
                         ZipEntry ze = zis.getNextEntry();
                         while (ze != null) {
                             String name = ze.getName();
                             if (name.equals(resource)) {
-                                try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                                    int len;
-                                    while ((len = zis.read(buffer)) > 0) {
-                                        fos.write(buffer, 0, len);
-                                    }
+                                try (OutputStream outputStream = Files.newOutputStream(newFile.toPath())) {
+                                    zis.transferTo(outputStream);
                                 }
                                 ze = null;
                             } else {
@@ -587,11 +583,8 @@ public class MainUtil {
                     parent.mkdirs();
                 }
                 newFile.createNewFile();
-                try (FileOutputStream fos = new FileOutputStream(newFile)) {
-                    int len;
-                    while ((len = stream.read(buffer)) > 0) {
-                        fos.write(buffer, 0, len);
-                    }
+                try (OutputStream outputStream = Files.newOutputStream(newFile.toPath())) {
+                    stream.transferTo(outputStream);
                 }
                 return newFile;
             }
