@@ -353,10 +353,10 @@ public class TextureUtil implements TextureHolder {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
                 new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/").mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://piston-data.mojang.com/v1/objects/90d438c3e432add8848a9f9f368ce5a52f6bc4a7/client.jar")
+                        new URL("https://piston-data.mojang.com/v1/objects/c0898ec7c6a5a2eaa317770203a1554260699994/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.1.jar")) {
+                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.2.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
@@ -810,10 +810,10 @@ public class TextureUtil implements TextureHolder {
                 new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/")
                         .mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://piston-data.mojang.com/v1/objects/90d438c3e432add8848a9f9f368ce5a52f6bc4a7/client.jar")
+                        new URL("https://piston-data.mojang.com/v1/objects/c0898ec7c6a5a2eaa317770203a1554260699994/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.1.jar")) {
+                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.2.jar")) {
                     byte[] dataBuffer = new byte[1024];
                     int bytesRead;
                     while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
