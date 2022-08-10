@@ -85,6 +85,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -369,7 +370,7 @@ public final class WorldEdit {
             }
 
             return filePath.toFile();
-        } catch (IOException e) {
+        } catch (IOException | InvalidPathException e) {
             throw new FilenameResolutionException(filename, Caption.of("worldedit.error.file-resolution.resolve-failed"));
         }
     }
