@@ -23,6 +23,7 @@ import com.fastasyncworldedit.core.command.SuggestInputParseException;
 import com.fastasyncworldedit.core.util.JoinedCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
+import com.sk89q.worldedit.extension.input.ParserContext;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
@@ -1948,6 +1949,9 @@ public final class BlockTypes {
      */
 
     public static BlockType parse(final String type) throws InputParseException {
+        return parse(type, new ParserContext());
+    }
+    public static BlockType parse(final String type, final ParserContext context) throws InputParseException {
         final String inputLower = type.toLowerCase(Locale.ROOT);
         String input = inputLower;
 
@@ -1958,13 +1962,14 @@ public final class BlockTypes {
         if (result != null) {
             return result;
         }
-
-        try {
-            BlockStateHolder<BlockState> block = LegacyMapper.getInstance().getBlockFromLegacy(input);
-            if (block != null) {
-                return block.getBlockType();
+        if (context.isTryingLegacy()) {
+            try {
+                BlockStateHolder<BlockState> block = LegacyMapper.getInstance().getBlockFromLegacy(input);
+                if (block != null) {
+                    return block.getBlockType();
+                }
+            } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
             }
-        } catch (NumberFormatException | IndexOutOfBoundsException ignored) {
         }
 
         throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(
