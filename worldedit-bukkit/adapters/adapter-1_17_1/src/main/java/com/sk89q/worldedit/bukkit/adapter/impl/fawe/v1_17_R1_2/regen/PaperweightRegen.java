@@ -79,6 +79,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalLong;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -217,10 +218,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         BiomeProvider biomeProvider = getBiomeProvider();
 
         MinecraftServer server = originalServerWorld.getCraftServer().getServer();
-        PrimaryLevelData levelProperties = (PrimaryLevelData) server.getWorldData();
-
-        WorldGenSettings newOpts = levelProperties.worldGenSettings()
-                .withSeed(originalWorldData.settings.hardcore(), options.getSeed());
+        WorldGenSettings originalOpts = originalWorldData.worldGenSettings();
+        WorldGenSettings newOpts = options.getSeed().isPresent()
+                ? originalOpts.withSeed(originalWorldData.isHardcore(), OptionalLong.of(seed))
+                : originalOpts;
         LevelSettings newWorldSettings = new LevelSettings(
                 "faweregentempworld",
                 originalWorldData.settings.gameType(),
