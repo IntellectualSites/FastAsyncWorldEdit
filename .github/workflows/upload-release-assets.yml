@@ -35,7 +35,7 @@ jobs:
           curseforge-id: 103525
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
-          files-primary: build/libs/!(*-@(sources|javadoc)).jar
+          files-primary: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar
 
           name: FastAsyncWorldEdit ${{ github.event.release.tag_name }}
           version: ${{ github.event.release.tag_name }}
