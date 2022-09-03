@@ -38,6 +38,7 @@ import com.google.common.collect.Lists;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.command.util.CommandPermissions;
@@ -104,6 +105,20 @@ import static com.sk89q.worldedit.command.util.Logging.LogMode.REGION;
  */
 @CommandContainer(superTypes = CommandPermissionsConditionGenerator.Registration.class)
 public class ClipboardCommands {
+
+    /**
+     * Throws if the region would allocate a clipboard larger than the block change limit.
+     *
+     * @param region The region to check
+     * @param session The session
+     * @throws MaxChangedBlocksException if the volume exceeds the limit
+     */
+    private void checkRegionBounds(Region region, LocalSession session) throws MaxChangedBlocksException {
+        int limit = session.getBlockChangeLimit();
+        if (region.getBoundingBox().getVolume() > limit) {
+            throw new MaxChangedBlocksException(limit);
+        }
+    }
 
     @Command(
             name = "/copy",
