@@ -141,10 +141,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities(Region region) {
-        //FAWE start - allow async entity retrieval
-        List<Entity> ents = WorldEditPlugin.getInstance().getBukkitImplAdapter().getEntities(getWorld());
-        //FAWE end
+        World world = getWorld();
 
+        List<Entity> ents = world.getEntities();
         List<com.sk89q.worldedit.entity.Entity> entities = new ArrayList<>();
         for (Entity ent : ents) {
             if (region.contains(BukkitAdapter.asBlockVector(ent.getLocation()))) {
@@ -157,9 +156,7 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities() {
         List<com.sk89q.worldedit.entity.Entity> list = new ArrayList<>();
-        //FAWE start - allow async entity retrieval
-        for (Entity entity : WorldEditPlugin.getInstance().getBukkitImplAdapter().getEntities(getWorld())) {
-            //FAWE end
+        for (Entity entity : getWorld().getEntities()) {
             list.add(BukkitAdapter.adapt(entity));
         }
         return list;

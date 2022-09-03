@@ -676,7 +676,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         }
                         if (Settings.settings().EXPERIMENTAL.REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL) {
                             for (UUID uuid : entityRemoves) {
-                                Entity entity = nmsWorld.entityManager.getEntityGetter().get(uuid);
+                                Entity entity = nmsWorld.getEntities().get(uuid);
                                 if (entity != null) {
                                     removeEntity(entity);
                                 }
