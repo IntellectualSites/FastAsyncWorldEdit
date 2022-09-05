@@ -26,16 +26,13 @@ jobs:
           files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           release-tag: ${{ github.event.release.tag_name }}
-
-  upload-to-curseforge:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: Kir-Antipov/mc-publish@v3.2
+      - name: Upload release to CurseForge
+        uses: Kir-Antipov/mc-publish@v3.2
         with:
           curseforge-id: 103525
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
-          files-primary: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar
+          files-primary: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar'
 
           name: FastAsyncWorldEdit ${{ github.event.release.tag_name }}
           version: ${{ github.event.release.tag_name }}
