@@ -343,7 +343,7 @@ public interface IBukkitAdapter {
      * @return WorldEdit EntityType
      */
     default EntityType adapt(org.bukkit.entity.EntityType entityType) {
-        return EntityTypes.get(entityType.getName().toLowerCase(Locale.ROOT));
+        return entityType.getName() == null ? null : EntityTypes.get(entityType.getName().toLowerCase(Locale.ROOT));
     }
 
     /**
