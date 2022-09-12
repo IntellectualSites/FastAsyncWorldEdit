@@ -427,7 +427,7 @@ public class TextureUtil implements TextureHolder {
         HashSet<BlockType> blocks = new HashSet<>();
         for (int typeId = 0; typeId < ids.length; typeId++) {
             if (ids[typeId]) {
-                blocks.add(BlockTypes.get(typeId));
+                blocks.add(BlockTypesCache.values[typeId]);
             }
         }
         return fromBlocks(blocks);
@@ -445,7 +445,7 @@ public class TextureUtil implements TextureHolder {
 
         TextureUtil tu = Fawe.instance().getTextureUtil();
         for (int typeId : tu.getValidBlockIds()) {
-            BlockType block = BlockTypes.get(typeId);
+            BlockType block = BlockTypesCache.values[typeId];
             extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
             if (mask.test(extent)) {
                 blocks.add(block);
@@ -685,7 +685,7 @@ public class TextureUtil implements TextureHolder {
         if (min == Long.MAX_VALUE) {
             return null;
         }
-        return BlockTypes.get(closest);
+        return BlockTypesCache.values[closest];
     }
 
     /**
@@ -714,7 +714,7 @@ public class TextureUtil implements TextureHolder {
         if (min == Long.MAX_VALUE) {
             return null;
         }
-        return BlockTypes.get(closest);
+        return BlockTypesCache.values[closest];
     }
 
     /**
@@ -737,8 +737,8 @@ public class TextureUtil implements TextureHolder {
                 }
             }
         }
-        layerBuffer[0] = BlockTypes.get(closest[0]);
-        layerBuffer[1] = BlockTypes.get(closest[1]);
+        layerBuffer[0] = BlockTypesCache.values[closest[0]];
+        layerBuffer[1] = BlockTypesCache.values[closest[1]];
         return layerBuffer;
     }
 
@@ -909,7 +909,7 @@ public class TextureUtil implements TextureHolder {
                 new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/")
                         .mkdirs();
                 try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://piston-data.mojang.com/v1/objects/c0898ec7c6a5a2eaa317770203a1554260699994/client.jar")
+                        new URL("https://piston-data.mojang.com/v1/objects/055b30d860ead928cba3849ba920c88b6950b654/client.jar")
                                 .openStream());
                      FileOutputStream fileOutputStream = new FileOutputStream(
                              Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.2.jar")) {
@@ -934,7 +934,10 @@ public class TextureUtil implements TextureHolder {
                     // Get all the groups in the current jar
                     // The vanilla textures are in `assets/minecraft`
                     // A jar may contain textures for multiple mods
-                    String modelsDir = "assets/%1$s/models/block/%2$s.json";
+                    String[] modelsDir = {
+                            "assets/%1$s/models/block/%2$s.json",
+                            "assets/%1$s/models/item/%2$s.json"
+                    };
                     String texturesDir = "assets/%1$s/textures/%2$s.png";
 
                     Type typeToken = new TypeToken<Map<String, Object>>() {
@@ -958,10 +961,15 @@ public class TextureUtil implements TextureHolder {
                         String nameSpace = split.length == 1 ? "" : split[0];
 
                         // Read models
-                        String modelFileName = String.format(modelsDir, nameSpace, name);
-                        ZipEntry entry = getEntry(zipFile, modelFileName);
+                        ZipEntry entry = null;
+                        for (final String dir : modelsDir) {
+                            String modelFileName = String.format(dir, nameSpace, name);
+                            if ((entry = getEntry(zipFile, modelFileName)) != null) {
+                                break;
+                            }
+                        }
                         if (entry == null) {
-                            LOGGER.error("Cannot find {} in {}", modelFileName, file);
+                            LOGGER.error("Cannot find {} in {}", modelsDir, file);
                             continue;
                         }
 
@@ -1179,7 +1187,8 @@ public class TextureUtil implements TextureHolder {
         if (min == Long.MAX_VALUE) {
             return null;
         }
-        return BlockTypes.get(closest);
+
+        return BlockTypesCache.values[closest];
     }
 
     private String getFileName(String path) {
