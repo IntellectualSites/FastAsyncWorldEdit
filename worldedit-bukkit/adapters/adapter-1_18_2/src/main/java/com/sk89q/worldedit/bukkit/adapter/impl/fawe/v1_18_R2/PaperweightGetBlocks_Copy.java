@@ -185,15 +185,25 @@ public class PaperweightGetBlocks_Copy implements IChunkGet {
     }
 
     @Override
-    public char[] load(int layer) {
+    public char[] loadChars(int layer) {
         layer -= getMinSectionPosition();
         return blocks[layer];
     }
 
     @Override
-    public char[] loadIfPresent(int layer) {
+    public char[] loadCharsIfPresent(int layer) {
         layer -= getMinSectionPosition();
         return blocks[layer];
+    }
+
+    @Override
+    public int[] loadInts(final int layer) {
+        return null;
+    }
+
+    @Override
+    public int[] loadIntsIfPresent(final int layer) {
+        return null;
     }
 
     @Override

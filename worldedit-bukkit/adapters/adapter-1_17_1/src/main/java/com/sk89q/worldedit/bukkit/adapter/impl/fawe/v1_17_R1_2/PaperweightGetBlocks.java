@@ -446,7 +446,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     bitMask |= 1 << layer;
 
                     // Changes may still be written to chunk SET
-                    char[] tmp = set.load(layerNo);
+                    char[] tmp = set.loadChars(layerNo);
                     char[] setArr = new char[4096];
                     System.arraycopy(tmp, 0, setArr, 0, 4096);
 
@@ -1016,6 +1016,16 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     public boolean hasSection(int layer) {
         layer -= getMinSectionPosition();
         return getSections(false)[layer] != null;
+    }
+
+    @Override
+    public int[] loadInts(final int layer) {
+        return null;
+    }
+
+    @Override
+    public int[] loadIntsIfPresent(final int layer) {
+        return null;
     }
 
     @Override

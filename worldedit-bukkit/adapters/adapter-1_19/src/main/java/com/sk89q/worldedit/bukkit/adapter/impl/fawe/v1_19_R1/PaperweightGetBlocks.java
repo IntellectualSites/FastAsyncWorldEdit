@@ -14,7 +14,6 @@ import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
@@ -82,7 +81,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBlocks {
 
@@ -490,7 +488,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                     bitMask |= 1 << getSectionIndex;
 
-                    char[] tmp = set.load(layerNo);
+                    char[] tmp = set.loadChars(layerNo);
                     char[] setArr = new char[4096];
                     System.arraycopy(tmp, 0, setArr, 0, 4096);
 
@@ -1115,6 +1113,16 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     public boolean hasSection(int layer) {
         layer -= getMinSectionPosition();
         return getSections(false)[layer] != null;
+    }
+
+    @Override
+    public int[] loadInts(final int layer) {
+        return null;
+    }
+
+    @Override
+    public int[] loadIntsIfPresent(final int layer) {
+        return null;
     }
 
     @Override

@@ -36,7 +36,7 @@ public class PaperweightPostProcessor implements IBatchProcessor {
         PaperweightGetBlocks_Copy getBlocks = (PaperweightGetBlocks_Copy) iChunkGet;
         layer:
         for (int layer = iChunkSet.getMinSectionPosition(); layer <= iChunkSet.getMaxSectionPosition(); layer++) {
-            char[] set = iChunkSet.loadIfPresent(layer);
+            char[] set = iChunkSet.loadCharsIfPresent(layer);
             if (set == null) {
                 // No edit means no need to process
                 continue;
@@ -48,7 +48,7 @@ public class PaperweightPostProcessor implements IBatchProcessor {
                 boolean fromGet = false; // Used for liquids
                 if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                     if (get == null) {
-                        get = getBlocks.load(layer);
+                        get = getBlocks.loadChars(layer);
                     }
                     // If this is null, then it's because we're loading a layer in the range of 0->15, but blocks aren't
                     // actually being set
@@ -62,7 +62,7 @@ public class PaperweightPostProcessor implements IBatchProcessor {
                     continue;
                 } else if (!fromGet) { // if fromGet, don't do the same again
                     if (get == null) {
-                        get = getBlocks.load(layer);
+                        get = getBlocks.loadChars(layer);
                     }
                     replacedOrdinal = get[i];
                 }
