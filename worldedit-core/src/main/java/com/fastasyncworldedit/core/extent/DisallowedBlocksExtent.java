@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.IntSetBlocks;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extension.factory.parser.DefaultBlockParser;
@@ -26,8 +27,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
@@ -134,34 +133,68 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
             if (!set.hasSection(layer)) {
                 continue;
             }
-            char[] blocks = Objects.requireNonNull(set.loadIfPresent(layer));
-            it:
-            for (int i = 0; i < blocks.length; i++) {
-                char block = blocks[i];
-                BlockState state = states[block];
-                if (blockedBlocks != null) {
-                    if (blockedBlocks.contains(state.getBlockType().getId())) {
-                        blocks[i] = 0;
+
+            if(!(set instanceof IntSetBlocks)) {
+                char[] blocks = Objects.requireNonNull(set.loadCharsIfPresent(layer));
+                it:
+                for (int i = 0; i < blocks.length; i++) {
+                    char block = blocks[i];
+                    BlockState state = states[block];
+                    if (blockedBlocks != null) {
+                        if (blockedBlocks.contains(state.getBlockType().getId())) {
+                            blocks[i] = 0;
+                            continue;
+                        }
+                    }
+                    if (blockedStates == null) {
                         continue;
                     }
-                }
-                if (blockedStates == null) {
-                    continue;
-                }
-                for (FuzzyBlockState fuzzy : blockedStates) {
-                    if (fuzzy.equalsFuzzy(state)) {
-                        blocks[i] = 0;
-                        continue it;
+                    for (FuzzyBlockState fuzzy : blockedStates) {
+                        if (fuzzy.equalsFuzzy(state)) {
+                            blocks[i] = 0;
+                            continue it;
+                        }
                     }
+                    if (remaps == null || remaps.isEmpty()) {
+                        blocks[i] = block;
+                        continue;
+                    }
+                    for (PropertyRemap<?> remap : remaps) {
+                        state = remap.apply(state);
+                    }
+                    blocks[i] = state.getOrdinalChar();
                 }
-                if (remaps == null || remaps.isEmpty()) {
-                    blocks[i] = block;
-                    continue;
+
+            } else {
+                int[] blocks = Objects.requireNonNull(set.loadIntsIfPresent(layer));
+                it:
+                for (int i = 0; i < blocks.length; i++) {
+                    int block = blocks[i];
+                    BlockState state = states[block];
+                    if (blockedBlocks != null) {
+                        if (blockedBlocks.contains(state.getBlockType().getId())) {
+                            blocks[i] = 0;
+                            continue;
+                        }
+                    }
+                    if (blockedStates == null) {
+                        continue;
+                    }
+                    for (FuzzyBlockState fuzzy : blockedStates) {
+                        if (fuzzy.equalsFuzzy(state)) {
+                            blocks[i] = 0;
+                            continue it;
+                        }
+                    }
+                    if (remaps == null || remaps.isEmpty()) {
+                        blocks[i] = block;
+                        continue;
+                    }
+                    for (PropertyRemap<?> remap : remaps) {
+                        state = remap.apply(state);
+                    }
+                    blocks[i] = state.getOrdinalChar();
                 }
-                for (PropertyRemap<?> remap : remaps) {
-                    state = remap.apply(state);
-                }
-                blocks[i] = state.getOrdinalChar();
             }
         }
         return set;

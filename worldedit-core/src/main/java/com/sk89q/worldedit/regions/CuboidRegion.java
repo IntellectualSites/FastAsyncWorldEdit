@@ -22,7 +22,6 @@ package com.sk89q.worldedit.regions;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.math.BlockVectorSet;
-import com.fastasyncworldedit.core.math.MutableBlockVector2;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
@@ -827,7 +826,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
-                char[] arr = Objects.requireNonNull(set.loadIfPresent(layer)); // This shouldn't be null if above is true
+                char[] arr = Objects.requireNonNull(set.loadCharsIfPresent(layer)); // This shouldn't be null if above is true
                 if (!(trimX || trimZ)) {
                     continue;
                 }
@@ -913,7 +912,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
-                char[] arr = Objects.requireNonNull(set.loadIfPresent(layer)); // This shouldn't be null if above is true
+                char[] arr = Objects.requireNonNull(set.loadCharsIfPresent(layer)); // This shouldn't be null if above is true
                 if (!(trimX || trimZ)) {
                     continue;
                 }

@@ -22,15 +22,15 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-public class CharSetBlocks extends CharBlocks implements IChunkSet {
+public class IntSetBlocks extends IntBlocks implements IChunkSet{
 
-    private static final Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
-            CharSetBlocks.class,
-            CharSetBlocks::new,
+    private static final Pool<IntSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
+            IntSetBlocks.class,
+            IntSetBlocks::new,
             Settings.settings().QUEUE.POOL
     );
 
-    public static CharSetBlocks newInstance() {
+    public static IntSetBlocks newInstance() {
         return POOL.poll();
     }
 
@@ -44,7 +44,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     private boolean fastMode = false;
     private int bitMask = -1;
 
-    private CharSetBlocks() {
+    private IntSetBlocks() {
         // Expand as we go
         super(0, 15);
     }
@@ -123,7 +123,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         updateSectionIndexRange(layer);
         layer -= minSectionPosition;
         this.sections[layer] = data == null ? EMPTY : FULL;
-        this.blocks[layer] = (char[]) data;
+
+        this.blocks[layer] = (int[]) data;
     }
 
     @Override
@@ -336,13 +337,9 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public int[] loadInts(final int layer) {
-        return null;
-    }
-
-    @Override
-    public int[] loadIntsIfPresent(final int layer) {
-        return null;
+    public int[] loadInts(int layer) {
+        updateSectionIndexRange(layer);
+        return super.loadInts(layer);
     }
 
     @Override
@@ -358,8 +355,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (layer < minSectionPosition) {
             int diff = minSectionPosition - layer;
             sectionCount += diff;
-            char[][] tmpBlocks = new char[sectionCount][];
-            Section[] tmpSections = new Section[sectionCount];
+            int[][] tmpBlocks = new int[sectionCount][];
+            IntBlocks.Section[] tmpSections = new IntBlocks.Section[sectionCount];
             Object[] tmpSectionLocks = new Object[sectionCount];
             System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
             System.arraycopy(sections, 0, tmpSections, diff, sections.length);
@@ -390,8 +387,8 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         } else {
             int diff = layer - maxSectionPosition;
             sectionCount += diff;
-            char[][] tmpBlocks = new char[sectionCount][];
-            Section[] tmpSections = new Section[sectionCount];
+            int[][] tmpBlocks = new int[sectionCount][];
+            IntBlocks.Section[] tmpSections = new IntBlocks.Section[sectionCount];
             Object[] tmpSectionLocks = new Object[sectionCount];
             System.arraycopy(blocks, 0, tmpBlocks, 0, blocks.length);
             System.arraycopy(sections, 0, tmpSections, 0, sections.length);
@@ -421,5 +418,4 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             }
         }
     }
-
 }

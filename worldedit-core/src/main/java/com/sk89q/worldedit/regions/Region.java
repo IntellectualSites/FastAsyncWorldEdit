@@ -29,6 +29,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.IntSetBlocks;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.extent.Extent;
@@ -42,8 +43,6 @@ import com.sk89q.worldedit.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 /**
  * Represents a physical shape.
@@ -405,18 +404,33 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 int by = layer << 4;
                 int ty = by + 15;
                 if (!containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
-                    processExtra = true;
-                    char[] arr = set.load(layer);
-                    for (int y = 0, index = 0; y < 16; y++) {
-                        for (int z = 0; z < 16; z++) {
-                            for (int x = 0; x < 16; x++, index++) {
-                                if (arr[index] != 0 && !contains(x, y, z)) {
-                                    arr[index] = 0;
+                    if (!(set instanceof IntSetBlocks)) {
+                        processExtra = true;
+                        char[] arr = set.loadChars(layer);
+                        for (int y = 0, index = 0; y < 16; y++) {
+                            for (int z = 0; z < 16; z++) {
+                                for (int x = 0; x < 16; x++, index++) {
+                                    if (arr[index] != 0 && !contains(x, y, z)) {
+                                        arr[index] = 0;
+                                    }
                                 }
                             }
                         }
+                        set.setBlocks(layer, arr);
+                    } else {
+                        processExtra = true;
+                        int[] arr = set.loadInts(layer);
+                        for (int y = 0, index = 0; y < 16; y++) {
+                            for (int z = 0; z < 16; z++) {
+                                for (int x = 0; x < 16; x++, index++) {
+                                    if (arr[index] != 0 && !contains(x, y, z)) {
+                                        arr[index] = 0;
+                                    }
+                                }
+                            }
+                        }
+                        set.setBlocks(layer, arr);
                     }
-                    set.setBlocks(layer, arr);
                 }
             }
             if (processExtra) {
@@ -451,24 +465,48 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
                 int by = layer << 4;
                 int ty = by + 15;
-                if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
-                    set.setBlocks(layer, FaweCache.INSTANCE.EMPTY_CHAR_4096);
-                    processExtra = true;
-                    continue;
-                }
-                char[] arr = set.load(layer);
-                for (int y = 0, index = 0; y < 16; y++) {
-                    for (int z = 0; z < 16; z++) {
-                        for (int x = 0; x < 16; x++, index++) {
-                            if (arr[index] != 0 && contains(x, y, z)) {
-                                arr[index] = 0;
-                                processExtra = true;
+
+                if (!(set instanceof IntSetBlocks)) {
+                    if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
+                        set.setBlocks(layer, FaweCache.INSTANCE.EMPTY_CHAR_4096);
+                        processExtra = true;
+                        continue;
+                    }
+                    char[] arr = set.loadChars(layer);
+                    for (int y = 0, index = 0; y < 16; y++) {
+                        for (int z = 0; z < 16; z++) {
+                            for (int x = 0; x < 16; x++, index++) {
+                                if (arr[index] != 0 && contains(x, y, z)) {
+                                    arr[index] = 0;
+                                    processExtra = true;
+                                }
                             }
                         }
                     }
-                }
-                if (processExtra) {
-                    set.setBlocks(layer, arr);
+                    if (processExtra) {
+                        set.setBlocks(layer, arr);
+                    }
+
+                } else {
+                    if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
+                        set.setBlocks(layer, FaweCache.INSTANCE.EMPTY_INT_4096);
+                        processExtra = true;
+                        continue;
+                    }
+                    int[] arr = set.loadInts(layer);
+                    for (int y = 0, index = 0; y < 16; y++) {
+                        for (int z = 0; z < 16; z++) {
+                            for (int x = 0; x < 16; x++, index++) {
+                                if (arr[index] != 0 && contains(x, y, z)) {
+                                    arr[index] = 0;
+                                    processExtra = true;
+                                }
+                            }
+                        }
+                    }
+                    if (processExtra) {
+                        set.setBlocks(layer, arr);
+                    }
                 }
             }
             if (processExtra) {

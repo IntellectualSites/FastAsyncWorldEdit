@@ -8,6 +8,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.IntGetBlocks;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.util.concurrent.Futures;
@@ -166,38 +167,75 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             if (!set.hasSection(layer)) {
                 continue;
             }
-            // add each block and tile
-            char[] blocksGet;
-            char[] tmp = get.load(layer);
-            if (tmp == null) {
-                blocksGet = FaweCache.INSTANCE.EMPTY_CHAR_4096;
-            } else {
-                System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
-            }
-            char[] blocksSet;
-            // loadIfPresent shouldn't be null if set.hasSection(layer) is true
-            System.arraycopy(Objects.requireNonNull(set.loadIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
 
-            // Account for negative layers
-            int by = layer << 4;
-            for (int y = 0, index = 0; y < 16; y++) {
-                int yy = y + by;
-                for (int z = 0; z < 16; z++) {
-                    int zz = z + bz;
-                    for (int x = 0; x < 16; x++, index++) {
-                        int xx = bx + x;
-                        int from = blocksGet[index];
-                        if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
-                            from = BlockTypesCache.ReservedIDs.AIR;
+            if(!(get instanceof IntGetBlocks)) {
+                // add each block and tile
+                char[] blocksGet;
+                char[] tmp = get.loadChars(layer);
+                if (tmp == null) {
+                    blocksGet = FaweCache.INSTANCE.EMPTY_CHAR_4096;
+                } else {
+                    System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
+                }
+                char[] blocksSet;
+                // loadIfPresent shouldn't be null if set.hasSection(layer) is true
+                System.arraycopy(Objects.requireNonNull(set.loadCharsIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
+
+                // Account for negative layers
+                int by = layer << 4;
+                for (int y = 0, index = 0; y < 16; y++) {
+                    int yy = y + by;
+                    for (int z = 0; z < 16; z++) {
+                        int zz = z + bz;
+                        for (int x = 0; x < 16; x++, index++) {
+                            int xx = bx + x;
+                            int from = blocksGet[index];
+                            if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                                from = BlockTypesCache.ReservedIDs.AIR;
+                            }
+                            final int combinedFrom = from;
+                            final int combinedTo = blocksSet[index];
+                            if (combinedTo != 0) {
+                                add(xx, yy, zz, combinedFrom, combinedTo);
+                            }
                         }
-                        final int combinedFrom = from;
-                        final int combinedTo = blocksSet[index];
-                        if (combinedTo != 0) {
-                            add(xx, yy, zz, combinedFrom, combinedTo);
+                    }
+                }
+            } else {
+                // add each block and tile
+                int[] blocksGet;
+                int[] tmp = get.loadInts(layer);
+                if (tmp == null) {
+                    blocksGet = FaweCache.INSTANCE.EMPTY_INT_4096;
+                } else {
+                    System.arraycopy(tmp, 0, (blocksGet = new int[4096]), 0, 4096);
+                }
+                int[] blocksSet;
+                // loadIfPresent shouldn't be null if set.hasSection(layer) is true
+                System.arraycopy(Objects.requireNonNull(set.loadIntsIfPresent(layer)), 0, (blocksSet = new int[4096]), 0, 4096);
+
+                // Account for negative layers
+                int by = layer << 4;
+                for (int y = 0, index = 0; y < 16; y++) {
+                    int yy = y + by;
+                    for (int z = 0; z < 16; z++) {
+                        int zz = z + bz;
+                        for (int x = 0; x < 16; x++, index++) {
+                            int xx = bx + x;
+                            int from = blocksGet[index];
+                            if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                                from = BlockTypesCache.ReservedIDs.AIR;
+                            }
+                            final int combinedFrom = from;
+                            final int combinedTo = blocksSet[index];
+                            if (combinedTo != 0) {
+                                add(xx, yy, zz, combinedFrom, combinedTo);
+                            }
                         }
                     }
                 }
             }
+
         }
 
         BiomeType[][] biomes = set.getBiomes();

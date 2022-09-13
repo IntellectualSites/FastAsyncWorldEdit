@@ -73,11 +73,11 @@ public class CharFilterBlock extends ChunkFilterBlock {
         if (!iget.hasSection(layer)) {
             getArr = FaweCache.INSTANCE.EMPTY_CHAR_4096;
         } else {
-            getArr = iget.load(layer);
+            getArr = iget.loadChars(layer);
         }
         this.set = iset;
         if (set.hasSection(layer)) {
-            setArr = set.load(layer);
+            setArr = set.loadChars(layer);
             delegate = FULL;
         } else {
             delegate = NULL;
@@ -381,7 +381,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     //Set delegate
     private SetDelegate initSet() {
-        setArr = set.load(layer);
+        setArr = set.loadChars(layer);
         return delegate = FULL;
     }
 

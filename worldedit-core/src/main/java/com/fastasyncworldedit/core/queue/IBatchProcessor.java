@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
+import com.fastasyncworldedit.core.queue.implementation.blocks.IntSetBlocks;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.Extent;
@@ -67,16 +68,29 @@ public interface IBatchProcessor {
             for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
                 if (set.hasSection(layer)) {
                     if (layer == minLayer) {
-                        char[] arr = set.loadIfPresent(layer);
-                        if (arr != null) {
-                            int index = (minY & 15) << 8;
-                            for (int i = 0; i < index; i++) {
-                                arr[i] = 0;
+                        if(!(set instanceof IntSetBlocks)) {
+                            char[] arr = set.loadCharsIfPresent(layer);
+                            if (arr != null) {
+                                int index = (minY & 15) << 8;
+                                for (int i = 0; i < index; i++) {
+                                    arr[i] = 0;
+                                }
+                            } else {
+                                arr = new char[4096];
                             }
+                            set.setBlocks(layer, arr);
                         } else {
-                            arr = new char[4096];
+                            int[] arr = set.loadIntsIfPresent(layer);
+                            if (arr != null) {
+                                int index = (minY & 15) << 8;
+                                for (int i = 0; i < index; i++) {
+                                    arr[i] = 0;
+                                }
+                            } else {
+                                arr = new int[4096];
+                            }
+                            set.setBlocks(layer, arr);
                         }
-                        set.setBlocks(layer, arr);
                     } else {
                         set.setBlocks(layer, null);
                     }
@@ -85,16 +99,29 @@ public interface IBatchProcessor {
             for (int layer = maxLayer; layer < set.getMaxSectionPosition(); layer++) {
                 if (set.hasSection(layer)) {
                     if (layer == minLayer) {
-                        char[] arr = set.loadIfPresent(layer);
-                        if (arr != null) {
-                            int index = ((maxY + 1) & 15) << 8;
-                            for (int i = index; i < arr.length; i++) {
-                                arr[i] = 0;
+                        if(!(set instanceof IntSetBlocks)) {
+                            char[] arr = set.loadCharsIfPresent(layer);
+                            if (arr != null) {
+                                int index = ((maxY + 1) & 15) << 8;
+                                for (int i = index; i < arr.length; i++) {
+                                    arr[i] = 0;
+                                }
+                            } else {
+                                arr = new char[4096];
                             }
+                            set.setBlocks(layer, arr);
                         } else {
-                            arr = new char[4096];
+                            int[] arr = set.loadIntsIfPresent(layer);
+                            if (arr != null) {
+                                int index = ((maxY + 1) & 15) << 8;
+                                for (int i = index; i < arr.length; i++) {
+                                    arr[i] = 0;
+                                }
+                            } else {
+                                arr = new int[4096];
+                            }
+                            set.setBlocks(layer, arr);
                         }
-                        set.setBlocks(layer, arr);
                     } else {
                         set.setBlocks(layer, null);
                     }
@@ -126,23 +153,45 @@ public interface IBatchProcessor {
                 continue;
             }
             if (layer == minLayer) {
-                char[] arr = set.loadIfPresent(layer);
-                if (arr != null) {
-                    int index = (minY & 15) << 8;
-                    for (int i = index; i < 4096; i++) {
-                        arr[i] = 0;
+                if(!(set instanceof IntSetBlocks)) {
+                    char[] arr = set.loadCharsIfPresent(layer);
+                    if (arr != null) {
+                        int index = (minY & 15) << 8;
+                        for (int i = index; i < 4096; i++) {
+                            arr[i] = 0;
+                        }
                     }
+                    set.setBlocks(layer, arr);
+                } else {
+                    int[] arr = set.loadIntsIfPresent(layer);
+                    if (arr != null) {
+                        int index = (minY & 15) << 8;
+                        for (int i = index; i < 4096; i++) {
+                            arr[i] = 0;
+                        }
+                    }
+                    set.setBlocks(layer, arr);
                 }
-                set.setBlocks(layer, arr);
             } else if (layer == maxLayer) {
-                char[] arr = set.loadIfPresent(layer);
-                if (arr != null) {
-                    int index = ((maxY + 1) & 15) << 8;
-                    for (int i = 0; i < index; i++) {
-                        arr[i] = 0;
+                if(!(set instanceof IntSetBlocks)) {
+                    char[] arr = set.loadCharsIfPresent(layer);
+                    if (arr != null) {
+                        int index = ((maxY + 1) & 15) << 8;
+                        for (int i = 0; i < index; i++) {
+                            arr[i] = 0;
+                        }
                     }
+                    set.setBlocks(layer, arr);
+                } else {
+                    int[] arr = set.loadIntsIfPresent(layer);
+                    if (arr != null) {
+                        int index = ((maxY + 1) & 15) << 8;
+                        for (int i = 0; i < index; i++) {
+                            arr[i] = 0;
+                        }
+                    }
+                    set.setBlocks(layer, arr);
                 }
-                set.setBlocks(layer, arr);
             } else {
                 set.setBlocks(layer, null);
             }

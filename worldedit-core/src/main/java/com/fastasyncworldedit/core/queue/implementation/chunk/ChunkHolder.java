@@ -140,23 +140,36 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public void setBlocks(int layer, char[] data) {
+    public void setBlocks(int layer, Object data) {
         checkAndWaitOnCalledLock();
         delegate.set(this).setBlocks(layer, data);
     }
 
     @Override
-    public char[] load(int layer) {
-        return getOrCreateGet().load(layer);
+    public char[] loadChars(int layer) {
+        return getOrCreateGet().loadChars(layer);
     }
 
     @Nullable
     @Override
-    public char[] loadIfPresent(final int layer) {
+    public char[] loadCharsIfPresent(final int layer) {
         if (chunkExisting == null) {
             return null;
         }
-        return chunkExisting.loadIfPresent(layer);
+        return chunkExisting.loadCharsIfPresent(layer);
+    }
+
+    @Override
+    public int[] loadInts(final int layer) {
+        return getOrCreateGet().loadInts(layer);
+    }
+
+    @Override
+    public int[] loadIntsIfPresent(final int layer) {
+        if (chunkExisting == null) {
+            return null;
+        }
+        return chunkExisting.loadIntsIfPresent(layer);
     }
 
     @Override

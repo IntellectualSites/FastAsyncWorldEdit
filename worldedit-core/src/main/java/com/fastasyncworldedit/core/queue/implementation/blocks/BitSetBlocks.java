@@ -53,14 +53,14 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public void setBlocks(int layer, char[] data) {
+    public void setBlocks(int layer, Object data) {
         layer -= minSectionPosition;
         row.reset(layer);
         int by = layer << 4;
         for (int y = 0, index = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++, index++) {
-                    if (data[index] != BlockTypesCache.ReservedIDs.__RESERVED__) {
+                    if (((char[] )data)[index] != BlockTypesCache.ReservedIDs.__RESERVED__) {
                         row.set(null, x, by + y, z, minSectionPosition, maxSectionPosition);
                     }
                 }
@@ -123,7 +123,7 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public char[] load(int layer) {
+    public char[] loadChars(int layer) {
         layer -= minSectionPosition;
         char[] arr = FaweCache.INSTANCE.SECTION_BITS_TO_CHAR.get();
         MemBlockSet.IRow nullRowY = row.getRow(layer);
@@ -156,8 +156,18 @@ public class BitSetBlocks implements IChunkSet {
     // No need to do anything different
     @Nullable
     @Override
-    public char[] loadIfPresent(final int layer) {
-        return load(layer);
+    public char[] loadCharsIfPresent(final int layer) {
+        return loadChars(layer);
+    }
+
+    @Override
+    public int[] loadInts(final int layer) {
+        return null;
+    }
+
+    @Override
+    public int[] loadIntsIfPresent(final int layer) {
+        return null;
     }
 
     @Override

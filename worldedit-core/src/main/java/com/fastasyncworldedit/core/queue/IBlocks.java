@@ -40,7 +40,7 @@ public interface IBlocks extends Trimable {
      * @param layer chunk section layer (may be negative)
      * @return char array of ordinals of the chunk section
      */
-    char[] load(int layer);
+    char[] loadChars(int layer);
 
     /**
      * Obtain the specified chunk section stored as an array of ordinals if present or null. Uses normal minecraft chunk-section
@@ -50,7 +50,11 @@ public interface IBlocks extends Trimable {
      * @return char array of ordinals of the chunk section if present
      */
     @Nullable
-    char[] loadIfPresent(int layer);
+    char[] loadCharsIfPresent(int layer);
+
+    int[] loadInts(int layer);
+
+    int[] loadIntsIfPresent(int layer);
 
     BlockState getBlock(int x, int y, int z);
 
@@ -110,7 +114,7 @@ public interface IBlocks extends Trimable {
                     continue;
                 }
 
-                char[] ids = this.load(layer);
+                char[] ids = this.loadChars(layer);
 
                 int nonEmpty = 0; // TODO optimize into same loop as toPalette
                 for (int i = 0; i < ids.length; i++) {

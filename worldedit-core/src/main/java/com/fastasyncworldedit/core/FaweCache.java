@@ -76,6 +76,8 @@ public enum FaweCache implements Trimable {
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
+    public final int[] EMPTY_INT_4096 = new int[4096];
+
     private final IdentityHashMap<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> REGISTERED_POOLS = new IdentityHashMap<>();
 
     /*
