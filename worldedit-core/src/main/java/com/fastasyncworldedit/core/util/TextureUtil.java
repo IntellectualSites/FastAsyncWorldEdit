@@ -40,7 +40,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.DigestInputStream;
+import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -648,10 +648,8 @@ public class TextureUtil implements TextureHolder {
     private static String calculateSha1(Path path) throws NoSuchAlgorithmException, IOException {
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
         try (final BufferedInputStream stream = new BufferedInputStream(Files.newInputStream(path));
-             final DigestInputStream digestInputStream = new DigestInputStream(stream, digest)) {
-            // noinspection StatementWithEmptyBody - update digest with bytes from passed input stream
-            while (digestInputStream.read() != -1) {
-            }
+             final DigestOutputStream digestOutputStream = new DigestOutputStream(OutputStream.nullOutputStream(), digest)) {
+            stream.transferTo(digestOutputStream);
             return HexFormat.of().formatHex(digest.digest());
         }
     }
