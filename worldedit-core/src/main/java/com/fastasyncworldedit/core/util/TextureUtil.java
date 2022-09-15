@@ -29,18 +29,16 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
@@ -49,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -335,7 +334,6 @@ public class TextureUtil implements TextureHolder {
             new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F)};
 
     private static final String VERSION_MANIFEST = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
-    private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes(StandardCharsets.US_ASCII);
     private final BlockType[] layerBuffer = new BlockType[2];
     protected int[] blockColors = new int[BlockTypes.size()];
     protected long[] blockDistance = new long[BlockTypes.size()];
@@ -373,24 +371,21 @@ public class TextureUtil implements TextureHolder {
                     LOGGER.info("Latest release version is {}", metadata.version());
                     HashedResource resource = getLatestClientJarUrl(metadata);
 
-                    String outPath = Path.of(
+                    Path out = Path.of(
                             Fawe.platform().getDirectory().getPath(),
                             Settings.settings().PATHS.TEXTURES,
                             metadata.version() + ".jar"
-                    ).toString();
+                    );
                     // Copy resource to local fs
                     try (final InputStream stream = new URL(resource.resource()).openStream();
-                         final ReadableByteChannel inChannel = Channels.newChannel(stream);
-                         final FileOutputStream out = new FileOutputStream(outPath);
-                         final FileChannel outChannel = out.getChannel()) {
-                        outChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
+                         final OutputStream writer = Files.newOutputStream(out)) {
+                        stream.transferTo(writer);
                     }
                     // Validate sha-1 hash
                     try {
-                        final File file = new File(outPath);
-                        final String sha1 = calculateSha1(file);
+                        final String sha1 = calculateSha1(out);
                         if (!sha1.equals(resource.hash())) {
-                            file.delete();
+                            Files.deleteIfExists(out);
                             LOGGER.error(
                                     "Hash comparison of final file failed (Expected: '{}', Calculated: '{}')",
                                     resource.hash(), sha1
@@ -402,12 +397,11 @@ public class TextureUtil implements TextureHolder {
                         LOGGER.warn("Couldn't verify integrity of downloaded client file");
                         LOGGER.warn(
                                 "Please verify that the downloaded files '{}' hash is equal to '{}'",
-                                outPath,
-                                resource.hash()
+                                out, resource.hash()
                         );
                         return;
                     }
-                    LOGGER.info("Asset jar been downloaded and validated successfully.");
+                    LOGGER.info("Asset jar has been downloaded and validated successfully.");
                 } catch (IOException e) {
                     LOGGER.error(
                             "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
@@ -645,38 +639,21 @@ public class TextureUtil implements TextureHolder {
     /**
      * Calculates the sha-1 hash based on the content of the provided file.
      *
-     * @param file The file to generate the sha-1 hash for
+     * @param path The path of the resource to generate the sha-1 hash for
      * @return The hash of the file contents
      * @throws NoSuchAlgorithmException If the SHA-1 algorithm could not be resolved
      * @throws IOException              If any I/O operation failed
      * @since TODO
      */
-    private static String calculateSha1(File file) throws NoSuchAlgorithmException, IOException {
+    private static String calculateSha1(Path path) throws NoSuchAlgorithmException, IOException {
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
-        try (final BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file));
+        try (final BufferedInputStream stream = new BufferedInputStream(Files.newInputStream(path));
              final DigestInputStream digestInputStream = new DigestInputStream(stream, digest)) {
             // noinspection StatementWithEmptyBody - update digest with bytes from passed input stream
             while (digestInputStream.read() != -1) {
             }
-            return toHexString(digest.digest());
+            return HexFormat.of().formatHex(digest.digest());
         }
-    }
-
-    /**
-     * Transforms the bytes into a readable hexadecimal string (
-     * <a href="https://stackoverflow.com/a/9855338/12620913">Stackoverflow</a>)
-     * @param bytes The bytes to convert into hex
-     * @return The hexadecimal representation of the bytes
-     * @since TODO
-     */
-    private static String toHexString(byte[] bytes) {
-        byte[] hexChars = new byte[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars, StandardCharsets.UTF_8);
     }
 
     @Override
