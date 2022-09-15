@@ -5,6 +5,9 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.SingleFilterBlock;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -24,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -321,6 +325,8 @@ public class TextureUtil implements TextureHolder {
             new BiomeColor(253, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
             new BiomeColor(254, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
             new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F)};
+
+    private static final String VERSION_MANIFEST = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
     private final BlockType[] layerBuffer = new BlockType[2];
     protected int[] blockColors = new int[BlockTypes.size()];
     protected long[] blockDistance = new long[BlockTypes.size()];
@@ -352,17 +358,22 @@ public class TextureUtil implements TextureHolder {
             try {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
                 new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/").mkdirs();
-                try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://piston-data.mojang.com/v1/objects/c0898ec7c6a5a2eaa317770203a1554260699994/client.jar")
-                                .openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.2.jar")) {
-                    byte[] dataBuffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+
+                try {
+                    VersionMetadata metadata = getLatestVersion();
+                    LOGGER.info("Latest release version is {}", metadata.version());
+                    String url = getLatestClientJarUrl(metadata);
+                    try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
+                         FileOutputStream fileOutputStream = new FileOutputStream(
+                                 Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES +
+                                         "/" + metadata.version() + ".jar")) {
+                        byte[] dataBuffer = new byte[1024];
+                        int bytesRead;
+                        while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                            fileOutputStream.write(dataBuffer, 0, bytesRead);
+                        }
+                        LOGGER.info("Asset jar down has been downloaded successfully.");
                     }
-                    LOGGER.info("Asset jar down has been downloaded successfully.");
                 } catch (IOException e) {
                     LOGGER.error(
                             "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
@@ -553,6 +564,47 @@ public class TextureUtil implements TextureHolder {
             }
         }
         return totalDistSqr / area;
+    }
+
+    /**
+     * Retrieves the minecraft versions manifest (containing all released versions) and returns the first {@code release}
+     * version (latest)
+     *
+     * @return {@link VersionMetadata} containing the id (= version) and url to the client manifest itself
+     * @throws IOException If any http / i/o operation fails.
+     * @since TODO
+     */
+    private static VersionMetadata getLatestVersion() throws IOException {
+        try (BufferedInputStream in = new BufferedInputStream(new URL(VERSION_MANIFEST).openStream());
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            final JsonElement element = JsonParser.parseReader(reader);
+            for (final JsonElement versions : element.getAsJsonObject().getAsJsonArray("versions")) {
+                JsonObject version = versions.getAsJsonObject();
+                if (!version.get("type").getAsString().equals("release")) {
+                    continue;
+                }
+                final String clientJsonUrl = version.get("url").getAsString();
+                final String id = version.get("id").getAsString();
+                return new VersionMetadata(id, clientJsonUrl);
+            }
+        }
+        throw new IOException("Failed to get latest version metadata");
+    }
+
+    /**
+     * Retrieves the url to the client.jar based on the previously retrieved {@link VersionMetadata}
+     *
+     * @param metadata The version metadata containing the url to the client.jar
+     * @return The full url to the client.jar
+     * @throws IOException If any http / i/o operation fails.
+     * @since TODO
+     */
+    private static String getLatestClientJarUrl(VersionMetadata metadata) throws IOException {
+        try (BufferedInputStream in = new BufferedInputStream(new URL(metadata.url()).openStream());
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            final JsonObject object = JsonParser.parseReader(reader).getAsJsonObject();
+            return object.getAsJsonObject("downloads").getAsJsonObject("client").get("url").getAsString();
+        }
     }
 
     @Override
@@ -1127,6 +1179,10 @@ public class TextureUtil implements TextureHolder {
             this.grassCombined = grass;
             this.foliage = foliage;
         }
+
+    }
+
+    private record VersionMetadata(String version, String url) {
 
     }
 
