@@ -29,6 +29,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,7 +37,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -327,6 +335,7 @@ public class TextureUtil implements TextureHolder {
             new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F)};
 
     private static final String VERSION_MANIFEST = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
+    private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes(StandardCharsets.US_ASCII);
     private final BlockType[] layerBuffer = new BlockType[2];
     protected int[] blockColors = new int[BlockTypes.size()];
     protected long[] blockDistance = new long[BlockTypes.size()];
@@ -362,18 +371,43 @@ public class TextureUtil implements TextureHolder {
                 try {
                     VersionMetadata metadata = getLatestVersion();
                     LOGGER.info("Latest release version is {}", metadata.version());
-                    String url = getLatestClientJarUrl(metadata);
-                    try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-                         FileOutputStream fileOutputStream = new FileOutputStream(
-                                 Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES +
-                                         "/" + metadata.version() + ".jar")) {
-                        byte[] dataBuffer = new byte[1024];
-                        int bytesRead;
-                        while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                            fileOutputStream.write(dataBuffer, 0, bytesRead);
-                        }
-                        LOGGER.info("Asset jar down has been downloaded successfully.");
+                    HashedResource resource = getLatestClientJarUrl(metadata);
+
+                    String outPath = Path.of(
+                            Fawe.platform().getDirectory().getPath(),
+                            Settings.settings().PATHS.TEXTURES,
+                            metadata.version() + ".jar"
+                    ).toString();
+                    // Copy resource to local fs
+                    try (final InputStream stream = new URL(resource.resource()).openStream();
+                         final ReadableByteChannel inChannel = Channels.newChannel(stream);
+                         final FileOutputStream out = new FileOutputStream(outPath);
+                         final FileChannel outChannel = out.getChannel()) {
+                        outChannel.transferFrom(inChannel, 0, Long.MAX_VALUE);
                     }
+                    // Validate sha-1 hash
+                    try {
+                        final File file = new File(outPath);
+                        final String sha1 = calculateSha1(file);
+                        if (!sha1.equals(resource.hash())) {
+                            file.delete();
+                            LOGGER.error(
+                                    "Hash comparison of final file failed (Expected: '{}', Calculated: '{}')",
+                                    resource.hash(), sha1
+                            );
+                            LOGGER.error("To prevent possibly malicious intentions, the downloaded file has been removed");
+                            return;
+                        }
+                    } catch (NoSuchAlgorithmException e) {
+                        LOGGER.warn("Couldn't verify integrity of downloaded client file");
+                        LOGGER.warn(
+                                "Please verify that the downloaded files '{}' hash is equal to '{}'",
+                                outPath,
+                                resource.hash()
+                        );
+                        return;
+                    }
+                    LOGGER.info("Asset jar been downloaded and validated successfully.");
                 } catch (IOException e) {
                     LOGGER.error(
                             "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
@@ -595,16 +629,54 @@ public class TextureUtil implements TextureHolder {
      * Retrieves the url to the client.jar based on the previously retrieved {@link VersionMetadata}
      *
      * @param metadata The version metadata containing the url to the client.jar
-     * @return The full url to the client.jar
+     * @return The full url to the client.jar including the expected file hash for validation purposes
      * @throws IOException If any http / i/o operation fails.
      * @since TODO
      */
-    private static String getLatestClientJarUrl(VersionMetadata metadata) throws IOException {
+    private static HashedResource getLatestClientJarUrl(VersionMetadata metadata) throws IOException {
         try (BufferedInputStream in = new BufferedInputStream(new URL(metadata.url()).openStream());
              BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             final JsonObject object = JsonParser.parseReader(reader).getAsJsonObject();
-            return object.getAsJsonObject("downloads").getAsJsonObject("client").get("url").getAsString();
+            final JsonObject client = object.getAsJsonObject("downloads").getAsJsonObject("client");
+            return new HashedResource(client.get("url").getAsString(), client.get("sha1").getAsString());
         }
+    }
+
+    /**
+     * Calculates the sha-1 hash based on the content of the provided file.
+     *
+     * @param file The file to generate the sha-1 hash for
+     * @return The hash of the file contents
+     * @throws NoSuchAlgorithmException If the SHA-1 algorithm could not be resolved
+     * @throws IOException              If any I/O operation failed
+     * @since TODO
+     */
+    private static String calculateSha1(File file) throws NoSuchAlgorithmException, IOException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        try (final BufferedInputStream stream = new BufferedInputStream(new FileInputStream(file));
+             final DigestInputStream digestInputStream = new DigestInputStream(stream, digest)) {
+            // noinspection StatementWithEmptyBody - update digest with bytes from passed input stream
+            while (digestInputStream.read() != -1) {
+            }
+            return toHexString(digest.digest());
+        }
+    }
+
+    /**
+     * Transforms the bytes into a readable hexadecimal string (
+     * <a href="https://stackoverflow.com/a/9855338/12620913">Stackoverflow</a>)
+     * @param bytes The bytes to convert into hex
+     * @return The hexadecimal representation of the bytes
+     * @since TODO
+     */
+    private static String toHexString(byte[] bytes) {
+        byte[] hexChars = new byte[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+        }
+        return new String(hexChars, StandardCharsets.UTF_8);
     }
 
     @Override
@@ -1183,6 +1255,10 @@ public class TextureUtil implements TextureHolder {
     }
 
     private record VersionMetadata(String version, String url) {
+
+    }
+
+    private record HashedResource(String resource, String hash) {
 
     }
 
