@@ -35,7 +35,6 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
@@ -183,7 +182,25 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 System.arraycopy(Objects.requireNonNull(set.loadCharsIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
 
                 // Account for negative layers
-                processNegativeLayers(bx, bz, layer, blocksGet, blocksSet);
+                int by = layer << 4;
+                for (int y = 0, index = 0; y < 16; y++) {
+                    int yy = y + by;
+                    for (int z = 0; z < 16; z++) {
+                        int zz = z + bz;
+                        for (int x = 0; x < 16; x++, index++) {
+                            int xx = bx + x;
+                            int from = blocksGet[index];
+                            if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                                from = BlockTypesCache.ReservedIDs.AIR;
+                            }
+                            final int combinedFrom = from;
+                            final int combinedTo = blocksSet[index];
+                            if (combinedTo != 0) {
+                                add(xx, yy, zz, combinedFrom, combinedTo);
+                            }
+                        }
+                    }
+                }
             } else {
                 // add each block and tile
                 int[] blocksGet;
@@ -198,7 +215,25 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 System.arraycopy(Objects.requireNonNull(set.loadIntsIfPresent(layer)), 0, (blocksSet = new int[4096]), 0, 4096);
 
                 // Account for negative layers
-                processNegativeLayers(bx, bz, layer, blocksGet, blocksSet);
+                int by = layer << 4;
+                for (int y = 0, index = 0; y < 16; y++) {
+                    int yy = y + by;
+                    for (int z = 0; z < 16; z++) {
+                        int zz = z + bz;
+                        for (int x = 0; x < 16; x++, index++) {
+                            int xx = bx + x;
+                            int from = blocksGet[index];
+                            if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                                from = BlockTypesCache.ReservedIDs.AIR;
+                            }
+                            final int combinedFrom = from;
+                            final int combinedTo = blocksSet[index];
+                            if (combinedTo != 0) {
+                                add(xx, yy, zz, combinedFrom, combinedTo);
+                            }
+                        }
+                    }
+                }
             }
 
         }
@@ -228,28 +263,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             }
         }
         return set;
-    }
-
-    private void processNegativeLayers(int bx, int bz, int layer, Object blocksGet, Object blocksSet) {
-        int by = layer << 4;
-        for (int y = 0, index = 0; y < 16; y++) {
-            int yy = y + by;
-            for (int z = 0; z < 16; z++) {
-                int zz = z + bz;
-                for (int x = 0; x < 16; x++, index++) {
-                    int xx = bx + x;
-                    int from = Array.getInt(blocksGet, index);
-                    if (from == BlockTypesCache.ReservedIDs.__RESERVED__) {
-                        from = BlockTypesCache.ReservedIDs.AIR;
-                    }
-                    final int combinedFrom = from;
-                    final int combinedTo = Array.getInt(blocksSet, index);
-                    if (combinedTo != 0) {
-                        add(xx, yy, zz, combinedFrom, combinedTo);
-                    }
-                }
-            }
-        }
     }
 
     @Override
