@@ -41,6 +41,7 @@ import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Set;
 
@@ -404,32 +405,11 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 int by = layer << 4;
                 int ty = by + 15;
                 if (!containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
+                    processExtra = true;
                     if (!(set instanceof IntSetBlocks)) {
-                        processExtra = true;
-                        char[] arr = set.loadChars(layer);
-                        for (int y = 0, index = 0; y < 16; y++) {
-                            for (int z = 0; z < 16; z++) {
-                                for (int x = 0; x < 16; x++, index++) {
-                                    if (arr[index] != 0 && !contains(x, y, z)) {
-                                        arr[index] = 0;
-                                    }
-                                }
-                            }
-                        }
-                        set.setBlocks(layer, arr);
+                        processCuboid(set, layer, set.loadChars(layer));
                     } else {
-                        processExtra = true;
-                        int[] arr = set.loadInts(layer);
-                        for (int y = 0, index = 0; y < 16; y++) {
-                            for (int z = 0; z < 16; z++) {
-                                for (int x = 0; x < 16; x++, index++) {
-                                    if (arr[index] != 0 && !contains(x, y, z)) {
-                                        arr[index] = 0;
-                                    }
-                                }
-                            }
-                        }
-                        set.setBlocks(layer, arr);
+                        processCuboid(set, layer, set.loadInts(layer));
                     }
                 }
             }
@@ -440,6 +420,18 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         } else {
             return null;
         }
+    }
+
+    private void processCuboid(IChunkSet set, int layer, Object arr) {
+        for (int y = 0, index = 0; y < 16; y++) {
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++, index++) {
+                    if (!Array.get(arr, index).equals(0) && !contains(x, y, z)) {
+                        Array.set(arr, index, 0);                    }
+                }
+            }
+        }
+        set.setBlocks(layer, arr);
     }
 
     /**
@@ -472,20 +464,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                         processExtra = true;
                         continue;
                     }
-                    char[] arr = set.loadChars(layer);
-                    for (int y = 0, index = 0; y < 16; y++) {
-                        for (int z = 0; z < 16; z++) {
-                            for (int x = 0; x < 16; x++, index++) {
-                                if (arr[index] != 0 && contains(x, y, z)) {
-                                    arr[index] = 0;
-                                    processExtra = true;
-                                }
-                            }
-                        }
-                    }
-                    if (processExtra) {
-                        set.setBlocks(layer, arr);
-                    }
+                    processExtra = isProcessExtra(set, processExtra, layer, set.loadChars(layer));
 
                 } else {
                     if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
@@ -493,20 +472,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                         processExtra = true;
                         continue;
                     }
-                    int[] arr = set.loadInts(layer);
-                    for (int y = 0, index = 0; y < 16; y++) {
-                        for (int z = 0; z < 16; z++) {
-                            for (int x = 0; x < 16; x++, index++) {
-                                if (arr[index] != 0 && contains(x, y, z)) {
-                                    arr[index] = 0;
-                                    processExtra = true;
-                                }
-                            }
-                        }
-                    }
-                    if (processExtra) {
-                        set.setBlocks(layer, arr);
-                    }
+                    processExtra = isProcessExtra(set, processExtra, layer, set.loadInts(layer));
                 }
             }
             if (processExtra) {
@@ -516,6 +482,23 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         } else {
             return null;
         }
+    }
+
+    private boolean isProcessExtra(IChunkSet set, boolean processExtra, int layer, Object arr) {
+        for (int y = 0, index = 0; y < 16; y++) {
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++, index++) {
+                    if (!Array.get(arr, index).equals(0) && contains(x, y, z)) {
+                        Array.set(arr, index, 0);
+                        processExtra = true;
+                    }
+                }
+            }
+        }
+        if (processExtra) {
+            set.setBlocks(layer, arr);
+        }
+        return processExtra;
     }
 
     @Override

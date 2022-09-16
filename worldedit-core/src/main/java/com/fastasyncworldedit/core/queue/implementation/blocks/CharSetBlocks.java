@@ -62,13 +62,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        int layer;
-        if (biomes == null || (y >> 4) < minSectionPosition || (y >> 4) > maxSectionPosition) {
-            return null;
-        } else if (biomes[(layer = (y >> 4) - minSectionPosition)] == null) {
-            return null;
-        }
-        return biomes[layer][(y & 15) >> 2 | (z >> 2) << 2 | x >> 2];
+        return getBiomeType(x, y, z, biomes, minSectionPosition, maxSectionPosition);
     }
 
     @Override
@@ -361,32 +355,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             char[][] tmpBlocks = new char[sectionCount][];
             Section[] tmpSections = new Section[sectionCount];
             Object[] tmpSectionLocks = new Object[sectionCount];
-            System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
-            System.arraycopy(sections, 0, tmpSections, diff, sections.length);
-            System.arraycopy(sectionLocks, 0, tmpSectionLocks, diff, sections.length);
-            for (int i = 0; i < diff; i++) {
-                tmpSections[i] = EMPTY;
-                tmpSectionLocks[i] = new Object();
-            }
-            blocks = tmpBlocks;
-            sections = tmpSections;
-            sectionLocks = tmpSectionLocks;
-            minSectionPosition = layer;
-            if (biomes != null) {
-                BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];
-                System.arraycopy(biomes, 0, tmpBiomes, diff, biomes.length);
-                biomes = tmpBiomes;
-            }
-            if (light != null) {
-                char[][] tmplight = new char[sectionCount][];
-                System.arraycopy(light, 0, tmplight, diff, light.length);
-                light = tmplight;
-            }
-            if (skyLight != null) {
-                char[][] tmplight = new char[sectionCount][];
-                System.arraycopy(skyLight, 0, tmplight, diff, skyLight.length);
-                skyLight = tmplight;
-            }
+            extracted(layer, diff, tmpBlocks, tmpSections, tmpSectionLocks);
         } else {
             int diff = layer - maxSectionPosition;
             sectionCount += diff;
@@ -419,6 +388,35 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 System.arraycopy(skyLight, 0, tmplight, 0, skyLight.length);
                 skyLight = tmplight;
             }
+        }
+    }
+
+    private void extracted(int layer, int diff, char[][] tmpBlocks, Section[] tmpSections, Object[] tmpSectionLocks) {
+        System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
+        System.arraycopy(sections, 0, tmpSections, diff, sections.length);
+        System.arraycopy(sectionLocks, 0, tmpSectionLocks, diff, sections.length);
+        for (int i = 0; i < diff; i++) {
+            tmpSections[i] = EMPTY;
+            tmpSectionLocks[i] = new Object();
+        }
+        blocks = tmpBlocks;
+        sections = tmpSections;
+        sectionLocks = tmpSectionLocks;
+        minSectionPosition = layer;
+        if (biomes != null) {
+            BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];
+            System.arraycopy(biomes, 0, tmpBiomes, diff, biomes.length);
+            biomes = tmpBiomes;
+        }
+        if (light != null) {
+            char[][] tmplight = new char[sectionCount][];
+            System.arraycopy(light, 0, tmplight, diff, light.length);
+            light = tmplight;
+        }
+        if (skyLight != null) {
+            char[][] tmplight = new char[sectionCount][];
+            System.arraycopy(skyLight, 0, tmplight, diff, skyLight.length);
+            skyLight = tmplight;
         }
     }
 

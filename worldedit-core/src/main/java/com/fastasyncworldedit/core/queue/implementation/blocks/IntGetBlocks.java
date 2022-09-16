@@ -8,6 +8,9 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Arrays;
 
+/**
+ * @since TODO
+ */
 public abstract class IntGetBlocks extends IntBlocks implements IChunkGet {
 
     /**
@@ -36,7 +39,7 @@ public abstract class IntGetBlocks extends IntBlocks implements IChunkGet {
         if (data == null) {
             data = new int[4096];
         }
-        Arrays.fill(data, (int) BlockTypesCache.ReservedIDs.AIR);
+        Arrays.fill(data, BlockTypesCache.ReservedIDs.AIR);
         return data;
     }
 

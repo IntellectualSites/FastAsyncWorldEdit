@@ -14,19 +14,10 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
-import com.sk89q.worldedit.world.block.BaseBlock;
-import com.sk89q.worldedit.world.block.BlockState;
-import com.sk89q.worldedit.world.block.BlockStateHolder;
-import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
-import com.sk89q.worldedit.world.block.FuzzyBlockState;
+import com.sk89q.worldedit.world.block.*;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
@@ -134,7 +125,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                 continue;
             }
 
-            if(!(set instanceof IntSetBlocks)) {
+            if (!(set instanceof IntSetBlocks)) {
                 char[] blocks = Objects.requireNonNull(set.loadCharsIfPresent(layer));
                 it:
                 for (int i = 0; i < blocks.length; i++) {
@@ -164,7 +155,6 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                     }
                     blocks[i] = state.getOrdinalChar();
                 }
-
             } else {
                 int[] blocks = Objects.requireNonNull(set.loadIntsIfPresent(layer));
                 it:
@@ -193,7 +183,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                     for (PropertyRemap<?> remap : remaps) {
                         state = remap.apply(state);
                     }
-                    blocks[i] = state.getOrdinalChar();
+                    blocks[i] = state.getOrdinal();
                 }
             }
         }

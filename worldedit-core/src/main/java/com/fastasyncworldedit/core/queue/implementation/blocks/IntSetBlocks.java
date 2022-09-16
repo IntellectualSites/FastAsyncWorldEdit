@@ -22,6 +22,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
+/**
+ * @since TODO
+ */
 public class IntSetBlocks extends IntBlocks implements IChunkSet{
 
     private static final Pool<IntSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
@@ -62,13 +65,7 @@ public class IntSetBlocks extends IntBlocks implements IChunkSet{
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        int layer;
-        if (biomes == null || (y >> 4) < minSectionPosition || (y >> 4) > maxSectionPosition) {
-            return null;
-        } else if (biomes[(layer = (y >> 4) - minSectionPosition)] == null) {
-            return null;
-        }
-        return biomes[layer][(y & 15) >> 2 | (z >> 2) << 2 | x >> 2];
+        return getBiomeType(x, y, z, biomes, minSectionPosition, maxSectionPosition);
     }
 
     @Override
@@ -356,7 +353,7 @@ public class IntSetBlocks extends IntBlocks implements IChunkSet{
             int diff = minSectionPosition - layer;
             sectionCount += diff;
             int[][] tmpBlocks = new int[sectionCount][];
-            IntBlocks.Section[] tmpSections = new IntBlocks.Section[sectionCount];
+            Section[] tmpSections = new Section[sectionCount];
             Object[] tmpSectionLocks = new Object[sectionCount];
             System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
             System.arraycopy(sections, 0, tmpSections, diff, sections.length);
@@ -388,7 +385,7 @@ public class IntSetBlocks extends IntBlocks implements IChunkSet{
             int diff = layer - maxSectionPosition;
             sectionCount += diff;
             int[][] tmpBlocks = new int[sectionCount][];
-            IntBlocks.Section[] tmpSections = new IntBlocks.Section[sectionCount];
+            Section[] tmpSections = new Section[sectionCount];
             Object[] tmpSectionLocks = new Object[sectionCount];
             System.arraycopy(blocks, 0, tmpBlocks, 0, blocks.length);
             System.arraycopy(sections, 0, tmpSections, 0, sections.length);

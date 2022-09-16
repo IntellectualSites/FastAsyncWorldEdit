@@ -10,7 +10,10 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 
-public abstract class IntBlocks implements IBlocks {
+/**
+ * @since TODO
+ */
+public abstract class IntBlocks extends BlocksHelper implements IBlocks {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -70,10 +73,7 @@ public abstract class IntBlocks implements IBlocks {
     };
     public int[][] blocks;
     public IntBlocks.Section[] sections;
-    public Object[] sectionLocks;
-    protected int minSectionPosition;
-    protected int maxSectionPosition;
-    protected int sectionCount;
+
 
     /**
      * New instance given initial min/max section indices. Can be negative.
@@ -177,21 +177,6 @@ public abstract class IntBlocks implements IBlocks {
         }
         layer -= minSectionPosition;
         return sections[layer].isFull() ? blocks[layer] : null;
-    }
-
-    @Override
-    public int getSectionCount() {
-        return sectionCount;
-    }
-
-    @Override
-    public int getMaxSectionPosition() {
-        return maxSectionPosition;
-    }
-
-    @Override
-    public int getMinSectionPosition() {
-        return minSectionPosition;
     }
 
     @Override

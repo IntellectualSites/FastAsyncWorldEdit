@@ -99,26 +99,17 @@ public class HeightmapProcessor implements IBatchProcessor {
                         }
                         ordinal = getSection[index(y, j)];
                     }
-                    // fast skip if block isn't relevant for any height map (air or empty)
-                    if (ordinal < 4) {
-                        continue;
-                    }
-                    BlockState block = BlockTypesCache.states[ordinal];
-                    if (block == null) {
-                        continue;
-                    }
-                    for (int i = 0; i < TYPES.length; i++) {
-                        if ((skip & (1 << i)) != 0) {
-                            continue; // skip finished height map
-                        }
-                        HeightMapType type = TYPES[i];
-                        // ignore if that position was already set
-                        if (!updated[i][j] && type.includes(block)) {
-                            // mc requires + 1, heightmaps are normalized internally, thus we need to "zero" them.
-                            heightmaps[i][j] = ((layer - get.getMinSectionPosition()) << 4) + y + 1;
-                            updated[i][j] = true; // mark as updated
-                        }
-                    }
+                    skipOrUpdateHeightmap(
+                            get,
+                            heightmaps,
+                            updated,
+                            skip,
+                            layer,
+                            y,
+                            j,
+                            BlockTypesCache.states[ordinal],
+                            ordinal
+                    );
                 }
             }
         } else {
@@ -158,26 +149,17 @@ public class HeightmapProcessor implements IBatchProcessor {
                             }
                             ordinal = getSection[index(y, j)];
                         }
-                        // fast skip if block isn't relevant for any height map (air or empty)
-                        if (ordinal < 4) {
-                            continue;
-                        }
-                        BlockState block = BlockTypesCache.states[ordinal];
-                        if (block == null) {
-                            continue;
-                        }
-                        for (int i = 0; i < TYPES.length; i++) {
-                            if ((skip & (1 << i)) != 0) {
-                                continue; // skip finished height map
-                            }
-                            HeightMapType type = TYPES[i];
-                            // ignore if that position was already set
-                            if (!updated[i][j] && type.includes(block)) {
-                                // mc requires + 1, heightmaps are normalized internally, thus we need to "zero" them.
-                                heightmaps[i][j] = ((layer - get.getMinSectionPosition()) << 4) + y + 1;
-                                updated[i][j] = true; // mark as updated
-                            }
-                        }
+                        skipOrUpdateHeightmap(
+                                get,
+                                heightmaps,
+                                updated,
+                                skip,
+                                layer,
+                                y,
+                                j,
+                                BlockTypesCache.states[ordinal],
+                                ordinal
+                        );
                     }
                 }
         }
@@ -196,6 +178,38 @@ public class HeightmapProcessor implements IBatchProcessor {
             set.setHeightMap(TYPES[i], heightmaps[i]);
         }
         return set;
+    }
+
+    private void skipOrUpdateHeightmap(
+            final IChunkGet get,
+            final int[][] heightmaps,
+            final boolean[][] updated,
+            final int skip,
+            final int layer,
+            final int y,
+            final int j,
+            final BlockState state,
+            final int ordinal
+    ) {
+        // fast skip if block isn't relevant for any height map (air or empty)
+        if (ordinal < 4) {
+            return;
+        }
+        if (state == null) {
+            return;
+        }
+        for (int i = 0; i < TYPES.length; i++) {
+            if ((skip & (1 << i)) != 0) {
+                continue; // skip finished height map
+            }
+            HeightMapType type = TYPES[i];
+            // ignore if that position was already set
+            if (!updated[i][j] && type.includes(state)) {
+                // mc requires + 1, heightmaps are normalized internally, thus we need to "zero" them.
+                heightmaps[i][j] = ((layer - get.getMinSectionPosition()) << 4) + y + 1;
+                updated[i][j] = true; // mark as updated
+            }
+        }
     }
 
     @Override
