@@ -30,7 +30,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -905,29 +904,15 @@ public class TextureUtil implements TextureHolder {
         if (folder.exists()) {
             // Get all the jar files
             File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-            if (files.length == 0) {
-                new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/")
-                        .mkdirs();
-                try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://piston-data.mojang.com/v1/objects/055b30d860ead928cba3849ba920c88b6950b654/client.jar")
-                                .openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.2.jar")) {
-                    byte[] dataBuffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                        fileOutputStream.write(dataBuffer, 0, bytesRead);
-                    }
-                    fileOutputStream.close();
-                    files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-                } catch (IOException e) {
-                    LOGGER.error(
-                            "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
-                                    "folder with a `.minecraft/versions` jar or mods in it.");
-                    LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
-                }
+            // We expect the latest version to be already there, due to the download in TextureUtil#<init>
+            if (files == null || files.length == 0) {
+                LOGGER.error("No version jar found in {}. Delete the named folder and restart your server to download the " +
+                        "missing assets.", folder.getPath());
+                LOGGER.error(
+                        "If no asset jar is created, please do so manually by creating a `FastAsyncWorldEdit/textures` " +
+                                "folder with a `.minecraft/versions` jar or mods in it.");
             }
-            if ((files.length > 0)) {
+            if (files != null && (files.length > 0)) {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);
 
