@@ -1206,6 +1206,40 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     //FAWE end
 
     /**
+     * Gets whether this EditSession will track history.
+     *
+     * @return whether history is tracked
+     */
+    public boolean isTrackingHistory() {
+        //FAWE start
+        return history;
+        //FAWE end
+    }
+
+    /**
+     * Sets whether this EditSession will track history.
+     *
+     * @param trackHistory whether to track history
+     */
+    public void setTrackingHistory(boolean trackHistory) {
+        //FAWE start
+        if (trackHistory) {
+            if (this.history) {
+                if (this.changeSet == null) {
+                    throw new IllegalStateException("No ChangeSetExtent is available");
+                }
+                enableHistory(this.changeSet);
+            }
+        } else {
+            if (this.history) {
+                disableHistory();
+                this.history = false;
+            }
+        }
+        //FAWE end
+    }
+
+    /**
      * Get the number of changed blocks.
      *
      * @return the number of changes
