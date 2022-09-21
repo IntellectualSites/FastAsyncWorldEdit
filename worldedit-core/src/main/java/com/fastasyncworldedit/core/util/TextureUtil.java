@@ -599,7 +599,7 @@ public class TextureUtil implements TextureHolder {
      *
      * @return {@link VersionMetadata} containing the id (= version) and url to the client manifest itself
      * @throws IOException If any http / i/o operation fails.
-     * @since TODO
+     * @since 2.4.6
      */
     private static VersionMetadata getLatestVersion() throws IOException {
         try (BufferedInputStream in = new BufferedInputStream(new URL(VERSION_MANIFEST).openStream());
@@ -624,7 +624,7 @@ public class TextureUtil implements TextureHolder {
      * @param metadata The version metadata containing the url to the client.jar
      * @return The full url to the client.jar including the expected file hash for validation purposes
      * @throws IOException If any http / i/o operation fails.
-     * @since TODO
+     * @since 2.4.6
      */
     private static HashedResource getLatestClientJarUrl(VersionMetadata metadata) throws IOException {
         try (BufferedInputStream in = new BufferedInputStream(new URL(metadata.url()).openStream());
@@ -642,7 +642,7 @@ public class TextureUtil implements TextureHolder {
      * @return The hash of the file contents
      * @throws NoSuchAlgorithmException If the SHA-1 algorithm could not be resolved
      * @throws IOException              If any I/O operation failed
-     * @since TODO
+     * @since 2.4.6
      */
     private static String calculateSha1(Path path) throws NoSuchAlgorithmException, IOException {
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
