@@ -6,7 +6,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.queue.implementation.blocks.IntSetBlocks;
+import com.fastasyncworldedit.core.queue.implementation.blocks.IntGetBlocks;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -62,7 +62,7 @@ public class HeightmapProcessor implements IBatchProcessor {
             if (!(hasSectionSet || hasSectionGet)) {
                 continue;
             }
-            if(!(set instanceof IntSetBlocks)) {
+            if(!(get instanceof IntGetBlocks)) {
             char[] setSection = hasSectionSet ? set.loadCharsIfPresent(layer) : null;
             if (setSection == null || Arrays.equals(setSection, FaweCache.INSTANCE.EMPTY_CHAR_4096) ||
                     Arrays.equals(setSection, AIR_LAYER_CHAR)) {

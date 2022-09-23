@@ -16,6 +16,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharSetBlocks;
+import com.fastasyncworldedit.core.queue.implementation.blocks.IntSetBlocks;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.queue.implementation.chunk.NullChunk;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -32,6 +33,7 @@ import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -186,7 +188,11 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             };
         }
         if (set == null) {
-            set = (x, z) -> CharSetBlocks.newInstance();
+            if(Objects.equals(Fawe.platform().getPlatform(), "Forge-Official")) {
+                set = (x, z) -> IntSetBlocks.newInstance();
+            } else {
+                set = (x, z) -> CharSetBlocks.newInstance();
+            }
         }
         this.cacheGet = get;
         this.cacheSet = set;

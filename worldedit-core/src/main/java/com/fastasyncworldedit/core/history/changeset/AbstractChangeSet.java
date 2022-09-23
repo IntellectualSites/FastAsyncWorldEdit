@@ -8,7 +8,7 @@ import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
-import com.fastasyncworldedit.core.queue.implementation.blocks.IntGetBlocks;
+import com.fastasyncworldedit.core.queue.implementation.blocks.IntSetBlocks;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.util.concurrent.Futures;
@@ -168,7 +168,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 continue;
             }
 
-            if(!(get instanceof IntGetBlocks)) {
+            if(!(set instanceof IntSetBlocks)) {
                 // add each block and tile
                 char[] blocksGet;
                 char[] tmp = get.loadChars(layer);
