@@ -12,7 +12,7 @@ griefprevention = "16.18"
 griefdefender = "2.1.0-SNAPSHOT"
 mcore = "7.0.1"
 residence = "4.5._13.1"
-towny = "0.98.3.8"
+towny = "0.98.3.10"
 redprotect = "1.9.6"
 
 # Third party
