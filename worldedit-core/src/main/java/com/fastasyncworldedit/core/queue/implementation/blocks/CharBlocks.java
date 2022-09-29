@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 
-public abstract class CharBlocks extends BlocksHelper implements IBlocks {
+public abstract class CharBlocks extends ChunkSectionedChunk implements IBlocks {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 

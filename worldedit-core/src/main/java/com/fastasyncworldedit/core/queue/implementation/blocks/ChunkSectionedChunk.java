@@ -2,7 +2,7 @@ package com.fastasyncworldedit.core.queue.implementation.blocks;
 
 import com.sk89q.worldedit.world.biome.BiomeType;
 
-public class BlocksHelper {
+public class ChunkSectionedChunk {
 
     public Object[] sectionLocks;
     protected int minSectionPosition;

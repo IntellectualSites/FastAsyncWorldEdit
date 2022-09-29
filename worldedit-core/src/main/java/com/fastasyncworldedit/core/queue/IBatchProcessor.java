@@ -68,18 +68,7 @@ public interface IBatchProcessor {
             for (int layer = set.getMinSectionPosition(); layer <= minLayer; layer++) {
                 if (set.hasSection(layer)) {
                     if (layer == minLayer) {
-                        if(!(set instanceof IntSetBlocks)) {
-                            char[] arr = set.loadCharsIfPresent(layer);
-                            if (arr != null) {
-                                int index = (minY & 15) << 8;
-                                for (int i = 0; i < index; i++) {
-                                    arr[i] = 0;
-                                }
-                            } else {
-                                arr = new char[4096];
-                            }
-                            set.setBlocks(layer, arr);
-                        } else {
+                        if (set instanceof IntSetBlocks) {
                             int[] arr = set.loadIntsIfPresent(layer);
                             if (arr != null) {
                                 int index = (minY & 15) << 8;
@@ -89,28 +78,28 @@ public interface IBatchProcessor {
                             } else {
                                 arr = new int[4096];
                             }
-                            set.setBlocks(layer, arr);
+                            set.setIntBlocks(layer, arr);
+                        } else {
+                            char[] arr = set.loadCharsIfPresent(layer);
+                            if (arr != null) {
+                                int index = (minY & 15) << 8;
+                                for (int i = 0; i < index; i++) {
+                                    arr[i] = 0;
+                                }
+                            } else {
+                                arr = new char[4096];
+                            }
+                            set.setCharBlocks(layer, arr);
                         }
                     } else {
-                        set.setBlocks(layer, null);
+                        set.setCharBlocks(layer, null);
                     }
                 }
             }
             for (int layer = maxLayer; layer < set.getMaxSectionPosition(); layer++) {
                 if (set.hasSection(layer)) {
                     if (layer == minLayer) {
-                        if(!(set instanceof IntSetBlocks)) {
-                            char[] arr = set.loadCharsIfPresent(layer);
-                            if (arr != null) {
-                                int index = ((maxY + 1) & 15) << 8;
-                                for (int i = index; i < arr.length; i++) {
-                                    arr[i] = 0;
-                                }
-                            } else {
-                                arr = new char[4096];
-                            }
-                            set.setBlocks(layer, arr);
-                        } else {
+                        if (set instanceof IntSetBlocks) {
                             int[] arr = set.loadIntsIfPresent(layer);
                             if (arr != null) {
                                 int index = ((maxY + 1) & 15) << 8;
@@ -120,10 +109,21 @@ public interface IBatchProcessor {
                             } else {
                                 arr = new int[4096];
                             }
-                            set.setBlocks(layer, arr);
+                            set.setIntBlocks(layer, arr);
+                        } else {
+                            char[] arr = set.loadCharsIfPresent(layer);
+                            if (arr != null) {
+                                int index = ((maxY + 1) & 15) << 8;
+                                for (int i = index; i < arr.length; i++) {
+                                    arr[i] = 0;
+                                }
+                            } else {
+                                arr = new char[4096];
+                            }
+                            set.setCharBlocks(layer, arr);
                         }
                     } else {
-                        set.setBlocks(layer, null);
+                        set.setCharBlocks(layer, null);
                     }
                 }
             }
@@ -153,16 +153,7 @@ public interface IBatchProcessor {
                 continue;
             }
             if (layer == minLayer) {
-                if(!(set instanceof IntSetBlocks)) {
-                    char[] arr = set.loadCharsIfPresent(layer);
-                    if (arr != null) {
-                        int index = (minY & 15) << 8;
-                        for (int i = index; i < 4096; i++) {
-                            arr[i] = 0;
-                        }
-                    }
-                    set.setBlocks(layer, arr);
-                } else {
+                if (set instanceof IntSetBlocks) {
                     int[] arr = set.loadIntsIfPresent(layer);
                     if (arr != null) {
                         int index = (minY & 15) << 8;
@@ -170,19 +161,19 @@ public interface IBatchProcessor {
                             arr[i] = 0;
                         }
                     }
-                    set.setBlocks(layer, arr);
+                    set.setIntBlocks(layer, arr);
+                } else {
+                    char[] arr = set.loadCharsIfPresent(layer);
+                    if (arr != null) {
+                        int index = (minY & 15) << 8;
+                        for (int i = index; i < 4096; i++) {
+                            arr[i] = 0;
+                        }
+                    }
+                    set.setCharBlocks(layer, arr);
                 }
             } else if (layer == maxLayer) {
-                if(!(set instanceof IntSetBlocks)) {
-                    char[] arr = set.loadCharsIfPresent(layer);
-                    if (arr != null) {
-                        int index = ((maxY + 1) & 15) << 8;
-                        for (int i = 0; i < index; i++) {
-                            arr[i] = 0;
-                        }
-                    }
-                    set.setBlocks(layer, arr);
-                } else {
+                if (set instanceof IntSetBlocks) {
                     int[] arr = set.loadIntsIfPresent(layer);
                     if (arr != null) {
                         int index = ((maxY + 1) & 15) << 8;
@@ -190,10 +181,19 @@ public interface IBatchProcessor {
                             arr[i] = 0;
                         }
                     }
-                    set.setBlocks(layer, arr);
+                    set.setIntBlocks(layer, arr);
+                } else {
+                    char[] arr = set.loadCharsIfPresent(layer);
+                    if (arr != null) {
+                        int index = ((maxY + 1) & 15) << 8;
+                        for (int i = 0; i < index; i++) {
+                            arr[i] = 0;
+                        }
+                    }
+                    set.setCharBlocks(layer, arr);
                 }
             } else {
-                set.setBlocks(layer, null);
+                set.setCharBlocks(layer, null);
             }
         }
         return hasBlocks;

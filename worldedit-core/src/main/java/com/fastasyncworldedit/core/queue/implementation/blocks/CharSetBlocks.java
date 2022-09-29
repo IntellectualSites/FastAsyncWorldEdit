@@ -113,11 +113,17 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void setBlocks(int layer, Object data) {
+    public void setCharBlocks(int layer, char[] data) {
         updateSectionIndexRange(layer);
         layer -= minSectionPosition;
         this.sections[layer] = data == null ? EMPTY : FULL;
-        this.blocks[layer] = (char[]) data;
+        this.blocks[layer] = data;
+    }
+
+    @Override
+    public void setIntBlocks(int layer, int[] data) {
+        throw new UnsupportedOperationException("CharSetBlocks does not implement setIntBlocks(). Please report to the " +
+                "FastAsyncWorldEdit developers!");
     }
 
     @Override
@@ -331,12 +337,14 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public int[] loadInts(final int layer) {
-        return null;
+        throw new UnsupportedOperationException("The class CharSetBlocks does not support the usage of loadInts(). Please " +
+                "report this error to the FastAsyncWorldEdit developers.");
     }
 
     @Override
     public int[] loadIntsIfPresent(final int layer) {
-        return null;
+        throw new UnsupportedOperationException("The class CharSetBlocks does not support the usage of loadIntsIfPresent(). " +
+                "Please report this error to the FastAsyncWorldEdit developers.");
     }
 
     @Override
@@ -355,7 +363,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             char[][] tmpBlocks = new char[sectionCount][];
             Section[] tmpSections = new Section[sectionCount];
             Object[] tmpSectionLocks = new Object[sectionCount];
-            extracted(layer, diff, tmpBlocks, tmpSections, tmpSectionLocks);
+            resizeDataArrays(layer, diff, tmpBlocks, tmpSections, tmpSectionLocks);
         } else {
             int diff = layer - maxSectionPosition;
             sectionCount += diff;
@@ -391,7 +399,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         }
     }
 
-    private void extracted(int layer, int diff, char[][] tmpBlocks, Section[] tmpSections, Object[] tmpSectionLocks) {
+    private void resizeDataArrays(int layer, int diff, char[][] tmpBlocks, Section[] tmpSections, Object[] tmpSectionLocks) {
         System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
         System.arraycopy(sections, 0, tmpSections, diff, sections.length);
         System.arraycopy(sectionLocks, 0, tmpSectionLocks, diff, sections.length);

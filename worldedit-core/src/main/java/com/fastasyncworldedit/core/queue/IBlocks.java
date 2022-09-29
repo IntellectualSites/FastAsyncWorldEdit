@@ -71,6 +71,7 @@ public interface IBlocks extends Trimable {
      * @return int array of ordinals of the chunk section if present
      * @since TODO
      */
+    @Nullable
     int[] loadIntsIfPresent(int layer);
 
     BlockState getBlock(int x, int y, int z);

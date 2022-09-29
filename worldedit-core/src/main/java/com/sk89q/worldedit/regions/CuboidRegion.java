@@ -27,12 +27,14 @@ import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.IntSetBlocks;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.Array;
 import java.util.AbstractSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -85,6 +87,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     //FAWE start - allow region to be created without clamping Y
+
     /**
      * Construct a new instance of this cuboid using two corners of the cuboid.
      *
@@ -168,6 +171,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
     }
 
     //FAWE start - allow region to be created without clamping Y
+
     /**
      * Sets the cached min and max x/y/z
      */
@@ -826,50 +830,75 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
-                char[] arr = Objects.requireNonNull(set.loadCharsIfPresent(layer)); // This shouldn't be null if above is true
-                if (!(trimX || trimZ)) {
-                    continue;
-                }
-                int indexY = 0;
-                for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
-                    int index;
-                    if (trimZ) {
-                        index = indexY;
-                        for (int z = 0; z < lowerZ; z++) {
-                            // null the z values
-                            for (int x = 0; x < 16; x++, index++) {
-                                arr[index] = 0;
-                            }
-                        }
-                        index = indexY + upperZi;
-                        for (int z = upperZ + 1; z < 16; z++) {
-                            // null the z values
-                            for (int x = 0; x < 16; x++, index++) {
-                                arr[index] = 0;
-                            }
-                        }
+                if (set instanceof IntSetBlocks) {
+                    int[] arr = Objects.requireNonNull(set.loadIntsIfPresent(layer)); // This shouldn't be null if above is true
+                    if (NoBlacklistTrimXZ(lowerX, upperX, lowerZ, upperZ, upperZi, lowerZi, trimX, trimZ, arr)) {
+                        continue;
                     }
-                    if (trimX) {
-                        index = indexY + lowerZi; // Skip blocks already removed by trimZ
-                        for (int z = lowerZ; z <= upperZ; z++, index += 16) {
-                            for (int x = 0; x < lowerX; x++) {
-                                // null the x values
-                                arr[index + x] = 0;
-                            }
-                            for (int x = upperX + 1; x < 16; x++) {
-                                // null the x values
-                                arr[index + x] = 0;
-                            }
-                        }
+                    set.setIntBlocks(layer, arr);
+                } else {
+                    char[] arr = Objects.requireNonNull(set.loadCharsIfPresent(layer)); // This shouldn't be null if above is true
+                    if (NoBlacklistTrimXZ(lowerX, upperX, lowerZ, upperZ, upperZi, lowerZi, trimX, trimZ, arr)) {
+                        continue;
                     }
+                    set.setCharBlocks(layer, arr);
                 }
-                set.setBlocks(layer, arr);
             }
 
             trimNBT(set, this::contains);
             return set;
         }
         return null;
+    }
+
+    private boolean NoBlacklistTrimXZ(
+            int lowerX,
+            int upperX,
+            int lowerZ,
+            int upperZ,
+            int upperZi,
+            int lowerZi,
+            boolean trimX,
+            boolean trimZ,
+            Object arr
+    ) {
+        if (!(trimX || trimZ)) {
+            return true;
+        }
+        int indexY = 0;
+        for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
+            int index;
+            if (trimZ) {
+                index = indexY;
+                for (int z = 0; z < lowerZ; z++) {
+                    // null the z values
+                    for (int x = 0; x < 16; x++, index++) {
+                        Array.set(arr, index, 0);
+                    }
+                }
+                index = indexY + upperZi;
+                for (int z = upperZ + 1; z < 16; z++) {
+                    // null the z values
+                    for (int x = 0; x < 16; x++, index++) {
+                        Array.set(arr, index, 0);
+                    }
+                }
+            }
+            if (trimX) {
+                index = indexY + lowerZi; // Skip blocks already removed by trimZ
+                for (int z = lowerZ; z <= upperZ; z++, index += 16) {
+                    for (int x = 0; x < lowerX; x++) {
+                        // null the x values
+                        Array.set(arr, index + x, 0);
+                    }
+                    for (int x = upperX + 1; x < 16; x++) {
+                        // null the x values
+                        Array.set(arr, index + x, 0);
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -912,38 +941,62 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
-                char[] arr = Objects.requireNonNull(set.loadCharsIfPresent(layer)); // This shouldn't be null if above is true
-                if (!(trimX || trimZ)) {
-                    continue;
-                }
-                int indexY = 0;
-                for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
-                    int index;
-                    if (trimZ) {
-                        index = indexY;
-                        for (int z = lowerZ; z <= upperZ; z++) {
-                            // null the z values
-                            for (int x = 0; x < 16; x++, index++) {
-                                arr[index] = 0;
-                            }
-                        }
+                if (set instanceof IntSetBlocks) {
+                    int[] arr = Objects.requireNonNull(set.loadIntsIfPresent(layer)); // This shouldn't be null if above is true
+                    if (BlacklistedTrimXZ(lowerX, upperX, lowerZ, upperZ, lowerZi, trimX, trimZ, arr)) {
+                        continue;
                     }
-                    if (trimX) {
-                        index = indexY + lowerZi; // Skip blocks already removed by trimZ
-                        for (int z = lowerZ; z <= upperZ; z++, index += 16) {
-                            for (int x = lowerX; x <= upperX; x++) {
-                                // null the x values
-                                arr[index + x] = 0;
-                            }
-                        }
+                    set.setIntBlocks(layer, arr);
+                } else {
+                    char[] arr = Objects.requireNonNull(set.loadCharsIfPresent(layer)); // This shouldn't be null if above is true
+                    if (BlacklistedTrimXZ(lowerX, upperX, lowerZ, upperZ, lowerZi, trimX, trimZ, arr)) {
+                        continue;
                     }
+                    set.setCharBlocks(layer, arr);
                 }
-                set.setBlocks(layer, arr);
             }
             trimNBT(set, bv3 -> !this.contains(bv3));
             return set;
         }
         return set;
+    }
+
+    private boolean BlacklistedTrimXZ(
+            int lowerX,
+            int upperX,
+            int lowerZ,
+            int upperZ,
+            int lowerZi,
+            boolean trimX,
+            boolean trimZ,
+            Object arr
+    ) {
+        if (!(trimX || trimZ)) {
+            return true;
+        }
+        int indexY = 0;
+        for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
+            int index;
+            if (trimZ) {
+                index = indexY;
+                for (int z = lowerZ; z <= upperZ; z++) {
+                    // null the z values
+                    for (int x = 0; x < 16; x++, index++) {
+                        Array.set(arr, index, 0);
+                    }
+                }
+            }
+            if (trimX) {
+                index = indexY + lowerZi; // Skip blocks already removed by trimZ
+                for (int z = lowerZ; z <= upperZ; z++, index += 16) {
+                    for (int x = lowerX; x <= upperX; x++) {
+                        // null the x values
+                        Array.set(arr, index + x, 0);
+                    }
+                }
+            }
+        }
+        return false;
     }
     //FAWE end
 

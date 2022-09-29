@@ -53,19 +53,25 @@ public class BitSetBlocks implements IChunkSet {
     }
 
     @Override
-    public void setBlocks(int layer, Object data) {
+    public void setCharBlocks(int layer, char[] data) {
         layer -= minSectionPosition;
         row.reset(layer);
         int by = layer << 4;
         for (int y = 0, index = 0; y < 16; y++) {
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++, index++) {
-                    if (((char[] )data)[index] != BlockTypesCache.ReservedIDs.__RESERVED__) {
+                    if (data[index] != BlockTypesCache.ReservedIDs.__RESERVED__) {
                         row.set(null, x, by + y, z, minSectionPosition, maxSectionPosition);
                     }
                 }
             }
         }
+    }
+
+    @Override
+    public void setIntBlocks(int layer, int[] data) {
+        throw new UnsupportedOperationException("BitSetBlocks does not implement setIntBlocks(). Please report to the " +
+                "FastAsyncWorldEdit developers!");
     }
 
     @Override

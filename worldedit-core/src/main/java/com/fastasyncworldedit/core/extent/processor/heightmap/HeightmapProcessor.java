@@ -25,8 +25,8 @@ public class HeightmapProcessor implements IBatchProcessor {
 
     static {
         Arrays.fill(COMPLETE, true);
-        Arrays.fill(AIR_LAYER_CHAR, (char) 1);
-        Arrays.fill(AIR_LAYER_INT, 1);
+        Arrays.fill(AIR_LAYER_CHAR, (char) BlockTypesCache.ReservedIDs.AIR);
+        Arrays.fill(AIR_LAYER_INT, BlockTypesCache.ReservedIDs.AIR);
     }
 
     private final int minY;
@@ -62,57 +62,57 @@ public class HeightmapProcessor implements IBatchProcessor {
             if (!(hasSectionSet || hasSectionGet)) {
                 continue;
             }
-            if(!(get instanceof IntGetBlocks)) {
-            char[] setSection = hasSectionSet ? set.loadCharsIfPresent(layer) : null;
-            if (setSection == null || Arrays.equals(setSection, FaweCache.INSTANCE.EMPTY_CHAR_4096) ||
-                    Arrays.equals(setSection, AIR_LAYER_CHAR)) {
-                hasSectionSet = false;
-            }
-            if (!hasSectionSet && !hasSectionGet) {
-                continue;
-            }
-            char[] getSection = null;
-            for (int y = 15; y >= 0; y--) {
-                // We don't need to actually iterate over x and z as we're both reading and writing an index
-                for (int j = 0; j < BLOCKS_PER_Y; j++) {
-                    char ordinal = 0;
-                    if (hasSectionSet) {
-                        ordinal = setSection[index(y, j)];
-                    }
-                    if (ordinal == 0) {
-                        if (!hasSectionGet) {
-                            if (!hasSectionSet) {
-                                continue layer;
-                            }
-                            continue;
-                        } else if (getSection == null) {
-                            getSection = get.loadChars(layer);
-                            // skip empty layer
-                            if (Arrays.equals(getSection, FaweCache.INSTANCE.EMPTY_CHAR_4096)
-                                    || Arrays.equals(getSection, AIR_LAYER_CHAR)) {
-                                hasSectionGet = false;
+            if (!(get instanceof IntGetBlocks)) {
+                char[] setSection = hasSectionSet ? set.loadCharsIfPresent(layer) : null;
+                if (setSection == null || Arrays.equals(setSection, FaweCache.INSTANCE.EMPTY_CHAR_4096) ||
+                        Arrays.equals(setSection, AIR_LAYER_CHAR)) {
+                    hasSectionSet = false;
+                }
+                if (!hasSectionSet && !hasSectionGet) {
+                    continue;
+                }
+                char[] getSection = null;
+                for (int y = 15; y >= 0; y--) {
+                    // We don't need to actually iterate over x and z as we're both reading and writing an index
+                    for (int j = 0; j < BLOCKS_PER_Y; j++) {
+                        char ordinal = 0;
+                        if (hasSectionSet) {
+                            ordinal = setSection[index(y, j)];
+                        }
+                        if (ordinal == 0) {
+                            if (!hasSectionGet) {
                                 if (!hasSectionSet) {
                                     continue layer;
                                 }
                                 continue;
+                            } else if (getSection == null) {
+                                getSection = get.loadChars(layer);
+                                // skip empty layer
+                                if (Arrays.equals(getSection, FaweCache.INSTANCE.EMPTY_CHAR_4096)
+                                        || Arrays.equals(getSection, AIR_LAYER_CHAR)) {
+                                    hasSectionGet = false;
+                                    if (!hasSectionSet) {
+                                        continue layer;
+                                    }
+                                    continue;
+                                }
                             }
+                            ordinal = getSection[index(y, j)];
                         }
-                        ordinal = getSection[index(y, j)];
+                        skipOrUpdateHeightmap(
+                                get,
+                                heightmaps,
+                                updated,
+                                skip,
+                                layer,
+                                y,
+                                j,
+                                BlockTypesCache.states[ordinal],
+                                ordinal
+                        );
                     }
-                    skipOrUpdateHeightmap(
-                            get,
-                            heightmaps,
-                            updated,
-                            skip,
-                            layer,
-                            y,
-                            j,
-                            BlockTypesCache.states[ordinal],
-                            ordinal
-                    );
                 }
-            }
-        } else {
+            } else {
                 int[] setSection = hasSectionSet ? set.loadIntsIfPresent(layer) : null;
                 if (setSection == null || Arrays.equals(setSection, FaweCache.INSTANCE.EMPTY_INT_4096) ||
                         Arrays.equals(setSection, AIR_LAYER_INT)) {
@@ -162,7 +162,7 @@ public class HeightmapProcessor implements IBatchProcessor {
                         );
                     }
                 }
-        }
+            }
             for (int i = 0; i < updated.length; i++) {
                 if ((skip & (1 << i)) == 0 // if already true, skip array equality check
                         && Arrays.equals(updated[i], COMPLETE)) {

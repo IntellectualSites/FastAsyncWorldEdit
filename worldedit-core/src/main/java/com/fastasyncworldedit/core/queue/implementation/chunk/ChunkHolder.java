@@ -140,9 +140,15 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public void setBlocks(int layer, Object data) {
+    public void setCharBlocks(int layer, char[] data) {
         checkAndWaitOnCalledLock();
-        delegate.set(this).setBlocks(layer, data);
+        delegate.set(this).setCharBlocks(layer, data);
+    }
+
+    @Override
+    public void setIntBlocks(int layer, int[] data) {
+        checkAndWaitOnCalledLock();
+        delegate.set(this).setIntBlocks(layer, data);
     }
 
     @Override

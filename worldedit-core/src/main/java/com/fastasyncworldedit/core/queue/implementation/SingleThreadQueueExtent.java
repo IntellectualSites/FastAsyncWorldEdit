@@ -32,6 +32,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -188,11 +189,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             };
         }
         if (set == null) {
-            if(Objects.equals(Fawe.platform().getPlatform(), "Forge-Official")) {
-                set = (x, z) -> IntSetBlocks.newInstance();
-            } else {
-                set = (x, z) -> CharSetBlocks.newInstance();
-            }
+            set = QueueHelper.getIChunkSetIChunkCache();
         }
         this.cacheGet = get;
         this.cacheSet = set;
@@ -208,6 +205,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             world = WorldWrapper.unwrap(extent);
         }
     }
+
 
     @Override
     public int size() {

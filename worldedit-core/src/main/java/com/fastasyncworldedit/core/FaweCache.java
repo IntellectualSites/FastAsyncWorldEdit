@@ -76,6 +76,9 @@ public enum FaweCache implements Trimable {
 
     public final char[] EMPTY_CHAR_4096 = new char[4096];
 
+    /**
+     * @since TODO
+     */
     public final int[] EMPTY_INT_4096 = new int[4096];
 
     private final IdentityHashMap<Class<? extends IChunkSet>, Pool<? extends IChunkSet>> REGISTERED_POOLS = new IdentityHashMap<>();
@@ -94,6 +97,7 @@ public enum FaweCache implements Trimable {
         SECTION_BLOCKS.clean();
         PALETTE_CACHE.clean();
         PALETTE_TO_BLOCK_CHAR.clean();
+        PALETTE_TO_BLOCK_INT.clean();
         INDEX_STORE.clean();
 
         MUTABLE_VECTOR3.clean();
@@ -242,6 +246,12 @@ public enum FaweCache implements Trimable {
     public final CleanableThreadLocal<char[]> PALETTE_TO_BLOCK_CHAR = new CleanableThreadLocal<>(
             () -> new char[Character.MAX_VALUE + 1], a -> {
         Arrays.fill(a, Character.MAX_VALUE);
+    }
+    );
+
+    public final CleanableThreadLocal<int[]> PALETTE_TO_BLOCK_INT = new CleanableThreadLocal<>(
+            () -> new int[Character.MAX_VALUE+1], a -> {
+        Arrays.fill(a, Integer.MAX_VALUE);
     }
     );
 

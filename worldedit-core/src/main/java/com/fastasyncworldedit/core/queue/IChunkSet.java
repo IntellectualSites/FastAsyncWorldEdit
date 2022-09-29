@@ -30,7 +30,9 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     @Override
     <T extends BlockStateHolder<T>> boolean setBlock(int x, int y, int z, T holder);
 
-    void setBlocks(int layer, Object data);
+    void setCharBlocks(int layer, char[] data);
+
+    void setIntBlocks(int layer, int[] data);
 
     boolean isEmpty();
 

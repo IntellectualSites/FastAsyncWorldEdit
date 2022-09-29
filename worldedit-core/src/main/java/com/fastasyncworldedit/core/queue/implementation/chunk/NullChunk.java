@@ -130,7 +130,10 @@ public final class NullChunk implements IQueueChunk {
         return false;
     }
 
-    public void setBlocks(int layer, @Nonnull Object data) {
+    public void setCharBlocks(int layer, @Nonnull char[] data) {
+    }
+
+    public void setIntBlocks(int layer, @Nonnull int[] data) {
     }
 
     @Nullable

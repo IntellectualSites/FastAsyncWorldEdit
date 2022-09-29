@@ -13,9 +13,7 @@ import javax.annotation.Nullable;
 /**
  * @since TODO
  */
-public abstract class IntBlocks extends BlocksHelper implements IBlocks {
-
-    private static final Logger LOGGER = LogManagerCompat.getLogger();
+public abstract class IntBlocks extends ChunkSectionedChunk implements IBlocks {
 
     protected static final IntBlocks.Section FULL = new IntBlocks.Section() {
         @Override
@@ -71,6 +69,7 @@ public abstract class IntBlocks extends BlocksHelper implements IBlocks {
             return false;
         }
     };
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     public int[][] blocks;
     public IntBlocks.Section[] sections;
 

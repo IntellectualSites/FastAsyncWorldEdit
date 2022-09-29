@@ -25,7 +25,7 @@ import java.util.stream.IntStream;
 /**
  * @since TODO
  */
-public class IntSetBlocks extends IntBlocks implements IChunkSet{
+public class IntSetBlocks extends IntBlocks implements IChunkSet {
 
     private static final Pool<IntSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
             IntSetBlocks.class,
@@ -116,12 +116,18 @@ public class IntSetBlocks extends IntBlocks implements IChunkSet{
     }
 
     @Override
-    public void setBlocks(int layer, Object data) {
+    public void setCharBlocks(int layer, char[] data) {
+        throw new UnsupportedOperationException("IntSetBlocks does not implement setCharBlocks(). Please report to the " +
+                "FastAsyncWorldEdit developers!");
+    }
+
+    @Override
+    public void setIntBlocks(int layer, int[] data) {
         updateSectionIndexRange(layer);
         layer -= minSectionPosition;
         this.sections[layer] = data == null ? EMPTY : FULL;
 
-        this.blocks[layer] = (int[]) data;
+        this.blocks[layer] = data;
     }
 
     @Override
@@ -328,9 +334,9 @@ public class IntSetBlocks extends IntBlocks implements IChunkSet{
     }
 
     @Override
-    public char[] loadChars(final int layer) {
-        updateSectionIndexRange(layer);
-        return super.loadChars(layer);
+    public char[] loadChars(int layer) {
+        throw new UnsupportedOperationException("The class IntSetBlocks does not support the usage of loadChars(). Please " +
+                "report this error to the FastAsyncWorldEdit developers.");
     }
 
     @Override
@@ -415,4 +421,5 @@ public class IntSetBlocks extends IntBlocks implements IChunkSet{
             }
         }
     }
+
 }

@@ -406,10 +406,10 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 int ty = by + 15;
                 if (!containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
                     processExtra = true;
-                    if (!(set instanceof IntSetBlocks)) {
-                        processCuboid(set, layer, set.loadChars(layer));
-                    } else {
+                    if (set instanceof IntSetBlocks) {
                         processCuboid(set, layer, set.loadInts(layer));
+                    } else {
+                        processCuboid(set, layer, set.loadChars(layer));
                     }
                 }
             }
@@ -427,11 +427,16 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++, index++) {
                     if (!Array.get(arr, index).equals(0) && !contains(x, y, z)) {
-                        Array.set(arr, index, 0);                    }
+                        Array.set(arr, index, 0);
+                    }
                 }
             }
         }
-        set.setBlocks(layer, arr);
+        if (set instanceof IntSetBlocks) {
+            set.setIntBlocks(layer, (int[]) arr);
+        } else {
+            set.setCharBlocks(layer, (char[]) arr);
+        }
     }
 
     /**
@@ -458,21 +463,21 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 int by = layer << 4;
                 int ty = by + 15;
 
-                if (!(set instanceof IntSetBlocks)) {
+                if (set instanceof IntSetBlocks) {
                     if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
-                        set.setBlocks(layer, FaweCache.INSTANCE.EMPTY_CHAR_4096);
+                        set.setIntBlocks(layer, FaweCache.INSTANCE.EMPTY_INT_4096);
+                        processExtra = true;
+                        continue;
+                    }
+                    processExtra = isProcessExtra(set, processExtra, layer, set.loadInts(layer));
+                } else {
+                    if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
+                        set.setCharBlocks(layer, FaweCache.INSTANCE.EMPTY_CHAR_4096);
                         processExtra = true;
                         continue;
                     }
                     processExtra = isProcessExtra(set, processExtra, layer, set.loadChars(layer));
 
-                } else {
-                    if (containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
-                        set.setBlocks(layer, FaweCache.INSTANCE.EMPTY_INT_4096);
-                        processExtra = true;
-                        continue;
-                    }
-                    processExtra = isProcessExtra(set, processExtra, layer, set.loadInts(layer));
                 }
             }
             if (processExtra) {
@@ -496,7 +501,11 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             }
         }
         if (processExtra) {
-            set.setBlocks(layer, arr);
+            if (set instanceof IntSetBlocks) {
+                set.setIntBlocks(layer, (int[]) arr);
+            } else {
+                set.setCharBlocks(layer, (char[]) arr);
+            }
         }
         return processExtra;
     }
