@@ -41,7 +41,7 @@ ext {
     }
 }
 
-version = String.format("%s-%s", rootVersion, buildNumber)
+version = String.format("%s", rootVersion)
 
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
