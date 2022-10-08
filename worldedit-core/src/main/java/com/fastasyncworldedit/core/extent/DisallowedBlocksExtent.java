@@ -18,6 +18,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.block.FuzzyBlockState;
 
 import javax.annotation.Nullable;
@@ -26,11 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
-
-import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
 
 public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IBatchProcessor {
 
@@ -56,7 +53,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
             this.blockedBlocks = new HashSet<>();
             for (String block : blockedBlocks) {
                 if (block.indexOf('[') == -1 || block.indexOf(']') == -1) {
-                    blockedBlocks.add(block);
+                    this.blockedBlocks.add(block);
                     continue;
                 }
                 String[] properties = block.substring(block.indexOf('[') + 1, block.indexOf(']')).split(",");
@@ -137,8 +134,11 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
             char[] blocks = Objects.requireNonNull(set.loadIfPresent(layer));
             it:
             for (int i = 0; i < blocks.length; i++) {
-                char block = blocks[i];
-                BlockState state = states[block];
+                char block;
+                if ((block = blocks[i]) == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                    continue;
+                }
+                BlockState state = BlockTypesCache.states[block];
                 if (blockedBlocks != null) {
                     if (blockedBlocks.contains(state.getBlockType().getId())) {
                         blocks[i] = 0;
