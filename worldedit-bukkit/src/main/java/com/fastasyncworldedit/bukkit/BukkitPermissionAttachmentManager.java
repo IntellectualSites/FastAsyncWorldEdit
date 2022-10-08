@@ -36,10 +36,6 @@ public class BukkitPermissionAttachmentManager {
         if (p == null) {
             return;
         }
-        if (p.hasMetadata("NPC") && noopAttachment != null) {
-            p.removeAttachment(noopAttachment);
-            return;
-        }
         PermissionAttachment attach = attachments.remove(p);
         if (attach != null) {
             p.removeAttachment(attach);
