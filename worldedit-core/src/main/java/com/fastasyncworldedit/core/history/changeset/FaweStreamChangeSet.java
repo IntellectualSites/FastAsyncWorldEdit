@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.history.change.MutableBlockChange;
 import com.fastasyncworldedit.core.history.change.MutableEntityChange;
 import com.fastasyncworldedit.core.history.change.MutableFullBlockChange;
 import com.fastasyncworldedit.core.history.change.MutableTileChange;
+import com.fastasyncworldedit.core.internal.exception.FaweSmallEditUnsupportedException;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.util.MainUtil;
@@ -146,8 +147,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 @Override
                 public void write(OutputStream out, int x, int y, int z) throws IOException {
                     if (y < 0 || y > 255) {
-                        throw new UnsupportedOperationException("y cannot be outside range 0-255 for " +
-                                "small-edits=true");
+                        throw new FaweSmallEditUnsupportedException();
                     }
                     int rx = -lx + (lx = x);
                     int ry = -ly + (ly = y);
@@ -332,7 +332,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             //x
             posDel.write(stream, x - originX, y, z - originZ);
             idDel.writeChange(stream, combinedFrom, combinedTo);
-        } catch (Throwable e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -358,7 +358,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             os.write((byte) (y + 128));
             os.writeVarInt(from.getInternalId());
             os.writeVarInt(to.getInternalId());
-        } catch (Throwable e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -699,7 +699,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
             final Iterator<MutableBiomeChange> biomeChange = getBiomeIterator(dir);
 
-            return new Iterator<Change>() {
+            return new Iterator<>() {
                 final Iterator<Change>[] iterators = new Iterator[]{tileCreate, tileRemove, entityCreate, entityRemove, blockChange, biomeChange};
                 int i = 0;
                 Iterator<Change> current = iterators[0];
