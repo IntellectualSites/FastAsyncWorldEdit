@@ -586,23 +586,6 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     }
 
     @Override
-    public List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        // Quickly add each entity to a list copy.
-        List<Entity> mcEntities = new ArrayList<>();
-        ((CraftWorld) world).getHandle().entityManager.getEntityGetter().getAll().forEach(mcEntities::add);
-
-        List<org.bukkit.entity.Entity> list = new ArrayList<>();
-        mcEntities.forEach((mcEnt) -> {
-            org.bukkit.entity.Entity bukkitEntity = mcEnt.getBukkitEntity();
-            if (bukkitEntity.isValid()) {
-                list.add(bukkitEntity);
-            }
-
-        });
-        return list;
-    }
-
-    @Override
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());

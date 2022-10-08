@@ -455,7 +455,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 state = item.getType().getBlockType().getDefaultState();
                 nbt = item.getNbtData();
             } else {
-                BlockType type = BlockTypes.parse(typeString.toLowerCase(Locale.ROOT));
+                BlockType type = BlockTypes.parse(typeString.toLowerCase(Locale.ROOT), context);
 
                 if (type != null) {
                     state = type.getDefaultState();

@@ -66,7 +66,7 @@ public class SaturatePattern extends AbstractPattern {
         }
         int newColor = TextureUtil.multiplyColor(currentColor, color);
         BlockType newBlock = util.getNearestBlock(newColor);
-        if (newBlock.equals(type)) {
+        if (newBlock == null || newBlock.equals(type)) {
             return false;
         }
         return set.setBlock(extent, newBlock.getDefaultState());

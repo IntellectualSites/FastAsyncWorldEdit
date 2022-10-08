@@ -96,13 +96,7 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
 
     @Override
     public BiomeType getBiome(BlockVector3 position) {
-        if (!contains(position)) {
-            if (!limit.MAX_FAILS()) {
-                WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
-            }
-            return null;
-        }
-        return super.getBiome(position);
+        return getBiomeType(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
@@ -118,24 +112,34 @@ public abstract class FaweRegionExtent extends ResettableExtent implements IBatc
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
-        if (!contains(position)) {
+        return getFullBlock(position.getX(), position.getY(), position.getZ());
+    }
+
+    @Override
+    public BaseBlock getFullBlock(int x, int y, int z) {
+        if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
         }
-        return super.getFullBlock(position);
+        return super.getFullBlock(x, y, z);
     }
 
     @Override
     public BlockState getBlock(BlockVector3 position) {
-        if (!contains(position)) {
+        return getBlock(position.getX(), position.getY(), position.getZ());
+    }
+
+    @Override
+    public BlockState getBlock(int x, int y, int z) {
+        if (!contains(x, y, z)) {
             if (!limit.MAX_FAILS()) {
                 WEManager.weManager().cancelEditSafe(this, FaweCache.OUTSIDE_REGION);
             }
             return BlockTypes.AIR.getDefaultState();
         }
-        return super.getBlock(position);
+        return super.getBlock(x, y, z);
     }
 
     @Nullable

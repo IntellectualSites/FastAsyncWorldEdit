@@ -1,7 +1,8 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:base",
-    ":disableDependencyDashboard"
+    ":semanticCommitsDisabled"
   ],
   "ignoreDeps": [
     "guava",  
@@ -23,6 +24,5 @@
     "log4j"
   ],
   "labels": ["Renovate"],
-  "commitMessagePrefix": "build: ",
   "rebaseWhen": "conflicted"
 }
