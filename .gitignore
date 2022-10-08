@@ -24,7 +24,6 @@ logs/
 worldedit-bukkit/src/main/java/ignore/*
 todo.txt
 mvn/*
-docs/
 *.sh
 # i18n
 worldedit-core/src/main/resources/lang/*
