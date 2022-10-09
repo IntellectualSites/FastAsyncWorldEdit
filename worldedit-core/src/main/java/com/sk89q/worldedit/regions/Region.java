@@ -407,9 +407,9 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 if (!containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
                     processExtra = true;
                     if (set instanceof IntSetBlocks) {
-                        processCuboid(set, layer, set.loadInts(layer));
+                        processCuboid(set, layer, null, set.loadInts(layer));
                     } else {
-                        processCuboid(set, layer, set.loadChars(layer));
+                        processCuboid(set, layer, set.loadChars(layer), null);
                     }
                 }
             }
@@ -422,20 +422,32 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         }
     }
 
-    private void processCuboid(IChunkSet set, int layer, Object arr) {
-        for (int y = 0, index = 0; y < 16; y++) {
-            for (int z = 0; z < 16; z++) {
-                for (int x = 0; x < 16; x++, index++) {
-                    if (!Array.get(arr, index).equals(0) && !contains(x, y, z)) {
-                        Array.set(arr, index, 0);
+    private void processCuboid(IChunkSet set, int layer, char[] charArr, int[] intArr) {
+        if (charArr == null) {
+            for (int y = 0, index = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++, index++) {
+                        if (intArr[index] != 0 && !contains(x, y, z)) {
+                            intArr[index] = 0;
+                        }
+                    }
+                }
+            }
+        } else {
+            for (int y = 0, index = 0; y < 16; y++) {
+                for (int z = 0; z < 16; z++) {
+                    for (int x = 0; x < 16; x++, index++) {
+                        if (charArr[index] != 0 && !contains(x, y, z)) {
+                            charArr[index] = 0;
+                        }
                     }
                 }
             }
         }
         if (set instanceof IntSetBlocks) {
-            set.setIntBlocks(layer, (int[]) arr);
+            set.setIntBlocks(layer, intArr);
         } else {
-            set.setCharBlocks(layer, (char[]) arr);
+            set.setCharBlocks(layer, charArr);
         }
     }
 
@@ -523,5 +535,4 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
         return ProcessorScope.REMOVING_BLOCKS;
     }
     //FAWE end
-
 }

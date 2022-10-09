@@ -1019,16 +1019,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    public int[] loadInts(final int layer) {
-        return null;
-    }
-
-    @Override
-    public int[] loadIntsIfPresent(final int layer) {
-        return null;
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public synchronized boolean trim(boolean aggressive) {
         skyLight = new DataLayer[getSectionCount()];
@@ -1074,5 +1064,4 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             return true;
         }
     }
-
 }

@@ -134,37 +134,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                 continue;
             }
 
-            if (!(set instanceof IntSetBlocks)) {
-                char[] blocks = Objects.requireNonNull(set.loadCharsIfPresent(layer));
-                it:
-                for (int i = 0; i < blocks.length; i++) {
-                    char block = blocks[i];
-                    BlockState state = states[block];
-                    if (blockedBlocks != null) {
-                        if (blockedBlocks.contains(state.getBlockType().getId())) {
-                            blocks[i] = 0;
-                            continue;
-                        }
-                    }
-                    if (blockedStates == null) {
-                        continue;
-                    }
-                    for (FuzzyBlockState fuzzy : blockedStates) {
-                        if (fuzzy.equalsFuzzy(state)) {
-                            blocks[i] = 0;
-                            continue it;
-                        }
-                    }
-                    if (remaps == null || remaps.isEmpty()) {
-                        blocks[i] = block;
-                        continue;
-                    }
-                    for (PropertyRemap<?> remap : remaps) {
-                        state = remap.apply(state);
-                    }
-                    blocks[i] = state.getOrdinalChar();
-                }
-            } else {
+            if (set instanceof IntSetBlocks) {
                 int[] blocks = Objects.requireNonNull(set.loadIntsIfPresent(layer));
                 it:
                 for (int i = 0; i < blocks.length; i++) {
@@ -193,6 +163,36 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                         state = remap.apply(state);
                     }
                     blocks[i] = state.getOrdinal();
+                }
+            } else {
+                char[] blocks = Objects.requireNonNull(set.loadCharsIfPresent(layer));
+                it:
+                for (int i = 0; i < blocks.length; i++) {
+                    char block = blocks[i];
+                    BlockState state = states[block];
+                    if (blockedBlocks != null) {
+                        if (blockedBlocks.contains(state.getBlockType().getId())) {
+                            blocks[i] = 0;
+                            continue;
+                        }
+                    }
+                    if (blockedStates == null) {
+                        continue;
+                    }
+                    for (FuzzyBlockState fuzzy : blockedStates) {
+                        if (fuzzy.equalsFuzzy(state)) {
+                            blocks[i] = 0;
+                            continue it;
+                        }
+                    }
+                    if (remaps == null || remaps.isEmpty()) {
+                        blocks[i] = block;
+                        continue;
+                    }
+                    for (PropertyRemap<?> remap : remaps) {
+                        state = remap.apply(state);
+                    }
+                    blocks[i] = state.getOrdinalChar();
                 }
             }
         }

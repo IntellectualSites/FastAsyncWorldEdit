@@ -138,7 +138,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 BlockState toBlock = set.getBlock(pos.getX() & 15, pos.getY(), pos.getZ() & 15);
                 if (fromBlock != toBlock || tilesTo.containsKey(pos)) {
                     addTileRemove(MainUtil.setPosition(entry.getValue(), entry.getKey().getX(), entry.getKey().getY(),
-                            entry.getKey().getZ()));
+                            entry.getKey().getZ()
+                    ));
                 }
             }
         }
@@ -168,18 +169,18 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 continue;
             }
 
-            if(!(set instanceof IntSetBlocks)) {
+            if (set instanceof IntSetBlocks) {
                 // add each block and tile
-                char[] blocksGet;
-                char[] tmp = get.loadChars(layer);
+                int[] blocksGet;
+                int[] tmp = get.loadInts(layer);
                 if (tmp == null) {
-                    blocksGet = FaweCache.INSTANCE.EMPTY_CHAR_4096;
+                    blocksGet = FaweCache.INSTANCE.EMPTY_INT_4096;
                 } else {
-                    System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
+                    System.arraycopy(tmp, 0, (blocksGet = new int[4096]), 0, 4096);
                 }
-                char[] blocksSet;
+                int[] blocksSet;
                 // loadIfPresent shouldn't be null if set.hasSection(layer) is true
-                System.arraycopy(Objects.requireNonNull(set.loadCharsIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
+                System.arraycopy(Objects.requireNonNull(set.loadIntsIfPresent(layer)), 0, (blocksSet = new int[4096]), 0, 4096);
 
                 // Account for negative layers
                 int by = layer << 4;
@@ -203,16 +204,16 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 }
             } else {
                 // add each block and tile
-                int[] blocksGet;
-                int[] tmp = get.loadInts(layer);
+                char[] blocksGet;
+                char[] tmp = get.loadChars(layer);
                 if (tmp == null) {
-                    blocksGet = FaweCache.INSTANCE.EMPTY_INT_4096;
+                    blocksGet = FaweCache.INSTANCE.EMPTY_CHAR_4096;
                 } else {
-                    System.arraycopy(tmp, 0, (blocksGet = new int[4096]), 0, 4096);
+                    System.arraycopy(tmp, 0, (blocksGet = new char[4096]), 0, 4096);
                 }
-                int[] blocksSet;
+                char[] blocksSet;
                 // loadIfPresent shouldn't be null if set.hasSection(layer) is true
-                System.arraycopy(Objects.requireNonNull(set.loadIntsIfPresent(layer)), 0, (blocksSet = new int[4096]), 0, 4096);
+                System.arraycopy(Objects.requireNonNull(set.loadCharsIfPresent(layer)), 0, (blocksSet = new char[4096]), 0, 4096);
 
                 // Account for negative layers
                 int by = layer << 4;
@@ -247,9 +248,9 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 BiomeType[] biomeSection = biomes[layer - set.getMinSectionPosition()];
                 int index = 0;
                 int yy = layer << 4;
-                for (int y = 0; y < 16; y+= 4) {
-                    for (int z = 0; z < 16; z+= 4) {
-                        for (int x = 0; x < 16; x+= 4, index++) {
+                for (int y = 0; y < 16; y += 4) {
+                    for (int z = 0; z < 16; z += 4) {
+                        for (int x = 0; x < 16; x += 4, index++) {
                             BiomeType newBiome = biomeSection[index];
                             if (newBiome != null) {
                                 BiomeType oldBiome = get.getBiomeType(x, yy + y, z);

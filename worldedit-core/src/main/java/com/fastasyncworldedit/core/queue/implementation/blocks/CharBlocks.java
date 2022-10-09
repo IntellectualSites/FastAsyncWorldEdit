@@ -71,7 +71,6 @@ public abstract class CharBlocks extends ChunkSectionedChunk implements IBlocks 
     public char[][] blocks;
     public Section[] sections;
 
-
     /**
      * New instance given initial min/max section indices. Can be negative.
      */

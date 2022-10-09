@@ -60,4 +60,13 @@ public abstract class CharGetBlocks extends CharBlocks implements IChunkGet {
         return null;
     }
 
+    @Override
+    public int[] loadInts(final int layer) {
+        throw new UnsupportedOperationException("loadInts() is not implemented for the class CharGetBlocks.");
+    }
+
+    @Override
+    public int[] loadIntsIfPresent(final int layer) {
+        throw new UnsupportedOperationException("loadIntsIfPresent() is not implemented for the class CharGetBlocks.");
+    }
 }

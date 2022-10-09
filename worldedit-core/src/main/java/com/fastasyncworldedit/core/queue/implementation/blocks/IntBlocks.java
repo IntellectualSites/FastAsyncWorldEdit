@@ -73,7 +73,6 @@ public abstract class IntBlocks extends ChunkSectionedChunk implements IBlocks {
     public int[][] blocks;
     public IntBlocks.Section[] sections;
 
-
     /**
      * New instance given initial min/max section indices. Can be negative.
      */
