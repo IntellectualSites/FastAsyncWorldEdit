@@ -134,8 +134,8 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
             char[] blocks = Objects.requireNonNull(set.loadIfPresent(layer));
             it:
             for (int i = 0; i < blocks.length; i++) {
-                char block;
-                if ((block = blocks[i]) == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                char block = blocks[i];
+                if (block == BlockTypesCache.ReservedIDs.__RESERVED__) {
                     continue;
                 }
                 BlockState state = BlockTypesCache.states[block];
