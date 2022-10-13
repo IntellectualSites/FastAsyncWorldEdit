@@ -91,6 +91,7 @@ public class FaweException extends RuntimeException {
         PLAYER_ONLY,
         ACTOR_REQUIRED,
         CLIPBOARD,
+        HISTORY,
         OTHER
     }
 

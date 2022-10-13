@@ -47,6 +47,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final World world;
+    private final AtomicInteger lastException = new AtomicInteger();
     protected AtomicInteger waitingCombined = new AtomicInteger(0);
     protected AtomicInteger waitingAsync = new AtomicInteger(0);
 
@@ -369,7 +370,10 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 if (completeNow) {
                     throw t;
                 } else {
-                    t.printStackTrace();
+                    int hash = t.getMessage().hashCode();
+                    if (lastException.getAndSet(hash) != hash) {
+                        t.printStackTrace();
+                    }
                 }
             } finally {
                 if (AbstractChangeSet.this.waitingCombined.decrementAndGet() <= 0) {
