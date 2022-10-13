@@ -605,7 +605,7 @@ public final class EditSessionBuilder {
             }
             if (this.limit != null && !this.limit.isUnlimited()) {
                 Set<String> limitBlocks = new HashSet<>();
-                if ((getActor() == null || getActor().hasPermission("worldedit.anyblock") && this.limit.UNIVERSAL_DISALLOWED_BLOCKS)) {
+                if ((getActor() == null || getActor().hasPermission("worldedit.anyblock")) && this.limit.UNIVERSAL_DISALLOWED_BLOCKS) {
                     limitBlocks.addAll(WorldEdit.getInstance().getConfiguration().disallowedBlocks);
                 }
                 if (this.limit.DISALLOWED_BLOCKS != null && !this.limit.DISALLOWED_BLOCKS.isEmpty()) {

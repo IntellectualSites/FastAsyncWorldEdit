@@ -391,8 +391,8 @@ public class Settings extends Config {
         public boolean UNIVERSAL_DISALLOWED_BLOCKS = true;
         @Comment({
                 "List of blocks to deny use of. Can be either an entire block type or a block with a specific property value.",
-                "Where block properties are specified, any blockstate with the property will be disallowed (i.g. all directions",
-                "of a waterlogged fence). For blocking/remapping of all occurence of a property like waterlogged, see",
+                "Where block properties are specified, any blockstate with the property will be disallowed (e.g. all directions",
+                "of a waterlogged fence). For blocking/remapping of all occurrences of a property like waterlogged, see",
                 "remap-properties below.",
                 "Example block property blocking:",
                 " - \"minecraft:conduit[waterlogged=true]\"",
