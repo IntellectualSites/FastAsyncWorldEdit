@@ -590,10 +590,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     static List<Entity> getEntities(LevelChunk chunk) {
-        if (PaperLib.isPaper()) {
-            return Arrays.asList(chunk.entities.getRawData());
-        }
-        return chunk.level.entityManager.getEntities(chunk.getPos());
+//        if (PaperLib.isPaper()) {
+//            return Arrays.asList(chunk.getBlockEntities().get(0));
+//        }
+//        return chunk.level.enti.getEntities(chunk.getPos());
+        return new ArrayList<>();
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
