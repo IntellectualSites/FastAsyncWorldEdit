@@ -591,9 +591,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static List<Entity> getEntities(LevelChunk chunk) {
 //        if (PaperLib.isPaper()) {
-//            return Arrays.asList(chunk.getBlockEntities().get(0));
+//            return Arrays.asList(chunk.entities.getRawData());
 //        }
-//        return chunk.level.enti.getEntities(chunk.getPos());
+//        return chunk.level.entityManager.getEntities(chunk.getPos());
         return new ArrayList<>();
     }
 
