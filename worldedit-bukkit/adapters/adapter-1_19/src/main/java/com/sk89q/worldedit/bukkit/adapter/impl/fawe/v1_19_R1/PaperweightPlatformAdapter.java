@@ -107,7 +107,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final Field fieldRemove;
 
-    public static final boolean POST_CHUNK_REWRITE;
+    static final boolean POST_CHUNK_REWRITE;
     private static Method PAPER_CHUNK_GEN_ALL_ENTITIES;
 
     static {
