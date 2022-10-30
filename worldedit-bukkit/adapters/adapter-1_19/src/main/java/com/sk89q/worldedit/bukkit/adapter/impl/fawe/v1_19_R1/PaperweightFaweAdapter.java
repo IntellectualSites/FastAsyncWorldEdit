@@ -55,6 +55,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
@@ -97,6 +98,7 @@ import org.bukkit.entity.Player;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -490,7 +492,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     public void sendFakeChunk(org.bukkit.World world, Player player, ChunkPacket chunkPacket) {
         ServerLevel nmsWorld = ((CraftWorld) world).getHandle();
         ChunkHolder map = PaperweightPlatformAdapter.getPlayerChunk(nmsWorld, chunkPacket.getChunkX(), chunkPacket.getChunkZ());
-        if (map != null && map.wasAccessibleSinceLastSave()) {
+        if (map != null && wasAccessibleSinceLastSave(map)) {
             boolean flag = false;
             // PlayerChunk.d players = map.players;
             Stream<ServerPlayer> stream = /*players.a(new ChunkCoordIntPair(packet.getChunkX(), packet.getChunkZ()), flag)
@@ -672,6 +674,18 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     @Override
     public IBatchProcessor getTickingPostProcessor() {
         return new PaperweightPostProcessor();
+    }
+
+    private boolean wasAccessibleSinceLastSave(ChunkHolder holder) {
+        if (!PaperLib.isPaper() || !PaperweightPlatformAdapter.POST_CHUNK_REWRITE) {
+            try {
+                return (boolean) holder.getClass().getDeclaredMethod("wasAccessibleSinceLastSave").invoke(holder);
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException ignored) {
+                // fall-through
+            }
+        }
+        // Papers new chunk system has no related replacement - therefor we assume true.
+        return true;
     }
 
 }

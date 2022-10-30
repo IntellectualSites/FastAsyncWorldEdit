@@ -1,5 +1,6 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R1;
 
+import com.destroystokyo.paper.util.maplist.EntityList;
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.DelegateSemaphore;
 import com.fastasyncworldedit.bukkit.adapter.NMSAdapter;
@@ -18,6 +19,7 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
+import io.papermc.paper.world.ChunkEntitySlices;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
@@ -47,6 +49,7 @@ import net.minecraft.world.level.chunk.LinearPalette;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
+import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import net.minecraft.world.level.gameevent.GameEventDispatcher;
 import net.minecraft.world.level.gameevent.GameEventListener;
 import org.bukkit.craftbukkit.v1_19_R1.CraftChunk;
@@ -103,6 +106,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MethodHandle methodremoveTickingBlockEntity;
 
     private static final Field fieldRemove;
+
+    public static final boolean POST_CHUNK_REWRITE;
+    private static Method PAPER_CHUNK_GEN_ALL_ENTITIES;
 
     static {
         try {
@@ -174,6 +180,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 throw new Error("data type scale not a power of two");
             }
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
+            boolean chunkRewrite = false;
+            try {
+                ServerLevel.class.getDeclaredMethod("getEntityLookup");
+                chunkRewrite = true;
+                PAPER_CHUNK_GEN_ALL_ENTITIES = ChunkEntitySlices.class.getDeclaredMethod("getAllEntities");
+            } catch (NoSuchMethodException ignored) {
+            }
+            POST_CHUNK_REWRITE = chunkRewrite;
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -589,9 +603,27 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static List<Entity> getEntities(LevelChunk chunk) {
         if (PaperLib.isPaper()) {
-            return Arrays.asList(chunk.entities.getRawData());
+            if (POST_CHUNK_REWRITE) {
+                try {
+                    //noinspection unchecked
+                    return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level.getEntityLookup().getChunk(chunk.locX, chunk.locZ));
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            try {
+                EntityList entityList = (EntityList) LevelChunk.class.getDeclaredField("entities").get(chunk);
+                return List.of(entityList.getRawData());
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                // fall through
+            }
         }
-        return chunk.level.entityManager.getEntities(chunk.getPos());
+        try {
+            ((PersistentEntitySectionManager<Entity>) (ServerLevel.class.getDeclaredField("entityManager").get(chunk.level))).getEntities(chunk.getPos());
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            // fall through
+        }
+        return List.of();
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
