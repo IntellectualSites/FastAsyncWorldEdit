@@ -320,12 +320,12 @@ public class WorldWrapper extends AbstractWorld {
 
     @Override
     public List<? extends Entity> getEntities(Region region) {
-        return TaskManager.taskManager().sync(() -> parent.getEntities(region));
+        return parent.getEntities(region);
     }
 
     @Override
     public List<? extends Entity> getEntities() {
-        return TaskManager.taskManager().sync(parent::getEntities);
+        return parent.getEntities();
     }
 
     @Override
