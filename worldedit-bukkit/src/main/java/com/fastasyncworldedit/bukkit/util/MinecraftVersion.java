@@ -1,9 +1,11 @@
 package com.fastasyncworldedit.bukkit.util;
 
 import com.google.common.collect.ComparisonChain;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
 
 import javax.annotation.Nonnull;
+import java.util.regex.Pattern;
 
 /**
  * Utility class for retrieving and comparing minecraft server versions.
@@ -44,18 +46,15 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
 
     /**
      * Construct a new version with major, minor and release based on the server version.
+     * @deprecated use {@link MinecraftVersion#getCurrent()} instead.
      */
+    @Deprecated(since = "TODO", forRemoval = true)
     public MinecraftVersion() {
-        // Array consists of three version parts, eg. ['v1', '16', 'R3']
-        String[] versionParts = getPackageVersion().split("_");
+        MinecraftVersion current = getCurrent();
 
-        if (versionParts.length != 3) {
-            throw new IllegalStateException("Failed to determine minecraft version!");
-        }
-
-        this.major = Integer.parseInt(versionParts[0].substring(1));
-        this.minor = Integer.parseInt(versionParts[1]);
-        this.release = Integer.parseInt(versionParts[2].substring(1));
+        this.major = current.getMajor();
+        this.minor = current.getMinor();
+        this.release = current.getRelease();
     }
 
     /**
@@ -65,9 +64,33 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
      */
     public static MinecraftVersion getCurrent() {
         if (current == null) {
-            return current = new MinecraftVersion();
+            return current = detectMinecraftVersion();
         }
         return current;
+    }
+
+    private static MinecraftVersion detectMinecraftVersion() {
+        int major;
+        int minor;
+        int release;
+        if (PaperLib.isPaper()) {
+            String[] parts = Bukkit.getMinecraftVersion().split(Pattern.quote("."));
+            if (parts.length != 2 && parts.length != 3) {
+                throw new IllegalStateException("Failed to determine minecraft version!");
+            }
+            major = Integer.parseInt(parts[0]);
+            minor = Integer.parseInt(parts[1]);
+            release = parts.length == 3 ? Integer.parseInt(parts[2]) : 0; // e.g. 1.18
+        } else {
+            String[] parts = getPackageVersion().split("_");
+            if (parts.length != 3) {
+                throw new IllegalStateException("Failed to determine minecraft version!");
+            }
+            major = Integer.parseInt(parts[0].substring(1));
+            minor = Integer.parseInt(parts[1]);
+            release = Integer.parseInt(parts[2].substring(1));
+        }
+        return new MinecraftVersion(major, minor, release);
     }
 
     /**
