@@ -30,6 +30,7 @@ import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
+import net.minecraft.util.ExceptionCollector;
 import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.util.ThreadingDetector;
 import net.minecraft.util.ZeroBitStorage;
@@ -109,6 +110,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static final boolean POST_CHUNK_REWRITE;
     private static Method PAPER_CHUNK_GEN_ALL_ENTITIES;
+    private static Field LEVEL_CHUNK_ENTITIES;
+    private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
     static {
         try {
@@ -180,12 +183,25 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 throw new Error("data type scale not a power of two");
             }
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
-            boolean chunkRewrite = false;
+            boolean chunkRewrite;
             try {
                 ServerLevel.class.getDeclaredMethod("getEntityLookup");
                 chunkRewrite = true;
                 PAPER_CHUNK_GEN_ALL_ENTITIES = ChunkEntitySlices.class.getDeclaredMethod("getAllEntities");
             } catch (NoSuchMethodException ignored) {
+                chunkRewrite = false;
+            }
+            try {
+                // Paper - Pre-Chunk-Update
+                LEVEL_CHUNK_ENTITIES = LevelChunk.class.getDeclaredField("entities");
+                LEVEL_CHUNK_ENTITIES.setAccessible(true);
+            } catch (NoSuchFieldException ignored) {
+            }
+            try {
+                // Non-Paper
+                SERVER_LEVEL_ENTITY_MANAGER = ServerLevel.class.getDeclaredField("entityManager");
+                LEVEL_CHUNK_ENTITIES.setAccessible(true);
+            } catch (NoSuchFieldException ignored) {
             }
             POST_CHUNK_REWRITE = chunkRewrite;
         } catch (RuntimeException e) {
@@ -602,27 +618,31 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     static List<Entity> getEntities(LevelChunk chunk) {
+        ExceptionCollector<RuntimeException> collector = new ExceptionCollector<>();
         if (PaperLib.isPaper()) {
             if (POST_CHUNK_REWRITE) {
                 try {
                     //noinspection unchecked
                     return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level.getEntityLookup().getChunk(chunk.locX, chunk.locZ));
                 } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=true]", e);
                 }
             }
             try {
-                EntityList entityList = (EntityList) LevelChunk.class.getDeclaredField("entities").get(chunk);
+                EntityList entityList = (EntityList) LEVEL_CHUNK_ENTITIES.get(chunk);
                 return List.of(entityList.getRawData());
-            } catch (IllegalAccessException | NoSuchFieldException e) {
+            } catch (IllegalAccessException e) {
+                collector.add(new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=false]", e));
                 // fall through
             }
         }
         try {
-            ((PersistentEntitySectionManager<Entity>) (ServerLevel.class.getDeclaredField("entityManager").get(chunk.level))).getEntities(chunk.getPos());
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            // fall through
+            //noinspection unchecked
+            return ((PersistentEntitySectionManager<Entity>) (SERVER_LEVEL_ENTITY_MANAGER.get(chunk.level))).getEntities(chunk.getPos());
+        } catch (IllegalAccessException e) {
+            collector.add(new RuntimeException("Failed to lookup entities [PAPER=false]", e));
         }
+        collector.throwIfPresent();
         return List.of();
     }
 
