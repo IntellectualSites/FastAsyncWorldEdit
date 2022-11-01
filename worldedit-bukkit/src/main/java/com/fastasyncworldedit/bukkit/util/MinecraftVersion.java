@@ -75,12 +75,12 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
         int release;
         if (PaperLib.isPaper()) {
             String[] parts = Bukkit.getMinecraftVersion().split(Pattern.quote("."));
-            if (parts.length != 3) {
+            if (parts.length != 2 && parts.length != 3) {
                 throw new IllegalStateException("Failed to determine minecraft version!");
             }
             major = Integer.parseInt(parts[0]);
             minor = Integer.parseInt(parts[1]);
-            release = Integer.parseInt(parts[2]);
+            release = parts.length == 3 ? Integer.parseInt(parts[2]) : 0; // e.g. 1.18
         } else {
             String[] parts = getPackageVersion().split("_");
             if (parts.length != 3) {
