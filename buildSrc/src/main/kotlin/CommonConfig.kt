@@ -18,6 +18,9 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "OSS Sonatype Snapshots"
             url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+            mavenContent {
+                snapshotsOnly()
+            }
         }
         maven {
             name = "Athion"

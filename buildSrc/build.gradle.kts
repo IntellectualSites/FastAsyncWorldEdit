@@ -6,18 +6,18 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
-    gradlePluginPortal()
-    maven {
-        name = "EngineHub"
-        url = uri("https://maven.enginehub.org/repo/")
-    }
     maven {
         name = "PaperMC"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
+        url = uri("https://papermc.io/repo/repository/maven-public/")
         content {
             includeGroupByRegex("io\\.papermc\\..*")
         }
+    }
+    mavenCentral()
+    gradlePluginPortal()
+    maven {
+        name = "EngineHub Repository"
+        url = uri("https://maven.enginehub.org/repo/")
     }
 }
 
