@@ -188,6 +188,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 ServerLevel.class.getDeclaredMethod("getEntityLookup");
                 chunkRewrite = true;
                 PAPER_CHUNK_GEN_ALL_ENTITIES = ChunkEntitySlices.class.getDeclaredMethod("getAllEntities");
+                PAPER_CHUNK_GEN_ALL_ENTITIES.setAccessible(true);
             } catch (NoSuchMethodException ignored) {
                 chunkRewrite = false;
             }
