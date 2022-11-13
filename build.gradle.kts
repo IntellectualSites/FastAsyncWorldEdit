@@ -6,7 +6,7 @@ import java.net.URI
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
-    id("xyz.jpenilla.run-paper") version "1.0.6"
+    id("xyz.jpenilla.run-paper") version "1.1.0"
 }
 
 logger.lifecycle("""
