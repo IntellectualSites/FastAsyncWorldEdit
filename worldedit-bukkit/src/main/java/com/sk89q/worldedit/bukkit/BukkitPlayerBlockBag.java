@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.core.extent.inventory.SlottableBlockBag;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.blocks.BaseItem;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
@@ -171,7 +172,10 @@ public class BukkitPlayerBlockBag extends BlockBag implements SlottableBlockBag 
     @Override
     public void flushChanges() {
         if (items != null) {
-            player.getInventory().setContents(items);
+            TaskManager.taskManager().sync(() -> {
+                player.getInventory().setContents(items);
+                return null;
+            });
             items = null;
         }
     }

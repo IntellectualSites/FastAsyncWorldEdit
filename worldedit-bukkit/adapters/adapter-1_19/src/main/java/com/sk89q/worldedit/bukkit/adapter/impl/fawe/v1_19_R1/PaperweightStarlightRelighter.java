@@ -12,7 +12,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongSet;
-import net.minecraft.server.MCUtil;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.TicketType;
@@ -41,7 +41,7 @@ public class PaperweightStarlightRelighter implements Relighter {
     private static final int CHUNKS_PER_BATCH_SQRT_LOG2 = 5; // for shifting
 
     private static final TicketType<Unit> FAWE_TICKET = TicketType.create("fawe_ticket", (a, b) -> 0);
-    private static final int LIGHT_LEVEL = MCUtil.getTicketLevelFor(ChunkStatus.LIGHT);
+    private static final int LIGHT_LEVEL = ChunkMap.MAX_VIEW_DISTANCE + ChunkStatus.getDistance(ChunkStatus.LIGHT);
 
     static {
         MethodHandle tmp = null;

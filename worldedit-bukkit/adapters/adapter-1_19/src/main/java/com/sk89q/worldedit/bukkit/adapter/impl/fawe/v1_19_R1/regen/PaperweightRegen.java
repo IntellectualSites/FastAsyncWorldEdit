@@ -364,7 +364,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             Fawe.instance().getQueueHandler().sync(() -> {
                 try {
                     freshChunkProvider.close(false);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             });

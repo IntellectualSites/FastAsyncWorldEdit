@@ -5,6 +5,9 @@ import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.SingleFilterBlock;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
@@ -24,19 +27,26 @@ import org.apache.logging.log4j.Logger;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -321,6 +331,8 @@ public class TextureUtil implements TextureHolder {
             new BiomeColor(253, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
             new BiomeColor(254, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F),
             new BiomeColor(255, "Unknown Biome", 0.8f, 0.4f, 0x92BD59, 0x77AB2F)};
+
+    private static final String VERSION_MANIFEST = "https://piston-meta.mojang.com/mc/game/version_manifest.json";
     private final BlockType[] layerBuffer = new BlockType[2];
     protected int[] blockColors = new int[BlockTypes.size()];
     protected long[] blockDistance = new long[BlockTypes.size()];
@@ -352,17 +364,43 @@ public class TextureUtil implements TextureHolder {
             try {
                 LOGGER.info("Downloading asset jar from Mojang, please wait...");
                 new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/").mkdirs();
-                try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://piston-data.mojang.com/v1/objects/c0898ec7c6a5a2eaa317770203a1554260699994/client.jar")
-                                .openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.2.jar")) {
-                    byte[] dataBuffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+
+                try {
+                    VersionMetadata metadata = getLatestVersion();
+                    LOGGER.info("Latest release version is {}", metadata.version());
+                    HashedResource resource = getLatestClientJarUrl(metadata);
+
+                    Path out = Path.of(
+                            Fawe.platform().getDirectory().getPath(),
+                            Settings.settings().PATHS.TEXTURES,
+                            metadata.version() + ".jar"
+                    );
+                    // Copy resource to local fs
+                    try (final InputStream stream = new URL(resource.resource()).openStream();
+                         final OutputStream writer = Files.newOutputStream(out)) {
+                        stream.transferTo(writer);
                     }
-                    LOGGER.info("Asset jar down has been downloaded successfully.");
+                    // Validate sha-1 hash
+                    try {
+                        final String sha1 = calculateSha1(out);
+                        if (!sha1.equals(resource.hash())) {
+                            Files.deleteIfExists(out);
+                            LOGGER.error(
+                                    "Hash comparison of final file failed (Expected: '{}', Calculated: '{}')",
+                                    resource.hash(), sha1
+                            );
+                            LOGGER.error("To prevent possibly malicious intentions, the downloaded file has been removed");
+                            return;
+                        }
+                    } catch (NoSuchAlgorithmException e) {
+                        LOGGER.warn("Couldn't verify integrity of downloaded client file");
+                        LOGGER.warn(
+                                "Please verify that the downloaded files '{}' hash is equal to '{}'",
+                                out, resource.hash()
+                        );
+                        return;
+                    }
+                    LOGGER.info("Asset jar has been downloaded and validated successfully.");
                 } catch (IOException e) {
                     LOGGER.error(
                             "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
@@ -388,7 +426,7 @@ public class TextureUtil implements TextureHolder {
         HashSet<BlockType> blocks = new HashSet<>();
         for (int typeId = 0; typeId < ids.length; typeId++) {
             if (ids[typeId]) {
-                blocks.add(BlockTypes.get(typeId));
+                blocks.add(BlockTypesCache.values[typeId]);
             }
         }
         return fromBlocks(blocks);
@@ -406,7 +444,7 @@ public class TextureUtil implements TextureHolder {
 
         TextureUtil tu = Fawe.instance().getTextureUtil();
         for (int typeId : tu.getValidBlockIds()) {
-            BlockType block = BlockTypes.get(typeId);
+            BlockType block = BlockTypesCache.values[typeId];
             extent.init(0, 0, 0, block.getDefaultState().toBaseBlock());
             if (mask.test(extent)) {
                 blocks.add(block);
@@ -555,6 +593,66 @@ public class TextureUtil implements TextureHolder {
         return totalDistSqr / area;
     }
 
+    /**
+     * Retrieves the minecraft versions manifest (containing all released versions) and returns the first {@code release}
+     * version (latest)
+     *
+     * @return {@link VersionMetadata} containing the id (= version) and url to the client manifest itself
+     * @throws IOException If any http / i/o operation fails.
+     * @since 2.4.6
+     */
+    private static VersionMetadata getLatestVersion() throws IOException {
+        try (BufferedInputStream in = new BufferedInputStream(new URL(VERSION_MANIFEST).openStream());
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            final JsonElement element = JsonParser.parseReader(reader);
+            for (final JsonElement versions : element.getAsJsonObject().getAsJsonArray("versions")) {
+                JsonObject version = versions.getAsJsonObject();
+                if (!version.get("type").getAsString().equals("release")) {
+                    continue;
+                }
+                final String clientJsonUrl = version.get("url").getAsString();
+                final String id = version.get("id").getAsString();
+                return new VersionMetadata(id, clientJsonUrl);
+            }
+        }
+        throw new IOException("Failed to get latest version metadata");
+    }
+
+    /**
+     * Retrieves the url to the client.jar based on the previously retrieved {@link VersionMetadata}
+     *
+     * @param metadata The version metadata containing the url to the client.jar
+     * @return The full url to the client.jar including the expected file hash for validation purposes
+     * @throws IOException If any http / i/o operation fails.
+     * @since 2.4.6
+     */
+    private static HashedResource getLatestClientJarUrl(VersionMetadata metadata) throws IOException {
+        try (BufferedInputStream in = new BufferedInputStream(new URL(metadata.url()).openStream());
+             BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
+            final JsonObject object = JsonParser.parseReader(reader).getAsJsonObject();
+            final JsonObject client = object.getAsJsonObject("downloads").getAsJsonObject("client");
+            return new HashedResource(client.get("url").getAsString(), client.get("sha1").getAsString());
+        }
+    }
+
+    /**
+     * Calculates the sha-1 hash based on the content of the provided file.
+     *
+     * @param path The path of the resource to generate the sha-1 hash for
+     * @return The hash of the file contents
+     * @throws NoSuchAlgorithmException If the SHA-1 algorithm could not be resolved
+     * @throws IOException              If any I/O operation failed
+     * @since 2.4.6
+     */
+    private static String calculateSha1(Path path) throws NoSuchAlgorithmException, IOException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        try (final BufferedInputStream stream = new BufferedInputStream(Files.newInputStream(path));
+             final DigestOutputStream digestOutputStream = new DigestOutputStream(OutputStream.nullOutputStream(), digest)) {
+            stream.transferTo(digestOutputStream);
+            return HexFormat.of().formatHex(digest.digest());
+        }
+    }
+
     @Override
     public TextureUtil getTextureUtil() {
         return this;
@@ -586,7 +684,7 @@ public class TextureUtil implements TextureHolder {
         if (min == Long.MAX_VALUE) {
             return null;
         }
-        return BlockTypes.get(closest);
+        return BlockTypesCache.values[closest];
     }
 
     /**
@@ -615,7 +713,7 @@ public class TextureUtil implements TextureHolder {
         if (min == Long.MAX_VALUE) {
             return null;
         }
-        return BlockTypes.get(closest);
+        return BlockTypesCache.values[closest];
     }
 
     /**
@@ -638,8 +736,8 @@ public class TextureUtil implements TextureHolder {
                 }
             }
         }
-        layerBuffer[0] = BlockTypes.get(closest[0]);
-        layerBuffer[1] = BlockTypes.get(closest[1]);
+        layerBuffer[0] = BlockTypesCache.values[closest[0]];
+        layerBuffer[1] = BlockTypesCache.values[closest[1]];
         return layerBuffer;
     }
 
@@ -806,36 +904,25 @@ public class TextureUtil implements TextureHolder {
         if (folder.exists()) {
             // Get all the jar files
             File[] files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-            if (files.length == 0) {
-                new File(Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/")
-                        .mkdirs();
-                try (BufferedInputStream in = new BufferedInputStream(
-                        new URL("https://piston-data.mojang.com/v1/objects/c0898ec7c6a5a2eaa317770203a1554260699994/client.jar")
-                                .openStream());
-                     FileOutputStream fileOutputStream = new FileOutputStream(
-                             Fawe.platform().getDirectory() + "/" + Settings.settings().PATHS.TEXTURES + "/1.19.2.jar")) {
-                    byte[] dataBuffer = new byte[1024];
-                    int bytesRead;
-                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                        fileOutputStream.write(dataBuffer, 0, bytesRead);
-                    }
-                    fileOutputStream.close();
-                    files = folder.listFiles((dir, name) -> name.endsWith(".jar"));
-                } catch (IOException e) {
-                    LOGGER.error(
-                            "Could not download version jar. Please do so manually by creating a `FastAsyncWorldEdit/textures` " +
-                                    "folder with a `.minecraft/versions` jar or mods in it.");
-                    LOGGER.error("If the file exists, please make sure the server has read access to the directory.");
-                }
+            // We expect the latest version to be already there, due to the download in TextureUtil#<init>
+            if (files == null || files.length == 0) {
+                LOGGER.error("No version jar found in {}. Delete the named folder and restart your server to download the " +
+                        "missing assets.", folder.getPath());
+                LOGGER.error(
+                        "If no asset jar is created, please do so manually by creating a `FastAsyncWorldEdit/textures` " +
+                                "folder with a `.minecraft/versions` jar or mods in it.");
             }
-            if ((files.length > 0)) {
+            if (files != null && (files.length > 0)) {
                 for (File file : files) {
                     ZipFile zipFile = new ZipFile(file);
 
                     // Get all the groups in the current jar
                     // The vanilla textures are in `assets/minecraft`
                     // A jar may contain textures for multiple mods
-                    String modelsDir = "assets/%1$s/models/block/%2$s.json";
+                    String[] modelsDir = {
+                            "assets/%1$s/models/block/%2$s.json",
+                            "assets/%1$s/models/item/%2$s.json"
+                    };
                     String texturesDir = "assets/%1$s/textures/%2$s.png";
 
                     Type typeToken = new TypeToken<Map<String, Object>>() {
@@ -859,10 +946,15 @@ public class TextureUtil implements TextureHolder {
                         String nameSpace = split.length == 1 ? "" : split[0];
 
                         // Read models
-                        String modelFileName = String.format(modelsDir, nameSpace, name);
-                        ZipEntry entry = getEntry(zipFile, modelFileName);
+                        ZipEntry entry = null;
+                        for (final String dir : modelsDir) {
+                            String modelFileName = String.format(dir, nameSpace, name);
+                            if ((entry = getEntry(zipFile, modelFileName)) != null) {
+                                break;
+                            }
+                        }
                         if (entry == null) {
-                            LOGGER.error("Cannot find {} in {}", modelFileName, file);
+                            LOGGER.error("Cannot find {} in {}", modelsDir, file);
                             continue;
                         }
 
@@ -1080,7 +1172,8 @@ public class TextureUtil implements TextureHolder {
         if (min == Long.MAX_VALUE) {
             return null;
         }
-        return BlockTypes.get(closest);
+
+        return BlockTypesCache.values[closest];
     }
 
     private String getFileName(String path) {
@@ -1127,6 +1220,14 @@ public class TextureUtil implements TextureHolder {
             this.grassCombined = grass;
             this.foliage = foliage;
         }
+
+    }
+
+    private record VersionMetadata(String version, String url) {
+
+    }
+
+    private record HashedResource(String resource, String hash) {
 
     }
 

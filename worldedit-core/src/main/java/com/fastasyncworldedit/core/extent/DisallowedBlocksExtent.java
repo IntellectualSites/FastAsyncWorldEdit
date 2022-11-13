@@ -19,6 +19,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.block.FuzzyBlockState;
 
 import javax.annotation.Nullable;
@@ -28,8 +29,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
 
 public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IBatchProcessor {
 
@@ -55,7 +54,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
             this.blockedBlocks = new HashSet<>();
             for (String block : blockedBlocks) {
                 if (block.indexOf('[') == -1 || block.indexOf(']') == -1) {
-                    blockedBlocks.add(block);
+                    this.blockedBlocks.add(block);
                     continue;
                 }
                 String[] properties = block.substring(block.indexOf('[') + 1, block.indexOf(']')).split(",");
@@ -133,7 +132,6 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
             if (!set.hasSection(layer)) {
                 continue;
             }
-
             if (set instanceof IntSetBlocks) {
                 int[] blocks = Objects.requireNonNull(set.loadIntsIfPresent(layer));
                 it:
