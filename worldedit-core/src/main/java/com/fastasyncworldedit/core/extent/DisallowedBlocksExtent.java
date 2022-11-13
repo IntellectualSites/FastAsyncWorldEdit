@@ -137,7 +137,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                 it:
                 for (int i = 0; i < blocks.length; i++) {
                     int block = blocks[i];
-                    BlockState state = states[block];
+                    BlockState state = BlockTypesCache.states[block];
                     if (blockedBlocks != null) {
                         if (blockedBlocks.contains(state.getBlockType().getId())) {
                             blocks[i] = 0;
@@ -167,7 +167,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                 it:
                 for (int i = 0; i < blocks.length; i++) {
                     char block = blocks[i];
-                    BlockState state = states[block];
+                    BlockState state = BlockTypesCache.states[block];
                     if (blockedBlocks != null) {
                         if (blockedBlocks.contains(state.getBlockType().getId())) {
                             blocks[i] = 0;
