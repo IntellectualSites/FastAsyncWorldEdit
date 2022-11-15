@@ -48,7 +48,7 @@ public class MinecraftVersion implements Comparable<MinecraftVersion> {
      * Construct a new version with major, minor and release based on the server version.
      * @deprecated use {@link MinecraftVersion#getCurrent()} instead.
      */
-    @Deprecated(since = "TODO", forRemoval = true)
+    @Deprecated(since = "2.4.10", forRemoval = true)
     public MinecraftVersion() {
         MinecraftVersion current = getCurrent();
 
