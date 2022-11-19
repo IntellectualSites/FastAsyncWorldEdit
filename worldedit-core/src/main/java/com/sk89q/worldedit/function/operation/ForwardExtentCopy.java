@@ -330,7 +330,7 @@ public class ForwardExtentCopy implements Operation {
                 }
                 if (sourceMask != Masks.alwaysTrue()) {
                     new MaskTraverser(sourceMask).reset(transExt);
-                    copy = new RegionMaskingFilter(source, sourceMask, copy);
+                    copy = new RegionMaskingFilter(sourceMask, copy);
                 }
                 if (copyingBiomes && (source.isWorld() || region instanceof FlatRegion)) {
                     copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
@@ -394,15 +394,21 @@ public class ForwardExtentCopy implements Operation {
                 if (maskFunc != null) {
                     copy = new RegionMaskTestFunction(sourceMask, copy, maskFunc);
                 } else {
-                    copy = new RegionMaskingFilter(source, sourceMask, copy);
+                    copy = new RegionMaskingFilter(sourceMask, copy);
                 }
-            }
-            if (copyingBiomes && (source.isWorld() || region instanceof FlatRegion)) {
-                copy = CombinedRegionFunction.combine(copy, new BiomeCopy(source, finalDest));
             }
             ExtentTraverser<ParallelQueueExtent> queueTraverser = new ExtentTraverser<>(finalDest).find(ParallelQueueExtent.class);
             Extent preloader = queueTraverser != null ? queueTraverser.get() : source;
             blockCopy = new RegionVisitor(region, copy, preloader);
+        }
+
+        if (copyingBiomes && (source.isWorld() || region instanceof FlatRegion)) {
+            BiomeCopy biomeCopy = new BiomeCopy(source, finalDest);
+            RegionFunction biomeFunction = sourceMask == Masks.alwaysTrue() ?
+                    biomeCopy : new RegionMaskingFilter(sourceMask, biomeCopy);
+            RegionVisitor regionVisitor = new RegionVisitor(region, biomeFunction, source);
+            Operations.completeBlindly(regionVisitor);
+            this.affectedBiomeCols += regionVisitor.getAffected();
         }
 
         List<? extends Entity> entities;
