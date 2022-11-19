@@ -201,7 +201,7 @@ public class BiomeCommands {
 
         RegionFunction replace = new BiomeReplace(editSession, target);
         if (mask != null) {
-            replace = new RegionMaskingFilter(editSession, mask, replace);
+            replace = new RegionMaskingFilter(mask, replace);
         }
         RegionVisitor visitor = new RegionVisitor(region, replace);
         Operations.completeLegacy(visitor);
