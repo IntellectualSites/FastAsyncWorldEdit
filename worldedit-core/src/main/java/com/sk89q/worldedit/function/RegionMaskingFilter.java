@@ -35,24 +35,32 @@ public class RegionMaskingFilter implements RegionFunction {
 
     private final RegionFunction function;
     private final Mask mask;
-    //FAWE start
-    private final Extent extent;
-    //FAWE end
 
     /**
      * Create a new masking filter.
      *
      * @param mask     the mask
      * @param function the function
+     * @deprecated Extent is not used
      */
-    //FAWE start - Extent
+    //FAWE start - Extent (unused -> to be removed)
     public RegionMaskingFilter(Extent extent, Mask mask, RegionFunction function) {
         checkNotNull(function);
         checkNotNull(mask);
-        //FAWE start
-        checkNotNull(extent);
-        this.extent = extent;
-        //FAWE end
+        this.mask = mask;
+        this.function = function;
+    }
+    // FAWE end - Extent
+
+    /**
+     * Create a new masking filter.
+     *
+     * @param mask the mask
+     * @param function the function
+     */
+    public RegionMaskingFilter(Mask mask, RegionFunction function) {
+        checkNotNull(function);
+        checkNotNull(mask);
         this.mask = mask;
         this.function = function;
     }
