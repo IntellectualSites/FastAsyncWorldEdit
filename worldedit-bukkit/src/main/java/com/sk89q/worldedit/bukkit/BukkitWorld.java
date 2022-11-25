@@ -24,6 +24,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.sk89q.jnbt.CompoundTag;
@@ -143,7 +144,7 @@ public class BukkitWorld extends AbstractWorld {
     public List<com.sk89q.worldedit.entity.Entity> getEntities(Region region) {
         World world = getWorld();
 
-        List<Entity> ents = world.getEntities();
+        List<Entity> ents = TaskManager.taskManager().sync(world::getEntities);
         List<com.sk89q.worldedit.entity.Entity> entities = new ArrayList<>();
         for (Entity ent : ents) {
             if (region.contains(BukkitAdapter.asBlockVector(ent.getLocation()))) {
@@ -156,7 +157,9 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public List<com.sk89q.worldedit.entity.Entity> getEntities() {
         List<com.sk89q.worldedit.entity.Entity> list = new ArrayList<>();
-        for (Entity entity : getWorld().getEntities()) {
+
+        List<Entity> ents = TaskManager.taskManager().sync(getWorld()::getEntities);
+        for (Entity entity : ents) {
             list.add(BukkitAdapter.adapt(entity));
         }
         return list;
@@ -279,12 +282,15 @@ public class BukkitWorld extends AbstractWorld {
             return false;
         }
 
-        InventoryHolder chest = (InventoryHolder) state;
-        Inventory inven = chest.getInventory();
-        if (chest instanceof Chest) {
-            inven = ((Chest) chest).getBlockInventory();
-        }
-        inven.clear();
+        TaskManager.taskManager().sync(() -> {
+            InventoryHolder chest = (InventoryHolder) state;
+            Inventory inven = chest.getInventory();
+            if (chest instanceof Chest) {
+                inven = ((Chest) chest).getBlockInventory();
+            }
+            inven.clear();
+            return null;
+        });
         return true;
     }
 

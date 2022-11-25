@@ -111,8 +111,9 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         int index = result.getInt("id");
         int x1 = result.getInt("x1");
         int x2 = result.getInt("x2");
-        int y1 = result.getByte("y1") + 128;
-        int y2 = result.getByte("y2") + 128;
+        // Keep 128 offset for backwards-compatibility
+        int y1 = result.getInt("y1") + 128;
+        int y2 = result.getInt("y2") + 128;
         int z1 = result.getInt("z1");
         int z2 = result.getInt("z2");
         CuboidRegion region = new CuboidRegion(BlockVector3.at(x1, y1, z1), BlockVector3.at(x2, y2, z2));
@@ -172,8 +173,9 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                     stmt.setInt(3, pos2.getBlockX());
                     stmt.setInt(4, pos1.getBlockZ());
                     stmt.setInt(5, pos2.getBlockZ());
-                    stmt.setByte(6, (byte) (pos1.getBlockY() - 128));
-                    stmt.setByte(7, (byte) (pos2.getBlockY() - 128));
+                    // Keep 128 offset for backwards-compatibility
+                    stmt.setInt(6, pos1.getBlockY() - 128);
+                    stmt.setInt(7, pos2.getBlockY() - 128);
                     if (uuid != null) {
                         byte[] uuidBytes = toBytes(uuid);
                         stmt.setBytes(8, uuidBytes);
@@ -196,8 +198,9 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                         stmt.setInt(3, pos2.getBlockX());
                         stmt.setInt(4, pos1.getBlockZ());
                         stmt.setInt(5, pos2.getBlockZ());
-                        stmt.setByte(6, (byte) (pos1.getBlockY() - 128));
-                        stmt.setByte(7, (byte) (pos2.getBlockY() - 128));
+                        // Keep 128 offset for backwards-compatibility
+                        stmt.setInt(6, pos1.getBlockY() - 128);
+                        stmt.setInt(7, pos2.getBlockY() - 128);
                         byte[] uuidBytes = ByteBuffer
                                 .allocate(16)
                                 .putLong(uuid.getMostSignificantBits())
@@ -253,8 +256,9 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                 stmt.setInt(5, pos2.getX());
                 stmt.setInt(6, pos1.getZ());
                 stmt.setInt(7, pos2.getZ());
-                stmt.setByte(8, (byte) (pos1.getY() - 128));
-                stmt.setByte(9, (byte) (pos2.getY() - 128));
+                // Keep 128 offset for backwards-compatibility
+                stmt.setInt(8, pos1.getY() - 128);
+                stmt.setInt(9, pos2.getY() - 128);
                 stmt.setString(10, change.getCommand());
                 stmt.setInt(11, change.size());
                 stmt.executeUpdate();

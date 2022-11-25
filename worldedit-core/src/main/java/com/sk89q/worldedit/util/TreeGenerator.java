@@ -150,7 +150,11 @@ public final class TreeGenerator {
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
                 //FAWE start - ensure canGenerateOn is called.
                 // chorus plants have to generate starting in the end stone itself, not the air above the ground
-                return super.generate(editSession, pos.subtract(0, 1, 0));
+                BlockVector3 down = pos.subtract(0, 1, 0);
+                if (!canGenerateOn(editSession.getBlockType(down.getX(), down.getY(), down.getZ()))) {
+                    return false;
+                }
+                return editSession.getWorld().generateTree(this, editSession, down);
                 //FAWE end
             }
 

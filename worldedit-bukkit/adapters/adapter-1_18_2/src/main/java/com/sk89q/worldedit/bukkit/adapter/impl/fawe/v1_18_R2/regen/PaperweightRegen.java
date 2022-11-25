@@ -146,10 +146,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             chunkSourceField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "K"));
             chunkSourceField.setAccessible(true);
 
-            ringPositionsField = ChunkGenerator.class.getDeclaredField(Refraction.pickName("ringPositions", "i"));
+            ringPositionsField = ChunkGenerator.class.getDeclaredField(Refraction.pickName("ringPositions", "h"));
             ringPositionsField.setAccessible(true);
 
-            hasGeneratedPositionsField = ChunkGenerator.class.getDeclaredField(Refraction.pickName("hasGeneratedPositions", "j"));
+            hasGeneratedPositionsField = ChunkGenerator.class.getDeclaredField(Refraction.pickName("hasGeneratedPositions", "i"));
             hasGeneratedPositionsField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);

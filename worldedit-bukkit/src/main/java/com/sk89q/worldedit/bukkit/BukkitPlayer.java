@@ -22,7 +22,6 @@ package com.sk89q.worldedit.bukkit;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.VaultResolver;
 import com.sk89q.worldedit.WorldEdit;
@@ -162,31 +161,29 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public void giveItem(BaseItemStack itemStack) {
         final PlayerInventory inv = player.getInventory();
         ItemStack newItem = BukkitAdapter.adapt(itemStack);
-        if (itemStack.getType().getId().equalsIgnoreCase(WorldEdit.getInstance().getConfiguration().wandItem)) {
-            inv.remove(newItem);
-        }
-        final ItemStack item = player.getInventory().getItemInMainHand();
-        player.getInventory().setItemInMainHand(newItem);
-        HashMap<Integer, ItemStack> overflow = inv.addItem(item);
-        if (!overflow.isEmpty()) {
-            TaskManager.taskManager().sync(new RunnableVal<>() {
-                @Override
-                public void run(Object value) {
-                    for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
-                        ItemStack stack = entry.getValue();
-                        if (stack.getType() != Material.AIR && stack.getAmount() > 0) {
-                            Item dropped = player.getWorld().dropItem(player.getLocation(), stack);
-                            PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
-                            Bukkit.getPluginManager().callEvent(event);
-                            if (event.isCancelled()) {
-                                dropped.remove();
-                            }
+        TaskManager.taskManager().sync(() -> {
+            if (itemStack.getType().getId().equalsIgnoreCase(WorldEdit.getInstance().getConfiguration().wandItem)) {
+                inv.remove(newItem);
+            }
+            final ItemStack item = player.getInventory().getItemInMainHand();
+            player.getInventory().setItemInMainHand(newItem);
+            HashMap<Integer, ItemStack> overflow = inv.addItem(item);
+            if (!overflow.isEmpty()) {
+                for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
+                    ItemStack stack = entry.getValue();
+                    if (stack.getType() != Material.AIR && stack.getAmount() > 0) {
+                        Item dropped = player.getWorld().dropItem(player.getLocation(), stack);
+                        PlayerDropItemEvent event = new PlayerDropItemEvent(player, dropped);
+                        Bukkit.getPluginManager().callEvent(event);
+                        if (event.isCancelled()) {
+                            dropped.remove();
                         }
                     }
                 }
-            });
-        }
-        player.updateInventory();
+            }
+            player.updateInventory();
+            return null;
+        });
     }
     //FAWE end
 

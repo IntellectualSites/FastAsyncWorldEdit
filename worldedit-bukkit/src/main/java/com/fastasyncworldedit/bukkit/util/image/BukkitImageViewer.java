@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.bukkit.util.image;
 
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.image.Drawable;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.fastasyncworldedit.core.util.image.ImageViewer;
@@ -163,15 +164,18 @@ public class BukkitImageViewer implements ImageViewer {
             controller.showInFrames(player, frames, true);
         } else {
             int slot = getMapSlot(player);
-            if (slot == -1) {
-                if (initializing) {
-                    player.getInventory().setItemInMainHand(new ItemStack(Material.MAP));
-                } else {
-                    return;
+            TaskManager.taskManager().sync(() -> {
+                if (slot == -1) {
+                    if (initializing) {
+                        player.getInventory().setItemInMainHand(new ItemStack(Material.MAP));
+                    } else {
+                        return null;
+                    }
+                } else if (player.getInventory().getHeldItemSlot() != slot) {
+                    player.getInventory().setHeldItemSlot(slot);
                 }
-            } else if (player.getInventory().getHeldItemSlot() != slot) {
-                player.getInventory().setHeldItemSlot(slot);
-            }
+                return null;
+            });
             if (image == null && drawable != null) {
                 image = drawable.draw();
             }

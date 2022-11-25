@@ -223,23 +223,11 @@ public abstract class AbstractRegion extends AbstractSet<BlockVector3> implement
     // Sub-class utilities
 
     protected final int getWorldMinY() {
-        //FAWE start > Server default based on version
-        return world == null ? WorldEdit
-                .getInstance()
-                .getPlatformManager()
-                .queryCapability(Capability.WORLD_EDITING)
-                .versionMinY() : world.getMinY();
-        //FAWE end
+        return world == null ? Integer.MIN_VALUE : world.getMinY();
     }
 
     protected final int getWorldMaxY() {
-        //FAWE start > Server default based on version
-        return world == null ? WorldEdit
-                .getInstance()
-                .getPlatformManager()
-                .queryCapability(Capability.WORLD_EDITING)
-                .versionMaxY() : world.getMaxY();
-        //FAWE end
+        return world == null ? Integer.MAX_VALUE : world.getMaxY();
     }
 
     //FAWE start

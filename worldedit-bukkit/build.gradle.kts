@@ -201,5 +201,6 @@ tasks {
         loaders.addAll(listOf("paper", "purpur", "spigot"))
         changelog.set("The changelog is available on GitHub: https://github.com/IntellectualSites/" +
                 "FastAsyncWorldEdit/releases/tag/${project.version}")
+        syncBodyFrom.set(rootProject.file("README.md").readText())
     }
 }
