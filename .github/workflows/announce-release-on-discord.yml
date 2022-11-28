@@ -1,7 +1,9 @@
 name: Announce release on discord
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ["build"]
+    types:
+      - completed
 
 jobs:
   send_announcement:
