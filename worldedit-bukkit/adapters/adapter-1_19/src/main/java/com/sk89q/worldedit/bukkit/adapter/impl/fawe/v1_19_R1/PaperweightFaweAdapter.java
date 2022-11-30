@@ -653,17 +653,11 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public RelighterFactory getRelighterFactory() {
-        try {
-            Class.forName("ca.spottedleaf.starlight.common.light.StarLightEngine");
-            if (PaperweightStarlightRelighter.isUsable()) {
-                return new PaperweightStarlightRelighterFactory();
-            }
-        } catch (ThreadDeath td) {
-            throw td;
-        } catch (Throwable ignored) {
-
+        if (PaperLib.isPaper()) {
+            return new PaperweightStarlightRelighterFactory();
+        } else {
+            return new NMSRelighterFactory();
         }
-        return new NMSRelighterFactory();
     }
 
     @Override

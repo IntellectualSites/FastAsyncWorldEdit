@@ -14,16 +14,12 @@ import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.server.MCUtil;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ThreadedLevelLightEngine;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Unit;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +31,6 @@ import java.util.function.IntConsumer;
 
 public class PaperweightStarlightRelighter implements Relighter {
 
-    public static final MethodHandle RELIGHT;
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final int CHUNKS_PER_BATCH = 1024; // 32 * 32
     private static final int CHUNKS_PER_BATCH_SQRT_LOG2 = 5; // for shifting
@@ -43,26 +38,6 @@ public class PaperweightStarlightRelighter implements Relighter {
     private static final TicketType<Unit> FAWE_TICKET = TicketType.create("fawe_ticket", (a, b) -> 0);
     private static final int LIGHT_LEVEL = MCUtil.getTicketLevelFor(ChunkStatus.LIGHT);
 
-    static {
-        MethodHandle tmp = null;
-        try {
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
-            tmp = lookup.findVirtual(
-                    ThreadedLevelLightEngine.class,
-                    "relight",
-                    MethodType.methodType(
-                            int.class, // return type
-                            // params
-                            Set.class,
-                            Consumer.class,
-                            IntConsumer.class
-                    )
-            );
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            LOGGER.error("Failed to locate 'relight' method in ThreadedLevelLightEngine. Is everything up to date?", e);
-        }
-        RELIGHT = tmp;
-    }
 
     private final ServerLevel serverLevel;
     private final ReentrantLock lock = new ReentrantLock();
@@ -74,10 +49,6 @@ public class PaperweightStarlightRelighter implements Relighter {
     public PaperweightStarlightRelighter(ServerLevel serverLevel, IQueueExtent<IQueueChunk> queue) {
         this.serverLevel = serverLevel;
         this.delegate = new NMSRelighter(queue);
-    }
-
-    public static boolean isUsable() {
-        return RELIGHT != null;
     }
 
     @Override
@@ -169,14 +140,9 @@ public class PaperweightStarlightRelighter implements Relighter {
             IntConsumer processCallback
     ) {
         try {
-            int unused = (int) RELIGHT.invokeExact(
-                    serverLevel.getChunkSource().getLightEngine(),
-                    coords,
-                    chunkCallback, // callback per chunk
-                    processCallback // callback for all chunks
-            );
-        } catch (Throwable throwable) {
-            LOGGER.error("Error occurred on relighting", throwable);
+            serverLevel.getChunkSource().getLightEngine().relight(coords, chunkCallback, processCallback);
+        } catch (Exception e) {
+            LOGGER.error("Error occurred on relighting", e);
         }
     }
 
