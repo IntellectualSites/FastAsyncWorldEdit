@@ -106,13 +106,13 @@ public class DefaultItemParser extends InputParser<BaseItem> {
                 nbtString = input.substring(nbtStart);
             }
 
-            if ("hand".equalsIgnoreCase(typeString)) {
+            if ("hand".equalsIgnoreCase(typeString) || "h".equalsIgnoreCase(typeString)) {
                 BaseItemStack heldItem = getItemInHand(context.requireActor(), HandSide.MAIN_HAND);
                 //FAWE start
                 itemType = heldItem.getType();
                 itemNbtData = heldItem.getNbt();
                 //FAWE end
-            } else if ("offhand".equalsIgnoreCase(typeString)) {
+            } else if ("offhand".equalsIgnoreCase(typeString) || "oh".equalsIgnoreCase(typeString)) {
                 BaseItemStack heldItem = getItemInHand(context.requireActor(), HandSide.OFF_HAND);
                 //FAWE start
                 itemType = heldItem.getType();
