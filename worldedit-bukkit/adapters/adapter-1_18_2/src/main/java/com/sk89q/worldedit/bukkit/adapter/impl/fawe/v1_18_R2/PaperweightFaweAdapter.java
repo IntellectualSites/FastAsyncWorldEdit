@@ -55,6 +55,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemType;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
+import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
@@ -663,17 +664,11 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
 
     @Override
     public RelighterFactory getRelighterFactory() {
-        try {
-            Class.forName("ca.spottedleaf.starlight.common.light.StarLightEngine");
-            if (PaperweightStarlightRelighter.isUsable()) {
-                return new PaperweightStarlightRelighterFactory();
-            }
-        } catch (ThreadDeath td) {
-            throw td;
-        } catch (Throwable ignored) {
-
+        if (PaperLib.isPaper()) {
+            return new PaperweightStarlightRelighterFactory();
+        } else {
+            return new NMSRelighterFactory();
         }
-        return new NMSRelighterFactory();
     }
 
     @Override
