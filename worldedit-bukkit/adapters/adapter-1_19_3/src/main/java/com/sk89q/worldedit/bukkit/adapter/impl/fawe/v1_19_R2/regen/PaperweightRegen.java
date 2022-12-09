@@ -49,6 +49,7 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.WorldGenSettings;
+import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
 import net.minecraft.world.level.levelgen.structure.placement.ConcentricRingsStructurePlacement;
@@ -75,6 +76,8 @@ import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
+
+import static net.minecraft.core.registries.Registries.BIOME;
 
 public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, LevelChunk, PaperweightRegen.ChunkStatusWrap> {
 
@@ -237,8 +240,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 session,
                 newWorldData,
                 originalServerWorld.dimension(),
-                // TODO package-private in 1.19.3
-                newOpts.dimensions().getOrThrow(levelStemResourceKey),
+                newOpts.dimensions().dimensions().getOrThrow(levelStemResourceKey),
                 new RegenNoOpWorldLoadListener(),
                 originalServerWorld.isDebug(),
                 seed,
@@ -282,14 +284,14 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                     originalGenerator);
             BiomeSource biomeSource;
             if (options.hasBiomeType()) {
-                biomeSource = new FixedBiomeSource(BuiltInRegistries.BIOME
+                biomeSource = new FixedBiomeSource(BuiltInRegistries.BIOME_SOURCE
                         .asHolderIdMap()
                         .byId(WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBiomeId(options.getBiomeType())));
             } else {
                 biomeSource = originalGenerator.getBiomeSource();
             }
             chunkGenerator = new NoiseBasedChunkGenerator(originalGenerator.structureSets,
-                    noiseBasedChunkGenerator.noises,
+                    noiseBasedChunkGenerator.settings,
                     biomeSource,
                     generatorSettingBaseSupplier
             );
@@ -387,7 +389,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     @Override
     protected ProtoChunk createProtoChunk(int x, int z) {
         return new FastProtoChunk(new ChunkPos(x, z), UpgradeData.EMPTY, freshWorld,
-                this.freshWorld.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY), null
+                this.freshWorld.registryAccess().registryOrThrow(BIOME), null
         );
     }
 
