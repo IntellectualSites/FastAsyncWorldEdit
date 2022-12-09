@@ -294,7 +294,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                     generatorSettingBaseSupplier
             );
         } else if (originalGenerator instanceof CustomChunkGenerator customChunkGenerator) {
-            chunkGenerator = customChunkGenerator.delegate;
+            chunkGenerator = customChunkGenerator.getDelegate();
         } else {
             LOGGER.error("Unsupported generator type {}", originalGenerator.getClass().getName());
             return false;
