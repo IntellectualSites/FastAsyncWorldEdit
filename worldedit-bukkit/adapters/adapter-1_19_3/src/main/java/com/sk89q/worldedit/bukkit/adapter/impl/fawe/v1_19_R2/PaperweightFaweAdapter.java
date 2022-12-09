@@ -59,10 +59,12 @@ import io.papermc.lib.PaperLib;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -243,7 +245,8 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     }
 
     public Block getBlock(BlockType blockType) {
-        return Registry.BLOCK.get(new ResourceLocation(blockType.getNamespace(), blockType.getResource()));
+        return DedicatedServer.getServer().registryAccess().registryOrThrow(Registries.BLOCK)
+                .get(new ResourceLocation(blockType.getNamespace(), blockType.getResource()));
     }
 
     @Deprecated
@@ -547,7 +550,8 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     @Override
     public org.bukkit.inventory.ItemStack adapt(BaseItemStack baseItemStack) {
         ItemStack stack = new ItemStack(
-                Registry.ITEM.get(ResourceLocation.tryParse(baseItemStack.getType().getId())),
+                DedicatedServer.getServer().registryAccess().registryOrThrow(Registries.ITEM)
+                        .get(ResourceLocation.tryParse(baseItemStack.getType().getId())),
                 baseItemStack.getAmount()
         );
         stack.setTag(((net.minecraft.nbt.CompoundTag) fromNative(baseItemStack.getNbtData())));

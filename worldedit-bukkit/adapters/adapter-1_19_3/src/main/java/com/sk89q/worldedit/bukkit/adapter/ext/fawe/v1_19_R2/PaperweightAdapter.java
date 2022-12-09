@@ -176,7 +176,7 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-public final class PaperweightAdapter implements BukkitImplAdapter {
+public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft.nbt.Tag> {
 
     private final Logger LOGGER = Logger.getLogger(getClass().getCanonicalName());
 
