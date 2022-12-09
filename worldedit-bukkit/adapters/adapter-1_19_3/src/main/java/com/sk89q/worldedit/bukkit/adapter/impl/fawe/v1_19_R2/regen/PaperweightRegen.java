@@ -20,12 +20,12 @@ import com.sk89q.worldedit.world.RegenOptions;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ChunkTaskPriorityQueueSorter.Message;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -42,6 +42,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.biome.FixedBiomeSource;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
+import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
 import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.ProtoChunk;
@@ -50,7 +51,6 @@ import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.WorldGenSettings;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.blending.BlendingData;
 import net.minecraft.world.level.levelgen.flat.FlatLevelGeneratorSettings;
@@ -92,6 +92,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     private static final Field generatorSettingBaseSupplierField;
     private static final Field delegateField;
     private static final Field chunkSourceField;
+    private static final Field generatorStructureStateField;
     private static final Field ringPositionsField;
     private static final Field hasGeneratedPositionsField;
 
@@ -141,10 +142,10 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             flatBedrockField = tmpFlatBedrockField;
 
             generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
-                    "settings", "g"));
+                    "settings", "e"));
             generatorSettingBaseSupplierField.setAccessible(true);
 
-            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "f"));
+            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "d"));
             generatorSettingFlatField.setAccessible(true);
 
             delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
@@ -153,10 +154,15 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             chunkSourceField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "L"));
             chunkSourceField.setAccessible(true);
 
-            ringPositionsField = ChunkGenerator.class.getDeclaredField(Refraction.pickName("ringPositions", "i"));
+            generatorStructureStateField = ChunkMap.class.getDeclaredField(Refraction.pickName("chunkGeneratorState", "w"));
+            generatorStructureStateField.setAccessible(true);
+
+            ringPositionsField = ChunkGeneratorStructureState.class.getDeclaredField(Refraction.pickName("ringPositions", "g"));
             ringPositionsField.setAccessible(true);
 
-            hasGeneratedPositionsField = ChunkGenerator.class.getDeclaredField(Refraction.pickName("hasGeneratedPositions", "j"));
+            hasGeneratedPositionsField = ChunkGeneratorStructureState.class.getDeclaredField(
+                    Refraction.pickName("hasGeneratedPositions", "h")
+            );
             hasGeneratedPositionsField.setAccessible(true);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -323,20 +329,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 //        chunkGenerator.conf = freshWorld.spigotConfig; - Does not exist anymore, may need to be re-addressed
 
-        if (seed == originalOpts.seed() && !options.hasBiomeType()) {
-            // Optimisation for needless ring position calculation when the seed and biome is the same.
-            boolean hasGeneratedPositions = hasGeneratedPositionsField.getBoolean(originalGenerator);
-            if (hasGeneratedPositions) {
-                Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> ringPositions =
-                        (Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>>) ringPositionsField.get(
-                                originalGenerator);
-                Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> copy = new Object2ObjectArrayMap<>(
-                        ringPositions);
-                ringPositionsField.set(chunkGenerator, copy);
-                hasGeneratedPositionsField.setBoolean(chunkGenerator, true);
-            }
-        }
-
         freshChunkProvider = new ServerChunkCache(
                 freshWorld,
                 session,
@@ -362,6 +354,22 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 return chunkAccess;
             }
         };
+
+        if (seed == originalOpts.seed() && !options.hasBiomeType()) {
+            // Optimisation for needless ring position calculation when the seed and biome is the same.
+            ChunkGeneratorStructureState state = (ChunkGeneratorStructureState) generatorStructureStateField.get(originalChunkProvider.chunkMap);
+            boolean hasGeneratedPositions = hasGeneratedPositionsField.getBoolean(state);
+            if (hasGeneratedPositions) {
+                Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> origPositions =
+                        (Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>>) ringPositionsField.get(state);
+                Map<ConcentricRingsStructurePlacement, CompletableFuture<List<ChunkPos>>> copy = new Object2ObjectArrayMap<>(
+                        origPositions);
+                ChunkGeneratorStructureState newState = (ChunkGeneratorStructureState) generatorStructureStateField.get(freshChunkProvider.chunkMap);
+                ringPositionsField.set(newState, copy);
+                hasGeneratedPositionsField.setBoolean(newState, true);
+            }
+        }
+
 
         ReflectionUtils.unsafeSet(chunkSourceField, freshWorld, freshChunkProvider);
         //let's start then

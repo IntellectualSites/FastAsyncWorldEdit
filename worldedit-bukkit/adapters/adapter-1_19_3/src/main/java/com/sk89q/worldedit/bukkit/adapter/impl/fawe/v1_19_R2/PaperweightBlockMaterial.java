@@ -38,8 +38,8 @@ public class PaperweightBlockMaterial implements BlockMaterial {
         this.material = blockState.getMaterial();
         this.craftBlockData = CraftBlockData.fromData(blockState);
         this.craftMaterial = craftBlockData.getMaterial();
-        BlockBehaviour.Properties blockInfo = ReflectionUtil.getField(BlockBehaviour.class, block, Refraction.pickName(
-                "properties", "aO"));
+        BlockBehaviour.Properties blockInfo = ReflectionUtil.getField(BlockBehaviour.class, block,
+                Refraction.pickName("properties", "aP"));
         this.isTranslucent = !(boolean) ReflectionUtil.getField(BlockBehaviour.Properties.class, blockInfo,
                 Refraction.pickName("canOcclude", "n")
         );
