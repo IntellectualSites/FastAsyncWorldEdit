@@ -13,6 +13,6 @@ repositories {
 
 dependencies {
     // https://papermc.io/repo/service/rest/repository/browse/maven-public/io/papermc/paper/dev-bundle/
-    paperDevBundle("1.19.3-R0.1-20221209.113631-4")
+    paperDevBundle("1.19.3-R0.1-20221210.010342-6")
     compileOnly("io.papermc:paperlib")
 }
