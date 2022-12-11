@@ -23,7 +23,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("2.5.0")
+var rootVersion by extra("2.5.1")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
@@ -41,7 +41,7 @@ ext {
     }
 }
 
-version = String.format("%s", rootVersion)
+version = String.format("%s-%s", rootVersion, buildNumber)
 
 if (!project.hasProperty("gitCommitHash")) {
     apply(plugin = "org.ajoberstar.grgit")
