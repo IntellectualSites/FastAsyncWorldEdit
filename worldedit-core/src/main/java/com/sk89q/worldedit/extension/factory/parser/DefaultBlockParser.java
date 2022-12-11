@@ -408,14 +408,14 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                         TextComponent.of(blockAndExtraData[0])
                 ));
             }
-            if ("hand".equalsIgnoreCase(typeString)) {
+            if ("hand".equalsIgnoreCase(typeString) || "h".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's hand.
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.MAIN_HAND);
                 //FAWE start
                 state = blockInHand.toBlockState();
                 nbt = blockInHand.getNbtData();
                 //FAWE end
-            } else if ("offhand".equalsIgnoreCase(typeString)) {
+            } else if ("offhand".equalsIgnoreCase(typeString) || "oh".equalsIgnoreCase(typeString)) {
                 // Get the block type from the item in the user's off hand.
                 final BaseBlock blockInHand = getBlockInHand(context.requireActor(), HandSide.OFF_HAND);
                 //FAWE start
