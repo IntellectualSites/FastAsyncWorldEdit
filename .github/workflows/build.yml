@@ -82,7 +82,7 @@ jobs:
           file_path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-${{ env.VERSION }}.jar
           # https://minecraft.curseforge.com/api/game/versions?token=redacted
           # gameVersionTypeID: 1
-          game_versions: "8849,8897,9016,9190,9261"
+          game_versions: "8503,9016,9190,9261,9560,9561"
           project_id: 103525
           game_endpoint: minecraft
           token: ${{ secrets.CURSEFORGE_TOKEN }}
