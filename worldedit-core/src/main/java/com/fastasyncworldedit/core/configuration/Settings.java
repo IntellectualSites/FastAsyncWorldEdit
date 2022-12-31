@@ -507,8 +507,6 @@ public class Settings extends Config {
     @Comment("This relates to how FAWE places chunks")
     public static class QUEUE {
 
-        @Create
-        public static PROGRESS PROGRESS;
         @Comment({
                 "This should equal the number of processors you have",
         })
@@ -572,21 +570,6 @@ public class Settings extends Config {
                 "Only works in versions up to 1.17.1"
         })
         public boolean NO_TICK_FASTMODE = true;
-
-        public static class PROGRESS {
-
-            @Comment({"Display constant titles about the progress of a user's edit",
-                    " - false = disabled",
-                    " - title = Display progress titles",
-                    " - chat = Display progress in chat"
-            })
-            public String DISPLAY = "false";
-            @Comment("How often edit progress is displayed")
-            public int INTERVAL = 1;
-            @Comment("Delay sending progress in milliseconds (so quick edits don't spam)")
-            public int DELAY = 5000;
-
-        }
 
     }
 
