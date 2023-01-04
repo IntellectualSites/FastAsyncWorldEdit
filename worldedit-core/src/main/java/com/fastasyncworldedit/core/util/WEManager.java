@@ -97,7 +97,7 @@ public class WEManager {
      * @return array of allowed regions if whitelist, else of disallowed regions.
      */
     public Region[] getMask(Player player, FaweMaskManager.MaskType type, final boolean isWhitelist) {
-        if (!Settings.settings().REGION_RESTRICTIONS || player.hasPermission("fawe.bypass") || player.hasPermission("fawe.bypass.regions")) {
+        if (!Settings.settings().REGION_RESTRICTIONS || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
         Location loc = player.getLocation();
