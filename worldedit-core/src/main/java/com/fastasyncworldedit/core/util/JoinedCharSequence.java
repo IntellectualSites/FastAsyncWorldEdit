@@ -1,5 +1,9 @@
 package com.fastasyncworldedit.core.util;
 
+/**
+ * @deprecated Unused, will be removed in the future. Use String concatenation instead.
+ */
+@Deprecated(forRemoval = true, since = "TODO")
 public class JoinedCharSequence implements CharSequence {
 
     private char join;

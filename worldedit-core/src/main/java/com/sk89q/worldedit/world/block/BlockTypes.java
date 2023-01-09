@@ -20,7 +20,6 @@
 package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
-import com.fastasyncworldedit.core.util.JoinedCharSequence;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -1923,23 +1922,19 @@ public final class BlockTypes {
     public static final BlockType ZOMBIE_WALL_HEAD = init();
 
     private static Field[] fieldsTmp;
-    private static JoinedCharSequence joined;
     private static int initIndex = 0;
 
     public static BlockType init() {
         if (fieldsTmp == null) {
             fieldsTmp = BlockTypes.class.getDeclaredFields();
             BlockTypesCache.$NAMESPACES.isEmpty(); // initialize cache
-            joined = new JoinedCharSequence();
         }
         String name = fieldsTmp[initIndex++].getName().toLowerCase(Locale.ROOT);
-        CharSequence fullName = joined.init(BlockType.REGISTRY.getDefaultNamespace(), ':', name);
-        return BlockType.REGISTRY.getMap().get(fullName);
+        return BlockType.REGISTRY.get(name);
     }
 
     static {
         fieldsTmp = null;
-        joined = null;
     }
 
     /*
