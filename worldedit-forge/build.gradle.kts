@@ -27,7 +27,7 @@ configurations.all {
 
 dependencies {
     "api"(project(":worldedit-core"))
-    "implementation"(enforcedPlatform("org.apache.logging.log4j:log4j-bom:2.11.2") {
+    "implementation"(enforcedPlatform("org.apache.logging.log4j:log4j-bom:2.19.0") {
         because("Forge provides Log4J at 2.11.2 (Mojang provides 2.8.1, but Forge bumps)")
 
     "minecraft"("net.minecraftforge:forge:$minecraftVersion-$forgeVersion")
