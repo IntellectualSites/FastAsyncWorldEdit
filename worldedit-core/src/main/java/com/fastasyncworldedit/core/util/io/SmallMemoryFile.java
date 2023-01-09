@@ -7,6 +7,22 @@ import java.nio.channels.FileChannel;
 
 import static com.fastasyncworldedit.core.util.io.MemoryFileSupport.shift;
 
+/**
+ * This implementation of MemoryFile provides storage of up to Integer.MAX_VALUE bytes.
+ * As access always uses {@link java.nio.ByteBuffer#getInt(int)}/ {@link java.nio.ByteBuffer#putInt(int, int)},
+ * the last three bytes cannot be accessed directly but only by accessing the whole integer.
+ * Otherwise, this class makes heavy use of unaligned memory access and a configured
+ * {@link ByteOrder#LITTLE_ENDIAN little endian} {@link java.nio.ByteBuffer}.
+ * <p/>
+ * To read or write a value, the highest byte position that fully contains the value is chosen.
+ * At this position, a whole {@code int} is read.
+ * <p/>
+ * Besides the padding at the end, no bit is unused.
+ * Due to the required shifting in combination with the int-based
+ * access, values can take up to 25 bits. Above that, information will get lost.
+ * <p/>
+ * The last byte of the padding is used to store the bitsPerEntry value to allow reading the file again.
+ */
 final class SmallMemoryFile implements MemoryFile {
     private final FileChannel channel;
     private final MappedByteBuffer buffer;
@@ -15,6 +31,7 @@ final class SmallMemoryFile implements MemoryFile {
 
     SmallMemoryFile(FileChannel channel, int size, final int bitsPerEntry) throws IOException {
         this.channel = channel;
+        this.channel.truncate(size); // cut off if previous file was larger
         this.buffer = this.channel.map(FileChannel.MapMode.READ_WRITE, 0, size);
         this.buffer.order(ByteOrder.LITTLE_ENDIAN);
         this.bitsPerEntry = bitsPerEntry;
@@ -45,11 +62,11 @@ final class SmallMemoryFile implements MemoryFile {
     }
 
     private int read(int bytePos, int shift) {
-        return (this.buffer.getInt(bytePos) >> shift) & this.entryMask;
+        return (this.buffer.getInt(bytePos) >>> shift) & this.entryMask;
     }
 
     private static int toBytePos(long bitPos) {
-        return (int) (bitPos >> 3); // must be in int range for SmallMemoryFile
+        return (int) (bitPos >>> 3); // must be in int range for SmallMemoryFile
     }
 
     private long bitPos(int index) {

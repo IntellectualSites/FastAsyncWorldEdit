@@ -22,6 +22,7 @@ package com.sk89q.worldedit.entity;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.extent.clipboard.Clipboards;
 import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismatchException;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
@@ -457,24 +458,24 @@ public interface Player extends Entity, Actor {
      * Loads any history items from disk: - Should already be called if history on disk is enabled.
      */
     default void loadClipboardFromDisk() {
-        File file = MainUtil.getFile(
+/*        File file = MainUtil.getFile(
                 Fawe.platform().getDirectory(),
                 Settings.settings().PATHS.CLIPBOARD + File.separator + getUniqueId() + ".bd"
-        );
+        );*/
         try {
-            if (file.exists() && file.length() > 5) {
-                LocalSession session = getSession();
-                try {
-                    if (session.getClipboard() != null) {
-                        return;
-                    }
-                } catch (EmptyClipboardException ignored) {
+            LocalSession session = getSession();
+            try {
+                if (session.getClipboard() != null) {
+                    return;
                 }
-                DiskOptimizedClipboard doc = DiskOptimizedClipboard.loadFromFile(file);
-                Clipboard clip = doc.toClipboard();
-                ClipboardHolder holder = new ClipboardHolder(clip);
-                session.setClipboard(holder);
+            } catch (EmptyClipboardException ignored) {
             }
+            Clipboard clipboard = Clipboards.load(this);
+            if (clipboard == null) {
+                return;
+            }
+            ClipboardHolder holder = new ClipboardHolder(clipboard);
+            session.setClipboard(holder);
         } catch (FaweClipboardVersionMismatchException e) {
             print(e.getComponent());
         } catch (RuntimeException e) {
@@ -482,14 +483,14 @@ public interface Player extends Entity, Actor {
             e.printStackTrace();
             print(Caption.of("fawe.error.stacktrace"));
             print(Caption.of("fawe.error.clipboard.load.failure"));
-            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
+            // print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
             print(Caption.of("fawe.error.stacktrace"));
         } catch (Exception e) {
             print(Caption.of("fawe.error.clipboard.invalid"));
             e.printStackTrace();
             print(Caption.of("fawe.error.stacktrace"));
             print(Caption.of("fawe.error.no-failure"));
-            print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
+            // print(Caption.of("fawe.error.clipboard.invalid.info", file.getName(), file.length()));
             print(Caption.of("fawe.error.stacktrace"));
         }
     }

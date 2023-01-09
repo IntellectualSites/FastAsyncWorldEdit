@@ -138,7 +138,7 @@ public interface OutputExtent {
     default boolean setBiome(BlockVector3 position, BiomeType biome) {
         DeprecationUtil.checkDelegatingOverride(getClass());
 
-        return setBiome(position.toBlockVector2(), biome);
+        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
     }
 
     /**

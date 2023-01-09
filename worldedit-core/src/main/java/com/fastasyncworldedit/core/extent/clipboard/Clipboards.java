@@ -17,6 +17,18 @@ import java.util.Objects;
 
 public final class Clipboards {
 
+    public static Clipboard load(Actor actor) {
+        Path path = createActorPath(actor);
+        if (Files.isDirectory(path)) {
+            try {
+                return new DiskBasedClipboard(path);
+            } catch (IOException e) {
+                return null; // failed to load
+            }
+        }
+        return null; // not does exist
+    }
+
     public static Clipboard create(Region region, BlockVector3 origin, Actor actor) {
         if (!(region instanceof CuboidRegion)) {
             return new BlockArrayClipboard(region, actor.getUniqueId());
