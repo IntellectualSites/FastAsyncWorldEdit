@@ -24,6 +24,7 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.event.extent.PasteEvent;
+import com.fastasyncworldedit.core.extent.clipboard.Clipboards;
 import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
@@ -154,9 +155,9 @@ public class ClipboardCommands {
         }
         session.setClipboard(null);
 
-        Clipboard clipboard = new BlockArrayClipboard(region, actor.getUniqueId());
-        clipboard.setOrigin(centerClipboard ? region.getCenter().toBlockPoint().withY(region.getMinimumY()) :
-                session.getPlacementPosition(actor));
+        final BlockVector3 origin = centerClipboard ? region.getCenter().toBlockPoint().withY(region.getMinimumY()) :
+                session.getPlacementPosition(actor);
+        Clipboard clipboard = Clipboards.create(region, origin, actor);
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setCopyingEntities(copyEntities);
         copy.setCopyingBiomes(copyBiomes);
