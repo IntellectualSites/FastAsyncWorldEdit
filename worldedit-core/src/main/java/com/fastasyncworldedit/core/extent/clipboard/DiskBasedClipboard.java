@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.extent.clipboard;
 
+import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.io.MemoryFile;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEditException;
@@ -90,7 +91,13 @@ public sealed class DiskBasedClipboard implements Clipboard {
     }
 
     private static long requiredBiomeEntries(BlockVector3 dimensions) {
-        return requiredEntries(dimensions.divide(4));
+        // biomes are based on 4*4*4, so we can divide the dimensions of the region by 4
+        BlockVector3 biomeDimensions = BlockVector3.at(
+                MathMan.ceilDiv(dimensions.getX(), 4),
+                MathMan.ceilDiv(dimensions.getY(), 4),
+                MathMan.ceilDiv(dimensions.getZ(), 4)
+        );
+        return requiredEntries(biomeDimensions);
     }
 
     @Override
