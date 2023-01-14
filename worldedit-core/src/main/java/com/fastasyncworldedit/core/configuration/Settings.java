@@ -721,6 +721,10 @@ public class Settings extends Config {
         })
         public boolean USE_DISK = true;
         @Comment({
+                "Experimental option: use new disk on clipboard variant"
+        })
+        public boolean USE_NEW = true;
+        @Comment({
                 "Compress the clipboard to reduce the size:",
                 " - TODO: Buffered random access with compression is not implemented on disk yet",
                 " - 0 = No compression",

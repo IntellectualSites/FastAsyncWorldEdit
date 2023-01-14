@@ -2,8 +2,8 @@ package com.fastasyncworldedit.core.extent.clipboard;
 
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.IFawe;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.sk89q.worldedit.extension.platform.Actor;
-import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
@@ -30,10 +30,17 @@ public final class Clipboards {
     }
 
     public static Clipboard create(Region region, BlockVector3 origin, Actor actor) {
-        if (!(region instanceof CuboidRegion)) {
-            return new BlockArrayClipboard(region, actor.getUniqueId());
+        if (Settings.settings().CLIPBOARD.USE_DISK) {
+            if (Settings.settings().CLIPBOARD.USE_NEW) {
+                return DiskBasedClipboard.create(region, origin, createActorPath(actor));
+            } else {
+                return new DiskOptimizedClipboard(region, actor.getUniqueId());
+            }
+        } else if (Settings.settings().CLIPBOARD.COMPRESSION_LEVEL == 0) {
+            return new CPUOptimizedClipboard(region);
+        } else {
+            return new MemoryOptimizedClipboard(region);
         }
-        return new DiskBasedClipboard(region.getDimensions(), region.getMinimumPoint(), origin, createActorPath(actor));
     }
 
     private static Path createActorPath(Actor actor) {
@@ -48,4 +55,5 @@ public final class Clipboards {
         }
         return folder;
     }
+
 }
