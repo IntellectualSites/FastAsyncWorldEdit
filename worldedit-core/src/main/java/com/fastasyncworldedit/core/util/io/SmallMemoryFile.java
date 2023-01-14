@@ -39,7 +39,7 @@ final class SmallMemoryFile implements MemoryFile {
     }
 
     @Override
-    public void setValue(int index, int value) {
+    public void setValue(long index, int value) {
         long bitPos = bitPos(index);
         int bytePos = toBytePos(bitPos);
         int shift = shift(bitPos, bytePos);
@@ -47,7 +47,7 @@ final class SmallMemoryFile implements MemoryFile {
     }
 
     @Override
-    public int getValue(final int index) {
+    public int getValue(final long index) {
         long bitPos = bitPos(index);
         int bytePos = toBytePos(bitPos);
         int shift = shift(bitPos, bytePos);
@@ -69,8 +69,8 @@ final class SmallMemoryFile implements MemoryFile {
         return (int) (bitPos >>> 3); // must be in int range for SmallMemoryFile
     }
 
-    private long bitPos(int index) {
-        return (long) this.bitsPerEntry * index;
+    private long bitPos(long index) {
+        return this.bitsPerEntry * index;
     }
 
     @Override

@@ -33,9 +33,9 @@ public sealed interface MemoryFile extends AutoCloseable, Flushable permits Smal
         throw new UnsupportedEncodingException("existing file too large: " + size);
     }
 
-    void setValue(int index, int value);
+    void setValue(long index, int value);
 
-    int getValue(int index);
+    int getValue(long index);
 
     /**
      * {@inheritDoc}
