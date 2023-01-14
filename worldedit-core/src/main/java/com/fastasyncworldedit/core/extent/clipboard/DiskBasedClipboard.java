@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class DiskBasedClipboard implements Clipboard {
+public sealed class DiskBasedClipboard implements Clipboard {
 
     private static final int INVALID_INDEX = -1;
     private static final BlockState AIR = Objects.requireNonNull(BlockTypes.AIR).getDefaultState();
@@ -46,7 +46,18 @@ public class DiskBasedClipboard implements Clipboard {
     private final Int2ReferenceMap<CompoundBinaryTag> nbt = new Int2ReferenceOpenHashMap<>();
     private BlockVector3 origin;
 
-    DiskBasedClipboard(
+    static DiskBasedClipboard create(
+            final Region region,
+            final BlockVector3 origin,
+            final Path folder
+    ) {
+        if (region instanceof CuboidRegion) {
+            return new DiskBasedClipboard(region.getDimensions(), region.getMinimumPoint(), origin, folder);
+        }
+        return new NonCuboidRegionDiskBasedClipboard(region, origin, folder);
+    }
+
+    private DiskBasedClipboard(
             final BlockVector3 dimensions,
             final BlockVector3 offset,
             final BlockVector3 origin,
@@ -260,7 +271,7 @@ public class DiskBasedClipboard implements Clipboard {
         return this.offset.add(this.dimensions.subtract(1, 1, 1));
     }
 
-    private boolean inRegion(int x, int y, int z) {
+    protected boolean inRegionNoOffset(int x, int y, int z) {
         return (x | y | z) >= 0 && y < this.dimensions.getY() && x < this.dimensions.getX() && z < this.dimensions.getZ();
     }
 
@@ -273,7 +284,7 @@ public class DiskBasedClipboard implements Clipboard {
         int lx = x - this.offset.getX();
         int ly = y - this.offset.getY();
         int lz = z - this.offset.getZ();
-        if (inRegion(lx, ly, lz)) {
+        if (inRegionNoOffset(lx, ly, lz)) {
             return toIndexUnchecked(lx, ly, lz);
         }
         return INVALID_INDEX;
@@ -290,7 +301,7 @@ public class DiskBasedClipboard implements Clipboard {
         int lx = x - this.offset.getX();
         int ly = y - this.offset.getY();
         int lz = z - this.offset.getZ();
-        if (inRegion(lx, ly, lz)) {
+        if (inRegionNoOffset(lx, ly, lz)) {
             return toBiomeIndexUnchecked(lx >> 2, ly >> 2, lz >> 2);
         }
         return INVALID_INDEX;
@@ -312,6 +323,7 @@ public class DiskBasedClipboard implements Clipboard {
             BlockVector3 dimensions,
             BlockVector3 origin
     ) {
+
         private static final int REQUIRED_BYTES = Integer.BYTES * 3 /* vectors */ * 3 /* ints per vector*/;
 
         static Metadata read(Path folder) throws IOException {
@@ -348,6 +360,30 @@ public class DiskBasedClipboard implements Clipboard {
             buffer.putInt(vector.getY());
             buffer.putInt(vector.getZ());
         }
+
+    }
+
+    // for regions other than CuboidRegion, we fall back to a slower check
+    static final class NonCuboidRegionDiskBasedClipboard extends DiskBasedClipboard {
+
+        private final Region region;
+
+        public NonCuboidRegionDiskBasedClipboard(Region region, BlockVector3 origin, Path folder) {
+            super(region.getDimensions(), region.getMinimumPoint(), origin, folder);
+            this.region = region;
+        }
+
+        @Override
+        protected boolean inRegionNoOffset(final int x, final int y, final int z) {
+            final BlockVector3 minimumPoint = this.region.getMinimumPoint();
+            return this.region.contains(minimumPoint.getX() + x, minimumPoint.getY() + y, minimumPoint.getZ() + z);
+        }
+
+        @Override
+        public Region getRegion() {
+            return this.region;
+        }
+
     }
 
 }
