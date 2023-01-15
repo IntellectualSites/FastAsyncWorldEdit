@@ -9,6 +9,16 @@ plugins {
     id("xyz.jpenilla.run-paper") version "2.0.1"
 }
 
+if (!File("$rootDir/.git").exists()) {
+    logger.lifecycle("""
+    **************************************************************************************
+    You need to fork and clone this repository! Don't download a .zip file.
+    If you need assistance, consult the GitHub docs: https://docs.github.com/get-started/quickstart/fork-a-repo
+    **************************************************************************************
+    """.trimIndent()
+    ).also { kotlin.system.exitProcess(1) }
+}
+
 logger.lifecycle("""
 *******************************************
  You are building FastAsyncWorldEdit!
