@@ -55,7 +55,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getEntities(region);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return Collections.emptyList();
@@ -68,7 +68,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getEntities();
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return Collections.emptyList();
@@ -83,7 +83,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.createEntity(location, entity);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return null;
@@ -98,7 +98,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.createEntity(location, entity, uuid);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return null;
@@ -112,7 +112,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             super.removeEntity(x, y, z, uuid);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
         }
@@ -124,7 +124,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.regenerateChunk(x, z, type, seed);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return false;
@@ -137,7 +137,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getHighestTerrainBlock(x, z, minY, maxY);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return minY;
@@ -150,7 +150,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getHighestTerrainBlock(x, z, minY, maxY, filter);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return minY;
@@ -163,7 +163,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getNearestSurfaceLayer(x, z, y, minY, maxY);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return minY;
@@ -176,7 +176,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return minY;
@@ -189,7 +189,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return minY;
@@ -202,7 +202,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return minY;
@@ -215,7 +215,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return minY;
@@ -237,7 +237,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return minY;
@@ -386,7 +386,7 @@ public class LimitExtent extends AbstractDelegateExtent {
                 try {
                     filter.applyBlock(block.init(pos));
                 } catch (FaweException e) {
-                    if (!limit.MAX_FAILS()) {
+                    if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                         throw e;
                     }
                 }
@@ -404,7 +404,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getBlock(position);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return BlockTypes.AIR.getDefaultState();
@@ -417,7 +417,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getBlock(x, y, z);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return BlockTypes.AIR.getDefaultState();
@@ -430,7 +430,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getFullBlock(position);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
@@ -443,7 +443,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getFullBlock(x, y, z);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return BlockTypes.AIR.getDefaultState().toBaseBlock();
@@ -456,7 +456,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getBiome(position);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return BiomeTypes.FOREST;
@@ -469,7 +469,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.getBiomeType(x, y, z);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return BiomeTypes.FOREST;
@@ -486,7 +486,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.setBlock(position, block);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return false;
@@ -502,7 +502,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.setBlock(x, y, z, block);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return false;
@@ -516,7 +516,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.setTile(x, y, z, tile);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return false;
@@ -529,7 +529,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.setBiome(position, biome);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return false;
@@ -542,7 +542,7 @@ public class LimitExtent extends AbstractDelegateExtent {
         try {
             return super.setBiome(x, y, z, biome);
         } catch (FaweException e) {
-            if (!limit.MAX_FAILS()) {
+            if (e.getType() == FaweException.Type.MANUAL || !limit.MAX_FAILS()) {
                 throw e;
             }
             return false;
