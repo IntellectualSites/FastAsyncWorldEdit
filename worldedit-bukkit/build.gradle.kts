@@ -32,6 +32,7 @@ repositories {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
     }
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     flatDir { dir(File("src/main/resources")) }
 }
 
@@ -92,8 +93,8 @@ dependencies {
     compileOnly(libs.mcore) { isTransitive = false }
     compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
-    compileOnly("com.plotsquared:PlotSquared-Bukkit") { isTransitive = false }
-    compileOnly("com.plotsquared:PlotSquared-Core") { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Bukkit:7.0.0-SNAPSHOT") { isTransitive = false }
+    compileOnly("com.plotsquared:PlotSquared-Core:7.0.0-SNAPSHOT") { isTransitive = false }
 
     // Third party
     implementation("io.papermc:paperlib")

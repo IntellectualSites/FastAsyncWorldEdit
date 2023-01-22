@@ -19,6 +19,7 @@
 
 package com.sk89q.wepif;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -30,8 +31,8 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -321,6 +322,11 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
             int newValue
     ) {
 
+    }
+
+    @Override
+    public @Nullable Location getLastDeathLocation() {
+        return null;
     }
 
 }
