@@ -3,7 +3,7 @@ package com.fastasyncworldedit.core.util;
 /**
  * @deprecated Unused, will be removed in the future. Use String concatenation instead.
  */
-@Deprecated(forRemoval = true, since = "TODO")
+@Deprecated(forRemoval = true, since = "2.5.1")
 public class JoinedCharSequence implements CharSequence {
 
     private char join;
