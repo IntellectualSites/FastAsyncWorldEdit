@@ -6,6 +6,11 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/plotsquared-v7']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/IntellectualSites/fastasyncworldedit']])
             }
         }
+        stage('Set JDK 17') {
+            steps {
+                tool name: 'OpenJDK-17.0.1', type: 'jdk'
+            }
+        }
         stage('Build') {
             steps {
                 sh './gradlew clean build'
