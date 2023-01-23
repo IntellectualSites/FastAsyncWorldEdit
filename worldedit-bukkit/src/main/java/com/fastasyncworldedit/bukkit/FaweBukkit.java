@@ -317,7 +317,7 @@ public class FaweBukkit implements IFawe, Listener {
         if (plotSquared == null) {
             return;
         }
-        if (PlotSquared.get().getVersion().version[0] == 6) {
+        if (PlotSquared.get().getVersion().version[0] == 7) {
             WEManager.weManager().addManager(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' v6 found. Using it now.");
         } else {
