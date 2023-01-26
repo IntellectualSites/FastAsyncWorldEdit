@@ -21,7 +21,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-import org.jetbrains.annotations.NotNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -70,7 +70,9 @@ public sealed class DiskBasedClipboard implements Clipboard {
         this.folder = folder;
         long entries = requiredEntries(dimensions);
         try {
-            this.blockFile = MemoryFile.create(folder.resolve("blocks.dc"), entries, BlockTypesCache.states.length);
+            this.blockFile = MemoryFile.create(blocksPath(folder), entries, BlockTypesCache.states.length);
+            Files.deleteIfExists(biomesPath(folder)); // clean up previous biome file
+            Files.deleteIfExists(metadataPath(folder)); // clean up previous biome file
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -82,8 +84,28 @@ public sealed class DiskBasedClipboard implements Clipboard {
         this.dimensions = metadata.dimensions();
         this.offset = metadata.offset();
         this.origin = metadata.origin();
-        this.blockFile = MemoryFile.load(folder.resolve("blocks.dc"), BlockTypesCache.states.length);
+        this.blockFile = MemoryFile.load(blocksPath(folder), BlockTypesCache.states.length);
         loadBiomeFileIfPresent();
+        loadBlockEntitiesIfPresent();
+    }
+
+    private static Path blocksPath(Path folder) {
+        return folder.resolve("blocks.dc");
+    }
+
+    private static Path biomesPath(Path folder) {
+        return folder.resolve("biomes.dc");
+    }
+
+    private static Path blockEntitiesPath(Path folder) {
+        return folder.resolve("blockEntities.nbt");
+    }
+
+    private static Path entitiesPath(Path folder) {
+        return folder.resolve("entities.nbt");
+    }
+    private static Path metadataPath(Path folder) {
+        return folder.resolve(".medatada");
     }
 
     private static long requiredEntries(BlockVector3 dimensions) {
@@ -167,6 +189,12 @@ public sealed class DiskBasedClipboard implements Clipboard {
         return true;
     }
 
+    // overridden for performance reasons
+
+    @Override
+    public boolean setBiome(final BlockVector3 position, final BiomeType biome) {
+        return setBiome(position.getX(), position.getY(), position.getZ(), biome);
+    }
     @Override
     public boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
         MemoryFile biomeFile = ensureBiomeFile();
@@ -185,7 +213,7 @@ public sealed class DiskBasedClipboard implements Clipboard {
         }
         int biomeCount = BiomeTypes.getMaxId();
         try {
-            biomeFile = MemoryFile.create(this.folder.resolve("biomes.dc"), requiredBiomeEntries(this.dimensions), biomeCount);
+            biomeFile = MemoryFile.create(biomesPath(this.folder), requiredBiomeEntries(this.dimensions), biomeCount);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -194,7 +222,7 @@ public sealed class DiskBasedClipboard implements Clipboard {
     }
 
     private void loadBiomeFileIfPresent() throws IOException {
-        Path biomeFilePath = this.folder.resolve("biomes.dc");
+        Path biomeFilePath = biomesPath(this.folder);
         if (Files.isRegularFile(biomeFilePath)) {
             this.biomeFile = MemoryFile.load(biomeFilePath, BiomeTypes.getMaxId());
         }
@@ -236,8 +264,9 @@ public sealed class DiskBasedClipboard implements Clipboard {
             Metadata.write(new Metadata(this.offset, this.dimensions, this.origin), this.folder);
             this.blockFile.close();
             if (this.biomeFile != null) {
-                this.biomeFile.flush();
+                this.biomeFile.close();
             }
+            writeNbt();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -246,9 +275,10 @@ public sealed class DiskBasedClipboard implements Clipboard {
     @Override
     public void flush() {
         try {
+            Metadata.write(new Metadata(this.offset, this.dimensions, this.origin), this.folder);
             this.blockFile.flush();
             if (this.biomeFile != null) {
-                this.biomeFile.close();
+                this.biomeFile.flush();
             }
             writeNbt();
         } catch (IOException e) {
@@ -265,7 +295,27 @@ public sealed class DiskBasedClipboard implements Clipboard {
             converted.put(String.valueOf(entry.getIntKey()), entry.getValue());
         }
         CompoundBinaryTag tiles = CompoundBinaryTag.from(converted);
-        BinaryTagIO.writer().write(tiles, this.folder.resolve("blockEntities.nbt"));
+        BinaryTagIO.writer().write(tiles, blockEntitiesPath(this.folder));
+    }
+
+    private void loadBlockEntitiesIfPresent() throws IOException {
+        final Int2ReferenceMap<CompoundBinaryTag> map = readNbt();
+        if (map != null) {
+            this.nbt.putAll(map);
+        }
+    }
+
+    private @Nullable Int2ReferenceMap<CompoundBinaryTag> readNbt() throws IOException {
+        final Path file = blockEntitiesPath(this.folder);
+        if (!Files.isRegularFile(file)) {
+            return null;
+        }
+        CompoundBinaryTag tiles = BinaryTagIO.reader().read(file);
+        final Int2ReferenceMap<CompoundBinaryTag> map = new Int2ReferenceOpenHashMap<>();
+        for (final String key : tiles.keySet()) {
+            map.put(Integer.parseInt(key), tiles.getCompound(key));
+        }
+        return map;
     }
 
     @Override
@@ -334,7 +384,7 @@ public sealed class DiskBasedClipboard implements Clipboard {
         private static final int REQUIRED_BYTES = Integer.BYTES * 3 /* vectors */ * 3 /* ints per vector*/;
 
         static Metadata read(Path folder) throws IOException {
-            Path file = getFile(folder);
+            Path file = metadataPath(folder);
             byte[] bytes = Files.readAllBytes(file);
             ByteBuffer buffer = ByteBuffer.wrap(bytes);
             BlockVector3 offset = getBlockVector3(buffer);
@@ -348,18 +398,13 @@ public sealed class DiskBasedClipboard implements Clipboard {
         }
 
         static void write(Metadata metadata, Path folder) throws IOException {
-            Path file = getFile(folder);
+            Path file = metadataPath(folder);
             byte[] raw = new byte[REQUIRED_BYTES];
             ByteBuffer buffer = ByteBuffer.wrap(raw);
             putBlockVector3(buffer, metadata.offset);
             putBlockVector3(buffer, metadata.dimensions);
             putBlockVector3(buffer, metadata.origin);
             Files.write(file, raw);
-        }
-
-        @NotNull
-        private static Path getFile(Path folder) {
-            return folder.resolve(".metadata");
         }
 
         static void putBlockVector3(ByteBuffer buffer, BlockVector3 vector) {
