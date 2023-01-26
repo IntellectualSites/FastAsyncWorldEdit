@@ -23,8 +23,7 @@ final class MemoryFileSupport {
 
     static long requiredBytes(int bitsPerEntry, long entries) {
         long bitsNeeded = bitsPerEntry * entries;
-        // Math.ceilDiv is Java 18+
-        return -Math.floorDiv(-bitsNeeded, 8) + MemoryFileSupport.PADDING;
+        return MathMan.ceilDiv(bitsNeeded, 8) + MemoryFileSupport.PADDING;
     }
 
     static int bitsPerEntry(int valueCount) {
@@ -38,4 +37,5 @@ final class MemoryFileSupport {
     static @Range(from = 0, to = 7) int shift(long bitPos, long bytePos) {
         return (int) (bitPos - (bytePos << 3));
     }
+
 }
