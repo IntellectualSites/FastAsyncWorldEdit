@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
 
 import static com.fastasyncworldedit.core.util.io.MemoryFileSupport.shift;
 
@@ -24,13 +25,16 @@ import static com.fastasyncworldedit.core.util.io.MemoryFileSupport.shift;
  * The last byte of the padding is used to store the bitsPerEntry value to allow reading the file again.
  */
 final class SmallMemoryFile implements MemoryFile {
+
     private final FileChannel channel;
+    private final FileLock fileLock;
     private final MappedByteBuffer buffer;
     private final int bitsPerEntry;
     private final int entryMask;
 
     SmallMemoryFile(FileChannel channel, int size, final int bitsPerEntry) throws IOException {
         this.channel = channel;
+        this.fileLock = channel.lock();
         this.channel.truncate(size); // cut off if previous file was larger
         this.buffer = this.channel.map(FileChannel.MapMode.READ_WRITE, 0, size);
         this.buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -76,6 +80,7 @@ final class SmallMemoryFile implements MemoryFile {
     @Override
     public void close() throws IOException {
         flush();
+        this.fileLock.release(); // unlock before closing the channel
         this.channel.close();
     }
 
