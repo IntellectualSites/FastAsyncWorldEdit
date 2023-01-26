@@ -107,7 +107,7 @@ public interface OutputExtent {
 
     @NonAbstractForCompatibility(
             delegateName = "setBiome",
-            delegateParams = {int.class, int.class, int.class, BiomeType.class}
+            delegateParams = {BlockVector3.class, BiomeType.class}
     )
     // The defaults need to remain for compatibility (the actual implementation still needs to override one of these)
     default boolean setBiome(int x, int y, int z, BiomeType biome) {
@@ -133,10 +133,10 @@ public interface OutputExtent {
      */
     @NonAbstractForCompatibility(
             delegateName = "setBiome",
-            delegateParams = {BlockVector3.class, BiomeType.class}
+            delegateParams = {int.class, int.class, int.class, BiomeType.class}
     )
     default boolean setBiome(BlockVector3 position, BiomeType biome) {
-        DeprecationUtil.checkDelegatingOverride(getClass());
+        // DeprecationUtil.checkDelegatingOverride(getClass()); FAWE - check not required as we delegate to int-based method
 
         return setBiome(position.getX(), position.getY(), position.getZ(), biome);
     }

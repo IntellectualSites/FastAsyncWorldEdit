@@ -88,7 +88,13 @@ public interface InputExtent {
         return getBiomeType(position.getX(), 0, position.getZ());
     }
 
+    @NonAbstractForCompatibility(
+            delegateName = "getBiome",
+            delegateParams = {BlockVector3.class}
+    )
     default BiomeType getBiomeType(int x, int y, int z) {
+        DeprecationUtil.checkDelegatingOverride(getClass());
+
         return getBiome(MutableBlockVector3.get(x, y, z));
     }
 
@@ -112,9 +118,9 @@ public interface InputExtent {
      */
     @NonAbstractForCompatibility(delegateName = "getBiome", delegateParams = {BlockVector2.class})
     default BiomeType getBiome(BlockVector3 position) {
-        DeprecationUtil.checkDelegatingOverride(getClass());
+        // DeprecationUtil.checkDelegatingOverride(getClass()); FAWE - check in getBiomeType
 
-        return getBiome(position.toBlockVector2());
+        return getBiomeType(position.getX(), position.getY(), position.getZ());
     }
 
     //FAWE start
