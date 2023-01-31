@@ -7,6 +7,8 @@ import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BaseBlock;
 
+import static java.lang.Math.floorDiv;
+
 public class Linear2DBlockPattern extends AbstractPattern {
 
     private final Pattern[] patternsArray;
@@ -37,7 +39,8 @@ public class Linear2DBlockPattern extends AbstractPattern {
 
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
-        int index = (get.getBlockX() / this.xScale + get.getBlockZ() / this.zScale) % patternsArray.length;
+        int index = (floorDiv(get.getBlockX(), this.xScale)
+                + floorDiv(get.getBlockZ(), this.zScale)) % patternsArray.length;
         if (index < 0) {
             index += patternsArray.length;
         }
