@@ -38,7 +38,6 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api")
 
     // Plugins
-    compileOnly(libs.redprotect) { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Core:7.0.0-SNAPSHOT") { isTransitive = false }
 
     // ensure this is on the classpath for the AP
