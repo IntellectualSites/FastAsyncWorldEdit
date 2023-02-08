@@ -6,6 +6,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.zaxxer.sparsebits.SparseBitSet;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -235,12 +236,15 @@ public class LocalBlockVectorSet implements BlockVector3Set {
         return toArray((Object[]) null);
     }
 
+    @SuppressWarnings("unchecked")
     @Nonnull
     @Override
     public <T> T[] toArray(T[] array) {
         int size = size();
-        if (array == null || array.length < size) {
-            array = (T[]) new BlockVector3[size];
+        if (array.length < size) {
+            array = Arrays.copyOf(array, size);
+        } else if (array.length > size) {
+            array[size] = null; // mark as end to comply with the method contract
         }
         int index = 0;
         for (int i = 0; i < size; i++) {
