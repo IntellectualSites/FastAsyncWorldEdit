@@ -24,11 +24,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.ExceptionCollector;
 import net.minecraft.util.SimpleBitStorage;
@@ -297,13 +295,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
     }
 
-    @SuppressWarnings("deprecation")
     public static void sendChunk(ServerLevel nmsWorld, int chunkX, int chunkZ, boolean lighting) {
+
         ChunkHolder chunkHolder = getPlayerChunk(nmsWorld, chunkX, chunkZ);
         if (chunkHolder == null) {
             return;
         }
-        ChunkPos coordIntPair = new ChunkPos(chunkX, chunkZ);
         LevelChunk levelChunk;
         if (PaperLib.isPaper()) {
             // getChunkAtIfLoadedImmediately is paper only
@@ -320,34 +317,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             return;
         }
         TaskManager.taskManager().task(() -> {
-            ClientboundLevelChunkWithLightPacket packet;
-            if (PaperLib.isPaper()) {
-                packet = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk,
-                        nmsWorld.getChunkSource().getLightEngine(),
-                        null,
-                        null,
-                        true,
-                        false // last false is to not bother with x-ray
-                );
-            } else {
-                // deprecated on paper - deprecation suppressed
-                packet = new ClientboundLevelChunkWithLightPacket(
-                        levelChunk,
-                        nmsWorld.getChunkSource().getLightEngine(),
-                        null,
-                        null,
-                        true
-                );
-            }
-            nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
+            nmsWorld.getChunkSource().chunkMap.resendChunk(levelChunk);
         });
     }
-
-    private static List<ServerPlayer> nearbyPlayers(ServerLevel serverLevel, ChunkPos coordIntPair) {
-        return serverLevel.getChunkSource().chunkMap.getPlayers(coordIntPair, false);
-    }
-
     /*
     NMS conversion
      */
