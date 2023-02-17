@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Set JDK 17') {
             steps {
-                tool name: 'OpenJDK-17.0.1', type: 'jdk'
+                tool name: 'Temurin-17.0.6+10', type: 'jdk'
             }
         }
         stage('Build') {
