@@ -2,7 +2,7 @@
 # Minecraft expectations
 fastutil = "8.5.9"
 guava = "31.1-jre"
-log4j = "2.19.0"
+log4j = "2.20.0"
 
 # Plugins
 dummypermscompat = "1.10"
