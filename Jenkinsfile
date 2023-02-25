@@ -11,6 +11,7 @@ pipeline {
         }
         stage('Build') {
             steps {
+                cleanWs()
                 sh './gradlew clean build'
             }
         }
