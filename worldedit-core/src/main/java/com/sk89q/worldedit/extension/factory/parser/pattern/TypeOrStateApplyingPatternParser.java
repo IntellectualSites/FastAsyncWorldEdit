@@ -33,10 +33,13 @@ import com.sk89q.worldedit.function.pattern.StateApplyingPattern;
 import com.sk89q.worldedit.function.pattern.TypeApplyingPattern;
 import com.sk89q.worldedit.internal.registry.InputParser;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import com.sk89q.worldedit.world.block.BlockType;
+import com.sk89q.worldedit.world.block.BlockTypes;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -67,7 +70,8 @@ public class TypeOrStateApplyingPatternParser extends InputParser<Pattern> imple
             if (type.isEmpty()) {
                 return Stream.empty(); // without knowing a type, we can't really suggest states
             } else {
-                return SuggestionHelper.getBlockPropertySuggestions(type, parts[1]).map(s -> "^" + s);
+                BlockType blockType = BlockTypes.get(type.toLowerCase(Locale.ROOT));
+                return SuggestionHelper.getBlockPropertySuggestions(type, blockType, parts[1]).map(s -> "^" + s);
             }
         }
     }
