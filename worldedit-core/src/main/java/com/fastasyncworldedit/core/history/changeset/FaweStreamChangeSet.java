@@ -126,8 +126,6 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
                 @Override
                 public void readCombined(FaweInputStream in, MutableBlockChange change, boolean dir) throws IOException {
-                    int from1 = in.read();
-                    int from2 = in.read();
                     change.ordinal = in.readVarInt();
                 }
 
