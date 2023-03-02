@@ -3,7 +3,7 @@ main: com.sk89q.worldedit.bukkit.WorldEditPlugin
 version: "${internalVersion}"
 load: STARTUP
 api-version: 1.15
-softdepend: [ Vault ]
+softdepend: [ Vault, WorldGuard ]
 provides: [ WorldEdit ]
 website: https://www.spigotmc.org/resources/13932/
 description: Blazingly fast world manipulation for builders, large networks and developers.
