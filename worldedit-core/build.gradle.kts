@@ -27,6 +27,19 @@ dependencies {
     implementation("com.google.guava:guava")
     implementation("com.google.code.gson:gson")
 
+    implementation(libs.jchronic) {
+        exclude(group = "junit", module = "junit")
+    }
+    implementation("com.thoughtworks.paranamer:paranamer:2.6")
+    implementation(libs.jlibnoise)
+    api(platform("org.enginehub.lin-bus:lin-bus-bom:0.1.0-SNAPSHOT"))
+    api("org.enginehub.lin-bus:lin-bus-tree:0.1.0-SNAPSHOT") {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
+    api("org.enginehub.lin-bus.format:lin-bus-format-snbt:0.1.0-SNAPSHOT") {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
+
     // Platform expectations
     implementation("org.yaml:snakeyaml")
 
