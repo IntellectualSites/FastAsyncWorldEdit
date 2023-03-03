@@ -273,6 +273,9 @@ public class MainUtil {
         return buffer;
     }
 
+    /**
+     * Note: The returned stream is not thread safe.
+     */
     public static FaweOutputStream getCompressedOS(OutputStream os, int amount, int buffer) throws IOException {
         os.write((byte) 10 + amount);
         os = new FastBufferedOutputStream(os, buffer);
