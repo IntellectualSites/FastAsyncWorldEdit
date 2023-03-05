@@ -624,6 +624,11 @@ public abstract class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public <B extends BlockStateHolder<B>> int setBlocks(final Region region, final B block) throws MaxChangedBlocksException {
+        return extent.setBlocks(region, block);
+    }
+
+    @Override
     public boolean setTile(int x, int y, int z, CompoundTag tile) throws WorldEditException {
         return setBlock(x, y, z, getBlock(x, y, z).toBaseBlock(tile));
     }
