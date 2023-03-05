@@ -31,8 +31,6 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import jdk.jfr.Category;
-import jdk.jfr.Event;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -71,13 +69,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public void closeAsync() {
-        @Category("FAWE")
-        class CloseCall extends Event {
-            public boolean closed;
-        }
-        final CloseCall closeCall = new CloseCall();
-        closeCall.closed = closed;
-        closeCall.commit();
         if (closed) {
             return;
         }
@@ -401,17 +392,16 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     private void drainQueue(boolean ignoreRunningState) {
-        if (!ignoreRunningState) {
-            if (!workers.compareAndSet(0, 1)) {
-                return; // already running on other thread or we WANT blocking behavior
-            }
+        // if ignoreRunningState, we allow this thread to drain the queue
+        // even if another thread is already draining
+        if (ignoreRunningState) {
             workers.incrementAndGet(); // count this additional worker
+        } else {
+            // only start draining from this thread if no other thread is draining already
+            if (!workers.compareAndSet(0, 1)) {
+                return; // already running on other thread
+            }
         }
-        @Category("FAWE")
-        class DrainQueue extends Event {
-
-        }
-        final DrainQueue drainQueue = new DrainQueue();
         try {
             while (true) {
                 var next = queue.poll();
@@ -422,7 +412,6 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             }
         } finally {
             workers.decrementAndGet();
-            drainQueue.commit();
         }
     }
 
