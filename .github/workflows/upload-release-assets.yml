@@ -19,7 +19,7 @@ jobs:
       - name: Clean Build
         run: ./gradlew clean build --no-daemon
       - name: Upload Release Assets
-        uses: AButler/upload-release-assets@ec6d3263266dc57eb6645b5f75e827987f7c217d # ratchet:AButler/upload-release-assets@v2.0
+        uses: AButler/upload-release-assets@b2b56d8ca22109e8606ac54603ab60dfb32058a7 # ratchet:AButler/upload-release-assets@v2.0
         with:
           files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
