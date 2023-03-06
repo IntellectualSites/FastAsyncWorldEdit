@@ -73,7 +73,16 @@ public class PropertyKeySet implements Set<PropertyKey> {
     @Nonnull
     @Override
     public <T> T[] toArray(@Nonnull T[] a) {
-        T[] array = Arrays.copyOf(a, this.bits.cardinality());
+        T[] array;
+        final int cardinality = this.bits.cardinality();
+        if (cardinality > a.length) {
+            array = Arrays.copyOf(a, cardinality);
+        } else {
+            array = a;
+            if (a.length > cardinality) {
+                array[cardinality] = null; // mark as end to comply with the method contract
+            }
+        }
         Iterator<PropertyKey> iter = iterator();
         for (int i = 0; i < array.length && iter.hasNext(); i++) {
             array[i] = (T) iter.next();
