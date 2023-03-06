@@ -80,14 +80,14 @@ jobs:
         if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         uses: itsmeow/curseforge-upload@13f278adc4cc7b881555f87e6ea528387dd6492b # v3
         with:
-          file_path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-${{ env.VERSION }}.jar
+          file_path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-${{ github.event.release.tag_name }}.jar
           # https://minecraft.curseforge.com/api/game/versions?token=redacted
           # gameVersionTypeID: 1
           game_versions: "8503,9016,9190,9261,9560,9561"
           project_id: 103525
           game_endpoint: minecraft
           token: ${{ secrets.CURSEFORGE_TOKEN }}
-          display_name: FastAsyncWorldEdit ${{ env.VERSION }}
+          display_name: FastAsyncWorldEdit ${{ github.event.release.tag_name }}
           release_type: release
           changelog: "Click here to view changelog: https://github.com/IntellectualSites/FastAsyncWorldEdit/releases/tag/${{ github.event.release.tag_name }}"
           changelog_type: markdown
