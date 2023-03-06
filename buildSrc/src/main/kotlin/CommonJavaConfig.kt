@@ -59,7 +59,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
             )
             options.encoding = "UTF-8"
             links(
-                    "https://jd.adventure.kyori.net/api/latest/",
+                    "https://jd.advntr.dev/api/latest/",
                     "https://logging.apache.org/log4j/2.x/log4j-api/apidocs/",
                     "https://www.antlr.org/api/Java/",
                     "https://docs.enginehub.org/javadoc/org.enginehub.piston/core/0.5.7/",
