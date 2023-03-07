@@ -439,9 +439,9 @@ public class BrushTool
             player.print(
                     Caption.of("fawe.error.no-perm", StringMan.join(current.getPermissions(), ",")));
             return false;
-        }
-        try (EditSession editSession = session.createEditSession(player, current.toString())) {
-            Location target = player.getBlockTrace(getRange(), true, traceMask);
+
+        }Location target = player.getBlockTrace(getRange(), true, traceMask);
+        try (EditSession editSession = session.createPositionedEditSession(player, current.toString(), target)) {
 
             if (target == null) {
                 editSession.cancel();

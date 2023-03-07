@@ -19,6 +19,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionIntersection;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
@@ -127,13 +128,17 @@ public class PlotSquaredFeature extends FaweMaskManager {
     }
 
     @Override
-    public FaweMask getMask(Player player, MaskType type, boolean isWhitelist) {
+    public FaweMask getMask(Player player, Location position, MaskType type, boolean isWhitelist) {
         final PlotPlayer<org.bukkit.entity.Player> pp = PlotPlayer.from(BukkitAdapter.adapt(player));
         if (pp == null) {
             return null;
         }
         final Set<CuboidRegion> regions;
-        Plot plot = pp.getCurrentPlot();
+        // We assume the current players world as the used world - the Location does not contain the world itself
+        Plot plot = com.plotsquared.core.location.Location.at(
+                player.getWorld().getName(),
+                position.toBlockPoint()
+        ).getPlot();
         if (isAllowed(player, plot, type)) {
             regions = plot.getRegions();
         } else {

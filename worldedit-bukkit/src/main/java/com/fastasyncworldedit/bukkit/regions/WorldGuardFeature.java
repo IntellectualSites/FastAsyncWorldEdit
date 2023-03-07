@@ -157,10 +157,11 @@ public class WorldGuardFeature extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
+    public FaweMask getMask(com.sk89q.worldedit.entity.Player wePlayer, com.sk89q.worldedit.util.Location position, MaskType type,
+                            boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
         final LocalPlayer localplayer = this.worldguard.wrapPlayer(player);
-        final Location location = player.getLocation();
+        final Location location = BukkitAdapter.adapt(position);
         final Set<ProtectedRegion> regions = this.getRegions(localplayer, location, isWhitelist);
         if (!regions.isEmpty()) {
             Set<Region> result = new HashSet<>();

@@ -66,9 +66,11 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
     }
 
     @Override
-    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer,
+                            com.sk89q.worldedit.util.Location position, MaskType type,
+                            boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
-        final Location location = player.getLocation();
+        final Location location = BukkitAdapter.adapt(position);
         try {
             final PlayerCache cache = ((Towny) this.towny).getCache(player);
             final WorldCoord mycoord = cache.getLastTownBlock();

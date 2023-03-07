@@ -2,13 +2,11 @@ package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
-import com.sk89q.worldedit.bukkit.BukkitWorld;
-import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.Location;
 import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.apache.logging.log4j.Logger;
@@ -34,9 +32,12 @@ public class GriefPreventionFeature extends BukkitMaskManager implements Listene
     }
 
     @Override
-    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, Location position, MaskType type,
+                            boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
-        final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(player.getLocation(), true, null);
+        final Claim claim = GriefPrevention.instance.dataStore.getClaimAt(
+                BukkitAdapter.adapt(position), true, null
+        );
         if (claim != null) {
             if (isAllowed(player, claim, type)) {
                 claim.getGreaterBoundaryCorner().getBlockX();

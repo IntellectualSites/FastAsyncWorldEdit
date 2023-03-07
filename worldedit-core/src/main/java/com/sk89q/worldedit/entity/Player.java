@@ -356,12 +356,29 @@ public interface Player extends Entity, Actor {
     Region[] getAllowedRegions();
 
     /**
+     * Get the player's current allowed WorldEdit regions intersecting the passed {@link Location} instead of the players
+     * location itself.
+     * @param position The alternative position to use.
+     * @return an array of allowed regions
+     */
+    Region[] getAllowedRegions(Location position);
+
+    /**
      * Get the player's current allowed WorldEdit regions.
      *
      * @param type Mask type; whether to check if the player is an owner of a member of the regions
      * @return an array of allowed regions
      */
     Region[] getAllowedRegions(FaweMaskManager.MaskType type);
+
+    /**
+     * Get the player's current allowed WorldEdit regions intersecting the passed {@link Location} instead of the players
+     * location itself.
+     * @param position The alternative position to use.
+     * @param type Mask type; whether to check if the player is an owner of a member of the regions
+     * @return an array of allowed regions
+     */
+    Region[] getAllowedRegions(Location position, FaweMaskManager.MaskType type);
 
     /**
      * Get the player's current disallowed WorldEdit regions. Effectively a blacklist.

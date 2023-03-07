@@ -97,10 +97,23 @@ public class WEManager {
      * @return array of allowed regions if whitelist, else of disallowed regions.
      */
     public Region[] getMask(Player player, FaweMaskManager.MaskType type, final boolean isWhitelist) {
+        return getMask(player, player.getLocation(), type, isWhitelist);
+    }
+
+    /**
+     * Get a player's mask.
+     *
+     * @param player      Player to get mask of
+     * @param position    The position to check for firstly (differs from players position for brushes e.g.)
+     * @param type        Mask type; whether to check if the player is an owner of a member of the regions
+     * @param isWhitelist If searching for whitelist or blacklist regions. True if whitelist
+     * @return array of allowed regions if whitelist, else of disallowed regions.
+     * @since TODO
+     */
+    public Region[] getMask(Player player, Location position, FaweMaskManager.MaskType type, final boolean isWhitelist) {
         if (!Settings.settings().REGION_RESTRICTIONS || player.hasPermission("fawe.bypass.regions")) {
             return new Region[]{RegionWrapper.GLOBAL()};
         }
-        Location loc = player.getLocation();
         String world = player.getWorld().getName();
         if (!world.equals(player.getMeta("lastMaskWorld"))) {
             player.deleteMeta("lastMaskWorld");
@@ -123,7 +136,7 @@ public class WEManager {
                         FaweMask mask = iterator.next();
                         if (mask.isValid(player, type)) {
                             Region region = mask.getRegion();
-                            if (region.contains(loc.toBlockPoint())) {
+                            if (region.contains(position.toBlockPoint())) {
                                 regions.add(region);
                             } else {
                                 removed = true;
@@ -148,7 +161,8 @@ public class WEManager {
                     if (manager.isExclusive() && !masks.isEmpty()) {
                         continue;
                     }
-                    final FaweMask mask = manager.getMask(player, FaweMaskManager.MaskType.getDefaultMaskType(), isWhitelist);
+                    final FaweMask mask = manager.getMask(player, position, FaweMaskManager.MaskType.getDefaultMaskType(),
+                            isWhitelist);
                     if (mask != null) {
                         regions.add(mask.getRegion());
                         masks.add(mask);

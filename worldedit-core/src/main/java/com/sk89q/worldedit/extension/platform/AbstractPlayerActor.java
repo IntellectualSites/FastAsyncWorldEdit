@@ -490,8 +490,18 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
     }
 
     @Override
+    public Region[] getAllowedRegions(Location position) {
+        return this.getAllowedRegions(position, FaweMaskManager.MaskType.getDefaultMaskType());
+    }
+
+    @Override
     public Region[] getAllowedRegions(FaweMaskManager.MaskType type) {
         return WEManager.weManager().getMask(this, type, true);
+    }
+
+    @Override
+    public Region[] getAllowedRegions(Location position, FaweMaskManager.MaskType type) {
+        return WEManager.weManager().getMask(this, position, type, true);
     }
 
     @Override

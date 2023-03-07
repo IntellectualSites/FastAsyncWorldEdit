@@ -64,6 +64,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.eventbus.EventBus;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
@@ -111,6 +112,9 @@ public final class EditSessionBuilder {
     @Nullable
     private BlockBag blockBag;
     private boolean tracing;
+
+    @Nullable
+    private Location basePosition;
 
     EditSessionBuilder(EventBus eventBus) {
         this.eventBus = eventBus;
@@ -413,6 +417,20 @@ public final class EditSessionBuilder {
         return setDirty();
     }
 
+    @Nullable
+    public Location basePosition() {
+        return basePosition;
+    }
+
+    /**
+     * Set's the base position for the current EditSession, which is required for calculating affected regions by this session
+     * (useful for remote actions, like brushes)
+     */
+    public EditSessionBuilder basePosition(@Nullable final Location basePosition) {
+        this.basePosition = basePosition;
+        return setDirty();
+    }
+
     /**
      * Compile the builder to the settings given. Prepares history, limits, lighting, etc.
      */
@@ -533,7 +551,7 @@ public final class EditSessionBuilder {
                 if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player) {
                         Player player = (Player) actor;
-                        allowedRegions = player.getAllowedRegions();
+                        allowedRegions = this.basePosition != null ? player.getAllowedRegions(this.basePosition) : player.getAllowedRegions();
                     }
                 }
             }

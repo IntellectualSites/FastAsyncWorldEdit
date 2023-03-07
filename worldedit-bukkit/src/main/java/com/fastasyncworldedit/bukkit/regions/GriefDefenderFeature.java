@@ -8,6 +8,7 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
+import com.sk89q.worldedit.util.Location;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -27,9 +28,10 @@ public class GriefDefenderFeature extends BukkitMaskManager implements Listener 
     }
 
     @Override
-    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
+    public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, Location position, MaskType type,
+                            boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
-        Claim claim = GriefDefender.getCore().getClaimAt(player.getLocation());
+        Claim claim = GriefDefender.getCore().getClaimAt(BukkitAdapter.adapt(position));
         if (claim != null && !claim.isWilderness()) {
             if (isAllowed(player, claim, type)) {
                 final BlockVector3 pos1 = BlockVector3.at(

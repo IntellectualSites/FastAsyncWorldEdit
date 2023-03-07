@@ -67,6 +67,7 @@ import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.Identifiable;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.SideEffectSet;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.World;
@@ -1627,7 +1628,7 @@ public class LocalSession implements TextureHolder {
         return createEditSession(actor, null);
     }
 
-    public EditSession createEditSession(Actor actor, String command) {
+    public EditSession createPositionedEditSession(Actor actor, String command, @Nullable Location position) {
         checkNotNull(actor);
 
         World world = null;
@@ -1649,6 +1650,10 @@ public class LocalSession implements TextureHolder {
         builder.command(command);
         builder.fastMode(!this.sideEffectSet.doesApplyAny());
 
+        if (position != null) {
+            builder.basePosition(position);
+        }
+
         editSession = builder.build();
 
         if (mask != null) {
@@ -1663,6 +1668,10 @@ public class LocalSession implements TextureHolder {
         editSession.setTickingWatchdog(tickingWatchdog);
 
         return editSession;
+    }
+
+    public EditSession createEditSession(Actor actor, String command) {
+        return createPositionedEditSession(actor, command, null);
     }
     //FAWE end
 
