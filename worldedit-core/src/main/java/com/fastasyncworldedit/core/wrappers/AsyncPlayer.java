@@ -58,12 +58,12 @@ public class AsyncPlayer extends PlayerProxy {
 
     @Override
     public void findFreePosition() {
-        TaskManager.taskManager().sync(new RunnableVal<Boolean>() {
+        TaskManager.taskManager().syncWith(new RunnableVal<Boolean>() {
             @Override
             public void run(Boolean value) {
                 getBasePlayer().findFreePosition();
             }
-        });
+        }, this);
     }
 
     @Override
