@@ -5,9 +5,11 @@ import com.fastasyncworldedit.core.extent.processor.lighting.NMSRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.util.Location;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
@@ -101,37 +103,51 @@ public class PaperweightStarlightRelighter implements Relighter {
         while (iterator.hasNext()) {
             coords.add(new ChunkPos(iterator.nextLong()));
         }
+        if (FoliaSupport.isFolia()) {
+            relightRegion(andThen, coords);
+            return;
+        }
         TaskManager.taskManager().task(() -> {
             // trigger chunk load and apply ticket on main thread
-            List<CompletableFuture<?>> futures = new ArrayList<>();
-            for (ChunkPos pos : coords) {
-                futures.add(serverLevel.getWorld().getChunkAtAsync(pos.x, pos.z)
-                        .thenAccept(c -> serverLevel.getChunkSource().addTicketAtLevel(
-                                FAWE_TICKET,
-                                pos,
-                                LIGHT_LEVEL,
-                                Unit.INSTANCE
-                        ))
-                );
-            }
-            // collect futures and trigger relight once all chunks are loaded
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAccept(v ->
-                    invokeRelight(
-                            coords,
-                            c -> {
-                            }, // no callback for single chunks required
-                            i -> {
-                                if (i != coords.size()) {
-                                    LOGGER.warn("Processed {} chunks instead of {}", i, coords.size());
-                                }
-                                // post process chunks on main thread
-                                TaskManager.taskManager().task(() -> postProcessChunks(coords));
-                                // call callback on our own threads
-                                TaskManager.taskManager().async(andThen);
-                            }
-                    )
-            );
+            relightRegion(andThen, coords);
         });
+    }
+
+    private void relightRegion(Runnable andThen, Set<ChunkPos> coords) {
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+        for (ChunkPos pos : coords) {
+            futures.add(serverLevel.getWorld().getChunkAtAsync(pos.x, pos.z)
+                    .thenAccept(c -> serverLevel.getChunkSource().addTicketAtLevel(
+                            FAWE_TICKET,
+                            pos,
+                            LIGHT_LEVEL,
+                            Unit.INSTANCE
+                    ))
+            );
+        }
+        Location location = toLocation(coords.iterator().next());
+        // collect futures and trigger relight once all chunks are loaded
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAcceptAsync(v ->
+                invokeRelight(
+                        coords,
+                        c -> {
+                        }, // no callback for single chunks required
+                        i -> {
+                            if (i != coords.size()) {
+                                LOGGER.warn("Processed {} chunks instead of {}", i, coords.size());
+                            }
+                            // post process chunks on main thread
+                            TaskManager.taskManager().task(() -> postProcessChunks(coords), location);
+                            // call callback on our own threads
+                            TaskManager.taskManager().async(andThen);
+                        }
+                ),
+                task -> TaskManager.taskManager().task(task, location)
+        );
+    }
+
+    private Location toLocation(ChunkPos chunkPos) {
+        return PaperweightPlatformAdapter.toLocation(this.serverLevel, chunkPos);
     }
 
     private void invokeRelight(

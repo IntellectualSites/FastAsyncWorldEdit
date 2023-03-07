@@ -4,7 +4,10 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
+import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.util.Location;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
@@ -52,6 +55,7 @@ public abstract class TaskManager {
      * @param runnable the task to run
      * @param interval in ticks
      */
+    @Deprecated
     public abstract int repeat(@Nonnull final Runnable runnable, final int interval);
 
     /**
@@ -75,7 +79,14 @@ public abstract class TaskManager {
      *
      * @param runnable the task to run
      */
+    @Deprecated
     public abstract void task(@Nonnull final Runnable runnable);
+    /**
+     * Run a task on the main thread.
+     *
+     * @param runnable the task to run
+     */
+    public abstract void task(@Nonnull final Runnable runnable, @Nonnull Location contextLocation);
 
     /**
      * Get the public ForkJoinPool.
@@ -155,6 +166,7 @@ public abstract class TaskManager {
     /**
      * Disable async catching for a specific task.
      */
+    @Deprecated
     public void runUnsafe(Runnable run) {
         QueueHandler queue = Fawe.instance().getQueueHandler();
         queue.startSet(true);
@@ -187,6 +199,7 @@ public abstract class TaskManager {
      *
      * @param runnable the task to run
      */
+    @Deprecated
     public void taskNowMain(@Nonnull final Runnable runnable) {
         if (Fawe.isMainThread()) {
             runnable.run();
@@ -211,6 +224,7 @@ public abstract class TaskManager {
      * @param runnable the task to run.
      * @param async    whether the task should run on the main thread
      */
+    @Deprecated
     public void taskSoonMain(@Nonnull final Runnable runnable, boolean async) {
         if (async) {
             async(runnable);
@@ -226,7 +240,9 @@ public abstract class TaskManager {
      * @param runnable the task to run
      * @param delay    in ticks
      */
+    @Deprecated
     public abstract void later(@Nonnull final Runnable runnable, final int delay);
+    public abstract void later(@Nonnull final Runnable runnable, Location location, final int delay);
 
     /**
      * Run a task later asynchronously.
@@ -251,6 +267,7 @@ public abstract class TaskManager {
      * @param task     the task to run on each object
      * @param whenDone when the object task completes
      */
+    @Deprecated
     public <T> void objectTask(Collection<T> objects, final RunnableVal<T> task, final Runnable whenDone) {
         final Iterator<T> iterator = objects.iterator();
         task(new Runnable() {
@@ -295,6 +312,7 @@ public abstract class TaskManager {
         }
     }
 
+    @Deprecated
     public void taskWhenFree(@Nonnull Runnable run) {
         if (Fawe.isMainThread()) {
             run.run();
@@ -308,6 +326,7 @@ public abstract class TaskManager {
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
      */
+    @Deprecated
     public <T> T syncWhenFree(@Nonnull final RunnableVal<T> function) {
         if (Fawe.isMainThread()) {
             function.run();
@@ -325,6 +344,7 @@ public abstract class TaskManager {
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
      */
+    @Deprecated
     public <T> T syncWhenFree(@Nonnull final Supplier<T> supplier) {
         if (Fawe.isMainThread()) {
             return supplier.get();
@@ -341,6 +361,7 @@ public abstract class TaskManager {
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms
      */
+    @Deprecated
     public <T> T sync(@Nonnull final RunnableVal<T> function) {
         return sync((Supplier<T>) function);
     }
@@ -350,6 +371,7 @@ public abstract class TaskManager {
      * - Useful if you need to access something from the Bukkit API from another thread<br>
      * - Usually wait time is around 25ms<br>
      */
+    @Deprecated
     public <T> T sync(final Supplier<T> function) {
         if (Fawe.isMainThread()) {
             return function.get();
@@ -360,5 +382,9 @@ public abstract class TaskManager {
             throw new RuntimeException(e);
         }
     }
+
+    public abstract <T> T syncAt(Supplier<T> supplier, Location context);
+
+    public abstract <T> T syncWith(Supplier<T> supplier, Player context);
 
 }

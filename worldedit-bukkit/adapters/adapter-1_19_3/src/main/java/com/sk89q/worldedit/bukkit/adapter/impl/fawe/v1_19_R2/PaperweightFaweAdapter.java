@@ -3,6 +3,7 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R2;
 import com.fastasyncworldedit.bukkit.adapter.CachedBukkitAdapter;
 import com.fastasyncworldedit.bukkit.adapter.IDelegateBukkitImplAdapter;
 import com.fastasyncworldedit.bukkit.adapter.NMSRelighterFactory;
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.entity.LazyBaseEntity;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
@@ -259,7 +260,12 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         int y = location.getBlockY();
         int z = location.getBlockZ();
         final ServerLevel handle = craftWorld.getHandle();
-        LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
+        LevelChunk chunk;
+        if (Fawe.isTickThread()) {
+            chunk = handle.getChunk(x >> 4, z >> 4);
+        } else {
+            chunk = TaskManager.taskManager().syncAt(() -> handle.getChunk(x >> 4, z >> 4), BukkitAdapter.adapt(location));
+        }
         final BlockPos blockPos = new BlockPos(x, y, z);
         final net.minecraft.world.level.block.state.BlockState blockData = chunk.getBlockState(blockPos);
         BlockState state = adapt(blockData);
