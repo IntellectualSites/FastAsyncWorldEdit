@@ -10,7 +10,6 @@ worldguard-bukkit = "7.0.7"
 mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "16.18"
 griefdefender = "2.1.0-SNAPSHOT"
-residence = "4.5._13.1"
 towny = "0.98.4.18"
 
 # Third party
@@ -53,7 +52,6 @@ worldguard = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", versi
 mapmanager = { group = "com.github.InventivetalentDev", name = "MapManager", version.ref = "mapmanager" }
 griefprevention = { group = "com.github.TechFortress", name = "GriefPrevention", version.ref = "griefprevention" }
 griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
-residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
 towny = { group = "com.github.TownyAdvanced", name = "Towny", version.ref = "towny" }
 
 # Third Party
