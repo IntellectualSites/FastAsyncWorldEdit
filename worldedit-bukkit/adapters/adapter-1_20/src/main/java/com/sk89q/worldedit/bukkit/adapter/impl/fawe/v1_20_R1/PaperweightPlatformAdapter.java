@@ -11,10 +11,14 @@ import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Location;
+import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -383,11 +387,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 );
             }
             nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
-        });
+        }, toLocation(nmsWorld, coordIntPair));
     }
 
     private static List<ServerPlayer> nearbyPlayers(ServerLevel serverLevel, ChunkPos coordIntPair) {
         return serverLevel.getChunkSource().chunkMap.getPlayers(coordIntPair, false);
+    }
+
+    public static Location toLocation(ServerLevel serverLevel, ChunkPos chunkPos) {
+        final World adapt = BukkitAdapter.adapt(serverLevel.getWorld());
+        final Vector3 pos = Vector3.at(chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ());
+        return new Location(adapt, pos);
     }
 
     /*
