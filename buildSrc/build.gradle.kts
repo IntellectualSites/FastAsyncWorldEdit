@@ -12,13 +12,6 @@ repositories {
         name = "EngineHub"
         url = uri("https://maven.enginehub.org/repo/")
     }
-    maven {
-        name = "PaperMC"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-        content {
-            includeGroupByRegex("io\\.papermc\\..*")
-        }
-    }
 }
 
 val properties = Properties().also { props ->
