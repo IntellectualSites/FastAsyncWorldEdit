@@ -243,6 +243,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         final ServerLevel handle = getServerLevel(location.getWorld());
         LevelChunk chunk;
         if (Fawe.isTickThread()) {
+            // TODO check if is owned by this thread, else synchronize
             chunk = handle.getChunk(x >> 4, z >> 4);
         } else {
             chunk = TaskManager.taskManager().syncAt(() -> handle.getChunk(x >> 4, z >> 4), BukkitAdapter.adapt(location));
