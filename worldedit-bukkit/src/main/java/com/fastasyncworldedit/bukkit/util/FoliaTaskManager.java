@@ -117,6 +117,7 @@ public class FoliaTaskManager extends TaskManager {
 
         private static final MethodHandle EXECUTE_FOR_LOCATION;
         private static final MethodHandle EXECUTE_FOR_PLAYER;
+        private static final Runnable THROW_IF_RETIRED = () -> throwRetired();
 
         private static final MethodType LOCATION_EXECUTE_TYPE = methodType(
                 void.class,
@@ -160,7 +161,7 @@ public class FoliaTaskManager extends TaskManager {
                 // (ES, P, R, R, L)Z (ES, R, R, L)Z
                 executeForPlayer = insertArguments(executeForPlayer, 1, pluginInstance);
                 // (ES, R1, R2, L)Z -> (ES, R1)Z
-                executeForPlayer = insertArguments(executeForPlayer, 2, null, 0);
+                executeForPlayer = insertArguments(executeForPlayer, 2, THROW_IF_RETIRED, 0);
                 // (ES, R1)Z -> (ES, R1)V
                 executeForPlayer = dropReturn(executeForPlayer);
                 MethodHandle getScheduler = lookup.findVirtual(
@@ -190,7 +191,6 @@ public class FoliaTaskManager extends TaskManager {
             }
         }
         static void executeForEntity(Player player, Runnable task) {
-            // TODO task might not be run if player retires
             try {
                 EXECUTE_FOR_PLAYER.invokeExact(BukkitAdapter.adapt(player), task);
             } catch (Error | RuntimeException e) {
@@ -198,6 +198,10 @@ public class FoliaTaskManager extends TaskManager {
             } catch (Throwable other) {
                 throw new RuntimeException(other);
             }
+        }
+
+        private static void throwRetired() {
+            throw new RuntimeException("Player retired");
         }
 
     }
