@@ -66,7 +66,9 @@ public class FloatingTreeRemover implements BlockTool {
                 || type == BlockTypes.MUSHROOM_STEM
                 || type == BlockTypes.VINE
                 || type == BlockTypes.NETHER_WART_BLOCK
-                || type == BlockTypes.WARPED_WART_BLOCK;
+                || type == BlockTypes.WARPED_WART_BLOCK
+                || type == BlockTypes.CRIMSON_STEM
+                || type == BlockTypes.WARPED_STEM;
     }
 
     @Override
