@@ -1,14 +1,12 @@
 name: draft release
-
 on:
   push:
     branches:
       - main
   pull_request:
-    types: [ opened, reopened, synchronize ]
+    types: [opened, reopened, synchronize]
   pull_request_target:
-    types: [ opened, reopened, synchronize ]
-
+    types: [opened, reopened, synchronize]
 jobs:
   update_release_draft:
     if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
