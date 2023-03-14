@@ -8,7 +8,7 @@ log4j = "2.19.0"
 dummypermscompat = "1.10"
 worldguard-bukkit = "7.0.7"
 mapmanager = "1.8.0-SNAPSHOT"
-griefprevention = "16.18"
+griefprevention = "16.18.1"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
 towny = "0.98.4.18"
@@ -36,7 +36,7 @@ text = "3.0.4"
 piston = "0.5.7"
 
 # Tests
-mockito = "5.1.1"
+mockito = "5.2.0"
 
 # Gradle plugins
 pluginyml = "0.5.3"
