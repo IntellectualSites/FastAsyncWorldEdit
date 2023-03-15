@@ -29,6 +29,7 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.mojang.datafixers.DSL;
 import com.mojang.datafixers.DSL.TypeReference;
 import com.mojang.datafixers.DataFixer;
 import com.mojang.datafixers.DataFixerBuilder;
@@ -219,7 +220,8 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         return this.fixer = new WrappedDataFixer(DataFixers.getDataFixer());
     }
 
-    public DataFixer buildOptimized(Executor executor) {
+    @Override
+    public DataFixer buildOptimized(final Set<DSL.TypeReference> requiredTypes, Executor executor) {
         return buildUnoptimized();
     }
 
@@ -232,6 +234,7 @@ class PaperweightDataConverters extends DataFixerBuilder implements com.sk89q.wo
         }
 
         @Override
+
         public <T> Dynamic<T> update(TypeReference type, Dynamic<T> dynamic, int sourceVer, int targetVer) {
             LegacyType legacyType = DFU_TO_LEGACY.get(type.typeName());
             if (sourceVer < LEGACY_VERSION && legacyType != null) {
