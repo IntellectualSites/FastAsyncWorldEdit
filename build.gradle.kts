@@ -85,8 +85,9 @@ applyCommonConfiguration()
 
 tasks {
     runServer {
-        minecraftVersion("1.19")
-        pluginJars(project(":worldedit-bukkit").file("build/libs/FastAsyncWorldEdit-Bukkit-$version.jar"))
+        minecraftVersion("1.19.3")
+        pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+                .toTypedArray())
 
     }
 }
