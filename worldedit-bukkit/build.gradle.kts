@@ -196,7 +196,7 @@ tasks {
         versionNumber.set("${project.version}")
         versionType.set("release")
         uploadFile.set(file("build/libs/${rootProject.name}-Bukkit-${project.version}.jar"))
-        gameVersions.addAll(listOf("1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.17.1", "1.16.5"))
+        gameVersions.addAll(listOf("1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.17.1", "1.16.5"))
         loaders.addAll(listOf("paper", "spigot"))
         changelog.set("The changelog is available on GitHub: https://github.com/IntellectualSites/" +
                 "FastAsyncWorldEdit/releases/tag/${project.version}")
