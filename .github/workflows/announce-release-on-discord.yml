@@ -1,9 +1,9 @@
 name: Announce release on discord
-on:
-  workflow_run:
-    workflows: ["Upload release assets"]
-    types:
-      - completed
+#on:
+#  workflow_run:
+#    workflows: ["Upload release assets"]
+#    types:
+#      - completed
 jobs:
   send_announcement:
     runs-on: ubuntu-latest
