@@ -5,8 +5,18 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import java.net.URI
 
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
     id("xyz.jpenilla.run-paper") version "2.0.1"
+}
+
+if (!File("$rootDir/.git").exists()) {
+    logger.lifecycle("""
+    **************************************************************************************
+    You need to fork and clone this repository! Don't download a .zip file.
+    If you need assistance, consult the GitHub docs: https://docs.github.com/get-started/quickstart/fork-a-repo
+    **************************************************************************************
+    """.trimIndent()
+    ).also { kotlin.system.exitProcess(1) }
 }
 
 logger.lifecycle("""
@@ -23,7 +33,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("2.5.1")
+var rootVersion by extra("2.5.3")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
@@ -75,8 +85,9 @@ applyCommonConfiguration()
 
 tasks {
     runServer {
-        minecraftVersion("1.19")
-        pluginJars(project(":worldedit-bukkit").file("build/libs/FastAsyncWorldEdit-Bukkit-$version.jar"))
+        minecraftVersion("1.19.3")
+        pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+                .toTypedArray())
 
     }
 }

@@ -158,8 +158,10 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
         Region maskedRegion;
         if (regions.size() == 1) {
-            int min = area != null ? area.getMinBuildHeight() : player.getWorld().getMinY();
-            int max = area != null ? Math.min(player.getWorld().getMaxY(), area.getMaxBuildHeight()) : player.getWorld().getMaxY();
+            final World world = player.getWorld();
+            int min = area != null ? area.getMinBuildHeight() : world.getMinY();
+            // PlotSquared uses exclusive max height, WorldEdit uses inclusive max height -> subtract 1
+            int max = area != null ? Math.min(world.getMaxY(), area.getMaxBuildHeight() - 1) : world.getMaxY();
 
             final CuboidRegion region = regions.iterator().next();
             final BlockVector3 pos1 = BlockVector3.at(region.getMinimumX(), min, region.getMinimumZ());

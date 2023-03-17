@@ -23,6 +23,7 @@ import com.fastasyncworldedit.bukkit.BukkitPermissionAttachmentManager;
 import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.core.util.UpdateNotification;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.util.WEManager;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.sk89q.bukkit.util.ClassSourceValidator;
@@ -58,6 +59,7 @@ import com.sk89q.worldedit.world.weather.WeatherTypes;
 import io.papermc.lib.PaperLib;
 import org.apache.logging.log4j.Logger;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -220,8 +222,10 @@ public class WorldEditPlugin extends JavaPlugin {
         }
 
         // Enable metrics
-        new Metrics(this, BSTATS_ID);
-
+        Metrics m = new Metrics(this, BSTATS_ID);
+        // First introduced in build 349, release 2.5.2
+        m.addCustomChart(new SimplePie("residence", ()
+                -> WEManager.weManager().getManagers().toString().contains("residence") ? "Yes" : "No"));
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
         // Check if a new build is available

@@ -6,10 +6,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven {
-        name = "PaperMC"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
+    gradlePluginPortal()
 }
 
 java {

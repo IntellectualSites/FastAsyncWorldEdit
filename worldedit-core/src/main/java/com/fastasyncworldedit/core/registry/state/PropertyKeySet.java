@@ -18,9 +18,9 @@ public class PropertyKeySet implements Set<PropertyKey> {
 
     public static PropertyKeySet ofCollection(Collection<? extends PropertyKey> collection) {
         PropertyKeySet set = new PropertyKeySet();
-        if (collection instanceof PropertyKeySet) {
+        if (collection instanceof PropertyKeySet pks) {
             // simple copy
-            set.bits.or(((PropertyKeySet) collection).bits);
+            set.bits.or(pks.bits);
             return set;
         }
         for (PropertyKey key : collection) {
@@ -51,10 +51,10 @@ public class PropertyKeySet implements Set<PropertyKey> {
 
     @Override
     public boolean contains(Object o) {
-        if (!(o instanceof PropertyKey)) {
+        if (!(o instanceof PropertyKey pk)) {
             return false;
         }
-        return this.bits.get(((PropertyKey) o).getId());
+        return this.bits.get(pk.getId());
     }
 
     @Nonnull
@@ -73,7 +73,16 @@ public class PropertyKeySet implements Set<PropertyKey> {
     @Nonnull
     @Override
     public <T> T[] toArray(@Nonnull T[] a) {
-        T[] array = Arrays.copyOf(a, this.bits.cardinality());
+        T[] array;
+        final int cardinality = this.bits.cardinality();
+        if (cardinality > a.length) {
+            array = Arrays.copyOf(a, cardinality);
+        } else {
+            array = a;
+            if (a.length > cardinality) {
+                array[cardinality] = null; // mark as end to comply with the method contract
+            }
+        }
         Iterator<PropertyKey> iter = iterator();
         for (int i = 0; i < array.length && iter.hasNext(); i++) {
             array[i] = (T) iter.next();
@@ -92,26 +101,26 @@ public class PropertyKeySet implements Set<PropertyKey> {
 
     @Override
     public boolean remove(Object o) {
-        if (!(o instanceof PropertyKey)) {
+        if (!(o instanceof PropertyKey pk)) {
             return false;
         }
-        if (!this.bits.get(((PropertyKey) o).getId())) {
+        if (!this.bits.get(pk.getId())) {
             return false;
         }
-        this.bits.clear(((PropertyKey) o).getId());
+        this.bits.clear(pk.getId());
         return true;
     }
 
     @Override
     public boolean containsAll(@Nonnull Collection<?> c) {
-        if (c instanceof PropertyKeySet) {
-            return ((PropertyKeySet) c).bits.intersects(this.bits);
+        if (c instanceof PropertyKeySet pks) {
+            return pks.bits.intersects(this.bits);
         }
         for (Object o : c) {
-            if (!(o instanceof PropertyKey)) {
+            if (!(o instanceof PropertyKey pk)) {
                 return false;
             }
-            if (!this.bits.get(((PropertyKey) o).getId())) {
+            if (!this.bits.get(pk.getId())) {
                 return false;
             }
         }
@@ -121,8 +130,8 @@ public class PropertyKeySet implements Set<PropertyKey> {
     @Override
     public boolean addAll(@Nonnull Collection<? extends PropertyKey> c) {
         int cardinality = this.bits.cardinality();
-        if (c instanceof PropertyKeySet) {
-            this.bits.or(((PropertyKeySet) c).bits);
+        if (c instanceof PropertyKeySet pks) {
+            this.bits.or(pks.bits);
         } else {
             for (PropertyKey key : c) {
                 this.bits.set(key.getId());
@@ -135,8 +144,8 @@ public class PropertyKeySet implements Set<PropertyKey> {
     public boolean retainAll(@Nonnull Collection<?> c) {
         int cardinality = this.bits.cardinality();
         BitSet removal;
-        if (c instanceof PropertyKeySet) {
-            removal = ((PropertyKeySet) c).bits;
+        if (c instanceof PropertyKeySet pks) {
+            removal = pks.bits;
         } else {
             removal = new BitSet(this.bits.length());
             for (PropertyKey key : this) {
@@ -152,12 +161,12 @@ public class PropertyKeySet implements Set<PropertyKey> {
     @Override
     public boolean removeAll(@Nonnull Collection<?> c) {
         int cardinality = this.bits.cardinality();
-        if (c instanceof PropertyKeySet) {
-            this.bits.andNot(((PropertyKeySet) c).bits);
+        if (c instanceof PropertyKeySet pks) {
+            this.bits.andNot(pks.bits);
         } else {
             for (Object o : c) { // mh
-                if (o instanceof PropertyKey) {
-                    this.bits.clear(((PropertyKey) o).getId());
+                if (o instanceof PropertyKey pk) {
+                    this.bits.clear(pk.getId());
                 }
             }
         }

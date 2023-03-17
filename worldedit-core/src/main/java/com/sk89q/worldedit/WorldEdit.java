@@ -420,7 +420,7 @@ public final class WorldEdit {
     }
 
     private boolean checkFilename(String filename) {
-        return filename.matches("^[A-Za-z0-9_\\- \\./\\\\'\\$@~!%\\^\\*\\(\\)\\[\\]\\+\\{\\},\\?]+\\.[A-Za-z0-9]+$");
+        return filename.matches("^[A-Za-z0-9_\\-./'$@~!%()\\[\\]+{},]+\\.[A-Za-z0-9]+$");
     }
 
     /**

@@ -1,16 +1,17 @@
-name: build
-
-on: [pull_request, push]
-
+name: Build
+on:
+  push:
+    branches:
+      - main
 jobs:
   build:
-    if: ${{ github.event_name != 'pull_request' || github.repository != github.event.pull_request.head.repo.full_name }}
+    if: github.repository_owner == 'IntellectualSites'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name : Validate Gradle Wrapper
-        uses : gradle/wrapper-validation-action@v1
+      - name: Validate Gradle Wrapper
+        uses: gradle/wrapper-validation-action@55e685c48d84285a5b0418cd094606e199cca3b6 # v1
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -43,7 +44,7 @@ jobs:
           ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
       - name: Publish core javadoc
         if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        uses: cpina/github-action-push-to-another-repository@main
+        uses: cpina/github-action-push-to-another-repository@0a14457bb28b04dfa1652e0ffdfda866d2845c73 # main
         env:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with:
@@ -55,7 +56,7 @@ jobs:
           target-directory: worldedit-core
       - name: Publish bukkit javadoc
         if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        uses: cpina/github-action-push-to-another-repository@main
+        uses: cpina/github-action-push-to-another-repository@0a14457bb28b04dfa1652e0ffdfda866d2845c73 # main
         env:
           SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
         with:
@@ -75,18 +76,18 @@ jobs:
         run: ./gradlew modrinth
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-      - name : Publish to CurseForge
-        if : ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        uses: itsmeow/curseforge-upload@v3
+      - name: Publish to CurseForge
+        if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        uses: itsmeow/curseforge-upload@13f278adc4cc7b881555f87e6ea528387dd6492b # v3
         with:
-          file_path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-${{ env.VERSION }}.jar
+          file_path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-${{ github.event.release.tag_name }}.jar
           # https://minecraft.curseforge.com/api/game/versions?token=redacted
           # gameVersionTypeID: 1
           game_versions: "8503,9016,9190,9261,9560,9561"
           project_id: 103525
           game_endpoint: minecraft
           token: ${{ secrets.CURSEFORGE_TOKEN }}
-          display_name: FastAsyncWorldEdit ${{ env.VERSION }}
+          display_name: FastAsyncWorldEdit ${{ github.event.release.tag_name }}
           release_type: release
           changelog: "Click here to view changelog: https://github.com/IntellectualSites/FastAsyncWorldEdit/releases/tag/${{ github.event.release.tag_name }}"
           changelog_type: markdown

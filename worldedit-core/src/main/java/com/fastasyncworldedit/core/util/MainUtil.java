@@ -27,6 +27,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import it.unimi.dsi.fastutil.io.FastBufferedInputStream;
+import it.unimi.dsi.fastutil.io.FastBufferedOutputStream;
 import net.jpountz.lz4.LZ4BlockInputStream;
 import net.jpountz.lz4.LZ4BlockOutputStream;
 import net.jpountz.lz4.LZ4Compressor;
@@ -40,7 +41,6 @@ import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -273,9 +273,12 @@ public class MainUtil {
         return buffer;
     }
 
+    /**
+     * Note: The returned stream is not thread safe.
+     */
     public static FaweOutputStream getCompressedOS(OutputStream os, int amount, int buffer) throws IOException {
         os.write((byte) 10 + amount);
-        os = new BufferedOutputStream(os, buffer);
+        os = new FastBufferedOutputStream(os, buffer);
         if (amount == 0) {
             return new FaweOutputStream(os);
         }
@@ -296,7 +299,7 @@ public class MainUtil {
                 os = new LZ4BlockOutputStream(os, buffer, factory.highCompressor());
             }
         }
-        os = new BufferedOutputStream(os, buffer);
+        os = new FastBufferedOutputStream(os, buffer);
         return new FaweOutputStream(os);
     }
 

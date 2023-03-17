@@ -24,5 +24,6 @@
     "log4j"
   ],
   "labels": ["Renovate"],
-  "rebaseWhen": "conflicted"
+  "rebaseWhen": "conflicted",
+  "schedule": ["on the first day of the week"]
 }

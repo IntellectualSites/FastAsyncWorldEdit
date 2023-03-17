@@ -530,7 +530,7 @@ public final class EditSessionBuilder {
                 }
             }
             if (allowedRegions == null && Settings.settings().REGION_RESTRICTIONS) {
-                if (actor != null && !actor.hasPermission("fawe.bypass") && !actor.hasPermission("fawe.bypass.regions")) {
+                if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player) {
                         Player player = (Player) actor;
                         allowedRegions = player.getAllowedRegions();
@@ -538,7 +538,7 @@ public final class EditSessionBuilder {
                 }
             }
             if (disallowedRegions == null && Settings.settings().REGION_RESTRICTIONS && Settings.settings().REGION_RESTRICTIONS_OPTIONS.ALLOW_BLACKLISTS) {
-                if (actor != null && !actor.hasPermission("fawe.bypass") && !actor.hasPermission("fawe.bypass.regions")) {
+                if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
                     if (actor instanceof Player) {
                         Player player = (Player) actor;
                         disallowedRegions = player.getDisallowedRegions();

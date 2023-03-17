@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.world.item;
 
-import com.fastasyncworldedit.core.util.JoinedCharSequence;
 import com.fastasyncworldedit.core.world.block.ItemTypesCache;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
@@ -2362,7 +2361,6 @@ public final class ItemTypes {
     }
 
     private static Field[] fieldsTmp;
-    private static JoinedCharSequence joined;
     private static int initIndex = 0;
 
     private static ItemType init() {
@@ -2370,11 +2368,9 @@ public final class ItemTypes {
             if (fieldsTmp == null) {
                 fieldsTmp = ItemTypes.class.getDeclaredFields();
                 ItemTypesCache.init(); // force class to load
-                joined = new JoinedCharSequence();
             }
             String name = fieldsTmp[initIndex++].getName().toLowerCase(Locale.ROOT);
-            CharSequence fullName = joined.init(ItemType.REGISTRY.getDefaultNamespace(), ':', name);
-            return ItemType.REGISTRY.getMap().get(fullName);
+            return ItemType.REGISTRY.get(name);
         } catch (Throwable e) {
             e.printStackTrace();
             throw e;
@@ -2383,7 +2379,6 @@ public final class ItemTypes {
 
     static {
         fieldsTmp = null;
-        joined = null;
     }
 
     @Nullable
