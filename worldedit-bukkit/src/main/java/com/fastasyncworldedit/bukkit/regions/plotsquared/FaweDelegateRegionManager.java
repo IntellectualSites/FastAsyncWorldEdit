@@ -145,6 +145,21 @@ public class FaweDelegateRegionManager {
                     editSession.setBlocks(fillingRegion, filling);
                     editSession.setBlocks(floorRegion, plotfloor);
                     editSession.setBlocks(airRegion, air);
+
+                    if (hybridPlotWorld.getMinBuildHeight() < hybridPlotWorld.getMinGenHeight()) {
+                        Region underneath = new CuboidRegion(
+                                pos1.withY(hybridPlotWorld.getMinBuildHeight()),
+                                pos2.withY(hybridPlotWorld.getMinGenHeight())
+                        );
+                        editSession.setBlocks(underneath, air);
+                    }
+                    if (hybridPlotWorld.getMaxGenHeight() < hybridPlotWorld.getMaxBuildHeight() - 1) {
+                        Region onTop = new CuboidRegion(
+                                pos1.withY(hybridPlotWorld.getMaxGenHeight()),
+                                pos2.withY(hybridPlotWorld.getMaxBuildHeight() - 1)
+                        );
+                        editSession.setBlocks(onTop, air);
+                    }
                 }
 
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {

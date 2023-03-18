@@ -5,14 +5,11 @@ plugins {
 applyPaperweightAdapterConfiguration()
 
 repositories {
-    maven {
-        name = "PaperMC"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
+    gradlePluginPortal()
 }
 
 dependencies {
     // https://papermc.io/repo/service/rest/repository/browse/maven-public/io/papermc/paper/dev-bundle/
-    paperDevBundle("1.19.3-R0.1-20221226.180038-55")
+    paperDevBundle("1.19.3-R0.1-20230312.180621-141")
     compileOnly("io.papermc:paperlib")
 }

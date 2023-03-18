@@ -20,6 +20,13 @@ public class FaweOutputStream extends DataOutputStream {
         return parent;
     }
 
+    // overwritten to un-synchronized
+    @Override
+    public void write(final int b) throws IOException {
+        out.write(b);
+        written++;
+    }
+
     public void write(int b, int amount) throws IOException {
         for (int i = 0; i < amount; i++) {
             write(b);

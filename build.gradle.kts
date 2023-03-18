@@ -5,7 +5,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import java.net.URI
 
 plugins {
-    id("io.github.gradle-nexus.publish-plugin") version "1.2.0"
+    id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
     id("xyz.jpenilla.run-paper") version "2.0.1"
 }
 
@@ -85,8 +85,9 @@ applyCommonConfiguration()
 
 tasks {
     runServer {
-        minecraftVersion("1.19")
-        pluginJars(project(":worldedit-bukkit").file("build/libs/FastAsyncWorldEdit-Bukkit-$version.jar"))
+        minecraftVersion("1.19.3")
+        pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+                .toTypedArray())
 
     }
 }
