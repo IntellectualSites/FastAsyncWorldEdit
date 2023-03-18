@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_19_R2;
+package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_19_R3;
 
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
@@ -31,8 +31,8 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R2.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
 import java.lang.ref.WeakReference;
