@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 public class ItemType implements RegistryItem, Keyed {
 //FAWE end
 
-    public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type");
+    public static final NamespacedRegistry<ItemType> REGISTRY = new NamespacedRegistry<>("item type", true);
 
     private final String id;
     @SuppressWarnings("deprecation")
