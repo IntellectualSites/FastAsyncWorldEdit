@@ -176,15 +176,28 @@ public class PlotSquaredFeature extends FaweMaskManager {
             maskedRegion = new RegionIntersection(world, weRegions);
         }
 
-        return new FaweMask(maskedRegion) {
-            @Override
-            public boolean isValid(Player player, MaskType type) {
-                if (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(finalPlot)) {
-                    return false;
-                }
-                return isAllowed(player, finalPlot, type);
+        return new PlotSquaredMask(maskedRegion, finalPlot);
+    }
+
+    private final class  PlotSquaredMask extends FaweMask {
+
+        private final Plot plot;
+        private final int hash;
+
+        private PlotSquaredMask(Region region, Plot plot) {
+            super(region);
+            this.plot = plot;
+            hash = plot.getConnectedPlots().hashCode();
+        }
+
+        @Override
+        public boolean isValid(Player player, MaskType type) {
+            if (plot.getConnectedPlots().hashCode() != hash Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(plot)) {
+                return false;
             }
-        };
+            return isAllowed(player, plot, type);
+        }
+
     }
 
 }
