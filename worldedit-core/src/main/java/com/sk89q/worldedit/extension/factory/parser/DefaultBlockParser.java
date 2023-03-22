@@ -207,7 +207,7 @@ public class DefaultBlockParser extends InputParser<BaseBlock> {
                 }).collect(Collectors.toSet());
                 if (!blocked.isEmpty()) {
                     throw new DisallowedUsageException(Caption.of(
-                            "fawe.error.limit.disallowed-block",
+                            "fawe.error.limit.disallowed-property",
                             TextComponent.of(input)
                     ));
                 }
