@@ -133,7 +133,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 e.printStackTrace();
             }
             this.braf = new RandomAccessFile(file, "rw");
-            long fileLength = (long) getVolume() << 1 + (long) headerSize;
+            long fileLength = (long) (getVolume() << 1) + (long) headerSize;
             braf.setLength(0);
             braf.setLength(fileLength);
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) fileLength;
@@ -180,7 +180,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             init();
 
             int biomeLength = ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
-            canHaveBiomes = headerSize + biomeLength < Integer.MAX_VALUE;
+            canHaveBiomes = (long) headerSize + biomeLength < Integer.MAX_VALUE;
 
             if (headerSize >= VERSION_2_HEADER_SIZE) {
                 readBiomeStatusFromHeader();
