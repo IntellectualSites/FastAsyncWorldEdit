@@ -173,7 +173,7 @@ public class ToolUtilCommands {
     ) throws WorldEditException {
         BrushTool brushTool = session.getBrushTool(player, false);
         if (brushTool == null) {
-            player.printError(Caption.of("worldedit.brush.none.equipped"));
+            player.print(Caption.of("worldedit.brush.none.equipped"));
             return;
         }
         brushTool.setTraceMask(maskOpt);
