@@ -64,9 +64,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private final int headerSize;
 
     private RandomAccessFile braf;
-    private MappedByteBuffer byteBuffer;
+    private MappedByteBuffer byteBuffer = null;
 
-    private FileChannel fileChannel;
+    private FileChannel fileChannel = null;
     private boolean hasBiomes = false;
     private boolean canHaveBiomes = true;
     private int nbtBytesRemaining;
@@ -133,7 +133,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 e.printStackTrace();
             }
             this.braf = new RandomAccessFile(file, "rw");
-            long fileLength = (long) getVolume() * 2L + (long) headerSize;
+            long fileLength = (long) (getVolume() << 1) + (long) headerSize;
             braf.setLength(0);
             braf.setLength(fileLength);
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) fileLength;
@@ -144,7 +144,11 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             byteBuffer.putChar(6, (char) getHeight());
             byteBuffer.putChar(8, (char) getLength());
         } catch (IOException e) {
+            close();
             throw new RuntimeException(e);
+        } catch (Throwable t) {
+            close();
+            throw t;
         }
     }
 
@@ -169,11 +173,15 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         nbtMap = new HashMap<>();
         try {
             this.file = file;
+            checkFileLength(file);
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) file.length();
             init();
-            long biomeLength = (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
+
+            int biomeLength = ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
+            canHaveBiomes = (long) headerSize + biomeLength < Integer.MAX_VALUE;
+
             if (headerSize >= VERSION_2_HEADER_SIZE) {
                 readBiomeStatusFromHeader();
                 int nbtCount = readNBTSavedCountFromHeader();
@@ -181,12 +189,42 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK && (nbtCount + entitiesCount > 0)) {
                     loadNBTFromFileFooter(nbtCount, entitiesCount, biomeLength);
                 }
-            } else if (braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
+            } else if (canHaveBiomes && braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
                 hasBiomes = true;
             }
             getAndSetOffsetAndOrigin();
         } catch (IOException e) {
+            close();
             throw new RuntimeException(e);
+        } catch (Throwable t) {
+            close();
+            throw t;
+        }
+    }
+
+    private void checkFileLength(File file) throws IOException {
+        long expectedFileSize = headerSize + ((long) getVolume() << 1);
+        if (file.length() > Integer.MAX_VALUE) {
+            if (expectedFileSize >= Integer.MAX_VALUE) {
+                throw new IOException(String.format(
+                        "Cannot load clipboard of file size: %d > 2147483647 bytes (2.147 GiB), " + "volume: %d blocks",
+                        file.length(),
+                        getVolume()
+                ));
+            } else {
+                throw new IOException(String.format(
+                        "Cannot load clipboard of file size > 2147483647 bytes (2.147 GiB). Possible corrupt file? Mismatch" +
+                                " between volume `%d` and file length `%d`!",
+                        file.length(),
+                        getVolume()
+                ));
+            }
+        } else if (expectedFileSize != file.length()) {
+            throw new IOException(String.format(
+                    "Possible corrupt clipboard file? Mismatch between expected file size `%d` and actual file size `%d`!",
+                    expectedFileSize,
+                    file.length()
+            ));
         }
     }
 
@@ -486,13 +524,26 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 fileChannel.close();
                 braf.close();
                 file.setWritable(true);
-                closeDirectBuffer(byteBuffer);
+                MappedByteBuffer tmpBuffer = byteBuffer;
                 byteBuffer = null;
+                closeDirectBuffer(tmpBuffer);
                 fileChannel = null;
                 braf = null;
+            } else if (fileChannel != null) {
+                fileChannel.close();
+                fileChannel = null;
             }
         } catch (IOException e) {
             e.printStackTrace();
+            if (fileChannel != null) {
+                try {
+                    fileChannel.close();
+                    fileChannel = null;
+                } catch (IOException ex) {
+                    LOGGER.error("Could not close file channel on clipboard {}. If this belongs to a player, the server may " +
+                            "need to be restarted for clipboard use to work.", getFile().getName(), ex);
+                }
+            }
         }
     }
 
@@ -648,8 +699,6 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             char ordinal = byteBuffer.getChar(diskIndex);
             return BlockState.getFromOrdinal(ordinal);
         } catch (IndexOutOfBoundsException ignored) {
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return BlockTypes.AIR.getDefaultState();
     }
