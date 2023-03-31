@@ -169,9 +169,14 @@ public class ToolUtilCommands {
     public void traceMask(
             Player player, LocalSession session,
             @Arg(desc = "The trace mask to set", def = "")
-                    Mask maskOpt
+            Mask maskOpt
     ) throws WorldEditException {
-        session.getBrushTool(player, false).setTraceMask(maskOpt);
+        BrushTool brushTool = session.getBrushTool(player, false);
+        if (brushTool == null) {
+            player.print(Caption.of("worldedit.brush.none.equipped"));
+            return;
+        }
+        brushTool.setTraceMask(maskOpt);
         if (maskOpt == null) {
             player.print(Caption.of("worldedit.tool.tracemask.disabled"));
         } else {
