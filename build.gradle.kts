@@ -104,9 +104,9 @@ tasks {
 
     }
     register<RunServer>("runFolia") {
+        downloadsApiService.set(xyz.jpenilla.runtask.service.DownloadsAPIService.folia(project))
         minecraftVersion("1.19.4")
         group = "run paper"
-        serverJar(file("run-folia/folia-paperclip-1.19.4-R0.1-SNAPSHOT-reobf.jar"))
         runDirectory.set(file("run-folia"))
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
