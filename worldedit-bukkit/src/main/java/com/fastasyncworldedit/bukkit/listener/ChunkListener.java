@@ -60,9 +60,6 @@ public abstract class ChunkListener implements Listener {
             Settings.settings().TICK_LIMITER.FALLING, Settings.settings().TICK_LIMITER.ITEMS};
 
     public ChunkListener() {
-        if (FoliaSupport.isFolia()) {
-            return;
-        }
         if (Settings.settings().TICK_LIMITER.ENABLED) {
             PluginManager plm = Bukkit.getPluginManager();
             Plugin plugin = Fawe.<FaweBukkit>platform().getPlugin();

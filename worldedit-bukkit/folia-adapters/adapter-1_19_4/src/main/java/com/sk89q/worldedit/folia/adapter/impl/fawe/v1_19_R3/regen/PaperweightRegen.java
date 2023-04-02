@@ -127,12 +127,15 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             serverWorldsField.setAccessible(true);
 
             Field tmpPaperConfigField;
+            Field tmpEnvironmentField;
             Field tmpFlatBedrockField;
             try { //only present on paper
                 tmpPaperConfigField = Level.class.getDeclaredField("paperConfig");
                 tmpPaperConfigField.setAccessible(true);
+                tmpEnvironmentField = tmpPaperConfigField.getType().getDeclaredField("environment");
+                tmpEnvironmentField.setAccessible(true);
 
-                tmpFlatBedrockField = tmpPaperConfigField.getType().getDeclaredField("generateFlatBedrock");
+                tmpFlatBedrockField = tmpEnvironmentField.getType().getDeclaredField("generateFlatBedrock");
                 tmpFlatBedrockField.setAccessible(true);
             } catch (Exception e) {
                 tmpPaperConfigField = null;

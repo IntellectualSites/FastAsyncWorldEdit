@@ -57,8 +57,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private double targetTPS = 18;
 
     public QueueHandler() {
-        // TODO make main thread independent
-        // TaskManager.taskManager().repeat(this, 1);
+        TaskManager.taskManager().repeat(this, 1);
     }
 
     @Override
