@@ -22,7 +22,7 @@ import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_19_R3.PaperweightAdapter;
+import com.sk89q.worldedit.folia.adapter.ext.fawe.v1_19_R3.PaperweightAdapter;
 import com.sk89q.worldedit.folia.adapter.impl.fawe.v1_19_R3.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.folia.adapter.impl.fawe.v1_19_R3.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
