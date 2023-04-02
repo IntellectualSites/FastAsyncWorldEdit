@@ -69,6 +69,9 @@ dependencies {
     project.project(":worldedit-bukkit:adapters").subprojects.forEach {
         "adapters"(project(it.path))
     }
+    project.project(":worldedit-bukkit:folia-adapters").subprojects.forEach {
+        "adapters"(project(it.path))
+    }
 
     // Minecraft expectations
     implementation(libs.fastutil)
@@ -142,6 +145,7 @@ addJarManifest(WorldEditKind.Plugin, includeClasspath = true)
 
 tasks.named<ShadowJar>("shadowJar") {
     dependsOn(project.project(":worldedit-bukkit:adapters").subprojects.map { it.tasks.named("assemble") })
+    dependsOn(project.project(":worldedit-bukkit:folia-adapters").subprojects.map { it.tasks.named("assemble") })
     from(Callable {
         adapters.resolve()
                 .map { f ->
