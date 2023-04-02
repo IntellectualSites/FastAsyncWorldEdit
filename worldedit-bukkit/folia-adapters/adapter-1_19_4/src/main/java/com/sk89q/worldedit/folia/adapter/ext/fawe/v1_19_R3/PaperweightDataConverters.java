@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_19_R3;
+package com.sk89q.worldedit.folia.adapter.ext.fawe.v1_19_R3;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
