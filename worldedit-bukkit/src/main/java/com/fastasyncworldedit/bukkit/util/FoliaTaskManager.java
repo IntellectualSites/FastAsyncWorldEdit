@@ -34,23 +34,35 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public int repeat(@NotNull final Runnable runnable, final int interval) {
-        return fail();
+        Bukkit.getGlobalRegionScheduler().runAtFixedRate(
+                WorldEditPlugin.getInstance(),
+                scheduledTask -> runnable.run(),
+                1,
+                interval
+        );
+        return 0;
     }
 
     @Override
     public int repeatAsync(@NotNull final Runnable runnable, final int interval) {
-        backgroundExecutor.scheduleAtFixedRate(runnable, 0, ticksToMs(interval), TimeUnit.MILLISECONDS);
+        Bukkit.getAsyncScheduler().runAtFixedRate(
+                WorldEditPlugin.getInstance(),
+                scheduledTask -> runnable.run(),
+                0,
+                ticksToMs(interval),
+                TimeUnit.MILLISECONDS
+        );
         return idCounter.getAndIncrement();
     }
 
     @Override
     public void async(@NotNull final Runnable runnable) {
-        backgroundExecutor.submit(runnable);
+        Bukkit.getAsyncScheduler().runNow(WorldEditPlugin.getInstance(), (s) -> runnable.run());
     }
 
     @Override
     public void task(@NotNull final Runnable runnable) {
-        fail();
+        Bukkit.getGlobalRegionScheduler().execute(WorldEditPlugin.getInstance(), runnable);
     }
 
     @Override
@@ -60,7 +72,7 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public void later(@NotNull final Runnable runnable, final int delay) {
-        fail();
+        Bukkit.getGlobalRegionScheduler().runDelayed(WorldEditPlugin.getInstance(), scheduledTask -> runnable.run(), delay);
     }
 
     @Override
@@ -142,7 +154,7 @@ public class FoliaTaskManager extends TaskManager {
 
             MethodHandle executeForPlayer;
             try {
-                Class<?> regionisedSchedulerClass = Class.forName("io.papermc.paper.threadedregions.scheduler.RegionisedScheduler");
+                Class<?> regionisedSchedulerClass = Class.forName("io.papermc.paper.threadedregions.scheduler.FoliaRegionScheduler");
                 final Method method = Bukkit.class.getDeclaredMethod("getRegionScheduler");
                 executeForLocation = lookup.findVirtual(
                         regionisedSchedulerClass,
