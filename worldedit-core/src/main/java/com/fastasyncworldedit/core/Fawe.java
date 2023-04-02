@@ -132,9 +132,9 @@ public class Fawe {
             }
         }, 0);*/
 
-        if (!FoliaSupport.isFolia()) {
+        // if (!FoliaSupport.isFolia()) {
             TaskManager.taskManager().repeat(timer, 1);
-        }
+        // }
     }
 
     /**
