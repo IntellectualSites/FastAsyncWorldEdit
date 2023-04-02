@@ -46,8 +46,8 @@ public class BukkitImplLoader {
     private String customCandidate;
 
     private static String SEARCH_PACKAGE = "com.sk89q.worldedit.bukkit.adapter.impl.fawe";
-    private static final String SEARCH_PACKAGE_DOT = SEARCH_PACKAGE + ".";
-    private static final String SEARCH_PATH = SEARCH_PACKAGE.replace(".", "/");
+    private static String SEARCH_PACKAGE_DOT = SEARCH_PACKAGE + ".";
+    private static String SEARCH_PATH = SEARCH_PACKAGE.replace(".", "/");
     private static final String CLASS_SUFFIX = ".class";
 
     private static final String LOAD_ERROR_MESSAGE =
@@ -68,6 +68,8 @@ public class BukkitImplLoader {
     public BukkitImplLoader() {
         if (FoliaSupport.isFolia()) {
             SEARCH_PACKAGE = "com.sk89q.worldedit.folia.adapter.impl.fawe";
+            SEARCH_PACKAGE_DOT = SEARCH_PACKAGE + ".";
+            SEARCH_PATH = SEARCH_PACKAGE.replace(".", "/");
         }
         addDefaults();
     }
