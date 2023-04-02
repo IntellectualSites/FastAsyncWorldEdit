@@ -5,7 +5,6 @@ plugins {
 applyPaperweightAdapterConfiguration()
 
 repositories {
-    mavenLocal()
     gradlePluginPortal()
 }
 
