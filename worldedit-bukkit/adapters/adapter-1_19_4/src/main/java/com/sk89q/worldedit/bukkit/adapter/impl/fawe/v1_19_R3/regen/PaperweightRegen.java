@@ -271,9 +271,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                             WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBiomeId(options.getBiomeType())
                     ) : null;
 
-            @Override
-            public void tick(BooleanSupplier shouldKeepTicking) { //no ticking
-            }
 
             @Override
             public Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
