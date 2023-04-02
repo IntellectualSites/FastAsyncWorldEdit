@@ -50,7 +50,15 @@ val adapters = configurations.create("adapters") {
         attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.OBFUSCATED))
     }
 }
-
+val foliaAdapters = configurations.create("foliaAdapters") {
+    description = "Adapters to include in the JAR"
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
+    attributes {
+        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.OBFUSCATED))
+    }
+}
 dependencies {
     // Modules
     api(projects.worldeditCore)
@@ -60,7 +68,7 @@ dependencies {
         "adapters"(project(it.path))
     }
     project.project(":worldedit-bukkit:folia-adapters").subprojects.forEach {
-        "adapters"(project(it.path))
+        "foliaAdapters"(project(it.path))
     }
 
     // Minecraft expectations
@@ -143,6 +151,14 @@ tasks.named<ShadowJar>("shadowJar") {
     dependsOn(project.project(":worldedit-bukkit:folia-adapters").subprojects.map { it.tasks.named("assemble") })
     from(Callable {
         adapters.resolve()
+                .map { f ->
+                    zipTree(f).matching {
+                        exclude("META-INF/")
+                    }
+                }
+    })
+    from(Callable {
+        foliaAdapters.resolve()
                 .map { f ->
                     zipTree(f).matching {
                         exclude("META-INF/")
