@@ -1,6 +1,7 @@
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import xyz.jpenilla.runpaper.task.RunServer
 import java.net.URI
 import java.time.format.DateTimeFormatter
 import xyz.jpenilla.runpaper.task.RunServer
@@ -101,6 +102,14 @@ tasks {
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
 
+    }
+    register<RunServer>("runFolia") {
+        minecraftVersion("1.19.4")
+        group = "run paper"
+        serverJar(file("run-folia/folia-paperclip-1.19.4-R0.1-SNAPSHOT-reobf.jar"))
+        runDirectory.set(file("run-folia"))
+        pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+                .toTypedArray())
     }
 }
 
