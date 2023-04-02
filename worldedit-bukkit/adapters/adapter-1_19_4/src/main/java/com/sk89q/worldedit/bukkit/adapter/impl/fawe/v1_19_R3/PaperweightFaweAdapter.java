@@ -521,17 +521,17 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         final BlockVector3 finalBlockVector = blockVector3;
         // Sync to main thread to ensure no clashes occur
         Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
-            serverLevel.getCurrentWorldData().captureTreeGeneration = true;
-            serverLevel.getCurrentWorldData().captureBlockStates = true;
+            serverLevel.captureTreeGeneration = true;
+            serverLevel.captureBlockStates = true;
             try {
                 if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
                     return null;
                 }
-                return ImmutableMap.copyOf(serverLevel.getCurrentWorldData().capturedBlockStates);
+                return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
             } finally {
-                serverLevel.getCurrentWorldData().captureBlockStates = false;
-                serverLevel.getCurrentWorldData().captureTreeGeneration = false;
-                serverLevel.getCurrentWorldData().capturedBlockStates.clear();
+                serverLevel.captureBlockStates = false;
+                serverLevel.captureTreeGeneration = false;
+                serverLevel.capturedBlockStates.clear();
             }
         });
         if (placed == null || placed.isEmpty()) {
