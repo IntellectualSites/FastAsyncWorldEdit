@@ -12,6 +12,7 @@ applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
 repositories {
+    mavenLocal()
     maven {
         name = "PaperMC"
         url = uri("https://repo.papermc.io/repository/maven-public/")
@@ -64,6 +65,11 @@ dependencies {
     implementation(libs.fastutil)
 
     // Platform expectations
+    compileOnly("dev.folia:folia-api:1.19.4-R0.1-SNAPSHOT") {
+        exclude("junit", "junit")
+        exclude(group = "org.slf4j", module = "slf4j-api")
+        exclude(group = "net.kyori")
+    }
     compileOnly("io.papermc.paper:paper-api") {
         exclude("junit", "junit")
         exclude(group = "org.slf4j", module = "slf4j-api")
