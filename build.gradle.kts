@@ -7,7 +7,7 @@ import java.net.URI
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
-    id("xyz.jpenilla.run-paper") version "2.0.1"
+    id("xyz.jpenilla.run-paper") version "2.0.2-SNAPSHOT"
 }
 
 if (!File("$rootDir/.git").exists()) {
@@ -92,9 +92,9 @@ tasks {
 
     }
     register<RunServer>("runFolia") {
+        downloadsApiService.set(xyz.jpenilla.runtask.service.DownloadsAPIService.folia(project))
         minecraftVersion("1.19.4")
         group = "run paper"
-        serverJar(file("run-folia/folia-paperclip-1.19.4-R0.1-SNAPSHOT-reobf.jar"))
         runDirectory.set(file("run-folia"))
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
