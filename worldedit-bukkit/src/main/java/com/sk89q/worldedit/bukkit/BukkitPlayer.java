@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.VaultResolver;
@@ -70,6 +71,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -240,7 +242,22 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         org.bukkit.World finalWorld = world;
         //FAWE end
-        // TODO async teleport?
+        if (FoliaSupport.isFolia()) {
+            return TaskManager.taskManager().syncWith(() -> {
+                try {
+                    return player.teleportAsync(new Location(
+                            finalWorld,
+                            pos.getX(),
+                            pos.getY(),
+                            pos.getZ(),
+                            yaw,
+                            pitch
+                    )).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }, this);
+        }
         return TaskManager.taskManager().syncWith(() -> player.teleport(new Location(
                 finalWorld,
                 pos.getX(),
