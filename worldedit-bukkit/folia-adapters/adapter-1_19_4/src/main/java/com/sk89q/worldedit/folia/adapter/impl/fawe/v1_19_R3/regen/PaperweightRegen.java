@@ -17,6 +17,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.io.file.SafeFiles;
 import com.sk89q.worldedit.world.RegenOptions;
+import io.papermc.paper.threadedregions.TickRegions;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -276,6 +277,17 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                             WorldEditPlugin.getInstance().getBukkitImplAdapter().getInternalBiomeId(options.getBiomeType())
                     ) : null;
 
+            @Override
+            public void tick(final BooleanSupplier shouldKeepTicking, final TickRegions.TickRegionData region) {}
+
+            @Override
+            protected void tickBlockEntities() {}
+
+            @Override
+            protected void tickTime() {}
+
+            @Override
+            public void tickChunk(final LevelChunk chunk, final int randomTickSpeed) {}
 
             @Override
             public Holder<Biome> getUncachedNoiseBiome(int biomeX, int biomeY, int biomeZ) {
@@ -287,6 +299,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 );
             }
         }).get();
+        freshWorld.randomSpawnSelection = originalServerWorld.randomSpawnSelection;
         freshWorld.noSave = true;
         removeWorldFromWorldsMap();
         newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
