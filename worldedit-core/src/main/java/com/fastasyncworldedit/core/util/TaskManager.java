@@ -201,7 +201,7 @@ public abstract class TaskManager {
      */
     @Deprecated
     public void taskNowMain(@Nonnull final Runnable runnable) {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             runnable.run();
         } else {
             task(runnable);
@@ -212,10 +212,10 @@ public abstract class TaskManager {
      * Run a task as soon as possible not on the main thread.
      *
      * @param runnable the task to run
-     * @see Fawe#isMainThread()
+     * @see Fawe#isTickThread()
      */
     public void taskNowAsync(@Nonnull final Runnable runnable) {
-        taskNow(runnable, Fawe.isMainThread());
+        taskNow(runnable, Fawe.isTickThread());
     }
 
     /**
@@ -314,7 +314,7 @@ public abstract class TaskManager {
 
     @Deprecated
     public void taskWhenFree(@Nonnull Runnable run) {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             run.run();
         } else {
             Fawe.instance().getQueueHandler().sync(run);
@@ -328,7 +328,7 @@ public abstract class TaskManager {
      */
     @Deprecated
     public <T> T syncWhenFree(@Nonnull final RunnableVal<T> function) {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             function.run();
             return function.value;
         }
@@ -346,7 +346,7 @@ public abstract class TaskManager {
      */
     @Deprecated
     public <T> T syncWhenFree(@Nonnull final Supplier<T> supplier) {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             return supplier.get();
         }
         try {
@@ -373,7 +373,7 @@ public abstract class TaskManager {
      */
     @Deprecated
     public <T> T sync(final Supplier<T> function) {
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             return function.get();
         }
         try {

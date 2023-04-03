@@ -679,7 +679,7 @@ public final class PlatformCommandManager {
         Actor actor = event.getActor();
         String args = event.getArguments();
         TaskManager.taskManager().taskNow(() -> {
-            if (!Fawe.isMainThread()) {
+            if (!Fawe.isTickThread()) {
                 Thread.currentThread().setName("FAWE Thread for player: " + actor.getName());
             }
             int space0 = args.indexOf(' ');
@@ -702,7 +702,7 @@ public final class PlatformCommandManager {
                     PlatformCommandManager.this.handleCommandOnCurrentThread(event);
                 }
             }, false, true);
-        }, Fawe.isMainThread());
+        }, Fawe.isTickThread());
     }
 
     public void handleCommandOnCurrentThread(CommandEvent event) {

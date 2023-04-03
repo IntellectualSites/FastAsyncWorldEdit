@@ -159,7 +159,7 @@ public class FaweDelegateSchematicHandler {
                 }
             }
         };
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             com.fastasyncworldedit.core.util.TaskManager.taskManager().async(r);
         } else {
             r.run();

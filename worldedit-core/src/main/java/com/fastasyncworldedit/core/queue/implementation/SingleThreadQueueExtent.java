@@ -238,7 +238,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return (V) result;
         }
 
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             V result = (V) chunk.call();
             if (result == null) {
                 return (V) (Future) Futures.immediateFuture(null);

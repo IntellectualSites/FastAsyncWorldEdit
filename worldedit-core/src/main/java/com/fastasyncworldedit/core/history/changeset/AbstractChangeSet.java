@@ -82,7 +82,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     @Override
     public void flush() {
         try {
-            if (!Fawe.isMainThread()) {
+            if (!Fawe.isTickThread()) {
                 while (waitingAsync.get() > 0) {
                     synchronized (waitingAsync) {
                         waitingAsync.wait(1000);
@@ -358,7 +358,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public Future<?> addWriteTask(Runnable writeTask) {
-        return addWriteTask(writeTask, Fawe.isMainThread());
+        return addWriteTask(writeTask, Fawe.isTickThread());
     }
 
     public Future<?> addWriteTask(final Runnable writeTask, final boolean completeNow) {
