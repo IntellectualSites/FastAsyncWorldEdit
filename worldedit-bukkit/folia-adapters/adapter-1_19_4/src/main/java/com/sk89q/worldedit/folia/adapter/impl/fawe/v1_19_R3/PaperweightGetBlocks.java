@@ -61,6 +61,7 @@ import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
@@ -771,28 +772,18 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             final int y = blockHash.getY();
                             final int z = blockHash.getZ() + bz;
                             final BlockPos pos = new BlockPos(x, y, z);
-
-                            synchronized (nmsWorld) {
-
-                                BlockEntity tileEntity = TaskManager.taskManager().syncAt(
-                                        () -> nmsWorld.getBlockEntity(pos),
-                                        new Location(new BukkitWorld(getChunk().bukkitChunk.getWorld()), Vector3.at(x, y, z))
-                                );
-                                if (tileEntity == null || tileEntity.isRemoved()) {
-                                    nmsWorld.removeBlockEntity(pos);
-                                    tileEntity = TaskManager.taskManager().syncAt(
-                                            () -> nmsWorld.getBlockEntity(pos),
-                                            new Location(new BukkitWorld(getChunk().bukkitChunk.getWorld()), Vector3.at(x, y, z))
-                                    );
-                                }
-                                if (tileEntity != null) {
-                                    final net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
-                                            nativeTag);
-                                    tag.put("x", IntTag.valueOf(x));
-                                    tag.put("y", IntTag.valueOf(y));
-                                    tag.put("z", IntTag.valueOf(z));
-                                    tileEntity.load(tag);
-                                }
+                            BlockEntity tileEntity = nmsWorld.getBlockEntity(pos);
+                            if (tileEntity == null || tileEntity.isRemoved()) {
+                                nmsWorld.removeBlockEntity(pos);
+                                tileEntity = nmsWorld.getBlockEntity(pos);
+                            }
+                            if (tileEntity != null) {
+                                final net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
+                                        nativeTag);
+                                tag.put("x", IntTag.valueOf(x));
+                                tag.put("y", IntTag.valueOf(y));
+                                tag.put("z", IntTag.valueOf(z));
+                                tileEntity.load(tag);
                             }
                         }
                     };
@@ -828,7 +819,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             // Run the sync tasks
                             for (Runnable task : finalSyncTasks) {
                                 if (task != null) {
-                                    task.run();
+                                    Bukkit.getRegionScheduler().execute(WorldEditPlugin.getInstance(), nmsWorld.getWorld(), bx,
+                                            bz, task::run
+                                    );
                                 }
                             }
                             if (callback == null) {
