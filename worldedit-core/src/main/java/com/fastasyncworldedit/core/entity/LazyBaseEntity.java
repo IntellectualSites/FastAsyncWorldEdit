@@ -24,7 +24,7 @@ public class LazyBaseEntity extends BaseEntity {
         Supplier<CompoundBinaryTag> tmp = saveTag;
         if (tmp != null) {
             saveTag = null;
-            if (Fawe.isMainThread()) {
+            if (Fawe.isTickThread()) {
                 setNbt(tmp.get());
             } else {
                 setNbt(TaskManager.taskManager().sync(tmp));

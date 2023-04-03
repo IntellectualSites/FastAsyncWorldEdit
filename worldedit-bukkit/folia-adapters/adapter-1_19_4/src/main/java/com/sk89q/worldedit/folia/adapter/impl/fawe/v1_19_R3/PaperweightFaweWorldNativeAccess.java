@@ -95,7 +95,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             net.minecraft.world.level.block.state.BlockState blockState
     ) {
         int currentTick = (int) RegionizedServer.getGlobalTickData().getCurrentTick();
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             return levelChunk.setBlockState(blockPos, blockState,
                     this.sideEffectSet != null && this.sideEffectSet.shouldApply(SideEffect.UPDATE)
             );
@@ -266,7 +266,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 }
             }
         };
-        if (Fawe.isMainThread()) {
+        if (Fawe.isTickThread()) {
             runnableVal.run();
         } else {
             TaskManager.taskManager().sync(runnableVal);
