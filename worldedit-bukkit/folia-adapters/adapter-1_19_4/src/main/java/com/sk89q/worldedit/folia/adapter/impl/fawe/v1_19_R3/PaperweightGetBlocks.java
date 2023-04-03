@@ -61,7 +61,6 @@ import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
@@ -253,8 +252,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         if (entity == null) {
             return null;
         }
-        return new PaperweightLazyCompoundTag(Suppliers.memoize(TaskManager.taskManager().syncAt(entity,
-                new Location(new BukkitWorld(getChunk().bukkitChunk.getWorld()), Vector3.at(x,y,z))
+        return new PaperweightLazyCompoundTag(Suppliers.memoize(TaskManager.taskManager().syncAt(
+                entity,
+                new Location(new BukkitWorld(getChunk().bukkitChunk.getWorld()), Vector3.at(x, y, z))
         )::saveWithId));
         // return new PaperweightLazyCompoundTag(Suppliers.memoize(blockEntity::saveWithId));
     }
@@ -773,10 +773,17 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             final BlockPos pos = new BlockPos(x, y, z);
 
                             synchronized (nmsWorld) {
-                                BlockEntity tileEntity = nmsWorld.getBlockEntity(pos);
+
+                                BlockEntity tileEntity = TaskManager.taskManager().syncAt(
+                                        () -> nmsWorld.getBlockEntity(pos),
+                                        new Location(new BukkitWorld(getChunk().bukkitChunk.getWorld()), Vector3.at(x, y, z))
+                                );
                                 if (tileEntity == null || tileEntity.isRemoved()) {
                                     nmsWorld.removeBlockEntity(pos);
-                                    tileEntity = nmsWorld.getBlockEntity(pos);
+                                    tileEntity = TaskManager.taskManager().syncAt(
+                                            () -> nmsWorld.getBlockEntity(pos),
+                                            new Location(new BukkitWorld(getChunk().bukkitChunk.getWorld()), Vector3.at(x, y, z))
+                                    );
                                 }
                                 if (tileEntity != null) {
                                     final net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
