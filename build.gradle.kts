@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import java.net.URI
 import java.time.format.DateTimeFormatter
+import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
@@ -86,7 +87,7 @@ val supportedVersions = listOf("1.16.5", "1.17", "1.17.1", "1.18.2", "1.19", "1.
 
 tasks {
     supportedVersions.forEach {
-        register<xyz.jpenilla.runpaper.task.RunServer>("runServer-$it") {
+        register<RunServer>("runServer-$it") {
             minecraftVersion(it)
             pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                     .toTypedArray())
