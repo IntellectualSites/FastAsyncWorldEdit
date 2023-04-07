@@ -1,8 +1,9 @@
 import org.ajoberstar.grgit.Grgit
-import java.time.format.DateTimeFormatter
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import java.net.URI
+import java.time.format.DateTimeFormatter
+import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
@@ -82,8 +83,19 @@ allprojects {
 }
 
 applyCommonConfiguration()
+val supportedVersions = listOf("1.16.5", "1.17", "1.17.1", "1.18.2", "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4")
 
 tasks {
+    supportedVersions.forEach {
+        register<RunServer>("runServer-$it") {
+            minecraftVersion(it)
+            pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+                    .toTypedArray())
+            jvmArgs("-DPaper.IgnoreJavaVersion=true", "-Dcom.mojang.eula.agree=true")
+            group = "run paper"
+            runDirectory.set(file("run-$it"))
+        }
+    }
     runServer {
         minecraftVersion("1.19.3")
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
