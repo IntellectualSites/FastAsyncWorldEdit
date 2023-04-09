@@ -47,6 +47,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.weather.WeatherType;
 
 import javax.annotation.Nullable;
@@ -311,6 +312,10 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      */
     boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
             MaxChangedBlocksException;
+
+    default boolean generateStructure(StructureType type, EditSession editSession, BlockVector3 position) {
+        return false;
+    }
 
     /**
      * Generate a feature at the given position.
