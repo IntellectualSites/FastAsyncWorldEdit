@@ -67,12 +67,14 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
+import com.sk89q.worldedit.world.generation.StructureType;
 import com.sk89q.worldedit.world.item.ItemType;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
@@ -111,6 +113,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import net.minecraft.world.phys.BlockHitResult;
@@ -896,10 +901,17 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 BiomeType.REGISTRY.register(name.toString(), new BiomeType(name.toString()));
             }
         }
+
         // Features
         for (ResourceLocation name: server.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).keySet()) {
             if (ConfiguredFeatureType.REGISTRY.get(name.toString()) == null) {
                 ConfiguredFeatureType.REGISTRY.register(name.toString(), new ConfiguredFeatureType(name.toString()));
+            }
+        }
+        // Structures
+        for (ResourceLocation name : server.registryAccess().registryOrThrow(Registries.STRUCTURE).keySet()) {
+            if (StructureType.REGISTRY.get(name.toString()) == null) {
+                StructureType.REGISTRY.register(name.toString(), new StructureType(name.toString()));
             }
         }
 
@@ -939,6 +951,29 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         ServerChunkCache chunkManager = originalWorld.getChunkSource();
         WorldGenLevel proxyLevel = PaperweightServerLevelDelegateProxy.newInstance(session, originalWorld, this);
         return k != null && k.place(proxyLevel, chunkManager.getGenerator(), random, new BlockPos(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
+    }
+
+    public boolean generateStructure(StructureType type, World world, EditSession session, BlockVector3 pt) {
+        ServerLevel originalWorld = ((CraftWorld) world).getHandle();
+        Structure k = originalWorld.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ResourceLocation.tryParse(type.getId()));
+        if (k == null) {
+            return false;
+        }
+
+        ServerChunkCache chunkManager = originalWorld.getChunkSource();
+        WorldGenLevel proxyLevel = PaperweightServerLevelDelegateProxy.newInstance(session, originalWorld, this);
+        ChunkPos chunkPos = new ChunkPos(new BlockPos(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
+        StructureStart structureStart = k.generate(originalWorld.registryAccess(), chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), chunkManager.randomState(), chunkManager.chunkMap.structureTemplateManager, originalWorld.getSeed(), chunkPos, 0, proxyLevel, biome -> true);
+
+        if (!structureStart.isValid()) {
+            return false;
+        } else {
+            BoundingBox boundingBox = structureStart.getBoundingBox();
+            ChunkPos min = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.minX()), SectionPos.blockToSectionCoord(boundingBox.minZ()));
+            ChunkPos max = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.maxX()), SectionPos.blockToSectionCoord(boundingBox.maxZ()));
+            ChunkPos.rangeClosed(min, max).forEach((chunkPosx) -> structureStart.placeInChunk(proxyLevel, originalWorld.structureManager(), chunkManager.getGenerator(), originalWorld.getRandom(), new BoundingBox(chunkPosx.getMinBlockX(), originalWorld.getMinBuildHeight(), chunkPosx.getMinBlockZ(), chunkPosx.getMaxBlockX(), originalWorld.getMaxBuildHeight(), chunkPosx.getMaxBlockZ()), chunkPosx));
+            return true;
+        }
     }
 
     // ------------------------------------------------------------------------
