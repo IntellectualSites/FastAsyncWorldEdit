@@ -152,7 +152,7 @@ public class Settings extends Config {
                 );
                 limit.INVENTORY_MODE = Math.min(limit.INVENTORY_MODE, newLimit.INVENTORY_MODE);
                 limit.SPEED_REDUCTION = Math.min(limit.SPEED_REDUCTION, newLimit.SPEED_REDUCTION);
-                limit.FAST_PLACEMENT |= newLimit.FAST_PLACEMENT;
+                limit.FAST_PLACEMENT &= newLimit.FAST_PLACEMENT;
                 limit.CONFIRM_LARGE &= newLimit.CONFIRM_LARGE;
                 limit.RESTRICT_HISTORY_TO_REGIONS &= newLimit.RESTRICT_HISTORY_TO_REGIONS;
                 if (limit.STRIP_NBT == null) {
