@@ -306,54 +306,6 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         return SideEffectSet.defaults().getSideEffectsToApply();
     }
 
-    public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
-        CraftChunk craftChunk = (CraftChunk) chunk;
-        LevelChunk levelChunk = craftChunk.getHandle();
-        Level level = levelChunk.getLevel();
-
-        BlockPos blockPos = new BlockPos(x, y, z);
-        net.minecraft.world.level.block.state.BlockState blockState = ((PaperweightBlockMaterial) state.getMaterial()).getState();
-        LevelChunkSection[] levelChunkSections = levelChunk.getSections();
-        int y4 = y >> 4;
-        LevelChunkSection section = levelChunkSections[y4];
-
-        net.minecraft.world.level.block.state.BlockState existing;
-        if (section == null) {
-            existing = ((PaperweightBlockMaterial) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
-        } else {
-            existing = section.getBlockState(x & 15, y & 15, z & 15);
-        }
-
-        levelChunk.removeBlockEntity(blockPos); // Force delete the old tile entity
-
-        CompoundBinaryTag compoundTag = state instanceof BaseBlock ? state.getNbt() : null;
-        if (compoundTag != null || existing instanceof TileEntityBlock) {
-            level.setBlock(blockPos, blockState, 0);
-            // remove tile
-            if (compoundTag != null) {
-                // We will assume that the tile entity was created for us,
-                // though we do not do this on the Forge version
-                BlockEntity blockEntity = level.getBlockEntity(blockPos);
-                if (blockEntity != null) {
-                    net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) fromNativeBinary(compoundTag);
-                    tag.put("x", IntTag.valueOf(x));
-                    tag.put("y", IntTag.valueOf(y));
-                    tag.put("z", IntTag.valueOf(z));
-                    blockEntity.load(tag); // readTagIntoTileEntity - load data
-                }
-            }
-        } else {
-            if (existing == blockState) {
-                return true;
-            }
-            levelChunk.setBlockState(blockPos, blockState, false);
-        }
-        if (update) {
-            level.getMinecraftWorld().sendBlockUpdated(blockPos, existing, blockState, 0);
-        }
-        return true;
-    }
-
     @Override
     public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
         return new PaperweightFaweWorldNativeAccess(
