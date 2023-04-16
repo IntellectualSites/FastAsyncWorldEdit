@@ -12,6 +12,6 @@ public interface VectorizedFilter extends Filter {
      * @param set  the set vector
      * @param mask the mask with the lanes set to true which should be affected by the filter
      */
-    void applyVector(VectorFacade get, VectorFacade set, VectorMask<Short> mask);
+    void applyVector(VectorFacade get, VectorFacade set, VectorMask<Integer> mask);
 
 }

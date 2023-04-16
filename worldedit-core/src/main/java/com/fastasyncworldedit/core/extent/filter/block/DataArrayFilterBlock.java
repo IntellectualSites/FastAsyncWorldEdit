@@ -8,7 +8,8 @@ import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.implementation.Flood;
-import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArrayGetBlocks;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
@@ -30,18 +31,18 @@ import javax.annotation.Nullable;
 import static com.sk89q.worldedit.world.block.BlockTypesCache.states;
 
 @ApiStatus.NonExtendable
-public class CharFilterBlock extends ChunkFilterBlock {
+public class DataArrayFilterBlock extends ChunkFilterBlock {
 
-    private static final SetDelegate FULL = (block, value) -> block.setArr[block.index] = value;
+    private static final SetDelegate FULL = (block, value) -> block.setArr.setAt(block.index, value);
     private static final SetDelegate NULL = (block, value) -> block.initSet().set(block, value);
 
     private int maxLayer;
     private int minLayer;
-    protected CharGetBlocks get;
+    protected DataArrayGetBlocks get;
     protected IChunkSet set;
-    protected char[] getArr;
+    protected DataArray getArr;
     @Nullable
-    protected char[] setArr;
+    protected DataArray setArr;
     protected SetDelegate delegate;
     // local
     protected int layer;
@@ -55,7 +56,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     private int chunkX;
     private int chunkZ;
 
-    public CharFilterBlock(Extent extent) {
+    public DataArrayFilterBlock(Extent extent) {
         super(extent);
     }
 
@@ -70,12 +71,12 @@ public class CharFilterBlock extends ChunkFilterBlock {
 
     @Override
     public synchronized final ChunkFilterBlock initLayer(IBlocks iget, IChunkSet iset, int layer) {
-        this.get = (CharGetBlocks) iget;
+        this.get = (DataArrayGetBlocks) iget;
         minLayer = this.get.getMinSectionPosition();
         maxLayer = this.get.getMaxSectionPosition();
         this.layer = layer;
         if (!iget.hasSection(layer)) {
-            getArr = FaweCache.INSTANCE.EMPTY_CHAR_4096;
+            getArr = FaweCache.INSTANCE.EMPTY_DATA;
         } else {
             getArr = iget.load(layer);
         }
@@ -233,29 +234,25 @@ public class CharFilterBlock extends ChunkFilterBlock {
         return chunkZ;
     }
 
-    public final char getOrdinalChar() {
-        return getArr[index];
-    }
-
     @Override
     public final int getOrdinal() {
-        return getArr[index];
+        return getArr.getAt(index);
     }
 
     @Override
     public void setOrdinal(int ordinal) {
-        delegate.set(this, (char) ordinal);
+        delegate.set(this, ordinal);
     }
 
     @Override
     public final BlockState getBlock() {
-        final int ordinal = getArr[index];
+        final int ordinal = getArr.getAt(index);
         return BlockTypesCache.states[ordinal];
     }
 
     @Override
     public void setBlock(BlockState state) {
-        delegate.set(this, state.getOrdinalChar());
+        delegate.set(this, state.getOrdinal());
     }
 
     @Override
@@ -318,7 +315,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public final BlockState getBlockNorth() {
         if (z > 0) {
-            return states[getArr[index - 16]];
+            return states[getArr.getAt(index - 16)];
         }
         return getExtent().getBlock(x(), y(), z() - 1);
     }
@@ -326,7 +323,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public final BlockState getBlockEast() {
         if (x < 15) {
-            return states[getArr[index + 1]];
+            return states[getArr.getAt(index + 1)];
         }
         return getExtent().getBlock(x() + 1, y(), z());
     }
@@ -334,7 +331,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public final BlockState getBlockSouth() {
         if (z < 15) {
-            return states[getArr[index + 16]];
+            return states[getArr.getAt(index + 16)];
         }
         return getExtent().getBlock(x(), y(), z() + 1);
     }
@@ -342,7 +339,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public final BlockState getBlockWest() {
         if (x > 0) {
-            return states[getArr[index - 1]];
+            return states[getArr.getAt(index - 1)];
         }
         return getExtent().getBlock(x() - 1, y(), z());
     }
@@ -350,7 +347,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public final BlockState getBlockBelow() {
         if (y > 0) {
-            return states[getArr[index - 256]];
+            return states[getArr.getAt(index - 256)];
         }
         if (layer > minLayer) {
             final int newLayer = layer - 1;
@@ -362,7 +359,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @Override
     public final BlockState getBlockAbove() {
         if (y < 16) {
-            return states[getArr[index + 256]];
+            return states[getArr.getAt(index + 256)];
         }
         if (layer < maxLayer) {
             final int newLayer = layer + 1;
@@ -376,7 +373,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
         final int newY = this.y + y;
         final int layerAdd = newY >> 4;
         if (layerAdd == 0) {
-            return states[getArr[this.index + (y << 8)]];
+            return states[getArr.getAt(this.index + (y << 8))];
         } else if ((layerAdd > 0 && layerAdd < (maxLayer - layer)) || (layerAdd < 0 && layerAdd < (minLayer - layer))) {
             final int newLayer = layer + layerAdd;
             final int index = (this.index + ((y & 15) << 8)) & 4095;
@@ -434,7 +431,7 @@ public class CharFilterBlock extends ChunkFilterBlock {
     @ApiStatus.Internal
     protected interface SetDelegate {
 
-        void set(@Nonnull CharFilterBlock block, char value);
+        void set(@Nonnull DataArrayFilterBlock block, int value);
 
     }
 

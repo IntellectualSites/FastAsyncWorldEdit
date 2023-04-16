@@ -24,30 +24,30 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-public class CharSetBlocks extends CharBlocks implements IChunkSet {
+public class DataArraySetBlocks extends DataArrayBlocks implements IChunkSet {
 
-    private static final Pool<CharSetBlocks> POOL = FaweCache.INSTANCE.registerPool(
-            CharSetBlocks.class,
-            CharSetBlocks::new, Settings.settings().QUEUE.POOL
+    private static final Pool<DataArraySetBlocks> POOL = FaweCache.INSTANCE.registerPool(
+            DataArraySetBlocks.class,
+            DataArraySetBlocks::new, Settings.settings().QUEUE.POOL
     );
 
     /**
-     * @deprecated Use {@link CharSetBlocks#newInstance(int, int)}
+     * @deprecated Use {@link DataArraySetBlocks#newInstance(int, int)}
      */
     @Deprecated(forRemoval = true, since = "2.13.0")
-    public static CharSetBlocks newInstance() {
+    public static DataArraySetBlocks newInstance() {
         return POOL.poll();
     }
 
     /**
-     * Create a new {@link CharSetBlocks} instance
+     * Create a new {@link DataArraySetBlocks} instance
      *
      * @param x chunk x
      * @param z chunk z
      * @return New pooled CharSetBlocks instance.
      */
-    public static CharSetBlocks newInstance(int x, int z) {
-        CharSetBlocks set = POOL.poll();
+    public static DataArraySetBlocks newInstance(int x, int z) {
+        DataArraySetBlocks set = POOL.poll();
         set.init(x, z);
         return set;
     }
@@ -63,7 +63,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     private int bitMask = -1;
     private SideEffectSet sideEffectSet = SideEffectSet.defaults();
 
-    private CharSetBlocks() {
+    private DataArraySetBlocks() {
         // Expand as we go
         super(0, 15);
     }
@@ -81,13 +81,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        int layer;
-        if (biomes == null || (y >> 4) < minSectionPosition || (y >> 4) > maxSectionPosition) {
-            return null;
-        } else if (biomes[(layer = (y >> 4) - minSectionPosition)] == null) {
-            return null;
-        }
-        return biomes[layer][(y & 15) >> 2 | (z >> 2) << 2 | x >> 2];
+        return getBiomeType(x, y, z, biomes, minSectionPosition, maxSectionPosition);
     }
 
     @Override
@@ -138,7 +132,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public void setBlocks(int layer, char[] data) {
+    public void setBlocks(int layer, final DataArray data) {
         updateSectionIndexRange(layer);
         layer -= minSectionPosition;
         this.blocks[layer] = data;
@@ -355,12 +349,11 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public ThreadUnsafeCharBlocks createCopy() {
-        char[][] blocksCopy = new char[sectionCount][];
+    public ThreadUnsafeDataArrayBlocks createCopy() {
+        DataArray[] blocksCopy = new DataArray[sectionCount];
         for (int i = 0; i < sectionCount; i++) {
             if (blocks[i] != null) {
-                blocksCopy[i] = new char[FaweCache.INSTANCE.BLOCKS_PER_LAYER];
-                System.arraycopy(blocks[i], 0, blocksCopy[i], 0, FaweCache.INSTANCE.BLOCKS_PER_LAYER);
+                blocksCopy[i] = DataArray.createCopy(blocks[i]);
             }
         }
         BiomeType[][] biomesCopy;
@@ -377,7 +370,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         }
         char[][] lightCopy = createLightCopy(light, sectionCount);
         char[][] skyLightCopy = createLightCopy(skyLight, sectionCount);
-        return new ThreadUnsafeCharBlocks(
+        return new ThreadUnsafeDataArrayBlocks(
                 blocksCopy,
                 minSectionPosition,
                 maxSectionPosition,
@@ -424,7 +417,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     @Override
-    public char[] load(final int layer) {
+    public DataArray load(final int layer) {
         updateSectionIndexRange(layer);
         return super.load(layer);
     }
@@ -453,7 +446,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     }
 
     private void resizeSectionsArrays(int diff, boolean appendNew) {
-        char[][] tmpBlocks = new char[sectionCount][];
+        DataArray[] tmpBlocks = new DataArray[sectionCount];
         Object[] tmpSectionLocks = new Object[sectionCount];
         int destPos = appendNew ? 0 : diff;
         System.arraycopy(blocks, 0, tmpBlocks, destPos, blocks.length);

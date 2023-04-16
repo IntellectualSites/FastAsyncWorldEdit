@@ -37,7 +37,7 @@ public class CountFilter extends ForkedFilter<CountFilter> implements Vectorized
     }
 
     @Override
-    public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
+    public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Integer> mask) {
         total += mask.trueCount();
     }
 

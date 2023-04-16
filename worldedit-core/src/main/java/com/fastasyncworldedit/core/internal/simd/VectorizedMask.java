@@ -3,35 +3,37 @@ package com.fastasyncworldedit.core.internal.simd;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.IntVector;
 import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorSpecies;
 
 public interface VectorizedMask {
 
     default void processChunks(IChunk chunk, IChunkGet get, IChunkSet set) {
-        VectorFacade setFassade = new VectorFacade(set);
-        VectorFacade getFassade = new VectorFacade(get);
+        VectorFacade setFacade = new VectorFacade(set);
+        VectorFacade getFacade = new VectorFacade(get);
         for (int layer = get.getMinSectionPosition(); layer <= get.getMaxSectionPosition(); layer++) {
-            setFassade.setLayer(layer);
-            getFassade.setLayer(layer);
-            final char[] sectionSet = set.loadIfPresent(layer);
+            setFacade.setLayer(layer);
+            getFacade.setLayer(layer);
+            final DataArray sectionSet = set.loadIfPresent(layer);
             if (sectionSet == null) {
                 continue;
             }
-            setFassade.setData(sectionSet);
-            processSection(layer, setFassade, getFassade);
+            setFacade.setData(sectionSet);
+            processSection(layer, setFacade, getFacade);
         }
     }
 
     default void processSection(int layer, VectorFacade set, VectorFacade get) {
-        final VectorSpecies<Short> species = ShortVector.SPECIES_PREFERRED;
+        final VectorSpecies<Integer> species = IntVector.SPECIES_PREFERRED;
         // assume that chunk sections have length 16 * 16 * 16 == 4096
         for (int i = 0; i < 4096; i += species.length()) {
             set.setIndex(i);
             get.setIndex(i);
             processVector(set, get, species);
+
         }
     }
 
@@ -42,8 +44,8 @@ public interface VectorizedMask {
      * @param get     the get vector
      * @param species the species to use
      */
-    default void processVector(VectorFacade set, VectorFacade get, VectorSpecies<Short> species) {
-        ShortVector s = set.getOrZero(species);
+    default void processVector(VectorFacade set, VectorFacade get, VectorSpecies<Integer> species) {
+        IntVector s = set.getOrZero(species);
         s = s.blend(BlockTypesCache.ReservedIDs.__RESERVED__, compareVector(set, get, species).not());
         set.setOrIgnore(s);
     }
@@ -55,6 +57,6 @@ public interface VectorizedMask {
      * @param get     the get vector
      * @param species the species to use
      */
-    VectorMask<Short> compareVector(VectorFacade set, VectorFacade get, VectorSpecies<Short> species);
+    VectorMask<Integer> compareVector(VectorFacade set, VectorFacade get, VectorSpecies<Integer> species);
 
 }

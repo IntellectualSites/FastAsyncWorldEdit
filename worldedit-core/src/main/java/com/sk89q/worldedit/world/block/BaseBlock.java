@@ -215,11 +215,6 @@ public class BaseBlock implements BlockStateHolder<BaseBlock>, TileEntityBlock {
     public int getOrdinal() {
         return blockState.getOrdinal();
     }
-
-    @Override
-    public final char getOrdinalChar() {
-        return blockState.getOrdinalChar();
-    }
     //FAWE end
 
     /**

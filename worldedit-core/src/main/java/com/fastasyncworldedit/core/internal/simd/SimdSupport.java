@@ -13,7 +13,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
-import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.IntVector;
 import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
 import org.apache.logging.log4j.Logger;
@@ -70,16 +70,16 @@ public class SimdSupport {
         };
     }
 
-    private static VectorizedMask vectorizedTargetMaskNonAir() {
+    private static <T> VectorizedMask vectorizedTargetMaskNonAir() {
         // everything > VOID_AIR is not air
-        return (set, get, species) -> get.get(species).compare(VectorOperators.UNSIGNED_GT, BlockTypesCache.ReservedIDs.VOID_AIR);
+        return (set, get, species) -> get.get(species).compare(VectorOperators.UGE, BlockTypesCache.ReservedIDs.VOID_AIR);
     }
 
-    private static VectorizedMask vectorizedTargetMask(char ordinal) {
+    private static <T> VectorizedMask vectorizedTargetMask(char ordinal) {
         return (set, get, species) -> get.get(species).compare(VectorOperators.EQ, (short) ordinal);
     }
 
-    private static VectorizedMask vectorizedTargetMaskInverse(char ordinal) {
+    private static <T> VectorizedMask vectorizedTargetMaskInverse(char ordinal) {
         return (set, get, species) -> get.get(species).compare(VectorOperators.NE, (short) ordinal);
     }
 
@@ -117,10 +117,10 @@ public class SimdSupport {
         }
 
         @Override
-        public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Short> mask) {
-            ShortVector s = set.getOrZero(mask.vectorSpecies());
+        public void applyVector(final VectorFacade get, final VectorFacade set, final VectorMask<Integer> mask) {
+            IntVector s = set.getOrZero(mask.vectorSpecies());
             // only change the lanes the mask dictates us to change, keep the rest
-            s = s.blend(ShortVector.broadcast(ShortVector.SPECIES_PREFERRED, ordinal), mask);
+            s = s.blend(IntVector.broadcast(s.species(), ordinal), mask);
             set.setOrIgnore(s);
         }
 

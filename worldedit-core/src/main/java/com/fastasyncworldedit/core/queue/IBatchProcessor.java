@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.queue;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.MultiBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.sk89q.worldedit.WorldEdit;
@@ -91,23 +92,19 @@ public interface IBatchProcessor {
                 if (layer > minLayer && layer < maxLayer) {
                     continue;
                 }
-                char[] blocks = set.loadIfPresent(layer);
+                DataArray blocks = set.loadIfPresent(layer);
                 if (blocks == null) {
                     continue;
                 }
                 // When on the minimum layer (as defined by minY), remove blocks up to minY (exclusive)
                 if (layer == minLayer) {
                     int index = (minY & 15) << 8;
-                    for (int i = 0; i < index; i++) {
-                        blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                    }
+                    blocks.setRange(0, index, BlockTypesCache.ReservedIDs.__RESERVED__);
                 }
                 // When on the maximum layer (as defined by maxY), remove blocks above maxY (exclusive)
                 if (layer == maxLayer) {
                     int index = ((maxY & 15) + 1) << 8;
-                    for (int i = index; i < blocks.length; i++) {
-                        blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                    }
+                    blocks.setRange(index, DataArray.CHUNK_SECTION_SIZE, BlockTypesCache.ReservedIDs.__RESERVED__);
                 }
                 set.setBlocks(layer, blocks);
             }
@@ -137,19 +134,17 @@ public interface IBatchProcessor {
                 continue;
             }
             if (layer == minLayer) {
-                char[] arr = set.loadIfPresent(layer);
+                DataArray arr = set.loadIfPresent(layer);
                 if (arr != null) {
                     int index = (minY & 15) << 8;
-                    Arrays.fill(arr, index, 4096, (char) BlockTypesCache.ReservedIDs.__RESERVED__);
+                    arr.setRange(index, DataArray.CHUNK_SECTION_SIZE, BlockTypesCache.ReservedIDs.__RESERVED__);
                 }
                 set.setBlocks(layer, arr);
             } else if (layer == maxLayer) {
-                char[] arr = set.loadIfPresent(layer);
+                DataArray arr = set.loadIfPresent(layer);
                 if (arr != null) {
                     int index = ((maxY + 1) & 15) << 8;
-                    for (int i = 0; i < index; i++) {
-                        arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
-                    }
+                    arr.setRange(0, index, BlockTypesCache.ReservedIDs.__RESERVED__);
                 }
                 set.setBlocks(layer, arr);
             } else {

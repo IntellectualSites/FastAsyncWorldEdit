@@ -1,13 +1,12 @@
 package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R4;
 
+import com.fastasyncworldedit.bukkit.adapter.PostProcessor;
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
-import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
-import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -16,14 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 
-import javax.annotation.Nullable;
-
-public class PaperweightPostProcessor implements IBatchProcessor {
-
-    @Override
-    public IChunkSet processSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
-        return set;
-    }
+public class PaperweightPostProcessor extends PostProcessor {
 
     @SuppressWarnings("deprecation")
     @Override
@@ -36,15 +28,15 @@ public class PaperweightPostProcessor implements IBatchProcessor {
         PaperweightGetBlocks_Copy getBlocks = (PaperweightGetBlocks_Copy) iChunkGet;
         layer:
         for (int layer = iChunkSet.getMinSectionPosition(); layer <= iChunkSet.getMaxSectionPosition(); layer++) {
-            char[] set = iChunkSet.loadIfPresent(layer);
+            DataArray set = iChunkSet.loadIfPresent(layer);
             if (set == null) {
                 // No edit means no need to process
                 continue;
             }
-            char[] get = null;
+            DataArray get = null;
             for (int i = 0; i < 4096; i++) {
-                char ordinal = set[i];
-                char replacedOrdinal = BlockTypesCache.ReservedIDs.__RESERVED__;
+                int ordinal = set.getAt(i);
+                int replacedOrdinal = BlockTypesCache.ReservedIDs.__RESERVED__;
                 boolean fromGet = false; // Used for liquids
                 if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                     if (get == null) {
@@ -56,7 +48,7 @@ public class PaperweightPostProcessor implements IBatchProcessor {
                         continue layer;
                     }
                     fromGet = true;
-                    ordinal = replacedOrdinal = get[i];
+                    ordinal = replacedOrdinal = get.getAt(i);
                 }
                 if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                     continue;
@@ -64,7 +56,7 @@ public class PaperweightPostProcessor implements IBatchProcessor {
                     if (get == null) {
                         get = getBlocks.load(layer);
                     }
-                    replacedOrdinal = get[i];
+                    replacedOrdinal = get.getAt(i);
                 }
                 boolean ticking = BlockTypesCache.ticking[ordinal];
                 boolean replacedWasTicking = BlockTypesCache.ticking[replacedOrdinal];
@@ -102,59 +94,6 @@ public class PaperweightPostProcessor implements IBatchProcessor {
                 }
             }
         }
-    }
-
-    @Nullable
-    @Override
-    public Extent construct(final Extent child) {
-        throw new UnsupportedOperationException("Processing only");
-    }
-
-    @Override
-    public ProcessorScope getScope() {
-        return ProcessorScope.READING_BLOCKS;
-    }
-
-    private boolean wasAdjacentToWater(char[] get, char[] set, int i, int x, int y, int z) {
-        if (set == null || get == null) {
-            return false;
-        }
-        char ordinal;
-        char reserved = BlockTypesCache.ReservedIDs.__RESERVED__;
-        if (x > 0 && set[i - 1] != reserved) {
-            if (BlockTypesCache.ticking[(ordinal = get[i - 1])] && isFluid(ordinal)) {
-                return true;
-            }
-        }
-        if (x < 15 && set[i + 1] != reserved) {
-            if (BlockTypesCache.ticking[(ordinal = get[i + 1])] && isFluid(ordinal)) {
-                return true;
-            }
-        }
-        if (z > 0 && set[i - 16] != reserved) {
-            if (BlockTypesCache.ticking[(ordinal = get[i - 16])] && isFluid(ordinal)) {
-                return true;
-            }
-        }
-        if (z < 15 && set[i + 16] != reserved) {
-            if (BlockTypesCache.ticking[(ordinal = get[i + 16])] && isFluid(ordinal)) {
-                return true;
-            }
-        }
-        if (y > 0 && set[i - 256] != reserved) {
-            if (BlockTypesCache.ticking[(ordinal = get[i - 256])] && isFluid(ordinal)) {
-                return true;
-            }
-        }
-        if (y < 15 && set[i + 256] != reserved) {
-            return BlockTypesCache.ticking[(ordinal = get[i + 256])] && isFluid(ordinal);
-        }
-        return false;
-    }
-
-    @SuppressWarnings("deprecation")
-    private boolean isFluid(char ordinal) {
-        return BlockState.getFromOrdinal(ordinal).getMaterial().isLiquid();
     }
 
     @SuppressWarnings("deprecation")

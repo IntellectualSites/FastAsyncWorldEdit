@@ -11,6 +11,7 @@ import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.queue.IChunkSet;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.NbtUtils;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
@@ -405,7 +406,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                 );
                                 LevelChunkSection newSection = PaperweightPlatformAdapter.newChunkSection(
                                         layerNo,
-                                        new char[4096],
+                                        DataArray.createEmpty(),
                                         adapter,
                                         biomeRegistry,
                                         biomeData
@@ -418,7 +419,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                                         newSection,
                                         getSectionIndex
                                 )) {
-                                    updateGet(nmsChunk, levelChunkSections, newSection, new char[4096], getSectionIndex);
+                                    updateGet(nmsChunk, levelChunkSections, newSection, DataArray.createEmpty(), getSectionIndex);
                                     continue;
                                 } else {
                                     existingSection = levelChunkSections[getSectionIndex];
@@ -451,9 +452,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
 
                 // setArr is modified by PaperweightPlatformAdapter#newChunkSection. This is in order to write changes to
                 // this chunk GET when #updateGet is called. Future dords, please listen this time.
-                char[] tmp = set.load(layerNo);
-                char[] setArr = new char[tmp.length];
-                System.arraycopy(tmp, 0, setArr, 0, tmp.length);
+                DataArray setArr = DataArray.createCopy(set.load(layerNo));
 
                 // synchronise on internal section to avoid circular locking with a continuing edit if the chunk was
                 // submitted to keep loaded internal chunks to queue target size.
@@ -469,15 +468,12 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                         }
                     }
 
-                    if (createCopy) {
-                        char[] tmpLoad = load(layerNo);
-                        char[] copyArr = new char[4096];
-                        System.arraycopy(tmpLoad, 0, copyArr, 0, 4096);
-                        copy.storeSection(getSectionIndex, copyArr);
-                        if (biomes != null && existingSection != null) {
-                            copy.storeBiomes(getSectionIndex, existingSection.getBiomes());
+                        if (createCopy) {
+                            copy.storeSection(getSectionIndex, DataArray.createCopy(load(layerNo)));
+                            if (biomes != null && existingSection != null) {
+                                copy.storeBiomes(getSectionIndex, existingSection.getBiomes());
+                            }
                         }
-                    }
 
                     if (existingSection == null) {
                         PalettedContainer<Holder<Biome>> biomeData = biomes == null ? new PalettedContainer<>(
@@ -535,7 +531,8 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                             } else if (existingSection != getSections(false)[getSectionIndex]) {
                                 this.sections[getSectionIndex] = existingSection;
                                 this.reset();
-                            } else if (!Arrays.equals(update(getSectionIndex, new char[4096], true), load(layerNo))) {
+                            } else if (!update(getSectionIndex, DataArray.createEmpty(), true)
+                                    .equals(load(layerNo))) {
                                 this.reset(layerNo);
                             /*} else if (lock.isModified()) {
                                 this.reset(layerNo);*/
@@ -769,7 +766,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
             LevelChunk nmsChunk,
             LevelChunkSection[] chunkSections,
             LevelChunkSection section,
-            char[] arr,
+            DataArray arr,
             int layer
     ) {
         try {
@@ -813,16 +810,14 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
      */
     @Override
     @SuppressWarnings("unchecked")
-    public char[] update(int layer, char[] data, boolean aggressive) {
+    public DataArray update(int layer, DataArray data, boolean aggressive) {
         LevelChunkSection section = getSections(aggressive)[layer];
         // Section is null, return empty array
         if (section == null) {
-            data = new char[4096];
-            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
-            return data;
+            return DataArray.createFilled(BlockTypesCache.ReservedIDs.AIR);
         }
-        if (data == null || data == FaweCache.INSTANCE.EMPTY_CHAR_4096 || data.length != 4096) {
-            data = new char[4096]; // new array, will be populated below
+        if (data == null || data == FaweCache.INSTANCE.EMPTY_DATA) {
+            data = DataArray.createFilled(BlockTypesCache.ReservedIDs.AIR);
         }
         Semaphore lock = PaperweightPlatformAdapter.applyLock(section);
         synchronized (lock) {
@@ -835,7 +830,7 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                 final BitStorage bits = (BitStorage) PaperweightPlatformAdapter.fieldStorage.get(dataObject);
 
                 if (bits instanceof ZeroBitStorage) {
-                    Arrays.fill(data, adapter.adaptToChar(blocks.get(0, 0, 0))); // get(int) is only public on paper
+                    data.setAll(adapter.adaptToOrdinal(blocks.get(0, 0, 0))); // get(int) is only public on paper
                     return data;
                 }
 
@@ -855,20 +850,20 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
                     return data;
                 }
 
-                char[] paletteToOrdinal = FaweCache.INSTANCE.PALETTE_TO_BLOCK_CHAR.get();
+                int[] paletteToOrdinal = FaweCache.INSTANCE.PALETTE_TO_BLOCK.get();
                 try {
                     if (num_palette == 1) {
-                        char ordinal = ordinal(palette.valueFor(0), adapter);
-                        Arrays.fill(data, ordinal);
+                        int ordinal = ordinal(palette.valueFor(0), adapter);
+                        data.setAll(ordinal);
                     } else {
                         for (int i = 0; i < num_palette; i++) {
-                            char ordinal = ordinal(palette.valueFor(i), adapter);
+                            int ordinal = ordinal(palette.valueFor(i), adapter);
                             paletteToOrdinal[i] = ordinal;
                         }
                         adapter.mapWithPalette(data, paletteToOrdinal);
                     }
                 } finally {
-                    Arrays.fill(paletteToOrdinal, 0, num_palette, Character.MAX_VALUE);
+                    Arrays.fill(paletteToOrdinal, 0, num_palette, -1);
                 }
                 return data;
             } catch (IllegalAccessException | InterruptedException e) {
@@ -880,11 +875,11 @@ public class PaperweightGetBlocks extends AbstractBukkitGetBlocks<ServerLevel, L
         }
     }
 
-    private char ordinal(BlockState ibd, PaperweightFaweAdapter adapter) {
+    private int ordinal(BlockState ibd, PaperweightFaweAdapter adapter) {
         if (ibd == null) {
             return BlockTypesCache.ReservedIDs.AIR;
         } else {
-            return adapter.adaptToChar(ibd);
+            return adapter.adaptToOrdinal(ibd);
         }
     }
 

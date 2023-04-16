@@ -5,6 +5,7 @@ import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.nbt.FaweCompoundTag;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.platform.Capability;
@@ -56,7 +57,7 @@ public interface IBlocks extends Trimable {
      * @param layer chunk section layer (may be negative)
      * @return char array of ordinals of the chunk section
      */
-    char[] load(int layer);
+    DataArray load(int layer);
 
     /**
      * Obtain the specified chunk section stored as an array of ordinals if present or null. Uses normal minecraft chunk-section
@@ -66,7 +67,7 @@ public interface IBlocks extends Trimable {
      * @return char array of ordinals of the chunk section if present
      */
     @Nullable
-    char[] loadIfPresent(int layer);
+    DataArray loadIfPresent(int layer);
 
     BlockState getBlock(int x, int y, int z);
 
@@ -163,14 +164,14 @@ public interface IBlocks extends Trimable {
                     continue;
                 }
 
-                char[] ids = this.load(layer);
+                DataArray ids = this.load(layer);
 
                 int nonEmpty = 0; // TODO optimize into same loop as toPalette
-                for (int i = 0; i < ids.length; i++) {
-                    char ordinal = ids[i];
+                for (int i = 0; i < DataArray.CHUNK_SECTION_SIZE; i++) {
+                    int ordinal = ids.getAt(i);
                     switch (ordinal) {
                         case BlockTypesCache.ReservedIDs.__RESERVED__, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR:
-                            ids[i] = BlockTypesCache.ReservedIDs.AIR;
+                            ids.setAt(i, BlockTypesCache.ReservedIDs.AIR);
                         case BlockTypesCache.ReservedIDs.AIR:
                             continue;
                         default:
