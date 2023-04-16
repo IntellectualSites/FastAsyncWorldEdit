@@ -8,7 +8,7 @@ import com.fastasyncworldedit.core.internal.simd.VectorizedMask;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.sk89q.worldedit.function.mask.AbstractExtentMask;
 import com.sk89q.worldedit.function.mask.Mask;
-import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.Vector;
 import jdk.incubator.vector.VectorMask;
 import jdk.incubator.vector.VectorOperators;
 
@@ -67,9 +67,9 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
         return new MaskFilter<>(getParent().fork(), mask.copy(), changes);
     }
 
-    public static class VectorizedMaskFilter<T extends VectorizedFilter> extends MaskFilter<T> implements VectorizedFilter {
+    public static class VectorizedMaskFilter<T extends VectorizedFilter<V>, V> extends MaskFilter<T> implements VectorizedFilter<V> {
 
-        private final VectorizedMask vectorizedMask;
+        private final VectorizedMask<V> vectorizedMask;
 
         public VectorizedMaskFilter(final T other, final Mask root) {
             super(other, root);
@@ -82,11 +82,11 @@ public class MaskFilter<T extends Filter> extends DelegateFilter<T> {
         }
 
         @Override
-        public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
+        public Vector<V> applyVector(final Vector<V> get, final Vector<V> set, VectorMask<V> mask) {
             final T parent = getParent();
-            VectorMask<Short> masked = vectorizedMask.compareVector(set, get);
-            ShortVector res = parent.applyVector(get, set, mask.and(masked));
-            VectorMask<Short> changed = res.compare(VectorOperators.NE, set);
+            VectorMask<V> masked = vectorizedMask.compareVector(set, get);
+            Vector<V> res = parent.applyVector(get, set, mask.and(masked));
+            VectorMask<V> changed = res.compare(VectorOperators.NE, set);
             changes.getAndAdd(changed.trueCount());
             return res;
         }

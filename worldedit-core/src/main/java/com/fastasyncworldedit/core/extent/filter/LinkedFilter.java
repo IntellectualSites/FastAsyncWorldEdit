@@ -5,7 +5,7 @@ import com.fastasyncworldedit.core.internal.simd.VectorizedFilter;
 import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunk;
 import com.sk89q.worldedit.regions.Region;
-import jdk.incubator.vector.ShortVector;
+import jdk.incubator.vector.Vector;
 import jdk.incubator.vector.VectorMask;
 import org.jetbrains.annotations.Nullable;
 
@@ -70,16 +70,16 @@ public sealed class LinkedFilter<L extends Filter, R extends Filter> implements 
         getRight().join();
     }
 
-    private final static class VectorizedLinkedFilter<L extends VectorizedFilter, R extends VectorizedFilter>
-            extends LinkedFilter<L, R> implements VectorizedFilter {
+    private final static class VectorizedLinkedFilter<L extends VectorizedFilter<V>, R extends VectorizedFilter<V>, V>
+            extends LinkedFilter<L, R> implements VectorizedFilter<V> {
 
         public VectorizedLinkedFilter(final L left, final R right) {
             super(left, right);
         }
 
         @Override
-        public ShortVector applyVector(final ShortVector get, final ShortVector set, VectorMask<Short> mask) {
-            ShortVector res = getLeft().applyVector(get, set, mask);
+        public Vector<V> applyVector(final Vector<V> get, final Vector<V> set, VectorMask<V> mask) {
+            Vector<V> res = getLeft().applyVector(get, set, mask);
             return getRight().applyVector(get, res, mask);
         }
 

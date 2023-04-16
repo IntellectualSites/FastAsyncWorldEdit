@@ -8,6 +8,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.math.IntPair;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
@@ -410,7 +411,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
      */
     public static LevelChunkSection newChunkSection(
             final int layer,
-            final char[] blocks,
+            final DataArray blocks,
             CachedBukkitAdapter adapter,
             Registry<Biome> biomeRegistry,
             @Nullable PalettedContainer<Holder<Biome>> biomes
@@ -420,8 +421,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static LevelChunkSection newChunkSection(
             final int layer,
-            final Function<Integer, char[]> get,
-            char[] set,
+            final Function<Integer, DataArray> get,
+            DataArray set,
             CachedBukkitAdapter adapter,
             Registry<Biome> biomeRegistry,
             @Nullable PalettedContainer<Holder<Biome>> biomes

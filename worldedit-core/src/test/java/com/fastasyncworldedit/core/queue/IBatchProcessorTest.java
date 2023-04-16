@@ -1,17 +1,20 @@
 package com.fastasyncworldedit.core.queue;
 
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.worldedit.extent.Extent;
-import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.jetbrains.annotations.Nullable;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentest4j.AssertionFailedError;
 
-import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static com.sk89q.worldedit.world.block.BlockTypesCache.ReservedIDs.AIR;
+import static com.sk89q.worldedit.world.block.BlockTypesCache.ReservedIDs.__RESERVED__;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -21,15 +24,18 @@ class IBatchProcessorTest {
     @Isolated
     class trimY {
 
-        private static final char[] CHUNK_DATA = new char[16 * 16 * 16];
-        private static final char[] SLICE_AIR = new char[16 * 16];
-        private static final char[] SLICE_RESERVED = new char[16 * 16];
+        static {
+            // this must happen before DataArray/CharDataArray is initialized
+            System.setProperty("fawe.test", "true");
+        }
+
+        private static final DataArray CHUNK_DATA = DataArray.createFilled(AIR);
         private final IBatchProcessor processor = new NoopBatchProcessor();
 
-        static {
-            Arrays.fill(CHUNK_DATA, (char) BlockTypesCache.ReservedIDs.AIR);
-            Arrays.fill(SLICE_AIR, (char) BlockTypesCache.ReservedIDs.AIR);
-            Arrays.fill(SLICE_RESERVED, (char) BlockTypesCache.ReservedIDs.__RESERVED__);
+        @AfterAll
+        static void tearDown() {
+            // remove again
+            System.getProperties().remove("fawe.test");
         }
 
         @ParameterizedTest
@@ -37,9 +43,9 @@ class IBatchProcessorTest {
         void testFullChunkSelectedInBoundedRegion(int minY, int maxY, int minSection, int maxSection) {
             final IChunkSet set = mock();
 
-            char[][] sections = new char[(320 + 64) >> 4][CHUNK_DATA.length];
-            for (final char[] chars : sections) {
-                System.arraycopy(CHUNK_DATA, 0, chars, 0, CHUNK_DATA.length);
+            DataArray[] sections = new DataArray[(320 + 64) >> 4];
+            for (int i = 0; i < sections.length; i++) {
+                sections[i] = DataArray.createCopy(CHUNK_DATA);
             }
 
             when(set.getMinSectionPosition()).thenReturn(-64 >> 4);
@@ -56,7 +62,7 @@ class IBatchProcessorTest {
 
             for (int section = -64 >> 4; section < 320 >> 4; section++) {
                 int sectionIndex = section + 4;
-                char[] palette = sections[sectionIndex];
+                DataArray palette = sections[sectionIndex];
                 if (section < minSection) {
                     assertNull(palette, "expected section below minimum section to be null");
                     continue;
@@ -72,28 +78,26 @@ class IBatchProcessorTest {
                         if (section == maxSection) {
                             shouldContainBlocks &= slice <= (maxY % 16);
                         }
-                        assertArrayEquals(
-                                shouldContainBlocks ? SLICE_AIR : SLICE_RESERVED,
-                                Arrays.copyOfRange(palette, slice << 8, (slice + 1) << 8),
-                                ("[lower] slice %d (y=%d) expected to contain " + (shouldContainBlocks ? "air" : "nothing"))
-                                        .formatted(slice, ((section << 4) + slice))
-                        );
+                        try {
+                            assertSliceMatches(palette, slice << 8, (slice + 1) << 8, shouldContainBlocks ? AIR : __RESERVED__);
+                        } catch (AssertionFailedError error) {
+                            fail("[lower] slice %d (y=%d) expected to contain " + (shouldContainBlocks ? "air" : "nothing"), error);
+                        }
                     }
                     continue;
                 }
                 if (section == maxSection) {
                     for (int slice = 0; slice < 16; slice++) {
                         boolean shouldContainBlocks = slice <= (maxY % 16);
-                        assertArrayEquals(
-                                shouldContainBlocks ? SLICE_AIR : SLICE_RESERVED,
-                                Arrays.copyOfRange(palette, slice << 8, (slice + 1) << 8),
-                                ("[upper] slice %d (y=%d) expected to contain " + (shouldContainBlocks ? "air" : "nothing"))
-                                        .formatted(slice, ((section << 4) + slice))
-                        );
+                        try {
+                            assertSliceMatches(palette, slice << 8, (slice + 1) << 8, shouldContainBlocks ? AIR : __RESERVED__);
+                        } catch (AssertionFailedError error) {
+                            fail("[upper] slice %d (y=%d) expected to contain " + (shouldContainBlocks ? "air" : "nothing"), error);
+                        }
                     }
                     continue;
                 }
-                assertArrayEquals(CHUNK_DATA, palette, "full captured chunk @ %d should contain full data".formatted(section));
+                assertEquals(CHUNK_DATA, palette, "full captured chunk @ %d should contain full data".formatted(section));
             }
 
         }
@@ -131,6 +135,12 @@ class IBatchProcessorTest {
             return null;
         }
 
+    }
+
+    private static void assertSliceMatches(DataArray dataArray, int sliceStart, int sliceEnd, int expectedValue) {
+        for (int i = sliceStart; i < sliceEnd; i++) {
+            assertEquals(expectedValue, dataArray.getAt(i), "mismatch at index " + i);
+        }
     }
 
 }

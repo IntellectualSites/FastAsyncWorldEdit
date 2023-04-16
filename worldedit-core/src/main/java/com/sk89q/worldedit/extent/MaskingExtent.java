@@ -20,7 +20,7 @@
 package com.sk89q.worldedit.extent;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.DataArrayFilterBlock;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.filter.block.FilterBlock;
 import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
@@ -65,7 +65,7 @@ public class MaskingExtent extends AbstractDelegateExtent implements IBatchProce
         this.mask = mask;
         this.vectorizedMask = SimdSupport.vectorizedTargetMask(mask);
         //FAWE start
-        this.getOrCreateFilterBlock = FaweCache.INSTANCE.createMainThreadSafeCache(() -> new CharFilterBlock(getExtent()));
+        this.getOrCreateFilterBlock = FaweCache.INSTANCE.createMainThreadSafeCache(() -> new DataArrayFilterBlock(getExtent()));
         //FAWE end
     }
 
