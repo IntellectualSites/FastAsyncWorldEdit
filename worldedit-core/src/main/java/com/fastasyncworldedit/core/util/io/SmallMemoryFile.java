@@ -9,7 +9,7 @@ import java.nio.channels.FileLock;
 import static com.fastasyncworldedit.core.util.io.MemoryFileSupport.shift;
 
 /**
- * This implementation of MemoryFile provides storage of up to Integer.MAX_VALUE bytes.
+ * This implementation of MemoryFile provides storage of up to {@link Integer#MAX_VALUE} bytes.
  * As access always uses {@link java.nio.ByteBuffer#getInt(int)}/ {@link java.nio.ByteBuffer#putInt(int, int)},
  * the last three bytes cannot be accessed directly but only by accessing the whole integer.
  * Otherwise, this class makes heavy use of unaligned memory access and a configured

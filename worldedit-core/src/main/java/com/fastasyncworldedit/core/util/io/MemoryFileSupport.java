@@ -11,7 +11,7 @@ import java.util.Set;
 final class MemoryFileSupport {
 
     /**
-     * The amount of additional bytes required to safely call {@link java.nio.ByteBuffer#getInt(int)}
+     * The number of additional bytes required to safely call {@link java.nio.ByteBuffer#getInt(int)}
      * and {@link java.nio.ByteBuffer#putInt(int, int)} for the last actually used byte.
      */
     static final int PADDING = 3;

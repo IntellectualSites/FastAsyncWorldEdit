@@ -7,7 +7,8 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 
 /**
- * A memory-mapped file that can hold integer values in range from 2 up to a variable maximum.
+ * A memory-mapped file that can hold non-negative integers.
+ * The storage is optimized for compactness while providing fast random access.
  */
 public sealed interface MemoryFile extends AutoCloseable, Flushable permits SmallMemoryFile {
 
