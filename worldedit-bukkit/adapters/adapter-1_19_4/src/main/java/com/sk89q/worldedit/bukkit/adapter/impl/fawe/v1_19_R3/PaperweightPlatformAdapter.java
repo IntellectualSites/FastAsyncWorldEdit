@@ -41,6 +41,8 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.chunk.GlobalPalette;
 import net.minecraft.world.level.chunk.HashMapPalette;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -57,6 +59,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -74,6 +77,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.function.Function;
 
+import static java.lang.invoke.MethodType.methodType;
 import static net.minecraft.core.registries.Registries.BIOME;
 
 public final class PaperweightPlatformAdapter extends NMSAdapter {
@@ -103,6 +107,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
 
+    /*
+     * This is a workaround for the changes from https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/1fddefce1cdce44010927b888432bf70c0e88cde#src/main/java/org/bukkit/craftbukkit/CraftChunk.java
+     * and is only needed to support 1.19.4 versions before *and* after this change.
+     */
+    private static final MethodHandle CRAFT_CHUNK_GET_HANDLE;
+
     private static final Field fieldRemove;
 
     static final boolean POST_CHUNK_REWRITE;
@@ -111,6 +121,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
     static {
+        final MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
             fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "d"));
             fieldData.setAccessible(true);
@@ -136,7 +147,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     "b"
             ), long.class);
             getVisibleChunkIfPresent.setAccessible(true);
-            methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
+            methodGetVisibleChunk = lookup.unreflect(getVisibleChunkIfPresent);
 
             Unsafe unsafe = ReflectionUtils.getUnsafe();
             if (!PaperLib.isPaper()) {
@@ -160,7 +171,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     ServerLevel.class
             );
             removeGameEventListener.setAccessible(true);
-            methodRemoveGameEventListener = MethodHandles.lookup().unreflect(removeGameEventListener);
+            methodRemoveGameEventListener = lookup.unreflect(removeGameEventListener);
 
             Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
                     Refraction.pickName(
@@ -169,7 +180,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     ), BlockPos.class
             );
             removeBlockEntityTicker.setAccessible(true);
-            methodremoveTickingBlockEntity = MethodHandles.lookup().unreflect(removeBlockEntityTicker);
+            methodremoveTickingBlockEntity = lookup.unreflect(removeBlockEntityTicker);
 
             fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
@@ -208,6 +219,20 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             rethrow.printStackTrace();
             throw new RuntimeException(rethrow);
         }
+        MethodHandle craftChunkGetHandle;
+        final MethodType type = methodType(ChunkAccess.class);
+        try {
+            craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", type);
+        } catch (NoSuchMethodException | IllegalAccessException e) {
+            try {
+                final MethodType newType = methodType(ChunkAccess.class, ChunkStatus.class);
+                craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", newType);
+                craftChunkGetHandle = MethodHandles.insertArguments(craftChunkGetHandle, 1, ChunkStatus.FULL);
+            } catch (NoSuchMethodException | IllegalAccessException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        CRAFT_CHUNK_GET_HANDLE = craftChunkGetHandle;
     }
 
     static boolean setSectionAtomic(
@@ -280,7 +305,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
             try {
                 CraftChunk chunk = (CraftChunk) future.get();
-                return chunk.getHandle();
+                return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
