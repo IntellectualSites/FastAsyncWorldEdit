@@ -29,10 +29,12 @@ import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.ExceptionCollector;
 import net.minecraft.util.SimpleBitStorage;
 import net.minecraft.util.ThreadingDetector;
+import net.minecraft.util.Unit;
 import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
@@ -267,10 +269,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         } else {
             LevelChunk nmsChunk = serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkX, chunkZ);
             if (nmsChunk != null) {
+                addTicket(serverLevel, chunkX, chunkZ);
                 return nmsChunk;
             }
             nmsChunk = serverLevel.getChunkSource().getChunkAtIfLoadedImmediately(chunkX, chunkZ);
             if (nmsChunk != null) {
+                addTicket(serverLevel, chunkX, chunkZ);
                 return nmsChunk;
             }
             // Avoid "async" methods from the main thread.
@@ -286,6 +290,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
         }
         return TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ));
+    }
+
+    private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
+        // Ensure chunk is definitely loaded before applying a ticket
+        io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(() -> serverLevel
+                .getChunkSource()
+                .addRegionTicket(TicketType.PLUGIN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE));
     }
 
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {
