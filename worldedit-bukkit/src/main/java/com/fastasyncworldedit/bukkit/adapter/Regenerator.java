@@ -253,10 +253,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                     e.printStackTrace();
                 }
             } else { // Concurrency.NONE or generateConcurrent == false
-                // run sequential
-                for (long xz : coords) {
-                    chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
-                }
+                // run sequential but submit to different thread
+                // running regen on the main thread otherwise triggers async-only events on the main thread
+                executor.submit(() -> {
+                    for (long xz : coords) {
+                        chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
+                    }
+                }).get(); // wait until finished this step
             }
         }
 
