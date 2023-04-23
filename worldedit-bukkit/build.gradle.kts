@@ -89,7 +89,6 @@ dependencies {
     compileOnly(libs.mapmanager) { isTransitive = false }
     compileOnly(libs.griefprevention) { isTransitive = false }
     compileOnly(libs.griefdefender) { isTransitive = false }
-    compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Bukkit") { isTransitive = false }
     compileOnly("com.plotsquared:PlotSquared-Core") { isTransitive = false }

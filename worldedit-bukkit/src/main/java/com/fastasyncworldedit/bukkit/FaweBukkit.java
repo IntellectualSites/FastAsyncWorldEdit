@@ -7,7 +7,6 @@ import com.fastasyncworldedit.bukkit.listener.ChunkListener9;
 import com.fastasyncworldedit.bukkit.listener.RenderListener;
 import com.fastasyncworldedit.bukkit.regions.GriefDefenderFeature;
 import com.fastasyncworldedit.bukkit.regions.GriefPreventionFeature;
-import com.fastasyncworldedit.bukkit.regions.ResidenceFeature;
 import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
@@ -219,14 +218,6 @@ public class FaweBukkit implements IFawe, Listener {
             try {
                 managers.add(new TownyFeature(townyPlugin));
                 LOGGER.info("Attempting to use plugin 'Towny'");
-            } catch (Throwable ignored) {
-            }
-        }
-        final Plugin residencePlugin = Bukkit.getServer().getPluginManager().getPlugin("Residence");
-        if (residencePlugin != null && residencePlugin.isEnabled()) {
-            try {
-                managers.add(new ResidenceFeature(residencePlugin, this));
-                LOGGER.info("Attempting to use plugin 'Residence'");
             } catch (Throwable ignored) {
             }
         }

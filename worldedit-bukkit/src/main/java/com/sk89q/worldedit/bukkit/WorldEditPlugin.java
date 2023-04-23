@@ -223,9 +223,6 @@ public class WorldEditPlugin extends JavaPlugin {
 
         // Enable metrics
         Metrics m = new Metrics(this, BSTATS_ID);
-        // First introduced in build 349, release 2.5.2
-        m.addCustomChart(new SimplePie("residence", ()
-                -> WEManager.weManager().getManagers().toString().contains("residence") ? "Yes" : "No"));
         // Check if we are in a safe environment
         ServerLib.checkUnsafeForks();
         // Check if a new build is available
