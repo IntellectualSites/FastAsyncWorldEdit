@@ -23,7 +23,6 @@ import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -183,17 +182,17 @@ public class PlotSquaredFeature extends FaweMaskManager {
     private final class PlotSquaredMask extends FaweMask {
 
         private final Plot plot;
-        private final WeakReference<Set<Plot>> connectedPlots;
+        private final Set<Plot> connectedPlots;
 
         private PlotSquaredMask(Region region, Plot plot) {
             super(region);
             this.plot = plot;
-            connectedPlots = new WeakReference<>(plot.getConnectedPlots());
+            connectedPlots = plot.getConnectedPlots();
         }
 
         @Override
         public boolean isValid(Player player, MaskType type) {
-            if (!connectedPlots.refersTo(plot.getConnectedPlots()) || (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(plot))) {
+            if (connectedPlots != plot.getConnectedPlots() || (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(plot))) {
                 return false;
             }
             return isAllowed(player, plot, type);
