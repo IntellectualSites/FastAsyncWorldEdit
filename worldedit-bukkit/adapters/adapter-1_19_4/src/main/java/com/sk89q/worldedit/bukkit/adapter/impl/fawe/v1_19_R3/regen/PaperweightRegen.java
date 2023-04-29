@@ -60,6 +60,7 @@ import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.PrimaryLevelData;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.generator.CustomChunkGenerator;
@@ -440,7 +441,11 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     @Override
     protected void populate(LevelChunk levelChunk, Random random, BlockPopulator blockPopulator) {
         // BlockPopulator#populate has to be called synchronously for TileEntity access
-        TaskManager.taskManager().task(() -> blockPopulator.populate(freshWorld.getWorld(), random, levelChunk.getBukkitChunk()));
+        TaskManager.taskManager().task(() -> {
+            final CraftWorld world = freshWorld.getWorld();
+            final Chunk chunk = world.getChunkAt(levelChunk.locX, levelChunk.locZ);
+            blockPopulator.populate(world, random, chunk);
+        });
     }
 
     @Override

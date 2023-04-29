@@ -394,6 +394,7 @@ public class Settings extends Config {
                 "Where block properties are specified, any blockstate with the property will be disallowed (e.g. all directions",
                 "of a waterlogged fence). For blocking/remapping of all occurrences of a property like waterlogged, see",
                 "remap-properties below.",
+                "To generate a blank list, substitute the default content with a set of square brackets [] instead.",
                 "Example block property blocking:",
                 " - \"minecraft:conduit[waterlogged=true]\"",
                 " - \"minecraft:piston[extended=false,facing=west]\"",
