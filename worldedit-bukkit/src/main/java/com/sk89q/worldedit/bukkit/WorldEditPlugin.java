@@ -114,7 +114,7 @@ public class WorldEditPlugin extends JavaPlugin {
     private BukkitPermissionAttachmentManager permissionAttachmentManager;
     // Fawe start
     private BukkitCommandSender bukkitConsoleCommandSender;
-    // Fawe stop
+    // Fawe end
 
     @Override
     public void onLoad() {
@@ -316,7 +316,7 @@ public class WorldEditPlugin extends JavaPlugin {
                     "The version of Spigot/Paper you are using doesn't support Tags. The usage of tags with WorldEdit will not work until you update.");
         }
     }
-//575AFD72384E9CF4B59175B4502E5637
+
     // FAWE start
     private void setupBiomes(boolean expectFail) {
         if (this.adapter.value().isPresent()) {
