@@ -313,6 +313,7 @@ public class BukkitWorld extends AbstractWorld {
         treeTypeMapping.put(TreeGenerator.TreeType.SHORT_JUNGLE, TreeType.SMALL_JUNGLE);
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM, TreeType.BROWN_MUSHROOM);
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_REDWOOD, TreeType.REDWOOD);
+        treeTypeMapping.put(TreeGenerator.TreeType.MANGROVE, TreeType.valueOf("MANGROVE"));
         treeTypeMapping.put(TreeGenerator.TreeType.PINE, TreeType.REDWOOD);
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_BIRCH, TreeType.BIRCH);
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_JUNGLE, TreeType.JUNGLE);
@@ -322,7 +323,7 @@ public class BukkitWorld extends AbstractWorld {
                 LOGGER.error("No TreeType mapping for TreeGenerator.TreeType." + type);
                 //FAWE start
                 LOGGER.info("The above message is displayed because your FAWE version is newer than {}" +
-                        " and contains features of future minecraft versions which do not exist in {} hence the tree type" +
+                        " and contains features of future minecraft versions which do not exist in {} hence the tree type " +
                         "{} is not available. This is not an error. This version will work on your version of Minecraft." +
                         "This is an informative message only.", Bukkit.getVersion(), Bukkit.getVersion(), type);
                 //FAWE end
