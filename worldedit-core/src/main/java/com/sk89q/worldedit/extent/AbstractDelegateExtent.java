@@ -514,11 +514,6 @@ public abstract class AbstractDelegateExtent implements Extent {
     }
 
     @Override
-    public Extent enableHistory(final AbstractChangeSet changeSet) {
-        return extent.enableHistory(changeSet);
-    }
-
-    @Override
     public Extent disableHistory() {
         Extent result = this.extent.disableHistory();
         if (result != this.extent) {
