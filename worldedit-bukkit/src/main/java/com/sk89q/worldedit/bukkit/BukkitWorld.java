@@ -313,7 +313,11 @@ public class BukkitWorld extends AbstractWorld {
         treeTypeMapping.put(TreeGenerator.TreeType.SHORT_JUNGLE, TreeType.SMALL_JUNGLE);
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM, TreeType.BROWN_MUSHROOM);
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_REDWOOD, TreeType.REDWOOD);
-        treeTypeMapping.put(TreeGenerator.TreeType.MANGROVE, TreeType.valueOf("MANGROVE"));
+        try {
+            treeTypeMapping.put(TreeGenerator.TreeType.MANGROVE, TreeType.valueOf("MANGROVE"));
+        } catch (IllegalArgumentException e) {
+            LOGGER.debug("Mangrove tree type are not exist in this minecraft version", e);
+        }
         treeTypeMapping.put(TreeGenerator.TreeType.PINE, TreeType.REDWOOD);
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_BIRCH, TreeType.BIRCH);
         treeTypeMapping.put(TreeGenerator.TreeType.RANDOM_JUNGLE, TreeType.JUNGLE);
