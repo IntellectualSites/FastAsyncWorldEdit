@@ -49,6 +49,7 @@ public final class TreeGenerator {
         REDWOOD("Spruce tree", "spruce", "redwood", "sequoia", "sequoioideae"),
         TALL_REDWOOD("Tall spruce tree", "tallspruce", "bigspruce", "tallredwood", "tallsequoia", "tallsequoioideae"),
         MEGA_REDWOOD("Large spruce tree", "largespruce", "megaredwood"),
+        MANGROVE("Mangrove", "mangrove"),
         RANDOM_REDWOOD("Random spruce tree", "randspruce", "randredwood", "randomredwood", "anyredwood") {
             @Override
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
