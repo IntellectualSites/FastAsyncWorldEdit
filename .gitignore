@@ -34,4 +34,4 @@ worldedit-core/src/main/resources/lang/*
 
 .DS_Store
 ### Run server ignore
-(run-[0-9.]+)/
+(run-[0-9.]+)/**
