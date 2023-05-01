@@ -20,17 +20,27 @@
 package com.sk89q.worldedit.bukkit;
 
 import com.sk89q.worldedit.util.TreeGenerator;
+import org.bukkit.Bukkit;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class BukkitWorldTest {
 
     @Test
     public void testTreeTypeMapping() {
-        for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
-            assertNotNull(BukkitWorld.toBukkitTreeType(type), "No mapping for: " + type);
+        try (MockedStatic<Bukkit> bukkit = Mockito.mockStatic(Bukkit.class)) {
+            bukkit.when(Bukkit::getVersion).thenReturn("Dummy Version");
+            for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
+                if (type != TreeGenerator.TreeType.MANGROVE) assertNotNull(BukkitWorld.toBukkitTreeType(type), "No mapping for: " + type);
+                if (type == TreeGenerator.TreeType.MANGROVE) assertNull(BukkitWorld.toBukkitTreeType(type), "No mapping for:" +
+                        " " + type);
+            }
         }
+
     }
 
 }
