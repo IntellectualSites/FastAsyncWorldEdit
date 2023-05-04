@@ -33,3 +33,5 @@ worldedit-core/src/main/resources/lang/*
 /worldedit-core/.factorypath
 
 .DS_Store
+### Run server ignore
+run-*
