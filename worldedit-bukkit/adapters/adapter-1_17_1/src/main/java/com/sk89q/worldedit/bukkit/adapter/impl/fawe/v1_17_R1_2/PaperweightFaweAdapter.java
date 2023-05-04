@@ -554,6 +554,10 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
             org.bukkit.World bukkitWorld
     ) {
         TreeType bukkitType = BukkitWorld.toBukkitTreeType(treeType);
+        if (treeType == null) {
+            LOGGER.debug("Tree type is not registered");
+            return false;
+        }
         if (bukkitType == TreeType.CHORUS_PLANT) {
             blockVector3 = blockVector3.add(
                     0,
@@ -572,11 +576,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                     return null;
                 }
                 return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
-            } catch (NullPointerException nullPointerException) {
-                LOGGER.debug("Tree type is not registered", nullPointerException);
-                // This catch helps us to prevent print of NPEs for not exists tree types
-                return null;
-            } finally {
+            }  finally {
                 serverLevel.captureBlockStates = false;
                 serverLevel.captureTreeGeneration = false;
                 serverLevel.capturedBlockStates.clear();
