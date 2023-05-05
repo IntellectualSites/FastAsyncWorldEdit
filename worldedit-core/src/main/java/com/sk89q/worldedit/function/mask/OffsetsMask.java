@@ -22,7 +22,8 @@ package com.sk89q.worldedit.function.mask;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.sk89q.worldedit.EditSessionBuilder;
+import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.extension.platform.Capability;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.util.Direction;
 import com.sk89q.worldedit.util.Direction.Flag;
@@ -43,6 +44,17 @@ public class OffsetsMask extends AbstractMask {
             .map(Direction::toBlockVector)
             .collect(ImmutableSet.toImmutableSet());
 
+    /**
+     * Create an offsets mask for a single offset.
+     *
+     * @param mask the mask to use
+     * @param offset the offset
+     * @return the new offsets mask
+     */
+    public static OffsetsMask single(Mask mask, BlockVector3 offset) {
+        return builder(mask).maxMatches(1).offsets(ImmutableList.of(offset)).build();
+    }
+
     //FAWE start
     /**
      * Create an offsets mask for a single offset.
@@ -57,6 +69,7 @@ public class OffsetsMask extends AbstractMask {
         return builder(mask).maxMatches(1).offsets(ImmutableList.of(offset)).minY(minY).maxY(maxY).build();
     }
     //FAWE end
+
 
     /**
      * Create a new builder, using the given mask.
@@ -176,7 +189,14 @@ public class OffsetsMask extends AbstractMask {
     private final int maxMatches;
     private final ImmutableSet<BlockVector3> offsets;
 
+
     //FAWE start - ignore resultant position outside world height range
+    private OffsetsMask(Mask mask, boolean excludeSelf, int minMatches, int maxMatches, ImmutableSet<BlockVector3> offsets) {
+        this(mask, excludeSelf, minMatches, maxMatches, offsets,
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMinY(),
+                WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.WORLD_EDITING).versionMaxY());
+    }
+
     private OffsetsMask(Mask mask, boolean excludeSelf, int minMatches, int maxMatches, ImmutableSet<BlockVector3> offsets, int minY, int maxY) {
         checkNotNull(mask);
         checkNotNull(offsets);
