@@ -27,7 +27,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Checks whether another mask tests true for a position that is offset
  * a given vector.
+ *
+ * @deprecated Use {@link OffsetsMask2D#single}
  */
+@Deprecated
 public class OffsetMask2D extends AbstractMask2D {
 
     private Mask2D mask;
@@ -95,7 +98,7 @@ public class OffsetMask2D extends AbstractMask2D {
 
     @Override
     public Mask2D copy2D() {
-        return new OffsetMask2D(mask.copy2D(), BlockVector2.at(offset.getX(), offset.getZ()));
+        return OffsetsMask2D.single(mask.copy2D(), BlockVector2.at(offset.getX(), offset.getZ()));
     }
     //FAWE end
 
