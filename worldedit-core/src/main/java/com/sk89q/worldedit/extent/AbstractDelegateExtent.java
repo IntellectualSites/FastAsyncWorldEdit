@@ -23,29 +23,43 @@ import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.HistoryExtent;
 import com.fastasyncworldedit.core.extent.NullExtent;
+import com.fastasyncworldedit.core.extent.processor.heightmap.HeightMapType;
+import com.fastasyncworldedit.core.function.generator.GenBase;
+import com.fastasyncworldedit.core.function.generator.Resource;
 import com.fastasyncworldedit.core.history.changeset.AbstractChangeSet;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
+import com.fastasyncworldedit.core.math.MutableBlockVector3;
+import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IBatchProcessor;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.buffer.ForgetfulExtentBuffer;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
+import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.OperationQueue;
+import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.util.Countable;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockType;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -53,9 +67,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * A base class for {@link Extent}s that merely passes extents onto another.
  */
-//FAWE start - made none abstract
-public class AbstractDelegateExtent implements Extent {
-//FAWE end
+public abstract class AbstractDelegateExtent implements Extent {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -68,7 +80,7 @@ public class AbstractDelegateExtent implements Extent {
      *
      * @param extent the extent
      */
-    public AbstractDelegateExtent(Extent extent) {
+    protected AbstractDelegateExtent(Extent extent) {
         checkNotNull(extent);
         this.extent = extent;
     }
@@ -113,6 +125,12 @@ public class AbstractDelegateExtent implements Extent {
         //FAWE start - return coordinates
         return extent.getFullBlock(x, y, z);
         //FAWE end
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public BiomeType getBiome(final BlockVector2 position) {
+        return extent.getBiome(position);
     }
 
     @Override
@@ -226,8 +244,217 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public boolean isWorld() {
+        return extent.isWorld();
+    }
+
+    @Override
+    public boolean regenerateChunk(
+            final int x,
+            final int z,
+            @Nullable final BiomeType type,
+            @Nullable final Long seed
+    ) {
+        return extent.regenerateChunk(x, z, type, seed);
+    }
+
+    @Override
+    public int getHighestTerrainBlock(final int x, final int z, final int minY, final int maxY) {
+        return extent.getHighestTerrainBlock(x, z, minY, maxY);
+    }
+
+    @Override
+    public int getHighestTerrainBlock(final int x, final int z, final int minY, final int maxY, final Mask filter) {
+        return extent.getHighestTerrainBlock(x, z, minY, maxY, filter);
+    }
+
+    @Override
+    public int getNearestSurfaceLayer(final int x, final int z, final int y, final int minY, final int maxY) {
+        return extent.getNearestSurfaceLayer(x, z, y, minY, maxY);
+    }
+
+    @Override
+    public int getNearestSurfaceTerrainBlock(
+            final int x,
+            final int z,
+            final int y,
+            final int minY,
+            final int maxY,
+            final int failedMin,
+            final int failedMax,
+            final Mask mask
+    ) {
+        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, mask);
+    }
+
+    @Override
+    public int getNearestSurfaceTerrainBlock(
+            final int x,
+            final int z,
+            final int y,
+            final int minY,
+            final int maxY,
+            final boolean ignoreAir
+    ) {
+        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, ignoreAir);
+    }
+
+    @Override
+    public int getNearestSurfaceTerrainBlock(final int x, final int z, final int y, final int minY, final int maxY) {
+        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY);
+    }
+
+    @Override
+    public int getNearestSurfaceTerrainBlock(
+            final int x,
+            final int z,
+            final int y,
+            final int minY,
+            final int maxY,
+            final int failedMin,
+            final int failedMax
+    ) {
+        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax);
+    }
+
+    @Override
+    public int getNearestSurfaceTerrainBlock(
+            final int x,
+            final int z,
+            final int y,
+            final int minY,
+            final int maxY,
+            final int failedMin,
+            final int failedMax,
+            final boolean ignoreAir
+    ) {
+        return extent.getNearestSurfaceTerrainBlock(x, z, y, minY, maxY, failedMin, failedMax, ignoreAir);
+    }
+
+    @Override
+    public void addCaves(final Region region) throws WorldEditException {
+        extent.addCaves(region);
+    }
+
+    @Override
+    public void generate(final Region region, final GenBase gen) throws WorldEditException {
+        extent.generate(region, gen);
+    }
+
+    @Override
+    public void addSchems(
+            final Region region,
+            final Mask mask,
+            final List<ClipboardHolder> clipboards,
+            final int rarity,
+            final boolean rotate
+    ) throws WorldEditException {
+        extent.addSchems(region, mask, clipboards, rarity, rotate);
+    }
+
+    @Override
+    public void spawnResource(final Region region, final Resource gen, final int rarity, final int frequency) throws
+            WorldEditException {
+        extent.spawnResource(region, gen, rarity, frequency);
+    }
+
+    @Override
+    public boolean contains(final BlockVector3 pt) {
+        return extent.contains(pt);
+    }
+
+    @Override
+    public boolean contains(final int x, final int y, final int z) {
+        return extent.contains(x, y, z);
+    }
+
+    @Override
+    public void addOre(
+            final Region region,
+            final Mask mask,
+            final Pattern material,
+            final int size,
+            final int frequency,
+            final int rarity,
+            final int minY,
+            final int maxY
+    ) throws WorldEditException {
+        extent.addOre(region, mask, material, size, frequency, rarity, minY, maxY);
+    }
+
+    @Override
+    public void addOres(final Region region, final Mask mask) throws WorldEditException {
+        extent.addOres(region, mask);
+    }
+
+    @Override
+    public List<Countable<BlockType>> getBlockDistribution(final Region region) {
+        return extent.getBlockDistribution(region);
+    }
+
+    @Override
+    public List<Countable<BlockState>> getBlockDistributionWithData(final Region region) {
+        return extent.getBlockDistributionWithData(region);
+    }
+
+    @Override
     public int getMaxY() {
         return extent.getMaxY();
+    }
+
+    @Override
+    public Clipboard lazyCopy(final Region region) {
+        return extent.lazyCopy(region);
+    }
+
+    @Override
+    public int countBlocks(final Region region, final Set<BaseBlock> searchBlocks) {
+        return extent.countBlocks(region, searchBlocks);
+    }
+
+    @Override
+    public int countBlocks(final Region region, final Mask searchMask) {
+        return extent.countBlocks(region, searchMask);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> int setBlocks(final Region region, final B block) throws MaxChangedBlocksException {
+        return extent.setBlocks(region, block);
+    }
+
+    @Override
+    public int setBlocks(final Region region, final Pattern pattern) throws MaxChangedBlocksException {
+        return extent.setBlocks(region, pattern);
+    }
+
+    @Override
+    public <B extends BlockStateHolder<B>> int replaceBlocks(
+            final Region region,
+            final Set<BaseBlock> filter,
+            final B replacement
+    ) throws MaxChangedBlocksException {
+        return extent.replaceBlocks(region, filter, replacement);
+    }
+
+    @Override
+    public int replaceBlocks(final Region region, final Set<BaseBlock> filter, final Pattern pattern) throws
+            MaxChangedBlocksException {
+        return extent.replaceBlocks(region, filter, pattern);
+    }
+
+    @Override
+    public int replaceBlocks(final Region region, final Mask mask, final Pattern pattern) throws MaxChangedBlocksException {
+        return extent.replaceBlocks(region, mask, pattern);
+    }
+
+    @Override
+    public int center(final Region region, final Pattern pattern) throws MaxChangedBlocksException {
+        return extent.center(region, pattern);
+    }
+
+    @Override
+    public int setBlocks(final Set<BlockVector3> vset, final Pattern pattern) {
+        return extent.setBlocks(vset, pattern);
     }
 
     @Override
@@ -295,6 +522,16 @@ public class AbstractDelegateExtent implements Extent {
         return this;
     }
 
+    @Override
+    public <T extends Filter> T apply(final Region region, final T filter, final boolean full) {
+        return extent.apply(region, filter, full);
+    }
+
+    @Override
+    public <T extends Filter> T apply(final Iterable<BlockVector3> positions, final T filter) {
+        return extent.apply(positions, filter);
+    }
+
     protected Operation commitBefore() {
         return null;
     }
@@ -308,6 +545,11 @@ public class AbstractDelegateExtent implements Extent {
     public BiomeType getBiome(BlockVector3 position) {
         return extent.getBiome(position);
     }
+
+    @Override
+    public int getEmittedLight(final BlockVector3 position) {
+        return extent.getEmittedLight(position);
+    }
     /*
      History
      */
@@ -318,13 +560,38 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public int getSkyLight(final MutableBlockVector3 position) {
+        return extent.getSkyLight(position);
+    }
+
+    @Override
     public int getSkyLight(int x, int y, int z) {
         return extent.getSkyLight(x, y, z);
     }
 
     @Override
+    public int getBrightness(final MutableBlockVector3 position) {
+        return extent.getBrightness(position);
+    }
+
+    @Override
     public int getBrightness(int x, int y, int z) {
         return extent.getBrightness(x, y, z);
+    }
+
+    @Override
+    public int getOpacity(final MutableBlockVector3 position) {
+        return extent.getOpacity(position);
+    }
+
+    @Override
+    public int getOpacity(final int x, final int y, final int z) {
+        return extent.getOpacity(x, y, z);
+    }
+
+    @Override
+    public int[] getHeightMap(final HeightMapType type) {
+        return extent.getHeightMap(type);
     }
 
     public void setChangeSet(AbstractChangeSet changeSet) {
@@ -366,6 +633,12 @@ public class AbstractDelegateExtent implements Extent {
         return extent.fullySupports3DBiomes();
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public boolean setBiome(final BlockVector2 position, final BiomeType biome) {
+        return extent.setBiome(position, biome);
+    }
+
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
         return extent.setBiome(x, y, z, biome);
@@ -377,13 +650,28 @@ public class AbstractDelegateExtent implements Extent {
     }
 
     @Override
+    public void setBlockLight(final BlockVector3 position, final int value) {
+        extent.setBlockLight(position, value);
+    }
+
+    @Override
     public void setBlockLight(int x, int y, int z, int value) {
         extent.setSkyLight(x, y, z, value);
     }
 
     @Override
+    public void setSkyLight(final BlockVector3 position, final int value) {
+        extent.setSkyLight(position, value);
+    }
+
+    @Override
     public void setSkyLight(int x, int y, int z, int value) {
         extent.setSkyLight(x, y, z, value);
+    }
+
+    @Override
+    public void setHeightMap(final HeightMapType type, final int[] heightMap) {
+        extent.setHeightMap(type, heightMap);
     }
 
     @Override
