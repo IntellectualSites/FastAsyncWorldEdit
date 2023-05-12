@@ -112,11 +112,15 @@ public class WorldEditPlugin extends JavaPlugin {
     private BukkitServerInterface platform;
     private BukkitConfiguration config;
     private BukkitPermissionAttachmentManager permissionAttachmentManager;
+    // Fawe start
+    private BukkitCommandSender bukkitConsoleCommandSender;
+    // Fawe end
 
     @Override
     public void onLoad() {
 
         //FAWE start
+        this.bukkitConsoleCommandSender = new BukkitCommandSender(this, Bukkit.getConsoleSender());
         // This is already covered by Spigot, however, a more pesky warning with a proper explanation over "Ambiguous plugin name..." can't hurt.
         Plugin[] plugins = Bukkit.getServer().getPluginManager().getPlugins();
         for (Plugin p : plugins) {
@@ -594,7 +598,7 @@ public class WorldEditPlugin extends JavaPlugin {
             return new BukkitBlockCommandSender(this, (BlockCommandSender) sender);
         }
 
-        return new BukkitCommandSender(this, sender);
+        return bukkitConsoleCommandSender;
     }
 
     public BukkitServerInterface getInternalPlatform() {
