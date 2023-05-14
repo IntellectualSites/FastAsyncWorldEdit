@@ -42,6 +42,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -56,7 +57,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
 
     private final World world;
     private final AtomicInteger lastException = new AtomicInteger();
-    private final AtomicInteger workers = new AtomicInteger(); // int as drainQueue(true) allows multiple workers
+    private final Semaphore workerSemaphore = new Semaphore(1, false);
     private final ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<>();
     protected volatile boolean closed;
 
@@ -303,7 +304,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public boolean isEmpty() {
-        return queue.isEmpty() && workers.get() == 0 && size() == 0;
+        return queue.isEmpty() && workerSemaphore.availablePermits() == 1 && size() == 0;
     }
 
     public void add(BlockVector3 loc, BaseBlock from, BaseBlock to) {
@@ -384,7 +385,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     private void triggerWorker() {
-        if (workers.get() > 0) {
+        if (workerSemaphore.availablePermits() == 0) {
             return; // fast path to avoid additional tasks: a worker is already draining the queue
         }
         // create a new worker to drain the current queue
@@ -392,14 +393,17 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     private void drainQueue(boolean ignoreRunningState) {
-        // if ignoreRunningState, we allow this thread to drain the queue
-        // even if another thread is already draining
-        if (ignoreRunningState) {
-            workers.incrementAndGet(); // count this additional worker
-        } else {
-            // only start draining from this thread if no other thread is draining already
-            if (!workers.compareAndSet(0, 1)) {
-                return; // already running on other thread
+        if (!workerSemaphore.tryAcquire()) {
+            if (ignoreRunningState) {
+                // ignoreRunningState means we want to block
+                // even if another thread is already draining
+                try {
+                    workerSemaphore.acquire();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            } else {
+                return; // another thread is draining the queue already, ignore
             }
         }
         try {
@@ -411,7 +415,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
                 next.run();
             }
         } finally {
-            workers.decrementAndGet();
+            workerSemaphore.release();
         }
     }
 
