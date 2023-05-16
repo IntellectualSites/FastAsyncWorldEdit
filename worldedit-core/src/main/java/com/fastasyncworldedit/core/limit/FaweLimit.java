@@ -2,6 +2,7 @@ package com.fastasyncworldedit.core.limit;
 
 import com.fastasyncworldedit.core.FaweCache;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class FaweLimit {
@@ -114,10 +115,10 @@ public class FaweLimit {
         MAX.FAST_PLACEMENT = true;
         MAX.CONFIRM_LARGE = true;
         MAX.RESTRICT_HISTORY_TO_REGIONS = false;
-        MAX.STRIP_NBT = null;
+        MAX.STRIP_NBT = Collections.emptySet();
         MAX.UNIVERSAL_DISALLOWED_BLOCKS = false;
-        MAX.DISALLOWED_BLOCKS = null;
-        MAX.REMAP_PROPERTIES = null;
+        MAX.DISALLOWED_BLOCKS = Collections.emptySet();
+        MAX.REMAP_PROPERTIES = Collections.emptySet();
     }
 
     public boolean MAX_CHANGES() {
