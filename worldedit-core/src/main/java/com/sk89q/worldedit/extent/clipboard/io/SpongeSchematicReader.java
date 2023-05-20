@@ -266,8 +266,8 @@ public class SpongeSchematicReader extends NBTSchematicReader {
                 if (id == null) {
                     continue;
                 }
+                values.put("id", id);
                 //FAWE end
-                values.put("id", values.get("Id"));
                 values.remove("Id");
                 values.remove("Pos");
                 if (fixer != null) {
