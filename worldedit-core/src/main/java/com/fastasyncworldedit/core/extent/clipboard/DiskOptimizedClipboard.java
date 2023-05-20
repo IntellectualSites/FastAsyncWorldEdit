@@ -173,7 +173,6 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         nbtMap = new HashMap<>();
         try {
             this.file = file;
-            checkFileLength(file);
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) file.length();
@@ -199,32 +198,6 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         } catch (Throwable t) {
             close();
             throw t;
-        }
-    }
-
-    private void checkFileLength(File file) throws IOException {
-        long expectedFileSize = headerSize + ((long) getVolume() << 1);
-        if (file.length() > Integer.MAX_VALUE) {
-            if (expectedFileSize >= Integer.MAX_VALUE) {
-                throw new IOException(String.format(
-                        "Cannot load clipboard of file size: %d > 2147483647 bytes (2.147 GiB), " + "volume: %d blocks",
-                        file.length(),
-                        getVolume()
-                ));
-            } else {
-                throw new IOException(String.format(
-                        "Cannot load clipboard of file size > 2147483647 bytes (2.147 GiB). Possible corrupt file? Mismatch" +
-                                " between volume `%d` and file length `%d`!",
-                        file.length(),
-                        getVolume()
-                ));
-            }
-        } else if (expectedFileSize != file.length()) {
-            throw new IOException(String.format(
-                    "Possible corrupt clipboard file? Mismatch between expected file size `%d` and actual file size `%d`!",
-                    expectedFileSize,
-                    file.length()
-            ));
         }
     }
 
