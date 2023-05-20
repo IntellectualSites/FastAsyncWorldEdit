@@ -170,7 +170,7 @@ class Int2BaseBlockMap extends AbstractInt2ObjectMap<BaseBlock> {
             return old;
         }
         int oldId = commonMap.put(key, internalId);
-        return assumeAsBlock(oldId);
+        return BlockStateIdAccess.isValidInternalId(oldId) ? assumeAsBlock(oldId) : uncommonMap.remove(key);
     }
 
     @Override
