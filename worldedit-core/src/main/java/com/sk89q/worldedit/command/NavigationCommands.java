@@ -60,7 +60,10 @@ public class NavigationCommands {
             aliases = {"!", "/unstuck"},
             desc = "Escape from being stuck inside a block"
     )
-    @CommandPermissions("worldedit.navigation.unstuck")
+    @CommandPermissions(
+            value = "worldedit.navigation.unstuck",
+            queued = false
+    )
     public void unstuck(Player player) throws WorldEditException {
         player.findFreePosition();
         player.print(Caption.of("worldedit.unstuck.moved"));
@@ -71,7 +74,10 @@ public class NavigationCommands {
             aliases = {"asc", "/asc", "/ascend"},
             desc = "Go up a floor"
     )
-    @CommandPermissions("worldedit.navigation.ascend")
+    @CommandPermissions(
+            value = "worldedit.navigation.ascend",
+            queued = false
+    )
     public void ascend(
             Player player,
             @Arg(desc = "# of levels to ascend", def = "1")
@@ -96,7 +102,10 @@ public class NavigationCommands {
             aliases = {"desc", "/desc", "/descend"},
             desc = "Go down a floor"
     )
-    @CommandPermissions("worldedit.navigation.descend")
+    @CommandPermissions(
+            value = "worldedit.navigation.descend",
+            queued = false
+    )
     public void descend(
             Player player,
             @Arg(desc = "# of levels to descend", def = "1")
@@ -147,7 +156,10 @@ public class NavigationCommands {
             aliases = {"/thru"},
             desc = "Pass through walls"
     )
-    @CommandPermissions("worldedit.navigation.thru.command")
+    @CommandPermissions(
+            value = "worldedit.navigation.thru.command",
+            queued = false
+    )
     public void thru(Player player) throws WorldEditException {
         if (player.passThroughForwardWall(6)) {
             player.print(Caption.of("worldedit.thru.moved"));
@@ -161,7 +173,10 @@ public class NavigationCommands {
             aliases = {"j", "/jumpto", "/j"},
             desc = "Teleport to a location"
     )
-    @CommandPermissions("worldedit.navigation.jumpto.command")
+    @CommandPermissions(
+            value = "worldedit.navigation.jumpto.command",
+            queued = false
+    )
     public void jumpTo(
             Player player,
             @Arg(desc = "Location to jump to", def = "")

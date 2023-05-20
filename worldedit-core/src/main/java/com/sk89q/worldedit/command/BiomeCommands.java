@@ -82,7 +82,10 @@ public class BiomeCommands {
             aliases = {"biomels", "/biomelist", "/listbiomes"},
             desc = "Gets all biomes available."
     )
-    @CommandPermissions("worldedit.biome.list")
+    @CommandPermissions(
+            value = "worldedit.biome.list",
+            queued = false
+    )
     public void biomeList(
             Actor actor,
             @ArgFlag(name = 'p', desc = "Page number.", def = "1")

@@ -140,7 +140,10 @@ public class RegionCommands {
             name = "/test",
             desc = "test region"
     )
-    @CommandPermissions("worldedit.region.test")
+    @CommandPermissions(
+            value = "worldedit.region.test",
+            queued = false
+    )
     @Logging(REGION)
     public void test(
             Actor actor, EditSession editSession,
@@ -175,7 +178,10 @@ public class RegionCommands {
             aliases = "/nbt",
             desc = "View nbt info for a block"
     )
-    @CommandPermissions("worldedit.nbtinfo")
+    @CommandPermissions(
+            value = "worldedit.nbtinfo",
+            queued = false
+    )
     public void nbtinfo(Player player, EditSession editSession) {
         Location pos = player.getBlockTrace(128);
         if (pos == null) {
@@ -228,13 +234,12 @@ public class RegionCommands {
             @Switch(name = 'h', desc = "Generate only a shell")
                     boolean shell
     ) throws WorldEditException {
-        if (!(region instanceof CuboidRegion)) {
+        if (!(region instanceof CuboidRegion cuboidregion)) {
             actor.print(Caption.of("worldedit.line.cuboid-only"));
             return 0;
         }
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
 
-        CuboidRegion cuboidregion = (CuboidRegion) region;
         BlockVector3 pos1 = cuboidregion.getPos1();
         BlockVector3 pos2 = cuboidregion.getPos2();
         int blocksChanged = editSession.drawLine(pattern, pos1, pos2, thickness, !shell);
@@ -261,13 +266,12 @@ public class RegionCommands {
             @Switch(name = 'h', desc = "Generate only a shell")
                     boolean shell
     ) throws WorldEditException {
-        if (!(region instanceof ConvexPolyhedralRegion)) {
+        if (!(region instanceof ConvexPolyhedralRegion cpregion)) {
             actor.print(Caption.of("worldedit.curve.invalid-type"));
             return 0;
         }
         checkCommandArgument(thickness >= 0, "Thickness must be >= 0");
 
-        ConvexPolyhedralRegion cpregion = (ConvexPolyhedralRegion) region;
         List<BlockVector3> vectors = new ArrayList<>(cpregion.getVertices());
 
         int blocksChanged = editSession.drawSpline(pattern, vectors, 0, 0, 0, 10, thickness, !shell);
@@ -468,7 +472,10 @@ public class RegionCommands {
             desc = "Bypass region restrictions",
             descFooter = "Bypass region restrictions"
     )
-    @CommandPermissions("fawe.admin")
+    @CommandPermissions(
+            value = "fawe.admin",
+            queued = false
+    )
     public void wea(Actor actor) throws WorldEditException {
         if (actor.togglePermission("fawe.bypass")) {
             actor.print(Caption.of("fawe.info.worldedit.bypassed"));
@@ -697,7 +704,7 @@ public class RegionCommands {
             actor.print(Caption.of("fawe.regen.time"));
             //FAWE end
             RegenOptions options = RegenOptions.builder()
-                    .seed(!randomSeed ? seed : new Long(ThreadLocalRandom.current().nextLong()))
+                    .seed(!randomSeed ? seed : Long.valueOf(ThreadLocalRandom.current().nextLong()))
                     .regenBiomes(regenBiomes)
                     .biomeType(biomeType)
                     .build();
@@ -718,9 +725,10 @@ public class RegionCommands {
     @Command(
             name = "/deform",
             desc = "Deforms a selected region with an expression",
-            descFooter = "The expression is executed for each block and is expected\n"
-                    + "to modify the variables x, y and z to point to a new block\n"
-                    + "to fetch. For details, see https://ehub.to/we/expr"
+            descFooter = """
+                    The expression is executed for each block and is expected
+                    to modify the variables x, y and z to point to a new block
+                    to fetch. For details, see https://ehub.to/we/expr"""
     )
     @CommandPermissions("worldedit.region.deform")
     @Logging(ALL)
@@ -794,9 +802,10 @@ public class RegionCommands {
     @Command(
             name = "/hollow",
             desc = "Hollows out the object contained in this selection",
-            descFooter = "Hollows out the object contained in this selection.\n"
-                    + "Optionally fills the hollowed out part with the given block.\n"
-                    + "Thickness is measured in manhattan distance."
+            descFooter = """
+                    Hollows out the object contained in this selection.
+                    Optionally fills the hollowed out part with the given block.
+                    Thickness is measured in manhattan distance."""
     )
     @CommandPermissions("worldedit.region.hollow")
     @Logging(REGION)

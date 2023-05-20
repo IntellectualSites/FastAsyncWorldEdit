@@ -223,7 +223,10 @@ public class HistorySubCommands {
             aliases = {"summary", "summarize"},
             desc = "Summarize an edit"
     )
-    @CommandPermissions("worldedit.history.info")
+    @CommandPermissions(
+            value = "worldedit.history.info",
+            queued = false
+    )
     public synchronized void summary(
             Player player, RollbackDatabase database, Arguments arguments,
             @Arg(desc = "Player uuid/name")
@@ -314,8 +317,7 @@ public class HistorySubCommands {
                     public Component apply(@Nullable Supplier<? extends ChangeSet> input) {
                         ChangeSet edit = input.get();
 
-                        if (edit instanceof RollbackOptimizedHistory) {
-                            RollbackOptimizedHistory rollback = (RollbackOptimizedHistory) edit;
+                        if (edit instanceof RollbackOptimizedHistory rollback) {
 
                             UUID uuid = rollback.getUUID();
                             int index = rollback.getIndex();
@@ -368,7 +370,10 @@ public class HistorySubCommands {
             aliases = {"inspect", "search", "near"},
             desc = "Find nearby edits"
     )
-    @CommandPermissions("worldedit.history.find")
+    @CommandPermissions(
+            value = "worldedit.history.find",
+            queued = false
+    )
     public synchronized void find(
             Player player, World world, RollbackDatabase database, Arguments arguments,
             @ArgFlag(name = 'u', def = "", desc = "String user")
@@ -429,7 +434,10 @@ public class HistorySubCommands {
             aliases = {"distribution"},
             desc = "View block distribution for an edit"
     )
-    @CommandPermissions("worldedit.history.distr")
+    @CommandPermissions(
+            value = "worldedit.history.distr",
+            queued = false
+    )
     public void distr(
             Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
             @Arg(desc = "Player uuid/name")
@@ -468,7 +476,10 @@ public class HistorySubCommands {
             name = "list",
             desc = "List your history"
     )
-    @CommandPermissions("worldedit.history.list")
+    @CommandPermissions(
+            value = "worldedit.history.list",
+            queued = false
+    )
     public void list(
             Player player, LocalSession session, RollbackDatabase database, Arguments arguments,
             @Arg(desc = "Player uuid/name")
@@ -476,7 +487,6 @@ public class HistorySubCommands {
             @ArgFlag(name = 'p', desc = "Page to view.", def = "")
                     Integer page
     ) {
-        int index = session.getHistoryIndex();
         List<Supplier<? extends ChangeSet>> history = Lists.transform(
                 session.getHistory(),
                 (Function<ChangeSet, Supplier<ChangeSet>>) input -> () -> input

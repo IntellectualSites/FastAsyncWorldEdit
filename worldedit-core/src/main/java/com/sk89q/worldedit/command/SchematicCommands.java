@@ -26,7 +26,6 @@ import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.io.schematic.MinecraftStructure;
 import com.fastasyncworldedit.core.util.MainUtil;
-import com.google.common.base.Function;
 import com.google.common.collect.Multimap;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
@@ -90,6 +89,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.fastasyncworldedit.core.util.ReflectionUtils.as;
@@ -209,11 +209,9 @@ public class SchematicCommands {
         }
 
         ClipboardHolder clipboard = session.getClipboard();
-        if (clipboard instanceof URIClipboardHolder) {
-            URIClipboardHolder identifiable = (URIClipboardHolder) clipboard;
+        if (clipboard instanceof URIClipboardHolder identifiable) {
             if (identifiable.contains(uri)) {
-                if (identifiable instanceof MultiClipboardHolder) {
-                    MultiClipboardHolder multi = (MultiClipboardHolder) identifiable;
+                if (identifiable instanceof MultiClipboardHolder multi) {
                     multi.remove(uri);
                     if (multi.getHolders().isEmpty()) {
                         session.setClipboard(null);
@@ -319,7 +317,7 @@ public class SchematicCommands {
         LocalConfiguration config = worldEdit.getConfiguration();
 
         //FAWE start
-        ClipboardFormat format = null;
+        ClipboardFormat format;
         InputStream in = null;
         try {
             URI uri;
@@ -526,7 +524,10 @@ public class SchematicCommands {
             aliases = {"listformats", "f"},
             desc = "List available formats"
     )
-    @CommandPermissions("worldedit.schematic.formats")
+    @CommandPermissions(
+            value = "worldedit.schematic.formats",
+            queued = false
+    )
     public void formats(Actor actor) {
         actor.print(Caption.of("worldedit.schematic.formats.title"));
         StringBuilder builder;
@@ -552,7 +553,10 @@ public class SchematicCommands {
             desc = "List saved schematics",
             descFooter = "Note: Format is not fully verified until loading."
     )
-    @CommandPermissions("worldedit.schematic.list")
+    @CommandPermissions(
+            value = "worldedit.schematic.list",
+            queued = false
+    )
     public void list(
             Actor actor, LocalSession session,
             @ArgFlag(name = 'p', desc = "Page to view.", def = "1")
@@ -823,7 +827,6 @@ public class SchematicCommands {
             final String SCHEMATIC_NAME = file.getName();
 
             double oldKbOverwritten = 0;
-            String overwrittenPath = curFilepath;
 
             int numFiles = -1;
             if (checkFilesize) {
@@ -839,10 +842,10 @@ public class SchematicCommands {
                 if (overwrite) {
                     oldKbOverwritten = Files.size(Paths.get(file.getAbsolutePath())) / 1000.0;
                     int iter = 1;
-                    while (new File(overwrittenPath + "." + iter + "." + format.getPrimaryFileExtension()).exists()) {
+                    while (new File(curFilepath + "." + iter + "." + format.getPrimaryFileExtension()).exists()) {
                         iter++;
                     }
-                    file = new File(overwrittenPath + "." + iter + "." + format.getPrimaryFileExtension());
+                    file = new File(curFilepath + "." + iter + "." + format.getPrimaryFileExtension());
                 }
             }
 

@@ -314,7 +314,10 @@ public class SelectionCommands {
             name = "/wand",
             desc = "Get the wand object"
     )
-    @CommandPermissions("worldedit.wand")
+    @CommandPermissions(
+            value = "worldedit.wand",
+            queued = false
+    )
     public void wand(
             Player player, LocalSession session,
             @Switch(name = 'n', desc = "Get a navigation wand") boolean navWand
@@ -348,7 +351,10 @@ public class SelectionCommands {
             aliases = {"/toggleeditwand"},
             desc = "Remind the user that the wand is now a tool and can be unbound with /tool none."
     )
-    @CommandPermissions("worldedit.wand.toggle")
+    @CommandPermissions(
+            value = "worldedit.wand.toggle",
+            queued = false
+    )
     public void toggleWand(Player player) {
         player.print(
                 Caption.of(
@@ -499,7 +505,10 @@ public class SelectionCommands {
             name = "/size",
             desc = "Get information about the selection"
     )
-    @CommandPermissions("worldedit.selection.size")
+    @CommandPermissions(
+            value = "worldedit.selection.size",
+            queued = false
+    )
     public void size(
             Actor actor, World world, LocalSession session,
             @Switch(name = 'c', desc = "Get clipboard info instead")
@@ -662,15 +671,15 @@ public class SelectionCommands {
 
         final RegionSelector newSelector;
         switch (selector) {
-            case CUBOID:
+            case CUBOID -> {
                 newSelector = new CuboidRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.cuboid.message"));
-                break;
-            case EXTEND:
+            }
+            case EXTEND -> {
                 newSelector = new ExtendingCuboidRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.extend.message"));
-                break;
-            case POLY: {
+            }
+            case POLY -> {
                 newSelector = new Polygonal2DRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.poly.message"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolygonVertexLimit();
@@ -678,23 +687,20 @@ public class SelectionCommands {
                         "worldedit.select.poly.limit-message",
                         TextComponent.of(integer)
                 )));
-                break;
             }
-            case ELLIPSOID:
+            case ELLIPSOID -> {
                 newSelector = new EllipsoidRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.ellipsoid.message"));
-                break;
-            case SPHERE:
+            }
+            case SPHERE -> {
                 newSelector = new SphereRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.sphere.message"));
-                break;
-            case CYL:
+            }
+            case CYL -> {
                 newSelector = new CylinderRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.cyl.message"));
-                break;
-            case CONVEX:
-            case HULL:
-            case POLYHEDRON: {
+            }
+            case CONVEX, HULL, POLYHEDRON -> {
                 newSelector = new ConvexPolyhedralRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.convex.message"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
@@ -702,31 +708,28 @@ public class SelectionCommands {
                         "worldedit.select.convex.limit-message",
                         TextComponent.of(integer)
                 )));
-                break;
             }
+
             //FAWE start
-            case POLYHEDRAL:
+            case POLYHEDRAL -> {
                 newSelector = new PolyhedralRegionSelector(world);
                 actor.print(Caption.of("fawe.selection.sel.convex.polyhedral"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
                 limit.ifPresent(integer -> actor.print(Caption.of("fawe.selection.sel.max", integer)));
                 actor.print(Caption.of("fawe.selection.sel.list"));
-                break;
-            case FUZZY:
-            case MAGIC:
+            }
+            case FUZZY, MAGIC -> {
                 Mask maskOpt = new IdMask(world);
                 newSelector = new FuzzyRegionSelector(actor, world, maskOpt);
                 actor.print(Caption.of("fawe.selection.sel.fuzzy"));
                 actor.print(Caption.of("fawe.selection.sel.list"));
-                break;
+            }
             //FAWE end
-            case LIST:
-            default:
+            case LIST, default -> {
                 CommandListBox box = new CommandListBox("Selection modes", null, null);
                 box.setHidingHelp(true);
                 TextComponentProducer contents = box.getContents();
                 contents.append(SubtleFormat.wrap("Select one of the modes below:")).newline();
-
                 box.appendCommand("cuboid", Caption.of("worldedit.select.cuboid.description"), "//sel cuboid");
                 box.appendCommand("extend", Caption.of("worldedit.select.extend.description"), "//sel extend");
                 box.appendCommand("poly", Caption.of("worldedit.select.poly.description"), "//sel poly");
@@ -734,6 +737,7 @@ public class SelectionCommands {
                 box.appendCommand("sphere", Caption.of("worldedit.select.sphere.description"), "//sel sphere");
                 box.appendCommand("cyl", Caption.of("worldedit.select.cyl.description"), "//sel cyl");
                 box.appendCommand("convex", Caption.of("worldedit.select.convex.description"), "//sel convex");
+
                 //FAWE start
                 box.appendCommand("polyhedral", Caption.of("fawe.selection.sel.polyhedral"), "//sel polyhedral");
                 box.appendCommand("fuzzy[=<mask>]", Caption.of("fawe.selection.sel.fuzzy-instruction"), "//sel fuzzy[=<mask>]");
@@ -742,6 +746,7 @@ public class SelectionCommands {
 
                 actor.print(box.create(1));
                 return;
+            }
         }
 
         if (setDefaultSelector) {
