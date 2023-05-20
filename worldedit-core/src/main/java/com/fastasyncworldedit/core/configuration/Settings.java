@@ -102,11 +102,10 @@ public class Settings extends Config {
 
     public FaweLimit getLimit(Actor actor) {
         FaweLimit limit;
-        if (actor.hasPermission("fawe.limit.*") || actor.hasPermission("fawe.bypass")) {
-            limit = FaweLimit.MAX.copy();
-        } else {
-            limit = new FaweLimit();
+        if (actor.hasPermission("fawe.bypass") || actor.hasPermission("fawe.limit.unlimited")) {
+            return FaweLimit.MAX.copy();
         }
+        limit = new FaweLimit();
         ArrayList<String> keys = new ArrayList<>(LIMITS.getSections());
         if (keys.remove("default")) {
             keys.add("default");
