@@ -87,9 +87,16 @@ class BlockMapTest {
                 Stream.of(Capability.values())
                         .collect(Collectors.toMap(Function.identity(), __ -> Preference.NORMAL))
         );
+        when(MOCKED_PLATFORM.getConfiguration()).thenReturn(new LocalConfiguration() {
+            @Override
+            public void load() {
+            }
+        });
         PlatformManager platformManager = WorldEdit.getInstance().getPlatformManager();
         platformManager.register(MOCKED_PLATFORM);
         WorldEdit.getInstance().getEventBus().post(new PlatformsRegisteredEvent());
+
+        assertTrue(WorldEdit.getInstance().getPlatformManager().isInitialized(), "Platform is not initialized");
 
         registerBlock("minecraft:air");
         registerBlock("minecraft:oak_wood");
