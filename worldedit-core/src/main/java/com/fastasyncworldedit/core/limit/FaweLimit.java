@@ -242,7 +242,7 @@ public class FaweLimit {
                 && FAST_PLACEMENT
                 && !RESTRICT_HISTORY_TO_REGIONS
                 && (STRIP_NBT == null || STRIP_NBT.isEmpty())
-                && !UNIVERSAL_DISALLOWED_BLOCKS
+                // && !UNIVERSAL_DISALLOWED_BLOCKS --> do not include this, it effectively has no relevance
                 && (DISALLOWED_BLOCKS == null || DISALLOWED_BLOCKS.isEmpty())
                 && (REMAP_PROPERTIES == null || REMAP_PROPERTIES.isEmpty());
     }
