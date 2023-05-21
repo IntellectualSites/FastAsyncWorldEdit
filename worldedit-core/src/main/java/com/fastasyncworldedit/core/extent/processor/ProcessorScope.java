@@ -3,9 +3,9 @@ package com.fastasyncworldedit.core.extent.processor;
 /**
  * The scope of a processor.
  * Order in which processors are executed:
- * - ADDING_BLOCKS (processors that strictly ADD blocks to an edit ONLY)
- * - CHANGING_BLOCKS (processors that strictly ADD or CHANGE blocks being set)
- * - REMOVING_BLOCKS (processors that string ADD, CHANGE or REMOVE blocks being set)
+ * - ADDING_BLOCKS (processors that may ADD blocks to an edit ONLY)
+ * - CHANGING_BLOCKS (processors that may ADD or CHANGE blocks being set)
+ * - REMOVING_BLOCKS (processors that may ADD, CHANGE or REMOVE blocks being set)
  * - CUSTOM (processors that do not specify a SCOPE)
  * - READING_SET_BLOCKS (processors that do not alter blocks at all, and read the blocks that are actually going to set, e.g. history processors)
  */

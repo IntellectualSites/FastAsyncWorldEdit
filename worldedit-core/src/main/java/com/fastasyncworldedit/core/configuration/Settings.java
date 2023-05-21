@@ -102,11 +102,10 @@ public class Settings extends Config {
 
     public FaweLimit getLimit(Actor actor) {
         FaweLimit limit;
-        if (actor.hasPermission("fawe.limit.*") || actor.hasPermission("fawe.bypass")) {
-            limit = FaweLimit.MAX.copy();
-        } else {
-            limit = new FaweLimit();
+        if (actor.hasPermission("fawe.bypass") || actor.hasPermission("fawe.limit.unlimited")) {
+            return FaweLimit.MAX.copy();
         }
+        limit = new FaweLimit();
         ArrayList<String> keys = new ArrayList<>(LIMITS.getSections());
         if (keys.remove("default")) {
             keys.add("default");
@@ -695,7 +694,7 @@ public class Settings extends Config {
     public static class TICK_LIMITER {
 
         @Comment("Enable the limiter")
-        public boolean ENABLED = true;
+        public boolean ENABLED = false;
         @Comment("The interval in ticks")
         public int INTERVAL = 20;
         @Comment("Max falling blocks per interval (per chunk)")
@@ -704,12 +703,6 @@ public class Settings extends Config {
         public int PHYSICS_MS = 10;
         @Comment("Max item spawns per interval (per chunk)")
         public int ITEMS = 256;
-        @Comment({
-                "Whether fireworks can load chunks",
-                " - Fireworks usually travel vertically so do not load any chunks",
-                " - Horizontal fireworks can be hacked in to crash a server"
-        })
-        public boolean FIREWORKS_LOAD_CHUNKS = false;
 
     }
 
