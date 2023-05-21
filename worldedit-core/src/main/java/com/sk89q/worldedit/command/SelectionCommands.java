@@ -671,15 +671,15 @@ public class SelectionCommands {
 
         final RegionSelector newSelector;
         switch (selector) {
-            case CUBOID -> {
+            case CUBOID:
                 newSelector = new CuboidRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.cuboid.message"));
-            }
-            case EXTEND -> {
+                break;
+            case EXTEND:
                 newSelector = new ExtendingCuboidRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.extend.message"));
-            }
-            case POLY -> {
+                break;
+            case POLY: {
                 newSelector = new Polygonal2DRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.poly.message"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolygonVertexLimit();
@@ -687,20 +687,23 @@ public class SelectionCommands {
                         "worldedit.select.poly.limit-message",
                         TextComponent.of(integer)
                 )));
+                break;
             }
-            case ELLIPSOID -> {
+            case ELLIPSOID:
                 newSelector = new EllipsoidRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.ellipsoid.message"));
-            }
-            case SPHERE -> {
+                break;
+            case SPHERE:
                 newSelector = new SphereRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.sphere.message"));
-            }
-            case CYL -> {
+                break;
+            case CYL:
                 newSelector = new CylinderRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.cyl.message"));
-            }
-            case CONVEX, HULL, POLYHEDRON -> {
+                break;
+            case CONVEX:
+            case HULL:
+            case POLYHEDRON: {
                 newSelector = new ConvexPolyhedralRegionSelector(oldSelector);
                 actor.print(Caption.of("worldedit.select.convex.message"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
@@ -708,28 +711,31 @@ public class SelectionCommands {
                         "worldedit.select.convex.limit-message",
                         TextComponent.of(integer)
                 )));
+                break;
             }
-
             //FAWE start
-            case POLYHEDRAL -> {
+            case POLYHEDRAL:
                 newSelector = new PolyhedralRegionSelector(world);
                 actor.print(Caption.of("fawe.selection.sel.convex.polyhedral"));
                 Optional<Integer> limit = ActorSelectorLimits.forActor(actor).getPolyhedronVertexLimit();
                 limit.ifPresent(integer -> actor.print(Caption.of("fawe.selection.sel.max", integer)));
                 actor.print(Caption.of("fawe.selection.sel.list"));
-            }
-            case FUZZY, MAGIC -> {
+                break;
+            case FUZZY:
+            case MAGIC:
                 Mask maskOpt = new IdMask(world);
                 newSelector = new FuzzyRegionSelector(actor, world, maskOpt);
                 actor.print(Caption.of("fawe.selection.sel.fuzzy"));
                 actor.print(Caption.of("fawe.selection.sel.list"));
-            }
+                break;
             //FAWE end
-            case LIST, default -> {
+            case LIST:
+            default:
                 CommandListBox box = new CommandListBox("Selection modes", null, null);
                 box.setHidingHelp(true);
                 TextComponentProducer contents = box.getContents();
                 contents.append(SubtleFormat.wrap("Select one of the modes below:")).newline();
+
                 box.appendCommand("cuboid", Caption.of("worldedit.select.cuboid.description"), "//sel cuboid");
                 box.appendCommand("extend", Caption.of("worldedit.select.extend.description"), "//sel extend");
                 box.appendCommand("poly", Caption.of("worldedit.select.poly.description"), "//sel poly");
@@ -746,7 +752,6 @@ public class SelectionCommands {
 
                 actor.print(box.create(1));
                 return;
-            }
         }
 
         if (setDefaultSelector) {

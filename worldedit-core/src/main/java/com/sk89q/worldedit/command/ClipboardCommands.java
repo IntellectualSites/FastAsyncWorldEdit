@@ -282,8 +282,8 @@ public class ClipboardCommands {
     private void createCopy(
             final LocalSession session,
             final EditSession editSession,
-            @Switch(name = 'b', desc = "Also copy biomes") final boolean copyBiomes,
-            @ArgFlag(name = 'm', desc = "Set the include mask, non-matching blocks become air", def = "") final Mask mask,
+            final boolean copyBiomes,
+            final Mask mask,
             final Clipboard clipboard,
             final ForwardExtentCopy copy
     ) {

@@ -1202,16 +1202,12 @@ public class BrushCommands {
             brush = new HollowSphereBrush();
         } else {
             //FAWE start - Suggest different brush material if sand or gravel is used
-            if (pattern instanceof BlockStateHolder) {
-                BlockType type = ((BlockStateHolder<?>) pattern).getBlockType();
-                switch (type.getId()) {
-                    case "minecraft:sand", "minecraft:gravel" -> {
-                        player.print(
-                                Caption.of("fawe.worldedit.brush.brush.try.other"));
-                        falling = true;
-                    }
-                    default -> {
-                    }
+            if (pattern instanceof BlockStateHolder<?> holder) {
+                BlockType type = holder.getBlockType();
+                if (type == BlockTypes.SAND || type == BlockTypes.GRAVEL) {
+                    player.print(
+                            Caption.of("fawe.worldedit.brush.brush.try.other"));
+                    falling = true;
                 }
             }
             if (falling) {
