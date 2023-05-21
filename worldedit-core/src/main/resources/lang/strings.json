@@ -296,6 +296,7 @@
   "worldedit.brush.butcher.equip": "Butcher brush equipped ({0}).",
   "worldedit.brush.operation.equip": "Set brush to {0}.",
   "worldedit.brush.morph.equip": "Morph brush shape equipped: {0}.",
+  "worldedit.brush.biome.column-supported-types": "This brush shape is not supported with whole-column brushing, try the cylinder shape.",
   "worldedit.brush.none.equip": "Brush unbound from your current item.",
   "worldedit.brush.none.equipped": "You have no brush bound to your current item. Try /brush sphere for a basic brush.",
   "worldedit.setbiome.changed": "Biomes were changed in {0} columns. You may have to rejoin your game (or close and reopen your world) to see a change.",
