@@ -107,8 +107,12 @@ import com.sk89q.worldedit.internal.annotation.ClipboardMask;
 import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.regions.factory.CuboidRegionFactory;
 import com.sk89q.worldedit.regions.factory.CylinderRegionFactory;
+import com.sk89q.worldedit.regions.factory.FixedHeightCuboidRegionFactory;
+import com.sk89q.worldedit.regions.factory.FixedHeightCylinderRegionFactory;
 import com.sk89q.worldedit.regions.factory.RegionFactory;
+import com.sk89q.worldedit.regions.factory.SphereRegionFactory;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.HandSide;
 import com.sk89q.worldedit.util.TreeGenerator;
@@ -1561,19 +1565,31 @@ public class BrushCommands {
             desc = "Biome brush, sets biomes in the area"
     )
     @CommandPermissions("worldedit.brush.biome")
-    public void biome(
-            Player player, LocalSession localSession,
-            @Arg(desc = "The shape of the region")
+    public void biome(Player player, LocalSession localSession,
+              @Arg(desc = "The shape of the region")
                     RegionFactory shape,
-            @Arg(desc = "The size of the brush", def = "5")
+              @Arg(desc = "The size of the brush", def = "5")
                     double radius,
-            @Arg(desc = "The biome type")
-                    BiomeType biomeType
+              @Arg(desc = "The biome type")
+                    BiomeType biomeType,
+              @Switch(name = 'c', desc = "Whether to set the full column")
+                    boolean column
     ) throws WorldEditException {
-        setOperationBasedBrush(
-                player, localSession, radius,
-                new ApplyRegion(new BiomeFactory(biomeType)), shape, "worldedit.brush.biome"
-        );
+        if (column) {
+            // Convert this shape factory to a column-based one, if possible
+            if (shape instanceof CylinderRegionFactory || shape instanceof SphereRegionFactory) {
+                // Sphere regions that are Y-expended are just cylinders
+                shape = new FixedHeightCylinderRegionFactory(player.getWorld().getMinY(), player.getWorld().getMaxY());
+            } else if (shape instanceof CuboidRegionFactory) {
+                shape = new FixedHeightCuboidRegionFactory(player.getWorld().getMinY(), player.getWorld().getMaxY());
+            } else {
+                player.printError(TranslatableComponent.of("worldedit.brush.biome.column-supported-types"));
+                return;
+            }
+        }
+
+        setOperationBasedBrush(player, localSession, radius,
+            new ApplyRegion(new BiomeFactory(biomeType)), shape, "worldedit.brush.biome");
         player.printInfo(TranslatableComponent.of("worldedit.setbiome.warning"));
     }
 
