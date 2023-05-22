@@ -147,6 +147,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                             try {
                                 builder.addRegex(full);
                             } catch (InputParseException ignored) {
+                                builder.clear();
                                 context.setPreferringWildcard(false);
                                 context.setRestricted(false);
                                 BaseBlock block = worldEdit.getBlockFactory().parseFromInput(full, context);
