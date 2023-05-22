@@ -20,9 +20,11 @@
 package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.util.StringMan;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.registry.LegacyMapper;
 
 import javax.annotation.Nullable;
@@ -1967,7 +1969,7 @@ public final class BlockTypes {
             }
         }
 
-        throw new SuggestInputParseException("Does not match a valid block type: " + inputLower, inputLower, () -> Stream.of(
+        throw new SuggestInputParseException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)), () -> Stream.of(
                         BlockTypesCache.values)
                 .filter(b -> StringMan.blockStateMatches(inputLower, b.getId()))
                 .map(BlockType::getId)

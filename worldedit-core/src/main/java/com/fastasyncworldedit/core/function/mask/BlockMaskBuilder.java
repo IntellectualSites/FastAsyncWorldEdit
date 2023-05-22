@@ -178,8 +178,7 @@ public class BlockMaskBuilder {
                             }
                             if (operator == null) {
                                 throw new SuggestInputParseException(
-                                        "No operator for " + input,
-                                        "",
+                                        Caption.of("fawe.error.no-operator-for-input", input),
                                         () -> Arrays.asList("=", "~", "!", "<", ">", "<=", ">=")
                                 );
                             }
@@ -195,7 +194,7 @@ public class BlockMaskBuilder {
                                 String value = charSequence.toString();
                                 final PropertyKey fKey = key;
                                 Collection<BlockType> types = type != null ? Collections.singleton(type) : blockTypeList;
-                                throw new SuggestInputParseException("No value for " + input, input, () -> {
+                                throw new SuggestInputParseException(Caption.of("fawe.error.no-value-for-input", input), () -> {
                                     HashSet<String> values = new HashSet<>();
                                     types.stream().filter(t -> t.hasProperty(fKey)).forEach(t -> {
                                         Property<Object> p = t.getProperty(fKey);
@@ -287,7 +286,7 @@ public class BlockMaskBuilder {
     }
 
     private void suggest(String input, String property, Collection<BlockType> finalTypes) throws InputParseException {
-        throw new SuggestInputParseException(input + " does not have: " + property, input, () -> {
+        throw new SuggestInputParseException(Caption.of("worldedit.error.parser.unknown-property", property, input), () -> {
             Set<PropertyKey> keys = PropertyKeySet.empty();
             finalTypes.forEach(t -> t.getProperties().forEach(p -> keys.add(p.getKey())));
             return keys.stream().map(PropertyKey::getName)
