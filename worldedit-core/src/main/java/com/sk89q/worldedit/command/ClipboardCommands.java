@@ -160,35 +160,7 @@ public class ClipboardCommands {
                 session.getPlacementPosition(actor));
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setCopyingEntities(copyEntities);
-        copy.setCopyingBiomes(copyBiomes);
-
-        Mask sourceMask = editSession.getSourceMask();
-        Region[] regions = editSession.getAllowedRegions();
-        Region allowedRegion;
-        if (regions == null || regions.length == 0) {
-            allowedRegion = new NullRegion();
-        } else {
-            allowedRegion = new RegionIntersection(regions);
-        }
-        final Mask firstSourceMask = mask != null ? mask : sourceMask;
-        final Mask finalMask = MaskIntersection.of(firstSourceMask, new RegionMask(allowedRegion)).optimize();
-        if (finalMask != Masks.alwaysTrue()) {
-            copy.setSourceMask(finalMask);
-        }
-        if (sourceMask != null) {
-            editSession.setSourceMask(null);
-            new MaskTraverser(sourceMask).reset(editSession);
-            editSession.setSourceMask(null);
-        }
-
-        try {
-            Operations.completeLegacy(copy);
-        } catch (Throwable e) {
-            throw e;
-        } finally {
-            clipboard.flush();
-        }
-        session.setClipboard(new ClipboardHolder(clipboard));
+        createCopy(session, editSession, copyBiomes, mask, clipboard, copy);
 
         copy.getStatusMessages().forEach(actor::print);
         //FAWE end
@@ -299,7 +271,25 @@ public class ClipboardCommands {
         copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
         copy.setCopyingEntities(copyEntities);
         copy.setRemovingEntities(true);
+        createCopy(session, editSession, copyBiomes, mask, clipboard, copy);
+
+        if (!actor.hasPermission("fawe.tips")) {
+            actor.print(Caption.of("fawe.tips.tip.lazycut"));
+        }
+        copy.getStatusMessages().forEach(actor::print);
+        //FAWE end
+    }
+
+    private void createCopy(
+            final LocalSession session,
+            final EditSession editSession,
+            final boolean copyBiomes,
+            final Mask mask,
+            final Clipboard clipboard,
+            final ForwardExtentCopy copy
+    ) {
         copy.setCopyingBiomes(copyBiomes);
+
         Mask sourceMask = editSession.getSourceMask();
         Region[] regions = editSession.getAllowedRegions();
         Region allowedRegion;
@@ -318,20 +308,13 @@ public class ClipboardCommands {
             new MaskTraverser(sourceMask).reset(editSession);
             editSession.setSourceMask(null);
         }
+
         try {
             Operations.completeLegacy(copy);
-        } catch (Throwable e) {
-            throw e;
         } finally {
             clipboard.flush();
         }
         session.setClipboard(new ClipboardHolder(clipboard));
-
-        if (!actor.hasPermission("fawe.tips")) {
-            actor.print(Caption.of("fawe.tips.tip.lazycut"));
-        }
-        copy.getStatusMessages().forEach(actor::print);
-        //FAWE end
     }
 
     //FAWE start
@@ -583,9 +566,10 @@ public class ClipboardCommands {
     @Command(
             name = "/rotate",
             desc = "Rotate the contents of the clipboard",
-            descFooter = "Non-destructively rotate the contents of the clipboard.\n"
-                    + "Angles are provided in degrees and a positive angle will result in a clockwise rotation. "
-                    + "Multiple rotations can be stacked. Interpolation is not performed so angles should be a multiple of 90 degrees.\n"
+            descFooter = """
+                    Non-destructively rotate the contents of the clipboard.
+                    Angles are provided in degrees and a positive angle will result in a clockwise rotation. Multiple rotations can be stacked. Interpolation is not performed so angles should be a multiple of 90 degrees.
+                    """
     )
     @CommandPermissions("worldedit.clipboard.rotate")
     public void rotate(

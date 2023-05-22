@@ -140,7 +140,7 @@ public class ToolUtilCommands {
             @Arg(desc = "The range of the brush")
                     int range
     ) throws WorldEditException {
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setRange(range);
+        session.getBrushTool(player).setRange(range);
         player.print(Caption.of("worldedit.tool.range.set"));
     }
 
@@ -156,7 +156,7 @@ public class ToolUtilCommands {
     ) throws WorldEditException {
         we.checkMaxBrushRadius(size);
 
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(size);
+        session.getBrushTool(player).setSize(size);
         player.print(Caption.of("worldedit.tool.size.set"));
     }
 

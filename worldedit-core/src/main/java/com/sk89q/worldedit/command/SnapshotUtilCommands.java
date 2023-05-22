@@ -95,7 +95,7 @@ public class SnapshotUtilCommands {
         if (snapshotName != null) {
             URI uri = resolveSnapshotName(config, snapshotName);
             Optional<Snapshot> snapOpt = config.snapshotDatabase.getSnapshot(uri);
-            if (!snapOpt.isPresent()) {
+            if (snapOpt.isEmpty()) {
                 actor.print(Caption.of("worldedit.restore.not-available"));
                 return;
             }
