@@ -1259,13 +1259,12 @@ public class BrushCommands {
 
     @Command(
             name = "clipboard",
-            desc = "@Deprecated use instead: `/br copypaste`)",
+            desc = "Paste your clipboard at the brush location. Includes any transforms.",
             descFooter = "Choose the clipboard brush.\n"
                     + "Without the -o flag, the paste will appear centered at the target location. "
                     + "With the flag, then the paste will appear relative to where you had "
                     + "stood relative to the copied area when you copied it."
     )
-    @Deprecated
     @CommandPermissions("worldedit.brush.clipboard")
     public void clipboardBrush(
             Player player, LocalSession session,
@@ -1279,7 +1278,11 @@ public class BrushCommands {
                     boolean pasteBiomes,
             @ArgFlag(name = 'm', desc = "Skip blocks matching this mask in the clipboard")
             @ClipboardMask
-                    Mask sourceMask, InjectedValueAccess context
+                    Mask sourceMask, InjectedValueAccess context,
+            //FAWE start - random rotation
+            @Switch(name = 'r', desc = "Apply random rotation on paste, combines with existing clipboard transforms")
+                    boolean randomRotate
+            //FAWE end
     ) throws WorldEditException {
         ClipboardHolder holder = session.getClipboard();
 
@@ -1295,9 +1298,9 @@ public class BrushCommands {
 
         set(
                 context,
-                new ClipboardBrush(newHolder, ignoreAir, usingOrigin, pasteEntities, pasteBiomes,
-                        sourceMask
-                ),
+                //FAWE start - random rotation
+                new ClipboardBrush(newHolder, ignoreAir, usingOrigin, pasteEntities, pasteBiomes, sourceMask, randomRotate),
+                //FAWE end
                 "worldedit.brush.clipboard"
         );
     }
