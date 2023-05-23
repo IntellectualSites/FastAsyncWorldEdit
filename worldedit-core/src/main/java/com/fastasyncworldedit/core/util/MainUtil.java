@@ -52,6 +52,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -68,7 +69,6 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -81,10 +81,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
-import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.Inflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -533,11 +531,11 @@ public class MainUtil {
         return readImage(new FileInputStream(file));
     }
 
-    public static void checkImageHost(URL url) throws IOException {
+    public static void checkImageHost(URI uri) throws IOException {
         if (Settings.settings().WEB.ALLOWED_IMAGE_HOSTS.contains("*")) {
             return;
         }
-        String host = url.getHost();
+        String host = uri.getHost();
         if (Settings.settings().WEB.ALLOWED_IMAGE_HOSTS.stream().anyMatch(host::equalsIgnoreCase)) {
             return;
         }

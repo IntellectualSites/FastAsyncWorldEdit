@@ -134,6 +134,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.util.List;
@@ -521,9 +522,9 @@ public class BrushCommands {
             @Switch(name = 'a', desc = "Use image Alpha") boolean alpha,
             @Switch(name = 'f', desc = "Blend the image with existing terrain") boolean fadeOut
     )
-            throws WorldEditException, IOException {
+            throws WorldEditException, IOException, URISyntaxException {
         URL url = new URL(imageURL);
-        MainUtil.checkImageHost(url);
+        MainUtil.checkImageHost(url.toURI());
         BufferedImage image = MainUtil.readImage(url);
         worldEdit.checkMaxBrushRadius(radius);
         if (yscale != 1) {

@@ -65,6 +65,7 @@ import org.jetbrains.annotations.Range;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -580,10 +581,10 @@ public class GenerationCommands {
             @Arg(desc = "boolean", def = "true") boolean randomize,
             @Arg(desc = "TODO", def = "100") int threshold,
             @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions
-    ) throws WorldEditException, IOException {
+    ) throws WorldEditException, IOException, URISyntaxException {
         TextureUtil tu = Fawe.instance().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(imageURL);
-        MainUtil.checkImageHost(url);
+        MainUtil.checkImageHost(url.toURI());
         if (dimensions != null) {
             checkCommandArgument(
                     (long) dimensions.getX() * dimensions.getZ() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
