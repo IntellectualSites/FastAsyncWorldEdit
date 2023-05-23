@@ -583,9 +583,7 @@ public class GenerationCommands {
     ) throws WorldEditException, IOException {
         TextureUtil tu = Fawe.instance().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(imageURL);
-        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
-            throw new IOException("Only i.imgur.com links are allowed!");
-        }
+        MainUtil.checkImageHost(url);
         if (dimensions != null) {
             checkCommandArgument(
                     (long) dimensions.getX() * dimensions.getZ() <= Settings.settings().WEB.MAX_IMAGE_SIZE,

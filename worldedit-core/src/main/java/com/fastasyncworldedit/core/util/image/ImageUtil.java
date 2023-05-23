@@ -203,6 +203,7 @@ public class ImageUtil {
                     arg = "https://i.imgur.com/" + arg.split("imgur.com/")[1] + ".png";
                 }
                 URL url = new URL(arg);
+                MainUtil.checkImageHost(url);
                 BufferedImage img = MainUtil.readImage(url);
                 if (img == null) {
                     throw new IOException("Failed to read " + url + ", please try again later");
@@ -229,7 +230,9 @@ public class ImageUtil {
                 if (arg.contains("imgur.com") && !arg.contains("i.imgur.com")) {
                     arg = "https://i.imgur.com/" + arg.split("imgur.com/")[1] + ".png";
                 }
-                return new URL(arg).toURI();
+                URL url = new URL(arg);
+                MainUtil.checkImageHost(url);
+                return url.toURI();
             }
             if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");

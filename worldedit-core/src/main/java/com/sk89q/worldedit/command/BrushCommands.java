@@ -523,9 +523,7 @@ public class BrushCommands {
     )
             throws WorldEditException, IOException {
         URL url = new URL(imageURL);
-        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
-            throw new IOException("Only i.imgur.com links are allowed!");
-        }
+        MainUtil.checkImageHost(url);
         BufferedImage image = MainUtil.readImage(url);
         worldEdit.checkMaxBrushRadius(radius);
         if (yscale != 1) {

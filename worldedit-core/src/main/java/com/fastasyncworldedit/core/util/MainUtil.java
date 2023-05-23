@@ -533,6 +533,21 @@ public class MainUtil {
         return readImage(new FileInputStream(file));
     }
 
+    public static void checkImageHost(URL url) throws IOException {
+        if (Settings.settings().WEB.ALLOWED_IMAGE_HOSTS.contains("*")) {
+            return;
+        }
+        String host = url.getHost();
+        if (Settings.settings().WEB.ALLOWED_IMAGE_HOSTS.stream().anyMatch(host::equalsIgnoreCase)) {
+            return;
+        }
+        throw new IOException(String.format(
+                "Host `%s` not allowed! Whitelisted image hosts are: %s",
+                host,
+                StringMan.join(Settings.settings().WEB.ALLOWED_IMAGE_HOSTS, ", ")
+        ));
+    }
+
     public static BufferedImage toRGB(BufferedImage src) {
         if (src == null) {
             return src;
