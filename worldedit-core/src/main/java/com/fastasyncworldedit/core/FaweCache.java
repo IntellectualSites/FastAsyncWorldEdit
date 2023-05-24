@@ -177,7 +177,7 @@ public enum FaweCache implements Trimable {
     public static final FaweException NO_REGION = new FaweException(
             Caption.of("fawe.cancel.reason.no.region"),
             Type.NO_REGION,
-            true
+            false
     );
     public static final FaweException OUTSIDE_REGION = new FaweException(
             Caption.of(
