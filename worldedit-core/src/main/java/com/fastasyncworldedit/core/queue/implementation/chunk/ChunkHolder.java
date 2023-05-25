@@ -1044,7 +1044,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         if (chunkSet != null && !chunkSet.isEmpty()) {
             chunkSet.setBitMask(bitMask);
             try {
-                return this.call(chunkSet, () -> {
+                return this.call(chunkSet.createCopy(), () -> {
                     this.delegate = NULL;
                     chunkSet = null;
                     calledLock.unlock(stamp);

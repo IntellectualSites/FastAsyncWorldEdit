@@ -9,7 +9,20 @@ import java.util.Map;
 
 public class BlockVector3ChunkMap<T> implements IAdaptedMap<BlockVector3, T, Integer, T> {
 
-    private final Int2ObjectArrayMap<T> map = new Int2ObjectArrayMap<>();
+    private final Int2ObjectArrayMap<T> map;
+
+    public BlockVector3ChunkMap() {
+        map = new Int2ObjectArrayMap<>();
+    }
+
+    /**
+     * Create a new instance that is a copy of an existing map
+     *
+     * @param map existing map to copy
+     */
+    public BlockVector3ChunkMap(BlockVector3ChunkMap<T> map) {
+        this.map = new Int2ObjectArrayMap<>(map.getParent());
+    }
 
     @Override
     public Map<Integer, T> getParent() {
