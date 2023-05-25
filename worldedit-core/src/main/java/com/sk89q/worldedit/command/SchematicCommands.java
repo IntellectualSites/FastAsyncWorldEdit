@@ -45,6 +45,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardWriter;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
+import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.util.formatting.component.ErrorFormat;
@@ -89,6 +90,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -312,7 +314,11 @@ public class SchematicCommands {
             @Arg(desc = "File name.")
                     String filename,
             @Arg(desc = "Format name.", def = "fast")
-                    String formatName
+                    String formatName,
+            //FAWE start - random rotation
+            @Switch(name = 'r', desc = "Apply random rotation to the clipboard")
+                    boolean randomRotate
+            //FAWE end
     ) throws FilenameException {
         LocalConfiguration config = worldEdit.getConfiguration();
 
@@ -394,6 +400,12 @@ public class SchematicCommands {
                 uri = file.toURI();
             }
             format.hold(actor, uri, in);
+            if (randomRotate) {
+                AffineTransform transform = new AffineTransform();
+                int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
+                transform = transform.rotateY(rotate);
+                session.getClipboard().setTransform(transform);
+            }
             actor.print(Caption.of("fawe.worldedit.schematic.schematic.loaded", filename));
         } catch (IllegalArgumentException e) {
             actor.print(Caption.of("worldedit.schematic.unknown-filename", TextComponent.of(filename)));
