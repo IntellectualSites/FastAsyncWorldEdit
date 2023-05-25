@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
@@ -306,8 +305,12 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 || (heightMaps != null && !heightMaps.isEmpty())) {
             return false;
         }
-        //noinspection SimplifyStreamApiCallChains - this is faster than using #noneMatch
-        return !IntStream.range(minSectionPosition, maxSectionPosition + 1).anyMatch(this::hasSection);
+        for (int i =  minSectionPosition; i <= maxSectionPosition; i++) {
+            if (hasSection(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -316,6 +319,9 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         tiles = null;
         entities = null;
         entityRemoves = null;
+        light = null;
+        skyLight = null;
+        heightMaps = null;
         super.reset();
         return null;
     }
