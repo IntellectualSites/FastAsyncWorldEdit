@@ -674,7 +674,7 @@ public class Settings extends Config {
         @Comment({
                 "Whitelist of hostnames to allow images to be downloaded from",
                 " - Adding '*' to the list will allow any host, but this is NOT adviseable",
-                " - Crash exploits exist with malphormed images",
+                " - Crash exploits exist with malformed images",
                 " - See: https://medium.com/chargebee-engineering/perils-of-parsing-pixel-flood-attack-on-java-imageio-a97aeb06637d"
         })
         public List<String> ALLOWED_IMAGE_HOSTS = new ArrayList<>(Collections.singleton(("i.imgur.com")));
