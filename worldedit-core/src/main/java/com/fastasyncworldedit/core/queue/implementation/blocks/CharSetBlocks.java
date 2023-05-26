@@ -15,7 +15,7 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +40,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public BlockVector3ChunkMap<CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
-    public Map<HeightMapType, int[]> heightMaps;
+    public EnumMap<HeightMapType, int[]> heightMaps;
     private boolean fastMode = false;
     private int bitMask = -1;
 
@@ -93,7 +93,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public Map<HeightMapType, int[]> getHeightMaps() {
-        return heightMaps == null ? new HashMap<>() : heightMaps;
+        return heightMaps == null ? new EnumMap<>(HeightMapType.class) : heightMaps;
     }
 
     @Override
@@ -177,7 +177,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public void setHeightMap(HeightMapType type, int[] heightMap) {
         if (heightMaps == null) {
-            heightMaps = new HashMap<>();
+            heightMaps = new EnumMap<>(HeightMapType.class);
         }
         heightMaps.put(type, heightMap);
     }
