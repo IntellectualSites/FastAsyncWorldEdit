@@ -407,11 +407,8 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             }
         }
         try {
-            while (true) {
-                var next = queue.poll();
-                if (next == null) {
-                    return; // drained
-                }
+            Runnable next;
+            while ((next = queue.poll()) != null) { // process all tasks in the queue
                 next.run();
             }
         } finally {
