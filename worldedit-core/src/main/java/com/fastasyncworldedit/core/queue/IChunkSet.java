@@ -117,7 +117,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     boolean hasBiomes(int layer);
 
     /**
-     * Create an entirely distinct copy of this SET instance. All mutable data must be copied to sufficiently prevetn leakage
+     * Create an entirely distinct copy of this SET instance. All mutable data must be copied to sufficiently prevent leakage
      * between the copy and the original.
      *
      * @return distinct new {@link IChunkSet instance}
