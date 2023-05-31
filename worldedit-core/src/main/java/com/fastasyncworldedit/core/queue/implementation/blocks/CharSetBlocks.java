@@ -369,7 +369,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 tiles != null ? new BlockVector3ChunkMap<>(tiles) : null,
                 entities != null ? new HashSet<>(entities) : null,
                 entityRemoves != null ? new HashSet<>(entityRemoves) : null,
-                heightMaps != null ? new HashMap<>(heightMaps) : null,
+                heightMaps != null ? new EnumMap<>(heightMaps) : null,
                 defaultOrdinal(),
                 fastMode,
                 bitMask

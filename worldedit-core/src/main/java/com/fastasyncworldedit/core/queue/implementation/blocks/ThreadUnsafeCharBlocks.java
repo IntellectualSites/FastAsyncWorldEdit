@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -304,7 +305,7 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     @Override
     public void setHeightMap(HeightMapType type, int[] heightMap) {
         if (heightMaps == null) {
-            heightMaps = new HashMap<>();
+            heightMaps = new EnumMap<>(HeightMapType.class);
         }
         heightMaps.put(type, heightMap);
     }
