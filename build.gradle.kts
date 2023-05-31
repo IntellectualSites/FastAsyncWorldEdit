@@ -4,7 +4,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import xyz.jpenilla.runpaper.task.RunServer
 import java.net.URI
 import java.time.format.DateTimeFormatter
-import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
