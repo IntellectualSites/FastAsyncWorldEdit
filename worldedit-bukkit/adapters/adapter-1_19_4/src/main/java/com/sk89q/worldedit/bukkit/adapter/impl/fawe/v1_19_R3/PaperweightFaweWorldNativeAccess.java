@@ -102,7 +102,7 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         }
         // Since FAWE is.. Async we need to do it on the main thread (wooooo.. :( )
         cachedChanges.add(new CachedChange(levelChunk, blockPos, blockState));
-        cachedChunksToSend.add(new IntPair(levelChunk.bukkitChunk.getX(), levelChunk.bukkitChunk.getZ()));
+        cachedChunksToSend.add(new IntPair(levelChunk.locX, levelChunk.locZ));
         boolean nextTick = lastTick.get() > currentTick;
         if (nextTick || cachedChanges.size() >= 1024) {
             if (nextTick) {

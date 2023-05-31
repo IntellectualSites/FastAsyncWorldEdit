@@ -678,31 +678,26 @@ public final class PlatformCommandManager {
 
         Actor actor = event.getActor();
         String args = event.getArguments();
-        TaskManager.taskManager().taskNow(() -> {
-            if (!Fawe.isTickThread()) {
-                Thread.currentThread().setName("FAWE Thread for player: " + actor.getName());
+        int space0 = args.indexOf(' ');
+        String arg0 = space0 == -1 ? args : args.substring(0, space0);
+        Optional<Command> optional = commandManager.getCommand(arg0);
+        if (optional.isEmpty()) {
+            return;
+        }
+        Command cmd = optional.get();
+        PermissionCondition queued = cmd.getCondition().as(PermissionCondition.class).orElse(null);
+        if (queued != null && !queued.isQueued()) {
+            TaskManager.taskManager().taskNow(() -> handleCommandOnCurrentThread(event), Fawe.isTickThread());
+            return;
+        } else {
+            actor.decline();
+        }
+        actor.runAction(() -> {
+            SessionKey key = actor.getSessionKey();
+            if (key.isActive()) {
+                PlatformCommandManager.this.handleCommandOnCurrentThread(event);
             }
-            int space0 = args.indexOf(' ');
-            String arg0 = space0 == -1 ? args : args.substring(0, space0);
-            Optional<Command> optional = commandManager.getCommand(arg0);
-            if (!optional.isPresent()) {
-                return;
-            }
-            Command cmd = optional.get();
-            PermissionCondition queued = cmd.getCondition().as(PermissionCondition.class).orElse(null);
-            if (queued != null && !queued.isQueued()) {
-                handleCommandOnCurrentThread(event);
-                return;
-            } else {
-                actor.decline();
-            }
-            actor.runAction(() -> {
-                SessionKey key = actor.getSessionKey();
-                if (key.isActive()) {
-                    PlatformCommandManager.this.handleCommandOnCurrentThread(event);
-                }
-            }, false, true);
-        }, Fawe.isTickThread());
+        }, false, true);
     }
 
     public void handleCommandOnCurrentThread(CommandEvent event) {

@@ -9,6 +9,6 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("1.19.4-R0.1-20230317.182750-6")
+    paperDevBundle("1.19.4-R0.1-20230423.020222-72")
     compileOnly("io.papermc:paperlib")
 }

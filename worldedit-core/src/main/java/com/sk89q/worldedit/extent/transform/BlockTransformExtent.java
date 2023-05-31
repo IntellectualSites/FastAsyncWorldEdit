@@ -555,10 +555,11 @@ public class BlockTransformExtent extends ResettableExtent {
 
         int transformedId = transformState(state, transform);
         BlockState transformed = BlockState.getFromInternalId(transformedId);
-        if (block.hasNbtData()) {
+        boolean baseBlock = block instanceof BaseBlock;
+        if (baseBlock && block.hasNbtData()) {
             return (B) transformBaseBlockNBT(transformed, block.getNbtData(), transform);
         }
-        return (B) (block instanceof BaseBlock ? transformed.toBaseBlock() : transformed);
+        return (B) (baseBlock? transformed.toBaseBlock() : transformed);
         //FAWE end
     }
 
