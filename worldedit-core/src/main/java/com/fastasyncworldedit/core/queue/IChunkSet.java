@@ -10,7 +10,7 @@ import com.sk89q.worldedit.world.block.BlockStateHolder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -96,7 +96,7 @@ public interface IChunkSet extends IBlocks, OutputExtent {
     }
 
     default Map<HeightMapType, int[]> getHeightMaps() {
-        return new HashMap<>();
+        return new EnumMap<>(HeightMapType.class);
     }
 
     @Override
