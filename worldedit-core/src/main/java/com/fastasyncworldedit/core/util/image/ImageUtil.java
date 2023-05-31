@@ -203,6 +203,7 @@ public class ImageUtil {
                     arg = "https://i.imgur.com/" + arg.split("imgur.com/")[1] + ".png";
                 }
                 URL url = new URL(arg);
+                MainUtil.checkImageHost(url.toURI());
                 BufferedImage img = MainUtil.readImage(url);
                 if (img == null) {
                     throw new IOException("Failed to read " + url + ", please try again later");
@@ -218,7 +219,7 @@ public class ImageUtil {
                 return MainUtil.readImage(file);
             }
             throw new InputParseException(Caption.of("fawe.error.invalid-image", TextComponent.of(arg)));
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             throw new InputParseException(TextComponent.of(e.getMessage()));
         }
     }
@@ -229,7 +230,9 @@ public class ImageUtil {
                 if (arg.contains("imgur.com") && !arg.contains("i.imgur.com")) {
                     arg = "https://i.imgur.com/" + arg.split("imgur.com/")[1] + ".png";
                 }
-                return new URL(arg).toURI();
+                URI uri = new URI(arg);
+                MainUtil.checkImageHost(uri);
+                return uri;
             }
             if (arg.startsWith("file:/")) {
                 arg = arg.replaceFirst("file:/+", "");
