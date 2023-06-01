@@ -6,7 +6,7 @@ log4j = "2.19.0"
 
 # Plugins
 dummypermscompat = "1.10"
-worldguard-bukkit = "7.0.7"
+worldguard-bukkit = "7.0.8"
 mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "16.18.1"
 griefdefender = "2.1.0-SNAPSHOT"
