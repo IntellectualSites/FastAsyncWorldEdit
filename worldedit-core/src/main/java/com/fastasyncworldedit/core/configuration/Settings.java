@@ -520,10 +520,10 @@ public class Settings extends Config {
                 " - A smaller value will reduce memory usage",
                 " - A value too small may break some operations (deform?)",
                 " - Values smaller than the configurated parallel-threads are not accepted",
-                " - It is recommended this option be at least 2x greater than parallel-threads"
+                " - It is recommended this option be at least 4x greater than parallel-threads"
 
         })
-        public int TARGET_SIZE = 64;
+        public int TARGET_SIZE = 8 * Runtime.getRuntime().availableProcessors();
         @Comment({
                 "Force FAWE to start placing chunks regardless of whether an edit is finished processing",
                 " - A larger value will use slightly less CPU time",

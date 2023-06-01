@@ -8,6 +8,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
@@ -114,5 +115,16 @@ public interface IChunkSet extends IBlocks, OutputExtent {
      * @return if the layer has biomes stored to be set to the world
      */
     boolean hasBiomes(int layer);
+
+    /**
+     * Create an entirely distinct copy of this SET instance. All mutable data must be copied to sufficiently prevent leakage
+     * between the copy and the original.
+     *
+     * @return distinct new {@link IChunkSet instance}
+     */
+    @Nonnull
+    default IChunkSet createCopy() {
+        return this;
+    }
 
 }

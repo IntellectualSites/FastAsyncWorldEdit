@@ -53,7 +53,6 @@ public abstract class QueueHandler implements Trimable, Runnable {
      */
     private long last;
     private long allocate = 50;
-    private double targetTPS = 18;
 
     public QueueHandler() {
         TaskManager.taskManager().repeat(this, 1);
@@ -87,7 +86,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
 
     private long getAllocate() {
         long now = System.currentTimeMillis();
-        targetTPS = 18 - Math.max(Settings.settings().QUEUE.EXTRA_TIME_MS * 0.05, 0);
+        double targetTPS = 18 - Math.max(Settings.settings().QUEUE.EXTRA_TIME_MS * 0.05, 0);
         long diff = 50 + this.last - (this.last = now);
         long absDiff = Math.abs(diff);
         if (diff == 0) {
