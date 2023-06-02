@@ -54,7 +54,7 @@ mapmanager = { group = "com.github.InventivetalentDev", name = "MapManager", ver
 griefprevention = { group = "com.github.TechFortress", name = "GriefPrevention", version.ref = "griefprevention" }
 griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
-towny = { group = "com.github.TownyAdvanced", name = "Towny", version.ref = "towny" }
+towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 
 # Third Party
 bstatsBase = { group = "org.bstats", name = "bstats-base", version.ref = "bstats" }
