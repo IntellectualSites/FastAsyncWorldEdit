@@ -11,7 +11,7 @@ mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "16.18.1"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
-towny = "0.99.0.5"
+towny = "0.99.1.0"
 
 # Third party
 bstats = "3.0.2"
@@ -54,7 +54,7 @@ mapmanager = { group = "com.github.InventivetalentDev", name = "MapManager", ver
 griefprevention = { group = "com.github.TechFortress", name = "GriefPrevention", version.ref = "griefprevention" }
 griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
 residence = { group = "com.bekvon.bukkit.residence", name = "Residence", version.ref = "residence" }
-towny = { group = "com.github.TownyAdvanced", name = "Towny", version.ref = "towny" }
+towny = { group = "com.palmergames.bukkit.towny", name = "towny", version.ref = "towny" }
 
 # Third Party
 bstatsBase = { group = "org.bstats", name = "bstats-base", version.ref = "bstats" }
