@@ -98,12 +98,19 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     public char[] load(int layer) {
         updateSectionIndexRange(layer);
         layer -= minSectionPosition;
-        return blocks[layer];
+        char[] arr = blocks[layer];
+        if (arr == null) {
+            arr = blocks[layer] = new char[FaweCache.INSTANCE.BLOCKS_PER_LAYER];
+        }
+        return arr;
     }
 
     @Nullable
     @Override
     public char[] loadIfPresent(int layer) {
+        if (layer < minSectionPosition || layer > maxSectionPosition) {
+            return null;
+        }
         layer -= minSectionPosition;
         return blocks[layer];
     }
@@ -439,8 +446,8 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     public IChunkSet createCopy() {
         char[][] blocksCopy = new char[sectionCount][];
         for (int i = 0; i < sectionCount; i++) {
+            blocksCopy[i] = new char[FaweCache.INSTANCE.BLOCKS_PER_LAYER];
             if (blocks[i] != null) {
-                blocksCopy[i] = new char[FaweCache.INSTANCE.BLOCKS_PER_LAYER];
                 System.arraycopy(blocks[i], 0, blocksCopy[i], 0, FaweCache.INSTANCE.BLOCKS_PER_LAYER);
             }
         }
