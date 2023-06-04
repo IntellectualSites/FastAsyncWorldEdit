@@ -5,6 +5,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class MutableBiomeChange implements Change {
 
@@ -13,8 +14,8 @@ public class MutableBiomeChange implements Change {
     private int to;
 
     public MutableBiomeChange() {
-        this.from = 0;
-        this.to = 0;
+        this.from = BlockTypesCache.ReservedIDs.__RESERVED__;
+        this.to = BlockTypesCache.ReservedIDs.__RESERVED__;
     }
 
     public void setBiome(int x, int y, int z, int from, int to) {

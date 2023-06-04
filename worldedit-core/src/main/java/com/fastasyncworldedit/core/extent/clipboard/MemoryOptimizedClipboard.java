@@ -16,6 +16,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -269,8 +270,8 @@ public class MemoryOptimizedClipboard extends LinearClipboard {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
         int ordinal = block.getOrdinal();
-        if (ordinal == 0) {
-            ordinal = 1;
+        if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+            ordinal = BlockTypesCache.ReservedIDs.AIR;
         }
         setOrdinal(index, ordinal);
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();

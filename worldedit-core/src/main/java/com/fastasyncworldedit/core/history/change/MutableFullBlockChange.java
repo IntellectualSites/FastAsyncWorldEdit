@@ -6,6 +6,7 @@ import com.sk89q.worldedit.extent.inventory.BlockBagException;
 import com.sk89q.worldedit.history.UndoContext;
 import com.sk89q.worldedit.history.change.Change;
 import com.sk89q.worldedit.world.block.BlockState;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 public class MutableFullBlockChange implements Change {
 
@@ -39,14 +40,14 @@ public class MutableFullBlockChange implements Change {
         if (blockBag != null) {
             BlockState toState = BlockState.getFromOrdinal(to);
             if (fromState != toState) {
-                if (allowFetch && from != 0) {
+                if (allowFetch && from != BlockTypesCache.ReservedIDs.__RESERVED__) {
                     try {
                         blockBag.fetchPlacedBlock(fromState);
                     } catch (BlockBagException e) {
                         return;
                     }
                 }
-                if (allowStore && to != 0) {
+                if (allowStore && to != BlockTypesCache.ReservedIDs.__RESERVED__) {
                     try {
                         blockBag.storeDroppedBlock(toState);
                     } catch (BlockBagException ignored) {

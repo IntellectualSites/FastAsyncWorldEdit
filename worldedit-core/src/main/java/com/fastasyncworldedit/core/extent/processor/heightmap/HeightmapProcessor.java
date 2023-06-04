@@ -73,11 +73,11 @@ public class HeightmapProcessor implements IBatchProcessor {
             for (int y = 15; y >= 0; y--) {
                 // We don't need to actually iterate over x and z as we're both reading and writing an index
                 for (int j = 0; j < BLOCKS_PER_Y; j++) {
-                    char ordinal = 0;
+                    char ordinal = BlockTypesCache.ReservedIDs.__RESERVED__;
                     if (hasSectionSet) {
                         ordinal = setSection[index(y, j)];
                     }
-                    if (ordinal == 0) {
+                    if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                         if (!hasSectionGet) {
                             if (!hasSectionSet) {
                                 continue layer;

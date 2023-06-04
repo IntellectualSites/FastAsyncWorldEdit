@@ -11,6 +11,7 @@ import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -191,8 +192,8 @@ public class CPUOptimizedClipboard extends LinearClipboard {
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int index, B block) {
         char ordinal = block.getOrdinalChar();
-        if (ordinal == 0) {
-            ordinal = 1;
+        if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+            ordinal = BlockTypesCache.ReservedIDs.AIR;
         }
         states[index] = ordinal;
         boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();

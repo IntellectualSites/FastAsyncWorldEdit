@@ -38,6 +38,7 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -408,8 +409,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                     for (int y = 0, index = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z++) {
                             for (int x = 0; x < 16; x++, index++) {
-                                if (arr[index] != 0 && !contains(x, y, z)) {
-                                    arr[index] = 0;
+                                if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && !contains(x, y, z)) {
+                                    arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                                 }
                             }
                         }
@@ -458,8 +459,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 for (int y = 0, index = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
                         for (int x = 0; x < 16; x++, index++) {
-                            if (arr[index] != 0 && contains(x, y, z)) {
-                                arr[index] = 0;
+                            if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && contains(x, y, z)) {
+                                arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                                 processExtra = true;
                             }
                         }
