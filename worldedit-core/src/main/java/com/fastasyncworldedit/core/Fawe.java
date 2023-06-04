@@ -12,7 +12,9 @@ import com.fastasyncworldedit.core.util.RandomTextureUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.util.WEManager;
+import com.fastasyncworldedit.core.util.task.KeyQueuedExecutorService;
 import com.github.luben.zstd.Zstd;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import net.jpountz.lz4.LZ4Factory;
@@ -33,6 +35,7 @@ import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -86,6 +89,15 @@ public class Fawe {
      * The platform specific implementation.
      */
     private final IFawe implementation;
+    private final KeyQueuedExecutorService<UUID> clipboardExecutor = Settings.settings().CLIPBOARD.USE_DISK
+            ? new KeyQueuedExecutorService<>(
+            1,
+            Settings.settings().QUEUE.PARALLEL_THREADS,
+            0L,
+            TimeUnit.MILLISECONDS,
+            new ThreadFactoryBuilder().setNameFormat("fawe-clipboard-%d").build()
+    )
+            : null;
     private FaweVersion version;
     private TextureUtil textures;
     private QueueHandler queueHandler;
@@ -426,6 +438,17 @@ public class Fawe {
      */
     public Thread setMainThread() {
         return this.thread = Thread.currentThread();
+    }
+
+    /**
+     * Gets the executor used for clipboard IO if clipboard on disk is enabled or null
+     *
+     * @return Executor used for clipboard IO if clipboard on disk is enabled or null
+     * @since TODO
+     */
+    @Nullable
+    public KeyQueuedExecutorService<UUID> getClipboardExecutor() {
+        return this.clipboardExecutor;
     }
 
 }

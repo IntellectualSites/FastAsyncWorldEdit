@@ -437,14 +437,16 @@ public interface Player extends Entity, Actor {
                     } else {
                         continue;
                     }
-                    WorldEdit.getInstance().getExecutorService().submit(() -> {
+                    Fawe.instance().getClipboardExecutor().submit(getUniqueId(), () -> {
                         doc.close(); // Ensure closed before deletion
                         doc.getFile().delete();
                     });
                 }
             }
-        } else if (Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT || Settings.settings().CLIPBOARD.USE_DISK) {
-            WorldEdit.getInstance().getExecutorService().submit(() -> session.setClipboard(null));
+        } else if (Settings.settings().CLIPBOARD.USE_DISK) {
+            Fawe.instance().getClipboardExecutor().submit(getUniqueId(), () -> session.setClipboard(null));
+        } else if (Settings.settings().CLIPBOARD.DELETE_ON_LOGOUT) {
+            session.setClipboard(null);
         }
         if (Settings.settings().HISTORY.DELETE_ON_LOGOUT) {
             session.clearHistory();
@@ -470,7 +472,10 @@ public interface Player extends Entity, Actor {
                     }
                 } catch (EmptyClipboardException ignored) {
                 }
-                DiskOptimizedClipboard doc = DiskOptimizedClipboard.loadFromFile(file);
+                DiskOptimizedClipboard doc = Fawe.instance().getClipboardExecutor().submit(
+                        getUniqueId(),
+                        () -> DiskOptimizedClipboard.loadFromFile(file)
+                ).get();
                 Clipboard clip = doc.toClipboard();
                 ClipboardHolder holder = new ClipboardHolder(clip);
                 session.setClipboard(holder);
