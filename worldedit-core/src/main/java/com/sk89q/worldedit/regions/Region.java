@@ -42,8 +42,6 @@ import com.sk89q.worldedit.world.World;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 /**
  * Represents a physical shape.
