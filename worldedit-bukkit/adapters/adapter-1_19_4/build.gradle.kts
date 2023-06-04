@@ -1,3 +1,5 @@
+import io.papermc.paperweight.userdev.PaperweightUserDependenciesExtension
+
 plugins {
     java
 }
@@ -9,6 +11,6 @@ repositories {
 }
 
 dependencies {
-    paperDevBundle("1.19.4-R0.1-20230423.020222-72")
+    the<PaperweightUserDependenciesExtension>().paperDevBundle("1.19.4-R0.1-20230601.025018-99")
     compileOnly("io.papermc:paperlib")
 }
