@@ -184,7 +184,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             removeBlockEntityTicker.setAccessible(true);
             methodremoveTickingBlockEntity = lookup.unreflect(removeBlockEntityTicker);
 
-            fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
+            fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "q"));
             fieldRemove.setAccessible(true);
 
             CHUNKSECTION_BASE = unsafe.arrayBaseOffset(LevelChunkSection[].class);
