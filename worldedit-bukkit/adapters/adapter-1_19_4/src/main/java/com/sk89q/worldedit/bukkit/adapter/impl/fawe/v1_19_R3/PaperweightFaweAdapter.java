@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
@@ -50,7 +49,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemType;
@@ -60,7 +58,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -71,14 +68,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -86,7 +81,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.TreeType;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockState;
@@ -602,10 +596,17 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 .getServer()
                 .registryAccess()
                 .registryOrThrow(BIOME);
-        return biomeRegistry.stream()
-                .map(biomeRegistry::getKey).filter(Objects::nonNull)
-                .map(CraftNamespacedKey::fromMinecraft)
-                .collect(Collectors.toList());
+        List<ResourceLocation> keys = biomeRegistry.stream()
+                .map(biomeRegistry::getKey).filter(Objects::nonNull).toList();
+        List<NamespacedKey> namespacedKeys = new ArrayList<>();
+        for (ResourceLocation key : keys) {
+            try {
+                namespacedKeys.add(CraftNamespacedKey.fromMinecraft(key));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error("Error converting biome key {}", key.toString(), e);
+            }
+        }
+        return namespacedKeys;
     }
 
     @Override
