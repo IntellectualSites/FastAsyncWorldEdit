@@ -7,7 +7,7 @@ pipeline {
         stage('Build') {
             steps {
                 withEnv([
-                        "PATH+JAVA=${tool 'Temurin-17.0.6+10'}/bin"
+                        "PATH+JAVA=${tool 'Temurin-17.0.7_7'}/bin"
                 ]) {
                     sh './gradlew clean build'
                 }
