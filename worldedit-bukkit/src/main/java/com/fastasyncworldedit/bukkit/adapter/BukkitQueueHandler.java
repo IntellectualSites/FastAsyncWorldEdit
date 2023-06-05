@@ -3,8 +3,6 @@ package com.fastasyncworldedit.bukkit.adapter;
 import co.aikar.timings.Timings;
 import com.fastasyncworldedit.bukkit.listener.ChunkListener;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
-import com.sk89q.worldedit.internal.util.LogManagerCompat;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,7 +29,7 @@ public class BukkitQueueHandler extends QueueHandler {
     }
 
     @Override
-    public void startSet(boolean parallel) {
+    public void startUnsafe(boolean parallel) {
         ChunkListener.physicsFreeze = true;
         if (parallel) {
             try {
@@ -51,7 +49,7 @@ public class BukkitQueueHandler extends QueueHandler {
     }
 
     @Override
-    public void endSet(boolean parallel) {
+    public void endUnsafe(boolean parallel) {
         ChunkListener.physicsFreeze = false;
         if (parallel) {
             try {

@@ -389,7 +389,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
             return; // fast path to avoid additional tasks: a worker is already draining the queue
         }
         // create a new worker to drain the current queue
-        Fawe.instance().getQueueHandler().submit(() -> drainQueue(false));
+        Fawe.instance().getQueueHandler().async(() -> drainQueue(false));
     }
 
     private void drainQueue(boolean ignoreRunningState) {
