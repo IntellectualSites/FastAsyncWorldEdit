@@ -824,14 +824,15 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimX = lowerX != 0 || upperX != 15;
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
+            if (!(trimX || trimZ)) {
+                return set;
+            }
+
             for (int layer = get.getMinSectionPosition(); layer < get.getMaxSectionPosition(); layer++) {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
                 char[] arr = Objects.requireNonNull(set.loadIfPresent(layer)); // This shouldn't be null if above is true
-                if (!(trimX || trimZ)) {
-                    continue;
-                }
                 int indexY = 0;
                 for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
                     int index;

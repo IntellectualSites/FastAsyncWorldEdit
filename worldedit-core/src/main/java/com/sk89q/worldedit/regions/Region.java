@@ -401,11 +401,17 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             // contains some
             boolean processExtra = false;
             for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
+                if (!set.hasSection(layer)) {
+                    continue;
+                }
                 int by = layer << 4;
                 int ty = by + 15;
                 if (!containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
                     processExtra = true;
-                    char[] arr = set.load(layer);
+                    char[] arr = set.loadIfPresent(layer);
+                    if (arr == null) {
+                        continue;
+                    }
                     for (int y = 0, index = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z++) {
                             for (int x = 0; x < 16; x++, index++) {
