@@ -409,7 +409,7 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                     for (int y = 0, index = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z++) {
                             for (int x = 0; x < 16; x++, index++) {
-                                if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && !contains(x, y, z)) {
+                                if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && !contains(bx + x, by + y, bz + z)) {
                                     arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                                 }
                             }
