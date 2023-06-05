@@ -18,4 +18,9 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: Build on ${{ matrix.os }}
-        run: ./gradlew clean build
+        run: ./gradlew clean build --no-daemon
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v3
+        with:
+            name: FastAsyncWorldEdit-SNAPSHOT
+            path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar
