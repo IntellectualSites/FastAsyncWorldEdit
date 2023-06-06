@@ -1,15 +1,26 @@
 package com.fastasyncworldedit.core.util.task;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.configuration.Settings;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 import java.io.Closeable;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public class AsyncNotifyQueue implements Closeable {
+
+    private static final ForkJoinPool QUEUE_SUBMISSIONS = new ForkJoinPool(
+            Settings.settings().QUEUE.PARALLEL_THREADS,
+            new FaweForkJoinWorkerThreadFactory("AsyncNotifyQueue - %s"),
+            null,
+            false
+    );
 
     private final Lock lock = new ReentrantLock(true);
     private final Thread.UncaughtExceptionHandler handler;
@@ -59,7 +70,7 @@ public class AsyncNotifyQueue implements Closeable {
             }
             return null;
         };
-        self[0] = Fawe.instance().getQueueHandler().async(wrapped);
+        self[0] = QUEUE_SUBMISSIONS.submit(wrapped);
         return self[0];
     }
 
