@@ -172,7 +172,7 @@ public class MultiRegionExtent extends FaweRegionExtent {
             set = intersection.processSet(chunk, get, set);
         }
         if (disallowedIntersection != null) {
-            set = intersection.processSet(chunk, get, set, true);
+            set = disallowedIntersection.processSet(chunk, get, set, true);
         }
         return set;
     }
