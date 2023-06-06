@@ -36,6 +36,8 @@ import java.lang.management.MemoryUsage;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -89,15 +91,7 @@ public class Fawe {
      * The platform specific implementation.
      */
     private final IFawe implementation;
-    private final KeyQueuedExecutorService<UUID> clipboardExecutor = Settings.settings().CLIPBOARD.USE_DISK
-            ? new KeyQueuedExecutorService<>(
-            1,
-            Settings.settings().QUEUE.PARALLEL_THREADS,
-            0L,
-            TimeUnit.MILLISECONDS,
-            new ThreadFactoryBuilder().setNameFormat("fawe-clipboard-%d").build()
-    )
-            : null;
+    private final KeyQueuedExecutorService<UUID> clipboardExecutor;
     private FaweVersion version;
     private TextureUtil textures;
     private QueueHandler queueHandler;
@@ -143,6 +137,15 @@ public class Fawe {
         }, 0);
 
         TaskManager.taskManager().repeat(timer, 1);
+
+        clipboardExecutor = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(
+                1,
+                Settings.settings().QUEUE.PARALLEL_THREADS,
+                0L,
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(),
+                new ThreadFactoryBuilder().setNameFormat("fawe-clipboard-%d").build()
+        ));
     }
 
     /**

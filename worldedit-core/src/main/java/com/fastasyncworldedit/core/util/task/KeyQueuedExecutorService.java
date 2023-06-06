@@ -1,7 +1,5 @@
 package com.fastasyncworldedit.core.util.task;
 
-import com.fastasyncworldedit.core.configuration.Settings;
-
 import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.List;
@@ -10,12 +8,9 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -30,80 +25,12 @@ public class KeyQueuedExecutorService<K> {
     private final Map<K, KeyRunner> keyQueue = new HashMap<>();
 
     /**
-     * Create a new {@link KeyQueuedExecutorService} with default settings:
-     *  - corePoolSize    = 1
-     *  - maximumPoolSize = Settings.settings().QUEUE.PARALLEL_THREADS
-     *  - keepAliveTime   = 0
-     */
-    public KeyQueuedExecutorService() {
-        this(1, Settings.settings().QUEUE.PARALLEL_THREADS, 0L, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Creates a new {@code KeyQueuedExecutorService} with the given initial
-     * parameters, the
-     * {@linkplain Executors#defaultThreadFactory default thread factory}
-     * and the {@linkplain ThreadPoolExecutor.AbortPolicy
-     * default rejected execution handler}.
+     * Create a new {@link KeyQueuedExecutorService} instance
      *
-     * <p>It may be more convenient to use one of the {@link Executors}
-     * factory methods instead of this general purpose constructor.
-     *
-     * @param corePoolSize    the number of threads to keep in the pool, even
-     *                        if they are idle, unless {@code allowCoreThreadTimeOut} is set
-     * @param maximumPoolSize the maximum number of threads to allow in the
-     *                        pool
-     * @param keepAliveTime   when the number of threads is greater than
-     *                        the core, this is the maximum time that excess idle threads
-     *                        will wait for new tasks before terminating.
-     * @param unit            the time unit for the {@code keepAliveTime} argument
-     * @throws IllegalArgumentException if one of the following holds:<br>
-     *                                  {@code corePoolSize < 0}<br>
-     *                                  {@code keepAliveTime < 0}<br>
-     *                                  {@code maximumPoolSize <= 0}<br>
-     *                                  {@code maximumPoolSize < corePoolSize}
-     * @throws NullPointerException     if {@code workQueue} is null
+     * @param parent Parent {@link ExecutorService} to use for actual task completion
      */
-    public KeyQueuedExecutorService(
-            int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit
-    ) {
-        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, Executors.defaultThreadFactory());
-    }
-
-    /**
-     * Creates a new {@code KeyQueuedExecutorService} with the given initial
-     * parameters and the {@linkplain ThreadPoolExecutor.AbortPolicy
-     * default rejected execution handler}.
-     *
-     * @param corePoolSize    the number of threads to keep in the pool, even
-     *                        if they are idle, unless {@code allowCoreThreadTimeOut} is set
-     * @param maximumPoolSize the maximum number of threads to allow in the
-     *                        pool
-     * @param keepAliveTime   when the number of threads is greater than
-     *                        the core, this is the maximum time that excess idle threads
-     *                        will wait for new tasks before terminating.
-     * @param unit            the time unit for the {@code keepAliveTime} argument
-     * @param threadFactory   the factory to use when the executor
-     *                        creates a new thread
-     * @throws IllegalArgumentException if one of the following holds:<br>
-     *                                  {@code corePoolSize < 0}<br>
-     *                                  {@code keepAliveTime < 0}<br>
-     *                                  {@code maximumPoolSize <= 0}<br>
-     *                                  {@code maximumPoolSize < corePoolSize}
-     * @throws NullPointerException     if {@code workQueue}
-     *                                  or {@code threadFactory} is null
-     */
-    public KeyQueuedExecutorService(
-            int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, ThreadFactory threadFactory
-    ) {
-        parent = new ThreadPoolExecutor(
-                corePoolSize,
-                maximumPoolSize,
-                keepAliveTime,
-                unit,
-                new LinkedBlockingQueue<>(),
-                threadFactory
-        );
+    public KeyQueuedExecutorService(ExecutorService parent) {
+        this.parent = parent;
     }
 
     /**
@@ -172,14 +99,19 @@ public class KeyQueuedExecutorService<K> {
     }
 
     public void execute(@Nonnull K key, @Nonnull FutureTask<?> command) {
-        KeyRunner runner;
         synchronized (keyQueue) {
-            runner = keyQueue.merge(key, new KeyRunner(key), (existing, theNew) -> {
-                existing.add(command);
-                return existing;
-            });
+            boolean triggerRun = false;
+            KeyRunner runner = keyQueue.get(key);
+            if (runner == null) {
+                runner = new KeyRunner(key);
+                keyQueue.put(key, runner);
+                triggerRun = true;
+            }
+            runner.add(command);
+            if (triggerRun) {
+                runner.triggerRun();
+            }
         }
-        runner.triggerRun();
     }
 
     private final class KeyRunner {
@@ -197,8 +129,8 @@ public class KeyQueuedExecutorService<K> {
             }
         }
 
-        synchronized void triggerRun() {
-            Runnable task = tasks.remove();
+        void triggerRun() {
+            Runnable task = tasks.poll();
             if (task == null) {
                 throw new RejectedExecutionException(rejection());
             }
@@ -215,10 +147,10 @@ public class KeyQueuedExecutorService<K> {
         private void run(Runnable task) {
             parent.execute(() -> {
                 task.run();
-                Runnable next = tasks.remove();
+                Runnable next = tasks.poll();
                 if (next == null) {
                     synchronized (keyQueue) {
-                        next = tasks.remove();
+                        next = tasks.poll();
                         if (next == null) {
                             keyQueue.remove(key);
                         }
