@@ -16,6 +16,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_19_R3.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R3.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R3.regen.PaperweightRegen;
@@ -85,6 +86,8 @@ import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -126,8 +129,45 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     private boolean initialised = false;
     private Map<String, List<Property<?>>> allBlockProperties = null;
 
+    // Folia - START
+    private MethodHandle currentWorldData;
+
+    private Class<?> regionizedWorldData;
+
+    private Field captureTreeGeneration;
+    private Field captureBlockStates;
+    private Field capturedBlockStates;
+
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new PaperweightAdapter();
+        if (this.parent.isFolia()) {
+            Method getCurrentWorldData = ServerLevel.class.getDeclaredMethod(
+                    "getCurrentWorldData"
+            );
+            getCurrentWorldData.setAccessible(true);
+            try {
+                currentWorldData = MethodHandles.lookup().unreflect(getCurrentWorldData);
+            } catch (IllegalAccessException e) {
+            }
+
+            try {
+                regionizedWorldData = Class.forName("io.papermc.paper.threadedregions.RegionizedWorldData");
+            } catch (ClassNotFoundException e) {
+            }
+            if (regionizedWorldData != null) {
+                final Field captureTreeGeneration = regionizedWorldData.getDeclaredField("captureTreeGeneration");
+                captureTreeGeneration.setAccessible(true);
+                this.captureTreeGeneration = captureTreeGeneration;
+
+                final Field captureBlockStates = regionizedWorldData.getDeclaredField("captureBlockStates");
+                captureBlockStates.setAccessible(true);
+                this.captureBlockStates = captureBlockStates;
+
+                final Field capturedBlockStates = regionizedWorldData.getDeclaredField("capturedBlockStates");
+                capturedBlockStates.setAccessible(true);
+                this.capturedBlockStates = capturedBlockStates;
+            }
+        }
     }
 
     @Nullable
@@ -504,17 +544,37 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         final BlockVector3 finalBlockVector = blockVector3;
         // Sync to main thread to ensure no clashes occur
         Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
-            serverLevel.captureTreeGeneration = true;
-            serverLevel.captureBlockStates = true;
-            try {
-                if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
-                    return null;
+            if (this.parent.isFolia()) {
+                try {
+                    var data = currentWorldData.invoke(serverLevel);
+                    captureBlockStates.setBoolean(data, true);
+                    captureTreeGeneration.setBoolean(data, true);
+                    try {
+                        if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
+                            return null;
+                        }
+                        return ImmutableMap.copyOf((Map<BlockPos, CraftBlockState>) capturedBlockStates.get(data));
+                    } finally {
+                        captureBlockStates.setBoolean(data, false);
+                        captureTreeGeneration.setBoolean(data, false);
+                        ((Map<BlockPos, CraftBlockState>) capturedBlockStates.get(data)).clear();
+                    }
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
                 }
-                return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
-            } finally {
-                serverLevel.captureBlockStates = false;
-                serverLevel.captureTreeGeneration = false;
-                serverLevel.capturedBlockStates.clear();
+            } else {
+                serverLevel.captureTreeGeneration = true;
+                serverLevel.captureBlockStates = true;
+                try {
+                    if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
+                        return null;
+                    }
+                    return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
+                } finally {
+                    serverLevel.captureBlockStates = false;
+                    serverLevel.captureTreeGeneration = false;
+                    serverLevel.capturedBlockStates.clear();
+                }
             }
         });
         if (placed == null || placed.isEmpty()) {
