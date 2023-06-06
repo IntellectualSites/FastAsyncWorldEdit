@@ -156,7 +156,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     /**
      * Load an existing file as a DiskOptimizedClipboard. The file MUST exist and MUST be created as a DiskOptimizedClipboard
      * with data written to it.
+     * @deprecated Will be made private, use {@link DiskOptimizedClipboard#loadFromFile(File)}
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public DiskOptimizedClipboard(File file) {
         this(file, VERSION);
     }
@@ -167,7 +169,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
      *
      * @param file            File to read from
      * @param versionOverride An override version to allow loading of older clipboards if required
+     * @deprecated Will be made private, use {@link DiskOptimizedClipboard#loadFromFile(File)}
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public DiskOptimizedClipboard(File file, int versionOverride) {
         super(readSize(file, versionOverride), BlockVector3.ZERO);
         headerSize = getHeaderSizeOverrideFromVersion(versionOverride);
