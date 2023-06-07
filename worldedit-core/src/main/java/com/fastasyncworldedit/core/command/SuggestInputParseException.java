@@ -19,7 +19,7 @@ public class SuggestInputParseException extends InputParseException {
     /**
      * @deprecated Use {@link SuggestInputParseException#SuggestInputParseException(Component, Supplier)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public SuggestInputParseException(String msg, String prefix, Supplier<List<String>> getSuggestions) {
         this(new InputParseException(msg), getSuggestions);
     }
@@ -27,7 +27,7 @@ public class SuggestInputParseException extends InputParseException {
     /**
      * @deprecated Use {@link SuggestInputParseException#of(Throwable, Supplier)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public static SuggestInputParseException of(Throwable other, String prefix, Supplier<List<String>> getSuggestions) {
         if (other instanceof InputParseException) {
             return of((InputParseException) other, getSuggestions);
@@ -38,7 +38,7 @@ public class SuggestInputParseException extends InputParseException {
     /**
      * @deprecated Use {@link SuggestInputParseException#of(InputParseException, Supplier)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public static SuggestInputParseException of(InputParseException other, String prefix, Supplier<List<String>> getSuggestions) {
         if (other instanceof SuggestInputParseException) {
             return (SuggestInputParseException) other;
@@ -49,7 +49,7 @@ public class SuggestInputParseException extends InputParseException {
     /**
      * @deprecated Use {@link SuggestInputParseException#SuggestInputParseException(InputParseException, Supplier)}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public SuggestInputParseException(InputParseException other, String prefix, Supplier<List<String>> getSuggestions) {
         super(other.getRichMessage());
         checkNotNull(getSuggestions);
@@ -62,8 +62,8 @@ public class SuggestInputParseException extends InputParseException {
      * Create a new SuggestInputParseException instance
      *
      * @param message        Message to send
-     * @param getSuggestions Supplier of list of sugegstions to give to user
-     * @since TODO
+     * @param getSuggestions Supplier of list of suggestions to give to user
+     * @since 2.6.2
      */
     public SuggestInputParseException(Component message, Supplier<List<String>> getSuggestions) {
         this(new InputParseException(message), getSuggestions);
@@ -129,7 +129,7 @@ public class SuggestInputParseException extends InputParseException {
     /**
      * @deprecated Unused
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public SuggestInputParseException prepend(String input) {
         // Do nothing
         return this;

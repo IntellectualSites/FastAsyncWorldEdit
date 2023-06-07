@@ -166,7 +166,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
     /**
      * @deprecated For removal without replacement.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public <T extends Future<T>> void complete(Future<T> task) {
         try {
             while (task != null) {
@@ -422,7 +422,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * @param parallel if the "set" being started is parallel/async
      * @deprecated To be replaced by better-named {@link QueueHandler#startUnsafe(boolean)} )}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public void startSet(boolean parallel) {
         startUnsafe(parallel);
     }
@@ -434,7 +434,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * @param parallel if the "set" being started is parallel/async
      * @deprecated To be replaced by better-named {@link QueueHandler#endUnsafe(boolean)} )}
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public void endSet(boolean parallel) {
         startUnsafe(parallel);
     }

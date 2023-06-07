@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * Executor service that queues tasks based on keys, executing tasks on a configurable {@link ThreadPoolExecutor}
  *
  * @param <K> Key type
- * @since TODO
+ * @since 2.6.2
  */
 public class KeyQueuedExecutorService<K> {
 

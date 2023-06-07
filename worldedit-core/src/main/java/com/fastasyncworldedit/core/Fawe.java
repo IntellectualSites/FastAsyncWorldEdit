@@ -447,7 +447,7 @@ public class Fawe {
      * Gets the executor used for clipboard IO if clipboard on disk is enabled or null
      *
      * @return Executor used for clipboard IO if clipboard on disk is enabled or null
-     * @since TODO
+     * @since 2.6.2
      */
     @Nullable
     public KeyQueuedExecutorService<UUID> getClipboardExecutor() {

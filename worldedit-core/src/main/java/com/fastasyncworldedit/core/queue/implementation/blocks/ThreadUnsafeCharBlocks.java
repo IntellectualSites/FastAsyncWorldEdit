@@ -30,7 +30,7 @@ import java.util.UUID;
  * This is currently only used as a "copy" of {@link CharSetBlocks} to provide to
  * {@link com.fastasyncworldedit.core.queue.IBatchProcessor} instances for processing without overlapping the continuing edit.
  *
- * @since TODO
+ * @since 2.6.2
  */
 public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
 
@@ -54,7 +54,7 @@ public class ThreadUnsafeCharBlocks implements IChunkSet, IBlocks {
     /**
      * New instance given the data stored in a {@link CharSetBlocks} instance.
      *
-     * @since TODO
+     * @since 2.6.2
      */
     ThreadUnsafeCharBlocks(
             char[][] blocks,
