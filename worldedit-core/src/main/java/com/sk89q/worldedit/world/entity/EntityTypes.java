@@ -47,7 +47,11 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType BLAZE = get("minecraft:blaze");
     @Nullable
+    public static final EntityType BLOCK_DISPLAY = get("minecraft:block_display");
+    @Nullable
     public static final EntityType BOAT = get("minecraft:boat");
+    @Nullable
+    public static final EntityType CAMEL = get("minecraft:camel");
     @Nullable
     public static final EntityType CAT = get("minecraft:cat");
     @Nullable
@@ -135,9 +139,13 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType ILLUSIONER = get("minecraft:illusioner");
     @Nullable
+    public static final EntityType INTERACTION = get("minecraft:interaction");
+    @Nullable
     public static final EntityType IRON_GOLEM = get("minecraft:iron_golem");
     @Nullable
     public static final EntityType ITEM = get("minecraft:item");
+    @Nullable
+    public static final EntityType ITEM_DISPLAY = get("minecraft:item_display");
     @Nullable
     public static final EntityType ITEM_FRAME = get("minecraft:item_frame");
     @Nullable
@@ -207,6 +215,8 @@ public final class EntityTypes {
     @Nullable
     public static final EntityType SMALL_FIREBALL = get("minecraft:small_fireball");
     @Nullable
+    public static final EntityType SNIFFER = get("minecraft:sniffer");
+    @Nullable
     public static final EntityType SNOW_GOLEM = get("minecraft:snow_golem");
     @Nullable
     public static final EntityType SNOWBALL = get("minecraft:snowball");
@@ -224,6 +234,8 @@ public final class EntityTypes {
     public static final EntityType STRIDER = get("minecraft:strider");
     @Nullable
     public static final EntityType TADPOLE = get("minecraft:tadpole");
+    @Nullable
+    public static final EntityType TEXT_DISPLAY = get("minecraft:text_display");
     @Nullable
     public static final EntityType TNT = get("minecraft:tnt");
     @Nullable

@@ -50,6 +50,8 @@ public final class BiomeTypes {
     @Deprecated
     public static final BiomeType BIRCH_FOREST_HILLS = get("minecraft:birch_forest_hills");
     @Nullable
+    public static final BiomeType CHERRY_GROVE = get("minecraft:cherry_grove");
+    @Nullable
     public static final BiomeType COLD_OCEAN = get("minecraft:cold_ocean");
     @Nullable
     public static final BiomeType CRIMSON_FOREST = get("minecraft:crimson_forest");
@@ -137,6 +139,9 @@ public final class BiomeTypes {
     @Nullable
     @Deprecated
     public static final BiomeType MODIFIED_BADLANDS_PLATEAU = get("minecraft:modified_badlands_plateau");
+    @Deprecated
+    @Nullable
+    public static final BiomeType MODIFIED_GRAVELLY_HILLS = get("minecraft:modified_gravelly_hills");
     @Nullable
     @Deprecated
     public static final BiomeType MODIFIED_GRAVELLY_MOUNTAINS = get("minecraft:modified_gravelly_mountains");
