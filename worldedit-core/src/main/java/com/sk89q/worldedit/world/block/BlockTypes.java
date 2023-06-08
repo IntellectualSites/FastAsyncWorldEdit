@@ -2066,6 +2066,8 @@ public final class BlockTypes {
     private static Field[] fieldsTmp;
     private static int initIndex = 0;
 
+    // Init each field
+    // The order is important
     public static BlockType init() {
         if (fieldsTmp == null) {
             fieldsTmp = BlockTypes.class.getDeclaredFields();
@@ -2075,6 +2077,7 @@ public final class BlockTypes {
         return BlockType.REGISTRY.get(name);
     }
 
+    // Clears memory after initialization
     static {
         fieldsTmp = null;
     }

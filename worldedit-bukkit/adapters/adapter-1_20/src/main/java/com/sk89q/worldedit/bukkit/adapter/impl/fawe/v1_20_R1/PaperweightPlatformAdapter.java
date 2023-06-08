@@ -137,11 +137,11 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldPalette = dataClazz.getDeclaredField(Refraction.pickName("palette", "c"));
             fieldPalette.setAccessible(true);
 
-            fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "h"));
+            fieldTickingFluidCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "g"));
             fieldTickingFluidCount.setAccessible(true);
-            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "g"));
+            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "f"));
             fieldTickingBlockCount.setAccessible(true);
-            fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("nonEmptyBlockCount", "f"));
+            fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("nonEmptyBlockCount", "e"));
             fieldNonEmptyBlockCount.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(

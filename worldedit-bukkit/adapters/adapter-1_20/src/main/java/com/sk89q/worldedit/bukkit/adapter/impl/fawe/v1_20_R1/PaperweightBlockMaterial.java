@@ -15,14 +15,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
-import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 
 public class PaperweightBlockMaterial implements BlockMaterial {
 
     private final Block block;
     private final BlockState blockState;
-    private final Material material;
     private final boolean isTranslucent;
     private final CraftBlockData craftBlockData;
     private final org.bukkit.Material craftMaterial;
@@ -36,13 +34,12 @@ public class PaperweightBlockMaterial implements BlockMaterial {
     public PaperweightBlockMaterial(Block block, BlockState blockState) {
         this.block = block;
         this.blockState = blockState;
-        this.material = blockState.getBukkitMaterial();
         this.craftBlockData = CraftBlockData.fromData(blockState);
         this.craftMaterial = craftBlockData.getMaterial();
         BlockBehaviour.Properties blockInfo = ReflectionUtil.getField(BlockBehaviour.class, block,
-                Refraction.pickName("properties", "aP"));
+                Refraction.pickName("properties", "aN"));
         this.isTranslucent = !(boolean) ReflectionUtil.getField(BlockBehaviour.Properties.class, blockInfo,
-                Refraction.pickName("canOcclude", "n")
+                Refraction.pickName("canOcclude", "m")
         );
         opacity = blockState.getLightBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
         BlockEntity tileEntity = !(block instanceof EntityBlock) ? null : ((EntityBlock) block).newBlockEntity(
@@ -64,10 +61,6 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     public CraftBlockData getCraftBlockData() {
         return craftBlockData;
-    }
-
-    public Material getMaterial() {
-        return material;
     }
 
     @Override
@@ -98,7 +91,8 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isSolid() {
-        return material.isSolid();
+        // TODO: Replace
+        return blockState.isSolid();
     }
 
     @Override
@@ -143,12 +137,12 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isMovementBlocker() {
-        return material.isSolid();
+        return craftMaterial.isSolid();
     }
 
     @Override
     public boolean isBurnable() {
-        return material.isFlammable();
+        return craftMaterial.isBurnable();
     }
 
     @Override
