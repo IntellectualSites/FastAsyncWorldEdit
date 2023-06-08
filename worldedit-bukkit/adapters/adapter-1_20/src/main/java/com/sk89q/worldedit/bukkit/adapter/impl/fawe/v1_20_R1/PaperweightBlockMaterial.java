@@ -10,11 +10,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.PushReaction;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 
 public class PaperweightBlockMaterial implements BlockMaterial {
@@ -35,7 +36,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
     public PaperweightBlockMaterial(Block block, BlockState blockState) {
         this.block = block;
         this.blockState = blockState;
-        this.material = blockState.getMaterial();
+        this.material = blockState.getBukkitMaterial();
         this.craftBlockData = CraftBlockData.fromData(blockState);
         this.craftMaterial = craftBlockData.getMaterial();
         BlockBehaviour.Properties blockInfo = ReflectionUtil.getField(BlockBehaviour.class, block,
@@ -81,7 +82,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isOpaque() {
-        return material.isSolidBlocking();
+        return blockState.isOpaque();
     }
 
     @Override
@@ -91,7 +92,8 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isLiquid() {
-        return material.isLiquid();
+        // TODO: Better check ?
+        return block instanceof LiquidBlock;
     }
 
     @Override
@@ -126,12 +128,12 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isFragileWhenPushed() {
-        return material.getPushReaction() == PushReaction.DESTROY;
+        return blockState.getPistonPushReaction() == PushReaction.DESTROY;
     }
 
     @Override
     public boolean isUnpushable() {
-        return material.getPushReaction() == PushReaction.BLOCK;
+        return blockState.getPistonPushReaction() == PushReaction.BLOCK;
     }
 
     @Override
@@ -157,7 +159,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
 
     @Override
     public boolean isReplacedDuringPlacement() {
-        return material.isReplaceable();
+        return blockState.canBeReplaced();
     }
 
     @Override
@@ -183,7 +185,7 @@ public class PaperweightBlockMaterial implements BlockMaterial {
     @Override
     public int getMapColor() {
         // rgb field
-        return material.getColor().col;
+        return block.defaultMapColor().col;
     }
 
 }

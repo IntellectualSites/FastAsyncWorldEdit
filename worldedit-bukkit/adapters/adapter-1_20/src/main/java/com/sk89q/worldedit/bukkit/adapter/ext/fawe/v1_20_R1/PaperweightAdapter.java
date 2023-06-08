@@ -351,16 +351,16 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
         return state.toBaseBlock();
     }
-
+/*
     @Override
     public boolean hasCustomBiomeSupport() {
         return true;
     }
-
+*/
     private static final HashMap<BiomeType, Holder<Biome>> biomeTypeToNMSCache = new HashMap<>();
     private static final HashMap<Holder<Biome>, BiomeType> biomeTypeFromNMSCache = new HashMap<>();
 
-    @Override
+   /* @Override
     public BiomeType getBiome(Location location) {
         checkNotNull(location);
 
@@ -389,11 +389,11 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         LevelChunk chunk = handle.getChunk(x >> 4, z >> 4);
         chunk.setBiome(x >> 2, y >> 2, z >> 2, biomeTypeToNMSCache.computeIfAbsent(biome, b -> ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registries.BIOME).getHolderOrThrow(ResourceKey.create(Registries.BIOME, new ResourceLocation(b.getId())))));
         chunk.setUnsaved(true);
-    }
+    }*/
 
     @Override
     public WorldNativeAccess<?, ?, ?> createWorldNativeAccess(org.bukkit.World world) {
-        return new com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R1.PaperweightWorldNativeAccess(this,
+        return new com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R1.PaperweightWorldNativeAccess(this,
                 new WeakReference<>(((CraftWorld) world).getHandle()));
     }
 
@@ -575,7 +575,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         ));
     }
 
-    @Override
+    /*@Override
     public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
         ((CraftPlayer) player).getHandle().connection.send(ClientboundBlockEntityDataPacket.create(
                 new StructureBlockEntity(
@@ -584,7 +584,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 ),
                 __ -> (net.minecraft.nbt.CompoundTag) fromNative(nbtData)
         ));
-    }
+    }*/
 
     @Override
     public void sendFakeOP(Player player) {
@@ -854,7 +854,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         return false;
     }
 
-    @Override
+    /*@Override
     public void initializeRegistries() {
         DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
         // Biomes
@@ -863,7 +863,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 BiomeType.REGISTRY.register(name.toString(), new BiomeType(name.toString()));
             }
         }
-    }
+    }*
 
     // ------------------------------------------------------------------------
     // Code that is less likely to break
@@ -1025,7 +1025,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                     WatchdogThread.tick();
                 }
             } catch (IllegalAccessException e) {
-                logger.log(Level.WARNING, "Failed to tick watchdog", e);
+                LOGGER.log(Level.WARNING, "Failed to tick watchdog", e);
             }
         }
     }

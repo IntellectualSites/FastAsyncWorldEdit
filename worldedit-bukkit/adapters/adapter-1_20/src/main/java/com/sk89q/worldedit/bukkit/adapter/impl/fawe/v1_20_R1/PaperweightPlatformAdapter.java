@@ -481,7 +481,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 );
             }
 
-            return new LevelChunkSection(layer, blockStatePalettedContainer, biomes);
+            return new LevelChunkSection(blockStatePalettedContainer, biomes);
         } catch (final Throwable e) {
             throw e;
         } finally {
@@ -499,14 +499,14 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             @Nullable PalettedContainer<Holder<Biome>> biomes
     ) {
         if (biomes == null) {
-            return new LevelChunkSection(layer, biomeRegistry);
+            return new LevelChunkSection(biomeRegistry);
         }
         PalettedContainer<net.minecraft.world.level.block.state.BlockState> dataPaletteBlocks = new PalettedContainer<>(
                 Block.BLOCK_STATE_REGISTRY,
                 Blocks.AIR.defaultBlockState(),
                 PalettedContainer.Strategy.SECTION_STATES
         );
-        return new LevelChunkSection(layer, dataPaletteBlocks, biomes);
+        return new LevelChunkSection(dataPaletteBlocks, biomes);
     }
 
     /**

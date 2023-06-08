@@ -111,17 +111,17 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         chunkStati.put(ChunkStatus.NOISE, Concurrency.RADIUS); // noise: radius 8
         chunkStati.put(ChunkStatus.SURFACE, Concurrency.NONE);   // surface: radius 0, requires NONE
         chunkStati.put(ChunkStatus.CARVERS, Concurrency.NONE);   // carvers: radius 0, but RADIUS and FULL change results
-        chunkStati.put(
+        /*chunkStati.put(
                 ChunkStatus.LIQUID_CARVERS,
                 Concurrency.NONE
-        );   // liquid carvers: radius 0, but RADIUS and FULL change results
+        );   // liquid carvers: radius 0, but RADIUS and FULL change results*/
         chunkStati.put(ChunkStatus.FEATURES, Concurrency.NONE);   // features: uses unsynchronized maps
         chunkStati.put(
                 ChunkStatus.LIGHT,
                 Concurrency.FULL
         );   // light: radius 1, but no writes to other chunks, only current chunk
         chunkStati.put(ChunkStatus.SPAWN, Concurrency.FULL);   // spawn: radius 0
-        chunkStati.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
+        // chunkStati.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
 
         try {
             serverWorldsField = CraftServer.class.getDeclaredField("worlds");
@@ -264,6 +264,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 seed,
                 ImmutableList.of(),
                 false,
+                originalServerWorld.getRandomSequences(),
                 environment,
                 generator,
                 biomeProvider
@@ -550,7 +551,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         @Override
         public String name() {
-            return chunkStatus.getName();
+            return chunkStatus.toString();
         }
 
         @Override
@@ -562,8 +563,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                     structureTemplateManager,
                     threadedLevelLightEngine,
                     c -> CompletableFuture.completedFuture(Either.left(c)),
-                    accessibleChunks,
-                    true
+                    accessibleChunks
             );
         }
 
@@ -582,11 +582,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
         public NoOpLightEngine(final ServerChunkCache chunkProvider) {
             super(chunkProvider, chunkProvider.chunkMap, false, MAILBOX, HANDLE);
-        }
-
-        @Override
-        public CompletableFuture<ChunkAccess> retainData(final ChunkAccess chunk) {
-            return CompletableFuture.completedFuture(chunk);
         }
 
         @Override
