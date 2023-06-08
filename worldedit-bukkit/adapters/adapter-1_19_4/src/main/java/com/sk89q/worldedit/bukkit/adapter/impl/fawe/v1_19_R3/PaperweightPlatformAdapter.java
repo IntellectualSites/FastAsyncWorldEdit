@@ -215,14 +215,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             } catch (NoSuchFieldException ignored) {
             }
             POST_CHUNK_REWRITE = chunkRewrite;
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | Error e) {
             throw e;
-        } catch (Throwable rethrow) {
-            rethrow.printStackTrace();
-            throw new RuntimeException(rethrow);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         MethodHandle craftChunkGetHandle;
-        final MethodType type = methodType(ChunkAccess.class);
+        final MethodType type = methodType(LevelChunk.class);
         try {
             craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", type);
         } catch (NoSuchMethodException | IllegalAccessException e) {
