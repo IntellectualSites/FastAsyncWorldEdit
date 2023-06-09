@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.configuration.file;
 
 import com.fastasyncworldedit.core.configuration.serialization.ConfigurationSerialization;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.Node;
@@ -12,6 +13,7 @@ import java.util.Map;
 public class YamlConstructor extends SafeConstructor {
 
     public YamlConstructor() {
+        super(new LoaderOptions());
         yamlConstructors.put(Tag.MAP, new ConstructCustomObject());
     }
 

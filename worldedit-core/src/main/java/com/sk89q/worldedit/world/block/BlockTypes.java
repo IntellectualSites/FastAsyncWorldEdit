@@ -55,6 +55,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType ACACIA_FENCE_GATE = init();
     @Nullable
+    public static final BlockType ACACIA_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType ACACIA_LEAVES = init();
     @Nullable
     public static final BlockType ACACIA_LOG = init();
@@ -72,6 +74,8 @@ public final class BlockTypes {
     public static final BlockType ACACIA_STAIRS = init();
     @Nullable
     public static final BlockType ACACIA_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType ACACIA_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType ACACIA_WALL_SIGN = init();
     @Nullable
@@ -111,7 +115,41 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType BAMBOO = init();
     @Nullable
+    public static final BlockType BAMBOO_BLOCK = init();
+    @Nullable
+    public static final BlockType BAMBOO_BUTTON = init();
+    @Nullable
+    public static final BlockType BAMBOO_DOOR = init();
+    @Nullable
+    public static final BlockType BAMBOO_FENCE = init();
+    @Nullable
+    public static final BlockType BAMBOO_FENCE_GATE = init();
+    @Nullable
+    public static final BlockType BAMBOO_HANGING_SIGN = init();
+    @Nullable
+    public static final BlockType BAMBOO_MOSAIC = init();
+    @Nullable
+    public static final BlockType BAMBOO_MOSAIC_SLAB = init();
+    @Nullable
+    public static final BlockType BAMBOO_MOSAIC_STAIRS = init();
+    @Nullable
+    public static final BlockType BAMBOO_PLANKS = init();
+    @Nullable
+    public static final BlockType BAMBOO_PRESSURE_PLATE = init();
+    @Nullable
     public static final BlockType BAMBOO_SAPLING = init();
+    @Nullable
+    public static final BlockType BAMBOO_SIGN = init();
+    @Nullable
+    public static final BlockType BAMBOO_SLAB = init();
+    @Nullable
+    public static final BlockType BAMBOO_STAIRS = init();
+    @Nullable
+    public static final BlockType BAMBOO_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType BAMBOO_WALL_HANGING_SIGN = init();
+    @Nullable
+    public static final BlockType BAMBOO_WALL_SIGN = init();
     @Nullable
     public static final BlockType BARREL = init();
     @Nullable
@@ -143,6 +181,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType BIRCH_FENCE_GATE = init();
     @Nullable
+    public static final BlockType BIRCH_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType BIRCH_LEAVES = init();
     @Nullable
     public static final BlockType BIRCH_LOG = init();
@@ -160,6 +200,8 @@ public final class BlockTypes {
     public static final BlockType BIRCH_STAIRS = init();
     @Nullable
     public static final BlockType BIRCH_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType BIRCH_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType BIRCH_WALL_SIGN = init();
     @Nullable
@@ -307,6 +349,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CALCITE = init();
     @Nullable
+    public static final BlockType CALIBRATED_SCULK_SENSOR = init();
+    @Nullable
     public static final BlockType CAMPFIRE = init();
     @Nullable
     public static final BlockType CANDLE = init();
@@ -331,9 +375,45 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CHAIN_COMMAND_BLOCK = init();
     @Nullable
+    public static final BlockType CHERRY_BUTTON = init();
+    @Nullable
+    public static final BlockType CHERRY_DOOR = init();
+    @Nullable
+    public static final BlockType CHERRY_FENCE = init();
+    @Nullable
+    public static final BlockType CHERRY_FENCE_GATE = init();
+    @Nullable
+    public static final BlockType CHERRY_HANGING_SIGN = init();
+    @Nullable
+    public static final BlockType CHERRY_LEAVES = init();
+    @Nullable
+    public static final BlockType CHERRY_LOG = init();
+    @Nullable
+    public static final BlockType CHERRY_PLANKS = init();
+    @Nullable
+    public static final BlockType CHERRY_PRESSURE_PLATE = init();
+    @Nullable
+    public static final BlockType CHERRY_SAPLING = init();
+    @Nullable
+    public static final BlockType CHERRY_SIGN = init();
+    @Nullable
+    public static final BlockType CHERRY_SLAB = init();
+    @Nullable
+    public static final BlockType CHERRY_STAIRS = init();
+    @Nullable
+    public static final BlockType CHERRY_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType CHERRY_WALL_HANGING_SIGN = init();
+    @Nullable
+    public static final BlockType CHERRY_WALL_SIGN = init();
+    @Nullable
+    public static final BlockType CHERRY_WOOD = init();
+    @Nullable
     public static final BlockType CHEST = init();
     @Nullable
     public static final BlockType CHIPPED_ANVIL = init();
+    @Nullable
+    public static final BlockType CHISELED_BOOKSHELF = init();
     @Nullable
     public static final BlockType CHISELED_DEEPSLATE = init();
     @Nullable
@@ -419,6 +499,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType CRIMSON_FUNGUS = init();
     @Nullable
+    public static final BlockType CRIMSON_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType CRIMSON_HYPHAE = init();
     @Nullable
     public static final BlockType CRIMSON_NYLIUM = init();
@@ -438,6 +520,8 @@ public final class BlockTypes {
     public static final BlockType CRIMSON_STEM = init();
     @Nullable
     public static final BlockType CRIMSON_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType CRIMSON_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType CRIMSON_WALL_SIGN = init();
     @Nullable
@@ -497,6 +581,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType DARK_OAK_FENCE_GATE = init();
     @Nullable
+    public static final BlockType DARK_OAK_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType DARK_OAK_LEAVES = init();
     @Nullable
     public static final BlockType DARK_OAK_LOG = init();
@@ -514,6 +600,8 @@ public final class BlockTypes {
     public static final BlockType DARK_OAK_STAIRS = init();
     @Nullable
     public static final BlockType DARK_OAK_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType DARK_OAK_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType DARK_OAK_WALL_SIGN = init();
     @Nullable
@@ -568,6 +656,8 @@ public final class BlockTypes {
     public static final BlockType DEAD_TUBE_CORAL_FAN = init();
     @Nullable
     public static final BlockType DEAD_TUBE_CORAL_WALL_FAN = init();
+    @Nullable
+    public static final BlockType DECORATED_POT = init();
     @Nullable
     public static final BlockType DEEPSLATE = init();
     @Nullable
@@ -843,6 +933,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType JUNGLE_FENCE_GATE = init();
     @Nullable
+    public static final BlockType JUNGLE_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType JUNGLE_LEAVES = init();
     @Nullable
     public static final BlockType JUNGLE_LOG = init();
@@ -860,6 +952,8 @@ public final class BlockTypes {
     public static final BlockType JUNGLE_STAIRS = init();
     @Nullable
     public static final BlockType JUNGLE_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType JUNGLE_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType JUNGLE_WALL_SIGN = init();
     @Nullable
@@ -1027,6 +1121,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType MANGROVE_FENCE_GATE = init();
     @Nullable
+    public static final BlockType MANGROVE_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType MANGROVE_LEAVES = init();
     @Nullable
     public static final BlockType MANGROVE_LOG = init();
@@ -1046,6 +1142,8 @@ public final class BlockTypes {
     public static final BlockType MANGROVE_STAIRS = init();
     @Nullable
     public static final BlockType MANGROVE_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType MANGROVE_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType MANGROVE_WALL_SIGN = init();
     @Nullable
@@ -1131,6 +1229,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType OAK_FENCE_GATE = init();
     @Nullable
+    public static final BlockType OAK_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType OAK_LEAVES = init();
     @Nullable
     public static final BlockType OAK_LOG = init();
@@ -1148,6 +1248,8 @@ public final class BlockTypes {
     public static final BlockType OAK_STAIRS = init();
     @Nullable
     public static final BlockType OAK_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType OAK_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType OAK_WALL_SIGN = init();
     @Nullable
@@ -1209,6 +1311,10 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType PETRIFIED_OAK_SLAB = init();
     @Nullable
+    public static final BlockType PIGLIN_HEAD = init();
+    @Nullable
+    public static final BlockType PIGLIN_WALL_HEAD = init();
+    @Nullable
     public static final BlockType PINK_BANNER = init();
     @Nullable
     public static final BlockType PINK_BED = init();
@@ -1224,6 +1330,8 @@ public final class BlockTypes {
     public static final BlockType PINK_CONCRETE_POWDER = init();
     @Nullable
     public static final BlockType PINK_GLAZED_TERRACOTTA = init();
+    @Nullable
+    public static final BlockType PINK_PETALS = init();
     @Nullable
     public static final BlockType PINK_SHULKER_BOX = init();
     @Nullable
@@ -1242,6 +1350,10 @@ public final class BlockTypes {
     public static final BlockType PISTON = init();
     @Nullable
     public static final BlockType PISTON_HEAD = init();
+    @Nullable
+    public static final BlockType PITCHER_CROP = init();
+    @Nullable
+    public static final BlockType PITCHER_PLANT = init();
     @Nullable
     public static final BlockType PLAYER_HEAD = init();
     @Nullable
@@ -1324,6 +1436,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType POTTED_CACTUS = init();
     @Nullable
+    public static final BlockType POTTED_CHERRY_SAPLING = init();
+    @Nullable
     public static final BlockType POTTED_CORNFLOWER = init();
     @Nullable
     public static final BlockType POTTED_CRIMSON_FUNGUS = init();
@@ -1364,6 +1478,8 @@ public final class BlockTypes {
     public static final BlockType POTTED_RED_TULIP = init();
     @Nullable
     public static final BlockType POTTED_SPRUCE_SAPLING = init();
+    @Nullable
+    public static final BlockType POTTED_TORCHFLOWER = init();
     @Nullable
     public static final BlockType POTTED_WARPED_FUNGUS = init();
     @Nullable
@@ -1600,6 +1716,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType SMOOTH_STONE_SLAB = init();
     @Nullable
+    public static final BlockType SNIFFER_EGG = init();
+    @Nullable
     public static final BlockType SNOW = init();
     @Nullable
     public static final BlockType SNOW_BLOCK = init();
@@ -1632,6 +1750,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType SPRUCE_FENCE_GATE = init();
     @Nullable
+    public static final BlockType SPRUCE_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType SPRUCE_LEAVES = init();
     @Nullable
     public static final BlockType SPRUCE_LOG = init();
@@ -1649,6 +1769,8 @@ public final class BlockTypes {
     public static final BlockType SPRUCE_STAIRS = init();
     @Nullable
     public static final BlockType SPRUCE_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType SPRUCE_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType SPRUCE_WALL_SIGN = init();
     @Nullable
@@ -1680,9 +1802,15 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType STRIPPED_ACACIA_WOOD = init();
     @Nullable
+    public static final BlockType STRIPPED_BAMBOO_BLOCK = init();
+    @Nullable
     public static final BlockType STRIPPED_BIRCH_LOG = init();
     @Nullable
     public static final BlockType STRIPPED_BIRCH_WOOD = init();
+    @Nullable
+    public static final BlockType STRIPPED_CHERRY_LOG = init();
+    @Nullable
+    public static final BlockType STRIPPED_CHERRY_WOOD = init();
     @Nullable
     public static final BlockType STRIPPED_CRIMSON_HYPHAE = init();
     @Nullable
@@ -1720,6 +1848,10 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType SUNFLOWER = init();
     @Nullable
+    public static final BlockType SUSPICIOUS_GRAVEL = init();
+    @Nullable
+    public static final BlockType SUSPICIOUS_SAND = init();
+    @Nullable
     public static final BlockType SWEET_BERRY_BUSH = init();
     @Nullable
     public static final BlockType TALL_GRASS = init();
@@ -1735,6 +1867,10 @@ public final class BlockTypes {
     public static final BlockType TNT = init();
     @Nullable
     public static final BlockType TORCH = init();
+    @Nullable
+    public static final BlockType TORCHFLOWER = init();
+    @Nullable
+    public static final BlockType TORCHFLOWER_CROP = init();
     @Nullable
     public static final BlockType TRAPPED_CHEST = init();
     @Nullable
@@ -1779,6 +1915,8 @@ public final class BlockTypes {
     @Nullable
     public static final BlockType WARPED_FUNGUS = init();
     @Nullable
+    public static final BlockType WARPED_HANGING_SIGN = init();
+    @Nullable
     public static final BlockType WARPED_HYPHAE = init();
     @Nullable
     public static final BlockType WARPED_NYLIUM = init();
@@ -1798,6 +1936,8 @@ public final class BlockTypes {
     public static final BlockType WARPED_STEM = init();
     @Nullable
     public static final BlockType WARPED_TRAPDOOR = init();
+    @Nullable
+    public static final BlockType WARPED_WALL_HANGING_SIGN = init();
     @Nullable
     public static final BlockType WARPED_WALL_SIGN = init();
     @Nullable
@@ -1926,6 +2066,8 @@ public final class BlockTypes {
     private static Field[] fieldsTmp;
     private static int initIndex = 0;
 
+    // Init each field
+    // The order is important
     public static BlockType init() {
         if (fieldsTmp == null) {
             fieldsTmp = BlockTypes.class.getDeclaredFields();
@@ -1935,6 +2077,7 @@ public final class BlockTypes {
         return BlockType.REGISTRY.get(name);
     }
 
+    // Clears memory after initialization
     static {
         fieldsTmp = null;
     }

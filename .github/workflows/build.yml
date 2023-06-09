@@ -76,18 +76,3 @@ jobs:
         run: ./gradlew modrinth
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-      - name: Publish to CurseForge
-        if: ${{ runner.os == 'Linux' && env.STATUS == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        uses: itsmeow/curseforge-upload@v3
-        with:
-          file_path: worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-${{ github.event.release.tag_name }}.jar
-          # https://minecraft.curseforge.com/api/game/versions?token=redacted
-          # gameVersionTypeID: 1
-          game_versions: "8503,9016,9190,9261,9560,9561"
-          project_id: 103525
-          game_endpoint: minecraft
-          token: ${{ secrets.CURSEFORGE_TOKEN }}
-          display_name: FastAsyncWorldEdit ${{ github.event.release.tag_name }}
-          release_type: release
-          changelog: "Click here to view changelog: https://github.com/IntellectualSites/FastAsyncWorldEdit/releases/tag/${{ github.event.release.tag_name }}"
-          changelog_type: markdown

@@ -12,7 +12,7 @@ applyPlatformAndCoreConfiguration()
 dependencies {
     constraints {
         implementation("org.yaml:snakeyaml") {
-            version { strictly("1.33") }
+            version { strictly("2.0") }
             because("Bukkit provides SnakeYaml")
         }
     }
@@ -28,7 +28,8 @@ dependencies {
     implementation("com.google.code.gson:gson")
 
     // Platform expectations
-    implementation("org.yaml:snakeyaml")
+    // TODO update bom-newest
+    implementation("org.yaml:snakeyaml:2.0")
 
     // Logging
     implementation("org.apache.logging.log4j:log4j-api")
