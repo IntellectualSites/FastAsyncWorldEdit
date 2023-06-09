@@ -36,31 +36,27 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
         if (block == null) {
             return false;
         }
-        Resident resident;
-        try {
-            resident = TownyUniverse.getInstance().getResident(player.getName());
-            try {
-                if (block.getResident().equals(resident)) {
-                    return true;
-                }
-            } catch (NotRegisteredException ignored) {
-            }
-            Town town = block.getTown();
-            if (town.isMayor(resident)) {
+        Resident resident = TownyAPI.getInstance().getResident(player);
+        if (resident == null) {
+            return false;
+        }
+        if (block.hasResident(resident) || block.hasTrustedResident(resident)) {
+            return true;
+        }
+        Town town = block.getTownOrNull(); // Will not be null, because block is not null.
+        if (town.isMayor(resident) || town.hasTrustedResident(resident)) {
+            return true;
+        }
+        if (!town.hasResident(resident)) {
+            return false;
+        }
+        if (player.hasPermission("fawe.towny.*")) {
+            return true;
+        }
+        for (String rank : resident.getTownRanks()) {
+            if (player.hasPermission("fawe.towny." + rank)) {
                 return true;
             }
-            if (!town.hasResident(resident)) {
-                return false;
-            }
-            if (player.hasPermission("fawe.towny.*")) {
-                return true;
-            }
-            for (String rank : resident.getTownRanks()) {
-                if (player.hasPermission("fawe.towny." + rank)) {
-                    return true;
-                }
-            }
-        } catch (NotRegisteredException ignored) {
         }
         return false;
     }
@@ -69,17 +65,13 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
     public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
         final Location location = player.getLocation();
+        final WorldCoord mycoord = WorldCoord.parseWorldCoord(location);
+        if (mycoord.isWilderness()) {
+            return null;
+        }
+        final TownBlock myplot = mycoord.getTownBlockOrNull(); // Will not be null, because of the isWilderness() test above.
+        boolean isMember = isAllowed(player, myplot);
         try {
-            final PlayerCache cache = ((Towny) this.towny).getCache(player);
-            final WorldCoord mycoord = cache.getLastTownBlock();
-            if (mycoord == null) {
-                return null;
-            }
-            final TownBlock myplot = mycoord.getTownBlock();
-            if (myplot == null) {
-                return null;
-            }
-            boolean isMember = isAllowed(player, myplot);
             if (isMember) {
                 final Chunk chunk = location.getChunk();
                 final BlockVector3 pos1 = BlockVector3
