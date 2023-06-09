@@ -9,6 +9,10 @@ project.description = "Core"
 
 applyPlatformAndCoreConfiguration()
 
+repositories {
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+}
+
 dependencies {
     constraints {
         implementation("org.yaml:snakeyaml") {
@@ -35,7 +39,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-api")
 
     // Plugins
-    compileOnly("com.plotsquared:PlotSquared-Core") { isTransitive = false }
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-core:7.0.0-SNAPSHOT") { isTransitive = false }
 
     // ensure this is on the classpath for the AP
     annotationProcessor(libs.guava)
