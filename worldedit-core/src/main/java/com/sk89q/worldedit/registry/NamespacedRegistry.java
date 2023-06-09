@@ -47,8 +47,16 @@ public final class NamespacedRegistry<V extends Keyed> extends Registry<V> {
         this(name, MINECRAFT_NAMESPACE);
     }
 
+    public NamespacedRegistry(final String name, final boolean checkInitialized) {
+        this(name, MINECRAFT_NAMESPACE, checkInitialized);
+    }
+
     public NamespacedRegistry(final String name, final String defaultNamespace) {
-        super(name);
+        this(name, defaultNamespace, false);
+    }
+
+    public NamespacedRegistry(final String name, final String defaultNamespace, final boolean checkInitialized) {
+        super(name, checkInitialized);
         this.defaultNamespace = defaultNamespace;
     }
 

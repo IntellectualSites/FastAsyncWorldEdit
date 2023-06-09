@@ -134,6 +134,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.util.List;
@@ -310,11 +311,11 @@ public class BrushCommands {
             },
             desc = "Join multiple objects together in a curve",
             descFooter =
-                    "Click to select some objects,click the same block twice to connect the objects.\n"
-                            + "Insufficient brush radius, or clicking the the wrong spot will result in undesired shapes. The shapes must be simple lines or loops.\n"
-                            + "Pic1: http://i.imgur.com/CeRYAoV.jpg -> http://i.imgur.com/jtM0jA4.png\n"
-                            + "Pic2: http://i.imgur.com/bUeyc72.png -> http://i.imgur.com/tg6MkcF.png"
-                            + "Tutorial: https://www.planetminecraft.com/blog/fawe-tutorial/"
+                    """
+                            Click to select some objects,click the same block twice to connect the objects.
+                            Insufficient brush radius, or clicking the the wrong spot will result in undesired shapes. The shapes must be simple lines or loops.
+                            Pic1: http://i.imgur.com/CeRYAoV.jpg -> http://i.imgur.com/jtM0jA4.png
+                            Pic2: http://i.imgur.com/bUeyc72.png -> http://i.imgur.com/tg6MkcF.pngTutorial: https://www.planetminecraft.com/blog/fawe-tutorial/"""
     )
     @CommandPermissions("worldedit.brush.spline")
     public void splineBrush(
@@ -337,9 +338,10 @@ public class BrushCommands {
                     "vaesweep"
             },
             desc = "Sweep your clipboard content along a curve",
-            descFooter = "Sweeps your clipboard content along a curve.\n"
-                    + "Define a curve by selecting the individual points with a brush\n"
-                    + "Set [copies] to a value > 0 if you want to have your selection pasted a limited amount of times equally spaced on the curve"
+            descFooter = """
+                    Sweeps your clipboard content along a curve.
+                    Define a curve by selecting the individual points with a brush
+                    Set [copies] to a value > 0 if you want to have your selection pasted a limited amount of times equally spaced on the curve"""
     )
     @CommandPermissions("worldedit.brush.sweep")
     public void sweepBrush(
@@ -520,11 +522,9 @@ public class BrushCommands {
             @Switch(name = 'a', desc = "Use image Alpha") boolean alpha,
             @Switch(name = 'f', desc = "Blend the image with existing terrain") boolean fadeOut
     )
-            throws WorldEditException, IOException {
+            throws WorldEditException, IOException, URISyntaxException {
         URL url = new URL(imageURL);
-        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
-            throw new IOException("Only i.imgur.com links are allowed!");
-        }
+        MainUtil.checkImageHost(url.toURI());
         BufferedImage image = MainUtil.readImage(url);
         worldEdit.checkMaxBrushRadius(radius);
         if (yscale != 1) {
@@ -636,10 +636,10 @@ public class BrushCommands {
     @Command(
             name = "layer",
             desc = "Replaces terrain with a layer.",
-            descFooter = "Replaces terrain with a layer.\n"
-                    + "Example: /br layer 5 oak_planks,orange_stained_glass,magenta_stained_glass,black_wool - Places several " +
-                    "layers on a surface\n"
-                    + "Pic: https://i.imgur.com/XV0vYoX.png"
+            descFooter = """
+                    Replaces terrain with a layer.
+                    Example: /br layer 5 oak_planks,orange_stained_glass,magenta_stained_glass,black_wool - Places several layers on a surface
+                    Pic: https://i.imgur.com/XV0vYoX.png"""
     )
     @CommandPermissions("worldedit.brush.layer")
     public void surfaceLayer(
@@ -658,11 +658,11 @@ public class BrushCommands {
     @Command(
             name = "splatter",
             desc = "Splatter a pattern on a surface",
-            descFooter = "Sets a bunch of blocks randomly on a surface.\n"
-                    + "Pic: https://i.imgur.com/hMD29oO.png\n"
-                    + "Example: /br splatter stone,dirt 30 15\n"
-                    + "Note: The seeds define how many splotches there are, recursion defines how large, "
-                    + "solid defines whether the pattern is applied per seed, else per block."
+            descFooter = """
+                    Sets a bunch of blocks randomly on a surface.
+                    Pic: https://i.imgur.com/hMD29oO.png
+                    Example: /br splatter stone,dirt 30 15
+                    Note: The seeds define how many splotches there are, recursion defines how large, solid defines whether the pattern is applied per seed, else per block."""
     )
     @CommandPermissions("worldedit.brush.splatter")
     public void splatterBrush(
@@ -691,9 +691,10 @@ public class BrushCommands {
                     "scommand"
             },
             desc = "Run commands at random points on a surface",
-            descFooter = "Run commands at random points on a surface\n"
-                    + " - Your selection will be expanded to the specified size around each point\n"
-                    + " - Placeholders: {x}, {y}, {z}, {world}, {size}"
+            descFooter = """
+                    Run commands at random points on a surface
+                     - Your selection will be expanded to the specified size around each point
+                     - Placeholders: {x}, {y}, {z}, {world}, {size}"""
     )
     @CommandPermissions("worldedit.brush.scattercommand")
     public void scatterCommandBrush(
@@ -723,9 +724,10 @@ public class BrushCommands {
             name = "height",
             aliases = {"heightmap"},
             desc = "Raise or lower terrain using a heightmap",
-            descFooter = "This brush raises and lowers land.\n"
-                    + "Note: Use a negative yscale to reduce height\n"
-                    + "Snow Pic: https://i.imgur.com/Hrzn0I4.png"
+            descFooter = """
+                    This brush raises and lowers land.
+                    Note: Use a negative yscale to reduce height
+                    Snow Pic: https://i.imgur.com/Hrzn0I4.png"""
     )
     @CommandPermissions("worldedit.brush.height")
     public void heightBrush(
@@ -890,9 +892,11 @@ public class BrushCommands {
                     "copypasta"
             },
             desc = "Copy Paste brush",
-            descFooter = "Left click the base of an object to copy.\n" + "Right click to paste\n"
-                    + "Note: Works well with the clipboard scroll action\n"
-                    + "Video: https://www.youtube.com/watch?v=RPZIaTbqoZw"
+            descFooter = """
+                    Left click the base of an object to copy.
+                    Right click to paste
+                    Note: Works well with the clipboard scroll action
+                    Video: https://www.youtube.com/watch?v=RPZIaTbqoZw"""
     )
     @CommandPermissions("worldedit.brush.copy")
     public void copy(
@@ -914,9 +918,10 @@ public class BrushCommands {
             name = "command",
             aliases = {"cmd"},
             desc = "Command brush",
-            descFooter = "Run the commands at the clicked position.\n"
-                    + " - Your selection will be expanded to the specified size around each point\n"
-                    + " - Placeholders: {x}, {y}, {z}, {world}, {size}"
+            descFooter = """
+                    Run the commands at the clicked position.
+                     - Your selection will be expanded to the specified size around each point
+                     - Placeholders: {x}, {y}, {z}, {world}, {size}"""
     )
     @CommandPermissions("worldedit.brush.command")
     public void command(
@@ -1036,7 +1041,7 @@ public class BrushCommands {
     )
             throws WorldEditException {
         WorldEdit.getInstance().checkMaxBrushRadius(radius);
-        BrushTool tool = session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType());
+        BrushTool tool = session.getBrushTool(player);
         tool.setSize(radius);
         tool.setFill(null);
         tool.setBrush(new OperationFactoryBrush(factory, shape, session), permission);
@@ -1196,17 +1201,12 @@ public class BrushCommands {
             brush = new HollowSphereBrush();
         } else {
             //FAWE start - Suggest different brush material if sand or gravel is used
-            if (pattern instanceof BlockStateHolder) {
-                BlockType type = ((BlockStateHolder) pattern).getBlockType();
-                switch (type.getId()) {
-                    case "minecraft:sand":
-                    case "minecraft:gravel":
-                        player.print(
-                                Caption.of("fawe.worldedit.brush.brush.try.other"));
-                        falling = true;
-                        break;
-                    default:
-                        break;
+            if (pattern instanceof BlockStateHolder<?> holder) {
+                BlockType type = holder.getBlockType();
+                if (type == BlockTypes.SAND || type == BlockTypes.GRAVEL) {
+                    player.print(
+                            Caption.of("fawe.worldedit.brush.brush.try.other"));
+                    falling = true;
                 }
             }
             if (falling) {
@@ -1258,13 +1258,12 @@ public class BrushCommands {
 
     @Command(
             name = "clipboard",
-            desc = "@Deprecated use instead: `/br copypaste`)",
+            desc = "Paste your clipboard at the brush location. Includes any transforms.",
             descFooter = "Choose the clipboard brush.\n"
                     + "Without the -o flag, the paste will appear centered at the target location. "
                     + "With the flag, then the paste will appear relative to where you had "
                     + "stood relative to the copied area when you copied it."
     )
-    @Deprecated
     @CommandPermissions("worldedit.brush.clipboard")
     public void clipboardBrush(
             Player player, LocalSession session,
@@ -1278,7 +1277,11 @@ public class BrushCommands {
                     boolean pasteBiomes,
             @ArgFlag(name = 'm', desc = "Skip blocks matching this mask in the clipboard")
             @ClipboardMask
-                    Mask sourceMask, InjectedValueAccess context
+                    Mask sourceMask, InjectedValueAccess context,
+            //FAWE start - random rotation
+            @Switch(name = 'r', desc = "Apply random rotation on paste, combines with existing clipboard transforms")
+                    boolean randomRotate
+            //FAWE end
     ) throws WorldEditException {
         ClipboardHolder holder = session.getClipboard();
 
@@ -1294,9 +1297,9 @@ public class BrushCommands {
 
         set(
                 context,
-                new ClipboardBrush(newHolder, ignoreAir, usingOrigin, pasteEntities, pasteBiomes,
-                        sourceMask
-                ),
+                //FAWE start - random rotation
+                new ClipboardBrush(newHolder, ignoreAir, usingOrigin, pasteEntities, pasteBiomes, sourceMask, randomRotate),
+                //FAWE end
                 "worldedit.brush.clipboard"
         );
     }
@@ -1361,7 +1364,7 @@ public class BrushCommands {
         iterations = Math.min(limit.MAX_ITERATIONS, iterations);
         //FAWE end
 
-        set(context, new SnowSmoothBrush(iterations, mask), "worldedit.brush.snowsmooth").setSize(radius);
+        set(context, new SnowSmoothBrush(iterations, snowBlockCount, mask), "worldedit.brush.snowsmooth").setSize(radius);
         player.print(Caption.of(
                 "worldedit.brush.smooth.equip",
                 radius,

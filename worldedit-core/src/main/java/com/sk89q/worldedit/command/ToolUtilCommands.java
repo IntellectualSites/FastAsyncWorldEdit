@@ -140,7 +140,7 @@ public class ToolUtilCommands {
             @Arg(desc = "The range of the brush")
                     int range
     ) throws WorldEditException {
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setRange(range);
+        session.getBrushTool(player).setRange(range);
         player.print(Caption.of("worldedit.tool.range.set"));
     }
 
@@ -156,7 +156,7 @@ public class ToolUtilCommands {
     ) throws WorldEditException {
         we.checkMaxBrushRadius(size);
 
-        session.getBrushTool(player.getItemInHand(HandSide.MAIN_HAND).getType()).setSize(size);
+        session.getBrushTool(player).setSize(size);
         player.print(Caption.of("worldedit.tool.size.set"));
     }
 
@@ -169,9 +169,14 @@ public class ToolUtilCommands {
     public void traceMask(
             Player player, LocalSession session,
             @Arg(desc = "The trace mask to set", def = "")
-                    Mask maskOpt
+            Mask maskOpt
     ) throws WorldEditException {
-        session.getBrushTool(player, false).setTraceMask(maskOpt);
+        BrushTool brushTool = session.getBrushTool(player, false);
+        if (brushTool == null) {
+            player.print(Caption.of("worldedit.brush.none.equipped"));
+            return;
+        }
+        brushTool.setTraceMask(maskOpt);
         if (maskOpt == null) {
             player.print(Caption.of("worldedit.tool.tracemask.disabled"));
         } else {

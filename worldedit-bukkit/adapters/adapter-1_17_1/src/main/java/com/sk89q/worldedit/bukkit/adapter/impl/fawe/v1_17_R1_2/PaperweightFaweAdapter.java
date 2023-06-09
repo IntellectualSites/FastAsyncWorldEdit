@@ -103,6 +103,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -658,10 +659,17 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 .registryAccess()
                 .ownedRegistryOrThrow(
                         Registry.BIOME_REGISTRY);
-        return biomeRegistry.stream()
-                .map(biomeRegistry::getKey)
-                .map(CraftNamespacedKey::fromMinecraft)
-                .collect(Collectors.toList());
+        List<ResourceLocation> keys = biomeRegistry.stream()
+                .map(biomeRegistry::getKey).filter(Objects::nonNull).toList();
+        List<NamespacedKey> namespacedKeys = new ArrayList<>();
+        for (ResourceLocation key : keys) {
+            try {
+                namespacedKeys.add(CraftNamespacedKey.fromMinecraft(key));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error("Error converting biome key {}", key.toString(), e);
+            }
+        }
+        return namespacedKeys;
     }
 
     @Override

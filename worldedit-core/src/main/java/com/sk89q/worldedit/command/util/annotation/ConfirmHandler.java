@@ -24,7 +24,7 @@ public class ConfirmHandler implements CommandCallListener {
         }
         Optional<Actor> actorOpt = parameters.injectedValue(Key.of(Actor.class));
 
-        if (!actorOpt.isPresent()) {
+        if (actorOpt.isEmpty()) {
             return;
         }
         Actor actor = actorOpt.get();

@@ -32,7 +32,7 @@ import com.sk89q.worldedit.registry.NamespacedRegistry;
 public class BiomeType implements RegistryItem, Keyed, BiomePattern {
 //FAWE end
 
-    public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type");
+    public static final NamespacedRegistry<BiomeType> REGISTRY = new NamespacedRegistry<>("biome type", true);
 
     private final String id;
     private int legacyId = -1;

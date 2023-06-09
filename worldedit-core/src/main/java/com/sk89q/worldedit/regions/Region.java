@@ -38,12 +38,11 @@ import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 /**
  * Represents a physical shape.
@@ -402,16 +401,22 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
             // contains some
             boolean processExtra = false;
             for (int layer = getMinimumY() >> 4; layer <= getMaximumY() >> 4; layer++) {
+                if (!set.hasSection(layer)) {
+                    continue;
+                }
                 int by = layer << 4;
                 int ty = by + 15;
                 if (!containsEntireCuboid(bx, tx, by, ty, bz, tz)) {
                     processExtra = true;
-                    char[] arr = set.load(layer);
+                    char[] arr = set.loadIfPresent(layer);
+                    if (arr == null) {
+                        continue;
+                    }
                     for (int y = 0, index = 0; y < 16; y++) {
                         for (int z = 0; z < 16; z++) {
                             for (int x = 0; x < 16; x++, index++) {
-                                if (arr[index] != 0 && !contains(x, y, z)) {
-                                    arr[index] = 0;
+                                if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && !contains(bx + x, by + y, bz + z)) {
+                                    arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                                 }
                             }
                         }
@@ -460,8 +465,8 @@ public interface Region extends Iterable<BlockVector3>, Cloneable, IBatchProcess
                 for (int y = 0, index = 0; y < 16; y++) {
                     for (int z = 0; z < 16; z++) {
                         for (int x = 0; x < 16; x++, index++) {
-                            if (arr[index] != 0 && contains(x, y, z)) {
-                                arr[index] = 0;
+                            if (arr[index] != BlockTypesCache.ReservedIDs.__RESERVED__ && contains(x, y, z)) {
+                                arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                                 processExtra = true;
                             }
                         }

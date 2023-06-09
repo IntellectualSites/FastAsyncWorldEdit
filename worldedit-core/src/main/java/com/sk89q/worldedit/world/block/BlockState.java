@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.world.block;
 
 import com.fastasyncworldedit.core.command.SuggestInputParseException;
+import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.function.mask.SingleBlockStateMask;
 import com.fastasyncworldedit.core.queue.ITileInput;
 import com.fastasyncworldedit.core.registry.state.PropertyKey;
@@ -43,6 +44,7 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.AbstractProperty;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.util.concurrency.LazyReference;
+import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.registry.BlockMaterial;
 
@@ -150,7 +152,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
             type = BlockTypes.get(key);
             if (type == null) {
                 String input = key.toString();
-                throw new SuggestInputParseException("Does not match a valid block type: " + input, input, () -> Stream.of(
+                throw new SuggestInputParseException(Caption.of("fawe.error.invalid-block-type", TextComponent.of(input)), () -> Stream.of(
                                 BlockTypesCache.values)
                         .map(BlockType::getId)
                         .filter(id -> StringMan.blockStateMatches(input, id))
@@ -211,8 +213,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                             String input = charSequence.toString();
                             BlockType finalType = type;
                             throw new SuggestInputParseException(
-                                    "Invalid property " + key + ":" + input + " for type " + type,
-                                    input,
+                                    Caption.of("worldedit.error.parser.unknown-property", key + ":" + input, type),
                                     () ->
                                             finalType.getProperties().stream()
                                                     .map(Property::getName)
@@ -222,8 +223,7 @@ public class BlockState implements BlockStateHolder<BlockState>, Pattern {
                             );
                         } else {
                             throw new SuggestInputParseException(
-                                    "No operator for " + state,
-                                    "",
+                                    Caption.of("fawe.error.no-operator-for-input", state),
                                     () -> Collections.singletonList("=")
                             );
                         }

@@ -56,7 +56,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class BlockType implements Keyed, Pattern {
 //FAWE end
 
-    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type");
+    public static final NamespacedRegistry<BlockType> REGISTRY = new NamespacedRegistry<>("block type", true);
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final String id;

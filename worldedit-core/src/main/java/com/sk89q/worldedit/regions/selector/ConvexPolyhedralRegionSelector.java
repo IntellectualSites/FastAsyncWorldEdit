@@ -26,6 +26,7 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.internal.cui.CUIRegion;
 import com.sk89q.worldedit.internal.cui.SelectionPointEvent;
 import com.sk89q.worldedit.internal.cui.SelectionPolygonEvent;
+import com.sk89q.worldedit.internal.cui.SelectionShapeEvent;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.ConvexPolyhedralRegion;
@@ -206,6 +207,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
         checkNotNull(session);
         checkNotNull(pos);
 
+        session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
         session.describeCUI(player);
 
         player.print(Caption.of("worldedit.selection.convex.explain.primary", TextComponent.of(pos.toString())));
@@ -226,6 +228,7 @@ public class ConvexPolyhedralRegionSelector implements RegionSelector, CUIRegion
     public void explainRegionAdjust(Actor player, LocalSession session) {
         checkNotNull(player);
         checkNotNull(session);
+        session.dispatchCUIEvent(player, new SelectionShapeEvent(getTypeID()));
         session.describeCUI(player);
     }
 

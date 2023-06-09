@@ -314,7 +314,10 @@ public class SelectionCommands {
             name = "/wand",
             desc = "Get the wand object"
     )
-    @CommandPermissions("worldedit.wand")
+    @CommandPermissions(
+            value = "worldedit.wand",
+            queued = false
+    )
     public void wand(
             Player player, LocalSession session,
             @Switch(name = 'n', desc = "Get a navigation wand") boolean navWand
@@ -348,7 +351,10 @@ public class SelectionCommands {
             aliases = {"/toggleeditwand"},
             desc = "Remind the user that the wand is now a tool and can be unbound with /tool none."
     )
-    @CommandPermissions("worldedit.wand.toggle")
+    @CommandPermissions(
+            value = "worldedit.wand.toggle",
+            queued = false
+    )
     public void toggleWand(Player player) {
         player.print(
                 Caption.of(
@@ -499,7 +505,10 @@ public class SelectionCommands {
             name = "/size",
             desc = "Get information about the selection"
     )
-    @CommandPermissions("worldedit.selection.size")
+    @CommandPermissions(
+            value = "worldedit.selection.size",
+            queued = false
+    )
     public void size(
             Actor actor, World world, LocalSession session,
             @Switch(name = 'c', desc = "Get clipboard info instead")
@@ -734,6 +743,7 @@ public class SelectionCommands {
                 box.appendCommand("sphere", Caption.of("worldedit.select.sphere.description"), "//sel sphere");
                 box.appendCommand("cyl", Caption.of("worldedit.select.cyl.description"), "//sel cyl");
                 box.appendCommand("convex", Caption.of("worldedit.select.convex.description"), "//sel convex");
+
                 //FAWE start
                 box.appendCommand("polyhedral", Caption.of("fawe.selection.sel.polyhedral"), "//sel polyhedral");
                 box.appendCommand("fuzzy[=<mask>]", Caption.of("fawe.selection.sel.fuzzy-instruction"), "//sel fuzzy[=<mask>]");

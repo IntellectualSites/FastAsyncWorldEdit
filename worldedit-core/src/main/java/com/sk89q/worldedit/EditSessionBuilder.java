@@ -531,16 +531,14 @@ public final class EditSessionBuilder {
             }
             if (allowedRegions == null && Settings.settings().REGION_RESTRICTIONS) {
                 if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
-                    if (actor instanceof Player) {
-                        Player player = (Player) actor;
+                    if (actor instanceof Player player) {
                         allowedRegions = player.getAllowedRegions();
                     }
                 }
             }
             if (disallowedRegions == null && Settings.settings().REGION_RESTRICTIONS && Settings.settings().REGION_RESTRICTIONS_OPTIONS.ALLOW_BLACKLISTS) {
                 if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
-                    if (actor instanceof Player) {
-                        Player player = (Player) actor;
+                    if (actor instanceof Player player) {
                         disallowedRegions = player.getDisallowedRegions();
                     }
                 }
@@ -560,6 +558,9 @@ public final class EditSessionBuilder {
                         regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, null);
                     }
                 }
+            }
+            if (placeChunks && regionExtent != null) {
+                queue.addProcessor(regionExtent);
             }
             // There's no need to do the below (and it'll also just be a pain to implement) if we're not placing chunks
             if (placeChunks) {
@@ -597,15 +598,14 @@ public final class EditSessionBuilder {
                 this.extent = regionExtent;
             }
             if (this.limit != null && this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
+                this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
                 if (placeChunks) {
-                    queue.addProcessor(new StripNBTExtent(this.extent, this.limit.STRIP_NBT));
-                } else {
-                    this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+                    queue.addProcessor((IBatchProcessor) this.extent);
                 }
             }
             if (this.limit != null && !this.limit.isUnlimited()) {
                 Set<String> limitBlocks = new HashSet<>();
-                if ((getActor() == null || getActor().hasPermission("worldedit.anyblock")) && this.limit.UNIVERSAL_DISALLOWED_BLOCKS) {
+                if (getActor() != null && !getActor().hasPermission("worldedit.anyblock") && this.limit.UNIVERSAL_DISALLOWED_BLOCKS) {
                     limitBlocks.addAll(WorldEdit.getInstance().getConfiguration().disallowedBlocks);
                 }
                 if (this.limit.DISALLOWED_BLOCKS != null && !this.limit.DISALLOWED_BLOCKS.isEmpty()) {
@@ -613,10 +613,9 @@ public final class EditSessionBuilder {
                 }
                 Set<PropertyRemap<?>> remaps = this.limit.REMAP_PROPERTIES;
                 if (!limitBlocks.isEmpty() || (remaps != null && !remaps.isEmpty())) {
+                    this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, remaps);
                     if (placeChunks) {
-                        queue.addProcessor(new DisallowedBlocksExtent(this.extent, limitBlocks, remaps));
-                    } else {
-                        this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, remaps);
+                        queue.addProcessor((IBatchProcessor) this.extent);
                     }
                 }
             }

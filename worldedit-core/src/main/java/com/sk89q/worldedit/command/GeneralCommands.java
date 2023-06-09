@@ -149,14 +149,11 @@ public class GeneralCommands {
         String arg0 = args.get(0).toLowerCase(Locale.ENGLISH);
         String flipped;
         switch (arg0) {
-            case "on":
-                flipped = "off";
-                break;
-            case "off":
-                flipped = "on";
-                break;
-            default:
+            case "on" -> flipped = "off";
+            case "off" -> flipped = "on";
+            default -> {
                 return TextComponent.of("There is no replacement for //fast " + arg0);
+            }
         }
         return CommandUtil.createNewCommandReplacementText("//perf " + flipped);
     }
@@ -362,7 +359,10 @@ public class GeneralCommands {
             descFooter = "This is dependent on platform implementation. " +
                     "Not all platforms support watchdog hooks, or contain a watchdog."
     )
-    @CommandPermissions("worldedit.watchdog")
+    @CommandPermissions(
+            value = "worldedit.watchdog",
+            queued = false
+    )
     public void watchdog(
             Actor actor, LocalSession session,
             @Arg(desc = "The mode to set the watchdog hook to", def = "")
@@ -424,7 +424,10 @@ public class GeneralCommands {
             aliases = {"/searchitem", "/l", "/search"},
             desc = "Search for an item"
     )
-    @CommandPermissions("worldedit.searchitem")
+    @CommandPermissions(
+            value = "worldedit.searchitem",
+            queued = false
+    )
     public void searchItem(
             Actor actor,
             @Switch(name = 'b', desc = "Only search for blocks")
@@ -573,7 +576,10 @@ public class GeneralCommands {
             aliases = {"tips"},
             desc = "Toggle FAWE tips"
     )
-    @CommandPermissions("fawe.tips")
+    @CommandPermissions(
+            value = "fawe.tips",
+            queued = false
+    )
     public void tips(Actor actor, LocalSession session) throws WorldEditException {
         if (actor.togglePermission("fawe.tips")) {
             actor.print(Caption.of("fawe.info.worldedit.toggle.tips.on"));
@@ -627,7 +633,6 @@ public class GeneralCommands {
             String command = "/searchitem " + (blocksOnly ? "-b " : "") + (itemsOnly ? "-i " : "") + "-p %page% " + search;
             Map<String, Component> results = new TreeMap<>();
             String idMatch = search.replace(' ', '_');
-            String nameMatch = search.toLowerCase(Locale.ROOT);
             for (ItemType searchType : ItemType.REGISTRY) {
                 if (blocksOnly && !searchType.hasBlockType()) {
                     continue;

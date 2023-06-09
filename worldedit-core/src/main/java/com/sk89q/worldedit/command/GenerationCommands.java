@@ -65,6 +65,7 @@ import org.jetbrains.annotations.Range;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -119,18 +120,15 @@ public class GenerationCommands {
         final double radiusX;
         final double radiusZ;
         switch (radii.size()) {
-            case 1:
-                radiusX = radiusZ = Math.max(1, radii.get(0));
-                break;
-
-            case 2:
+            case 1 -> radiusX = radiusZ = Math.max(1, radii.get(0));
+            case 2 -> {
                 radiusX = Math.max(1, radii.get(0));
                 radiusZ = Math.max(1, radii.get(1));
-                break;
-
-            default:
+            }
+            default -> {
                 actor.print(Caption.of("worldedit.cyl.invalid-radius"));
                 return 0;
+            }
         }
         worldEdit.checkMaxRadius(radiusX);
         worldEdit.checkMaxRadius(radiusZ);
@@ -169,18 +167,15 @@ public class GenerationCommands {
         final double radiusX;
         final double radiusZ;
         switch (radii.size()) {
-            case 1:
-                radiusX = radiusZ = Math.max(1, radii.get(0));
-                break;
-
-            case 2:
+            case 1 -> radiusX = radiusZ = Math.max(1, radii.get(0));
+            case 2 -> {
                 radiusX = Math.max(1, radii.get(0));
                 radiusZ = Math.max(1, radii.get(1));
-                break;
-
-            default:
+            }
+            default -> {
                 actor.print(Caption.of("worldedit.cyl.invalid-radius"));
                 return 0;
+            }
         }
 
         worldEdit.checkMaxRadius(radiusX);
@@ -234,19 +229,16 @@ public class GenerationCommands {
         final double radiusY;
         final double radiusZ;
         switch (radii.size()) {
-            case 1:
-                radiusX = radiusY = radiusZ = Math.max(0, radii.get(0));
-                break;
-
-            case 3:
+            case 1 -> radiusX = radiusY = radiusZ = Math.max(0, radii.get(0));
+            case 3 -> {
                 radiusX = Math.max(0, radii.get(0));
                 radiusY = Math.max(0, radii.get(1));
                 radiusZ = Math.max(0, radii.get(2));
-                break;
-
-            default:
+            }
+            default -> {
                 actor.print(Caption.of("worldedit.sphere.invalid-radius"));
                 return 0;
+            }
         }
 
         worldEdit.checkMaxRadius(radiusX);
@@ -437,9 +429,10 @@ public class GenerationCommands {
             name = "/generatebiome",
             aliases = {"/genbiome", "/gb"},
             desc = "Sets biome according to a formula.",
-            descFooter = "Formula must return positive numbers (true) if the point is inside the shape\n"
-                    + "Sets the biome of blocks in that shape.\n"
-                    + "For details, see https://ehub.to/we/expr"
+            descFooter = """
+                    Formula must return positive numbers (true) if the point is inside the shape
+                    Sets the biome of blocks in that shape.
+                    For details, see https://ehub.to/we/expr"""
     )
     @CommandPermissions("worldedit.generation.shape.biome")
     @Logging(ALL)
@@ -588,12 +581,10 @@ public class GenerationCommands {
             @Arg(desc = "boolean", def = "true") boolean randomize,
             @Arg(desc = "TODO", def = "100") int threshold,
             @Arg(desc = "BlockVector2", def = "") BlockVector2 dimensions
-    ) throws WorldEditException, IOException {
+    ) throws WorldEditException, IOException, URISyntaxException {
         TextureUtil tu = Fawe.instance().getCachedTextureUtil(randomize, 0, threshold);
         URL url = new URL(imageURL);
-        if (!url.getHost().equalsIgnoreCase("i.imgur.com")) {
-            throw new IOException("Only i.imgur.com links are allowed!");
-        }
+        MainUtil.checkImageHost(url.toURI());
         if (dimensions != null) {
             checkCommandArgument(
                     (long) dimensions.getX() * dimensions.getZ() <= Settings.settings().WEB.MAX_IMAGE_SIZE,
@@ -626,14 +617,12 @@ public class GenerationCommands {
         BlockVector3 pos1 = session.getPlacementPosition(actor);
         BlockVector3 pos2 = pos1.add(image.getWidth() - 1, 0, image.getHeight() - 1);
         CuboidRegion region = new CuboidRegion(pos1, pos2);
-        int[] count = new int[1];
         final BufferedImage finalImage = image;
         RegionVisitor visitor = new RegionVisitor(region, pos -> {
             int x = pos.getBlockX() - pos1.getBlockX();
             int z = pos.getBlockZ() - pos1.getBlockZ();
             int color = finalImage.getRGB(x, z);
             BlockType block = tu.getNearestBlock(color);
-            count[0]++;
             if (block != null) {
                 return editSession.setBlock(pos, block.getDefaultState());
             }

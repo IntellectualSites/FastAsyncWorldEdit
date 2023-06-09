@@ -445,10 +445,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                     bitMask |= 1 << layer;
 
-                    // Changes may still be written to chunk SET
-                    char[] tmp = set.load(layerNo);
-                    char[] setArr = new char[4096];
-                    System.arraycopy(tmp, 0, setArr, 0, 4096);
+                    char[] setArr = set.load(layerNo);
 
                     // synchronise on internal section to avoid circular locking with a continuing edit if the chunk was
                     // submitted to keep loaded internal chunks to queue target size.

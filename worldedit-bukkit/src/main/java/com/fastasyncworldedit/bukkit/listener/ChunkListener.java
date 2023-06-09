@@ -371,48 +371,6 @@ public abstract class ChunkListener implements Listener {
         }
     }
 
-    /**
-     * Prevent firework from loading chunks.
-     */
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onChunkLoad(ChunkLoadEvent event) {
-        if (!Settings.settings().TICK_LIMITER.FIREWORKS_LOAD_CHUNKS) {
-            Chunk chunk = event.getChunk();
-            Entity[] entities = chunk.getEntities();
-            World world = chunk.getWorld();
-
-            Exception e = new Exception();
-            int start = 14;
-            int end = 22;
-            int depth = Math.min(end, getDepth(e));
-
-            for (int frame = start; frame < depth; frame++) {
-                StackTraceElement elem = getElement(e, frame);
-                if (elem == null) {
-                    return;
-                }
-                String className = elem.getClassName();
-                int len = className.length();
-                if (len > 15 && className.charAt(len - 15) == 'E' && className
-                        .endsWith("EntityFireworks")) {
-                    for (Entity ent : world.getEntities()) {
-                        if (ent.getType() == EntityType.FIREWORK) {
-                            Vector velocity = ent.getVelocity();
-                            double vertical = Math.abs(velocity.getY());
-                            if (Math.abs(velocity.getX()) > vertical
-                                    || Math.abs(velocity.getZ()) > vertical) {
-                                LOGGER.warn(
-                                        "[FAWE `tick-limiter`] Detected and cancelled rogue FireWork at {}",
-                                        ent.getLocation());
-                                ent.remove();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     @EventHandler(priority = EventPriority.LOWEST)
     public void onItemSpawn(ItemSpawnEvent event) {
         if (physicsFreeze) {

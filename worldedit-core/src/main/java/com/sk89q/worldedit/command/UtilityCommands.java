@@ -29,7 +29,6 @@ import com.fastasyncworldedit.core.util.StringMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.image.ImageUtil;
 import com.fastasyncworldedit.core.util.task.DelegateConsumer;
-import com.google.common.base.Function;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.IncompleteRegionException;
 import com.sk89q.worldedit.LocalConfiguration;
@@ -98,6 +97,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -130,7 +130,10 @@ public class UtilityCommands {
             aliases = {"/hmi", "hmi"},
             desc = "Generate the heightmap interface: https://github.com/IntellectualSites/HeightMap"
     )
-    @CommandPermissions("fawe.admin")
+    @CommandPermissions(
+            value = "fawe.admin",
+            queued = false
+    )
     public void heightmapInterface(
             Actor actor,
             @Arg(name = "min", desc = "int", def = "100") int min,
@@ -145,12 +148,9 @@ public class UtilityCommands {
         final int sub = srcFolder.getAbsolutePath().length();
         List<String> images = new ArrayList<>();
         MainUtil.iterateFiles(srcFolder, file -> {
-            switch (file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase(Locale.ROOT)) {
-                case ".png":
-                case ".jpeg":
-                    break;
-                default:
-                    return;
+            String s = file.getName().substring(file.getName().lastIndexOf('.')).toLowerCase(Locale.ROOT);
+            if (!s.equals(".png") && !s.equals(".jpeg")) {
+                return;
             }
             try {
                 String name = file.getAbsolutePath().substring(sub);
@@ -187,7 +187,7 @@ public class UtilityCommands {
         StringBuilder config = new StringBuilder();
         config.append("var images = [\n");
         for (String image : images) {
-            config.append('"' + image.replace(File.separator, "/") + "\",\n");
+            config.append('"').append(image.replace(File.separator, "/")).append("\",\n");
         }
         config.append("];\n");
         config.append("// The low res images (they should all be the same size)\n");
@@ -805,7 +805,10 @@ public class UtilityCommands {
             name = "/help",
             desc = "Displays help for WorldEdit commands"
     )
-    @CommandPermissions("worldedit.help")
+    @CommandPermissions(
+            value = "worldedit.help",
+            queued = false
+    )
     public void help(
             Actor actor,
             @Switch(name = 's', desc = "List sub-commands of the given command, if applicable")
@@ -859,7 +862,6 @@ public class UtilityCommands {
             URI uri = input.getKey();
             String path = input.getValue();
 
-            boolean url = false;
             boolean loaded = isLoaded.apply(uri);
 
             URIType type = URIType.FILE;
@@ -959,21 +961,13 @@ public class UtilityCommands {
         if (len > 0) {
             for (String arg : args) {
                 switch (arg.toLowerCase(Locale.ROOT)) {
-                    case "me":
-                    case "mine":
-                    case "local":
-                    case "private":
-                        listMine = true;
-                        break;
-                    case "public":
-                    case "global":
-                        listGlobal = true;
-                        break;
-                    case "all":
+                    case "me", "mine", "local", "private" -> listMine = true;
+                    case "public", "global" -> listGlobal = true;
+                    case "all" -> {
                         listMine = true;
                         listGlobal = true;
-                        break;
-                    default:
+                    }
+                    default -> {
                         if (arg.endsWith("/") || arg.endsWith(File.separator)) {
                             arg = arg.replace("/", File.separator);
                             String newDirFilter = dirFilter + arg;
@@ -995,7 +989,7 @@ public class UtilityCommands {
                         } else {
                             filters.add(arg);
                         }
-                        break;
+                    }
                 }
             }
         }
@@ -1005,7 +999,7 @@ public class UtilityCommands {
 
         List<File> toFilter = new ArrayList<>();
         if (!filters.isEmpty()) {
-            forEachFile = new DelegateConsumer<File>(forEachFile) {
+            forEachFile = new DelegateConsumer<>(forEachFile) {
                 @Override
                 public void accept(File file) {
                     toFilter.add(file);
@@ -1015,7 +1009,7 @@ public class UtilityCommands {
 
         if (formatName != null) {
             final ClipboardFormat cf = ClipboardFormats.findByAlias(formatName);
-            forEachFile = new DelegateConsumer<File>(forEachFile) {
+            forEachFile = new DelegateConsumer<>(forEachFile) {
                 @Override
                 public void accept(File file) {
                     if (cf.isFormat(file)) {
@@ -1024,7 +1018,7 @@ public class UtilityCommands {
                 }
             };
         } else {
-            forEachFile = new DelegateConsumer<File>(forEachFile) {
+            forEachFile = new DelegateConsumer<>(forEachFile) {
                 @Override
                 public void accept(File file) {
                     if (!file.toString().endsWith(".cached")) {
@@ -1062,7 +1056,7 @@ public class UtilityCommands {
             }
             if (listGlobal) {
                 File rel = MainUtil.resolveRelative(new File(dir, dirFilter));
-                forEachFile = new DelegateConsumer<File>(forEachFile) {
+                forEachFile = new DelegateConsumer<>(forEachFile) {
                     @Override
                     public void accept(File f) {
                         try {
@@ -1172,7 +1166,7 @@ public class UtilityCommands {
         StringBuilder name = new StringBuilder();
         if (relative.isAbsolute()) {
             relative = root.toURI().relativize(file.toURI());
-            name.append(".." + File.separator);
+            name.append("..").append(File.separator);
         }
         name.append(relative.getPath());
         return name.toString();

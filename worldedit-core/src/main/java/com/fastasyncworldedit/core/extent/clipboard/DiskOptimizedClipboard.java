@@ -26,6 +26,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
@@ -64,9 +65,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private final int headerSize;
 
     private RandomAccessFile braf;
-    private MappedByteBuffer byteBuffer;
+    private MappedByteBuffer byteBuffer = null;
 
-    private FileChannel fileChannel;
+    private FileChannel fileChannel = null;
     private boolean hasBiomes = false;
     private boolean canHaveBiomes = true;
     private int nbtBytesRemaining;
@@ -133,7 +134,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 e.printStackTrace();
             }
             this.braf = new RandomAccessFile(file, "rw");
-            long fileLength = (long) getVolume() * 2L + (long) headerSize;
+            long fileLength = (long) (getVolume() << 1) + (long) headerSize;
             braf.setLength(0);
             braf.setLength(fileLength);
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) fileLength;
@@ -144,14 +145,20 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             byteBuffer.putChar(6, (char) getHeight());
             byteBuffer.putChar(8, (char) getLength());
         } catch (IOException e) {
+            close();
             throw new RuntimeException(e);
+        } catch (Throwable t) {
+            close();
+            throw t;
         }
     }
 
     /**
      * Load an existing file as a DiskOptimizedClipboard. The file MUST exist and MUST be created as a DiskOptimizedClipboard
      * with data written to it.
+     * @deprecated Will be made private, use {@link DiskOptimizedClipboard#loadFromFile(File)}
      */
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public DiskOptimizedClipboard(File file) {
         this(file, VERSION);
     }
@@ -162,7 +169,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
      *
      * @param file            File to read from
      * @param versionOverride An override version to allow loading of older clipboards if required
+     * @deprecated Will be made private, use {@link DiskOptimizedClipboard#loadFromFile(File)}
      */
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public DiskOptimizedClipboard(File file, int versionOverride) {
         super(readSize(file, versionOverride), BlockVector3.ZERO);
         headerSize = getHeaderSizeOverrideFromVersion(versionOverride);
@@ -173,7 +182,10 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             braf.setLength(file.length());
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) file.length();
             init();
-            long biomeLength = (long) ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
+
+            int biomeLength = ((getHeight() >> 2) + 1) * ((getLength() >> 2) + 1) * ((getWidth() >> 2) + 1);
+            canHaveBiomes = (long) headerSize + biomeLength < Integer.MAX_VALUE;
+
             if (headerSize >= VERSION_2_HEADER_SIZE) {
                 readBiomeStatusFromHeader();
                 int nbtCount = readNBTSavedCountFromHeader();
@@ -181,12 +193,16 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 if (Settings.settings().CLIPBOARD.SAVE_CLIPBOARD_NBT_TO_DISK && (nbtCount + entitiesCount > 0)) {
                     loadNBTFromFileFooter(nbtCount, entitiesCount, biomeLength);
                 }
-            } else if (braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
+            } else if (canHaveBiomes && braf.length() - headerSize == ((long) getVolume() << 1) + biomeLength) {
                 hasBiomes = true;
             }
             getAndSetOffsetAndOrigin();
         } catch (IOException e) {
+            close();
             throw new RuntimeException(e);
+        } catch (Throwable t) {
+            close();
+            throw t;
         }
     }
 
@@ -486,13 +502,26 @@ public class DiskOptimizedClipboard extends LinearClipboard {
                 fileChannel.close();
                 braf.close();
                 file.setWritable(true);
-                closeDirectBuffer(byteBuffer);
+                MappedByteBuffer tmpBuffer = byteBuffer;
                 byteBuffer = null;
+                closeDirectBuffer(tmpBuffer);
                 fileChannel = null;
                 braf = null;
+            } else if (fileChannel != null) {
+                fileChannel.close();
+                fileChannel = null;
             }
         } catch (IOException e) {
             e.printStackTrace();
+            if (fileChannel != null) {
+                try {
+                    fileChannel.close();
+                    fileChannel = null;
+                } catch (IOException ex) {
+                    LOGGER.error("Could not close file channel on clipboard {}. If this belongs to a player, the server may " +
+                            "need to be restarted for clipboard use to work.", getFile().getName(), ex);
+                }
+            }
         }
     }
 
@@ -648,8 +677,6 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             char ordinal = byteBuffer.getChar(diskIndex);
             return BlockState.getFromOrdinal(ordinal);
         } catch (IndexOutOfBoundsException ignored) {
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return BlockTypes.AIR.getDefaultState();
     }
@@ -674,8 +701,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         try {
             int index = headerSize + (getIndex(x, y, z) << 1);
             char ordinal = block.getOrdinalChar();
-            if (ordinal == 0) {
-                ordinal = 1;
+            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                ordinal = BlockTypesCache.ReservedIDs.AIR;
             }
             byteBuffer.putChar(index, ordinal);
             boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();

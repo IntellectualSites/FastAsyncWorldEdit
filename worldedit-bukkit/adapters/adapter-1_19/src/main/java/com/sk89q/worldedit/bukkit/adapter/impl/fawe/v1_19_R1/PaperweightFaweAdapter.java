@@ -645,10 +645,17 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 .registryAccess()
                 .ownedRegistryOrThrow(
                         Registry.BIOME_REGISTRY);
-        return biomeRegistry.stream()
-                .map(biomeRegistry::getKey).filter(Objects::nonNull)
-                .map(CraftNamespacedKey::fromMinecraft)
-                .collect(Collectors.toList());
+        List<ResourceLocation> keys = biomeRegistry.stream()
+                .map(biomeRegistry::getKey).filter(Objects::nonNull).toList();
+        List<NamespacedKey> namespacedKeys = new ArrayList<>();
+        for (ResourceLocation key : keys) {
+            try {
+                namespacedKeys.add(CraftNamespacedKey.fromMinecraft(key));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error("Error converting biome key {}", key.toString(), e);
+            }
+        }
+        return namespacedKeys;
     }
 
     @Override

@@ -15,12 +15,11 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.IntStream;
 
 public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
@@ -40,7 +39,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     public BlockVector3ChunkMap<CompoundTag> tiles;
     public HashSet<CompoundTag> entities;
     public HashSet<UUID> entityRemoves;
-    public Map<HeightMapType, int[]> heightMaps;
+    public EnumMap<HeightMapType, int[]> heightMaps;
     private boolean fastMode = false;
     private int bitMask = -1;
 
@@ -93,7 +92,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
 
     @Override
     public Map<HeightMapType, int[]> getHeightMaps() {
-        return heightMaps == null ? new HashMap<>() : heightMaps;
+        return heightMaps == null ? new EnumMap<>(HeightMapType.class) : heightMaps;
     }
 
     @Override
@@ -177,7 +176,7 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
     @Override
     public void setHeightMap(HeightMapType type, int[] heightMap) {
         if (heightMaps == null) {
-            heightMaps = new HashMap<>();
+            heightMaps = new EnumMap<>(HeightMapType.class);
         }
         heightMaps.put(type, heightMap);
     }
@@ -306,8 +305,12 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
                 || (heightMaps != null && !heightMaps.isEmpty())) {
             return false;
         }
-        //noinspection SimplifyStreamApiCallChains - this is faster than using #noneMatch
-        return !IntStream.range(minSectionPosition, maxSectionPosition + 1).anyMatch(this::hasSection);
+        for (int i =  minSectionPosition; i <= maxSectionPosition; i++) {
+            if (hasSection(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -316,6 +319,9 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         tiles = null;
         entities = null;
         entityRemoves = null;
+        light = null;
+        skyLight = null;
+        heightMaps = null;
         super.reset();
         return null;
     }
@@ -327,6 +333,62 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
             return false;
         }
         return biomes != null && biomes[layer] != null;
+    }
+
+    @Override
+    public ThreadUnsafeCharBlocks createCopy() {
+        char[][] blocksCopy = new char[sectionCount][];
+        for (int i = 0; i < sectionCount; i++) {
+            if (blocks[i] != null) {
+                blocksCopy[i] = new char[FaweCache.INSTANCE.BLOCKS_PER_LAYER];
+                System.arraycopy(blocks[i], 0, blocksCopy[i], 0, FaweCache.INSTANCE.BLOCKS_PER_LAYER);
+            }
+        }
+        BiomeType[][] biomesCopy;
+        if (biomes == null) {
+            biomesCopy = null;
+        } else {
+            biomesCopy = new BiomeType[sectionCount][];
+            for (int i = 0; i < sectionCount; i++) {
+                if (biomes[i] != null) {
+                    biomesCopy[i] = new BiomeType[biomes[i].length];
+                    System.arraycopy(biomes[i], 0, biomesCopy[i], 0, biomes[i].length);
+                }
+            }
+        }
+        char[][] lightCopy = createLightCopy(light, sectionCount);
+        char[][] skyLightCopy = createLightCopy(skyLight, sectionCount);
+        return new ThreadUnsafeCharBlocks(
+                blocksCopy,
+                minSectionPosition,
+                maxSectionPosition,
+                biomesCopy,
+                sectionCount,
+                lightCopy,
+                skyLightCopy,
+                tiles != null ? new BlockVector3ChunkMap<>(tiles) : null,
+                entities != null ? new HashSet<>(entities) : null,
+                entityRemoves != null ? new HashSet<>(entityRemoves) : null,
+                heightMaps != null ? new EnumMap<>(heightMaps) : null,
+                defaultOrdinal(),
+                fastMode,
+                bitMask
+        );
+    }
+
+    static char[][] createLightCopy(char[][] lightArr, int sectionCount) {
+        if (lightArr == null) {
+            return null;
+        } else {
+            char[][] lightCopy = new char[sectionCount][];
+            for (int i = 0; i < sectionCount; i++) {
+                if (lightArr[i] != null) {
+                    lightCopy[i] = new char[lightArr[i].length];
+                    System.arraycopy(lightArr[i], 0, lightCopy[i], 0, lightArr[i].length);
+                }
+            }
+            return lightCopy;
+        }
     }
 
     @Override
@@ -348,67 +410,47 @@ public class CharSetBlocks extends CharBlocks implements IChunkSet {
         if (layer < minSectionPosition) {
             int diff = minSectionPosition - layer;
             sectionCount += diff;
-            char[][] tmpBlocks = new char[sectionCount][];
-            Section[] tmpSections = new Section[sectionCount];
-            Object[] tmpSectionLocks = new Object[sectionCount];
-            System.arraycopy(blocks, 0, tmpBlocks, diff, blocks.length);
-            System.arraycopy(sections, 0, tmpSections, diff, sections.length);
-            System.arraycopy(sectionLocks, 0, tmpSectionLocks, diff, sections.length);
-            for (int i = 0; i < diff; i++) {
-                tmpSections[i] = EMPTY;
-                tmpSectionLocks[i] = new Object();
-            }
-            blocks = tmpBlocks;
-            sections = tmpSections;
-            sectionLocks = tmpSectionLocks;
             minSectionPosition = layer;
-            if (biomes != null) {
-                BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];
-                System.arraycopy(biomes, 0, tmpBiomes, diff, biomes.length);
-                biomes = tmpBiomes;
-            }
-            if (light != null) {
-                char[][] tmplight = new char[sectionCount][];
-                System.arraycopy(light, 0, tmplight, diff, light.length);
-                light = tmplight;
-            }
-            if (skyLight != null) {
-                char[][] tmplight = new char[sectionCount][];
-                System.arraycopy(skyLight, 0, tmplight, diff, skyLight.length);
-                skyLight = tmplight;
-            }
+            resizeSectionsArrays(diff, false); // prepend new layer(s)
         } else {
             int diff = layer - maxSectionPosition;
             sectionCount += diff;
-            char[][] tmpBlocks = new char[sectionCount][];
-            Section[] tmpSections = new Section[sectionCount];
-            Object[] tmpSectionLocks = new Object[sectionCount];
-            System.arraycopy(blocks, 0, tmpBlocks, 0, blocks.length);
-            System.arraycopy(sections, 0, tmpSections, 0, sections.length);
-            System.arraycopy(sectionLocks, 0, tmpSectionLocks, 0, sections.length);
-            for (int i = sectionCount - diff; i < sectionCount; i++) {
-                tmpSections[i] = EMPTY;
-                tmpSectionLocks[i] = new Object();
-            }
-            blocks = tmpBlocks;
-            sections = tmpSections;
-            sectionLocks = tmpSectionLocks;
             maxSectionPosition = layer;
-            if (biomes != null) {
-                BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];
-                System.arraycopy(biomes, 0, tmpBiomes, 0, biomes.length);
-                biomes = tmpBiomes;
-            }
-            if (light != null) {
-                char[][] tmplight = new char[sectionCount][];
-                System.arraycopy(light, 0, tmplight, 0, light.length);
-                light = tmplight;
-            }
-            if (skyLight != null) {
-                char[][] tmplight = new char[sectionCount][];
-                System.arraycopy(skyLight, 0, tmplight, 0, skyLight.length);
-                skyLight = tmplight;
-            }
+            resizeSectionsArrays(diff, true); // append new layer(s)
+        }
+    }
+
+    private void resizeSectionsArrays(int diff, boolean appendNew) {
+        char[][] tmpBlocks = new char[sectionCount][];
+        Section[] tmpSections = new Section[sectionCount];
+        Object[] tmpSectionLocks = new Object[sectionCount];
+        int destPos = appendNew ? 0 : diff;
+        System.arraycopy(blocks, 0, tmpBlocks, destPos, blocks.length);
+        System.arraycopy(sections, 0, tmpSections, destPos, sections.length);
+        System.arraycopy(sectionLocks, 0, tmpSectionLocks, destPos, sections.length);
+        int toFillFrom = appendNew ? sectionCount - diff : 0;
+        int toFillTo = appendNew ? sectionCount : diff;
+        for (int i = toFillFrom; i < toFillTo; i++) {
+            tmpSections[i] = EMPTY;
+            tmpSectionLocks[i] = new Object();
+        }
+        blocks = tmpBlocks;
+        sections = tmpSections;
+        sectionLocks = tmpSectionLocks;
+        if (biomes != null) {
+            BiomeType[][] tmpBiomes = new BiomeType[sectionCount][64];
+            System.arraycopy(biomes, 0, tmpBiomes, destPos, biomes.length);
+            biomes = tmpBiomes;
+        }
+        if (light != null) {
+            char[][] tmplight = new char[sectionCount][];
+            System.arraycopy(light, 0, tmplight, destPos, light.length);
+            light = tmplight;
+        }
+        if (skyLight != null) {
+            char[][] tmplight = new char[sectionCount][];
+            System.arraycopy(skyLight, 0, tmplight, destPos, skyLight.length);
+            skyLight = tmplight;
         }
     }
 

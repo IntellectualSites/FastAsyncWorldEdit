@@ -102,11 +102,10 @@ public class Settings extends Config {
 
     public FaweLimit getLimit(Actor actor) {
         FaweLimit limit;
-        if (actor.hasPermission("fawe.limit.*") || actor.hasPermission("fawe.bypass")) {
-            limit = FaweLimit.MAX.copy();
-        } else {
-            limit = new FaweLimit();
+        if (actor.hasPermission("fawe.bypass") || actor.hasPermission("fawe.limit.unlimited")) {
+            return FaweLimit.MAX.copy();
         }
+        limit = new FaweLimit();
         ArrayList<String> keys = new ArrayList<>(LIMITS.getSections());
         if (keys.remove("default")) {
             keys.add("default");
@@ -394,6 +393,7 @@ public class Settings extends Config {
                 "Where block properties are specified, any blockstate with the property will be disallowed (e.g. all directions",
                 "of a waterlogged fence). For blocking/remapping of all occurrences of a property like waterlogged, see",
                 "remap-properties below.",
+                "To generate a blank list, substitute the default content with a set of square brackets [] instead.",
                 "Example block property blocking:",
                 " - \"minecraft:conduit[waterlogged=true]\"",
                 " - \"minecraft:piston[extended=false,facing=west]\"",
@@ -520,10 +520,10 @@ public class Settings extends Config {
                 " - A smaller value will reduce memory usage",
                 " - A value too small may break some operations (deform?)",
                 " - Values smaller than the configurated parallel-threads are not accepted",
-                " - It is recommended this option be at least 2x greater than parallel-threads"
+                " - It is recommended this option be at least 4x greater than parallel-threads"
 
         })
-        public int TARGET_SIZE = 64;
+        public int TARGET_SIZE = 8 * Runtime.getRuntime().availableProcessors();
         @Comment({
                 "Force FAWE to start placing chunks regardless of whether an edit is finished processing",
                 " - A larger value will use slightly less CPU time",
@@ -671,6 +671,14 @@ public class Settings extends Config {
         })
         public int MAX_IMAGE_SIZE = 8294400;
 
+        @Comment({
+                "Whitelist of hostnames to allow images to be downloaded from",
+                " - Adding '*' to the list will allow any host, but this is NOT adviseable",
+                " - Crash exploits exist with malformed images",
+                " - See: https://medium.com/chargebee-engineering/perils-of-parsing-pixel-flood-attack-on-java-imageio-a97aeb06637d"
+        })
+        public List<String> ALLOWED_IMAGE_HOSTS = new ArrayList<>(Collections.singleton(("i.imgur.com")));
+
     }
 
     public static class EXTENT {
@@ -694,7 +702,7 @@ public class Settings extends Config {
     public static class TICK_LIMITER {
 
         @Comment("Enable the limiter")
-        public boolean ENABLED = true;
+        public boolean ENABLED = false;
         @Comment("The interval in ticks")
         public int INTERVAL = 20;
         @Comment("Max falling blocks per interval (per chunk)")
@@ -703,12 +711,6 @@ public class Settings extends Config {
         public int PHYSICS_MS = 10;
         @Comment("Max item spawns per interval (per chunk)")
         public int ITEMS = 256;
-        @Comment({
-                "Whether fireworks can load chunks",
-                " - Fireworks usually travel vertically so do not load any chunks",
-                " - Horizontal fireworks can be hacked in to crash a server"
-        })
-        public boolean FIREWORKS_LOAD_CHUNKS = false;
 
     }
 

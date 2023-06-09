@@ -25,8 +25,6 @@ public class AbstractDelegateChangeSet extends AbstractChangeSet {
     public AbstractDelegateChangeSet(AbstractChangeSet parent) {
         super(parent.getWorld());
         this.parent = parent;
-        this.waitingCombined = parent.waitingCombined;
-        this.waitingAsync = parent.waitingAsync;
     }
 
     public final AbstractChangeSet getParent() {

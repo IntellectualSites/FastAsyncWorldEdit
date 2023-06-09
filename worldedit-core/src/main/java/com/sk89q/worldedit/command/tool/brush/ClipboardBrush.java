@@ -27,8 +27,12 @@ import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.transform.AffineTransform;
+import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class ClipboardBrush implements Brush {
 
@@ -38,6 +42,9 @@ public class ClipboardBrush implements Brush {
     private final boolean pasteEntities;
     private final boolean pasteBiomes;
     private final Mask sourceMask;
+    //FAWE start - random rotation
+    private final boolean randomRotate;
+    //FAWE end
 
     public ClipboardBrush(ClipboardHolder holder, boolean ignoreAirBlocks, boolean usingOrigin) {
         this.holder = holder;
@@ -46,23 +53,48 @@ public class ClipboardBrush implements Brush {
         this.pasteBiomes = false;
         this.pasteEntities = false;
         this.sourceMask = null;
+        //FAWE start - random rotation
+        this.randomRotate = false;
+        //FAWE end
     }
 
     public ClipboardBrush(
             ClipboardHolder holder, boolean ignoreAirBlocks, boolean usingOrigin, boolean pasteEntities,
             boolean pasteBiomes, Mask sourceMask
     ) {
+        //FAWE start - random rotation
+        this(holder, ignoreAirBlocks, usingOrigin, pasteEntities, pasteBiomes, sourceMask, false);
+    }
+
+    public ClipboardBrush(
+            ClipboardHolder holder, boolean ignoreAirBlocks, boolean usingOrigin, boolean pasteEntities,
+            boolean pasteBiomes, Mask sourceMask, boolean randomRotate
+    ) {
+        //FAWE end
         this.holder = holder;
         this.ignoreAirBlocks = ignoreAirBlocks;
         this.usingOrigin = usingOrigin;
         this.pasteEntities = pasteEntities;
         this.pasteBiomes = pasteBiomes;
         this.sourceMask = sourceMask;
+        this.randomRotate = randomRotate;
     }
 
     @Override
     public void build(EditSession editSession, BlockVector3 position, Pattern pattern, double size) throws
             MaxChangedBlocksException {
+        //FAWE start - random rotation
+        Transform originalTransform = holder.getTransform();
+        Transform transform = new AffineTransform();
+        if (this.randomRotate) {
+            int rotate = 90 * ThreadLocalRandom.current().nextInt(4);
+            transform = ((AffineTransform) transform).rotateY(rotate);
+            if (originalTransform != null) {
+                transform = originalTransform.combine(transform);
+            }
+        }
+        holder.setTransform(transform);
+        //FAWE end
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
         BlockVector3 centerOffset = region.getCenter().toBlockPoint().subtract(clipboard.getOrigin());
@@ -77,6 +109,10 @@ public class ClipboardBrush implements Brush {
                 .build();
 
         Operations.completeLegacy(operation);
+        //FAWE start - random rotation
+        // reset transform
+        holder.setTransform(originalTransform);
+        //FAWE end
     }
 
 }

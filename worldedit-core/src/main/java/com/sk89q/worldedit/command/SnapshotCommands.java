@@ -98,7 +98,10 @@ public class SnapshotCommands {
             name = "list",
             desc = "List snapshots"
     )
-    @CommandPermissions("worldedit.snapshots.list")
+    @CommandPermissions(
+            value = "worldedit.snapshots.list",
+            queued = false
+    )
     void list(
             Actor actor, World world,
             @ArgFlag(name = 'p', desc = "Page of results to return", def = "1")
@@ -127,8 +130,7 @@ public class SnapshotCommands {
                     TextComponent.of(world.getName())
             ));
 
-            if (config.snapshotDatabase instanceof FileSystemSnapshotDatabase) {
-                FileSystemSnapshotDatabase db = (FileSystemSnapshotDatabase) config.snapshotDatabase;
+            if (config.snapshotDatabase instanceof FileSystemSnapshotDatabase db) {
                 Path root = db.getRoot();
                 if (Files.isDirectory(root)) {
                     WorldEdit.logger.info("No snapshots were found for world '"

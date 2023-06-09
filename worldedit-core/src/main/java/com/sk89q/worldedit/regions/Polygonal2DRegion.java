@@ -506,24 +506,26 @@ public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
     //FAWE start
     @Override
     public boolean containsEntireCuboid(int bx, int tx, int by, int ty, int bz, int tz) {
-        for (int x = bx; x <= tx; x++) {
-            if (!contains(x, 0, bz)) {
-                return false;
+        for (int y : new int[]{by, ty}) {
+            for (int x = bx; x <= tx; x++) {
+                if (!contains(x, y, bz)) {
+                    return false;
+                }
             }
-        }
-        for (int x = bx; x <= tx; x++) {
-            if (!contains(x, 0, tz)) {
-                return false;
+            for (int x = bx; x <= tx; x++) {
+                if (!contains(x, y, tz)) {
+                    return false;
+                }
             }
-        }
-        for (int z = bz; z <= tz; z++) {
-            if (!contains(bx, 0, z)) {
-                return false;
+            for (int z = bz; z <= tz; z++) {
+                if (!contains(bx, y, z)) {
+                    return false;
+                }
             }
-        }
-        for (int z = bz; z <= tz; z++) {
-            if (!contains(tx, 0, z)) {
-                return false;
+            for (int z = bz; z <= tz; z++) {
+                if (!contains(tx, y, z)) {
+                    return false;
+                }
             }
         }
         return true;

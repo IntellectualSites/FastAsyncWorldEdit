@@ -9,7 +9,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
       - name: Validate Gradle Wrapper
-        uses: gradle/wrapper-validation-action@55e685c48d84285a5b0418cd094606e199cca3b6 # v1
+        uses: gradle/wrapper-validation-action@v1
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -19,7 +19,7 @@ jobs:
       - name: Clean Build
         run: ./gradlew clean build --no-daemon
       - name: Upload Release Assets
-        uses: AButler/upload-release-assets@ec6d3263266dc57eb6645b5f75e827987f7c217d # ratchet:AButler/upload-release-assets@v2.0
+        uses: AButler/upload-release-assets@v2.0
         with:
           files: 'worldedit-bukkit/build/libs/FastAsyncWorldEdit-Bukkit-*.jar'
           repo-token: ${{ secrets.GITHUB_TOKEN }}
