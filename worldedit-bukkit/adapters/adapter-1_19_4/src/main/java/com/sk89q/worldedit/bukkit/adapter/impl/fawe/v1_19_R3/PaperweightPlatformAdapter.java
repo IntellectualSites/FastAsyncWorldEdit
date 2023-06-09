@@ -109,12 +109,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
 
-    /*
-     * This is a workaround for the changes from https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/1fddefce1cdce44010927b888432bf70c0e88cde#src/main/java/org/bukkit/craftbukkit/CraftChunk.java
-     * and is only needed to support 1.19.4 versions before *and* after this change.
-     */
-    private static final MethodHandle CRAFT_CHUNK_GET_HANDLE;
-
     private static final Field fieldRemove;
 
     static final boolean POST_CHUNK_REWRITE;
@@ -220,20 +214,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        MethodHandle craftChunkGetHandle;
-        final MethodType type = methodType(LevelChunk.class);
-        try {
-            craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", type);
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            try {
-                final MethodType newType = methodType(ChunkAccess.class, ChunkStatus.class);
-                craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", newType);
-                craftChunkGetHandle = MethodHandles.insertArguments(craftChunkGetHandle, 1, ChunkStatus.FULL);
-            } catch (NoSuchMethodException | IllegalAccessException ex) {
-                throw new RuntimeException(ex);
-            }
-        }
-        CRAFT_CHUNK_GET_HANDLE = craftChunkGetHandle;
     }
 
     static boolean setSectionAtomic(
@@ -309,7 +289,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             try {
                 CraftChunk chunk = (CraftChunk) future.get();
                 addTicket(serverLevel, chunkX, chunkZ);
-                return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
+                return (LevelChunk) chunk.getHandle(ChunkStatus.FULL);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
