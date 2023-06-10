@@ -69,22 +69,13 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
         }
         final TownBlock myplot = mycoord.getTownBlockOrNull(); // Will not be null, because of the isWilderness() test above.
         boolean isMember = isAllowed(player, myplot);
-        try {
-            if (isMember) {
-                final Chunk chunk = location.getChunk();
-                final BlockVector3 pos1 = BlockVector3
-                        .at(chunk.getX() * 16, 0, chunk.getZ() * 16);
-                final BlockVector3 pos2 = BlockVector3.at(
-                        chunk.getX() * 16 + 15, 156, chunk.getZ() * 16
-                                + 15);
-                return new FaweMask(new CuboidRegion(pos1, pos2)) {
-                    @Override
-                    public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
-                        return isAllowed(BukkitAdapter.adapt(player), myplot);
-                    }
-                };
-            }
-        } catch (Exception ignored) {
+        if (isMember) {
+            return new FaweMask(new CuboidRegion(mycoord.getLowerMostCornerLocation(), mycoord.getUpperMostCornerLocation())) {
+                @Override
+                public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
+                    return isAllowed(BukkitAdapter.adapt(player), myplot);
+                }
+            };
         }
         return null;
     }
