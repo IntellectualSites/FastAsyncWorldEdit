@@ -70,8 +70,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
         final TownBlock myplot = mycoord.getTownBlockOrNull(); // Will not be null, because of the isWilderness() test above.
         boolean isMember = isAllowed(player, myplot);
         if (isMember) {
-            final loc1 = mycoord.getLowerMostCornerLocation();
-            final loc2 = mycoord.getUpperMostCornerLocation();
+            final Location loc1 = mycoord.getLowerMostCornerLocation();
+            final Location loc2 = mycoord.getUpperMostCornerLocation();
             final BlockVector3 pos1 = BlockVector3.at(loc1.getX(), loc1.getY(), loc1.getZ());
             final BlockVector3 pos2 = BlockVector3.at(loc2.getX(), loc2.getY(), loc2.getZ());
             return new FaweMask(new CuboidRegion(pos1, pos2)) {
