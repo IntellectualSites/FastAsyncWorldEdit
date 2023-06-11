@@ -3,7 +3,6 @@ package com.fastasyncworldedit.core.queue.implementation.preloader;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.FaweTimer;
-import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.MutablePair;
 import com.google.common.collect.ImmutableSet;
