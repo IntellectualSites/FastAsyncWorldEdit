@@ -149,6 +149,7 @@
   "fawe.cancel.reason.max.iterations": "Max iterations",
   "fawe.cancel.reason.outside.level": "Outside world",
   "fawe.cancel.reason.outside.region": "Outside allowed region (bypass with /wea, or disable `region-restrictions` in config.yml)",
+  "fawe.cancel.reason.outside.safe.region": "Outside safe edit region of +/- 30,000,000 blocks.",
   "fawe.cancel.reason.no.region": "No allowed region (bypass with /wea, or disable `region-restrictions` in config.yml)",
   "fawe.cancel.reason.no.region.reason": "No allowed region: {0}",
   "fawe.cancel.reason.no.region.plot.noworldeditflag": "Plot flag NoWorldeditFlag set",

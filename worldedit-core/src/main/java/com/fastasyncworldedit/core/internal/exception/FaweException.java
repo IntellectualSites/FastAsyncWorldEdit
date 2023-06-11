@@ -80,6 +80,7 @@ public class FaweException extends RuntimeException {
         MANUAL,
         NO_REGION,
         OUTSIDE_REGION,
+        OUTSIDE_SAFE_REGION,
         MAX_CHECKS,
         MAX_CHANGES,
         LOW_MEMORY,
