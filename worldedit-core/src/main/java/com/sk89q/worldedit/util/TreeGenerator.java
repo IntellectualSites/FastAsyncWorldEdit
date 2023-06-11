@@ -165,6 +165,9 @@ public final class TreeGenerator {
             }
             //FAWE end
         },
+        MANGROVE("Mangrove tree", "mangrove"),
+        TALL_MANGROVE("Tall mangrove tree", "tall_mangrove"),
+        CHERRY("Cherry blossom", "cherry"),
         RANDOM("Random tree", "rand", "random") {
             @Override
             public boolean generate(EditSession editSession, BlockVector3 pos) throws MaxChangedBlocksException {
