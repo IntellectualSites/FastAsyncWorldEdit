@@ -182,6 +182,11 @@ public enum FaweCache implements Trimable {
                     "fawe.cancel.reason.outside.region"),
             Type.OUTSIDE_REGION
     );
+    public static final FaweException OUTSIDE_SAFE_REGION = new FaweException(
+            Caption.of(
+                    "fawe.cancel.reason.outside.safe.region"),
+            Type.OUTSIDE_REGION
+    );
     public static final FaweException MAX_CHECKS = new FaweException(
             Caption.of("fawe.cancel.reason.max" + ".checks"),
             Type.MAX_CHECKS

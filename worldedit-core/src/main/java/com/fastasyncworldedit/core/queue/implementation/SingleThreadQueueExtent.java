@@ -293,7 +293,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             if (pair == lastPair) {
                 return lastChunk;
             }
-            if (!processGet(x, z)) {
+            if (!processGet(x, z) || (Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE
+                    // if any chunk coord is outside 30 million blocks
+                    && (x > 1875000 || z > 1875000 || x < -1875000 || z < -1875000))) {
                 lastPair = pair;
                 lastChunk = NullChunk.getInstance();
                 return NullChunk.getInstance();
