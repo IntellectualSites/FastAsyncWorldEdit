@@ -65,16 +65,19 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.eventbus.EventBus;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * A builder-style factory for {@link EditSession EditSessions}.
@@ -590,10 +593,17 @@ public final class EditSessionBuilder {
             } else {
                 relighter = NullRelighter.INSTANCE;
             }
+            Consumer<Component> onErrorMessage;
+            if (getActor() != null) {
+                onErrorMessage = c -> getActor().print(Caption.of("fawe.error.occurred-continuing", c));
+            } else {
+                onErrorMessage = c -> {
+                };
+            }
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
-                this.extent = new LimitExtent(regionExtent, limit);
+                this.extent = new LimitExtent(regionExtent, limit, onErrorMessage);
             } else if (limit != null && !limit.isUnlimited()) {
-                this.extent = new LimitExtent(this.extent, limit);
+                this.extent = new LimitExtent(this.extent, limit, onErrorMessage);
             } else if (regionExtent != null) {
                 this.extent = regionExtent;
             }
