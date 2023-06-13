@@ -676,13 +676,13 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public void refreshChunk(int chunkX, int chunkZ) {
-        testCoords(BlockVector3.at(chunkX << 16, 0, chunkZ << 16));
+        testCoords(BlockVector3.at(chunkX << 4, 0, chunkZ << 4));
         getWorld().refreshChunk(chunkX, chunkZ);
     }
 
     @Override
     public IChunkGet get(int chunkX, int chunkZ) {
-        testCoords(BlockVector3.at(chunkX << 16, 0, chunkZ << 16));
+        testCoords(BlockVector3.at(chunkX << 4, 0, chunkZ << 4));
         return WorldEditPlugin.getInstance().getBukkitImplAdapter().get(getWorldChecked(), chunkX, chunkZ);
     }
 
