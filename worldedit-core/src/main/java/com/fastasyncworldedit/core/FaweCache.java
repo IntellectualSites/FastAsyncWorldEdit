@@ -171,52 +171,68 @@ public enum FaweCache implements Trimable {
     public static final FaweBlockBagException BLOCK_BAG = new FaweBlockBagException();
     public static final FaweException MANUAL = new FaweException(
             Caption.of("fawe.cancel.reason.manual"),
-            Type.MANUAL
+            Type.MANUAL,
+            false
     );
     public static final FaweException NO_REGION = new FaweException(
             Caption.of("fawe.cancel.reason.no.region"),
-            Type.NO_REGION
+            Type.NO_REGION,
+            false
     );
     public static final FaweException OUTSIDE_REGION = new FaweException(
             Caption.of(
                     "fawe.cancel.reason.outside.region"),
+            Type.OUTSIDE_REGION,
+            true
+    );
+    public static final FaweException OUTSIDE_SAFE_REGION = new FaweException(
+            Caption.of(
+                    "fawe.cancel.reason.outside.safe.region"),
             Type.OUTSIDE_REGION
     );
     public static final FaweException MAX_CHECKS = new FaweException(
             Caption.of("fawe.cancel.reason.max" + ".checks"),
-            Type.MAX_CHECKS
+            Type.MAX_CHECKS,
+            true
     );
     public static final FaweException MAX_CHANGES = new FaweException(
             Caption.of("fawe.cancel.reason.max" + ".changes"),
-            Type.MAX_CHANGES
+            Type.MAX_CHANGES,
+            false
     );
     public static final FaweException LOW_MEMORY = new FaweException(
             Caption.of("fawe.cancel.reason.low" + ".memory"),
-            Type.LOW_MEMORY
+            Type.LOW_MEMORY,
+            false
     );
     public static final FaweException MAX_ENTITIES = new FaweException(
             Caption.of(
                     "fawe.cancel.reason.max.entities"),
-            Type.MAX_ENTITIES
+            Type.MAX_ENTITIES,
+            true
     );
     public static final FaweException MAX_TILES = new FaweException(Caption.of(
             "fawe.cancel.reason.max.tiles",
-            Type.MAX_TILES
+            Type.MAX_TILES,
+            true
     ));
     public static final FaweException MAX_ITERATIONS = new FaweException(
             Caption.of(
                     "fawe.cancel.reason.max.iterations"),
-            Type.MAX_ITERATIONS
+            Type.MAX_ITERATIONS,
+            true
     );
     public static final FaweException PLAYER_ONLY = new FaweException(
             Caption.of(
                     "fawe.cancel.reason.player-only"),
-            Type.PLAYER_ONLY
+            Type.PLAYER_ONLY,
+            false
     );
     public static final FaweException ACTOR_REQUIRED = new FaweException(
             Caption.of(
                     "fawe.cancel.reason.actor-required"),
-            Type.ACTOR_REQUIRED
+            Type.ACTOR_REQUIRED,
+            false
     );
 
     /*

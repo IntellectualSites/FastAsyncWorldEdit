@@ -21,6 +21,8 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.bukkit.util.WorldUnloadedException;
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
@@ -242,6 +244,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public int getBlockLightLevel(BlockVector3 pt) {
+        //FAWE start - safe edit region
+        testCoords(pt);
+        //FAWE end
         return getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).getLightLevel();
     }
 
@@ -265,6 +270,9 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean clearContainerBlockContents(BlockVector3 pt) {
         checkNotNull(pt);
+        //FAWE start - safe edit region
+        testCoords(pt);
+        //FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             try {
@@ -337,6 +345,7 @@ public class BukkitWorld extends AbstractWorld {
     @Override
     public boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 pt) {
         //FAWE start - allow tree commands to be undone and obey region restrictions
+        testCoords(pt);
         return WorldEditPlugin.getInstance().getBukkitImplAdapter().generateTree(type, editSession, pt, getWorld());
         //FAWE end
     }
@@ -349,6 +358,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public void checkLoadedChunk(BlockVector3 pt) {
+        //FAWE start - safe edit region
+        testCoords(pt);
+        //FAWE end
         World world = getWorld();
         //FAWE start
         int X = pt.getBlockX() >> 4;
@@ -480,6 +492,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public void simulateBlockMine(BlockVector3 pt) {
+        //FAWE start - safe edit region
+        testCoords(pt);
+        //FAWE end
         getWorld().getBlockAt(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()).breakNaturally();
     }
 
@@ -493,6 +508,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean canPlaceAt(BlockVector3 position, com.sk89q.worldedit.world.block.BlockState blockState) {
+        //FAWE start - safe edit region
+        testCoords(position);
+        //FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.canPlaceAt(getWorld(), position, blockState);
@@ -505,6 +523,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public com.sk89q.worldedit.world.block.BlockState getBlock(BlockVector3 position) {
+        //FAWE start - safe edit region
+        testCoords(position);
+        //FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             try {
@@ -526,6 +547,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(BlockVector3 position, B block, SideEffectSet sideEffects) {
+        //FAWE start - safe edit region
+        testCoords(position);
+        //FAWE end
         if (worldNativeAccess != null) {
             try {
                 return worldNativeAccess.setBlock(position, block, sideEffects);
@@ -545,6 +569,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public BaseBlock getFullBlock(BlockVector3 position) {
+        //FAWE start - safe edit region
+        testCoords(position);
+        //FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.getFullBlock(BukkitAdapter.adapt(getWorld(), position));
@@ -553,11 +580,25 @@ public class BukkitWorld extends AbstractWorld {
         }
     }
 
+    private void testCoords(BlockVector3 position) throws FaweException {
+        if (!Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE) {
+            return;
+        }
+        int x = position.getX();
+        int z = position.getZ();
+        if (x > 30000000 || z > 30000000 || x < -30000000 || z < -30000000) {
+            throw FaweCache.OUTSIDE_SAFE_REGION;
+        }
+    }
+
     @Override
     public Set<SideEffect> applySideEffects(
             BlockVector3 position, com.sk89q.worldedit.world.block.BlockState previousType,
             SideEffectSet sideEffectSet
     ) {
+        //FAWE start - safe edit region
+        testCoords(position);
+        //FAWE end
         if (worldNativeAccess != null) {
             worldNativeAccess.applySideEffects(position, previousType, sideEffectSet);
             return Sets.intersection(
@@ -571,6 +612,9 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public boolean useItem(BlockVector3 position, BaseItem item, Direction face) {
+        //FAWE start - safe edit region
+        testCoords(position);
+        //FAWE end
         BukkitImplAdapter adapter = WorldEditPlugin.getInstance().getBukkitImplAdapter();
         if (adapter != null) {
             return adapter.simulateItemUse(getWorld(), position, item, face);
@@ -588,6 +632,9 @@ public class BukkitWorld extends AbstractWorld {
     @SuppressWarnings("deprecation")
     @Override
     public BiomeType getBiome(BlockVector3 position) {
+        //FAWE start - safe edit region
+        testCoords(position);
+        //FAWE end
         if (HAS_3D_BIOMES) {
             return BukkitAdapter.adapt(getWorld().getBiome(position.getBlockX(), position.getBlockY(), position.getBlockZ()));
         } else {
@@ -598,6 +645,9 @@ public class BukkitWorld extends AbstractWorld {
     @SuppressWarnings("deprecation")
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        //FAWE start - safe edit region
+        testCoords(position);
+        //FAWE end
         if (HAS_3D_BIOMES) {
             getWorld().setBiome(position.getBlockX(), position.getBlockY(), position.getBlockZ(), BukkitAdapter.adapt(biome));
         } else {
@@ -626,11 +676,13 @@ public class BukkitWorld extends AbstractWorld {
 
     @Override
     public void refreshChunk(int chunkX, int chunkZ) {
+        testCoords(BlockVector3.at(chunkX << 4, 0, chunkZ << 4));
         getWorld().refreshChunk(chunkX, chunkZ);
     }
 
     @Override
     public IChunkGet get(int chunkX, int chunkZ) {
+        testCoords(BlockVector3.at(chunkX << 4, 0, chunkZ << 4));
         return WorldEditPlugin.getInstance().getBukkitImplAdapter().get(getWorldChecked(), chunkX, chunkZ);
     }
 

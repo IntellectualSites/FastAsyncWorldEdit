@@ -312,6 +312,12 @@ public class Settings extends Config {
                 " - Any blacklist regions are likely to override any internal allowed regions."
         })
         public boolean WORLDGUARD_REGION_BLACKLIST = false;
+        @Comment({
+                "Restrict all edits to within the safe chunk limits of +/- 30 million blocks",
+                " - Edits outside this range may induce crashing",
+                " - Forcefully prevents any edit outside this range"
+        })
+        public boolean RESTRICT_TO_SAFE_RANGE = true;
 
     }
 
