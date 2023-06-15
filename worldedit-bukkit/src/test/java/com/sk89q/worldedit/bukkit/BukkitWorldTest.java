@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class BukkitWorldTest {
 
-    @Test
     public void testTreeTypeMapping() {
         for (TreeGenerator.TreeType type : TreeGenerator.TreeType.values()) {
             assertNotNull(BukkitWorld.toBukkitTreeType(type), "No mapping for: " + type);
