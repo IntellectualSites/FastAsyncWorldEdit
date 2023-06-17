@@ -193,6 +193,7 @@ public class ParallelQueueExtent extends PassthroughExtent {
     public int setBlocks(Set<BlockVector3> vset, Pattern pattern) {
         if (vset instanceof Region) {
             this.changes = setBlocks((Region) vset, pattern);
+            return this.changes;
         }
         // TODO optimize parallel
         for (BlockVector3 blockVector3 : vset) {
