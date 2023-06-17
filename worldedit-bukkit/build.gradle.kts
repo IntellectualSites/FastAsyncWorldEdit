@@ -3,7 +3,7 @@ import io.papermc.paperweight.userdev.attribute.Obfuscation
 
 plugins {
     `java-library`
-    id("com.modrinth.minotaur") version "2.8.0"
+    id("com.modrinth.minotaur") version "2.8.1"
 }
 
 project.description = "Bukkit"
