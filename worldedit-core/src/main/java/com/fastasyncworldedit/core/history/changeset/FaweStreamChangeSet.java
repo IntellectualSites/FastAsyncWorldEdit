@@ -258,7 +258,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
         if (blockSize > 0) {
             return false;
         }
-        if (waitingCombined.get() != 0 || waitingAsync.get() != 0) {
+        if (!super.isEmpty()) {
             return false;
         }
         flush();

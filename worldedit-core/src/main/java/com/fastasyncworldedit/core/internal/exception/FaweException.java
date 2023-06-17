@@ -14,6 +14,7 @@ public class FaweException extends RuntimeException {
 
     private final Component message;
     private final Type type;
+    private final boolean ignorable;
 
     /**
      * New instance. Defaults to {@link FaweException.Type#OTHER}.
@@ -33,8 +34,19 @@ public class FaweException extends RuntimeException {
      * New instance of a given {@link FaweException.Type}
      */
     public FaweException(Component reason, Type type) {
+        this(reason, type, false);
+    }
+
+    /**
+     * New instance of a given {@link FaweException.Type}
+     *
+     * @param ignorable if an edit can continue if this exception is caught, e.g. by {@link com.fastasyncworldedit.core.extent.LimitExtent}
+     * @since TODO
+     */
+    public FaweException(Component reason, Type type, boolean ignorable) {
         this.message = reason;
         this.type = type;
+        this.ignorable = ignorable;
     }
 
     @Override
@@ -53,6 +65,15 @@ public class FaweException extends RuntimeException {
      */
     public Type getType() {
         return type;
+    }
+
+    /**
+     * If an edit can continue if this exception is caught, e.g. by {@link com.fastasyncworldedit.core.extent.LimitExtent}
+     *
+     * @since TODO
+     */
+    public boolean ignorable() {
+        return ignorable;
     }
 
     public static FaweException get(Throwable e) {
@@ -80,6 +101,7 @@ public class FaweException extends RuntimeException {
         MANUAL,
         NO_REGION,
         OUTSIDE_REGION,
+        OUTSIDE_SAFE_REGION,
         MAX_CHECKS,
         MAX_CHANGES,
         LOW_MEMORY,

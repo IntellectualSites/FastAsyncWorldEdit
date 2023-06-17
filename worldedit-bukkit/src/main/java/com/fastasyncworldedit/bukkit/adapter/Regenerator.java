@@ -165,7 +165,11 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                     .setNameFormat("fawe-regen-%d")
                     .build()
             );
-        } // else using sequential chunk generation, concurrent not supported
+        } else { // else using sequential chunk generation, concurrent not supported
+            executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
+                    .setNameFormat("fawe-regen-%d")
+                    .build());
+        }
 
         //TODO: can we get that required radius down without affecting chunk generation (e.g. strucures, features, ...)?
         //for now it is working well and fast, if we are bored in the future we could do the research (a lot of it) to reduce the border radius
@@ -253,10 +257,13 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                     e.printStackTrace();
                 }
             } else { // Concurrency.NONE or generateConcurrent == false
-                // run sequential
-                for (long xz : coords) {
-                    chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
-                }
+                // run sequential but submit to different thread
+                // running regen on the main thread otherwise triggers async-only events on the main thread
+                executor.submit(() -> {
+                    for (long xz : coords) {
+                        chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
+                    }
+                }).get(); // wait until finished this step
             }
         }
 

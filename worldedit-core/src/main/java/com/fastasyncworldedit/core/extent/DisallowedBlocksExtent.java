@@ -141,7 +141,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                 BlockState state = BlockTypesCache.states[block];
                 if (blockedBlocks != null) {
                     if (blockedBlocks.contains(state.getBlockType().getId())) {
-                        blocks[i] = 0;
+                        blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                         continue;
                     }
                 }
@@ -150,7 +150,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
                 }
                 for (FuzzyBlockState fuzzy : blockedStates) {
                     if (fuzzy.equalsFuzzy(state)) {
-                        blocks[i] = 0;
+                        blocks[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                         continue it;
                     }
                 }
@@ -178,7 +178,7 @@ public class DisallowedBlocksExtent extends AbstractDelegateExtent implements IB
 
     @Override
     public ProcessorScope getScope() {
-        return ProcessorScope.CHANGING_BLOCKS;
+        return ProcessorScope.REMOVING_BLOCKS;
     }
 
 }

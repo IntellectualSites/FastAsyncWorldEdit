@@ -65,16 +65,19 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.Identifiable;
 import com.sk89q.worldedit.util.eventbus.EventBus;
+import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
 import com.sk89q.worldedit.world.World;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * A builder-style factory for {@link EditSession EditSessions}.
@@ -531,16 +534,14 @@ public final class EditSessionBuilder {
             }
             if (allowedRegions == null && Settings.settings().REGION_RESTRICTIONS) {
                 if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
-                    if (actor instanceof Player) {
-                        Player player = (Player) actor;
+                    if (actor instanceof Player player) {
                         allowedRegions = player.getAllowedRegions();
                     }
                 }
             }
             if (disallowedRegions == null && Settings.settings().REGION_RESTRICTIONS && Settings.settings().REGION_RESTRICTIONS_OPTIONS.ALLOW_BLACKLISTS) {
                 if (actor != null && !actor.hasPermission("fawe.bypass.regions")) {
-                    if (actor instanceof Player) {
-                        Player player = (Player) actor;
+                    if (actor instanceof Player player) {
                         disallowedRegions = player.getDisallowedRegions();
                     }
                 }
@@ -560,6 +561,9 @@ public final class EditSessionBuilder {
                         regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, null);
                     }
                 }
+            }
+            if (placeChunks && regionExtent != null) {
+                queue.addProcessor(regionExtent);
             }
             // There's no need to do the below (and it'll also just be a pain to implement) if we're not placing chunks
             if (placeChunks) {
@@ -589,23 +593,29 @@ public final class EditSessionBuilder {
             } else {
                 relighter = NullRelighter.INSTANCE;
             }
+            Consumer<Component> onErrorMessage;
+            if (getActor() != null) {
+                onErrorMessage = c -> getActor().print(Caption.of("fawe.error.occurred-continuing", c));
+            } else {
+                onErrorMessage = c -> {
+                };
+            }
             if (limit != null && !limit.isUnlimited() && regionExtent != null) {
-                this.extent = new LimitExtent(regionExtent, limit);
+                this.extent = new LimitExtent(regionExtent, limit, onErrorMessage);
             } else if (limit != null && !limit.isUnlimited()) {
-                this.extent = new LimitExtent(this.extent, limit);
+                this.extent = new LimitExtent(this.extent, limit, onErrorMessage);
             } else if (regionExtent != null) {
                 this.extent = regionExtent;
             }
             if (this.limit != null && this.limit.STRIP_NBT != null && !this.limit.STRIP_NBT.isEmpty()) {
+                this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
                 if (placeChunks) {
-                    queue.addProcessor(new StripNBTExtent(this.extent, this.limit.STRIP_NBT));
-                } else {
-                    this.extent = new StripNBTExtent(this.extent, this.limit.STRIP_NBT);
+                    queue.addProcessor((IBatchProcessor) this.extent);
                 }
             }
             if (this.limit != null && !this.limit.isUnlimited()) {
                 Set<String> limitBlocks = new HashSet<>();
-                if ((getActor() == null || getActor().hasPermission("worldedit.anyblock")) && this.limit.UNIVERSAL_DISALLOWED_BLOCKS) {
+                if (getActor() != null && !getActor().hasPermission("worldedit.anyblock") && this.limit.UNIVERSAL_DISALLOWED_BLOCKS) {
                     limitBlocks.addAll(WorldEdit.getInstance().getConfiguration().disallowedBlocks);
                 }
                 if (this.limit.DISALLOWED_BLOCKS != null && !this.limit.DISALLOWED_BLOCKS.isEmpty()) {
@@ -613,10 +623,9 @@ public final class EditSessionBuilder {
                 }
                 Set<PropertyRemap<?>> remaps = this.limit.REMAP_PROPERTIES;
                 if (!limitBlocks.isEmpty() || (remaps != null && !remaps.isEmpty())) {
+                    this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, remaps);
                     if (placeChunks) {
-                        queue.addProcessor(new DisallowedBlocksExtent(this.extent, limitBlocks, remaps));
-                    } else {
-                        this.extent = new DisallowedBlocksExtent(this.extent, limitBlocks, remaps);
+                        queue.addProcessor((IBatchProcessor) this.extent);
                     }
                 }
             }

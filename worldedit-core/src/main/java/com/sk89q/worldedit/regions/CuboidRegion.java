@@ -31,6 +31,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.worldedit.math.BlockVector2;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.storage.ChunkStore;
 
 import javax.annotation.Nonnull;
@@ -823,14 +824,15 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
             boolean trimX = lowerX != 0 || upperX != 15;
             boolean trimZ = lowerZ != 0 || upperZ != 15;
 
+            if (!(trimX || trimZ)) {
+                return set;
+            }
+
             for (int layer = get.getMinSectionPosition(); layer < get.getMaxSectionPosition(); layer++) {
                 if (!set.hasSection(layer)) {
                     continue;
                 }
                 char[] arr = Objects.requireNonNull(set.loadIfPresent(layer)); // This shouldn't be null if above is true
-                if (!(trimX || trimZ)) {
-                    continue;
-                }
                 int indexY = 0;
                 for (int y = 0; y < 16; y++, indexY += 256) { // For each y layer within a chunk section
                     int index;
@@ -839,14 +841,14 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         for (int z = 0; z < lowerZ; z++) {
                             // null the z values
                             for (int x = 0; x < 16; x++, index++) {
-                                arr[index] = 0;
+                                arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
                         }
                         index = indexY + upperZi;
                         for (int z = upperZ + 1; z < 16; z++) {
                             // null the z values
                             for (int x = 0; x < 16; x++, index++) {
-                                arr[index] = 0;
+                                arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
                         }
                     }
@@ -855,11 +857,11 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         for (int z = lowerZ; z <= upperZ; z++, index += 16) {
                             for (int x = 0; x < lowerX; x++) {
                                 // null the x values
-                                arr[index + x] = 0;
+                                arr[index + x] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
                             for (int x = upperX + 1; x < 16; x++) {
                                 // null the x values
-                                arr[index + x] = 0;
+                                arr[index + x] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
                         }
                     }
@@ -925,7 +927,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         for (int z = lowerZ; z <= upperZ; z++) {
                             // null the z values
                             for (int x = 0; x < 16; x++, index++) {
-                                arr[index] = 0;
+                                arr[index] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
                         }
                     }
@@ -934,7 +936,7 @@ public class CuboidRegion extends AbstractRegion implements FlatRegion {
                         for (int z = lowerZ; z <= upperZ; z++, index += 16) {
                             for (int x = lowerX; x <= upperX; x++) {
                                 // null the x values
-                                arr[index + x] = 0;
+                                arr[index + x] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
                         }
                     }

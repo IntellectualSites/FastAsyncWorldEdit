@@ -26,6 +26,7 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 import org.apache.logging.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
@@ -155,7 +156,9 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     /**
      * Load an existing file as a DiskOptimizedClipboard. The file MUST exist and MUST be created as a DiskOptimizedClipboard
      * with data written to it.
+     * @deprecated Will be made private, use {@link DiskOptimizedClipboard#loadFromFile(File)}
      */
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public DiskOptimizedClipboard(File file) {
         this(file, VERSION);
     }
@@ -166,14 +169,15 @@ public class DiskOptimizedClipboard extends LinearClipboard {
      *
      * @param file            File to read from
      * @param versionOverride An override version to allow loading of older clipboards if required
+     * @deprecated Will be made private, use {@link DiskOptimizedClipboard#loadFromFile(File)}
      */
+    @Deprecated(forRemoval = true, since = "2.6.2")
     public DiskOptimizedClipboard(File file, int versionOverride) {
         super(readSize(file, versionOverride), BlockVector3.ZERO);
         headerSize = getHeaderSizeOverrideFromVersion(versionOverride);
         nbtMap = new HashMap<>();
         try {
             this.file = file;
-            checkFileLength(file);
             this.braf = new RandomAccessFile(file, "rw");
             braf.setLength(file.length());
             this.nbtBytesRemaining = Integer.MAX_VALUE - (int) file.length();
@@ -199,32 +203,6 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         } catch (Throwable t) {
             close();
             throw t;
-        }
-    }
-
-    private void checkFileLength(File file) throws IOException {
-        long expectedFileSize = headerSize + ((long) getVolume() << 1);
-        if (file.length() > Integer.MAX_VALUE) {
-            if (expectedFileSize >= Integer.MAX_VALUE) {
-                throw new IOException(String.format(
-                        "Cannot load clipboard of file size: %d > 2147483647 bytes (2.147 GiB), " + "volume: %d blocks",
-                        file.length(),
-                        getVolume()
-                ));
-            } else {
-                throw new IOException(String.format(
-                        "Cannot load clipboard of file size > 2147483647 bytes (2.147 GiB). Possible corrupt file? Mismatch" +
-                                " between volume `%d` and file length `%d`!",
-                        file.length(),
-                        getVolume()
-                ));
-            }
-        } else if (expectedFileSize != file.length()) {
-            throw new IOException(String.format(
-                    "Possible corrupt clipboard file? Mismatch between expected file size `%d` and actual file size `%d`!",
-                    expectedFileSize,
-                    file.length()
-            ));
         }
     }
 
@@ -723,8 +701,8 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         try {
             int index = headerSize + (getIndex(x, y, z) << 1);
             char ordinal = block.getOrdinalChar();
-            if (ordinal == 0) {
-                ordinal = 1;
+            if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                ordinal = BlockTypesCache.ReservedIDs.AIR;
             }
             byteBuffer.putChar(index, ordinal);
             boolean hasNbt = block instanceof BaseBlock && block.hasNbtData();

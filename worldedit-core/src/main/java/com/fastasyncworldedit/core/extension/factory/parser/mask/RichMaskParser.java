@@ -50,7 +50,7 @@ public class RichMaskParser extends FaweParser<Mask> {
     @Override
     public Mask parseFromInput(String input, ParserContext context) throws InputParseException {
         if (input.isEmpty()) {
-            throw new SuggestInputParseException("No input provided", "", () -> Stream
+            throw new SuggestInputParseException(Caption.of("fawe.error.no-input-provided"), () -> Stream
                     .of("#", ",", "&")
                     .map(n -> n + ":")
                     .collect(Collectors.toList())
@@ -95,7 +95,6 @@ public class RichMaskParser extends FaweParser<Mask> {
                                                         "https://intellectualsites.github.io/fastasyncworldedit-documentation/patterns/patterns"
                                                 ))
                                 )),
-                                full,
                                 () -> {
                                     if (full.length() == 1) {
                                         return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions(""));
@@ -148,6 +147,7 @@ public class RichMaskParser extends FaweParser<Mask> {
                             try {
                                 builder.addRegex(full);
                             } catch (InputParseException ignored) {
+                                builder.clear();
                                 context.setPreferringWildcard(false);
                                 context.setRestricted(false);
                                 BaseBlock block = worldEdit.getBlockFactory().parseFromInput(full, context);
@@ -162,7 +162,6 @@ public class RichMaskParser extends FaweParser<Mask> {
                                                                 "https://intellectualsites.github.io/fastasyncworldedit-documentation/masks/masks"
                                                         ))
                                         )),
-                                        full,
                                         () -> {
                                             if (full.length() == 1) {
                                                 return new ArrayList<>(worldEdit.getMaskFactory().getSuggestions(""));

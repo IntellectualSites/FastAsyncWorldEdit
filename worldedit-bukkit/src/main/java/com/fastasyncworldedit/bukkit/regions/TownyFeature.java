@@ -2,9 +2,7 @@ package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.palmergames.bukkit.towny.Towny;
-import com.palmergames.bukkit.towny.TownyUniverse;
-import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
-import com.palmergames.bukkit.towny.object.PlayerCache;
+import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
@@ -36,31 +34,27 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
         if (block == null) {
             return false;
         }
-        Resident resident;
-        try {
-            resident = TownyUniverse.getInstance().getResident(player.getName());
-            try {
-                if (block.getResident().equals(resident)) {
-                    return true;
-                }
-            } catch (NotRegisteredException ignored) {
-            }
-            Town town = block.getTown();
-            if (town.isMayor(resident)) {
+        Resident resident = TownyAPI.getInstance().getResident(player);
+        if (resident == null) {
+            return false;
+        }
+        if (block.hasResident(resident) || block.hasTrustedResident(resident)) {
+            return true;
+        }
+        Town town = block.getTownOrNull(); // Will not be null, because block is not null.
+        if (town.isMayor(resident) || town.hasTrustedResident(resident)) {
+            return true;
+        }
+        if (!town.hasResident(resident)) {
+            return false;
+        }
+        if (player.hasPermission("fawe.towny.*")) {
+            return true;
+        }
+        for (String rank : resident.getTownRanks()) {
+            if (player.hasPermission("fawe.towny." + rank)) {
                 return true;
             }
-            if (!town.hasResident(resident)) {
-                return false;
-            }
-            if (player.hasPermission("fawe.towny.*")) {
-                return true;
-            }
-            for (String rank : resident.getTownRanks()) {
-                if (player.hasPermission("fawe.towny." + rank)) {
-                    return true;
-                }
-            }
-        } catch (NotRegisteredException ignored) {
         }
         return false;
     }
@@ -69,32 +63,23 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
     public FaweMask getMask(final com.sk89q.worldedit.entity.Player wePlayer, MaskType type, boolean isWhitelist) {
         final Player player = BukkitAdapter.adapt(wePlayer);
         final Location location = player.getLocation();
-        try {
-            final PlayerCache cache = ((Towny) this.towny).getCache(player);
-            final WorldCoord mycoord = cache.getLastTownBlock();
-            if (mycoord == null) {
-                return null;
-            }
-            final TownBlock myplot = mycoord.getTownBlock();
-            if (myplot == null) {
-                return null;
-            }
-            boolean isMember = isAllowed(player, myplot);
-            if (isMember) {
-                final Chunk chunk = location.getChunk();
-                final BlockVector3 pos1 = BlockVector3
-                        .at(chunk.getX() * 16, 0, chunk.getZ() * 16);
-                final BlockVector3 pos2 = BlockVector3.at(
-                        chunk.getX() * 16 + 15, 156, chunk.getZ() * 16
-                                + 15);
-                return new FaweMask(new CuboidRegion(pos1, pos2)) {
-                    @Override
-                    public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
-                        return isAllowed(BukkitAdapter.adapt(player), myplot);
-                    }
-                };
-            }
-        } catch (Exception ignored) {
+        final WorldCoord mycoord = WorldCoord.parseWorldCoord(location);
+        if (mycoord.isWilderness()) {
+            return null;
+        }
+        final TownBlock myplot = mycoord.getTownBlockOrNull(); // Will not be null, because of the isWilderness() test above.
+        boolean isMember = isAllowed(player, myplot);
+        if (isMember) {
+            final Location loc1 = mycoord.getLowerMostCornerLocation();
+            final Location loc2 = mycoord.getUpperMostCornerLocation();
+            final BlockVector3 pos1 = BlockVector3.at(loc1.getX(), loc1.getY(), loc1.getZ());
+            final BlockVector3 pos2 = BlockVector3.at(loc2.getX(), loc2.getY(), loc2.getZ());
+            return new FaweMask(new CuboidRegion(pos1, pos2)) {
+                @Override
+                public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {
+                    return isAllowed(BukkitAdapter.adapt(player), myplot);
+                }
+            };
         }
         return null;
     }

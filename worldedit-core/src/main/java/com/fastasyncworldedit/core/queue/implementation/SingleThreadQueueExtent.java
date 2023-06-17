@@ -275,8 +275,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      * Get a new IChunk from either the pool, or create a new one<br> + Initialize it at the
      * coordinates
      *
-     * @param chunkX
-     * @param chunkZ
+     * @param chunkX X chunk coordinate
+     * @param chunkZ Z chunk coordinate
      * @return IChunk
      */
     private ChunkHolder poolOrCreate(int chunkX, int chunkZ) {
@@ -293,7 +293,9 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             if (pair == lastPair) {
                 return lastChunk;
             }
-            if (!processGet(x, z)) {
+            if (!processGet(x, z) || (Settings.settings().REGION_RESTRICTIONS_OPTIONS.RESTRICT_TO_SAFE_RANGE
+                    // if any chunk coord is outside 30 million blocks
+                    && (x > 1875000 || z > 1875000 || x < -1875000 || z < -1875000))) {
                 lastPair = pair;
                 lastChunk = NullChunk.getInstance();
                 return NullChunk.getInstance();
@@ -309,19 +311,11 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             // If queueing is enabled AND either of the following
             //  - memory is low & queue size > num threads + 8
             //  - queue size > target size and primary queue has less than num threads submissions
-            if (enabledQueue && ((lowMem && size > Settings.settings().QUEUE.PARALLEL_THREADS + 8) || (size > Settings.settings().QUEUE.TARGET_SIZE && Fawe
-                    .instance()
-                    .getQueueHandler()
-                    .isUnderutilized()))) {
+            int targetSize = lowMem ? Settings.settings().QUEUE.PARALLEL_THREADS + 8 : Settings.settings().QUEUE.TARGET_SIZE;
+            if (enabledQueue && size > targetSize && (lowMem || Fawe.instance().getQueueHandler().isUnderutilized())) {
                 chunk = chunks.removeFirst();
                 final Future future = submitUnchecked(chunk);
                 if (future != null && !future.isDone()) {
-                    final int targetSize;
-                    if (lowMem) {
-                        targetSize = Settings.settings().QUEUE.PARALLEL_THREADS + 8;
-                    } else {
-                        targetSize = Settings.settings().QUEUE.TARGET_SIZE;
-                    }
                     pollSubmissions(targetSize, lowMem);
                     submissions.add(future);
                 }

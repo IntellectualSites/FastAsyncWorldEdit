@@ -4,14 +4,13 @@ pipeline {
         disableConcurrentBuilds()
     }
     stages {
-        stage('Set JDK 17') {
-            steps {
-                tool name: 'Temurin-17.0.6+10', type: 'jdk'
-            }
-        }
         stage('Build') {
             steps {
-                sh './gradlew clean build'
+                withEnv([
+                        "PATH+JAVA=${tool 'Temurin-17.0.7_7'}/bin"
+                ]) {
+                    sh './gradlew clean build'
+                }
             }
         }
         stage('Archive artifacts') {

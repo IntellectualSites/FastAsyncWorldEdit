@@ -3,7 +3,7 @@ import io.papermc.paperweight.userdev.attribute.Obfuscation
 
 plugins {
     `java-library`
-    id("com.modrinth.minotaur") version "2.+"
+    id("com.modrinth.minotaur") version "2.8.1"
 }
 
 project.description = "Bukkit"
@@ -32,6 +32,10 @@ repositories {
         name = "OSS Sonatype Snapshots"
         url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
     }
+    maven {
+        name = "Glaremasters"
+        url = uri("https://repo.glaremasters.me/repository/towny/")
+    }
     flatDir { dir(File("src/main/resources")) }
 }
 
@@ -47,7 +51,13 @@ val adapters = configurations.create("adapters") {
     isCanBeResolved = true
     shouldResolveConsistentlyWith(configurations["runtimeClasspath"])
     attributes {
-        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE, objects.named(Obfuscation.OBFUSCATED))
+        attribute(Obfuscation.OBFUSCATION_ATTRIBUTE,
+                if ((project.findProperty("enginehub.obf.none") as String?).toBoolean()) {
+                    objects.named(Obfuscation.NONE)
+                } else {
+                    objects.named(Obfuscation.OBFUSCATED)
+                }
+        )
     }
 }
 
@@ -196,7 +206,7 @@ tasks {
         versionNumber.set("${project.version}")
         versionType.set("release")
         uploadFile.set(file("build/libs/${rootProject.name}-Bukkit-${project.version}.jar"))
-        gameVersions.addAll(listOf("1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.17.1", "1.16.5"))
+        gameVersions.addAll(listOf("1.20", "1.19.4", "1.19.3", "1.19.2", "1.19.1", "1.19", "1.18.2", "1.17.1", "1.16.5"))
         loaders.addAll(listOf("paper", "spigot"))
         changelog.set("The changelog is available on GitHub: https://github.com/IntellectualSites/" +
                 "FastAsyncWorldEdit/releases/tag/${project.version}")

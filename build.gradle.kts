@@ -1,12 +1,13 @@
 import org.ajoberstar.grgit.Grgit
-import java.time.format.DateTimeFormatter
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import java.net.URI
+import java.time.format.DateTimeFormatter
+import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
-    id("xyz.jpenilla.run-paper") version "2.0.1"
+    id("xyz.jpenilla.run-paper") version "2.1.0"
 }
 
 if (!File("$rootDir/.git").exists()) {
@@ -33,7 +34,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("2.6.0")
+var rootVersion by extra("2.6.4")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
@@ -82,8 +83,19 @@ allprojects {
 }
 
 applyCommonConfiguration()
+val supportedVersions = listOf("1.16.5", "1.17", "1.17.1", "1.18.2", "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4", "1.20")
 
 tasks {
+    supportedVersions.forEach {
+        register<RunServer>("runServer-$it") {
+            minecraftVersion(it)
+            pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+                    .toTypedArray())
+            jvmArgs("-DPaper.IgnoreJavaVersion=true", "-Dcom.mojang.eula.agree=true")
+            group = "run paper"
+            runDirectory.set(file("run-$it"))
+        }
+    }
     runServer {
         minecraftVersion("1.19.3")
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
@@ -93,7 +105,7 @@ tasks {
 }
 
 nexusPublishing {
-    repositories {
+    this.repositories {
         sonatype {
             nexusUrl.set(URI.create("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(URI.create("https://s01.oss.sonatype.org/content/repositories/snapshots/"))

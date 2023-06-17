@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableMap;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.blocks.BaseItemStack;
-import com.sk89q.worldedit.blocks.TileEntityBlock;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
@@ -50,7 +49,6 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockStateHolder;
 import com.sk89q.worldedit.world.block.BlockType;
-import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.item.ItemType;
@@ -60,7 +58,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -71,14 +68,12 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.LevelChunkSection;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -86,7 +81,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.TreeType;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockState;
@@ -304,54 +298,6 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     @Override
     public Set<SideEffect> getSupportedSideEffects() {
         return SideEffectSet.defaults().getSideEffectsToApply();
-    }
-
-    public boolean setBlock(org.bukkit.Chunk chunk, int x, int y, int z, BlockStateHolder state, boolean update) {
-        CraftChunk craftChunk = (CraftChunk) chunk;
-        LevelChunk levelChunk = craftChunk.getHandle();
-        Level level = levelChunk.getLevel();
-
-        BlockPos blockPos = new BlockPos(x, y, z);
-        net.minecraft.world.level.block.state.BlockState blockState = ((PaperweightBlockMaterial) state.getMaterial()).getState();
-        LevelChunkSection[] levelChunkSections = levelChunk.getSections();
-        int y4 = y >> 4;
-        LevelChunkSection section = levelChunkSections[y4];
-
-        net.minecraft.world.level.block.state.BlockState existing;
-        if (section == null) {
-            existing = ((PaperweightBlockMaterial) BlockTypes.AIR.getDefaultState().getMaterial()).getState();
-        } else {
-            existing = section.getBlockState(x & 15, y & 15, z & 15);
-        }
-
-        levelChunk.removeBlockEntity(blockPos); // Force delete the old tile entity
-
-        CompoundBinaryTag compoundTag = state instanceof BaseBlock ? state.getNbt() : null;
-        if (compoundTag != null || existing instanceof TileEntityBlock) {
-            level.setBlock(blockPos, blockState, 0);
-            // remove tile
-            if (compoundTag != null) {
-                // We will assume that the tile entity was created for us,
-                // though we do not do this on the Forge version
-                BlockEntity blockEntity = level.getBlockEntity(blockPos);
-                if (blockEntity != null) {
-                    net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) fromNativeBinary(compoundTag);
-                    tag.put("x", IntTag.valueOf(x));
-                    tag.put("y", IntTag.valueOf(y));
-                    tag.put("z", IntTag.valueOf(z));
-                    blockEntity.load(tag); // readTagIntoTileEntity - load data
-                }
-            }
-        } else {
-            if (existing == blockState) {
-                return true;
-            }
-            levelChunk.setBlockState(blockPos, blockState, false);
-        }
-        if (update) {
-            level.getMinecraftWorld().sendBlockUpdated(blockPos, existing, blockState, 0);
-        }
-        return true;
     }
 
     @Override
@@ -650,10 +596,17 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 .getServer()
                 .registryAccess()
                 .registryOrThrow(BIOME);
-        return biomeRegistry.stream()
-                .map(biomeRegistry::getKey).filter(Objects::nonNull)
-                .map(CraftNamespacedKey::fromMinecraft)
-                .collect(Collectors.toList());
+        List<ResourceLocation> keys = biomeRegistry.stream()
+                .map(biomeRegistry::getKey).filter(Objects::nonNull).toList();
+        List<NamespacedKey> namespacedKeys = new ArrayList<>();
+        for (ResourceLocation key : keys) {
+            try {
+                namespacedKeys.add(CraftNamespacedKey.fromMinecraft(key));
+            } catch (IllegalArgumentException e) {
+                LOGGER.error("Error converting biome key {}", key.toString(), e);
+            }
+        }
+        return namespacedKeys;
     }
 
     @Override

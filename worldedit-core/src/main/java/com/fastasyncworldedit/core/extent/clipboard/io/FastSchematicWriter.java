@@ -172,8 +172,8 @@ public class FastSchematicWriter implements ClipboardWriter {
                 }
 
                 int ordinal = block.getOrdinal();
-                if (ordinal == 0) {
-                    ordinal = 1;
+                if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+                    ordinal = BlockTypesCache.ReservedIDs.AIR;
                 }
                 char value = palette[ordinal];
                 if (value == Character.MAX_VALUE) {

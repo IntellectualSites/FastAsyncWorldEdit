@@ -7,6 +7,7 @@ import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -71,7 +72,7 @@ public interface IBatchProcessor {
                         if (arr != null) {
                             int index = (minY & 15) << 8;
                             for (int i = 0; i < index; i++) {
-                                arr[i] = 0;
+                                arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
                         } else {
                             arr = new char[4096];
@@ -89,7 +90,7 @@ public interface IBatchProcessor {
                         if (arr != null) {
                             int index = ((maxY + 1) & 15) << 8;
                             for (int i = index; i < arr.length; i++) {
-                                arr[i] = 0;
+                                arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                             }
                         } else {
                             arr = new char[4096];
@@ -130,7 +131,7 @@ public interface IBatchProcessor {
                 if (arr != null) {
                     int index = (minY & 15) << 8;
                     for (int i = index; i < 4096; i++) {
-                        arr[i] = 0;
+                        arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                     }
                 }
                 set.setBlocks(layer, arr);
@@ -139,7 +140,7 @@ public interface IBatchProcessor {
                 if (arr != null) {
                     int index = ((maxY + 1) & 15) << 8;
                     for (int i = 0; i < index; i++) {
-                        arr[i] = 0;
+                        arr[i] = BlockTypesCache.ReservedIDs.__RESERVED__;
                     }
                 }
                 set.setBlocks(layer, arr);

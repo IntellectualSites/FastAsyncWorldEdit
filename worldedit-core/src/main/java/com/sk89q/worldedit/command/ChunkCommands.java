@@ -79,7 +79,10 @@ public class ChunkCommands {
             aliases = {"/chunkinfo"},
             desc = "Get information about the chunk you're inside"
     )
-    @CommandPermissions("worldedit.chunkinfo")
+    @CommandPermissions(
+            value = "worldedit.chunkinfo",
+            queued = false
+    )
     public void chunkInfo(Player player) {
         Location pos = player.getBlockLocation();
         int chunkX = (int) Math.floor(pos.getBlockX() / 16.0);
@@ -99,7 +102,10 @@ public class ChunkCommands {
             aliases = {"/listchunks"},
             desc = "List chunks that your selection includes"
     )
-    @CommandPermissions("worldedit.listchunks")
+    @CommandPermissions(
+            value = "worldedit.listchunks",
+            queued = false
+    )
     public void listChunks(
             Actor actor, World world, LocalSession session,
             @ArgFlag(name = 'p', desc = "Page number.", def = "1") int page

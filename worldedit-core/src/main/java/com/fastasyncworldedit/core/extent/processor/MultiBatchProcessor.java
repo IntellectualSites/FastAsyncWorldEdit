@@ -257,7 +257,7 @@ public class MultiBatchProcessor implements IBatchProcessor {
         for (IBatchProcessor processor : processors) {
             scope = Math.max(scope, processor.getScope().intValue());
         }
-        return ProcessorScope.valueOf(0);
+        return ProcessorScope.valueOf(scope);
     }
 
     /**

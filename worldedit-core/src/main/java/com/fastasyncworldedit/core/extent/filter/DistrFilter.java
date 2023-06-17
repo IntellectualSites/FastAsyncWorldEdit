@@ -41,8 +41,8 @@ public class DistrFilter extends ForkedFilter<DistrFilter> {
     @Override
     public final void applyBlock(FilterBlock block) {
         int ordinal = block.getOrdinal();
-        if (ordinal == 0) {
-            ordinal = 1;
+        if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
+            ordinal = BlockTypesCache.ReservedIDs.AIR;
         }
         counter[ordinal]++;
     }

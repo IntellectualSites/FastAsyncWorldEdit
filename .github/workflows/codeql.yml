@@ -1,5 +1,7 @@
 name: "CodeQL"
 on:
+  push:
+    branches: [main]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [main]
@@ -18,11 +20,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          cache: gradle
+          java-version: 17
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@32dc499307d133bb5085bae78498c0ac2cf762d5 # v2
+        uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
       - name: Autobuild
-        uses: github/codeql-action/autobuild@32dc499307d133bb5085bae78498c0ac2cf762d5 # v2
+        uses: github/codeql-action/autobuild@v2
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@32dc499307d133bb5085bae78498c0ac2cf762d5 # v2
+        uses: github/codeql-action/analyze@v2
