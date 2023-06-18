@@ -23,7 +23,6 @@ import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.the
 import org.gradle.plugins.signing.SigningExtension
-import java.util.*
 import javax.inject.Inject
 
 fun Project.applyLibrariesConfiguration() {
@@ -205,7 +204,7 @@ fun Project.applyLibrariesConfiguration() {
                 from(libsComponent)
 
                 group = "com.fastasyncworldedit"
-                artifactId ="FastAsyncWorldEdit-Libs-${project.name.replaceFirstChar(Char::titlecase)}"
+                artifactId = "FastAsyncWorldEdit-Libs-${project.name.replaceFirstChar(Char::titlecase)}"
                 version = version
 
                 pom {
