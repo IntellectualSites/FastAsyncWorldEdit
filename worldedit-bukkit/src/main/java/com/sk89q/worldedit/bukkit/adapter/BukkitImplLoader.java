@@ -66,11 +66,6 @@ public class BukkitImplLoader {
      * Create a new instance.
      */
     public BukkitImplLoader() {
-        if (FoliaSupport.isFolia()) {
-            SEARCH_PACKAGE = "com.sk89q.worldedit.folia.adapter.impl.fawe";
-            SEARCH_PACKAGE_DOT = SEARCH_PACKAGE + ".";
-            SEARCH_PATH = SEARCH_PACKAGE.replace(".", "/");
-        }
         addDefaults();
     }
 
