@@ -6,6 +6,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -101,6 +102,16 @@ public class FoliaTaskManager extends TaskManager {
         }
     }
 
+    public <T> T syncAt(final Supplier<T> supplier, final World context, int chunkX, int chunkZ) {
+        FutureTask<T> task = new FutureTask<>(supplier::get);
+        SchedulerAdapter.executeForChunk(context,chunkX, chunkZ, task);
+        try {
+            return task.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public <T> T syncWith(final Supplier<T> supplier, final Player context) {
         FutureTask<T> task = new FutureTask<>(supplier::get);
@@ -128,6 +139,7 @@ public class FoliaTaskManager extends TaskManager {
     private static class SchedulerAdapter {
 
         private static final MethodHandle EXECUTE_FOR_LOCATION;
+        private static final MethodHandle EXECUTE_FOR_CHUNK;
         private static final MethodHandle EXECUTE_FOR_PLAYER;
         private static final Runnable THROW_IF_RETIRED = () -> throwRetired();
 
@@ -135,6 +147,15 @@ public class FoliaTaskManager extends TaskManager {
                 void.class,
                 Plugin.class,
                 org.bukkit.Location.class,
+                Runnable.class
+        );
+
+        private static final MethodType CHUNK_EXECUTE_TYPE = methodType(
+                void.class,
+                Plugin.class,
+                org.bukkit.World.class,
+                int.class,
+                int.class,
                 Runnable.class
         );
 
@@ -151,6 +172,7 @@ public class FoliaTaskManager extends TaskManager {
             final MethodHandles.Lookup lookup = MethodHandles.lookup();
 
             MethodHandle executeForLocation;
+            MethodHandle executeForChunk;
 
             MethodHandle executeForPlayer;
             try {
@@ -163,6 +185,14 @@ public class FoliaTaskManager extends TaskManager {
                 );
                 executeForLocation = executeForLocation.bindTo(method.invoke(null));
                 executeForLocation = executeForLocation.bindTo(pluginInstance);
+
+                executeForChunk = lookup.findVirtual(
+                        regionisedSchedulerClass,
+                        "execute",
+                        CHUNK_EXECUTE_TYPE
+                );
+                executeForChunk = executeForChunk.bindTo(method.invoke(null));
+                executeForChunk = executeForChunk.bindTo(pluginInstance);
 
                 Class<?> entitySchedulerClass = Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
                 executeForPlayer = lookup.findVirtual(
@@ -190,7 +220,18 @@ public class FoliaTaskManager extends TaskManager {
                 throw new AssertionError(throwable);
             }
             EXECUTE_FOR_LOCATION = executeForLocation;
+            EXECUTE_FOR_CHUNK = executeForChunk;
             EXECUTE_FOR_PLAYER = executeForPlayer;
+        }
+
+        static void executeForChunk(World world,int chunkX, int chunkZ, Runnable task) {
+            try {
+                EXECUTE_FOR_CHUNK.invokeExact(world,chunkX, chunkZ, task);
+            } catch (Error | RuntimeException e) {
+                throw e;
+            } catch (Throwable other) {
+                throw new RuntimeException(other);
+            }
         }
 
         static void executeForLocation(Location location, Runnable task) {
