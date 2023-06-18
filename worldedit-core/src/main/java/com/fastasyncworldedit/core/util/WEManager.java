@@ -108,27 +108,22 @@ public class WEManager {
         }
         player.setMeta("lastMaskWorld", world);
         Set<FaweMask> masks = player.getMeta("lastMask");
-        Set<Region> backupRegions = new HashSet<>();
         Set<Region> regions = new HashSet<>();
-
 
         if (masks == null || !isWhitelist) {
             masks = new HashSet<>();
         } else {
             synchronized (masks) {
                 boolean removed = false;
+                boolean inMask = false;
                 if (!masks.isEmpty()) {
                     Iterator<FaweMask> iterator = masks.iterator();
                     while (iterator.hasNext()) {
                         FaweMask mask = iterator.next();
-                        if (mask.isValid(player, type)) {
+                        if (mask.isValid(player, type, false)) {
                             Region region = mask.getRegion();
-                            if (region.contains(loc.toBlockPoint())) {
-                                regions.add(region);
-                            } else {
-                                removed = true;
-                                backupRegions.add(region);
-                            }
+                            inMask |= region.contains(loc.toBlockPoint());
+                            regions.add(region);
                         } else {
                             if (Settings.settings().ENABLED_COMPONENTS.DEBUG) {
                                 player.printDebug(Caption.of("fawe.error.region-mask-invalid", mask.getClass().getSimpleName()));
@@ -138,39 +133,44 @@ public class WEManager {
                         }
                     }
                 }
-                if (!removed) {
+                if (!removed && inMask) {
                     return regions.toArray(new Region[0]);
                 }
-                masks.clear();
             }
         }
-        for (FaweMaskManager manager : managers) {
-            if (player.hasPermission("fawe." + manager.getKey())) {
-                try {
-                    if (manager.isExclusive() && !masks.isEmpty()) {
-                        continue;
-                    }
-                    final FaweMask mask = manager.getMask(player, FaweMaskManager.MaskType.getDefaultMaskType(), isWhitelist);
-                    if (mask != null) {
-                        regions.add(mask.getRegion());
-                        masks.add(mask);
-                        if (manager.isExclusive()) {
-                            break;
+        synchronized (masks) {
+            for (FaweMaskManager manager : managers) {
+                if (player.hasPermission("fawe." + manager.getKey())) {
+                    try {
+                        if (manager.isExclusive() && !masks.isEmpty()) {
+                            continue;
                         }
+                        final FaweMask mask = manager.getMask(
+                                player,
+                                FaweMaskManager.MaskType.getDefaultMaskType(),
+                                isWhitelist,
+                                masks.isEmpty()
+                        );
+                        if (mask != null) {
+                            regions.add(mask.getRegion());
+                            masks.add(mask);
+                            if (manager.isExclusive()) {
+                                break;
+                            }
+                        }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
                     }
-                } catch (Throwable e) {
-                    e.printStackTrace();
+                } else {
+                    player.printError(TextComponent.of("Missing permission " + "fawe." + manager.getKey()));
                 }
-            } else {
-                player.printError(TextComponent.of("Missing permission " + "fawe." + manager.getKey()));
             }
-        }
-        if (isWhitelist) {
-            regions.addAll(backupRegions);
-            if (!masks.isEmpty()) {
-                player.setMeta("lastMask", masks);
-            } else {
-                player.deleteMeta("lastMask");
+            if (isWhitelist) {
+                if (!masks.isEmpty()) {
+                    player.setMeta("lastMask", masks);
+                } else {
+                    player.deleteMeta("lastMask");
+                }
             }
         }
         return regions.toArray(new Region[0]);

@@ -3,7 +3,6 @@ package com.fastasyncworldedit.bukkit.regions;
 import com.bekvon.bukkit.residence.Residence;
 import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import com.bekvon.bukkit.residence.protection.CuboidArea;
-import com.fastasyncworldedit.bukkit.FaweBukkit;
 import com.fastasyncworldedit.core.regions.FaweMask;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -19,13 +18,8 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private final FaweBukkit plugin;
-    private final Plugin residence;
-
-    public ResidenceFeature(final Plugin residencePlugin, final FaweBukkit p3) {
+    public ResidenceFeature(final Plugin residencePlugin) {
         super(residencePlugin.getName());
-        this.residence = residencePlugin;
-        this.plugin = p3;
         LOGGER.info("Plugin 'Residence' found. Using it now.");
     }
 

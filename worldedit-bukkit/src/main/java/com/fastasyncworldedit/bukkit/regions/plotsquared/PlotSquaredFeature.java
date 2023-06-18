@@ -67,28 +67,32 @@ public class PlotSquaredFeature extends FaweMaskManager {
      * @param plot   the {@link Plot}
      * @param type   the {@link MaskType}
      * @return {@code true} if the player is the plot owner, trusted, has the permission fawe.plotsquared.member
-     * or fawe.plotsquared.admin and the NoWorldeditFlag is not set; otherwise {@code false}
+     *         or fawe.plotsquared.admin and the NoWorldeditFlag is not set; otherwise {@code false}
      */
-    public boolean isAllowed(Player player, Plot plot, MaskType type) {
+    public boolean isAllowed(Player player, Plot plot, MaskType type, boolean notify) {
         if (plot == null) {
             return false;
         }
         UUID uid = player.getUniqueId();
         if (plot.getFlag(NoWorldeditFlag.class)) {
-            player.print(Caption.of(
-                    "fawe.cancel.reason.no.region.reason",
-                    Caption.of("fawe.cancel.reason.no.region.plot.noworldeditflag")
-            ));
+            if (notify) {
+                player.print(Caption.of(
+                        "fawe.cancel.reason.no.region.reason",
+                        Caption.of("fawe.cancel.reason.no.region.plot.noworldeditflag")
+                ));
+            }
             return false;
         }
         if (plot.isOwner(uid) || player.hasPermission("fawe.plotsquared.admin")) {
             return true;
         }
         if (type != MaskType.MEMBER) {
-            player.print(Caption.of(
-                    "fawe.cancel.reason.no.region.reason",
-                    Caption.of("fawe.cancel.reason.no.region.plot.owner.only")
-            ));
+            if (notify) {
+                player.print(Caption.of(
+                        "fawe.cancel.reason.no.region.reason",
+                        Caption.of("fawe.cancel.reason.no.region.plot.owner.only")
+                ));
+            }
             return false;
         }
         if (plot.getTrusted().contains(uid) || plot.getTrusted().contains(DBFunc.EVERYONE)) {
@@ -96,26 +100,32 @@ public class PlotSquaredFeature extends FaweMaskManager {
         }
         if (plot.getMembers().contains(uid) || plot.getMembers().contains(DBFunc.EVERYONE)) {
             if (!player.hasPermission("fawe.plotsquared.member")) {
-                player.print(Caption.of(
-                        "fawe.cancel.reason.no.region.reason",
-                        Caption.of("fawe.error.no-perm", "fawe.plotsquared.member")
-                ));
+                if (notify) {
+                    player.print(Caption.of(
+                            "fawe.cancel.reason.no.region.reason",
+                            Caption.of("fawe.error.no-perm", "fawe.plotsquared.member")
+                    ));
+                }
                 return false;
             }
             if (!plot.getOwners().isEmpty() && plot.getOwners().stream().anyMatch(this::playerOnline)) {
                 return true;
             } else {
-                player.print(Caption.of(
-                        "fawe.cancel.reason.no.region.reason",
-                        Caption.of("fawe.cancel.reason.no.region.plot.owner.offline")
-                ));
+                if (notify) {
+                    player.print(Caption.of(
+                            "fawe.cancel.reason.no.region.reason",
+                            Caption.of("fawe.cancel.reason.no.region.plot.owner.offline")
+                    ));
+                }
                 return false;
             }
         }
-        player.print(Caption.of(
-                "fawe.cancel.reason.no.region.reason",
-                Caption.of("fawe.cancel.reason.no.region.not.added")
-        ));
+        if (notify) {
+            player.print(Caption.of(
+                    "fawe.cancel.reason.no.region.reason",
+                    Caption.of("fawe.cancel.reason.no.region.not.added")
+            ));
+        }
         return false;
     }
 
@@ -128,14 +138,19 @@ public class PlotSquaredFeature extends FaweMaskManager {
     }
 
     @Override
-    public FaweMask getMask(Player player, MaskType type, boolean isWhitelist) {
+    public FaweMask getMask(final Player player, final MaskType type, final boolean isWhitelist) {
+        return getMask(player, type, isWhitelist, true);
+    }
+
+    @Override
+    public FaweMask getMask(Player player, MaskType type, boolean isWhitelist, boolean notify) {
         final PlotPlayer<org.bukkit.entity.Player> pp = PlotPlayer.from(BukkitAdapter.adapt(player));
         if (pp == null) {
             return null;
         }
         final Set<CuboidRegion> regions;
         Plot plot = pp.getCurrentPlot();
-        if (isAllowed(player, plot, type)) {
+        if (isAllowed(player, plot, type, notify)) {
             regions = plot.getRegions();
         } else {
             plot = null;
@@ -184,19 +199,23 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
         private final Plot plot;
         private final WeakReference<Set<Plot>> connectedPlots;
+        private final boolean singlePlot;
 
         private PlotSquaredMask(Region region, Plot plot) {
             super(region);
             this.plot = plot;
-            connectedPlots = new WeakReference<>(plot.getConnectedPlots());
+            Set<Plot> connected = plot.getConnectedPlots();
+            connectedPlots = new WeakReference<>(connected);
+            singlePlot = connected.size() == 1;
         }
 
         @Override
-        public boolean isValid(Player player, MaskType type) {
-            if (!connectedPlots.refersTo(plot.getConnectedPlots()) || (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(plot))) {
+        public boolean isValid(Player player, MaskType type, boolean notify) {
+            if ((!connectedPlots.refersTo(plot.getConnectedPlots()) && !singlePlot) || (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(
+                    plot))) {
                 return false;
             }
-            return isAllowed(player, plot, type);
+            return isAllowed(player, plot, type, notify);
         }
 
     }
