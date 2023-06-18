@@ -386,7 +386,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     }
 
                     int ordinal = set.getBlock(lx, ly, lz).getOrdinal();
-                    if (ordinal != 0) {
+                    if (ordinal != BlockTypesCache.ReservedIDs.__RESERVED__) {
                         BlockEntity tile = entry.getValue();
                         if (PaperLib.isPaper() && tile instanceof BeaconBlockEntity) {
                             if (beacons == null) {
