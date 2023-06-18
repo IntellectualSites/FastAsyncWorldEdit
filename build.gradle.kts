@@ -84,7 +84,7 @@ allprojects {
 
 applyCommonConfiguration()
 val supportedVersions = listOf("1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.2")
-
+val foliaSupportedVersions = listOf("1.19.4", "1.20.1", "1.20.2")
 tasks {
     supportedVersions.forEach {
         register<RunServer>("runServer-$it") {
@@ -102,14 +102,17 @@ tasks {
                 .toTypedArray())
 
     }
-    register<RunServer>("runFolia") {
-        downloadsApiService.set(xyz.jpenilla.runtask.service.DownloadsAPIService.folia(project))
-        minecraftVersion("1.19.4")
-        group = "run paper"
-        runDirectory.set(file("run-folia"))
-        pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+    foliaSupportedVersions.forEach {
+        register<RunServer>("runFolia-$it") {
+            downloadsApiService.set(xyz.jpenilla.runtask.service.DownloadsAPIService.folia(project))
+            minecraftVersion(it)
+            group = "run paper"
+            runDirectory.set(file("run-folia-$it"))
+            pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
+        }
     }
+
 }
 
 nexusPublishing {
