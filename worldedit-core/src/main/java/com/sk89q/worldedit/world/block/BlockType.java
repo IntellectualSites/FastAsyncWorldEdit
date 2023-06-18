@@ -82,8 +82,9 @@ public class BlockType implements Keyed, Pattern {
 
     //FAWE start
     /**
-     * @deprecated You should not be initialising your own BlockTypes. If there is a specific requirement to actually create
-     * new block types, please contact the FAWE devs to discuss.
+     * @deprecated You should not be initialising your own BlockTypes, use {@link BlockTypes#get(String)} instead. If there is
+     * a specific requirement to actually create new block types, please contact the FAWE devs to discuss. Use
+     * {@link BlockTypes#get(String)} instead.
      */
     @Deprecated(since = "TODO")
     //FAWE end
@@ -93,8 +94,9 @@ public class BlockType implements Keyed, Pattern {
 
     //FAWE start
     /**
-     * @deprecated You should not be initialising your own BlockTypes. If there is a specific requirement to actually create
-     * new block types, please contact the FAWE devs to discuss.
+     * @deprecated You should not be initialising your own BlockTypes, use {@link BlockTypes#get(String)} instead. If there is
+     * a specific requirement to actually create new block types, please contact the FAWE devs to discuss. Use
+     * {@link BlockTypes#get(String)} instead.
      */
     @Deprecated(since = "TODO")
     //FAWE end
