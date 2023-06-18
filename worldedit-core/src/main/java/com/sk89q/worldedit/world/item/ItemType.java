@@ -60,9 +60,9 @@ public class ItemType implements RegistryItem, Keyed {
                     .getRegistries().getItemRegistry().getMaterial(this)
     );
     //FAWE start
-    private BlockType blockType;
-    private boolean initBlockType;
-    private BaseItem defaultState;
+    private transient BlockType blockType;
+    private transient boolean initBlockType;
+    private transient BaseItem defaultState;
     //FAWE end
 
     public ItemType(String id) {

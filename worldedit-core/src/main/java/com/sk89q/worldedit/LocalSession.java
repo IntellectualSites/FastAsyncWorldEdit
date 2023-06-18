@@ -105,8 +105,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class LocalSession implements TextureHolder {
 
-    private static final transient int CUI_VERSION_UNINITIALIZED = -1;
-    public static transient int MAX_HISTORY_SIZE = 15;
+    public static int MAX_HISTORY_SIZE = 15;
+    private static final int CUI_VERSION_UNINITIALIZED = -1;
 
     // Non-session related fields
     private transient LocalConfiguration config;
