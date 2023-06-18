@@ -155,7 +155,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new PaperweightAdapter();
         if (this.parent.isFolia()) {
-            Method getCurrentWorldData = ServerLevel.class.getDeclaredMethod(
+            Method getCurrentWorldData = ServerLevel.class.getSuperclass().getDeclaredMethod(
                     "getCurrentWorldData"
             );
             getCurrentWorldData.setAccessible(true);
