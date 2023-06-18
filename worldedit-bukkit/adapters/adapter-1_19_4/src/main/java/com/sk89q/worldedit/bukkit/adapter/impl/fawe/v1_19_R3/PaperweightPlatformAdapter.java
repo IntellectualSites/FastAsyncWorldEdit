@@ -122,9 +122,20 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static Field LEVEL_CHUNK_ENTITIES;
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
+    private static boolean FOLIA_SUPPORT;
+
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
+            boolean isFolia = false;
+            try {
+                // Assume API is present
+                Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+                isFolia = true;
+            } catch (Exception unused) {
+
+            }
+            FOLIA_SUPPORT = isFolia;
             fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "d"));
             fieldData.setAccessible(true);
 
@@ -222,13 +233,18 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             throw new RuntimeException(rethrow);
         }
         MethodHandle craftChunkGetHandle;
-        final MethodType type = methodType(ChunkAccess.class);
+        final MethodType type = methodType(ChunkAccess.class, ChunkStatus.class);
         try {
-            craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", type);
+            if (FOLIA_SUPPORT) {
+                craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", methodType(LevelChunk.class));
+            } else {
+                craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", type);
+            }
+
         } catch (NoSuchMethodException | IllegalAccessException e) {
             try {
                 final MethodType newType = methodType(ChunkAccess.class, ChunkStatus.class);
-                craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", newType);
+                craftChunkGetHandle = lookup.findVirtual(CraftChunk.class, "getHandle", newType); // Todo: Check folia
                 craftChunkGetHandle = MethodHandles.insertArguments(craftChunkGetHandle, 1, ChunkStatus.FULL);
             } catch (NoSuchMethodException | IllegalAccessException ex) {
                 throw new RuntimeException(ex);
@@ -294,12 +310,16 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         } else {
             LevelChunk nmsChunk = serverLevel.getChunkSource().getChunkAtIfCachedImmediately(chunkX, chunkZ);
             if (nmsChunk != null) {
-                addTicket(serverLevel, chunkX, chunkZ);
+                if(!FOLIA_SUPPORT) {// TODO: Dirty folia workaround - Needs be discussed with FAWE members
+                    addTicket(serverLevel, chunkX, chunkZ);
+                }
                 return nmsChunk;
             }
             nmsChunk = serverLevel.getChunkSource().getChunkAtIfLoadedImmediately(chunkX, chunkZ);
             if (nmsChunk != null) {
-                addTicket(serverLevel, chunkX, chunkZ);
+                if(!FOLIA_SUPPORT) {// TODO: Dirty folia workaround - Needs be discussed with FAWE members
+                    addTicket(serverLevel, chunkX, chunkZ);
+                }
                 return nmsChunk;
             }
             // Avoid "async" methods from the main thread.
@@ -309,7 +329,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
             try {
                 CraftChunk chunk = (CraftChunk) future.get();
-                addTicket(serverLevel, chunkX, chunkZ);
+                if(!FOLIA_SUPPORT) {// TODO: Dirty folia workaround - Needs be discussed with FAWE members
+                    addTicket(serverLevel, chunkX, chunkZ);
+                }
                 return (LevelChunk) CRAFT_CHUNK_GET_HANDLE.invoke(chunk);
             } catch (Throwable e) {
                 e.printStackTrace();
