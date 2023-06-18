@@ -141,7 +141,7 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new PaperweightAdapter();
         if (this.parent.isFolia()) {
-            Method getCurrentWorldData = ServerLevel.class.getDeclaredMethod(
+            Method getCurrentWorldData = ServerLevel.class.getSuperclass().getDeclaredMethod(
                     "getCurrentWorldData"
             );
             getCurrentWorldData.setAccessible(true);
