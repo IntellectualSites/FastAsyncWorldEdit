@@ -30,7 +30,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                     ordinal = BlockTypesCache.ReservedIDs.AIR;
                     nonAir--;
                 }
-                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR -> nonAir--;
+                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR ->
+                        nonAir--;
             }
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
@@ -73,6 +74,8 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             CachedBukkitAdapter adapter,
             short[] nonEmptyBlockCount
     ) {
+        // Write to new array to avoid editing SET array
+        char[] copy = new char[set.length];
         short nonAir = 4096;
         int num_palette = 0;
         char[] getArr = null;
@@ -83,23 +86,19 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
                     if (getArr == null) {
                         getArr = get.apply(layer);
                     }
-                    // write to set array as this should be a copied array, and will be important when the changes are written
-                    // to the GET chunk cached by FAWE
-                    set[i] = switch (ordinal = getArr[i]) {
+                    switch (ordinal = getArr[i]) {
                         case BlockTypesCache.ReservedIDs.__RESERVED__ -> {
                             nonAir--;
-                            yield (ordinal = BlockTypesCache.ReservedIDs.AIR);
+                            ordinal = BlockTypesCache.ReservedIDs.AIR;
                         }
-                        case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR,
-                                BlockTypesCache.ReservedIDs.VOID_AIR -> {
-                            nonAir--;
-                            yield ordinal;
-                        }
-                        default -> ordinal;
-                    };
+                        case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR ->
+                                nonAir--;
+                    }
                 }
-                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR -> nonAir--;
+                case BlockTypesCache.ReservedIDs.AIR, BlockTypesCache.ReservedIDs.CAVE_AIR, BlockTypesCache.ReservedIDs.VOID_AIR ->
+                        nonAir--;
             }
+            copy[i] = ordinal;
             int palette = blockToPalette[ordinal];
             if (palette == Integer.MAX_VALUE) {
                 blockToPalette[ordinal] = num_palette;
@@ -117,7 +116,7 @@ public class NMSAdapter implements FAWEPlatformAdapterImpl {
             System.arraycopy(adapter.getOrdinalToIbdID(), 0, blockToPalette, 0, adapter.getOrdinalToIbdID().length);
         }
         for (int i = 0; i < 4096; i++) {
-            char ordinal = set[i];
+            char ordinal = copy[i];
             if (ordinal == BlockTypesCache.ReservedIDs.__RESERVED__) {
                 LOGGER.error("Empty (__RESERVED__) ordinal given where not expected, default to air.");
                 ordinal = BlockTypesCache.ReservedIDs.AIR;
