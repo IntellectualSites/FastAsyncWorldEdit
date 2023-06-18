@@ -12,6 +12,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
 import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.google.common.base.Suppliers;
 import com.sk89q.jnbt.CompoundTag;
@@ -19,11 +20,15 @@ import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R1.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R1.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.internal.Constants;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
+import com.sk89q.worldedit.math.Vector3;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
@@ -82,6 +87,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static net.minecraft.core.registries.Registries.BIOME;
@@ -256,13 +262,31 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public CompoundTag getTile(int x, int y, int z) {
-        BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
-                chunkX << 4), y, (z & 15) + (
-                chunkZ << 4)));
-        if (blockEntity == null) {
-            return null;
+        PaperweightAdapter adapter = (PaperweightAdapter) this.adapter.getParent();
+        if (adapter.isFolia()) {
+            Supplier<BlockEntity> entity = () -> {
+                var pos = new BlockPos((x & 15) + (
+                        chunkX << 4), y, (z & 15) + (
+                        chunkZ << 4));
+                return getChunk().getBlockEntity(pos);
+            };
+
+            if (entity == null) {
+                return null;
+            }
+            return new PaperweightLazyCompoundTag(Suppliers.memoize(TaskManager.taskManager().syncAt(
+                    entity,
+                    new Location(new BukkitWorld(serverLevel.getWorld()), Vector3.at(x, y, z))
+            )::saveWithId));
+        } else {
+            BlockEntity blockEntity = getChunk().getBlockEntity(new BlockPos((x & 15) + (
+                    chunkX << 4), y, (z & 15) + (
+                    chunkZ << 4)));
+            if (blockEntity == null) {
+                return null;
+            }
+            return new PaperweightLazyCompoundTag(Suppliers.memoize(blockEntity::saveWithId));
         }
-        return new PaperweightLazyCompoundTag(Suppliers.memoize(blockEntity::saveWithId));
     }
 
     @Override
@@ -788,7 +812,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             final int z = blockHash.getZ() + bz;
                             final BlockPos pos = new BlockPos(x, y, z);
 
-                            synchronized (nmsWorld) {
+                            PaperweightAdapter adapter = (PaperweightAdapter) this.adapter.getParent();
+                            if (adapter.isFolia()) {
                                 BlockEntity tileEntity = nmsWorld.getBlockEntity(pos);
                                 if (tileEntity == null || tileEntity.isRemoved()) {
                                     nmsWorld.removeBlockEntity(pos);
@@ -801,6 +826,22 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     tag.put("y", IntTag.valueOf(y));
                                     tag.put("z", IntTag.valueOf(z));
                                     tileEntity.load(tag);
+                                }
+                            } else {
+                                synchronized (nmsWorld) {
+                                    BlockEntity tileEntity = nmsWorld.getBlockEntity(pos);
+                                    if (tileEntity == null || tileEntity.isRemoved()) {
+                                        nmsWorld.removeBlockEntity(pos);
+                                        tileEntity = nmsWorld.getBlockEntity(pos);
+                                    }
+                                    if (tileEntity != null) {
+                                        final net.minecraft.nbt.CompoundTag tag = (net.minecraft.nbt.CompoundTag) adapter.fromNative(
+                                                nativeTag);
+                                        tag.put("x", IntTag.valueOf(x));
+                                        tag.put("y", IntTag.valueOf(y));
+                                        tag.put("z", IntTag.valueOf(z));
+                                        tileEntity.load(tag);
+                                    }
                                 }
                             }
                         }

@@ -85,6 +85,8 @@ import org.bukkit.craftbukkit.v1_20_R1.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -126,8 +128,47 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     private boolean initialised = false;
     private Map<String, List<Property<?>>> allBlockProperties = null;
 
+    // Folia - START
+    private MethodHandle currentWorldData;
+
+    private Class<?> regionizedWorldData;
+
+    private Field captureTreeGeneration;
+    private Field captureBlockStates;
+    private Field capturedBlockStates;
+
+
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
         this.parent = new PaperweightAdapter();
+
+        if (this.parent.isFolia()) {
+            Method getCurrentWorldData = ServerLevel.class.getSuperclass().getDeclaredMethod(
+                    "getCurrentWorldData"
+            );
+            getCurrentWorldData.setAccessible(true);
+            try {
+                currentWorldData = MethodHandles.lookup().unreflect(getCurrentWorldData);
+            } catch (IllegalAccessException e) {
+            }
+
+            try {
+                regionizedWorldData = Class.forName("io.papermc.paper.threadedregions.RegionizedWorldData");
+            } catch (ClassNotFoundException e) {
+            }
+            if (regionizedWorldData != null) {
+                final Field captureTreeGeneration = regionizedWorldData.getDeclaredField("captureTreeGeneration");
+                captureTreeGeneration.setAccessible(true);
+                this.captureTreeGeneration = captureTreeGeneration;
+
+                final Field captureBlockStates = regionizedWorldData.getDeclaredField("captureBlockStates");
+                captureBlockStates.setAccessible(true);
+                this.captureBlockStates = captureBlockStates;
+
+                final Field capturedBlockStates = regionizedWorldData.getDeclaredField("capturedBlockStates");
+                capturedBlockStates.setAccessible(true);
+                this.capturedBlockStates = capturedBlockStates;
+            }
+        }
     }
 
     @Nullable
