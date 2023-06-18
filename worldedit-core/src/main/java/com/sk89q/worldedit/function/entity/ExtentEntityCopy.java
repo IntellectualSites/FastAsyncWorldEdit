@@ -160,17 +160,7 @@ public class ExtentEntityCopy implements EntityFunction {
             // Remove
             if (isRemoving() && success) {
                 //FAWE start
-                UUID uuid = null;
-                if (tag.containsKey("UUID")) {
-                    int[] arr = tag.getIntArray("UUID");
-                    uuid = new UUID((long) arr[0] << 32 | (arr[1] & 0xFFFFFFFFL), (long) arr[2] << 32 | (arr[3] & 0xFFFFFFFFL));
-                } else if (tag.containsKey("UUIDMost")) {
-                    uuid = new UUID(tag.getLong("UUIDMost"), tag.getLong("UUIDLeast"));
-                } else if (tag.containsKey("WorldUUIDMost")) {
-                    uuid = new UUID(tag.getLong("WorldUUIDMost"), tag.getLong("WorldUUIDLeast"));
-                } else if (tag.containsKey("PersistentIDMSB")) {
-                    uuid = new UUID(tag.getLong("PersistentIDMSB"), tag.getLong("PersistentIDLSB"));
-                }
+                UUID uuid = entity.getState().getNbtData().getUUID();
                 if (uuid != null) {
                     if (source != null) {
                         source.removeEntity(

@@ -622,10 +622,11 @@ public class Settings extends Config {
         public boolean PERSISTENT_BRUSHES = true;
 
         @Comment({
-                "[SAFE] Keep entities that are positioned in non-air blocks when editing an area",
-                "Might cause client-side FPS lag in some situations"
+                "[SAFE] Keep entities that are positioned in non-air blocks when editing an area (default: true)",
+                " - Might cause client-side FPS lag in some situations",
+                " - Requires fast-placement to be true"
         })
-        public boolean KEEP_ENTITIES_IN_BLOCKS = false;
+        public boolean KEEP_ENTITIES_IN_BLOCKS = true;
 
         @Comment({
                 "[SAFE] Attempt to remove entities from the world if they were not present in the expected chunk (default: true)",
