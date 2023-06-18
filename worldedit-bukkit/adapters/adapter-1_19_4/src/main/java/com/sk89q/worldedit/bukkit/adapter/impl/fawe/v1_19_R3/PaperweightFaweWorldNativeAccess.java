@@ -70,13 +70,13 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
             try {
                 regionizedServerClass = Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
                 regionScheduleHandleClass = Class.forName(
-                        "io.papermc.paper.threadedregions.TickRegionScheduler.RegionScheduleHandle");
+                        "io.papermc.paper.threadedregions.TickRegionScheduler$RegionScheduleHandle");
                 globalTickData = MethodHandles.lookup().unreflect(regionizedServerClass.getDeclaredMethod("getGlobalTickData"));
                 var data = globalTickData.invoke();
                 globalCurrentTick = MethodHandles.lookup().unreflect(regionScheduleHandleClass.getDeclaredMethod(
                         "getCurrentTick"));
-                final int tick = (int) globalCurrentTick.invoke(data);
-                this.lastTick = new AtomicInteger(tick);
+                final long tick = (long) globalCurrentTick.invoke(data);
+                this.lastTick = new AtomicInteger((int) tick);
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
