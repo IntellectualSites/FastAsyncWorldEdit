@@ -72,7 +72,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -99,7 +98,6 @@ public final class EditSessionBuilder {
     private RelightMode relightMode;
     private Relighter relighter;
     private Boolean wnaMode;
-    private AbstractChangeSet changeTask;
     private Extent bypassHistory;
     private Extent bypassAll;
     private Extent extent;
@@ -522,7 +520,6 @@ public final class EditSessionBuilder {
                         changeSet = new BlockBagChangeSet(changeSet, blockBag, limit.INVENTORY_MODE == 1);
                     }
                     if (combineStages) {
-                        changeTask = changeSet;
                         this.extent = extent.enableHistory(changeSet);
                     } else {
                         this.extent = new HistoryExtent(extent, changeSet);
@@ -699,7 +696,7 @@ public final class EditSessionBuilder {
      * Get the change set that will be used for history
      */
     public AbstractChangeSet getChangeTask() {
-        return changeTask;
+        return changeSet;
     }
 
     /**
