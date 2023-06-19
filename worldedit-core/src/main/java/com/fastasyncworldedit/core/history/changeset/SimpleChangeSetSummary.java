@@ -50,7 +50,7 @@ public class SimpleChangeSetSummary implements ChangeSetSummary {
     public Map<BlockState, Integer> getBlocks() {
         HashMap<BlockState, Integer> map = new HashMap<>();
         for (int i = 0; i < blocks.length; i++) {
-            if (blocks[i] != 0) {
+            if (blocks[i] != BlockTypesCache.ReservedIDs.__RESERVED__) {
                 BlockState state = BlockTypesCache.states[i];
                 map.put(state, blocks[i]);
             }
