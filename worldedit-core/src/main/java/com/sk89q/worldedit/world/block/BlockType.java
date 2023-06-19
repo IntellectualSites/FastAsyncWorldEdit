@@ -78,13 +78,35 @@ public class BlockType implements Keyed, Pattern {
         this.id = i == -1 ? id : id.substring(0, i);
         this.settings = new BlockTypesCache.Settings(this, id, internalId, states);
     }
+    //FAWE end
 
+    //FAWE start
+    /**
+     * @deprecated You should not be initialising your own BlockTypes, use {@link BlockTypes#get(String)} instead. If there is
+     * a specific requirement to actually create new block types, please contact the FAWE devs to discuss. Use
+     * {@link BlockTypes#get(String)} instead.
+     */
+    @Deprecated(since = "TODO")
+    //FAWE end
+    public BlockType(String id) {
+        this(id, null);
+    }
+
+    //FAWE start
+    /**
+     * @deprecated You should not be initialising your own BlockTypes, use {@link BlockTypes#get(String)} instead. If there is
+     * a specific requirement to actually create new block types, please contact the FAWE devs to discuss. Use
+     * {@link BlockTypes#get(String)} instead.
+     */
+    @Deprecated(since = "TODO")
+    //FAWE end
     public BlockType(String id, Function<BlockState, BlockState> values) {
         // If it has no namespace, assume minecraft.
         if (!id.contains(":")) {
             id = "minecraft:" + id;
         }
         this.id = id;
+        //FAWE start
         //TODO fix the line below
         this.settings = new BlockTypesCache.Settings(this, id, 0, null);
     }
