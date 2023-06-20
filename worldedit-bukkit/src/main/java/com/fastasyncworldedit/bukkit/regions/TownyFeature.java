@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.bukkit.regions;
 
 import com.fastasyncworldedit.core.regions.FaweMask;
-import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
@@ -12,7 +11,6 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
@@ -22,11 +20,8 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private final Plugin towny;
-
     public TownyFeature(Plugin townyPlugin) {
         super(townyPlugin.getName());
-        this.towny = townyPlugin;
         LOGGER.info("Plugin 'Towny' found. Using it now.");
     }
 
@@ -73,7 +68,7 @@ public class TownyFeature extends BukkitMaskManager implements Listener {
             final Location loc1 = mycoord.getLowerMostCornerLocation();
             final Location loc2 = mycoord.getUpperMostCornerLocation();
             final BlockVector3 pos1 = BlockVector3.at(loc1.getX(), loc1.getY(), loc1.getZ());
-            final BlockVector3 pos2 = BlockVector3.at(loc2.getX(), loc2.getY(), loc2.getZ());
+            final BlockVector3 pos2 = BlockVector3.at(loc2.getX() - 1, loc2.getY(), loc2.getZ() - 1);
             return new FaweMask(new CuboidRegion(pos1, pos2)) {
                 @Override
                 public boolean isValid(com.sk89q.worldedit.entity.Player player, MaskType type) {

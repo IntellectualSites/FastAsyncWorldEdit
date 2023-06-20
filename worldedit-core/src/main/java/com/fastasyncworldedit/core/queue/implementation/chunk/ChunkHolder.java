@@ -45,8 +45,8 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     private final ReentrantWrappedStampedLock calledLock = new ReentrantWrappedStampedLock();
 
-    private IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
-    private IChunkSet chunkSet; // The blocks to be set to the chunkExisting
+    private volatile IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
+    private volatile IChunkSet chunkSet; // The blocks to be set to the chunkExisting
     private IBlockDelegate delegate; // delegate handles the abstraction of the chunk layers
     private IQueueExtent<? extends IChunk> extent; // the parent queue extent which has this chunk
     private int chunkX;
@@ -1042,13 +1042,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         calledLock.lock();
         final long stamp = calledLock.getStampChecked();
         if (chunkSet != null && !chunkSet.isEmpty()) {
+            this.delegate = GET;
             chunkSet.setBitMask(bitMask);
             try {
-                return this.call(chunkSet.createCopy(), () -> {
-                    this.delegate = NULL;
-                    chunkSet = null;
-                    calledLock.unlock(stamp);
-                });
+                IChunkSet copy = chunkSet.createCopy();
+                chunkSet = null;
+                return this.call(copy, () -> calledLock.unlock(stamp));
             } catch (Throwable t) {
                 calledLock.unlock();
                 throw t;
