@@ -36,6 +36,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -180,8 +181,9 @@ public class BlockMaskBuilder {
                     String regex = charSequence.toString();
                     blockTypeList = new ArrayList<>();
                     builders = new ArrayList<>();
+                    Pattern pattern = Pattern.compile("(minecraft:)?" + regex);
                     for (BlockType type : BlockTypesCache.values) {
-                        if (type.getId().matches("(minecraft:)?" + regex)) {
+                        if (pattern.matcher(type.getId()).find()) {
                             blockTypeList.add(type);
                             builders.add(new FuzzyStateAllowingBuilder(type));
                             add(type);
