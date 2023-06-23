@@ -69,6 +69,10 @@ public class FastBitSet {
         Arrays.fill(bits, -1L);
     }
 
+    public static void unsetAll(long[] bits) {
+        Arrays.fill(bits, 0);
+    }
+
     public static void and(long[] bits, final long[] other) {
         final int end = Math.min(other.length, bits.length);
         for (int i = 0; i < end; ++i) {

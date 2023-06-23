@@ -229,6 +229,7 @@ public abstract class BreadthFirstSearch implements Operation {
      */
     public void visit(BlockVector3 position) {
         if (!visited.contains(position)) {
+            isVisitable(position, position); // Ignore this, just to initialize mask on this point
             queue.add(position);
             visited.add(position);
         }
