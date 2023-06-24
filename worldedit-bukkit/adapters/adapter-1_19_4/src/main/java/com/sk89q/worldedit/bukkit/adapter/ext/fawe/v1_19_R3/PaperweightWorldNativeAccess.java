@@ -35,9 +35,9 @@ import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChunk, net.minecraft.world.level.block.state.BlockState, BlockPos> {
     private static final int UPDATE = 1;
@@ -142,6 +142,12 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
         if (newState.hasAnalogOutputSignal()) {
             world.updateNeighbourForOutputSignal(pos, newState.getBlock());
         }
+    }
+
+    @Override
+    public void updateBlock(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
+        ServerLevel world = getWorld();
+        newState.onPlace(world, pos, oldState, false);
     }
 
     // Not sure why neighborChanged is deprecated

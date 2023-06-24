@@ -15,8 +15,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.FullChunkStatus;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -215,6 +215,12 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         }
         newState.triggerEvent(level, blockPos, NOTIFY, recursionLimit);
         newState.updateIndirectNeighbourShapes(level, blockPos, NOTIFY, recursionLimit);
+    }
+
+    @Override
+    public void updateBlock(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
+        Level world = getLevel();
+        newState.onPlace(world, pos, oldState, false);
     }
 
     @Override

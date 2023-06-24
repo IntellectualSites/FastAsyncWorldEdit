@@ -19,12 +19,12 @@
 
 package com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R1;
 
-import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.internal.block.BlockStateIdAccess;
 import com.sk89q.worldedit.internal.wna.WorldNativeAccess;
 import com.sk89q.worldedit.util.SideEffect;
 import com.sk89q.worldedit.util.SideEffectSet;
+import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.world.block.BlockState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.FullChunkStatus;
@@ -35,9 +35,9 @@ import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R1.block.data.CraftBlockData;
 import org.bukkit.event.block.BlockPhysicsEvent;
 
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChunk, net.minecraft.world.level.block.state.BlockState, BlockPos> {
     private static final int UPDATE = 1;
@@ -142,6 +142,12 @@ public class PaperweightWorldNativeAccess implements WorldNativeAccess<LevelChun
         if (newState.hasAnalogOutputSignal()) {
             world.updateNeighbourForOutputSignal(pos, newState.getBlock());
         }
+    }
+
+    @Override
+    public void updateBlock(BlockPos pos, net.minecraft.world.level.block.state.BlockState oldState, net.minecraft.world.level.block.state.BlockState newState) {
+        ServerLevel world = getWorld();
+        newState.onPlace(world, pos, oldState, false);
     }
 
     // Not sure why neighborChanged is deprecated

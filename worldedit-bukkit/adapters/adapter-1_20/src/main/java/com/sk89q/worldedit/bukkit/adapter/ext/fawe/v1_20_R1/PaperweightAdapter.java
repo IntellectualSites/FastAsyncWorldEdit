@@ -308,6 +308,29 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         return combinedId == 0 && state.getBlockType() != BlockTypes.AIR ? OptionalInt.empty() : OptionalInt.of(combinedId);
     }
 
+    public BlockState adapt(net.minecraft.world.level.block.state.BlockState blockState) {
+        int internalId = Block.getId(blockState);
+        BlockState state = BlockStateIdAccess.getBlockStateById(internalId);
+        if (state == null) {
+            state = BukkitAdapter.adapt(CraftBlockData.createData(blockState));
+        }
+
+        return state;
+    }
+
+    public BiomeType adapt(Biome biome) {
+        var mcBiome = ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registries.BIOME).getKey(biome);
+        if (mcBiome == null) {
+            return null;
+        }
+        return BiomeType.REGISTRY.get(mcBiome.toString());
+    }
+
+    public net.minecraft.world.level.block.state.BlockState adapt(BlockState blockState) {
+        int internalId = BlockStateIdAccess.getBlockStateId(blockState);
+        return Block.stateById(internalId);
+    }
+
     @Override
     public BlockState getBlock(Location location) {
         checkNotNull(location);
@@ -576,17 +599,6 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 __ -> (net.minecraft.nbt.CompoundTag) fromNativeBinary(nbtData)
         ));
     }
-
-    /*@Override
-    public void sendFakeNBT(Player player, BlockVector3 pos, CompoundTag nbtData) {
-        ((CraftPlayer) player).getHandle().connection.send(ClientboundBlockEntityDataPacket.create(
-                new StructureBlockEntity(
-                        new BlockPos(pos.getBlockX(), pos.getBlockY(), pos.getBlockZ()),
-                        Blocks.STRUCTURE_BLOCK.defaultBlockState()
-                ),
-                __ -> (net.minecraft.nbt.CompoundTag) fromNative(nbtData)
-        ));
-    }*/
 
     @Override
     public void sendFakeOP(Player player) {
@@ -865,7 +877,73 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
                 BiomeType.REGISTRY.register(name.toString(), new BiomeType(name.toString()));
             }
         }
+<<<<<<< HEAD:worldedit-bukkit/adapters/adapter-1_20/src/main/java/com/sk89q/worldedit/bukkit/adapter/ext/fawe/v1_20_R1/PaperweightAdapter.java
     }*
+=======
+
+        // Features
+        for (ResourceLocation name: server.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).keySet()) {
+            if (ConfiguredFeatureType.REGISTRY.get(name.toString()) == null) {
+                ConfiguredFeatureType.REGISTRY.register(name.toString(), new ConfiguredFeatureType(name.toString()));
+            }
+        }
+
+        // Structures
+        for (ResourceLocation name : server.registryAccess().registryOrThrow(Registries.STRUCTURE).keySet()) {
+            if (StructureType.REGISTRY.get(name.toString()) == null) {
+                StructureType.REGISTRY.register(name.toString(), new StructureType(name.toString()));
+            }
+        }
+
+        // BiomeCategories
+        Registry<Biome> biomeRegistry = server.registryAccess().registryOrThrow(Registries.BIOME);
+        biomeRegistry.getTagNames().forEach(tagKey -> {
+            String key = tagKey.location().toString();
+            if (BiomeCategory.REGISTRY.get(key) == null) {
+                BiomeCategory.REGISTRY.register(key, new BiomeCategory(
+                    key,
+                    () -> biomeRegistry.getTag(tagKey)
+                        .stream()
+                        .flatMap(HolderSet.Named::stream)
+                        .map(Holder::value)
+                        .map(this::adapt)
+                        .collect(Collectors.toSet()))
+                );
+            }
+        });
+    }
+
+    public boolean generateFeature(ConfiguredFeatureType type, World world, EditSession session, BlockVector3 pt) {
+        ServerLevel originalWorld = ((CraftWorld) world).getHandle();
+        ConfiguredFeature<?, ?> k = originalWorld.registryAccess().registryOrThrow(Registries.CONFIGURED_FEATURE).get(ResourceLocation.tryParse(type.getId()));
+        ServerChunkCache chunkManager = originalWorld.getChunkSource();
+        WorldGenLevel proxyLevel = PaperweightServerLevelDelegateProxy.newInstance(session, originalWorld, this);
+        return k != null && k.place(proxyLevel, chunkManager.getGenerator(), random, new BlockPos(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
+    }
+
+    public boolean generateStructure(StructureType type, World world, EditSession session, BlockVector3 pt) {
+        ServerLevel originalWorld = ((CraftWorld) world).getHandle();
+        Structure k = originalWorld.registryAccess().registryOrThrow(Registries.STRUCTURE).get(ResourceLocation.tryParse(type.getId()));
+        if (k == null) {
+            return false;
+        }
+
+        ServerChunkCache chunkManager = originalWorld.getChunkSource();
+        WorldGenLevel proxyLevel = PaperweightServerLevelDelegateProxy.newInstance(session, originalWorld, this);
+        ChunkPos chunkPos = new ChunkPos(new BlockPos(pt.getBlockX(), pt.getBlockY(), pt.getBlockZ()));
+        StructureStart structureStart = k.generate(originalWorld.registryAccess(), chunkManager.getGenerator(), chunkManager.getGenerator().getBiomeSource(), chunkManager.randomState(), originalWorld.getStructureManager(), originalWorld.getSeed(), chunkPos, 0, proxyLevel, biome -> true);
+
+        if (!structureStart.isValid()) {
+            return false;
+        } else {
+            BoundingBox boundingBox = structureStart.getBoundingBox();
+            ChunkPos min = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.minX()), SectionPos.blockToSectionCoord(boundingBox.minZ()));
+            ChunkPos max = new ChunkPos(SectionPos.blockToSectionCoord(boundingBox.maxX()), SectionPos.blockToSectionCoord(boundingBox.maxZ()));
+            ChunkPos.rangeClosed(min, max).forEach((chunkPosx) -> structureStart.placeInChunk(proxyLevel, originalWorld.structureManager(), chunkManager.getGenerator(), originalWorld.getRandom(), new BoundingBox(chunkPosx.getMinBlockX(), originalWorld.getMinBuildHeight(), chunkPosx.getMinBlockZ(), chunkPosx.getMaxBlockX(), originalWorld.getMaxBuildHeight(), chunkPosx.getMaxBlockZ()), chunkPosx));
+            return true;
+        }
+    }
+>>>>>>> 61363821b (Add a BiomeCategories API (#2338)):worldedit-bukkit/adapters/adapter-1.20/src/main/java/com/sk89q/worldedit/bukkit/adapter/impl/v1_20_R1/PaperweightAdapter.java
 
     // ------------------------------------------------------------------------
     // Code that is less likely to break

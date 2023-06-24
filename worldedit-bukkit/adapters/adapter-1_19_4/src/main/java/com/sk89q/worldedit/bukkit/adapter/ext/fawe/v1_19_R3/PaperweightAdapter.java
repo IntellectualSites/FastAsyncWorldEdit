@@ -71,6 +71,7 @@ import com.sk89q.worldedit.util.nbt.ShortBinaryTag;
 import com.sk89q.worldedit.util.nbt.StringBinaryTag;
 import com.sk89q.worldedit.world.DataFixer;
 import com.sk89q.worldedit.world.RegenOptions;
+import com.sk89q.worldedit.world.biome.BiomeCategory;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BaseBlock;
@@ -81,6 +82,9 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import com.sk89q.worldedit.world.item.ItemType;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
@@ -137,6 +141,7 @@ import org.bukkit.generator.ChunkGenerator;
 import org.spigotmc.SpigotConfig;
 import org.spigotmc.WatchdogThread;
 
+import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -158,7 +163,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -288,6 +292,14 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
 
     private static Item getItemFromType(ItemType itemType) {
         return DedicatedServer.getServer().registryAccess().registryOrThrow(Registries.ITEM).get(ResourceLocation.tryParse(itemType.id()));
+    }
+
+    public BiomeType adapt(Biome biome) {
+        var mcBiome = ((CraftServer) Bukkit.getServer()).getServer().registryAccess().registryOrThrow(Registries.BIOME).getKey(biome);
+        if (mcBiome == null) {
+            return null;
+        }
+        return BiomeType.REGISTRY.get(mcBiome.toString());
     }
 
     @Override
@@ -802,6 +814,34 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void initializeRegistries() {
+        DedicatedServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        // Biomes
+        for (ResourceLocation name : server.registryAccess().registryOrThrow(Registries.BIOME).keySet()) {
+            if (BiomeType.REGISTRY.get(name.toString()) == null) {
+                BiomeType.REGISTRY.register(name.toString(), new BiomeType(name.toString()));
+            }
+        }
+
+        // BiomeCategories
+        Registry<Biome> biomeRegistry = server.registryAccess().registryOrThrow(Registries.BIOME);
+        biomeRegistry.getTagNames().forEach(tagKey -> {
+            String key = tagKey.location().toString();
+            if (BiomeCategory.REGISTRY.get(key) == null) {
+                BiomeCategory.REGISTRY.register(key, new BiomeCategory(
+                    key,
+                    () -> biomeRegistry.getTag(tagKey)
+                        .stream()
+                        .flatMap(HolderSet.Named::stream)
+                        .map(Holder::value)
+                        .map(this::adapt)
+                        .collect(Collectors.toSet()))
+                );
+            }
+        });
     }
 
     // ------------------------------------------------------------------------
