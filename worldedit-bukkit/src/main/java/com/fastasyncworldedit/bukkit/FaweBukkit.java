@@ -325,7 +325,7 @@ public class FaweBukkit implements IFawe, Listener {
             LOGGER.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             LOGGER.error("!!                                                                                                !!");
             LOGGER.error("!!         ERROR: PlotSquared v7 found. This FAWE version does not support PlotSquared V7         !!");
-            LOGGER.error("!!      Follow the instructions when notified of v7 release candidates the and use FAWE from      !!");
+            LOGGER.error("!!        Follow the instructions when notified of v7 release candidates and use FAWE from        !!");
             LOGGER.error("!!  https://ci.athion.net/job/FastAsyncWorldEdit-Pull-Requests/view/change-requests/job/PR-2075/  !!");
             LOGGER.error("!!                                                                                                !!");
             LOGGER.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
