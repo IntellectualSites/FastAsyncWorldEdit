@@ -7,7 +7,8 @@ package com.fastasyncworldedit.core.extent.processor;
  * - CHANGING_BLOCKS (processors that may ADD or CHANGE blocks being set)
  * - REMOVING_BLOCKS (processors that may ADD, CHANGE or REMOVE blocks being set)
  * - CUSTOM (processors that do not specify a SCOPE)
- * - READING_SET_BLOCKS (processors that do not alter blocks at all, and read the blocks that are actually going to set, e.g. history processors)
+ * - READING_SET_BLOCKS (processors that do not alter blocks at all, and read the blocks that are actually going to set, e.g.
+ * history processors). There is no guarantee that changes made here will be stored in history.
  */
 public enum ProcessorScope {
     ADDING_BLOCKS(0),
