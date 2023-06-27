@@ -38,7 +38,7 @@ public class FaweMask implements IDelegateRegion {
      * @since TODO
      */
     public boolean isValid(Player player, FaweMaskManager.MaskType type, boolean notify) {
-        return isValid(player, type, notify);
+        return isValid(player, type);
     }
 
     @Override
