@@ -12,7 +12,6 @@ import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.Trimable;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
 import com.fastasyncworldedit.core.util.MemUtil;
-import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.CleanableThreadLocal;
 import com.fastasyncworldedit.core.util.task.FaweForkJoinWorkerThreadFactory;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
@@ -87,13 +86,14 @@ public abstract class QueueHandler implements Trimable, Runnable {
     private long allocate = 50;
 
     protected QueueHandler() {
-        TaskManager.taskManager().repeat(this, 1);
+        // TODO make main thread independent
+        // TaskManager.taskManager().repeat(this, 1);
     }
 
     @Override
     public void run() {
-        if (!Fawe.isMainThread()) {
-            throw new IllegalStateException("Not main thread");
+        if (!Fawe.isTickThread()) {
+            throw new IllegalStateException("Not ticking thread");
         }
         if (!syncTasks.isEmpty()) {
             long currentAllocate = getAllocate();
