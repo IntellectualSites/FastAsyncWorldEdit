@@ -17,8 +17,28 @@ public class FaweMask implements IDelegateRegion {
         return region;
     }
 
+    /**
+     * Test if the mask is still valid
+     *
+     * @param player player to test
+     * @param type   type of mask
+     * @return if still valid
+     */
     public boolean isValid(Player player, FaweMaskManager.MaskType type) {
         return false;
+    }
+
+    /**
+     * Test if the mask is still valid
+     *
+     * @param player player to test
+     * @param type   type of mask
+     * @param notify if the player should be notified
+     * @return if still valid
+     * @since TODO
+     */
+    public boolean isValid(Player player, FaweMaskManager.MaskType type, boolean notify) {
+        return isValid(player, type);
     }
 
     @Override

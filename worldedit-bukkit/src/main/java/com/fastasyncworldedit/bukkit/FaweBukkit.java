@@ -225,7 +225,7 @@ public class FaweBukkit implements IFawe, Listener {
         final Plugin residencePlugin = Bukkit.getServer().getPluginManager().getPlugin("Residence");
         if (residencePlugin != null && residencePlugin.isEnabled()) {
             try {
-                managers.add(new ResidenceFeature(residencePlugin, this));
+                managers.add(new ResidenceFeature(residencePlugin));
                 LOGGER.info("Attempting to use plugin 'Residence'");
             } catch (Throwable ignored) {
             }

@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.regions;
 
 import com.fastasyncworldedit.core.configuration.Settings;
-import com.fastasyncworldedit.core.regions.filter.RegionFilter;
 import com.sk89q.worldedit.entity.Player;
 
 import java.util.Locale;
@@ -27,6 +26,15 @@ public abstract class FaweMaskManager {
      * Get a {@link FaweMask} for the given player and {@link MaskType}. If isWhitelist is false, will return a "blacklist" mask.
      */
     public abstract FaweMask getMask(final Player player, MaskType type, boolean isWhitelist);
+
+    /**
+     * Get a {@link FaweMask} for the given player and {@link MaskType}. If isWhitelist is false, will return a "blacklist" mask.
+     *
+     * @since TODO
+     */
+    public FaweMask getMask(final Player player, MaskType type, boolean isWhitelist, boolean notify) {
+        return getMask(player, type, isWhitelist);
+    }
 
     public boolean isExclusive() {
         return Settings.settings().REGION_RESTRICTIONS_OPTIONS.EXCLUSIVE_MANAGERS.contains(this.key);

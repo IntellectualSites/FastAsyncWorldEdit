@@ -356,8 +356,8 @@ public class Fawe {
         );
         if (Settings.settings().QUEUE.TARGET_SIZE < 4 * Settings.settings().QUEUE.PARALLEL_THREADS) {
             LOGGER.error(
-                    "queue.target_size is {}, and queue.parallel_threads is {}. It is HIGHLY recommended that queue" +
-                            ".target_size be at least four times queue.parallel_threads or greater.",
+                    "queue.target-size is {}, and queue.parallel_threads is {}. It is HIGHLY recommended that queue" +
+                            ".target-size be at least four times queue.parallel-threads or greater.",
                     Settings.settings().QUEUE.TARGET_SIZE,
                     Settings.settings().QUEUE.PARALLEL_THREADS
             );
