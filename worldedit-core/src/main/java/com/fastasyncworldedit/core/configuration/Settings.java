@@ -584,7 +584,8 @@ public class Settings extends Config {
             @Comment({"Display constant titles about the progress of a user's edit",
                     " - false = disabled",
                     " - title = Display progress titles",
-                    " - chat = Display progress in chat"
+                    " - chat = Display progress in chat",
+                    " - Currently not implemented"
             })
             public String DISPLAY = "false";
             @Comment("How often edit progress is displayed")

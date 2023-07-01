@@ -34,7 +34,7 @@ logger.lifecycle("""
 *******************************************
 """)
 
-var rootVersion by extra("2.6.4")
+var rootVersion by extra("2.6.5")
 var snapshot by extra("SNAPSHOT")
 var revision: String by extra("")
 var buildNumber by extra("")
@@ -83,7 +83,7 @@ allprojects {
 }
 
 applyCommonConfiguration()
-val supportedVersions = listOf("1.16.5", "1.17", "1.17.1", "1.18.2", "1.19", "1.19.1", "1.19.2", "1.19.3", "1.19.4", "1.20")
+val supportedVersions = listOf("1.16.5", "1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.1")
 
 tasks {
     supportedVersions.forEach {
@@ -97,7 +97,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.19.3")
+        minecraftVersion("1.20.1")
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
 

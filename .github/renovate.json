@@ -4,6 +4,7 @@
     "config:base",
     ":semanticCommitsDisabled"
   ],
+  "automerge": true,
   "ignoreDeps": [
     "guava",  
     "com.google.guava:guava",
