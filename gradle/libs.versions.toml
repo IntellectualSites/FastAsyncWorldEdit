@@ -39,7 +39,7 @@ piston = "0.5.7"
 mockito = "5.3.1"
 
 # Gradle plugins
-pluginyml = "0.5.3"
+pluginyml = "0.6.0"
 
 [libraries]
 # Minecraft expectations
