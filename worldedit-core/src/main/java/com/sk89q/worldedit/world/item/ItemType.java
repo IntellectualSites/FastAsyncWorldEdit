@@ -43,7 +43,7 @@ public class ItemType implements RegistryItem, Keyed {
 
     private final String id;
     @SuppressWarnings("deprecation")
-    private final LazyReference<String> name = LazyReference.from(() -> {
+    private transient final LazyReference<String> name = LazyReference.from(() -> {
         String name = GuavaUtil.firstNonNull(
                 WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
                         .getRegistries().getItemRegistry().getName(this),
@@ -51,18 +51,18 @@ public class ItemType implements RegistryItem, Keyed {
         );
         return name.isEmpty() ? getId() : name;
     });
-    private final LazyReference<Component> richName = LazyReference.from(() ->
+    private transient final LazyReference<Component> richName = LazyReference.from(() ->
             WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
                     .getRegistries().getItemRegistry().getRichName(this)
     );
-    private final LazyReference<ItemMaterial> itemMaterial = LazyReference.from(() ->
+    private transient final LazyReference<ItemMaterial> itemMaterial = LazyReference.from(() ->
             WorldEdit.getInstance().getPlatformManager().queryCapability(Capability.GAME_HOOKS)
                     .getRegistries().getItemRegistry().getMaterial(this)
     );
     //FAWE start
-    private BlockType blockType;
-    private boolean initBlockType;
-    private BaseItem defaultState;
+    private transient BlockType blockType;
+    private transient boolean initBlockType;
+    private transient BaseItem defaultState;
     //FAWE end
 
     public ItemType(String id) {
