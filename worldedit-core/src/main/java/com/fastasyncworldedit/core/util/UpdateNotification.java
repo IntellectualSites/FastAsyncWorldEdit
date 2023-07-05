@@ -14,7 +14,13 @@ import org.w3c.dom.Document;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.net.URL;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 public class UpdateNotification {
 
@@ -28,35 +34,51 @@ public class UpdateNotification {
      */
     public static void doUpdateCheck() {
         if (Settings.settings().ENABLED_COMPONENTS.UPDATE_NOTIFICATIONS) {
-            try {
-                DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-                DocumentBuilder db = dbf.newDocumentBuilder();
-                Document doc = db.parse(new URL("https://ci.athion.net/job/FastAsyncWorldEdit/api/xml/").openStream());
-                faweVersion = doc.getElementsByTagName("lastSuccessfulBuild").item(0).getFirstChild().getTextContent();
-                FaweVersion faweVersion = Fawe.instance().getVersion();
-                if (faweVersion.build == 0) {
-                    LOGGER.warn("You are using a snapshot or a custom version of FAWE. This is not an official build distributed " +
-                            "via https://www.spigotmc.org/resources/13932/");
-                    return;
-                }
-                if (faweVersion.build < Integer.parseInt(UpdateNotification.faweVersion)) {
-                    hasUpdate = true;
-                    int versionDifference = Integer.parseInt(UpdateNotification.faweVersion) - faweVersion.build;
-                    LOGGER.warn(
-                            """
-                                    An update for FastAsyncWorldEdit is available. You are {} build(s) out of date.
-                                    You are running build {}, the latest version is build {}.
-                                    Update at https://www.spigotmc.org/resources/13932/""",
-                            versionDifference,
-                            faweVersion.build,
-                            UpdateNotification.faweVersion
-                    );
-                }
-            } catch (Exception e) {
-                LOGGER.error("Unable to check for updates. Skipping.");
-            }
+            final HttpRequest request = HttpRequest
+                    .newBuilder()
+                    .uri(URI.create("https://ci.athion.net/job/FastAsyncWorldEdit/api/xml/"))
+                    .timeout(Duration.of(10L, ChronoUnit.SECONDS))
+                    .build();
+            HttpClient.newHttpClient()
+                    .sendAsync(request, HttpResponse.BodyHandlers.ofInputStream())
+                    .whenComplete((response, thrown) -> {
+                        if (thrown != null) {
+                            LOGGER.error("Update check failed: {} ", thrown.getMessage());
+                        }
+                        processResponseBody(response.body());
+                    });
 
+        }
+    }
+
+    private static void processResponseBody(InputStream body) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(body);
+            faweVersion = doc.getElementsByTagName("lastSuccessfulBuild").item(0).getFirstChild().getTextContent();
+            FaweVersion faweVersion = Fawe.instance().getVersion();
+            if (faweVersion.build == 0) {
+                LOGGER.warn("You are using a snapshot or a custom version of FAWE. This is not an official build distributed " +
+                        "via https://www.spigotmc.org/resources/13932/");
+                return;
+            }
+            if (faweVersion.build < Integer.parseInt(UpdateNotification.faweVersion)) {
+                hasUpdate = true;
+                int versionDifference = Integer.parseInt(UpdateNotification.faweVersion) - faweVersion.build;
+                LOGGER.warn(
+                        """
+                                An update for FastAsyncWorldEdit is available. You are {} build(s) out of date.
+                                You are running build {}, the latest version is build {}.
+                                Update at https://www.spigotmc.org/resources/13932/""",
+                        versionDifference,
+                        faweVersion.build,
+                        UpdateNotification.faweVersion
+                );
+            }
+        } catch (Exception ignored) {
+            LOGGER.error("Unable to check for updates. Skipping.");
         }
     }
 
