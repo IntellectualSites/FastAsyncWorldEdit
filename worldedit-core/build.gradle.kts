@@ -32,8 +32,7 @@ dependencies {
     implementation("com.google.code.gson:gson")
 
     // Platform expectations
-    // TODO update bom-newest
-    implementation("org.yaml:snakeyaml:2.0")
+    implementation("org.yaml:snakeyaml")
 
     // Logging
     implementation("org.apache.logging.log4j:log4j-api")
