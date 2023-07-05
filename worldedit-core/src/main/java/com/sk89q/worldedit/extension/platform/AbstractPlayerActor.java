@@ -25,7 +25,7 @@ import com.fastasyncworldedit.core.math.MutableBlockVector3;
 import com.fastasyncworldedit.core.regions.FaweMaskManager;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.WEManager;
-import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
+import com.fastasyncworldedit.core.util.task.AsyncNotifyKeyedQueue;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.WorldEdit;
@@ -81,7 +81,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
 
     // Queue for async tasks
     private final AtomicInteger runningCount = new AtomicInteger();
-    private final AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue(
+    private final AsyncNotifyKeyedQueue asyncNotifyQueue = new AsyncNotifyKeyedQueue(
             (thread, throwable) -> {
                 while (throwable.getCause() != null) {
                     throwable = throwable.getCause();
@@ -96,7 +96,7 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
                         throwable.printStackTrace();
                     }
                 }
-            });
+            }, this::getUniqueId);
 
     public AbstractPlayerActor(Map<String, Object> meta) {
         this.meta = meta;
