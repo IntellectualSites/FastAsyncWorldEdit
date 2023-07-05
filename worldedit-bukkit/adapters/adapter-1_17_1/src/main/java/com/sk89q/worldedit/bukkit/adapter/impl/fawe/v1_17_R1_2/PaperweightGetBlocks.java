@@ -445,7 +445,11 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                     bitMask |= 1 << layer;
 
-                    char[] setArr = set.load(layerNo);
+                    // setArr is modified by PaperweightPlatformAdapter#newChunkSection. This is in order to write changes to
+                    // this chunk GET when #updateGet is called. Future dords, please listen this time.
+                    char[] tmp = set.load(layerNo);
+                    char[] setArr = new char[tmp.length];
+                    System.arraycopy(tmp, 0, setArr, 0, tmp.length);
 
                     // synchronise on internal section to avoid circular locking with a continuing edit if the chunk was
                     // submitted to keep loaded internal chunks to queue target size.
