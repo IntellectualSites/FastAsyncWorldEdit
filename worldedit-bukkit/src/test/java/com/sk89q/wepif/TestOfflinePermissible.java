@@ -20,6 +20,7 @@
 package com.sk89q.wepif;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
+import org.bukkit.BanEntry;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -35,6 +36,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -157,6 +159,15 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     @Override
     public boolean isBanned() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public @Nullable BanEntry<org.bukkit.profile.PlayerProfile> ban(
+            @Nullable final String reason,
+            @Nullable final Date expires,
+            @Nullable final String source
+    ) {
+        return null;
     }
 
     @Override
