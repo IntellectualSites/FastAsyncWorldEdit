@@ -45,7 +45,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
         "testImplementation"("org.mockito:mockito-core:5.1.1")
         "testImplementation"("org.mockito:mockito-junit-jupiter:5.1.1")
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-        "implementation"(platform("com.intellectualsites.bom:bom-1.18.x:1.9"))
+        "implementation"(platform("com.intellectualsites.bom:bom-1.18.x:1.31"))
     }
 
     // Java 8 turns on doclint which we fail
