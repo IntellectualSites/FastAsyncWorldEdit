@@ -183,6 +183,7 @@ public class FaweDelegateRegionManager {
                                 .findByFile(schematicFile)
                                 .getReader(new FileInputStream(schematicFile))
                                 .read();
+                        clip.setOrigin(clip.getRegion().getMinimumPoint());
                         clip.paste(scheditsession, to, true, true, true);
                     } catch (IOException e) {
                         e.printStackTrace();
