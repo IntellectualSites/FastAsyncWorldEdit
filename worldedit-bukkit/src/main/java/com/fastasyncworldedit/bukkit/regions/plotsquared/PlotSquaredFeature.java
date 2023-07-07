@@ -211,8 +211,9 @@ public class PlotSquaredFeature extends FaweMaskManager {
 
         @Override
         public boolean isValid(Player player, MaskType type, boolean notify) {
-            if ((!connectedPlots.refersTo(plot.getConnectedPlots()) && !singlePlot) || (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(
-                    plot))) {
+            if ((!connectedPlots.refersTo(plot.getConnectedPlots()) && (!singlePlot || plot
+                    .getConnectedPlots()
+                    .size() > 1)) || (Settings.Done.RESTRICT_BUILDING && DoneFlag.isDone(plot))) {
                 return false;
             }
             return isAllowed(player, plot, type, notify);
