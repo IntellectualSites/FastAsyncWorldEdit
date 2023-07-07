@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A clipboard with disk backed storage. (lower memory + loads on crash)
@@ -61,7 +62,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private static final int HEADER_SIZE = 27; // Current header size
     private static final int VERSION_1_HEADER_SIZE = 22; // Header size of "version 1"
     private static final int VERSION_2_HEADER_SIZE = 27; // Header size of "version 2" i.e. when NBT/entities could be saved
-    private static final Map<String, LockHolder> LOCK_HOLDER_CACHE = new HashMap<>();
+    private static final Map<String, LockHolder> LOCK_HOLDER_CACHE = new ConcurrentHashMap<>();
 
     private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
@@ -310,12 +311,12 @@ public class DiskOptimizedClipboard extends LinearClipboard {
             } catch (OverlappingFileLockException e) {
                 LockHolder existing = LOCK_HOLDER_CACHE.get(file.getName());
                 if (existing != null) {
-                    int seconds = (int) (System.currentTimeMillis() - existing.lockHeldSince) / 1000;
+                    long ms = System.currentTimeMillis() - existing.lockHeldSince;
                     LOGGER.error(
-                            "Cannot lock clipboard file {} acquired by thread {}, {}s ago",
+                            "Cannot lock clipboard file {} acquired by thread {}, {}ms ago",
                             file.getName(),
                             existing.thread,
-                            seconds
+                            ms
                     );
                 }
                 // Rethrow to prevent clipboard access
