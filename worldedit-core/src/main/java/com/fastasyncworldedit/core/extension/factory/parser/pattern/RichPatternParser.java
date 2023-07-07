@@ -117,7 +117,7 @@ public class RichPatternParser extends FaweParser<Pattern> {
                                     if (addBrackets) {
                                         value += "[";
                                     }
-                                    value += StringMan.join(entry.getValue(), " ");
+                                    value += StringMan.join(entry.getValue(), "][");
                                     if (addBrackets) {
                                         value += "]";
                                     }
