@@ -310,6 +310,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Set<CompoundTag> getEntities() {
+        ensureLoaded(serverLevel, chunkX, chunkZ);
         List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         if (entities.isEmpty()) {
             return Collections.emptySet();
