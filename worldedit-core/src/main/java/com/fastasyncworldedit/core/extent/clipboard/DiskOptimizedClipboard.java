@@ -39,6 +39,8 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,6 +61,7 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private static final int HEADER_SIZE = 27; // Current header size
     private static final int VERSION_1_HEADER_SIZE = 22; // Header size of "version 1"
     private static final int VERSION_2_HEADER_SIZE = 27; // Header size of "version 2" i.e. when NBT/entities could be saved
+    private static final Map<String, LockHolder> LOCK_HOLDER_CACHE = new HashMap<>();
 
     private final HashMap<IntTriple, CompoundTag> nbtMap;
     private final File file;
@@ -301,7 +304,23 @@ public class DiskOptimizedClipboard extends LinearClipboard {
     private void init() throws IOException {
         if (this.fileChannel == null) {
             this.fileChannel = braf.getChannel();
-            this.fileChannel.lock();
+            try {
+                FileLock lock = this.fileChannel.lock();
+                LOCK_HOLDER_CACHE.put(file.getName(), new LockHolder(lock));
+            } catch (OverlappingFileLockException e) {
+                LockHolder existing = LOCK_HOLDER_CACHE.get(file.getName());
+                if (existing != null) {
+                    int seconds = (int) (System.currentTimeMillis() - existing.lockHeldSince) / 1000;
+                    LOGGER.error(
+                            "Cannot lock clipboard file {} acquired by thread {}, {}s ago",
+                            file.getName(),
+                            existing.thread,
+                            seconds
+                    );
+                }
+                // Rethrow to prevent clipboard access
+                throw e;
+            }
             this.byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, 0, braf.length());
         }
     }
@@ -736,5 +755,19 @@ public class DiskOptimizedClipboard extends LinearClipboard {
         }
         return false;
     }
+
+    private static class LockHolder {
+
+        final FileLock lock;
+        final long lockHeldSince;
+        final String thread;
+
+        LockHolder(FileLock lock) {
+            this.lock = lock;
+            lockHeldSince = System.currentTimeMillis();
+            this.thread = Thread.currentThread().getName();
+        }
+    }
+
 
 }
