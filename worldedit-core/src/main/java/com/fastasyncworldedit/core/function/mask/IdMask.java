@@ -7,7 +7,8 @@ import com.sk89q.worldedit.math.BlockVector3;
 
 public class IdMask extends AbstractExtentMask implements ResettableMask {
 
-    private transient int id = -1;
+    private final Object lock = new Object();
+    private transient Integer id = -1;
 
     public IdMask(Extent extent) {
         super(extent);
@@ -18,8 +19,14 @@ public class IdMask extends AbstractExtentMask implements ResettableMask {
         if (id != -1) {
             return extent.getBlock(vector).getInternalBlockTypeId() == id;
         } else {
-            id = extent.getBlock(vector).getInternalBlockTypeId();
-            return true;
+            synchronized (lock) {
+                if (id != -1) {
+                    return extent.getBlock(vector).getInternalBlockTypeId() == id;
+                } else {
+                    id = extent.getBlock(vector).getInternalBlockTypeId();
+                    return true;
+                }
+            }
         }
     }
 
@@ -35,7 +42,7 @@ public class IdMask extends AbstractExtentMask implements ResettableMask {
 
     @Override
     public Mask copy() {
-        return new IdMask(getExtent());
+        return this;
     }
 
     @Override
