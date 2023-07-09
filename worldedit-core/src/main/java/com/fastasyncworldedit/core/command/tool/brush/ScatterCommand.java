@@ -65,8 +65,11 @@ public class ScatterCommand extends ScatterBrush {
             wePlayer = new SilentPlayerWrapper(wePlayer);
         }
         for (String cmd : cmds) {
+            if (cmd.isBlank()) {
+                continue;
+            }
             cmd = cmd.charAt(0) != '/' ? "/" + cmd : cmd;
-            cmd = cmd.charAt(1) == '/' ? cmd.substring(1) : cmd;
+            cmd = cmd.length() >1 && cmd.charAt(1) == '/' ? cmd.substring(1) : cmd;
             CommandEvent event = new CommandEvent(wePlayer, cmd, editSession);
             PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
