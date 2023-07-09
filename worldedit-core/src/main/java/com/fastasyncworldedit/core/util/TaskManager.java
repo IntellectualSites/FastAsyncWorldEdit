@@ -88,7 +88,10 @@ public abstract class TaskManager {
 
     /**
      * Run a bunch of tasks in parallel using the shared thread pool.
+     *
+     * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
      */
+    @Deprecated(forRemoval = true, since = "TODO")
     public void parallel(Collection<Runnable> runables) {
         for (Runnable run : runables) {
             pool.submit(run);
@@ -101,8 +104,9 @@ public abstract class TaskManager {
      *
      * @param runnables  the tasks to run
      * @param numThreads number of threads (null = config.yml parallel threads)
+     * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "TODO")
     public void parallel(Collection<Runnable> runnables, @Nullable Integer numThreads) {
         if (runnables == null) {
             return;
@@ -271,13 +275,17 @@ public abstract class TaskManager {
         });
     }
 
+    /**
+     * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
     public void wait(AtomicBoolean running, int timeout) {
         try {
             long start = System.currentTimeMillis();
             synchronized (running) {
                 while (running.get()) {
                     running.wait(timeout);
-                    if (running.get() && System.currentTimeMillis() - start > Settings.settings().QUEUE.DISCARD_AFTER_MS) {
+                    if (running.get() && System.currentTimeMillis() - start > 60000) {
                         new RuntimeException("FAWE is taking a long time to execute a task (might just be a symptom): ").printStackTrace();
                         LOGGER.info("For full debug information use: /fawe threads");
                     }
@@ -288,6 +296,10 @@ public abstract class TaskManager {
         }
     }
 
+    /**
+     * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
     public void notify(AtomicBoolean running) {
         running.set(false);
         synchronized (running) {
