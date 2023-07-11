@@ -50,12 +50,19 @@ import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormat;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.function.EntityFunction;
+import com.sk89q.worldedit.function.block.BlockReplace;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
+import com.sk89q.worldedit.function.mask.BoundedHeightMask;
 import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
+import com.sk89q.worldedit.function.mask.MaskIntersection;
+import com.sk89q.worldedit.function.mask.Masks;
+import com.sk89q.worldedit.function.mask.RegionMask;
 import com.sk89q.worldedit.function.operation.Operations;
 import com.sk89q.worldedit.function.pattern.Pattern;
+import com.sk89q.worldedit.function.visitor.DownwardVisitor;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
+import com.sk89q.worldedit.function.visitor.RecursiveVisitor;
 import com.sk89q.worldedit.internal.annotation.Direction;
 import com.sk89q.worldedit.internal.annotation.VertHeight;
 import com.sk89q.worldedit.internal.expression.EvaluationException;
@@ -63,8 +70,10 @@ import com.sk89q.worldedit.internal.expression.Expression;
 import com.sk89q.worldedit.internal.expression.ExpressionException;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.Vector2;
+import com.sk89q.worldedit.math.Vector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.CylinderRegion;
+import com.sk89q.worldedit.regions.EllipsoidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.formatting.component.SubtleFormat;
 import com.sk89q.worldedit.util.formatting.text.Component;
@@ -835,6 +844,55 @@ public class UtilityCommands {
             actor.print(Caption.of("fawe.worldedit.utility.nothing.confirmed"));
         }
     }
+
+//    @Command(
+//            name = "/hollowr",
+//            desc = "Hollow out a space recursively with a pattern"
+//    )
+//    @CommandPermissions("worldedit.hollowr")
+//    @Logging(PLACEMENT)
+//    public int hollowr(
+//            Actor actor,
+//            LocalSession session,
+//            EditSession editSession,
+//            @Arg(desc = "The radius to hollow out") Expression radiusExp,
+//            @ArgFlag(name = 'p', desc = "The blocks to fill with") Pattern pattern,
+//            @ArgFlag(name = 'm', desc = "The blocks remove", def = "") Mask mask
+//    ) throws WorldEditException {
+//        //FAWE start
+//        double radius = radiusExp.evaluate();
+//        //FAWE end
+//        radius = Math.max(1, radius);
+//        we.checkMaxRadius(radius);
+//        if (mask == null) {
+//            Mask mask = new MaskIntersection(
+//                    new RegionMask(new EllipsoidRegion(null, origin, Vector3.at(radius, radius, radius))),
+//                    new BoundedHeightMask(
+//                            Math.max(lowerBound, minY),
+//                            Math.min(maxY, origin.getBlockY())
+//                    ),
+//                    Masks.negate(new ExistingBlockMask(this))
+//            );
+//        }
+//
+//        // Want to replace blocks
+//        BlockReplace replace = new BlockReplace(this, pattern);
+//
+//        // Pick how we're going to visit blocks
+//        RecursiveVisitor visitor;
+//        //FAWE start - provide extent for preloading, min/max y
+//        if (recursive) {
+//            visitor = new RecursiveVisitor(mask, replace, (int) (radius * 2 + 1), minY, maxY, this);
+//        } else {
+//            visitor = new DownwardVisitor(mask, replace, origin.getBlockY(), (int) (radius * 2 + 1), minY, maxY, this);
+//        }
+//        //FAWE end
+//
+//        BlockVector3 pos = session.getPlacementPosition(actor);
+//        int affected = editSession.res(pos, pattern, radius, depth, true);
+//        actor.print(Caption.of("worldedit.fillr.created", TextComponent.of(affected)));
+//        return affected;
+//    }
 
     public static List<Map.Entry<URI, String>> filesToEntry(final File root, final List<File> files, final UUID uuid) {
         return files.stream()
