@@ -929,11 +929,13 @@ public class BrushCommands {
             @Arg(desc = "Expression")
                     Expression radius,
             @Arg(desc = "Command to run")
-                    List<String> input
+                    List<String> input,
+            @Switch(name = 'p', desc = "Show any printed output")
+                    boolean print
     ) throws WorldEditException {
         worldEdit.checkMaxBrushRadius(radius);
         String cmd = StringMan.join(input, " ");
-        set(context, new CommandBrush(cmd), "worldedit.brush.command").setSize(radius);
+        set(context, new CommandBrush(cmd, print), "worldedit.brush.command").setSize(radius);
     }
 
     @Command(

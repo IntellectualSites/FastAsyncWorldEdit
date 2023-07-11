@@ -22,9 +22,27 @@ import java.util.List;
 public class CommandBrush implements Brush {
 
     private final String command;
+    private final boolean print;
 
+    /**
+     * New instance
+     *
+     * @deprecated Use {@link CommandBrush#CommandBrush(String, boolean)}
+     */
+    @Deprecated(forRemoval = true)
     public CommandBrush(String command) {
-        this.command = command.charAt(0) == '/' ? "/" + command : command;
+        this(command, false);
+    }
+
+    /**
+     * New instance
+     *
+     * @param command command to run, or commands split by ';'
+     * @param print   if output should be printed to the actor for the run commands
+     */
+    public CommandBrush(String command, boolean print) {
+        this.command = command;
+        this.print = print;
     }
 
     @Override
@@ -36,7 +54,7 @@ public class CommandBrush implements Brush {
                 position.subtract(radius, radius, radius),
                 position.add(radius, radius, radius)
         );
-        String replaced = command.replace("{x}", position.getBlockX() + "")
+        String replaced = command.replace("{x}", Integer.toString(position.getBlockX()))
                 .replace("{y}", Integer.toString(position.getBlockY()))
                 .replace("{z}", Integer.toString(position.getBlockZ()))
                 .replace("{world}", editSession.getWorld().getName())
@@ -46,21 +64,22 @@ public class CommandBrush implements Brush {
         if (!(actor instanceof Player player)) {
             throw FaweCache.PLAYER_ONLY;
         }
-        //Use max world height to allow full coverage of the world height
-        Location face = player.getBlockTraceFace(editSession.getWorld().getMaxY(), true);
-        if (face == null) {
-            position = position.add(0, 1, 1);
-        } else {
-            position = position.add(face.getDirection().toBlockPoint());
-        }
         player.setSelection(selector);
-        AsyncPlayer wePlayer = new SilentPlayerWrapper(new LocationMaskedPlayerWrapper(
+        AsyncPlayer wePlayer = new LocationMaskedPlayerWrapper(
                 player,
                 new Location(player.getExtent(), position.toVector3())
-        ));
+        );
+        if (!print) {
+            wePlayer = new SilentPlayerWrapper(wePlayer);
+        }
         List<String> cmds = StringMan.split(replaced, ';');
         for (String cmd : cmds) {
-            CommandEvent event = new CommandEvent(wePlayer, cmd);
+            if (cmd.isBlank()) {
+                continue;
+            }
+            cmd = cmd.charAt(0) != '/' ? "/" + cmd : cmd;
+            cmd = cmd.length() >1 && cmd.charAt(1) == '/' ? cmd.substring(1) : cmd;
+            CommandEvent event = new CommandEvent(wePlayer, cmd, editSession);
             PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
     }

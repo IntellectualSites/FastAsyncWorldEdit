@@ -3,7 +3,9 @@ package com.fastasyncworldedit.core.command.tool.brush;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.math.LocalBlockVectorSet;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.wrappers.AsyncPlayer;
 import com.fastasyncworldedit.core.wrappers.LocationMaskedPlayerWrapper;
+import com.fastasyncworldedit.core.wrappers.SilentPlayerWrapper;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.MaxChangedBlocksException;
 import com.sk89q.worldedit.entity.Player;
@@ -13,7 +15,7 @@ import com.sk89q.worldedit.extension.platform.PlatformCommandManager;
 import com.sk89q.worldedit.function.pattern.Pattern;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
-import com.sk89q.worldedit.util.formatting.text.Component;
+import com.sk89q.worldedit.util.Location;
 
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class ScatterCommand extends ScatterBrush {
                 position.subtract(radius, radius, radius),
                 position.add(radius, radius, radius)
         );
-        String replaced = command.replace("{x}", position.getBlockX() + "")
+        String replaced = command.replace("{x}", Integer.toString(position.getBlockX()))
                 .replace("{y}", Integer.toString(position.getBlockY()))
                 .replace("{z}", Integer.toString(position.getBlockZ()))
                 .replace("{world}", editSession.getWorld().getName())
@@ -55,41 +57,22 @@ public class ScatterCommand extends ScatterBrush {
         }
         player.setSelection(selector);
         List<String> cmds = StringMan.split(replaced, ';');
+        AsyncPlayer wePlayer = new LocationMaskedPlayerWrapper(
+                player,
+                new Location(player.getExtent(), position.toVector3())
+        );
+        if (!print) {
+            wePlayer = new SilentPlayerWrapper(wePlayer);
+        }
         for (String cmd : cmds) {
-            Player p = print ?
-                    new LocationMaskedPlayerWrapper(player, player.getLocation().setPosition(position.toVector3()), false) :
-                    new ScatterCommandPlayerWrapper(player, position);
-            CommandEvent event = new CommandEvent(p, cmd, editSession);
+            if (cmd.isBlank()) {
+                continue;
+            }
+            cmd = cmd.charAt(0) != '/' ? "/" + cmd : cmd;
+            cmd = cmd.length() >1 && cmd.charAt(1) == '/' ? cmd.substring(1) : cmd;
+            CommandEvent event = new CommandEvent(wePlayer, cmd, editSession);
             PlatformCommandManager.getInstance().handleCommandOnCurrentThread(event);
         }
-    }
-
-    private static final class ScatterCommandPlayerWrapper extends LocationMaskedPlayerWrapper {
-
-        ScatterCommandPlayerWrapper(Player player, BlockVector3 position) {
-            super(player, player.getLocation().setPosition(position.toVector3()), false);
-        }
-
-        @Override
-        public void print(String msg) {
-        }
-
-        @Override
-        public void print(Component component) {
-        }
-
-        @Override
-        public void printDebug(String msg) {
-        }
-
-        @Override
-        public void printError(String msg) {
-        }
-
-        @Override
-        public void printRaw(String msg) {
-        }
-
     }
 
 }

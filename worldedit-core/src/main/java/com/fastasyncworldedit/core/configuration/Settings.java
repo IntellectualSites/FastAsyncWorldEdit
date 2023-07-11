@@ -468,30 +468,13 @@ public class Settings extends Config {
         })
         public int BUFFER_SIZE = 531441;
 
-
-        @Comment({
-                "The maximum time in milliseconds to wait for a chunk to load for an edit.",
-                " (50ms = 1 server tick, 0 = Fastest).",
-                " The default value of 100 should be safe for most cases.",
-                "",
-                "Actions which require loaded chunks (e.g. copy) which do not load in time",
-                " will use the last chunk as filler, which may appear as bands of duplicated blocks.",
-                "Actions usually wait about 25-50ms for the chunk to load, more if the server is lagging.",
-                "A value of 100ms does not force it to wait 100ms if the chunk loads in 10ms.",
-                "",
-                "This value is a timeout in case a chunk is never going to load (for whatever odd reason).",
-                "If the action times out, the operation continues by using the previous chunk as filler,",
-                " and displaying an error message.  In this case, either copy a smaller section,",
-                " or increase chunk-wait-ms.",
-                "A value of 0 is faster simply because it doesn't bother loading the chunks or waiting.",
-        })
-        public int CHUNK_WAIT_MS = 1000;
         @Comment("Delete history on disk after a number of days")
         public int DELETE_AFTER_DAYS = 7;
         @Comment("Delete history in memory on logout (does not effect disk)")
         public boolean DELETE_ON_LOGOUT = true;
         @Comment({
                 "If history should be enabled by default for plugins using WorldEdit:",
+                " - It is faster to have disabled",
                 " - It is faster to have disabled",
                 " - Use of the FAWE API will not be effected"
         })
@@ -515,10 +498,12 @@ public class Settings extends Config {
 
         @Create
         public static PROGRESS PROGRESS;
+
         @Comment({
                 "This should equal the number of processors you have",
         })
         public int PARALLEL_THREADS = Math.max(1, Runtime.getRuntime().availableProcessors());
+
         @Comment({
                 "When doing edits that effect more than this many chunks:",
                 " - FAWE will start placing before all calculations are finished",
@@ -530,14 +515,6 @@ public class Settings extends Config {
 
         })
         public int TARGET_SIZE = 8 * Runtime.getRuntime().availableProcessors();
-        @Comment({
-                "Force FAWE to start placing chunks regardless of whether an edit is finished processing",
-                " - A larger value will use slightly less CPU time",
-                " - A smaller value will reduce memory usage",
-                " - A value too small may break some operations (deform?)"
-        })
-        //TODO Find out where this was used and why the usage was removed
-        public int MAX_WAIT_MS = 1000;
 
         @Comment({
                 "Increase or decrease queue intensity (ms) [-50,50]:",
@@ -565,13 +542,6 @@ public class Settings extends Config {
                 " - Enable to improve performance at the expense of memory",
         })
         public boolean POOL = true;
-
-        @Comment({
-                "Discard edits which have been idle for a certain amount of time (ms)",
-                " - E.g. A plugin creates an EditSession but never does anything with it",
-                " - This only applies to plugins improperly using WorldEdit's legacy API"
-        })
-        public int DISCARD_AFTER_MS = 60000;
 
         @Comment({
                 "When using fastmode do not bother to tick existing/placed blocks/fluids",
@@ -639,7 +609,7 @@ public class Settings extends Config {
         public boolean REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL = true;
 
         @Comment({
-                "Other experimental features"
+                "Increased debug logging for brush actions and processor setup"
         })
         public boolean OTHER = false;
 
