@@ -4,12 +4,15 @@ import com.fastasyncworldedit.core.extent.processor.ProcessorScope;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.regions.Region;
 
+import javax.annotation.Nonnull;
+import java.util.Objects;
+
 public class FaweMask implements IDelegateRegion {
 
     private final Region region;
 
-    public FaweMask(Region region) {
-        this.region = region;
+    public FaweMask(@Nonnull Region region) {
+        this.region = Objects.requireNonNull(region);
     }
 
     @Override
