@@ -51,12 +51,12 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
      * Get the cached get object. This is faster than getting the object using NMS and allows for
      * wrapping.
      */
-    IChunkGet getCachedGet(@Range(from = 0, to = 15) int chunkX, @Range(from = 0, to = 15) int chunkZ);
+    IChunkGet getCachedGet(int chunkX, int chunkZ);
 
     /**
      * Get the cached chunk set object.
      */
-    IChunkSet getCachedSet(@Range(from = 0, to = 15) int chunkX, @Range(from = 0, to = 15) int chunkZ);
+    IChunkSet getCachedSet(int chunkX, int chunkZ);
 
     /**
      * Submit the chunk so that it's changes are applied to the world

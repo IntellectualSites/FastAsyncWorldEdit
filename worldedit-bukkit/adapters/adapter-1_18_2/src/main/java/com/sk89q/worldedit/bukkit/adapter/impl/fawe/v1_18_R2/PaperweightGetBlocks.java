@@ -14,12 +14,12 @@ import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
 import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldedit.bukkit.BukkitEntity;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.internal.Constants;
@@ -60,13 +60,13 @@ import org.apache.logging.log4j.Logger;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_18_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_18_R2.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_18_R2.entity.CraftEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import javax.annotation.Nonnull;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,7 +82,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBlocks {
 
@@ -132,11 +131,13 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.biomeHolderIdMap = biomeRegistry.asHolderIdMap();
     }
 
-    public int getChunkX() {
+    @Override
+    public int getX() {
         return chunkX;
     }
 
-    public int getChunkZ() {
+    @Override
+    public int getZ() {
         return chunkZ;
     }
 
@@ -332,7 +333,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public Set<CompoundTag> getEntities() {
-        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
         if (entities.isEmpty()) {
             return Collections.emptySet();
         }
@@ -371,6 +372,51 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     input.save(tag);
                     return (CompoundTag) adapter.toNative(tag);
                 }).collect(Collectors.toList());
+                return result.iterator();
+            }
+        };
+    }
+
+    @Override
+    public Set<com.sk89q.worldedit.entity.Entity> getFullEntities() {
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(ensureLoaded(serverLevel, chunkX, chunkZ));
+        if (entities.isEmpty()) {
+            return Collections.emptySet();
+        }
+        int size = entities.size();
+        return new AbstractSet<>() {
+            @Override
+            public int size() {
+                return size;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public boolean contains(Object get) {
+                if (!(get instanceof com.sk89q.worldedit.entity.Entity e)) {
+                    return false;
+                }
+                UUID getUUID = e.getState().getNbtData().getUUID();
+                for (Entity entity : entities) {
+                    UUID uuid = entity.getUUID();
+                    if (uuid.equals(getUUID)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Nonnull
+            @Override
+            public Iterator<com.sk89q.worldedit.entity.Entity> iterator() {
+                Iterable<com.sk89q.worldedit.entity.Entity> result = entities
+                        .stream()
+                        .map(input -> new BukkitEntity(input.getBukkitEntity()))
+                        .collect(Collectors.toList());
                 return result.iterator();
             }
         };

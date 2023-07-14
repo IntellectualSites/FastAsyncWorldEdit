@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Range;
  */
 public interface IChunkCache<T> extends Trimable {
 
-    T get(@Range(from = 0, to = 15) int chunkX, @Range(from = 0, to = 15) int chunkZ);
+    T get(int chunkX, int chunkZ);
 
     @Override
     default boolean trim(boolean aggressive) {

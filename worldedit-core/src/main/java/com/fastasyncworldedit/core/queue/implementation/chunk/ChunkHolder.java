@@ -14,6 +14,7 @@ import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.Pool;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -921,6 +922,12 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public Set<CompoundTag> getEntities() {
         checkAndWaitOnCalledLock();
         return delegate.get(this).getEntities();
+    }
+
+    @Override
+    public Set<Entity> getFullEntities() {
+        checkAndWaitOnCalledLock();
+        return delegate.get(this).getFullEntities();
     }
 
     @Override

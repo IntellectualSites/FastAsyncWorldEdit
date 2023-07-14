@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.stream.IntStream;
 
 /**
- * A shared interface for IGetBlocks and ISetBlocks.
+ * A shared interface for IGetBlocks and ISetBlocks. Represents a chunk.
  */
 public interface IBlocks extends Trimable {
 
@@ -91,6 +91,16 @@ public interface IBlocks extends Trimable {
      * height worlds, this will only return under 0 if blocks are stored outside the default range.
      */
     int getMinSectionPosition();
+
+    /**
+     * Get the chunk x coordinate
+     */
+    int getX();
+
+    /**
+     * Get the chunk z coordinate
+     */
+    int getZ();
 
     default byte[] toByteArray(boolean full, boolean stretched) {
         return toByteArray(null, getBitMask(), full, stretched);

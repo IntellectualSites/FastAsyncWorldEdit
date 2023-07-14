@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.queue.IBlocks;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
@@ -68,6 +69,11 @@ public final class NullChunkGet implements IChunkGet {
         return null;
     }
 
+    @Nullable
+    public Set<Entity> getFullEntities() {
+        return null;
+    }
+
     @Override
     public void setCreateCopy(boolean createCopy) {
     }
@@ -106,6 +112,16 @@ public final class NullChunkGet implements IChunkGet {
 
     @Override
     public int getMinSectionPosition() {
+        return 0;
+    }
+
+    @Override
+    public int getX() {
+        return 0;
+    }
+
+    @Override
+    public int getZ() {
         return 0;
     }
 

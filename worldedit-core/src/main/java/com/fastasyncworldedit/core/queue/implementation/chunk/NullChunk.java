@@ -6,6 +6,7 @@ import com.fastasyncworldedit.core.queue.Filter;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.biome.BiomeType;
@@ -181,6 +182,11 @@ public final class NullChunk implements IQueueChunk {
     @Nullable
     public CompoundTag getEntity(@Nonnull UUID uuid) {
         return null;
+    }
+
+    @Override
+    public Set<Entity> getFullEntities() {
+        return Collections.emptySet();
     }
 
     @Override
