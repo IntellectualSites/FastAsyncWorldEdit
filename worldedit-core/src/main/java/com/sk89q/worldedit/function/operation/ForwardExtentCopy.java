@@ -20,21 +20,29 @@
 package com.sk89q.worldedit.function.operation;
 
 import com.fastasyncworldedit.core.configuration.Caption;
+import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.BlockTranslateExtent;
+import com.fastasyncworldedit.core.extent.OncePerChunkExtent;
 import com.fastasyncworldedit.core.extent.PositionTransformExtent;
+import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
 import com.fastasyncworldedit.core.function.RegionMaskTestFunction;
 import com.fastasyncworldedit.core.function.block.BiomeCopy;
 import com.fastasyncworldedit.core.function.block.CombinedBlockCopy;
 import com.fastasyncworldedit.core.function.block.SimpleBlockCopy;
 import com.fastasyncworldedit.core.function.visitor.IntersectRegionFunction;
+import com.fastasyncworldedit.core.queue.IQueueChunk;
+import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.ParallelQueueExtent;
+import com.fastasyncworldedit.core.queue.implementation.SingleThreadQueueExtent;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.sk89q.worldedit.WorldEditException;
+import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.metadata.EntityProperties;
+import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 import com.sk89q.worldedit.function.CombinedRegionFunction;
 import com.sk89q.worldedit.function.RegionFunction;
@@ -44,17 +52,24 @@ import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.mask.Masks;
 import com.sk89q.worldedit.function.visitor.EntityVisitor;
 import com.sk89q.worldedit.function.visitor.RegionVisitor;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.math.transform.AffineTransform;
 import com.sk89q.worldedit.math.transform.Identity;
 import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.regions.FlatRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.util.formatting.text.Component;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -67,6 +82,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * source. Therefore, interpolation will not occur to fill in the gaps.</p>
  */
 public class ForwardExtentCopy implements Operation {
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private final Extent source;
     private final Extent destination;
@@ -405,16 +422,53 @@ public class ForwardExtentCopy implements Operation {
             blockCopy = new RegionVisitor(region, copy, preloader);
         }
 
-        List<? extends Entity> entities;
+        Collection<Entity> entities;
         if (copyingEntities) {
-            // filter players since they can't be copied
-            entities = source.getEntities(region);
-            entities.removeIf(entity -> {
-                EntityProperties properties = entity.getFacet(EntityProperties.class);
-                return properties != null && !properties.isPasteable();
-            });
+            IQueueExtent<IQueueChunk> queue;
+            Extent ext = source instanceof AbstractDelegateExtent ex ? ex.getExtent() : source;
+            ParallelQueueExtent parallel = new ExtentTraverser<>(source).findAndGet(ParallelQueueExtent.class);
+            if (parallel != null) {
+                queue = parallel.getExtent();
+            } else {
+                queue = new ExtentTraverser<>(source).findAndGet(SingleThreadQueueExtent.class);
+            }
+            if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS && queue != null) {
+                entities = new LinkedBlockingQueue<>();
+                OncePerChunkExtent oncePer = new OncePerChunkExtent(
+                        ext,
+                        queue,
+                        (get) -> {
+                            if (region.containsChunk(get.getX(), get.getZ())) {
+                                entities.addAll(get.getFullEntities());
+                            } else {
+                                get.getFullEntities().forEach(e -> {
+                                    if (region.contains(e.getLocation().toBlockPoint())) {
+                                        entities.add(e);
+                                    }
+                                });
+                            }
+                        }
+                );
+                ExtentBatchProcessorHolder batchExtent =
+                        new ExtentTraverser<>(source).findAndGet(ExtentBatchProcessorHolder.class);
+                if (batchExtent != null) {
+                    batchExtent.getProcessor().join(oncePer);
+                } else {
+                    new ExtentTraverser(source).setNext(oncePer);
+                }
+            } else {
+                if (Settings.settings().EXPERIMENTAL.IMPROVED_ENTITY_EDITS) {
+                    LOGGER.warn("Could not find IQueueExtent instance for entity retrieval, falling back to default method.");
+                }
+                // filter players since they can't be copied
+                entities = new HashSet<>(source.getEntities(region));
+                entities.removeIf(entity -> {
+                    EntityProperties properties = entity.getFacet(EntityProperties.class);
+                    return properties != null && !properties.isPasteable();
+                });
+            }
         } else {
-            entities = Collections.emptyList();
+            entities = Collections.emptySet();
         }
 
         for (int i = 0; i < repetitions; i++) {
@@ -474,6 +528,42 @@ public class ForwardExtentCopy implements Operation {
                         TextComponent.of(affectedEntities)
                 )
         );
+    }
+
+    private static final class EntityHolder implements Entity {
+
+        @Nullable
+        @Override
+        public BaseEntity getState() {
+            return null;
+        }
+
+        @Override
+        public boolean remove() {
+            return false;
+        }
+
+        @Override
+        public Location getLocation() {
+            return null;
+        }
+
+        @Override
+        public boolean setLocation(final Location location) {
+            return false;
+        }
+
+        @Override
+        public Extent getExtent() {
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public <T> T getFacet(final Class<? extends T> cls) {
+            return null;
+        }
+
     }
 
 }

@@ -27,13 +27,25 @@ public class BitSetBlocks implements IChunkSet {
     private final int minSectionPosition;
     private final int maxSectionPosition;
     private final int layers;
+    private final int chunkX;
+    private final int chunkZ;
 
+    /**
+     * @deprecated use {@link BitSetBlocks#BitSetBlocks(BlockState, int, int, int, int)}
+     */
+    @Deprecated(forRemoval = true, since = "TODO")
     public BitSetBlocks(BlockState blockState, int minSectionPosition, int maxSectionPosition) {
+        this(blockState, minSectionPosition, maxSectionPosition, 0, 0);
+    }
+
+    public BitSetBlocks(BlockState blockState, int minSectionPosition, int maxSectionPosition, int chunkX, int chunkZ) {
         this.row = new MemBlockSet.RowZ(minSectionPosition, maxSectionPosition);
         this.blockState = blockState;
         this.minSectionPosition = minSectionPosition;
         this.maxSectionPosition = maxSectionPosition;
         this.layers = maxSectionPosition - minSectionPosition + 1;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
     }
 
     @Override
@@ -236,6 +248,16 @@ public class BitSetBlocks implements IChunkSet {
     @Override
     public int getMinSectionPosition() {
         return maxSectionPosition;
+    }
+
+    @Override
+    public int getX() {
+        return chunkX;
+    }
+
+    @Override
+    public int getZ() {
+        return chunkZ;
     }
 
     @Override

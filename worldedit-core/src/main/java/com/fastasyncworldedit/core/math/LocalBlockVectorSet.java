@@ -213,8 +213,8 @@ public class LocalBlockVectorSet implements BlockVector3Set {
 
     @Nonnull
     @Override
-    public Object[] toArray() {
-        return toArray((Object[]) null);
+    public BlockVector3[] toArray() {
+        return toArray(new BlockVector3[0]);
     }
 
     @SuppressWarnings("unchecked")

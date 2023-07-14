@@ -666,6 +666,13 @@ public class Settings extends Config {
         public boolean REMOVE_ENTITY_FROM_WORLD_ON_CHUNK_FAIL = true;
 
         @Comment({
+                "[SAFE] Perform operations involving entities on chunk load",
+                " - Allows entities that might not otherwise be captured due to unloaded chunks to be captured",
+                " - Main use-case is copying larger areas with entities"
+        })
+        public boolean IMPROVED_ENTITY_EDITS = true;
+
+        @Comment({
                 "Increased debug logging for brush actions and processor setup"
         })
         public boolean OTHER = false;

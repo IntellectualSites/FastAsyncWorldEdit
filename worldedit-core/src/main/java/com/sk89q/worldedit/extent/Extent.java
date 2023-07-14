@@ -889,7 +889,7 @@ public interface Extent extends InputExtent, OutputExtent {
     }
 
     default Extent addPostProcessor(IBatchProcessor processor) {
-        if (processor.getScope() != ProcessorScope.READING_SET_BLOCKS) {
+        if (processor.getScope() != ProcessorScope.READING_BLOCKS) {
             throw new IllegalArgumentException("You cannot alter blocks in a PostProcessor");
         }
         return processor.construct(this);
