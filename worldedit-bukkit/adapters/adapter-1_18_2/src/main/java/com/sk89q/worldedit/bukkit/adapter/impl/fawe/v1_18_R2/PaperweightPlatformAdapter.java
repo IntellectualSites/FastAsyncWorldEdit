@@ -18,12 +18,10 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.IdMap;
 import net.minecraft.core.Registry;
-import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ChunkMap;
@@ -36,12 +34,13 @@ import net.minecraft.util.ThreadingDetector;
 import net.minecraft.util.Unit;
 import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.GlobalPalette;
 import net.minecraft.world.level.chunk.HashMapPalette;
@@ -51,8 +50,6 @@ import net.minecraft.world.level.chunk.LinearPalette;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
-import net.minecraft.world.level.gameevent.GameEventDispatcher;
-import net.minecraft.world.level.gameevent.GameEventListener;
 import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
 import sun.misc.Unsafe;
 
@@ -103,6 +100,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
+
+    private static final Field fieldOffers;
+    private static final MerchantOffers OFFERS = new MerchantOffers();
 
     private static final Field fieldRemove;
 
@@ -174,6 +174,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 throw new Error("data type scale not a power of two");
             }
             CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
+
+            fieldOffers = AbstractVillager.class.getDeclaredField(Refraction.pickName("offers", "bW"));
+            fieldOffers.setAccessible(true);
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -578,7 +581,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return BiomeTypes.get(biome.unwrapKey().orElseThrow().location().toString());
     }
 
-    @SuppressWarnings("unchecked")
     static void removeBeacon(BlockEntity beacon, LevelChunk levelChunk) {
         try {
             // Do the method ourselves to avoid trying to reflect generic method parameters
@@ -600,6 +602,29 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static List<Entity> getEntities(LevelChunk chunk) {
         return chunk.level.entityManager.getEntities(chunk.getPos());
+    }
+
+    public static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
+        boolean isVillager = entity instanceof AbstractVillager && !Fawe.isMainThread();
+        boolean unset = false;
+        if (isVillager) {
+            try {
+                if (fieldOffers.get(entity) != null) {
+                    fieldOffers.set(entity, OFFERS);
+                    unset = true;
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to villager to avoid async catcher.", e);
+            }
+        }
+        entity.save(compoundTag);
+        if (unset) {
+            try {
+                fieldOffers.set(entity, null);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to null again on villager.", e);
+            }
+        }
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {

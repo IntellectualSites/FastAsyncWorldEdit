@@ -374,7 +374,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             public Iterator<CompoundTag> iterator() {
                 Iterable<CompoundTag> result = entities.stream().map(input -> {
                     net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                    input.save(tag);
+                    PaperweightPlatformAdapter.readEntityIntoTag(input, tag);
                     return (CompoundTag) adapter.toNative(tag);
                 }).collect(Collectors.toList());
                 return result.iterator();
@@ -394,7 +394,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     @SuppressWarnings("rawtypes")
     public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         forceLoadSections = false;
-        copy = createCopy ? new PaperweightGetBlocks_Copy(levelChunk) : null;
+        copy = createCopy ? new PaperweightGetBlocks_Copy(getChunk()) : null;
         try {
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);

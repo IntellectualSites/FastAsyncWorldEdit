@@ -29,7 +29,11 @@ import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockTypesCache;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.event.block.BeaconDeactivatedEvent;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.IdMap;
+import net.minecraft.core.Registry;
+import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.IntTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -42,7 +46,14 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.chunk.DataLayer;
+import net.minecraft.world.level.chunk.HashMapPalette;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.LinearPalette;
+import net.minecraft.world.level.chunk.Palette;
+import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import org.apache.logging.log4j.Logger;
@@ -52,7 +63,17 @@ import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.AbstractSet;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
@@ -347,7 +368,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             public Iterator<CompoundTag> iterator() {
                 Iterable<CompoundTag> result = entities.stream().map(input -> {
                     net.minecraft.nbt.CompoundTag tag = new net.minecraft.nbt.CompoundTag();
-                    input.save(tag);
+                    PaperweightPlatformAdapter.readEntityIntoTag(input, tag);
                     return (CompoundTag) adapter.toNative(tag);
                 }).collect(Collectors.toList());
                 return result.iterator();
@@ -367,7 +388,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     @SuppressWarnings("rawtypes")
     public synchronized <T extends Future<T>> T call(IChunkSet set, Runnable finalizer) {
         forceLoadSections = false;
-        copy = createCopy ? new PaperweightGetBlocks_Copy(levelChunk) : null;
+        copy = createCopy ? new PaperweightGetBlocks_Copy(getChunk()) : null;
         try {
             ServerLevel nmsWorld = serverLevel;
             LevelChunk nmsChunk = ensureLoaded(nmsWorld, chunkX, chunkZ);
