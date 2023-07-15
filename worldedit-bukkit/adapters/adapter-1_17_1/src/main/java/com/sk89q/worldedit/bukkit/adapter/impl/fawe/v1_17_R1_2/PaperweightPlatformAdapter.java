@@ -12,6 +12,7 @@ import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -48,6 +49,8 @@ import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.gameevent.GameEventDispatcher;
 import net.minecraft.world.level.gameevent.GameEventListener;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
 import sun.misc.Unsafe;
 
@@ -61,6 +64,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -90,6 +95,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MethodHandle methodremoveBlockEntityTicker;
 
     private static final Field fieldRemove;
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     static {
         try {
@@ -225,7 +232,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
             try {
-                CraftChunk chunk = (CraftChunk) future.get();
+                CraftChunk chunk;
+                try {
+                    chunk = (CraftChunk) future.get(10, TimeUnit.SECONDS);
+                } catch (TimeoutException e) {
+                    String world = serverLevel.getWorld().getName();
+                    // We've already taken 10 seconds we can afford to wait a little here.
+                    boolean loaded = TaskManager.taskManager().sync(() -> Bukkit.getWorld(world) != null);
+                    if (loaded) {
+                        LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
+                        // Retry chunk load
+                        chunk = (CraftChunk) serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
+                    } else {
+                        throw new UnsupportedOperationException("Cannot load chunk from unloaded world " + world + "!");
+                    }
+                }
                 return chunk.getHandle();
             } catch (Throwable e) {
                 e.printStackTrace();

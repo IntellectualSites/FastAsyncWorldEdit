@@ -23,8 +23,10 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.ResettableExtent;
+import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.history.DiskStorageHistory;
+import com.fastasyncworldedit.core.internal.exception.FaweClipboardVersionMismatchException;
 import com.fastasyncworldedit.core.internal.io.FaweInputStream;
 import com.fastasyncworldedit.core.internal.io.FaweOutputStream;
 import com.fastasyncworldedit.core.limit.FaweLimit;
@@ -50,6 +52,8 @@ import com.sk89q.worldedit.command.tool.Tool;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.extension.platform.Locatable;
+import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
+import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
@@ -93,6 +97,7 @@ import java.util.ListIterator;
 import java.util.Objects;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -873,6 +878,58 @@ public class LocalSession implements TextureHolder {
                     this.clipboard.flush();
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * Load a clipboard from disk and into this localsession. Synchronises with other clipboard setting/getting to and from
+     * this session
+     *
+     * @param file Clipboard file to load
+     * @throws FaweClipboardVersionMismatchException in clipboard version mismatch (between saved and internal, expected, version)
+     * @throws ExecutionException                    if the computation threw an exception
+     * @throws InterruptedException                  if the current thread was interrupted while waiting
+     */
+    public void loadClipboardFromDisk(File file) throws FaweClipboardVersionMismatchException, ExecutionException,
+            InterruptedException {
+        synchronized (clipboardLock) {
+            if (file.exists() && file.length() > 5) {
+                try {
+                    if (getClipboard() != null) {
+                        return;
+                    }
+                } catch (EmptyClipboardException ignored) {
+                }
+                DiskOptimizedClipboard doc = Fawe.instance().getClipboardExecutor().submit(
+                        uuid,
+                        () -> DiskOptimizedClipboard.loadFromFile(file)
+                ).get();
+                Clipboard clip = doc.toClipboard();
+                ClipboardHolder holder = new ClipboardHolder(clip);
+                setClipboard(holder);
+            }
+        }
+    }
+
+    public void deleteClipboardOnDisk() {
+        synchronized (clipboardLock) {
+            ClipboardHolder holder = getExistingClipboard();
+            if (holder != null) {
+                for (Clipboard clipboard : holder.getClipboards()) {
+                    DiskOptimizedClipboard doc;
+                    if (clipboard instanceof DiskOptimizedClipboard) {
+                        doc = (DiskOptimizedClipboard) clipboard;
+                    } else if (clipboard instanceof BlockArrayClipboard && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard) {
+                        doc = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+                    } else {
+                        continue;
+                    }
+                    Fawe.instance().getClipboardExecutor().submit(uuid, () -> {
+                        doc.close(); // Ensure closed before deletion
+                        doc.getFile().delete();
+                    });
                 }
             }
         }

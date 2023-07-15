@@ -6,8 +6,10 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -17,27 +19,33 @@ import org.jetbrains.annotations.Nullable;
  */
 public class EntityInBlockRemovingProcessor implements IBatchProcessor {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
+
     @Override
     public IChunkSet processSet(final IChunk chunk, final IChunkGet get, final IChunkSet set) {
-        for (CompoundTag tag : get.getEntities()) {
-            // Empty tags for seemingly non-existent entities can exist?
-            if (tag.getList("Pos").size() == 0) {
-                continue;
+        try {
+            for (CompoundTag tag : get.getEntities()) {
+                // Empty tags for seemingly non-existent entities can exist?
+                if (tag.getList("Pos").size() == 0) {
+                    continue;
+                }
+                BlockVector3 pos = tag.getEntityPosition().toBlockPoint();
+                int x = pos.getX() & 15;
+                int y = pos.getY();
+                int z = pos.getZ() & 15;
+                if (!set.hasSection(y >> 4)) {
+                    continue;
+                }
+                if (set.getBlock(x, y, z).getBlockType() != BlockTypes.__RESERVED__ && !set
+                        .getBlock(x, y, z)
+                        .getBlockType()
+                        .getMaterial()
+                        .isAir()) {
+                    set.removeEntity(tag.getUUID());
+                }
             }
-            BlockVector3 pos = tag.getEntityPosition().toBlockPoint();
-            int x = pos.getX() & 15;
-            int y = pos.getY();
-            int z = pos.getZ() & 15;
-            if (!set.hasSection(y >> 4)) {
-                continue;
-            }
-            if (set.getBlock(x, y, z).getBlockType() != BlockTypes.__RESERVED__ && !set
-                    .getBlock(x, y, z)
-                    .getBlockType()
-                    .getMaterial()
-                    .isAir()) {
-                set.removeEntity(tag.getUUID());
-            }
+        } catch (Exception e) {
+            LOGGER.warn("Could not remove entities in blocks in chunk {},{}", chunk.getX(), chunk.getZ(), e);
         }
         return set;
     }

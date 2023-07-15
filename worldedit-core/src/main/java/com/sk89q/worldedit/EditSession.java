@@ -30,6 +30,7 @@ import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.extent.SourceMaskExtent;
 import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
+import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
 import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.function.SurfaceRegionFunction;
@@ -55,6 +56,7 @@ import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.ProcessorTraverser;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
@@ -524,9 +526,15 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return mask, may be null
      */
     public Mask getMask() {
-        //FAWE start - ExtendTraverser & MaskingExtents
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(getExtent()).find(MaskingExtent.class);
-        return maskingExtent != null ? maskingExtent.get().getMask() : null;
+        //FAWE start - ExtentTraverser & MaskingExtents
+        MaskingExtent maskingExtent = new ExtentTraverser<>(getExtent()).findAndGet(MaskingExtent.class);
+        if (maskingExtent == null) {
+            ExtentTraverser<ExtentBatchProcessorHolder> processorExtent =
+                    new ExtentTraverser<>(getExtent()).find(ExtentBatchProcessorHolder.class);
+            maskingExtent =
+                    new ProcessorTraverser<>(processorExtent.get().getProcessor()).find(MaskingExtent.class);
+        }
+        return maskingExtent != null ? maskingExtent.getMask() : null;
         //FAWE end
     }
 
@@ -609,23 +617,29 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     //FAWE start - use MaskingExtent & ExtentTraverser
 
     /**
-     * Set a mask.
+     * Set a mask. Combines with any existing masks, set null to clear existing masks.
      *
      * @param mask mask or null
      */
-    public void setMask(Mask mask) {
+    public void setMask(@Nullable Mask mask) {
         if (mask == null) {
             mask = Masks.alwaysTrue();
         } else {
             new MaskTraverser(mask).reset(this);
         }
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(getExtent()).find(MaskingExtent.class);
-        if (maskingExtent != null && maskingExtent.get() != null) {
-            Mask oldMask = maskingExtent.get().getMask();
+        MaskingExtent maskingExtent = new ExtentTraverser<>(getExtent()).findAndGet(MaskingExtent.class);
+        if (maskingExtent == null && mask != Masks.alwaysTrue()) {
+            ExtentTraverser<ExtentBatchProcessorHolder> processorExtent =
+                    new ExtentTraverser<>(getExtent()).find(ExtentBatchProcessorHolder.class);
+            maskingExtent =
+                    new ProcessorTraverser<>(processorExtent.get().getProcessor()).find(MaskingExtent.class);
+        }
+        if (maskingExtent != null) {
+            Mask oldMask = maskingExtent.getMask();
             if (oldMask instanceof ResettableMask) {
                 ((ResettableMask) oldMask).reset();
             }
-            maskingExtent.get().setMask(mask);
+            maskingExtent.setMask(mask);
         } else if (mask != Masks.alwaysTrue()) {
             addProcessor(new MaskingExtent(getExtent(), mask));
         }
@@ -2991,9 +3005,10 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
                 } catch (ExpressionTimeoutException e) {
                     timedOut[0] = timedOut[0] + 1;
                     return null;
+                } catch (RuntimeException e) {
+                    throw e;
                 } catch (Exception e) {
-                    LOGGER.warn("Failed to create shape", e);
-                    return null;
+                    throw new RuntimeException(e);
                 }
             }
         };
