@@ -73,7 +73,10 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
 
     /**
      * Creates a new {@link ReadOnlyClipboard}.
+     *
+     * @deprecated Internal use only. Use {@link BlockArrayClipboard#BlockArrayClipboard(Region)}
      */
+    @Deprecated
     static Clipboard create(Region region) {
         checkNotNull(region);
         checkNotNull(
@@ -95,7 +98,10 @@ public interface Clipboard extends Extent, Iterable<BlockVector3>, Closeable, Fl
      *  - {@link DiskOptimizedClipboard}
      *  - {@link CPUOptimizedClipboard}
      *  - {@link MemoryOptimizedClipboard}
+     *  
+     * @deprecated Internal use only. Use {@link BlockArrayClipboard#BlockArrayClipboard(Region, UUID)}
      */
+    @Deprecated
     static Clipboard create(Region region, UUID uuid) {
         if (Settings.settings().CLIPBOARD.USE_DISK) {
             return new DiskOptimizedClipboard(region, uuid);
