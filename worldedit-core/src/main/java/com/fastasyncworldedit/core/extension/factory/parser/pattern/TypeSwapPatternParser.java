@@ -3,6 +3,7 @@ package com.fastasyncworldedit.core.extension.factory.parser.pattern;
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.extension.factory.parser.RichParser;
 import com.fastasyncworldedit.core.function.pattern.TypeSwapPattern;
+import com.fastasyncworldedit.core.util.Permission;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.extension.input.InputParseException;
 import com.sk89q.worldedit.extension.input.ParserContext;
@@ -42,7 +43,12 @@ public class TypeSwapPatternParser extends RichParser<Pattern> {
                     TextComponent.of(getPrefix() + "[input][output] (e.g. " + getPrefix() + "[spruce][oak])")
             ));
         }
-        return new TypeSwapPattern(context.requireExtent(), input[0], input[1]);
+        return new TypeSwapPattern(
+                context.requireExtent(),
+                input[0],
+                input[1],
+                Permission.hasPermission(context.requireActor(), "fawe.pattern.typeswap.regex")
+        );
     }
 
 }

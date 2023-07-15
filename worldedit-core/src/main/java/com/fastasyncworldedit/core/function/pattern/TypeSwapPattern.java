@@ -20,8 +20,11 @@ import java.util.regex.Pattern;
  */
 public class TypeSwapPattern extends AbstractExtentPattern {
 
+    private static final Pattern SPLITTER = Pattern.compile("[|,]");
+
     private final String inputString;
     private final String outputString;
+    private final String[] inputs;
     private Pattern inputPattern = null;
 
     /**
@@ -30,14 +33,22 @@ public class TypeSwapPattern extends AbstractExtentPattern {
      * @param extent       extent to use
      * @param inputString  string to replace. May be regex.
      * @param outputString string to replace with
+     * @param allowRegex   if regex should be allowed for input string matching
      * @since TODO
      */
-    public TypeSwapPattern(Extent extent, String inputString, String outputString) {
+    public TypeSwapPattern(Extent extent, String inputString, String outputString, boolean allowRegex) {
         super(extent);
         this.inputString = inputString;
         this.outputString = outputString;
         if (!StringMan.isAlphanumericUnd(inputString)) {
-            this.inputPattern = Pattern.compile(inputString);
+            if (allowRegex) {
+                this.inputPattern = Pattern.compile(inputString.replace(",", "|"));
+                inputs = null;
+            } else {
+                inputs = SPLITTER.split(inputString);
+            }
+        } else {
+            inputs = null;
         }
     }
 
@@ -45,9 +56,13 @@ public class TypeSwapPattern extends AbstractExtentPattern {
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockState existing = get.getBlock(extent);
         String oldId = existing.getBlockType().getId();
-        String newId;
+        String newId = oldId;
         if (inputPattern != null) {
             newId = inputPattern.matcher(oldId).replaceAll(outputString);
+        } else if (inputs != null && inputs.length > 0) {
+            for (String input : inputs) {
+                newId = oldId.replace(input, outputString);
+            }
         } else {
             newId = oldId.replace(inputString, outputString);
         }
