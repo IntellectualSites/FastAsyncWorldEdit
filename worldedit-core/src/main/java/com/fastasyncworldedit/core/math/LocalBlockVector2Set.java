@@ -11,9 +11,11 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * The LocalBlockVectorSet is a Memory and CPU optimized Set for storing BlockVectors which are all in a local region
- * - All vectors must be in a 2048 * 512 * 2048 area centered around the first entry
- * - This will use 8 bytes for every 64 BlockVectors (about 800x less than a HashSet)
+ * The LocalBlockVector2Set is a Memory and CPU optimized Set for storing BlockVector2s which are all in a local region
+ * - All vectors must be in a 65534 * 65534 area centered around the first entry
+ * - This will use 8 bytes for every 64 BlockVector2s (about 600x less than a HashSet)
+ *
+ * @since TODO
  */
 public class LocalBlockVector2Set implements Set<BlockVector2> {
 
@@ -22,8 +24,9 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
     private int offsetZ;
 
     /**
-     * New LocalBlockVectorSet that will set the offset x and z to the first value given. The y offset will default to 128 to
-     * allow -64 -> 320 world height.
+     * New LocalBlockVectorSet that will set the offset x and z to the first value given.
+     *
+     * @since TODO
      */
     public LocalBlockVector2Set() {
         offsetX = offsetZ = Integer.MAX_VALUE;
@@ -31,7 +34,7 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
     }
 
     /**
-     * New LocalBlockVectorSet with a given offset. Defaults y offset to 128.
+     * New LocalBlockVectorSet with a given offset.
      *
      * @param x x offset
      * @param z z offset
@@ -71,10 +74,15 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
         }
         short sx = (short) (x - offsetX);
         short sz = (short) (z - offsetZ);
-        if (sx > 32767 || sx < -32768 || sz > 32767 || sz < -32768) {
+        if (sx > 32767 || sx < -32767 || sz > 32767 || sz < -32767) {
             return false;
         }
-        return set.get(MathMan.pairSearchCoords(sx, sz));
+        try {
+            return set.get(MathMan.pairSearchCoords(sx, sz));
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println(x + " " + z + "    " + sx + " " + sz);
+            throw e;
+        }
     }
 
     @Override
@@ -125,8 +133,7 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
     }
 
     /**
-     * Set the offset applied to values when storing and reading to keep the values within -1024 to 1023. Uses default y offset
-     * of 128 to allow -64 -> 320 world height use.
+     * Set the offset applied to values when storing and reading to keep the values within -32767 to 32767.
      *
      * @param x x offset
      * @param z z offset
@@ -226,7 +233,7 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
         }
         int relX = x - offsetX;
         int relZ = z - offsetZ;
-        return relX <= 32767 && relX >= -32768 && relZ <= 32727 && relZ >= -32768;
+        return relX <= 32767 && relX >= -32767 && relZ <= 32727 && relZ >= -32767;
     }
 
     /**
@@ -243,9 +250,9 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
         }
         int relX = x - offsetX;
         int relZ = z - offsetZ;
-        if (relX > 32767 || relX < -32768 || relZ > 32767 || relZ < -32768) {
+        if (relX > 32767 || relX < -32767 || relZ > 32767 || relZ < -32767) {
             throw new UnsupportedOperationException(
-                    "LocalBlockVector2Set can only contain vectors within 32768 blocks (cuboid) of the first entry. Attempted " + "to set block at " + x + ", " + z + ". With origin " + offsetX + " " + offsetZ);
+                    "LocalBlockVector2Set can only contain vectors within 32767 blocks (cuboid) of the first entry. Attempted " + "to set block at " + x + ", " + z + ". With origin " + offsetX + " " + offsetZ);
         }
         int index = getIndex(x, z);
         if (set.get(index)) {
@@ -285,7 +292,7 @@ public class LocalBlockVector2Set implements Set<BlockVector2> {
     public boolean remove(int x, int z) {
         int relX = x - offsetX;
         int relZ = z - offsetZ;
-        if (relX > 1023 || relX < -1024 || relZ > 1023 || relZ < -1024) {
+        if (relX > 32767 || relX < -32767 || relZ > 32767 || relZ < -32767) {
             return false;
         }
         int index = MathMan.pairSearchCoords((short) (x - offsetX), (short) (z - offsetZ));

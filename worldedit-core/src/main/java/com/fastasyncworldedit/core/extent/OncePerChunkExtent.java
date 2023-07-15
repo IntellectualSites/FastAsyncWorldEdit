@@ -20,7 +20,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 /**
- * Extent/processor that runs a t
+ * Extent/processor that runs a task the first time a chunk GET is loaded
+ *
+ * @since TODO
  */
 public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatchProcessor {
 
@@ -34,6 +36,9 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
      * Create a new instance.
      *
      * @param extent the extent
+     * @param queue  Queue to load chunk GET from if acting as extent not processor
+     * @param task   Consumer task for the chunk GET
+     * @since TODO
      */
     public OncePerChunkExtent(Extent extent, IQueueExtent<IQueueChunk> queue, Consumer<IChunkGet> task) {
         super(extent);
