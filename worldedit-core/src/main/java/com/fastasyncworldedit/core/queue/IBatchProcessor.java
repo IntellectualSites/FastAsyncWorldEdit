@@ -85,7 +85,7 @@ public interface IBatchProcessor {
             }
             for (int layer = maxLayer; layer < set.getMaxSectionPosition(); layer++) {
                 if (set.hasSection(layer)) {
-                    if (layer == minLayer) {
+                    if (layer == maxLayer) {
                         char[] arr = set.loadIfPresent(layer);
                         if (arr != null) {
                             int index = ((maxY + 1) & 15) << 8;
@@ -126,7 +126,7 @@ public interface IBatchProcessor {
                 hasBlocks |= set.hasSection(layer);
                 continue;
             }
-            if (layer == minLayer) {
+            if (layer == maxLayer) {
                 char[] arr = set.loadIfPresent(layer);
                 if (arr != null) {
                     int index = (minY & 15) << 8;
