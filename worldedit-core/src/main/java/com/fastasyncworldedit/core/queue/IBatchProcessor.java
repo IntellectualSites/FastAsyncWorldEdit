@@ -126,7 +126,7 @@ public interface IBatchProcessor {
                 hasBlocks |= set.hasSection(layer);
                 continue;
             }
-            if (layer == minLayer) {
+            if (layer == maxLayer) {
                 char[] arr = set.loadIfPresent(layer);
                 if (arr != null) {
                     int index = (minY & 15) << 8;
