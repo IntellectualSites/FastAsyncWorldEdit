@@ -55,67 +55,49 @@ public class TypeSwapPattern extends AbstractExtentPattern {
     @Override
     public boolean apply(Extent extent, BlockVector3 get, BlockVector3 set) throws WorldEditException {
         BlockState existing = get.getBlock(extent);
-        String oldId = existing.getBlockType().getId();
-        String newId = oldId;
-        if (inputPattern != null) {
-            newId = inputPattern.matcher(oldId).replaceAll(outputString);
-        } else if (inputs != null && inputs.length > 0) {
-            for (String input : inputs) {
-                newId = oldId.replace(input, outputString);
-            }
-        } else {
-            newId = oldId.replace(inputString, outputString);
-        }
-        if (newId.equals(oldId)) {
+        BlockState newBlock = getNewBlock(existing);
+        if (newBlock == null) {
             return false;
         }
-        BlockType newType = BlockTypes.get(newId);
-        if (newType == null) {
-            return false;
-        }
-        BlockState newBlock = newType.getDefaultState().withProperties(existing);
         return set.setBlock(extent, newBlock);
     }
 
     @Override
     public void applyBlock(final FilterBlock block) {
         BlockState existing = block.getBlock();
-        String oldId = existing.getBlockType().getId();
-        String newId;
-        if (inputPattern != null) {
-            newId = inputPattern.matcher(oldId).replaceAll(outputString);
-        } else {
-            newId = oldId.replace(inputString, outputString);
+        BlockState newState = getNewBlock(existing);
+        if (newState != null) {
+            block.setBlock(newState);
         }
-        if (newId.equals(oldId)) {
-            return;
-        }
-        BlockType newType = BlockTypes.get(newId);
-        if (newType == null) {
-            return;
-        }
-        BlockState newBlock = newType.getDefaultState().withProperties(existing);
-        block.setBlock(newBlock);
     }
 
     @Override
     public BaseBlock applyBlock(final BlockVector3 position) {
         BaseBlock existing = position.getFullBlock(getExtent());
+        BlockState newState = getNewBlock(existing.toBlockState());
+        return newState == null ? existing : newState.toBaseBlock();
+    }
+
+    private BlockState getNewBlock(BlockState existing) {
         String oldId = existing.getBlockType().getId();
-        String newId;
+        String newId = oldId;
         if (inputPattern != null) {
             newId = inputPattern.matcher(oldId).replaceAll(outputString);
+        } else if (inputs != null && inputs.length > 0) {
+            for (String input : inputs) {
+                newId = newId.replace(input, outputString);
+            }
         } else {
             newId = oldId.replace(inputString, outputString);
         }
         if (newId.equals(oldId)) {
-            return existing;
+            return null;
         }
         BlockType newType = BlockTypes.get(newId);
         if (newType == null) {
-            return existing;
+            return null;
         }
-        return newType.getDefaultState().withProperties(existing.toBlockState()).toBaseBlock(newType.getDefaultState().getNbtReference());
+        return newType.getDefaultState().withProperties(existing);
     }
 
 }
