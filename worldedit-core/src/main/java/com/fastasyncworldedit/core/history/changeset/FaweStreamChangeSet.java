@@ -167,7 +167,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 @Override
                 public int readX(FaweInputStream in) throws IOException {
                     in.readFully(buffer);
-                    return lx = lx + ((((buffer[1] & 0xFF) + ((MathMan.unpair16x(buffer[3])) << 8)) << 20) >> 20);
+                    return lx = lx + ((((buffer[1] & 0xFF) | ((MathMan.unpair16x(buffer[3])) << 8)) << 20) >> 20);
                 }
 
                 @Override
@@ -177,7 +177,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
 
                 @Override
                 public int readZ(FaweInputStream in) throws IOException {
-                    return lz = lz + ((((buffer[2] & 0xFF) + ((MathMan.unpair16y(buffer[3])) << 8)) << 20) >> 20);
+                    return lz = lz + ((((buffer[2] & 0xFF) | ((MathMan.unpair16y(buffer[3])) << 8)) << 20) >> 20);
                 }
             };
         } else {
@@ -203,17 +203,17 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
                 @Override
                 public int readX(FaweInputStream is) throws IOException {
                     is.readFully(buffer);
-                    return lx = (lx + (buffer[0] & 0xFF) + (buffer[1] << 8));
+                    return lx = lx + ((buffer[0] & 0xFF) | (buffer[1] << 8));
                 }
 
                 @Override
                 public int readY(FaweInputStream is) throws IOException {
-                    return ly = (ly + (buffer[4] & 0xFF) + (buffer[5] << 8));
+                    return ly = ly + ((buffer[4] & 0xFF) | (buffer[5]) << 8);
                 }
 
                 @Override
                 public int readZ(FaweInputStream is) throws IOException {
-                    return lz = (lz + (buffer[2] & 0xFF) + (buffer[3] << 8));
+                    return lz = lz + ((buffer[2] & 0xFF) | (buffer[3]) << 8);
                 }
             };
         }
@@ -353,7 +353,7 @@ public abstract class FaweStreamChangeSet extends AbstractChangeSet {
             os.write((byte) (z));
             // only need to store biomes in the 4x4x4 chunks so only need one byte for y still (signed byte -128 -> 127)
             //  means -512 -> 508. Add 128 to avoid negative value casting.
-            os.write((byte) (y + 128));
+            os.write((byte) (y + 32));
             os.writeVarInt(from.getInternalId());
             os.writeVarInt(to.getInternalId());
         } catch (IOException e) {

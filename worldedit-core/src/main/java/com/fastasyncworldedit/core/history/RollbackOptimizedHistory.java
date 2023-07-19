@@ -7,6 +7,7 @@ import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.world.World;
+import com.sk89q.worldedit.world.biome.BiomeType;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
@@ -108,6 +109,26 @@ public class RollbackOptimizedHistory extends DiskStorageHistory {
     @Override
     public void add(int x, int y, int z, int combinedFrom, int combinedTo) {
         super.add(x, y, z, combinedFrom, combinedTo);
+        if (x < minX) {
+            minX = x;
+        } else if (x > maxX) {
+            maxX = x;
+        }
+        if (y < minY) {
+            minY = y;
+        } else if (y > maxY) {
+            maxY = y;
+        }
+        if (z < minZ) {
+            minZ = z;
+        } else if (z > maxZ) {
+            maxZ = z;
+        }
+    }
+
+    @Override
+    public void addBiomeChange(int x, int y, int z, BiomeType from, BiomeType to) {
+        super.addBiomeChange(x, y, z, from, to);
         if (x < minX) {
             minX = x;
         } else if (x > maxX) {
