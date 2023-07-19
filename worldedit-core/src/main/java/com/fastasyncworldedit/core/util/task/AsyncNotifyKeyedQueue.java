@@ -26,7 +26,7 @@ public class AsyncNotifyKeyedQueue implements Closeable {
 
     private final Thread.UncaughtExceptionHandler handler;
     private final Supplier<UUID> key;
-    private boolean closed;
+    private volatile boolean closed;
 
     /**
      * New instance
