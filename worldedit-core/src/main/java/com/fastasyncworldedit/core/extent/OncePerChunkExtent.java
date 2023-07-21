@@ -17,6 +17,8 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import com.sk89q.worldedit.world.block.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -28,7 +30,7 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
 
     private final LocalBlockVector2Set set = new LocalBlockVector2Set();
     private final IQueueExtent<IQueueChunk> queue;
-    private final Consumer<IChunkGet> task;
+    private Consumer<IChunkGet> task;
     private volatile long lastPair = Long.MAX_VALUE;
     private volatile boolean isProcessing;
 
@@ -40,10 +42,14 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
      * @param task   Consumer task for the chunk GET
      * @since TODO
      */
-    public OncePerChunkExtent(Extent extent, IQueueExtent<IQueueChunk> queue, Consumer<IChunkGet> task) {
+    public OncePerChunkExtent(
+            @Nonnull Extent extent,
+            @Nonnull IQueueExtent<IQueueChunk> queue,
+            @Nonnull Consumer<IChunkGet> task
+    ) {
         super(extent);
-        this.queue = queue;
-        this.task = task;
+        this.queue = Objects.requireNonNull(queue);
+        this.task = Objects.requireNonNull(task);
     }
 
     private boolean shouldRun(int chunkX, int chunkZ) {
@@ -65,6 +71,14 @@ public class OncePerChunkExtent extends AbstractDelegateExtent implements IBatch
         if (!isProcessing && shouldRun(chunkX, chunkZ)) {
             task.accept(queue.getCachedGet(chunkX, chunkZ));
         }
+    }
+
+    public Consumer<IChunkGet> getTask() {
+        return task;
+    }
+
+    public void setTask(Consumer<IChunkGet> task) {
+        this.task = task;
     }
 
     @Override
