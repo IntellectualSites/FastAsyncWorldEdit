@@ -101,8 +101,8 @@ dependencies {
     compileOnly(libs.griefdefender) { isTransitive = false }
     compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
-    compileOnly("com.plotsquared:PlotSquared-Bukkit") { isTransitive = false }
-    compileOnly("com.plotsquared:PlotSquared-Core") { isTransitive = false }
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-core") { isTransitive = false }
 
     // Third party
     implementation("io.papermc:paperlib")
@@ -183,7 +183,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("org.lz4:lz4-java:1.8.0"))
         }
         relocate("net.kyori", "com.fastasyncworldedit.core.adventure") {
-            include(dependency("net.kyori:adventure-nbt:4.9.3"))
+            include(dependency("net.kyori:adventure-nbt:4.14.0"))
         }
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
             include(dependency("com.zaxxer:SparseBitSet:1.2"))
