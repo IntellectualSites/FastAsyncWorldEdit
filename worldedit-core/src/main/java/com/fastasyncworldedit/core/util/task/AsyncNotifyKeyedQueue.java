@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  * async queue that accepts a {@link Thread.UncaughtExceptionHandler} for exception handling per instance, delegating to a
  * parent {@link KeyQueuedExecutorService}.
  *
- * @since TODO
+ * @since 2.7.0
  */
 public class AsyncNotifyKeyedQueue implements Closeable {
 

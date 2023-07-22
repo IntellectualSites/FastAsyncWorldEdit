@@ -516,7 +516,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * <p>
      * Internal API usage only.
      *
-     * @since TODO
+     * @since 2.7.0
      */
     public ExecutorService getForkJoinPoolPrimary() {
         return forkJoinPoolPrimary;
@@ -528,7 +528,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * <p>
      * Internal API usage only.
      *
-     * @since TODO
+     * @since 2.7.0
      */
     public ExecutorService getForkJoinPoolSecondary() {
         return forkJoinPoolSecondary;

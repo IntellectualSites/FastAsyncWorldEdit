@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * Pattern that replaces blocks based on their ID, matching for an "input" and replacing with an "output" string. The "input"
  * string may be regex. Keeps as much of the block state as possible, excluding NBT data.
  *
- * @since TODO
+ * @since 2.7.0
  */
 public class TypeSwapPattern extends AbstractExtentPattern {
 
@@ -34,7 +34,7 @@ public class TypeSwapPattern extends AbstractExtentPattern {
      * @param inputString  string to replace. May be regex.
      * @param outputString string to replace with
      * @param allowRegex   if regex should be allowed for input string matching
-     * @since TODO
+     * @since 2.7.0
      */
     public TypeSwapPattern(Extent extent, String inputString, String outputString, boolean allowRegex) {
         super(extent);
