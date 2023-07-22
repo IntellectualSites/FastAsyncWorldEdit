@@ -12,10 +12,6 @@ applyPlatformAndCoreConfiguration()
 applyShadowConfiguration()
 
 repositories {
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-}
-
-repositories {
     maven {
         name = "PaperMC"
         url = uri("https://repo.papermc.io/repository/maven-public/")
@@ -105,8 +101,8 @@ dependencies {
     compileOnly(libs.griefdefender) { isTransitive = false }
     compileOnly(libs.residence) { isTransitive = false }
     compileOnly(libs.towny) { isTransitive = false }
-    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit:7.0.0-SNAPSHOT") { isTransitive = false }
-    compileOnly("com.intellectualsites.plotsquared:plotsquared-core:7.0.0-SNAPSHOT") { isTransitive = false }
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-bukkit") { isTransitive = false }
+    compileOnly("com.intellectualsites.plotsquared:plotsquared-core") { isTransitive = false }
 
     // Third party
     implementation("io.papermc:paperlib")
