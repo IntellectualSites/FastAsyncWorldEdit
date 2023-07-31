@@ -329,7 +329,7 @@ public class FaweBukkit implements IFawe, Listener {
             WEManager.weManager().addManager(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
             LOGGER.info("Plugin 'PlotSquared' v7 found. Using it now.");
         } else {
-            LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");
+            LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v7.");
             LOGGER.info("https://www.spigotmc.org/resources/77506/");
         }
     }
