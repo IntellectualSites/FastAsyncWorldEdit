@@ -1235,10 +1235,10 @@ public class LocalSession implements TextureHolder {
                 navWandItem = ItemTypes.parse(config.navigationWand);
             }
             synchronized (this.tools) {
-                if (tools.get(navWandItem.getInternalId()) == null && NavigationWand.INSTANCE.canUse(actor)) {
+                if (navWandItem != null && tools.get(navWandItem.getInternalId()) == null && NavigationWand.INSTANCE.canUse(actor)) {
                     tools.put(navWandItem.getInternalId(), NavigationWand.INSTANCE);
                 }
-                if (tools.get(wandItem.getInternalId()) == null && SelectionWand.INSTANCE.canUse(actor)) {
+                if (wandItem != null && tools.get(wandItem.getInternalId()) == null && SelectionWand.INSTANCE.canUse(actor)) {
                     tools.put(wandItem.getInternalId(), SelectionWand.INSTANCE);
                 }
             }
