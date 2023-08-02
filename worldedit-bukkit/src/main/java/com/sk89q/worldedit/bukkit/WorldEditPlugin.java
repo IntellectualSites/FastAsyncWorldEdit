@@ -672,6 +672,13 @@ public class WorldEditPlugin extends JavaPlugin {
             String label = buffer.substring(0, firstSpace);
             // Strip leading slash, if present.
             label = label.startsWith("/") ? label.substring(1) : label;
+
+            // If command not owned by FAWE, do not tab complete
+            Plugin owner = platform.getDynamicCommands().getCommandOwner(label);
+            if (owner != WorldEditPlugin.this) {
+                return;
+            }
+
             final Optional<org.enginehub.piston.Command> command
                     = WorldEdit.getInstance().getPlatformManager().getPlatformCommandManager().getCommandManager().getCommand(
                     label);
