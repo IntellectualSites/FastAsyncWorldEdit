@@ -36,6 +36,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -159,6 +161,24 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     @Override
     public boolean isBanned() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public <E extends BanEntry<? super PlayerProfile>> @Nullable E ban(
+            @Nullable final String reason,
+            @Nullable final Instant expires,
+            @Nullable final String source
+    ) {
+        return null;
+    }
+
+    @Override
+    public <E extends BanEntry<? super PlayerProfile>> @Nullable E ban(
+            @Nullable final String reason,
+            @Nullable final Duration duration,
+            @Nullable final String source
+    ) {
+        return null;
     }
 
     @Override

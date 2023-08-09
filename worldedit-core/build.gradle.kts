@@ -11,7 +11,7 @@ applyPlatformAndCoreConfiguration()
 
 dependencies {
     constraints {
-        implementation("org.yaml:snakeyaml") {
+        implementation(libs.snakeyaml) {
             version { strictly("2.0") }
             because("Bukkit provides SnakeYaml")
         }
@@ -24,17 +24,17 @@ dependencies {
 
     // Minecraft expectations
     implementation(libs.fastutil)
-    implementation("com.google.guava:guava")
-    implementation("com.google.code.gson:gson")
+    implementation(libs.guava)
+    implementation(libs.gson)
 
     // Platform expectations
-    implementation("org.yaml:snakeyaml")
+    implementation(libs.snakeyaml)
 
     // Logging
-    implementation("org.apache.logging.log4j:log4j-api")
+    implementation(libs.log4jApi)
 
     // Plugins
-    compileOnly("com.intellectualsites.plotsquared:plotsquared-core") { isTransitive = false }
+    compileOnly(libs.plotSquaredCore) { isTransitive = false }
 
     // ensure this is on the classpath for the AP
     annotationProcessor(libs.guava)
@@ -45,11 +45,11 @@ dependencies {
     compileOnly(libs.truezip)
     implementation(libs.findbugs)
     implementation(libs.rhino)
-    compileOnly("net.kyori:adventure-api")
+    compileOnly(libs.adventureApi)
     compileOnlyApi(libs.adventureNbt)
-    compileOnlyApi("net.kyori:adventure-text-minimessage")
+    compileOnlyApi(libs.adventureMiniMessage)
     implementation(libs.zstd) { isTransitive = false }
-    compileOnly("com.intellectualsites.paster:Paster")
+    compileOnly(libs.paster)
     compileOnly(libs.lz4Java) { isTransitive = false }
     compileOnly(libs.sparsebitset)
     compileOnly(libs.parallelgzip) { isTransitive = false }
