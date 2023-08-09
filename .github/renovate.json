@@ -24,6 +24,7 @@
     "org.apache.logging.log4j:log4j-api",
     "org.apache.logging.log4j:log4j-bom",
     "org.apache.logging.log4j:log4j-slf4j-impl",
+    "org.apache.logging.log4j:log4j-core",
     "org.bstats:bstats-sponge",
     "org.spongepowered:spongeapi",
     "org.yaml:snakeyaml"
