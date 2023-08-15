@@ -121,10 +121,11 @@ public abstract class AbstractFactory<E> {
      */
     public boolean containsAlias(String alias) {
         return parsers.stream().anyMatch(p -> {
-            if (!(p instanceof AliasedParser)) {
+            try {
+                return ((AliasedParser) p).getMatchedAliases().contains(alias);
+            } catch (Exception e) {
                 return false;
             }
-            return ((AliasedParser) p).getMatchedAliases().contains(alias);
         });
     }
 
