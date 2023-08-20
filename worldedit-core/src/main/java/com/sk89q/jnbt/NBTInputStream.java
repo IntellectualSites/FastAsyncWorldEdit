@@ -63,6 +63,7 @@ public final class NBTInputStream implements Closeable {
         this.is = new DataInputStream(is);
     }
 
+    //FAWE start
     public NBTInputStream(DataInputStream dis) {
         this.is = dis;
     }
@@ -75,12 +76,14 @@ public final class NBTInputStream implements Closeable {
         is.reset();
     }
 
+    //FAWE end
     /**
      * Reads an NBT tag from the stream.
      *
      * @return The tag that was read.
      */
     public NamedTag readNamedTag() throws IOException {
+        //FAWE start
         return readNamedTag(0);
     }
 
@@ -101,7 +104,7 @@ public final class NBTInputStream implements Closeable {
         return readTagPayload(type, 0);
     }
 
-    public void readNamedTagLazy(StreamDelegate scope) throws IOException {
+    public void readNamedTagLazy(StreamDelegate scope) {
         try {
             int type = is.readByte();
             if (type == NBTConstants.TYPE_END) {
@@ -112,19 +115,30 @@ public final class NBTInputStream implements Closeable {
             if (child != null) {
                 child.acceptRoot(this, type, 0);
             } else {
-                readTagPayloadLazy(type, 0);
+                readTagPayloadLazy(type, 0, scope, scope.getRetained() != null);
             }
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
 
+    public void readNamedTagLazyExceptionally(StreamDelegate scope) throws IOException {
+        int type = is.readByte();
+        if (type == NBTConstants.TYPE_END) {
+            return;
+        }
+
+        StreamDelegate child = scope.get(is);
+        if (child != null) {
+            child.acceptRoot(this, type, 0);
+        } else {
+            readTagPayloadLazy(type, 0, scope, scope.getRetained() != null);
+        }
+    }
+
     public String readNamedTagName(int type) throws IOException {
         if (type != NBTConstants.TYPE_END) {
-            int nameLength = is.readShort() & 0xFFFF;
-            byte[] nameBytes = new byte[nameLength];
-            is.readFully(nameBytes);
-            return new String(nameBytes, NBTConstants.CHARSET);
+            return is.readUTF();
         } else {
             return "";
         }
@@ -133,72 +147,107 @@ public final class NBTInputStream implements Closeable {
     private byte[] buf;
 
     public void readTagPayloadLazy(int type, int depth) throws IOException {
+        readTagPayloadLazy(type, depth, null, false);
+    }
+
+    public void readTagPayloadLazy(int type, int depth, StreamDelegate scope, boolean retain) throws IOException {
+        int length;
         switch (type) {
-            case NBTConstants.TYPE_END:
-                return;
-            case NBTConstants.TYPE_BYTE:
-                is.skipBytes(1);
-                return;
-            case NBTConstants.TYPE_SHORT:
-                is.skipBytes(2);
-                return;
-            case NBTConstants.TYPE_INT:
-                is.skipBytes(4);
-                return;
-            case NBTConstants.TYPE_LONG:
-                is.skipBytes(8);
-                return;
-            case NBTConstants.TYPE_FLOAT:
-                is.skipBytes(4);
-                return;
-            case NBTConstants.TYPE_DOUBLE:
-                is.skipBytes(8);
-                return;
-            case NBTConstants.TYPE_STRING:
-                int length = is.readShort() & 0xFFFF;
-                is.skipBytes(length);
-                return;
-            case NBTConstants.TYPE_BYTE_ARRAY:
-                is.skipBytes(is.readInt());
-                return;
-            case NBTConstants.TYPE_LIST: {
-                int childType = is.readByte();
-                length = is.readInt();
-                for (int i = 0; i < length; ++i) {
-                    readTagPayloadLazy(childType, depth + 1);
-                }
-                return;
+            case NBTConstants.TYPE_END -> {
             }
-            case NBTConstants.TYPE_COMPOUND: {
-                // readDataPayload
-                depth++;
-                while (true) {
+            case NBTConstants.TYPE_BYTE -> {
+                if (!retain) {
+                    is.skipBytes(1);
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
+            }
+            case NBTConstants.TYPE_SHORT -> {
+                if (!retain) {
+                    is.skipBytes(2);
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
+            }
+            case NBTConstants.TYPE_INT, NBTConstants.TYPE_FLOAT -> {
+                if (!retain) {
+                    is.skipBytes(4);
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
+            }
+            case NBTConstants.TYPE_LONG, NBTConstants.TYPE_DOUBLE -> {
+                if (!retain) {
+                    is.skipBytes(8);
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
+            }
+            case NBTConstants.TYPE_STRING -> {
+                length = is.readShort() & 0xFFFF;
+                if (!retain) {
+                    is.skipBytes(length);
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
+            }
+            case NBTConstants.TYPE_BYTE_ARRAY -> {
+                if (!retain) {
+                    is.skipBytes(is.readInt());
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
+            }
+            case NBTConstants.TYPE_LIST -> {
+                if (!retain) {
                     int childType = is.readByte();
-                    if (childType == NBTConstants.TYPE_END) {
-                        return;
+                    length = is.readInt();
+                    for (int i = 0; i < length; ++i) {
+                        readTagPayloadLazy(childType, depth + 1, scope, retain);
                     }
-                    is.skipBytes(is.readShort() & 0xFFFF);
-                    readTagPayloadLazy(childType, depth + 1);
+                } else {
+                    scope.retain(readTagPayload(type, depth));
                 }
             }
-            case NBTConstants.TYPE_INT_ARRAY: {
-                is.skipBytes(is.readInt() << 2);
-                return;
+            case NBTConstants.TYPE_COMPOUND -> {
+                if (!retain) {
+                    // readDataPayload
+                    depth++;
+                    while (true) {
+                        int childType = is.readByte();
+                        if (childType == NBTConstants.TYPE_END) {
+                            return;
+                        }
+                        is.skipBytes(is.readShort() & 0xFFFF);
+                        readTagPayloadLazy(childType, depth + 1, scope, retain);
+                    }
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
             }
-            case NBTConstants.TYPE_LONG_ARRAY: {
-                is.skipBytes(is.readInt() << 3);
-                return;
+            case NBTConstants.TYPE_INT_ARRAY -> {
+                if (!retain) {
+                    is.skipBytes(is.readInt() << 2);
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
             }
-            default:
-                throw new IOException("Invalid tag type: " + type + ".");
+            case NBTConstants.TYPE_LONG_ARRAY -> {
+                if (!retain) {
+                    is.skipBytes(is.readInt() << 3);
+                } else {
+                    scope.retain(readTagPayload(type, depth));
+                }
+            }
+            default -> throw new IOException("Invalid tag type: " + type + ".");
         }
     }
 
     public void readTagPayloadLazy(int type, int depth, StreamDelegate scope) throws IOException {
         switch (type) {
-            case NBTConstants.TYPE_END:
-                return;
-            case NBTConstants.TYPE_BYTE: {
+            case NBTConstants.TYPE_END -> {
+            }
+            case NBTConstants.TYPE_BYTE -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -208,9 +257,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(1);
                 }
-                return;
             }
-            case NBTConstants.TYPE_SHORT: {
+            case NBTConstants.TYPE_SHORT -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -220,9 +268,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(2);
                 }
-                return;
             }
-            case NBTConstants.TYPE_INT: {
+            case NBTConstants.TYPE_INT -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -232,9 +279,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(4);
                 }
-                return;
             }
-            case NBTConstants.TYPE_LONG: {
+            case NBTConstants.TYPE_LONG -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -244,9 +290,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(8);
                 }
-                return;
             }
-            case NBTConstants.TYPE_FLOAT: {
+            case NBTConstants.TYPE_FLOAT -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -256,9 +301,8 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(4);
                 }
-                return;
             }
-            case NBTConstants.TYPE_DOUBLE: {
+            case NBTConstants.TYPE_DOUBLE -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
@@ -268,24 +312,20 @@ public final class NBTInputStream implements Closeable {
                 } else {
                     is.skipBytes(8);
                 }
-                return;
             }
-            case NBTConstants.TYPE_STRING: {
+            case NBTConstants.TYPE_STRING -> {
                 ValueReader value = scope.getValueReader();
                 if (value == null) {
                     value = scope.getElemReader();
                 }
-                int length = is.readShort() & 0xFFFF;
                 if (value != null) {
-                    byte[] bytes = new byte[length];
-                    is.readFully(bytes);
-                    value.apply(0, new String(bytes, NBTConstants.CHARSET));
+                    value.apply(0, is.readUTF());
                 } else {
+                    int length = is.readShort() & 0xFFFF;
                     is.skipBytes(length);
                 }
-                return;
             }
-            case NBTConstants.TYPE_LIST: {
+            case NBTConstants.TYPE_LIST -> {
                 int childType = is.readByte();
                 int length = is.readInt();
                 StreamDelegate child;
@@ -306,16 +346,15 @@ public final class NBTInputStream implements Closeable {
                 child = scope.get0();
                 if (child == null) {
                     for (int i = 0; i < length; ++i) {
-                        readTagPayloadLazy(childType, depth + 1);
+                        readTagPayloadLazy(childType, depth + 1, scope, scope.getRetained() != null);
                     }
                 } else {
                     for (int i = 0; i < length; ++i) {
                         readTagPayloadLazy(childType, depth + 1, child);
                     }
                 }
-                return;
             }
-            case NBTConstants.TYPE_COMPOUND: {
+            case NBTConstants.TYPE_COMPOUND -> {
                 // readDataPayload
                 scope.acceptInfo(-1, NBTConstants.TYPE_BYTE);
                 ValueReader valueReader = scope.getValueReader();
@@ -342,14 +381,23 @@ public final class NBTInputStream implements Closeable {
                         return;
                     }
                     StreamDelegate child = scope.get(is);
-                    if (child == null) {
-                        readTagPayloadLazy(childType, depth + 1);
-                    } else {
-                        readTagPayloadLazy(childType, depth + 1, child);
+                    try {
+                        if (child == null) {
+                            readTagPayloadLazy(childType, depth + 1, scope, scope.getRetained() != null);
+                        } else {
+                            readTagPayloadLazy(childType, depth + 1, child);
+                        }
+                    } catch (IOException e) {
+                        String cur = scope.getCurrentName() == null ? scope.getRetainedName() : scope.getCurrentName();
+                        if (cur != null) {
+                            throw new IOException("Error reading child scope: `" + scope.getCurrentName() + "`", e);
+                        } else {
+                            throw e;
+                        }
                     }
                 }
             }
-            case NBTConstants.TYPE_BYTE_ARRAY: {
+            case NBTConstants.TYPE_BYTE_ARRAY -> {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_BYTE);
                 if (scope.acceptLazy(length, this)) {
@@ -384,9 +432,8 @@ public final class NBTInputStream implements Closeable {
                     return;
                 }
                 is.skipBytes(length);
-                return;
             }
-            case NBTConstants.TYPE_INT_ARRAY: {
+            case NBTConstants.TYPE_INT_ARRAY -> {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_INT);
                 if (scope.acceptLazy(length, this)) {
@@ -405,9 +452,8 @@ public final class NBTInputStream implements Closeable {
                     return;
                 }
                 is.skipBytes(length << 2);
-                return;
             }
-            case NBTConstants.TYPE_LONG_ARRAY: {
+            case NBTConstants.TYPE_LONG_ARRAY -> {
                 int length = is.readInt();
                 scope.acceptInfo(length, NBTConstants.TYPE_LONG);
                 if (scope.acceptLazy(length, this)) {
@@ -426,11 +472,8 @@ public final class NBTInputStream implements Closeable {
                     return;
                 }
                 is.skipBytes(length << 3);
-                return;
             }
-
-            default:
-                throw new IOException("Invalid tag type: " + type + ".");
+            default -> throw new IOException("Invalid tag type: " + type + ".");
         }
     }
 
@@ -447,65 +490,60 @@ public final class NBTInputStream implements Closeable {
     }
 
     public static int getSize(int type) {
-        switch (type) {
-            default:
-            case NBTConstants.TYPE_END:
-            case NBTConstants.TYPE_BYTE:
-                return 1;
-            case NBTConstants.TYPE_BYTE_ARRAY:
-            case NBTConstants.TYPE_STRING:
-            case NBTConstants.TYPE_LIST:
-            case NBTConstants.TYPE_COMPOUND:
-            case NBTConstants.TYPE_INT_ARRAY:
-            case NBTConstants.TYPE_LONG_ARRAY:
-            case NBTConstants.TYPE_SHORT:
-                return 2;
-            case NBTConstants.TYPE_FLOAT:
-            case NBTConstants.TYPE_INT:
-                return 4;
-            case NBTConstants.TYPE_DOUBLE:
-            case NBTConstants.TYPE_LONG:
-                return 8;
-        }
+        return switch (type) {
+            default -> 1;
+            case NBTConstants.TYPE_BYTE_ARRAY, NBTConstants.TYPE_STRING, NBTConstants.TYPE_LIST, NBTConstants.TYPE_COMPOUND, NBTConstants.TYPE_INT_ARRAY, NBTConstants.TYPE_LONG_ARRAY, NBTConstants.TYPE_SHORT ->
+                    2;
+            case NBTConstants.TYPE_FLOAT, NBTConstants.TYPE_INT -> 4;
+            case NBTConstants.TYPE_DOUBLE, NBTConstants.TYPE_LONG -> 8;
+        };
     }
 
     public Object readTagPayloadRaw(int type, int depth) throws IOException {
+        int length;
+        byte[] bytes;
         switch (type) {
-            case NBTConstants.TYPE_END:
+            case NBTConstants.TYPE_END -> {
                 if (depth == 0) {
                     throw new IOException(
                             "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
                     return null;
                 }
-            case NBTConstants.TYPE_BYTE:
+            }
+            case NBTConstants.TYPE_BYTE -> {
                 return (is.readByte());
-            case NBTConstants.TYPE_SHORT:
+            }
+            case NBTConstants.TYPE_SHORT -> {
                 return (is.readShort());
-            case NBTConstants.TYPE_INT:
+            }
+            case NBTConstants.TYPE_INT -> {
                 return (is.readInt());
-            case NBTConstants.TYPE_LONG:
+            }
+            case NBTConstants.TYPE_LONG -> {
                 return (is.readLong());
-            case NBTConstants.TYPE_FLOAT:
+            }
+            case NBTConstants.TYPE_FLOAT -> {
                 return (is.readFloat());
-            case NBTConstants.TYPE_DOUBLE:
+            }
+            case NBTConstants.TYPE_DOUBLE -> {
                 return (is.readDouble());
-            case NBTConstants.TYPE_BYTE_ARRAY:
-                int length = is.readInt();
-                byte[] bytes = new byte[length];
-                is.readFully(bytes);
-                return (bytes);
-            case NBTConstants.TYPE_STRING:
-                length = is.readShort() & 0xFFFF;
+            }
+            case NBTConstants.TYPE_BYTE_ARRAY -> {
+                length = is.readInt();
                 bytes = new byte[length];
                 is.readFully(bytes);
-                return (new String(bytes, NBTConstants.CHARSET));
-            case NBTConstants.TYPE_LIST: {
+                return (bytes);
+            }
+            case NBTConstants.TYPE_STRING -> {
+                return is.readUTF();
+            }
+            case NBTConstants.TYPE_LIST -> {
                 int childType = is.readByte();
                 length = is.readInt();
                 return readListRaw(depth, childType, length);
             }
-            case NBTConstants.TYPE_COMPOUND: {
+            case NBTConstants.TYPE_COMPOUND -> {
                 Map<String, Object> tagMap = new HashMap<>();
                 while (true) {
                     int childType = is.readByte();
@@ -517,16 +555,15 @@ public final class NBTInputStream implements Closeable {
                     tagMap.put(name, value);
                 }
             }
-            case NBTConstants.TYPE_INT_ARRAY: {
+            case NBTConstants.TYPE_INT_ARRAY -> {
                 length = is.readInt();
                 return readIntArrayRaw(length);
             }
-            case NBTConstants.TYPE_LONG_ARRAY: {
+            case NBTConstants.TYPE_LONG_ARRAY -> {
                 length = is.readInt();
                 return readLongArrayRaw(length);
             }
-            default:
-                throw new IOException("Invalid tag type: " + type + ".");
+            default -> throw new IOException("Invalid tag type: " + type + ".");
         }
     }
 
@@ -542,7 +579,7 @@ public final class NBTInputStream implements Closeable {
             for (int i = 0; i < toRead; i += 4, index++) {
                 data[index] = ((buf[i] & 0xFF) << 24) + ((buf[i + 1] & 0xFF) << 16) + ((buf[i + 2] & 0xFF) << 8) + (buf[i + 3] & 0xFF);
             }
-            length -= toRead;
+            length -= (toRead >> 2);
         }
         return data;
     }
@@ -559,7 +596,7 @@ public final class NBTInputStream implements Closeable {
             for (int i = 0; i < toRead; i += 8, index++) {
                 data[index] = (((long) buf[i] << 56) | ((long) (buf[i + 1] & 255) << 48) | ((long) (buf[i + 2] & 255) << 40) | ((long) (buf[i + 3] & 255) << 32) | ((long) (buf[i + 4] & 255) << 24) | ((buf[i + 5] & 255) << 16) | ((buf[i + 6] & 255) << 8) | (buf[i + 7] & 255));
             }
-            length -= toRead;
+            length -= (toRead >> 3);
         }
         return (data);
     }
@@ -573,40 +610,47 @@ public final class NBTInputStream implements Closeable {
      * @throws IOException if an I/O error occurs.
      */
     public Tag readTagPayload(int type, int depth) throws IOException { //FAWE - public
+        int length;
+        byte[] bytes;
         switch (type) {
-            case NBTConstants.TYPE_END:
+            case NBTConstants.TYPE_END -> {
                 if (depth == 0) {
                     throw new IOException(
                             "TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
                 } else {
                     return new EndTag();
                 }
-            case NBTConstants.TYPE_BYTE:
+            }
+            case NBTConstants.TYPE_BYTE -> {
                 return new ByteTag(is.readByte());
-            case NBTConstants.TYPE_SHORT:
+            }
+            case NBTConstants.TYPE_SHORT -> {
                 return new ShortTag(is.readShort());
-            case NBTConstants.TYPE_INT:
+            }
+            case NBTConstants.TYPE_INT -> {
                 return new IntTag(is.readInt());
-            case NBTConstants.TYPE_LONG:
+            }
+            case NBTConstants.TYPE_LONG -> {
                 return new LongTag(is.readLong());
-            case NBTConstants.TYPE_FLOAT:
+            }
+            case NBTConstants.TYPE_FLOAT -> {
                 return new FloatTag(is.readFloat());
-            case NBTConstants.TYPE_DOUBLE:
+            }
+            case NBTConstants.TYPE_DOUBLE -> {
                 return new DoubleTag(is.readDouble());
-            case NBTConstants.TYPE_BYTE_ARRAY:
-                int length = is.readInt();
-                byte[] bytes = new byte[length];
-                is.readFully(bytes);
-                return new ByteArrayTag(bytes);
-            case NBTConstants.TYPE_STRING:
-                length = is.readShort() & 0xFFFF;
+            }
+            case NBTConstants.TYPE_BYTE_ARRAY -> {
+                length = is.readInt();
                 bytes = new byte[length];
                 is.readFully(bytes);
-                return new StringTag(new String(bytes, NBTConstants.CHARSET));
-            case NBTConstants.TYPE_LIST:
+                return new ByteArrayTag(bytes);
+            }
+            case NBTConstants.TYPE_STRING -> {
+                return new StringTag(is.readUTF());
+            }
+            case NBTConstants.TYPE_LIST -> {
                 int childType = is.readByte();
                 length = is.readInt();
-
                 List<Tag> tagList = new ArrayList<>();
                 for (int i = 0; i < length; ++i) {
                     Tag tag = readTagPayload(childType, depth + 1);
@@ -615,9 +659,9 @@ public final class NBTInputStream implements Closeable {
                     }
                     tagList.add(tag);
                 }
-
                 return new ListTag(NBTUtils.getTypeClass(childType), tagList);
-            case NBTConstants.TYPE_COMPOUND:
+            }
+            case NBTConstants.TYPE_COMPOUND -> {
                 Map<String, Tag<?, ?>> tagMap = new HashMap<>();
                 while (true) {
                     NamedTag namedTag = readNamedTag(depth + 1);
@@ -628,24 +672,25 @@ public final class NBTInputStream implements Closeable {
                         tagMap.put(namedTag.getName(), tag);
                     }
                 }
-
                 return new CompoundTag(tagMap);
-            case NBTConstants.TYPE_INT_ARRAY:
+            }
+            case NBTConstants.TYPE_INT_ARRAY -> {
                 length = is.readInt();
                 int[] data = new int[length];
                 for (int i = 0; i < length; i++) {
                     data[i] = is.readInt();
                 }
                 return new IntArrayTag(data);
-            case NBTConstants.TYPE_LONG_ARRAY:
+            }
+            case NBTConstants.TYPE_LONG_ARRAY -> {
                 length = is.readInt();
                 long[] longData = new long[length];
                 for (int i = 0; i < length; i++) {
                     longData[i] = is.readLong();
                 }
                 return new LongArrayTag(longData);
-            default:
-                throw new IOException("Invalid tag type: " + type + ".");
+            }
+            default -> throw new IOException("Invalid tag type: " + type + ".");
         }
     }
 

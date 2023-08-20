@@ -309,5 +309,17 @@ public class BukkitServerInterface extends AbstractPlatform implements MultiUser
         }
         return this.plugin.getBukkitImplAdapter().getTickingPostProcessor();
     }
+
+    @Nullable
+    @Override
+    public char[] getIbdToStateOrdinal() {
+        return BukkitAdapter.getIbdToStateOrdinal();
+    }
+
+    @Nullable
+    @Override
+    public int[] getOrdinalToIbdID() {
+        return BukkitAdapter.getOrdinalToIbdID();
+    }
     //FAWE end
 }

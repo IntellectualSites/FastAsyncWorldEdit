@@ -32,6 +32,7 @@
   "fawe.worldedit.history.command.undo.disabled": "Undo disabled, use: //fast",
   "fawe.worldedit.selection.selection.count": "Counted {0} blocks.",
   "fawe.worldedit.anvil.world.is.loaded": "The world shouldn't be in use when executing. Unload the world, or use -f to override (save first)",
+  "fawe.worldedit.anvil.replaceall.complete": "Replaceall with anvil completed.",
   "fawe.worldedit.brush.brush.reset": "Reset your brush. (SHIFT + Click)",
   "fawe.worldedit.brush.brush.none": "You aren't holding a brush!",
   "fawe.worldedit.brush.brush.scroll.action.set": "Set scroll action to {0}",

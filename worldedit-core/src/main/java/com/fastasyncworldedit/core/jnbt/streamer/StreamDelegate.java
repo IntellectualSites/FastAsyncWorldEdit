@@ -2,19 +2,26 @@ package com.fastasyncworldedit.core.jnbt.streamer;
 
 import com.sk89q.jnbt.NBTConstants;
 import com.sk89q.jnbt.NBTInputStream;
+import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked", "rawtypes", "removal"})
 public class StreamDelegate {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     private static final byte[][] ZERO_KEYS = new byte[0][];
     private static final StreamDelegate[] ZERO_VALUES = new StreamDelegate[0];
+
+    private Map<String, Tag> retained = null;
 
     private byte[] buffer;
     private byte[][] keys;
@@ -25,9 +32,24 @@ public class StreamDelegate {
     private InfoReader infoReader;
     private ValueReader valueReader;
 
+    private String retainedName = null;
+    private String currentName = null;
+
+    /**
+     * Used to read a streamed {@link NBTInputStream}
+     */
     public StreamDelegate() {
         keys = ZERO_KEYS;
         values = ZERO_VALUES;
+    }
+
+    /**
+     * Set that keys not added to this StreamDelegate instance should still be retained alongside their value retained. They can
+     * be accessed via {@link StreamDelegate#getRetained}
+     */
+    public StreamDelegate retainOthers() {
+        retained = new LinkedHashMap<>();
+        return this;
     }
 
     public StreamDelegate addAndGetParent(String name) {
@@ -35,15 +57,11 @@ public class StreamDelegate {
         return this;
     }
 
-    public StreamDelegate add() {
-        return add("");
-    }
-
-    public StreamDelegate add(String name) {
+    public StreamDelegate add(@Nullable String name) {
         return add(name, new StreamDelegate());
     }
 
-    private StreamDelegate add(String name, StreamDelegate scope) {
+    private StreamDelegate add(@Nullable String name, StreamDelegate scope) {
         if (valueReader != null) {
             LOGGER.warn(
                     "Scope {} | {} may not run, as the stream is only read once, and a value reader is already set",
@@ -51,7 +69,7 @@ public class StreamDelegate {
                     scope
             );
         }
-        byte[] bytes = name.getBytes(NBTConstants.CHARSET);
+        byte[] bytes = name == null ? new byte[0] : name.getBytes(NBTConstants.CHARSET);
         int maxSize = bytes.length;
 
         byte[][] tmpKeys = new byte[keys.length + 1][];
@@ -96,10 +114,12 @@ public class StreamDelegate {
     public StreamDelegate get(DataInputStream is) throws IOException {
         int nameLength = is.readShort() & 0xFFFF;
         if (nameLength == 0 && keys.length > 0 && keys[0].length == 0) {
+            currentName = "";
+            retainedName = null;
             return values[0];
         }
         if (nameLength > buffer.length) {
-            is.skipBytes(nameLength);
+            setRetained(is, nameLength);
             return null;
         }
         int index = 0;
@@ -139,32 +159,57 @@ public class StreamDelegate {
                                     continue middle;
                                 }
                             }
+                            currentName = new String(key);
+                            retainedName = null;
                             return values[i];
                         }
+                        currentName = null;
+                        retainedName = new String(Arrays.copyOf(buffer, nameLength), NBTConstants.CHARSET);
                         return null;
                     }
                 }
+                // fall through
             }
             case 1: {
                 byte[] key = keys[index];
                 if (key.length == nameLength) {
                     int i = 0;
+                    boolean retain = false;
                     for (; nameLength > 0; nameLength--, i++) {
                         byte b = is.readByte();
                         buffer[i] = b;
-                        if (b != key[i]) {
-                            nameLength--;
-                            break outer;
+                        if (!retain && b != key[i]) {
+                            if (retained == null) {
+                                nameLength--;
+                                break outer;
+                            }
+                            retain = true;
                         }
-
                     }
-                    return values[index];
+                    if (!retain) {
+                        currentName = new String(key);
+                        retainedName = null;
+                        return values[index];
+                    }
+                    retainedName = new String(Arrays.copyOf(buffer, i), NBTConstants.CHARSET);
+                    return null;
                 }
                 break;
             }
         }
-        is.skipBytes(nameLength);
+        setRetained(is, nameLength);
         return null;
+    }
+
+    private void setRetained(DataInputStream is, int nameLength) throws IOException {
+        if (retained == null) {
+            is.skipBytes(nameLength);
+        } else {
+            byte[] nameBytes = new byte[nameLength];
+            is.readFully(nameBytes);
+            retainedName = new String(nameBytes, NBTConstants.CHARSET);
+        }
+        currentName = null;
     }
 
     public StreamDelegate withLong(LongValueReader valueReader) {
@@ -220,6 +265,19 @@ public class StreamDelegate {
         return elemReader;
     }
 
+    @Nullable
+    public Map<String, Tag> getRetained() {
+        return retained;
+    }
+
+    public void retain(Tag tag) {
+        if (retainedName == null) {
+            throw new IllegalStateException("Retained name null?!");
+        }
+        retained.put(retainedName, tag);
+        retainedName = null;
+    }
+
     public void acceptInfo(int length, int type) throws IOException {
         if (infoReader != null) {
             infoReader.apply(length, type);
@@ -232,6 +290,14 @@ public class StreamDelegate {
             return true;
         }
         return false;
+    }
+
+    public String getCurrentName() {
+        return currentName;
+    }
+
+    public String getRetainedName() {
+        return retainedName;
     }
 
 }

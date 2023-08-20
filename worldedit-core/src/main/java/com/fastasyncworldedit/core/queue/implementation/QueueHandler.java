@@ -10,6 +10,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.Trimable;
+import com.fastasyncworldedit.core.anvil.MCAWorld;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkCache;
 import com.fastasyncworldedit.core.util.MemUtil;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -400,6 +401,26 @@ public abstract class QueueHandler implements Trimable, Runnable {
         }
     }
 
+    /**
+     * Get or create the MCA WorldChunkCache for a world
+     */
+    public IChunkCache<IChunkGet> getOrCreateMCAWorldCache(World world) {
+        world = WorldWrapper.unwrap(world);
+
+        synchronized (chunkGetCache) {
+            final WeakReference<IChunkCache<IChunkGet>> ref = chunkGetCache.get(world);
+            if (ref != null) {
+                final IChunkCache<IChunkGet> cached = ref.get();
+                if (cached != null) {
+                    return cached;
+                }
+            }
+            final IChunkCache<IChunkGet> created = new ChunkCache<>(world);
+            chunkGetCache.put(world, new WeakReference<>(created));
+            return created;
+        }
+    }
+
     public IQueueExtent<IQueueChunk> create() {
         return new SingleThreadQueueExtent();
     }
@@ -455,6 +476,24 @@ public abstract class QueueHandler implements Trimable, Runnable {
      * @param parallel If the task was being run async and/or in parallel
      */
     public abstract void endUnsafe(boolean parallel);
+
+    public IQueueExtent<IQueueChunk> getMCAQueue(MCAWorld world) {
+        return getMCAQueue(world, null, null);
+    }
+
+    public IQueueExtent<IQueueChunk> getMCAQueue(MCAWorld world, IBatchProcessor processor, IBatchProcessor postProcessor) {
+        final IQueueExtent<IQueueChunk> queue = pool();
+        IChunkCache<IChunkGet> cache = getOrCreateMCAWorldCache(world);
+        queue.init(world, cache, null);
+        if (processor != null) {
+            queue.setProcessor(processor);
+        }
+        if (postProcessor != null) {
+            queue.setPostProcessor(postProcessor);
+        }
+        queue.addFlushTask(world::flush);
+        return queue;
+    }
 
     /**
      * Create a new queue for a given world.
