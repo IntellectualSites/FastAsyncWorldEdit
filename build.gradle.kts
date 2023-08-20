@@ -4,7 +4,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import xyz.jpenilla.runpaper.task.RunServer
 import java.net.URI
 import java.time.format.DateTimeFormatter
-import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
@@ -85,7 +84,7 @@ allprojects {
 
 applyCommonConfiguration()
 val supportedVersions = listOf("1.18.2", "1.19.4", "1.20", "1.20.4")
-val foliaSupportedVersions = listOf("1.19.4", "1.20.1")
+val foliaSupportedVersions = listOf("1.20.1")
 
 tasks {
     supportedVersions.forEach {
@@ -108,7 +107,7 @@ tasks {
         register<RunServer>("runFolia-$it") {
             downloadsApiService.set(xyz.jpenilla.runtask.service.DownloadsAPIService.folia(project))
             minecraftVersion(it)
-            group = "run paper"
+            group = "run folia"
             runDirectory.set(file("run-folia-$it"))
             pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
