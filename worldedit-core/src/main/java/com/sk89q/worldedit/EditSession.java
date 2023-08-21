@@ -3819,12 +3819,13 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
             }
             if (containsAny) {
                 changes++;
-                TaskManager.taskManager().sync(new RunnableVal<Object>() {
+                // TODO this seems to be broken?
+/*                TaskManager.taskManager().sync(new RunnableVal<Object>() {
                     @Override
                     public void run(Object value) {
                         regenerateChunk(cx, cz, biome, seed);
                     }
-                });
+                });*/
             }
         }
         if (changes != 0) {

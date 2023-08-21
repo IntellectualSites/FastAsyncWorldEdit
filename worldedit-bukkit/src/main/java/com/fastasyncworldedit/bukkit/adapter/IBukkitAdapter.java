@@ -389,7 +389,9 @@ public interface IBukkitAdapter {
      * @return list of {@link org.bukkit.entity.Entity}
      */
     default List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return TaskManager.taskManager().sync(world::getEntities);
+        // TODO
+        // return TaskManager.taskManager().sync(world::getEntities);
+        return List.of();
     }
 
 }

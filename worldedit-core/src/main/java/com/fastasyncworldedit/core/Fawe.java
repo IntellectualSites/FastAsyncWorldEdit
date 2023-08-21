@@ -139,7 +139,7 @@ public class Fawe {
         }, 0);*/
 
         if (!FoliaSupport.isFolia()) {
-            TaskManager.taskManager().repeat(timer, 1);
+            // TODO TaskManager.taskManager().repeat(timer, 1);
         }
 
         clipboardExecutor = new KeyQueuedExecutorService<>(new ThreadPoolExecutor(

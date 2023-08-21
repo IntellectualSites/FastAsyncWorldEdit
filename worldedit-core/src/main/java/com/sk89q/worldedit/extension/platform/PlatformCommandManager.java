@@ -687,7 +687,8 @@ public final class PlatformCommandManager {
         Command cmd = optional.get();
         PermissionCondition queued = cmd.getCondition().as(PermissionCondition.class).orElse(null);
         if (queued != null && !queued.isQueued()) {
-            TaskManager.taskManager().taskNow(() -> handleCommandOnCurrentThread(event), Fawe.isMainThread());
+            // TODO?
+            // TaskManager.taskManager().taskNow(() -> handleCommandOnCurrentThread(event), Fawe.isMainThread());
             return;
         } else {
             actor.decline();

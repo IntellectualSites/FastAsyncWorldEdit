@@ -27,9 +27,9 @@ public class ResidenceFeature extends BukkitMaskManager implements Listener {
         return residence != null &&
                 (residence.getOwner().equals(player.getName()) ||
                         residence.getOwner().equals(player.getUniqueId().toString()) ||
-                        type == MaskType.MEMBER && TaskManager.taskManager().sync(() -> residence
+                        type == MaskType.MEMBER && TaskManager.taskManager().syncWith(() -> residence
                                 .getPermissions()
-                                .playerHas(player, "build", false)));
+                                .playerHas(player, "build", false), BukkitAdapter.adapt(player)));
     }
 
     @Override

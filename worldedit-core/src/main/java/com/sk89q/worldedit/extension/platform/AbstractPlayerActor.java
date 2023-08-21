@@ -677,7 +677,8 @@ public abstract class AbstractPlayerActor implements Actor, Player, Cloneable {
         if (async) {
             asyncNotifyQueue.run(wrapped);
         } else {
-            TaskManager.taskManager().taskNow(wrapped, false);
+            // TODO
+            // TaskManager.taskManager().taskNow(wrapped, false);
         }
         return true;
     }

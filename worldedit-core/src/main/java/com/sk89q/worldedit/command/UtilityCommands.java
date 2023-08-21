@@ -709,7 +709,16 @@ public class UtilityCommands {
 
         //FAWE start - run this sync
         int finalRadius = radius;
-        int killed = TaskManager.taskManager().sync(() -> killMatchingEntities(finalRadius, actor, flags::createFunction));
+        int killed;
+        // TODO location context might be somewhere else actually
+        if (actor instanceof Player player) {
+            killed = TaskManager.taskManager().syncWith(
+                    () -> killMatchingEntities(finalRadius, actor, flags::createFunction),
+                    player
+            );
+        } else {
+            killed = 0;
+        }
         //FAWE end
 
         actor.print(Caption.of(
@@ -741,7 +750,9 @@ public class UtilityCommands {
         }
 
         //FAWE start - run this sync
-        int removed = TaskManager.taskManager().sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
+        int removed = 0;
+        // TODO location context might be somewhere else actually
+        // removed = TaskManager.taskManager().sync(() -> killMatchingEntities(radius, actor, remover::createFunction));
         //FAWE end
         actor.print(Caption.of("worldedit.remove.removed", TextComponent.of(removed)));
         return removed;

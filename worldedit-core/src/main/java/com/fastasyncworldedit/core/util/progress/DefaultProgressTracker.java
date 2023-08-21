@@ -93,14 +93,16 @@ public class DefaultProgressTracker implements BiConsumer<DefaultProgressTracker
     }
 
     private void done() {
-        TaskManager.taskManager().task(this::doneTask);
+        // TODO
+        // TaskManager.taskManager().task(this::doneTask);
     }
 
     private long lastTick = 0;
 
     private void send() {
         // Run on main thread
-        TaskManager.taskManager().task(this::sendTask);
+        // TODO
+        // TaskManager.taskManager().task(this::sendTask);
     }
 
     public void doneTask() {

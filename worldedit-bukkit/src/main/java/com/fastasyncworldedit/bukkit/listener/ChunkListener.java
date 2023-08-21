@@ -67,7 +67,7 @@ public abstract class ChunkListener implements Listener {
             PluginManager plm = Bukkit.getPluginManager();
             Plugin plugin = Fawe.<FaweBukkit>platform().getPlugin();
             plm.registerEvents(this, plugin);
-            TaskManager.taskManager().repeat(() -> {
+            /*TaskManager.taskManager().repeat(() -> {
                 Location tmpLoc = lastCancelPos;
                 if (tmpLoc != null) {
                     LOGGER.info("[FAWE Tick Limiter] Detected and cancelled physics lag source at {}", tmpLoc);
@@ -89,7 +89,7 @@ public abstract class ChunkListener implements Listener {
                     counter.put(key, badLimit);
                 }
                 badChunks.clear();
-            }, Settings.settings().TICK_LIMITER.INTERVAL);
+            }, Settings.settings().TICK_LIMITER.INTERVAL)*/;
         }
     }
 

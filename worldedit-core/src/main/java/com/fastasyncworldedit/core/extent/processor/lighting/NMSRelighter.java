@@ -914,13 +914,13 @@ public class NMSRelighter implements Relighter {
             queue.flush();
             finished.set(true);
         } else {
-            TaskManager.taskManager().sync(new RunnableVal<>() {
+            TaskManager.taskManager().syncAt(new RunnableVal<>() {
                 @Override
                 public void run(Object value) {
                     queue.flush();
                     finished.set(true);
                 }
-            });
+            }, null); // TODO
         }
     }
 
@@ -951,7 +951,8 @@ public class NMSRelighter implements Relighter {
         if (Settings.settings().LIGHTING.ASYNC) {
             runnable.run();
         } else {
-            TaskManager.taskManager().sync(runnable);
+            // TODO
+            // TaskManager.taskManager().sync(runnable);
         }
     }
 
