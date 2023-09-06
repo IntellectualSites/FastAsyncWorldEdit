@@ -21,7 +21,7 @@ permissions:
     default: op
     children:
       fawe.bypass.regions: true
-      fawe.limit.*: true
+      fawe.limit.unlimited: true
   fawe.tips:
     default: op
   fawe.admin:
