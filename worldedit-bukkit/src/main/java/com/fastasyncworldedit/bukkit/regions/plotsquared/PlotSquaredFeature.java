@@ -42,7 +42,7 @@ public class PlotSquaredFeature extends FaweMaskManager {
         if (Settings.FAWE_Components.FAWE_HOOK) {
             Settings.Enabled_Components.WORLDEDIT_RESTRICTIONS = false;
             if (Settings.PLATFORM.toLowerCase(Locale.ROOT).startsWith("bukkit")) {
-                new FaweTrim();
+            //    new FaweTrim();
             }
             // TODO: revisit this later on
             /*

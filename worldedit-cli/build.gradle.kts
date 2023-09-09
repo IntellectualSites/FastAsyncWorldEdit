@@ -27,16 +27,16 @@ dependencies {
 
     // Minecraft expectations
     annotationProcessor(libs.guava)
-    implementation("com.google.guava:guava")
-    implementation("com.google.code.gson:gson")
+    implementation(libs.guava)
+    implementation(libs.gson)
 
     // Logging
     implementation(libs.log4jBom) {
         because("We control Log4J on this platform")
     }
-    implementation("org.apache.logging.log4j:log4j-api")
+    implementation(libs.log4jApi)
     implementation(libs.log4jCore)
-    implementation("commons-cli:commons-cli:1.5.0")
+    implementation(libs.commonsCli)
     api(libs.parallelgzip) { isTransitive = false }
     api(libs.lz4Java)
 }

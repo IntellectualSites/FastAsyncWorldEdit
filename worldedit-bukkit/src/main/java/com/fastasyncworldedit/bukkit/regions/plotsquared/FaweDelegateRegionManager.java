@@ -171,13 +171,11 @@ public class FaweDelegateRegionManager {
                                     .limitUnlimited()
                                     .changeSetNull()
                                     .build();
-                    File schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schem");
+                    File schematicFile = new File(hybridPlotWorld.getSchematicRoot(), "plot.schem");
                     if (!schematicFile.exists()) {
-                        schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schematic");
+                        schematicFile = new File(hybridPlotWorld.getSchematicRoot(), "plot.schematic");
                     }
-                    BlockVector3 to = plot.getBottomAbs().getBlockVector3().withY(Settings.Schematics.PASTE_ON_TOP
-                            ? hybridPlotWorld.SCHEM_Y
-                            : hybridPlotWorld.getMinBuildHeight());
+                    BlockVector3 to = plot.getBottomAbs().getBlockVector3().withY(hybridPlotWorld.getPlotYStart());
                     try {
                         Clipboard clip = ClipboardFormats
                                 .findByFile(schematicFile)
@@ -215,7 +213,7 @@ public class FaweDelegateRegionManager {
     ) {
         TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
-                //todo because of the following code this should proably be in the Bukkit module
+                //todo because of the following code this should probably be in the Bukkit module
                 World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
                 World pos3World = BukkitAdapter.adapt(getWorld(swapPos.getWorldName()));
                 EditSession sessionA = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
