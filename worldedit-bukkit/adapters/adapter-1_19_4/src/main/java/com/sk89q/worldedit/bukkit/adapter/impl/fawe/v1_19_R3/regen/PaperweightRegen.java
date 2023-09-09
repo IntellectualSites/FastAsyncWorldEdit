@@ -369,7 +369,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
 
-        ReflectionUtils.unsafeSet(chunkSourceField, freshWorld, freshChunkProvider);
+        chunkSourceField.set(freshWorld, freshChunkProvider);
         //let's start then
         structureTemplateManager = server.getStructureManager();
         threadedLevelLightEngine = new NoOpLightEngine(freshChunkProvider);
