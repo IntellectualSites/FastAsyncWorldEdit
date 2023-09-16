@@ -11,9 +11,8 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.withType
 
-fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean = true) {
+fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, javaRelease: Int = 17, banSlf4j: Boolean = true) {
     applyCommonConfiguration()
-    apply(plugin = "eclipse")
     apply(plugin = "idea")
 
     tasks
@@ -23,7 +22,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                 val disabledLint = listOf(
                         "processing", "path", "fallthrough", "serial"
                 )
-                options.release.set(17)
+                options.release.set(javaRelease)
                 options.compilerArgs.addAll(listOf("-Xlint:all") + disabledLint.map { "-Xlint:-$it" })
                 options.isDeprecation = true
                 options.encoding = "UTF-8"
@@ -49,6 +48,7 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
 
     // Java 8 turns on doclint which we fail
     tasks.withType<Javadoc>().configureEach {
+        options.encoding = "UTF-8"
         (options as StandardJavadocDocletOptions).apply {
             addStringOption("Xdoclint:none", "-quiet")
             tags(
@@ -56,7 +56,6 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
                     "implSpec:a:Implementation Requirements:",
                     "implNote:a:Implementation Note:"
             )
-            options.encoding = "UTF-8"
             links(
                     "https://jd.advntr.dev/api/latest/",
                     "https://logging.apache.org/log4j/2.x/log4j-api/apidocs/",

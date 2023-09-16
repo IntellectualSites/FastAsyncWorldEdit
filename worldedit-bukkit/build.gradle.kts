@@ -44,6 +44,8 @@ val localImplementation = configurations.create("localImplementation") {
     isCanBeConsumed = false
     isCanBeResolved = false
 }
+configurations["compileOnly"].extendsFrom(localImplementation)
+configurations["testImplementation"].extendsFrom(localImplementation)
 
 val adapters = configurations.create("adapters") {
     description = "Adapters to include in the JAR"
@@ -75,8 +77,8 @@ dependencies {
 
     // Platform expectations
     compileOnly(libs.paper) {
-        exclude("junit", "junit")
         exclude(group = "org.slf4j", module = "slf4j-api")
+        exclude("junit", "junit")
     }
 
     // Logging

@@ -31,7 +31,9 @@ dependencies {
     implementation(libs.snakeyaml)
 
     // Logging
-    implementation(libs.log4jApi)
+    implementation(libs.log4jApi) {
+        because("Mojang provides Log4J")
+    }
 
     // Plugins
     compileOnly(libs.plotSquaredCore) { isTransitive = false }

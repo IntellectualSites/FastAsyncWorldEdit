@@ -17,10 +17,7 @@ import org.gradle.plugins.signing.SigningExtension
 fun Project.applyPlatformAndCoreConfiguration() {
     applyCommonConfiguration()
     apply(plugin = "java")
-    apply(plugin = "eclipse")
-    apply(plugin = "idea")
     apply(plugin = "maven-publish")
-    apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "signing")
 
     applyCommonJavaConfiguration(
@@ -42,11 +39,6 @@ fun Project.applyPlatformAndCoreConfiguration() {
         the<JavaPluginExtension>().withSourcesJar()
     }
 
-    val javaComponent = components["java"] as AdhocComponentWithVariants
-    javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
-        skip()
-    }
-
     val publishingExtension = the<PublishingExtension>()
 
     configure<SigningExtension> {
@@ -62,7 +54,14 @@ fun Project.applyPlatformAndCoreConfiguration() {
     configure<PublishingExtension> {
         publications {
             register<MavenPublication>("maven") {
-                from(javaComponent)
+                versionMapping {
+                    usage("java-api") {
+                        fromResolutionOf("runtimeClasspath")
+                    }
+                    usage("java-runtime") {
+                        fromResolutionResult()
+                    }
+                }
 
                 group = "com.fastasyncworldedit"
                 artifactId = "${rootProject.name}-${project.description}"
@@ -128,6 +127,7 @@ fun Project.applyPlatformAndCoreConfiguration() {
 }
 
 fun Project.applyShadowConfiguration() {
+    apply(plugin = "com.github.johnrengelman.shadow")
     tasks.named<ShadowJar>("shadowJar") {
         dependencies {
             include(project(":worldedit-libs:core"))
@@ -140,6 +140,11 @@ fun Project.applyShadowConfiguration() {
         exclude("LICENSE*")
         exclude("META-INF/maven/**")
         minimize()
+    }
+    val javaComponent = components["java"] as AdhocComponentWithVariants
+    // I don't think we want this published (it's the shadow jar)
+    javaComponent.withVariantsFromConfiguration(configurations["shadowRuntimeElements"]) {
+        skip()
     }
 }
 
