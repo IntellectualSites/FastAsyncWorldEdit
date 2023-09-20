@@ -1,6 +1,4 @@
 import org.ajoberstar.grgit.Grgit
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import java.net.URI
 import java.time.format.DateTimeFormatter
 import xyz.jpenilla.runpaper.task.RunServer
@@ -62,23 +60,6 @@ if (!project.hasProperty("gitCommitHash")) {
         logger.warn("Error getting commit hash", e)
 
         "no.git.id"
-    }
-}
-
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile::class) {
-            options.compilerArgs.addAll(arrayOf("-Xmaxerrs", "1000"))
-        }
-        tasks.withType(Test::class) {
-            testLogging {
-                events(FAILED)
-                exceptionFormat = FULL
-                showExceptions = true
-                showCauses = true
-                showStackTraces = true
-            }
-        }
     }
 }
 
