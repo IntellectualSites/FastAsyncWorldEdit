@@ -14,6 +14,10 @@ fun Project.applyCommonConfiguration() {
         maven {
             name = "EngineHub"
             url = uri("https://maven.enginehub.org/repo/")
+            content {
+                excludeModule("io.papermc.paper","paper-api")
+                excludeModule("io.papermc","paperlib")
+            }
         }
         maven {
             name = "OSS Sonatype Snapshots"
