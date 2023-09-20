@@ -44,6 +44,7 @@ serverlib = "2.3.4"
 text-adapter = "3.0.6"
 text = "3.0.4"
 piston = "0.5.7"
+lin-bus = "0.1.0-SNAPSHOT"
 
 # Tests
 mockito = "5.5.0"
@@ -115,6 +116,11 @@ pistonImpl = { group = "org.enginehub.piston", name = "default-impl", version.re
 pistonAnnotations = { group = "org.enginehub.piston.core-ap", name = "annotations", version.ref = "piston" }
 pistonProcessor = { group = "org.enginehub.piston.core-ap", name = "processor", version.ref = "piston" }
 pistonRuntime = { group = "org.enginehub.piston.core-ap", name = "runtime", version.ref = "piston" }
+## LinBus
+linBusBom = { group = "org.enginehub.lin-bus", name = "lin-bus-bom", version.ref = "lin-bus" }
+linBusTree = { group = "org.enginehub.lin-bus", name = "lin-bus-tree", version.ref = "lin-bus" }
+linBusFormatSnbt = { group = "org.enginehub.lin-bus.format", name = "lin-bus-format-snbt", version.ref = "lin-bus" }
+
 
 # Tests
 mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
