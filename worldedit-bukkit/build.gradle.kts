@@ -36,6 +36,13 @@ repositories {
         name = "Glaremasters"
         url = uri("https://repo.glaremasters.me/repository/towny/")
     }
+    maven {
+        name = "Athion"
+        url = uri("https://ci.athion.net/plugin/repository/tools/")
+        content {
+            includeGroup("com.bekvon.bukkit.residence")
+        }
+    }
     flatDir { dir(File("src/main/resources")) }
 }
 
