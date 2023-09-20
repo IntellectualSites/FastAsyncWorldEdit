@@ -8,10 +8,6 @@ plugins {
 repositories {
     mavenCentral()
     gradlePluginPortal()
-    maven {
-        name = "EngineHub"
-        url = uri("https://maven.enginehub.org/repo/")
-    }
 }
 
 val properties = Properties().also { props ->
