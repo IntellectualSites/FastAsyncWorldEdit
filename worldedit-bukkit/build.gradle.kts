@@ -17,10 +17,6 @@ repositories {
         url = uri("https://repo.papermc.io/repository/maven-public/")
     }
     maven {
-        name = "EngineHub"
-        url = uri("https://maven.enginehub.org/repo/")
-    }
-    maven {
         name = "JitPack"
         url = uri("https://jitpack.io")
     }
@@ -35,6 +31,9 @@ repositories {
     maven {
         name = "Glaremasters"
         url = uri("https://repo.glaremasters.me/repository/towny/")
+        content {
+            includeGroup("com.palmergames.bukkit.towny")
+        }
     }
     maven {
         name = "Athion"
