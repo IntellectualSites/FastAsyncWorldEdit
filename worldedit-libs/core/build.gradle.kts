@@ -1,3 +1,7 @@
+plugins {
+    `java-base`
+}
+
 applyLibrariesConfiguration()
 
 dependencies {

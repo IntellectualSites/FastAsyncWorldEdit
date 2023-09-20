@@ -27,7 +27,6 @@ import javax.inject.Inject
 
 fun Project.applyLibrariesConfiguration() {
     applyCommonConfiguration()
-    apply(plugin = "java-base")
     apply(plugin = "maven-publish")
     apply(plugin = "com.github.johnrengelman.shadow")
     apply(plugin = "signing")
