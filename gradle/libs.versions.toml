@@ -102,6 +102,7 @@ paster = { group = "com.intellectualsites.paster", name = "Paster", version.ref 
 vault = { group = "com.github.MilkBowl", name = "VaultAPI", version.ref = "vault" }
 serverlib = { group = "dev.notmyfault.serverlib", name = "ServerLib", version.ref = "serverlib" }
 checkerqual = { group = "org.checkerframework", name = "checker-qual", version.ref = "checkerqual" }
+paranamer = { group = "com.thoughtworks.paranamer", name = "paranamer", version = "2.6" }
 
 # Internal
 ## Text

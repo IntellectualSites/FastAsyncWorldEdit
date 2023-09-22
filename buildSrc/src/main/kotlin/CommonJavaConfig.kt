@@ -1,3 +1,4 @@
+import org.gradle.api.Action
 import org.gradle.api.Project
 import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPluginExtension
@@ -10,6 +11,8 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.withType
+import org.gradle.plugins.ide.idea.GenerateIdeaModule
+import org.gradle.plugins.ide.idea.model.IdeaProject
 
 fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean = true) {
     applyCommonConfiguration()

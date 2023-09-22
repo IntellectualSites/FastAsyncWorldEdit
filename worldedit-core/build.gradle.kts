@@ -27,11 +27,24 @@ dependencies {
     implementation(libs.guava)
     implementation(libs.gson)
 
+    implementation(libs.paranamer)
+    implementation(libs.jchronic)
+    implementation(libs.jlibnoise)
+    api(platform(libs.linBusBom))
+    api(libs.linBusTree) {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
+    api(libs.linBusFormatSnbt) {
+        exclude(group = "org.jetbrains", module = "annotations")
+    }
+
     // Platform expectations
     implementation(libs.snakeyaml)
 
     // Logging
-    implementation(libs.log4jApi)
+    implementation(libs.log4jApi) {
+        because("Mojang provides Log4j")
+    }
 
     // Plugins
     compileOnly(libs.plotSquaredCore) { isTransitive = false }
