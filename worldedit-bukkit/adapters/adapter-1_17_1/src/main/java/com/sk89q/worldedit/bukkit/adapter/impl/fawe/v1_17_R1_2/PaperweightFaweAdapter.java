@@ -22,6 +22,8 @@ import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.PaperweightAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.light.PaperweightStarlightRelighter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.light.PaperweightStarlightRelighterFactory;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;

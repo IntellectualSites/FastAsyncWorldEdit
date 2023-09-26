@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.light;
 
 import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;

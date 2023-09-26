@@ -1,4 +1,4 @@
-package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2;
+package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.light;
 
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.lighting.NMSRelighter;
@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightPlatformAdapter;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongArraySet;
