@@ -682,9 +682,10 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 return new PaperweightStarlightRelighterFactory();
             }
         } catch (ThreadDeath td) {
+            LOGGER.debug("Something went wrong to create starlight re-lighter", td);
             throw td;
         } catch (Throwable ignored) {
-
+            LOGGER.debug("Something went wrong to create starlight re-lighter", ignored);
         }
         return new NMSRelighterFactory();
     }
