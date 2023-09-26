@@ -206,7 +206,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
                 });
             }
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.info("Something went wrong", e);
         } finally {
             allBlockProperties = ImmutableMap.copyOf(properties);
         }
