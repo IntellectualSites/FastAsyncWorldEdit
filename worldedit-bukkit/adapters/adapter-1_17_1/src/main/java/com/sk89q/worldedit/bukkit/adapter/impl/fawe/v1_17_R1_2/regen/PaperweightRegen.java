@@ -99,31 +99,31 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     private static final Field DELEGATE_FIELD;
     private static final Field CHUNK_SOURCE_FIELD;
 
-    //list of chunk stati in correct order without FULL
-    private static final Map<ChunkStatus, Concurrency> CHUNK_STATI = new LinkedHashMap<>();
+    //list of chunk status in correct order without FULL
+    private static final Map<ChunkStatus, Concurrency> CHUNK_STATUS = new LinkedHashMap<>();
 
     static {
-        CHUNK_STATI.put(ChunkStatus.EMPTY, Concurrency.FULL);   // empty: radius -1, does nothing
-        CHUNK_STATI.put(ChunkStatus.STRUCTURE_STARTS, Concurrency.NONE);   // structure starts: uses unsynchronized maps
-        CHUNK_STATI.put(
+        CHUNK_STATUS.put(ChunkStatus.EMPTY, Concurrency.FULL);   // empty: radius -1, does nothing
+        CHUNK_STATUS.put(ChunkStatus.STRUCTURE_STARTS, Concurrency.NONE);   // structure starts: uses unsynchronized maps
+        CHUNK_STATUS.put(
                 ChunkStatus.STRUCTURE_REFERENCES,
                 Concurrency.FULL
         );   // structure refs: radius 8, but only writes to current chunk
-        CHUNK_STATI.put(ChunkStatus.BIOMES, Concurrency.FULL);   // biomes: radius 0
-        CHUNK_STATI.put(ChunkStatus.NOISE, Concurrency.RADIUS); // noise: radius 8
-        CHUNK_STATI.put(ChunkStatus.SURFACE, Concurrency.NONE);   // surface: radius 0, requires NONE
-        CHUNK_STATI.put(ChunkStatus.CARVERS, Concurrency.NONE);   // carvers: radius 0, but RADIUS and FULL change results
-        CHUNK_STATI.put(
+        CHUNK_STATUS.put(ChunkStatus.BIOMES, Concurrency.FULL);   // biomes: radius 0
+        CHUNK_STATUS.put(ChunkStatus.NOISE, Concurrency.RADIUS); // noise: radius 8
+        CHUNK_STATUS.put(ChunkStatus.SURFACE, Concurrency.NONE);   // surface: radius 0, requires NONE
+        CHUNK_STATUS.put(ChunkStatus.CARVERS, Concurrency.NONE);   // carvers: radius 0, but RADIUS and FULL change results
+        CHUNK_STATUS.put(
                 ChunkStatus.LIQUID_CARVERS,
                 Concurrency.NONE
         );   // liquid carvers: radius 0, but RADIUS and FULL change results
-        CHUNK_STATI.put(ChunkStatus.FEATURES, Concurrency.NONE);   // features: uses unsynchronized maps
-        CHUNK_STATI.put(
+        CHUNK_STATUS.put(ChunkStatus.FEATURES, Concurrency.NONE);   // features: uses unsynchronized maps
+        CHUNK_STATUS.put(
                 ChunkStatus.LIGHT,
                 Concurrency.FULL
         );   // light: radius 1, but no writes to other chunks, only current chunk
-        CHUNK_STATI.put(ChunkStatus.SPAWN, Concurrency.FULL);   // spawn: radius 0
-        CHUNK_STATI.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
+        CHUNK_STATUS.put(ChunkStatus.SPAWN, Concurrency.FULL);   // spawn: radius 0
+        CHUNK_STATUS.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
 
         try {
             WORLDS_FIELD = CraftServer.class.getDeclaredField("worlds");
@@ -195,7 +195,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         seed = options.getSeed().orElse(originalServerWorld.getSeed());
-        CHUNK_STATI.forEach((s, c) -> super.chunkStatuses.put(new ChunkStatusWrap(s), c));
+        CHUNK_STATUS.forEach((s, c) -> super.chunkStatuses.put(new ChunkStatusWrap(s), c));
 
         return true;
     }
