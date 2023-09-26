@@ -145,9 +145,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             FIELD_REMOVE = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             FIELD_REMOVE.setAccessible(true);
         } catch (RuntimeException e) {
+            LOGGER.debug("Something went wrong", e);
             throw e;
         } catch (Throwable rethrow) {
-            rethrow.printStackTrace();
+            LOGGER.debug("Something went wrong", rethrow);
             throw new RuntimeException(rethrow);
         }
     }
@@ -184,7 +185,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 return newLock;
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Something went wrong on apply lock", e);
             throw new RuntimeException(e);
         }
     }
@@ -232,7 +233,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 }
                 return chunk.getHandle();
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Something went wrong on ensure chunk loading", e);
             }
         }
         return TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ));
@@ -250,6 +251,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             return (ChunkHolder) METHOD_GET_VISIBLE_CHUNK.invoke(chunkMap, ChunkPos.asLong(chunkX, chunkZ));
         } catch (Throwable thr) {
+            LOGGER.debug("Something went wrong to get player chunk", thr);
             throw new RuntimeException(thr);
         }
     }
@@ -400,6 +402,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 FIELD_PALETTE.set(dataPaletteBlocks, blockStatePalettedContainer);
                 FIELD_BITS.set(dataPaletteBlocks, bitsPerEntry);
             } catch (final IllegalAccessException e) {
+                LOGGER.debug("Something went wrong", e);
                 throw new RuntimeException(e);
             }
 
@@ -409,11 +412,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 try {
                     FIELD_NON_EMPTY_BLOCK_COUNT.set(levelChunkSection, nonEmptyBlockCount[0]);
                 } catch (IllegalAccessException e) {
+                    LOGGER.debug("Something went wrong", e);
                     throw new RuntimeException(e);
                 }
             }
             return levelChunkSection;
         } catch (final Throwable e) {
+            LOGGER.error("Something went wrong at create new chunk section", e);
             throw e;
         } finally {
             Arrays.fill(blockToPalette, Integer.MAX_VALUE);
@@ -431,16 +436,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         FIELD_TICKING_FLUID_CONTENT.setShort(section, (short) 0);
         FIELD_TICKING_BLOCK_COUNT.setShort(section, (short) 0);
     }
-
-    public static Biome[] getBiomeArray(ChunkBiomeContainer chunkBiomeContainer) {
-        try {
-            return (Biome[]) FIELD_BIOMES.get(chunkBiomeContainer);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static BiomeType adapt(Biome biome, LevelAccessor levelAccessor) {
         ResourceLocation resourceLocation = levelAccessor.registryAccess().ownedRegistryOrThrow(Registry.BIOME_REGISTRY).getKey(
                 biome);
@@ -483,7 +478,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             METHOD_REMOVE_BLOCK_ENTITY_TICKER.invoke(levelChunk, beacon.getBlockPos());
         } catch (Throwable throwable) {
-            throwable.printStackTrace();
+            LOGGER.error("Something went wrong to remove beacon", throwable);
         }
     }
 
