@@ -4,7 +4,6 @@ import com.fastasyncworldedit.bukkit.adapter.Regenerator;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.queue.IChunkCache;
 import com.fastasyncworldedit.core.queue.IChunkGet;
-import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
@@ -92,43 +91,43 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
-    private static final Field worldsField;
-    private static final Field paperConfigField;
-    private static final Field generateFlatBedrockField;
-    private static final Field generatorSettingFlatField;
-    private static final Field generatorSettingBaseSupplierField;
-    private static final Field delegateField;
-    private static final Field chunkSourceField;
+    private static final Field WORLDS_FIELD;
+    private static final Field PAPER_CONFIG_FIELD;
+    private static final Field GENERATE_FLAT_BEDROCK_FIELD;
+    private static final Field GENERATOR_SETTING_FLAT_FIELD;
+    private static final Field GENERATOR_SETTING_BASE_SUPPLIER_FIELD;
+    private static final Field DELEGATE_FIELD;
+    private static final Field CHUNK_SOURCE_FIELD;
 
     //list of chunk stati in correct order without FULL
-    private static final Map<ChunkStatus, Concurrency> chunkStati = new LinkedHashMap<>();
+    private static final Map<ChunkStatus, Concurrency> CHUNK_STATI = new LinkedHashMap<>();
 
     static {
-        chunkStati.put(ChunkStatus.EMPTY, Concurrency.FULL);   // empty: radius -1, does nothing
-        chunkStati.put(ChunkStatus.STRUCTURE_STARTS, Concurrency.NONE);   // structure starts: uses unsynchronized maps
-        chunkStati.put(
+        CHUNK_STATI.put(ChunkStatus.EMPTY, Concurrency.FULL);   // empty: radius -1, does nothing
+        CHUNK_STATI.put(ChunkStatus.STRUCTURE_STARTS, Concurrency.NONE);   // structure starts: uses unsynchronized maps
+        CHUNK_STATI.put(
                 ChunkStatus.STRUCTURE_REFERENCES,
                 Concurrency.FULL
         );   // structure refs: radius 8, but only writes to current chunk
-        chunkStati.put(ChunkStatus.BIOMES, Concurrency.FULL);   // biomes: radius 0
-        chunkStati.put(ChunkStatus.NOISE, Concurrency.RADIUS); // noise: radius 8
-        chunkStati.put(ChunkStatus.SURFACE, Concurrency.NONE);   // surface: radius 0, requires NONE
-        chunkStati.put(ChunkStatus.CARVERS, Concurrency.NONE);   // carvers: radius 0, but RADIUS and FULL change results
-        chunkStati.put(
+        CHUNK_STATI.put(ChunkStatus.BIOMES, Concurrency.FULL);   // biomes: radius 0
+        CHUNK_STATI.put(ChunkStatus.NOISE, Concurrency.RADIUS); // noise: radius 8
+        CHUNK_STATI.put(ChunkStatus.SURFACE, Concurrency.NONE);   // surface: radius 0, requires NONE
+        CHUNK_STATI.put(ChunkStatus.CARVERS, Concurrency.NONE);   // carvers: radius 0, but RADIUS and FULL change results
+        CHUNK_STATI.put(
                 ChunkStatus.LIQUID_CARVERS,
                 Concurrency.NONE
         );   // liquid carvers: radius 0, but RADIUS and FULL change results
-        chunkStati.put(ChunkStatus.FEATURES, Concurrency.NONE);   // features: uses unsynchronized maps
-        chunkStati.put(
+        CHUNK_STATI.put(ChunkStatus.FEATURES, Concurrency.NONE);   // features: uses unsynchronized maps
+        CHUNK_STATI.put(
                 ChunkStatus.LIGHT,
                 Concurrency.FULL
         );   // light: radius 1, but no writes to other chunks, only current chunk
-        chunkStati.put(ChunkStatus.SPAWN, Concurrency.FULL);   // spawn: radius 0
-        chunkStati.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
+        CHUNK_STATI.put(ChunkStatus.SPAWN, Concurrency.FULL);   // spawn: radius 0
+        CHUNK_STATI.put(ChunkStatus.HEIGHTMAPS, Concurrency.FULL);   // heightmaps: radius 0
 
         try {
-            worldsField = CraftServer.class.getDeclaredField("worlds");
-            worldsField.setAccessible(true);
+            WORLDS_FIELD = CraftServer.class.getDeclaredField("worlds");
+            WORLDS_FIELD.setAccessible(true);
 
             Field tmpPaperConfigField;
             Field tmpFlatBedrockField;
@@ -142,21 +141,21 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 tmpPaperConfigField = null;
                 tmpFlatBedrockField = null;
             }
-            paperConfigField = tmpPaperConfigField;
-            generateFlatBedrockField = tmpFlatBedrockField;
+            PAPER_CONFIG_FIELD = tmpPaperConfigField;
+            GENERATE_FLAT_BEDROCK_FIELD = tmpFlatBedrockField;
 
-            generatorSettingBaseSupplierField = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
+            GENERATOR_SETTING_BASE_SUPPLIER_FIELD = NoiseBasedChunkGenerator.class.getDeclaredField(Refraction.pickName(
                     "settings", "g"));
-            generatorSettingBaseSupplierField.setAccessible(true);
+            GENERATOR_SETTING_BASE_SUPPLIER_FIELD.setAccessible(true);
 
-            generatorSettingFlatField = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "e"));
-            generatorSettingFlatField.setAccessible(true);
+            GENERATOR_SETTING_FLAT_FIELD = FlatLevelSource.class.getDeclaredField(Refraction.pickName("settings", "e"));
+            GENERATOR_SETTING_FLAT_FIELD.setAccessible(true);
 
-            delegateField = CustomChunkGenerator.class.getDeclaredField("delegate");
-            delegateField.setAccessible(true);
+            DELEGATE_FIELD = CustomChunkGenerator.class.getDeclaredField("delegate");
+            DELEGATE_FIELD.setAccessible(true);
 
-            chunkSourceField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "C"));
-            chunkSourceField.setAccessible(true);
+            CHUNK_SOURCE_FIELD = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "C"));
+            CHUNK_SOURCE_FIELD.setAccessible(true);
         } catch (Exception e) {
             LOGGER.error("Something went wrong to create regeneration class", e);
             throw new RuntimeException(e);
@@ -187,16 +186,16 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         originalChunkProvider = originalServerWorld.getChunkSource();
 
         //flat bedrock? (only on paper)
-        if (paperConfigField != null) {
+        if (PAPER_CONFIG_FIELD != null) {
             try {
-                generateFlatBedrock = generateFlatBedrockField.getBoolean(paperConfigField.get(originalServerWorld));
+                generateFlatBedrock = GENERATE_FLAT_BEDROCK_FIELD.getBoolean(PAPER_CONFIG_FIELD.get(originalServerWorld));
             } catch (Exception ignored) {
                 LOGGER.debug("Something went wrong to prepare regeneration", ignored);
             }
         }
 
         seed = options.getSeed().orElse(originalServerWorld.getSeed());
-        chunkStati.forEach((s, c) -> super.chunkStatuses.put(new ChunkStatusWrap(s), c));
+        CHUNK_STATI.forEach((s, c) -> super.chunkStatuses.put(new ChunkStatusWrap(s), c));
 
         return true;
     }
@@ -271,17 +270,17 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         freshWorld.noSave = true;
         removeWorldFromWorldsMap();
         newWorldData.checkName(originalServerWorld.serverLevelData.getLevelName()); //rename to original world name
-        if (paperConfigField != null) {
-            paperConfigField.set(freshWorld, originalServerWorld.paperConfig);
+        if (PAPER_CONFIG_FIELD != null) {
+            PAPER_CONFIG_FIELD.set(freshWorld, originalServerWorld.paperConfig);
         }
 
         //generator
         if (originalChunkProvider.getGenerator() instanceof FlatLevelSource) {
-            FlatLevelGeneratorSettings generatorSettingFlat = (FlatLevelGeneratorSettings) generatorSettingFlatField.get(
+            FlatLevelGeneratorSettings generatorSettingFlat = (FlatLevelGeneratorSettings) GENERATOR_SETTING_FLAT_FIELD.get(
                     originalChunkProvider.getGenerator());
             chunkGenerator = new FlatLevelSource(generatorSettingFlat);
         } else if (originalChunkProvider.getGenerator() instanceof NoiseBasedChunkGenerator) {
-            Supplier<NoiseGeneratorSettings> generatorSettingBaseSupplier = (Supplier<NoiseGeneratorSettings>) generatorSettingBaseSupplierField
+            Supplier<NoiseGeneratorSettings> generatorSettingBaseSupplier = (Supplier<NoiseGeneratorSettings>) GENERATOR_SETTING_BASE_SUPPLIER_FIELD
                     .get(originalChunkProvider.getGenerator());
             BiomeSource biomeSource;
             if (options.hasBiomeType()) {
@@ -296,7 +295,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             }
             chunkGenerator = new NoiseBasedChunkGenerator(biomeSource, seed, generatorSettingBaseSupplier);
         } else if (originalChunkProvider.getGenerator() instanceof CustomChunkGenerator) {
-            chunkGenerator = (ChunkGenerator) delegateField.get(originalChunkProvider.getGenerator());
+            chunkGenerator = (ChunkGenerator) DELEGATE_FIELD.get(originalChunkProvider.getGenerator());
         } else {
             LOGGER.error("Unsupported generator type {}", originalChunkProvider.getGenerator().getClass().getName());
             return false;
@@ -331,7 +330,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             }
         };
 
-        chunkSourceField.set(freshWorld, freshChunkProvider);
+        CHUNK_SOURCE_FIELD.set(freshWorld, freshChunkProvider);
         //let's start then
         structureManager = server.getStructureManager();
         threadedLevelLightEngine = freshChunkProvider.getLightEngine();
@@ -423,7 +422,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     private void removeWorldFromWorldsMap() {
         Fawe.instance().getQueueHandler().sync(() -> {
             try {
-                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) worldsField.get(Bukkit.getServer());
+                Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) WORLDS_FIELD.get(Bukkit.getServer());
                 map.remove("faweregentempworld");
             } catch (IllegalAccessException e) {
                 LOGGER.debug("Something went wrong to remove world from worlds map", e);
