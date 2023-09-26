@@ -158,6 +158,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             chunkSourceField = ServerLevel.class.getDeclaredField(Refraction.pickName("chunkSource", "C"));
             chunkSourceField.setAccessible(true);
         } catch (Exception e) {
+            LOGGER.error("Something went wrong to create regeneration class", e);
             throw new RuntimeException(e);
         }
     }
@@ -190,6 +191,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             try {
                 generateFlatBedrock = generateFlatBedrockField.getBoolean(paperConfigField.get(originalServerWorld));
             } catch (Exception ignored) {
+                LOGGER.debug("Something went wrong to prepare regeneration", ignored);
             }
         }
 
@@ -342,6 +344,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         try {
             session.close();
         } catch (Exception ignored) {
+            LOGGER.debug("Something went wrong to close session", ignored);
         }
 
         //shutdown chunk provider
@@ -350,22 +353,26 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 try {
                     freshChunkProvider.close(false);
                 } catch (IOException e) {
+                    LOGGER.debug("Something went wrong to close chunk provider", e);
                     throw new RuntimeException(e);
                 }
             });
         } catch (Exception ignored) {
+            LOGGER.debug("Something went wrong to shutdown chunk provider", ignored);
         }
 
         //remove world from server
         try {
             Fawe.instance().getQueueHandler().sync(this::removeWorldFromWorldsMap);
         } catch (Exception ignored) {
+            LOGGER.debug("Something went wrong to remove world from server", ignored);
         }
 
         //delete directory
         try {
             SafeFiles.tryHardToDeleteDir(tempDir);
         } catch (Exception ignored) {
+            LOGGER.debug("Something went wrong to delete directory", ignored);
         }
     }
 
@@ -419,6 +426,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
                 Map<String, org.bukkit.World> map = (Map<String, org.bukkit.World>) worldsField.get(Bukkit.getServer());
                 map.remove("faweregentempworld");
             } catch (IllegalAccessException e) {
+                LOGGER.debug("Something went wrong to remove world from worlds map", e);
                 throw new RuntimeException(e);
             }
         });
