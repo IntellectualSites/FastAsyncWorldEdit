@@ -52,7 +52,6 @@ import net.minecraft.world.level.gameevent.GameEventListener;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftChunk;
-import sun.misc.Unsafe;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -71,69 +70,69 @@ import java.util.stream.Stream;
 
 public final class PaperweightPlatformAdapter extends NMSAdapter {
 
-    public static final Field fieldStorage;
-    public static final Field fieldPalette;
-    public static final Field fieldBits;
+    public static final Field FIELD_STORAGE;
+    public static final Field FIELD_PALETTE;
+    public static final Field FIELD_BITS;
 
-    public static final Field fieldBitsPerEntry;
+    public static final Field FIELD_BITS_PER_ENTRY;
 
-    private static final Field fieldTickingFluidContent;
-    private static final Field fieldTickingBlockCount;
-    private static final Field fieldNonEmptyBlockCount;
+    private static final Field FIELD_TICKING_FLUID_CONTENT;
+    private static final Field FIELD_TICKING_BLOCK_COUNT;
+    private static final Field FIELD_NON_EMPTY_BLOCK_COUNT;
 
-    private static final Field fieldBiomes;
+    private static final Field FIELD_BIOMES;
 
-    private static final MethodHandle methodGetVisibleChunk;
+    private static final MethodHandle METHOD_GET_VISIBLE_CHUNK;
 
-    private static final Field fieldLock;
+    private static final Field FIELD_LOCK;
 
-    private static final Field fieldGameEventDispatcherSections;
-    private static final MethodHandle methodremoveBlockEntityTicker;
+    private static final Field FIELD_GAME_EVENT_DISPATCHER_SECTIONS;
+    private static final MethodHandle METHOD_REMOVE_BLOCK_ENTITY_TICKER;
 
-    private static final Field fieldRemove;
+    private static final Field FIELD_REMOVE;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     static {
         try {
-            fieldBits = PalettedContainer.class.getDeclaredField(Refraction.pickName("bits", "l"));
-            fieldBits.setAccessible(true);
-            fieldStorage = PalettedContainer.class.getDeclaredField(Refraction.pickName("storage", "c"));
-            fieldStorage.setAccessible(true);
-            fieldPalette = PalettedContainer.class.getDeclaredField(Refraction.pickName("palette", "k"));
-            fieldPalette.setAccessible(true);
+            FIELD_BITS = PalettedContainer.class.getDeclaredField(Refraction.pickName("bits", "l"));
+            FIELD_BITS.setAccessible(true);
+            FIELD_STORAGE = PalettedContainer.class.getDeclaredField(Refraction.pickName("storage", "c"));
+            FIELD_STORAGE.setAccessible(true);
+            FIELD_PALETTE = PalettedContainer.class.getDeclaredField(Refraction.pickName("palette", "k"));
+            FIELD_PALETTE.setAccessible(true);
 
-            fieldBitsPerEntry = BitStorage.class.getDeclaredField(Refraction.pickName("bits", "c"));
-            fieldBitsPerEntry.setAccessible(true);
+            FIELD_BITS_PER_ENTRY = BitStorage.class.getDeclaredField(Refraction.pickName("bits", "c"));
+            FIELD_BITS_PER_ENTRY.setAccessible(true);
 
-            fieldTickingFluidContent = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "h"));
-            fieldTickingFluidContent.setAccessible(true);
-            fieldTickingBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "g"));
-            fieldTickingBlockCount.setAccessible(true);
-            fieldNonEmptyBlockCount = LevelChunkSection.class.getDeclaredField(Refraction.pickName("nonEmptyBlockCount", "f"));
-            fieldNonEmptyBlockCount.setAccessible(true);
+            FIELD_TICKING_FLUID_CONTENT = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingFluidCount", "h"));
+            FIELD_TICKING_FLUID_CONTENT.setAccessible(true);
+            FIELD_TICKING_BLOCK_COUNT = LevelChunkSection.class.getDeclaredField(Refraction.pickName("tickingBlockCount", "g"));
+            FIELD_TICKING_BLOCK_COUNT.setAccessible(true);
+            FIELD_NON_EMPTY_BLOCK_COUNT = LevelChunkSection.class.getDeclaredField(Refraction.pickName("nonEmptyBlockCount", "f"));
+            FIELD_NON_EMPTY_BLOCK_COUNT.setAccessible(true);
 
-            fieldBiomes = ChunkBiomeContainer.class.getDeclaredField(Refraction.pickName("biomes", "f"));
-            fieldBiomes.setAccessible(true);
+            FIELD_BIOMES = ChunkBiomeContainer.class.getDeclaredField(Refraction.pickName("biomes", "f"));
+            FIELD_BIOMES.setAccessible(true);
 
             Method getVisibleChunkIfPresent = ChunkMap.class.getDeclaredMethod(Refraction.pickName(
                     "getVisibleChunkIfPresent",
                     "getVisibleChunk"
             ), long.class);
             getVisibleChunkIfPresent.setAccessible(true);
-            methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
+            METHOD_GET_VISIBLE_CHUNK = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
 
             if (!PaperLib.isPaper()) {
-                fieldLock = PalettedContainer.class.getDeclaredField(Refraction.pickName("lock", "m"));
-                fieldLock.setAccessible(true);
+                FIELD_LOCK = PalettedContainer.class.getDeclaredField(Refraction.pickName("lock", "m"));
+                FIELD_LOCK.setAccessible(true);
             } else {
                 // in paper, the used methods are synchronized properly
-                fieldLock = null;
+                FIELD_LOCK = null;
             }
 
-            fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField(Refraction.pickName(
+            FIELD_GAME_EVENT_DISPATCHER_SECTIONS = LevelChunk.class.getDeclaredField(Refraction.pickName(
                     "gameEventDispatcherSections", "x"));
-            fieldGameEventDispatcherSections.setAccessible(true);
+            FIELD_GAME_EVENT_DISPATCHER_SECTIONS.setAccessible(true);
             Method removeBlockEntityTicker = LevelChunk.class.getDeclaredMethod(
                     Refraction.pickName(
                             "removeBlockEntityTicker",
@@ -141,10 +140,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                     ), BlockPos.class
             );
             removeBlockEntityTicker.setAccessible(true);
-            methodremoveBlockEntityTicker = MethodHandles.lookup().unreflect(removeBlockEntityTicker);
+            METHOD_REMOVE_BLOCK_ENTITY_TICKER = MethodHandles.lookup().unreflect(removeBlockEntityTicker);
 
-            fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
-            fieldRemove.setAccessible(true);
+            FIELD_REMOVE = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
+            FIELD_REMOVE.setAccessible(true);
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -176,12 +175,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         try {
             synchronized (section) {
                 PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.getStates();
-                Semaphore currentLock = (Semaphore) fieldLock.get(blocks);
+                Semaphore currentLock = (Semaphore) FIELD_LOCK.get(blocks);
                 if (currentLock instanceof DelegateSemaphore delegateSemaphore) {
                     return delegateSemaphore;
                 }
                 DelegateSemaphore newLock = new DelegateSemaphore(1, currentLock);
-                fieldLock.set(blocks, newLock);
+                FIELD_LOCK.set(blocks, newLock);
                 return newLock;
             }
         } catch (Throwable e) {
@@ -249,7 +248,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {
         ChunkMap chunkMap = nmsWorld.getChunkSource().chunkMap;
         try {
-            return (ChunkHolder) methodGetVisibleChunk.invoke(chunkMap, ChunkPos.asLong(chunkX, chunkZ));
+            return (ChunkHolder) METHOD_GET_VISIBLE_CHUNK.invoke(chunkMap, ChunkPos.asLong(chunkX, chunkZ));
         } catch (Throwable thr) {
             throw new RuntimeException(thr);
         }
@@ -397,9 +396,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 }
             }
             try {
-                fieldStorage.set(dataPaletteBlocks, nmsBits);
-                fieldPalette.set(dataPaletteBlocks, blockStatePalettedContainer);
-                fieldBits.set(dataPaletteBlocks, bitsPerEntry);
+                FIELD_STORAGE.set(dataPaletteBlocks, nmsBits);
+                FIELD_PALETTE.set(dataPaletteBlocks, blockStatePalettedContainer);
+                FIELD_BITS.set(dataPaletteBlocks, bitsPerEntry);
             } catch (final IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -408,7 +407,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 levelChunkSection.recalcBlockCounts();
             } else {
                 try {
-                    fieldNonEmptyBlockCount.set(levelChunkSection, nonEmptyBlockCount[0]);
+                    FIELD_NON_EMPTY_BLOCK_COUNT.set(levelChunkSection, nonEmptyBlockCount[0]);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
@@ -429,13 +428,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     public static void clearCounts(final LevelChunkSection section) throws IllegalAccessException {
-        fieldTickingFluidContent.setShort(section, (short) 0);
-        fieldTickingBlockCount.setShort(section, (short) 0);
+        FIELD_TICKING_FLUID_CONTENT.setShort(section, (short) 0);
+        FIELD_TICKING_BLOCK_COUNT.setShort(section, (short) 0);
     }
 
     public static Biome[] getBiomeArray(ChunkBiomeContainer chunkBiomeContainer) {
         try {
-            return (Biome[]) fieldBiomes.get(chunkBiomeContainer);
+            return (Biome[]) FIELD_BIOMES.get(chunkBiomeContainer);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return null;
@@ -470,7 +469,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                                 gameEventDispatcher.unregister(gameEventListener);
                                 if (gameEventDispatcher.isEmpty()) {
                                     try {
-                                        ((Int2ObjectMap<GameEventDispatcher>) fieldGameEventDispatcherSections.get(levelChunk))
+                                        ((Int2ObjectMap<GameEventDispatcher>) FIELD_GAME_EVENT_DISPATCHER_SECTIONS.get(levelChunk))
                                                 .remove(i);
                                     } catch (IllegalAccessException e) {
                                         e.printStackTrace();
@@ -479,10 +478,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                             }
                         }
                     }
-                    fieldRemove.set(beacon, true);
+                    FIELD_REMOVE.set(beacon, true);
                 }
             }
-            methodremoveBlockEntityTicker.invoke(levelChunk, beacon.getBlockPos());
+            METHOD_REMOVE_BLOCK_ENTITY_TICKER.invoke(levelChunk, beacon.getBlockPos());
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }

@@ -878,10 +878,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 lock.acquire();
 
                 final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.getStates();
-                final BitStorage bits = (BitStorage) PaperweightPlatformAdapter.fieldStorage.get(blocks);
-                final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.fieldPalette.get(blocks);
+                final BitStorage bits = (BitStorage) PaperweightPlatformAdapter.FIELD_STORAGE.get(blocks);
+                final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.FIELD_PALETTE.get(blocks);
 
-                final int bitsPerEntry = (int) PaperweightPlatformAdapter.fieldBitsPerEntry.get(bits);
+                final int bitsPerEntry = (int) PaperweightPlatformAdapter.FIELD_BITS_PER_ENTRY.get(bits);
                 final long[] blockStates = bits.getRaw();
 
                 new BitArrayUnstretched(bitsPerEntry, 4096, blockStates).toRaw(data);
@@ -1041,7 +1041,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 try {
                     final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocksExisting = existing.getStates();
 
-                    final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.fieldPalette.get(
+                    final Palette<BlockState> palette = (Palette<BlockState>) PaperweightPlatformAdapter.FIELD_PALETTE.get(
                             blocksExisting);
                     int paletteSize;
 
