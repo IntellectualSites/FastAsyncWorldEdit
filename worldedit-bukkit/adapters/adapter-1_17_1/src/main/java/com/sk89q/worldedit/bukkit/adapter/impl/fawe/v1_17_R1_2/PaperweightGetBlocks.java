@@ -96,8 +96,6 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private final int chunkZ;
     private final int minHeight;
     private final int maxHeight;
-    private final int minSectionPosition;
-    private final int maxSectionPosition;
     private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
     private DataLayer[] blockLight;
