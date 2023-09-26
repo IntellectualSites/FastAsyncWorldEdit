@@ -48,9 +48,11 @@ public class PaperweightBlockMaterial implements BlockMaterial {
                 BlockPos.ZERO,
                 blockState
         );
-        tile = tileEntity == null
-                ? null
-                : new PaperweightLazyCompoundTag(Suppliers.memoize(() -> tileEntity.save(new net.minecraft.nbt.CompoundTag())));
+        if (tileEntity == null) {
+            this.tile = null;
+        } else {
+            tile = new PaperweightLazyCompoundTag(Suppliers.memoize(() -> tileEntity.save(new net.minecraft.nbt.CompoundTag())));
+        }
     }
 
     public Block getBlock() {
