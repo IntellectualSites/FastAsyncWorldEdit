@@ -152,7 +152,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             try {
                 fillLightNibble(light, LightLayer.BLOCK, minSectionPosition, maxSectionPosition);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Something went wrong at fill light nibble", e);
             }
         }
     }
@@ -164,7 +164,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             try {
                 fillLightNibble(light, LightLayer.SKY, minSectionPosition, maxSectionPosition);
             } catch (Throwable e) {
-                e.printStackTrace();
+                LOGGER.error("Something went wrong at fill light nibble", e);
             }
         }
     }
@@ -788,7 +788,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             }
             return null;
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOGGER.error("Something went wrong", e);
             return null;
         } finally {
             forceLoadSections = true;
@@ -926,7 +926,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 }
                 return data;
             } catch (IllegalAccessException | InterruptedException e) {
-                e.printStackTrace();
+                LOGGER.error("Something went wrong", e);
                 throw new RuntimeException(e);
             } finally {
                 lock.release();
@@ -1057,6 +1057,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                     }
                     super.trim(false, i);
                 } catch (IllegalAccessException ignored) {
+                    LOGGER.debug("Something went wrong", ignored);
                     super.trim(false, i);
                 }
             }
