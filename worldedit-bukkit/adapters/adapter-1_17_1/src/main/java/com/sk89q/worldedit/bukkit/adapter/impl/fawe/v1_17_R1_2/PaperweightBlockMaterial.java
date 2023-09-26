@@ -44,10 +44,15 @@ public class PaperweightBlockMaterial implements BlockMaterial {
                 Refraction.pickName("canOcclude", "n")
         );
         opacity = blockState.getLightBlock(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
-        BlockEntity tileEntity = !(block instanceof EntityBlock) ? null : ((EntityBlock) block).newBlockEntity(
-                BlockPos.ZERO,
-                blockState
-        );
+        BlockEntity tileEntity;
+        if (block instanceof EntityBlock) {
+            tileEntity = ((EntityBlock) block).newBlockEntity(
+                    BlockPos.ZERO,
+                    blockState
+            );
+        } else {
+            tileEntity = null;
+        }
         if (tileEntity == null) {
             this.tile = null;
         } else {
