@@ -529,10 +529,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         //FAWE start - ExtentTraverser & MaskingExtents
         MaskingExtent maskingExtent = new ExtentTraverser<>(getExtent()).findAndGet(MaskingExtent.class);
         if (maskingExtent == null) {
-            ExtentTraverser<ExtentBatchProcessorHolder> processorExtent =
-                    new ExtentTraverser<>(getExtent()).find(ExtentBatchProcessorHolder.class);
-            maskingExtent =
-                    new ProcessorTraverser<>(processorExtent.get().getProcessor()).find(MaskingExtent.class);
+            ExtentBatchProcessorHolder processorExtent =
+                    new ExtentTraverser<>(getExtent()).findAndGet(ExtentBatchProcessorHolder.class);
+            if (processorExtent != null) {
+                maskingExtent =
+                        new ProcessorTraverser<>(processorExtent.getProcessor()).find(MaskingExtent.class);
+            }
         }
         return maskingExtent != null ? maskingExtent.getMask() : null;
         //FAWE end
@@ -629,10 +631,12 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         }
         MaskingExtent maskingExtent = new ExtentTraverser<>(getExtent()).findAndGet(MaskingExtent.class);
         if (maskingExtent == null && mask != Masks.alwaysTrue()) {
-            ExtentTraverser<ExtentBatchProcessorHolder> processorExtent =
-                    new ExtentTraverser<>(getExtent()).find(ExtentBatchProcessorHolder.class);
-            maskingExtent =
-                    new ProcessorTraverser<>(processorExtent.get().getProcessor()).find(MaskingExtent.class);
+            ExtentBatchProcessorHolder processorExtent =
+                    new ExtentTraverser<>(getExtent()).findAndGet(ExtentBatchProcessorHolder.class);
+            if (processorExtent != null) {
+                maskingExtent =
+                        new ProcessorTraverser<>(processorExtent.getProcessor()).find(MaskingExtent.class);
+            }
         }
         if (maskingExtent != null) {
             Mask oldMask = maskingExtent.getMask();

@@ -25,7 +25,6 @@ import com.sk89q.worldedit.util.YAMLConfiguration;
 import com.sk89q.worldedit.util.report.Unreported;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.File;
 import java.nio.file.Path;
 
 /**
@@ -52,26 +51,6 @@ public class BukkitConfiguration extends YAMLConfiguration {
         if (unsupportedVersionEditing) {
             WorldEdit.logger.warn("Editing without a Bukkit adapter has been enabled. You will not receive support "
                     + "for any issues that arise as a result.");
-        }
-        migrateLegacyFolders();
-    }
-
-    private void migrateLegacyFolders() {
-        migrate(scriptsDir, "craftscripts");
-        migrate(saveDir, "schematics");
-        migrate("drawings", "draw.js images");
-    }
-
-    private void migrate(String file, String name) {
-        File fromDir = new File(".", file);
-        File toDir = new File(getWorkingDirectoryPath().toFile(), file);
-        if (fromDir.exists() & !toDir.exists()) {
-            if (fromDir.renameTo(toDir)) {
-                plugin.getLogger().info("Migrated " + name + " folder '" + file
-                        + "' from server root to plugin data folder.");
-            } else {
-                plugin.getLogger().warning("Error while migrating " + name + " folder!");
-            }
         }
     }
 

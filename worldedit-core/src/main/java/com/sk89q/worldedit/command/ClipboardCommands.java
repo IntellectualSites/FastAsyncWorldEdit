@@ -19,6 +19,7 @@
 
 package com.sk89q.worldedit.command;
 
+import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweAPI;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Caption;
@@ -28,6 +29,7 @@ import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.ImgurUtility;
@@ -160,7 +162,7 @@ public class ClipboardCommands {
                 session.getPlacementPosition(actor));
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setCopyingEntities(copyEntities);
-        createCopy(session, editSession, copyBiomes, mask, clipboard, copy);
+        createCopy(actor, session, editSession, copyBiomes, mask, clipboard, copy);
 
         copy.getStatusMessages().forEach(actor::print);
         //FAWE end
@@ -271,7 +273,7 @@ public class ClipboardCommands {
         copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
         copy.setCopyingEntities(copyEntities);
         copy.setRemovingEntities(true);
-        createCopy(session, editSession, copyBiomes, mask, clipboard, copy);
+        createCopy(actor, session, editSession, copyBiomes, mask, clipboard, copy);
 
         if (!actor.hasPermission("fawe.tips")) {
             actor.print(Caption.of("fawe.tips.tip.lazycut"));
@@ -281,6 +283,7 @@ public class ClipboardCommands {
     }
 
     private void createCopy(
+            final Actor actor,
             final LocalSession session,
             final EditSession editSession,
             final boolean copyBiomes,
@@ -311,9 +314,22 @@ public class ClipboardCommands {
 
         try {
             Operations.completeLegacy(copy);
-        } finally {
-            clipboard.flush();
+        } catch (Exception e) {
+            DiskOptimizedClipboard doc;
+            if (clipboard instanceof DiskOptimizedClipboard) {
+                doc = (DiskOptimizedClipboard) clipboard;
+            } else if (clipboard instanceof BlockArrayClipboard && ((BlockArrayClipboard) clipboard).getParent() instanceof DiskOptimizedClipboard) {
+                doc = (DiskOptimizedClipboard) ((BlockArrayClipboard) clipboard).getParent();
+            } else {
+                throw e;
+            }
+            Fawe.instance().getClipboardExecutor().submit(actor.getUniqueId(), () -> {
+                clipboard.close();
+                doc.getFile().delete();
+            });
+            throw e;
         }
+        clipboard.flush();
         session.setClipboard(new ClipboardHolder(clipboard));
     }
 

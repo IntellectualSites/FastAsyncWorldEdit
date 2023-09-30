@@ -325,20 +325,11 @@ public class FaweBukkit implements IFawe, Listener {
         if (plotSquared == null) {
             return;
         }
-        if (PlotSquared.get().getVersion().version[0] == 6) {
+        if (PlotSquared.get().getVersion().version[0] == 7) {
             WEManager.weManager().addManager(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
-            LOGGER.info("Plugin 'PlotSquared' v6 found. Using it now.");
-        } else if (PlotSquared.get().getVersion().version[0] == 7) {
-            WEManager.weManager().addManager(new com.fastasyncworldedit.bukkit.regions.plotsquared.PlotSquaredFeature());
-            LOGGER.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            LOGGER.error("!!                                                                                                !!");
-            LOGGER.error("!!         ERROR: PlotSquared v7 found. This FAWE version does not support PlotSquared V7         !!");
-            LOGGER.error("!!        Follow the instructions when notified of v7 release candidates and use FAWE from        !!");
-            LOGGER.error("!!  https://ci.athion.net/job/FastAsyncWorldEdit-Pull-Requests/view/change-requests/job/PR-2075/  !!");
-            LOGGER.error("!!                                                                                                !!");
-            LOGGER.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            LOGGER.info("Plugin 'PlotSquared' v7 found. Using it now.");
         } else {
-            LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v6.");
+            LOGGER.error("Incompatible version of PlotSquared found. Please use PlotSquared v7.");
             LOGGER.info("https://www.spigotmc.org/resources/77506/");
         }
     }

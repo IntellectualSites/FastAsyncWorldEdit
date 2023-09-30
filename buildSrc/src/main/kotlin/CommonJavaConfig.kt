@@ -40,12 +40,11 @@ fun Project.applyCommonJavaConfiguration(sourcesJar: Boolean, banSlf4j: Boolean 
 
     dependencies {
         "compileOnly"("com.google.code.findbugs:jsr305:3.0.2")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.9.2")
-        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.9.2")
-        "testImplementation"("org.mockito:mockito-core:5.1.1")
-        "testImplementation"("org.mockito:mockito-junit-jupiter:5.1.1")
-        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.9.2")
-        "implementation"(platform("com.intellectualsites.bom:bom-1.18.x:1.31"))
+        "testImplementation"("org.junit.jupiter:junit-jupiter-api:5.10.0")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:5.10.0")
+        "testImplementation"("org.mockito:mockito-core:5.4.0")
+        "testImplementation"("org.mockito:mockito-junit-jupiter:5.4.0")
+        "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:5.10.0")
     }
 
     // Java 8 turns on doclint which we fail

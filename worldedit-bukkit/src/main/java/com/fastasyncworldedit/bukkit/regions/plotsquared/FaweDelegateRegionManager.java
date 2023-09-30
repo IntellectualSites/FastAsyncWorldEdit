@@ -172,13 +172,11 @@ public class FaweDelegateRegionManager {
                                     .limitUnlimited()
                                     .changeSetNull()
                                     .build();
-                    File schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schem");
+                    File schematicFile = new File(hybridPlotWorld.getSchematicRoot(), "plot.schem");
                     if (!schematicFile.exists()) {
-                        schematicFile = new File(hybridPlotWorld.getRoot(), "plot.schematic");
+                        schematicFile = new File(hybridPlotWorld.getSchematicRoot(), "plot.schematic");
                     }
-                    BlockVector3 to = plot.getBottomAbs().getBlockVector3().withY(Settings.Schematics.PASTE_ON_TOP
-                            ? hybridPlotWorld.SCHEM_Y
-                            : hybridPlotWorld.getMinBuildHeight());
+                    BlockVector3 to = plot.getBottomAbs().getBlockVector3().withY(hybridPlotWorld.getPlotYStart());
                     try {
                         Clipboard clip = ClipboardFormats
                                 .findByFile(schematicFile)
