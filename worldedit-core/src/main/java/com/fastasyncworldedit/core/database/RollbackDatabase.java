@@ -172,7 +172,7 @@ public class RollbackDatabase extends AsyncNotifyQueue {
                     stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
                             "`y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
                 }
-                try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
+                try (PreparedStatement stmt = connection.prepareStatement(stmtStr.formatted(this.prefix))) {
                     stmt.setInt(1, (int) (minTime / 1000));
                     stmt.setInt(2, pos1.getBlockX());
                     stmt.setInt(3, pos2.getBlockX());
