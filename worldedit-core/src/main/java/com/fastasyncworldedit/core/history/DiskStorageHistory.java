@@ -233,7 +233,6 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
     public void close() throws IOException {
         super.close();
         synchronized (this) {
-            System.out.println("CLOSING");
             try {
                 if (osBD != null) {
                     osBD.close();

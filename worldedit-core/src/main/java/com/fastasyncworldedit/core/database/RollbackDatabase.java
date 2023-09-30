@@ -159,11 +159,19 @@ public class RollbackDatabase extends AsyncNotifyQueue {
         Future<Integer> future = call(() -> {
             try {
                 int count = 0;
-                String stmtStr = ascending
-                        ? uuid == null
-                        ? "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? ORDER BY `time` , `id`"
-                        : "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC"
-                        : "SELECT * FROM`" + this.prefix + "edits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND `y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
+                String stmtStr;
+                if (ascending) {
+                    if (uuid == null) {
+                        stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
+                                "`y2`>=? AND `y1`<=? ORDER BY `time` , `id`";
+                    } else {
+                        stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
+                                "`y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` ASC, `id` ASC";
+                    }
+                } else {
+                    stmtStr = "SELECT * FROM`%sedits` WHERE `time`>? AND `x2`>=? AND `x1`<=? AND `z2`>=? AND `z1`<=? AND " +
+                            "`y2`>=? AND `y1`<=? AND `player`=? ORDER BY `time` DESC, `id` DESC";
+                }
                 try (PreparedStatement stmt = connection.prepareStatement(stmtStr)) {
                     stmt.setInt(1, (int) (minTime / 1000));
                     stmt.setInt(2, pos1.getBlockX());

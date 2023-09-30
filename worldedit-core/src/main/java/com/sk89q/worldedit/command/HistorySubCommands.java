@@ -131,7 +131,7 @@ public class HistorySubCommands {
             other = null;
         }
         Location origin = player.getLocation();
-        BlockVector3 bot  = origin.toBlockPoint().subtract(radius, radius, radius);
+        BlockVector3 bot = origin.toBlockPoint().subtract(radius, radius, radius);
         BlockVector3 top = origin.toBlockPoint().add(radius, radius, radius);
         bot = bot.clampY(world.getMinY(), world.getMaxY());
         top = top.clampY(world.getMinY(), world.getMaxY());
