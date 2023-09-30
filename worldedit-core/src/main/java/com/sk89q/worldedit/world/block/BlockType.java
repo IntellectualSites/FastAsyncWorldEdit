@@ -86,7 +86,7 @@ public class BlockType implements Keyed, Pattern {
      * a specific requirement to actually create new block types, please contact the FAWE devs to discuss. Use
      * {@link BlockTypes#get(String)} instead.
      */
-    @Deprecated(since = "TODO")
+    @Deprecated(since = "2.7.0")
     //FAWE end
     public BlockType(String id) {
         this(id, null);
@@ -98,7 +98,7 @@ public class BlockType implements Keyed, Pattern {
      * a specific requirement to actually create new block types, please contact the FAWE devs to discuss. Use
      * {@link BlockTypes#get(String)} instead.
      */
-    @Deprecated(since = "TODO")
+    @Deprecated(since = "2.7.0")
     //FAWE end
     public BlockType(String id, Function<BlockState, BlockState> values) {
         // If it has no namespace, assume minecraft.

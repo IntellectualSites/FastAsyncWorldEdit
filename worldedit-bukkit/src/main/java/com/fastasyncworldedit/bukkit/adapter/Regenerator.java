@@ -22,14 +22,14 @@ import com.sk89q.worldedit.world.block.BaseBlock;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.World;
 import org.bukkit.generator.BiomeProvider;
 import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.WorldInfo;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -42,7 +42,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Represents an abstract regeneration handler.
@@ -62,7 +61,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     protected final RegenOptions options;
 
     //runtime
-    protected final Map<ChunkStatus, Concurrency> chunkStati = new LinkedHashMap<>();
+    protected final Map<ChunkStatus, Concurrency> chunkStatuses = new LinkedHashMap<>();
     private final Long2ObjectLinkedOpenHashMap<ProtoChunk> protoChunks = new Long2ObjectLinkedOpenHashMap<>();
     private final Long2ObjectOpenHashMap<Chunk> chunks = new Long2ObjectOpenHashMap<>();
     protected boolean generateConcurrent = true;
@@ -85,19 +84,19 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         this.options = options;
     }
 
-    private static Random getChunkRandom(long worldseed, int x, int z) {
+    private static Random getChunkRandom(long worldSeed, int x, int z) {
         Random random = new Random();
-        random.setSeed(worldseed);
+        random.setSeed(worldSeed);
         long xRand = random.nextLong() / 2L * 2L + 1L;
         long zRand = random.nextLong() / 2L * 2L + 1L;
-        random.setSeed((long) x * xRand + (long) z * zRand ^ worldseed);
+        random.setSeed((long) x * xRand + (long) z * zRand ^ worldSeed);
         return random;
     }
 
     /**
      * Regenerates the selected {@code Region}.
      *
-     * @return whether or not the regeneration process was successful
+     * @return whether the regeneration process was successful
      * @throws Exception when something goes terribly wrong
      */
     public boolean regenerate() throws Exception {
@@ -175,8 +174,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         //for now it is working well and fast, if we are bored in the future we could do the research (a lot of it) to reduce the border radius
 
         //generate chunk coords lists with a certain radius
-        Int2ObjectOpenHashMap<List<Long>> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
-        chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
+        Int2ObjectOpenHashMap<long[]> chunkCoordsForRadius = new Int2ObjectOpenHashMap<>();
+        chunkStatuses.keySet().stream().mapToInt(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
             if (radius == -1) { //ignore ChunkStatus.EMPTY
                 return;
             }
@@ -186,19 +185,19 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         });
 
         //create chunks
-        for (Long xz : chunkCoordsForRadius.get(0)) {
+        for (long xz : chunkCoordsForRadius.get(0)) {
             ProtoChunk chunk = createProtoChunk(MathMan.unpairIntX(xz), MathMan.unpairIntY(xz));
             protoChunks.put(xz, chunk);
         }
 
         //generate lists for RegionLimitedWorldAccess, need to be square with odd length (e.g. 17x17), 17 = 1 middle chunk + 8 border chunks * 2
-        Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldlimits = new Int2ObjectOpenHashMap<>();
-        chunkStati.keySet().stream().map(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
+        Int2ObjectOpenHashMap<Long2ObjectOpenHashMap<List<IChunkAccess>>> worldLimits = new Int2ObjectOpenHashMap<>();
+        chunkStatuses.keySet().stream().mapToInt(ChunkStatusWrapper::requiredNeighborChunkRadius0).distinct().forEach(radius -> {
             if (radius == -1) { //ignore ChunkStatus.EMPTY
                 return;
             }
             Long2ObjectOpenHashMap<List<IChunkAccess>> map = new Long2ObjectOpenHashMap<>();
-            for (Long xz : chunkCoordsForRadius.get(radius)) {
+            for (long xz : chunkCoordsForRadius.get(radius)) {
                 int x = MathMan.unpairIntX(xz);
                 int z = MathMan.unpairIntY(xz);
                 List<IChunkAccess> l = new ArrayList<>((radius + 1 + radius) * (radius + 1 + radius));
@@ -209,80 +208,63 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                 }
                 map.put(xz, l);
             }
-            worldlimits.put(radius, map);
+            worldLimits.put(radius, map);
         });
 
         //run generation tasks excluding FULL chunk status
-        for (Map.Entry<ChunkStatus, Concurrency> entry : chunkStati.entrySet()) {
+        for (Map.Entry<ChunkStatus, Concurrency> entry : chunkStatuses.entrySet()) {
             ChunkStatus chunkStatus = entry.getKey();
             int radius = chunkStatus.requiredNeighborChunkRadius0();
 
-            List<Long> coords = chunkCoordsForRadius.get(radius);
+            long[] coords = chunkCoordsForRadius.get(radius);
+            Long2ObjectOpenHashMap<List<IChunkAccess>> limitsForRadius = worldLimits.get(radius);
             if (this.generateConcurrent && entry.getValue() == Concurrency.RADIUS) {
-                SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks = getChunkStatusTaskRows(coords, radius);
-                for (ConcurrentTasks<SequentialTasks<Long>> para : tasks) {
+                SequentialTasks<ConcurrentTasks<LongList>> tasks = getChunkStatusTaskRows(coords, radius);
+                for (ConcurrentTasks<LongList> para : tasks) {
                     List<Runnable> scheduled = new ArrayList<>(tasks.size());
-                    for (SequentialTasks<Long> row : para) {
+                    for (LongList row : para) {
                         scheduled.add(() -> {
-                            for (Long xz : row) {
-                                chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
+                            for (long xz : row) {
+                                chunkStatus.processChunkSave(xz, limitsForRadius.get(xz));
                             }
                         });
                     }
-                    try {
-                        List<Future<?>> futures = new ArrayList<>();
-                        scheduled.forEach(task -> futures.add(executor.submit(task)));
-                        for (Future<?> future : futures) {
-                            future.get();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    runAndWait(scheduled);
                 }
             } else if (this.generateConcurrent && entry.getValue() == Concurrency.FULL) {
                 // every chunk can be processed individually
-                List<Runnable> scheduled = new ArrayList<>(coords.size());
+                List<Runnable> scheduled = new ArrayList<>(coords.length);
                 for (long xz : coords) {
-                    scheduled.add(() -> {
-                        chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
-                    });
+                    scheduled.add(() -> chunkStatus.processChunkSave(xz, limitsForRadius.get(xz)));
                 }
-                try {
-                    List<Future<?>> futures = new ArrayList<>();
-                    scheduled.forEach(task -> futures.add(executor.submit(task)));
-                    for (Future<?> future : futures) {
-                        future.get();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                runAndWait(scheduled);
             } else { // Concurrency.NONE or generateConcurrent == false
                 // run sequential but submit to different thread
                 // running regen on the main thread otherwise triggers async-only events on the main thread
                 executor.submit(() -> {
                     for (long xz : coords) {
-                        chunkStatus.processChunkSave(xz, worldlimits.get(radius).get(xz));
+                        chunkStatus.processChunkSave(xz, limitsForRadius.get(xz));
                     }
                 }).get(); // wait until finished this step
             }
         }
 
         //convert to proper chunks
-        for (Long xz : chunkCoordsForRadius.get(0)) {
+        for (long xz : chunkCoordsForRadius.get(0)) {
             ProtoChunk proto = protoChunks.get(xz);
             chunks.put(xz, createChunk(proto));
         }
 
         //final chunkstatus
         ChunkStatus FULL = getFullChunkStatus();
-        for (Long xz : chunkCoordsForRadius.get(0)) { //FULL.requiredNeighbourChunkRadius() == 0!
+        for (long xz : chunkCoordsForRadius.get(0)) { //FULL.requiredNeighbourChunkRadius() == 0!
             Chunk chunk = chunks.get(xz);
-            FULL.processChunkSave(xz, Arrays.asList(chunk));
+            FULL.processChunkSave(xz, List.of(chunk));
         }
 
         //populate
         List<BlockPopulator> populators = getBlockPopulators();
-        for (Long xz : chunkCoordsForRadius.get(0)) {
+        for (long xz : chunkCoordsForRadius.get(0)) {
             int x = MathMan.unpairIntX(xz);
             int z = MathMan.unpairIntY(xz);
 
@@ -300,6 +282,18 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                 BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMaxHeight() : 256);
         source.init(target, initSourceQueueCache(), null);
         return true;
+    }
+
+    private void runAndWait(final List<Runnable> tasks) {
+        try {
+            List<Future<?>> futures = new ArrayList<>();
+            tasks.forEach(task -> futures.add(executor.submit(task)));
+            for (Future<?> future : futures) {
+                future.get();
+            }
+        } catch (Exception e) {
+            LOGGER.catching(e);
+        }
     }
 
     private void copyToWorld() {
@@ -437,7 +431,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     protected abstract IChunkCache<IChunkGet> initSourceQueueCache();
 
     //algorithms
-    private List<Long> getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
+    private long[] getChunkCoordsRegen(Region region, int border) { //needs to be square num of chunks
         BlockVector3 oldMin = region.getMinimumPoint();
         BlockVector3 newMin = BlockVector3.at(
                 (oldMin.getX() >> 4 << 4) - border * 16,
@@ -455,76 +449,79 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                 .sorted(Comparator
                         .comparingInt(BlockVector2::getZ)
                         .thenComparingInt(BlockVector2::getX)) //needed for RegionLimitedWorldAccess
-                .map(c -> MathMan.pairInt(c.getX(), c.getZ()))
-                .collect(Collectors.toList());
+                .mapToLong(c -> MathMan.pairInt(c.getX(), c.getZ()))
+                .toArray();
     }
 
     /**
      * Creates a list of chunkcoord rows that may be executed concurrently
      *
-     * @param allcoords                   the coords that should be sorted into rows, must be sorted by z and x
+     * @param allCoords                   the coords that should be sorted into rows, must be sorted by z and x
      * @param requiredNeighborChunkRadius the radius of neighbor chunks that may not be written to concurrently (ChunkStatus
      *                                    .requiredNeighborRadius)
      * @return a list of chunkcoords rows that may be executed concurrently
      */
-    private SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> getChunkStatusTaskRows(
-            List<Long> allcoords,
+    private SequentialTasks<ConcurrentTasks<LongList>> getChunkStatusTaskRows(
+            long[] allCoords,
             int requiredNeighborChunkRadius
     ) {
-        int requiredneighbors = Math.max(0, requiredNeighborChunkRadius);
+        int requiredNeighbors = Math.max(0, requiredNeighborChunkRadius);
 
-        int minx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(0));
-        int maxx = allcoords.isEmpty() ? 0 : MathMan.unpairIntX(allcoords.get(allcoords.size() - 1));
-        int minz = allcoords.isEmpty() ? 0 : MathMan.unpairIntY(allcoords.get(0));
-        int maxz = allcoords.isEmpty() ? 0 : MathMan.unpairIntY(allcoords.get(allcoords.size() - 1));
-        SequentialTasks<ConcurrentTasks<SequentialTasks<Long>>> tasks;
-        if (maxz - minz > maxx - minx) {
-            int numlists = Math.min(requiredneighbors * 2 + 1, maxx - minx + 1);
+        final int coordsCount = allCoords.length;
+        long first = coordsCount == 0 ? 0 : allCoords[0];
+        long last = coordsCount == 0 ? 0 : allCoords[coordsCount - 1];
+        int minX = MathMan.unpairIntX(first);
+        int maxX = MathMan.unpairIntX(last);
+        int minZ = MathMan.unpairIntY(first);
+        int maxZ = MathMan.unpairIntY(last);
+        SequentialTasks<ConcurrentTasks<LongList>> tasks;
+        if (maxZ - minZ > maxX - minX) {
+            int numlists = Math.min(requiredNeighbors * 2 + 1, maxX - minX + 1);
 
-            Int2ObjectOpenHashMap<SequentialTasks<Long>> byx = new Int2ObjectOpenHashMap();
-            int expectedListLength = (allcoords.size() + 1) / (maxx - minx);
+            Int2ObjectOpenHashMap<LongList> byX = new Int2ObjectOpenHashMap<>();
+            int expectedListLength = (coordsCount + 1) / (maxX - minX);
 
             //init lists
-            for (int i = minx; i <= maxx; i++) {
-                byx.put(i, new SequentialTasks(expectedListLength));
+            for (int i = minX; i <= maxX; i++) {
+                byX.put(i, new LongArrayList(expectedListLength));
             }
 
             //sort into lists by x coord
-            for (Long xz : allcoords) {
-                byx.get(MathMan.unpairIntX(xz)).add(xz);
+            for (long allCoord : allCoords) {
+                byX.get(MathMan.unpairIntX(allCoord)).add(allCoord);
             }
 
             //create parallel tasks
-            tasks = new SequentialTasks(numlists);
+            tasks = new SequentialTasks<>(numlists);
             for (int offset = 0; offset < numlists; offset++) {
-                ConcurrentTasks<SequentialTasks<Long>> para = new ConcurrentTasks((maxz - minz + 1) / numlists + 1);
-                for (int i = 0; minx + i * numlists + offset <= maxx; i++) {
-                    para.add(byx.get(minx + i * numlists + offset));
+                ConcurrentTasks<LongList> para = new ConcurrentTasks<>((maxZ - minZ + 1) / numlists + 1);
+                for (int i = 0; minX + i * numlists + offset <= maxX; i++) {
+                    para.add(byX.get(minX + i * numlists + offset));
                 }
                 tasks.add(para);
             }
         } else {
-            int numlists = Math.min(requiredneighbors * 2 + 1, maxz - minz + 1);
+            int numlists = Math.min(requiredNeighbors * 2 + 1, maxZ - minZ + 1);
 
-            Int2ObjectOpenHashMap<SequentialTasks<Long>> byz = new Int2ObjectOpenHashMap();
-            int expectedListLength = (allcoords.size() + 1) / (maxz - minz);
+            Int2ObjectOpenHashMap<LongList> byZ = new Int2ObjectOpenHashMap<>();
+            int expectedListLength = (coordsCount + 1) / (maxZ - minZ);
 
             //init lists
-            for (int i = minz; i <= maxz; i++) {
-                byz.put(i, new SequentialTasks(expectedListLength));
+            for (int i = minZ; i <= maxZ; i++) {
+                byZ.put(i, new LongArrayList(expectedListLength));
             }
 
             //sort into lists by x coord
-            for (Long xz : allcoords) {
-                byz.get(MathMan.unpairIntY(xz)).add(xz);
+            for (long allCoord : allCoords) {
+                byZ.get(MathMan.unpairIntY(allCoord)).add(allCoord);
             }
 
             //create parallel tasks
-            tasks = new SequentialTasks(numlists);
+            tasks = new SequentialTasks<>(numlists);
             for (int offset = 0; offset < numlists; offset++) {
-                ConcurrentTasks<SequentialTasks<Long>> para = new ConcurrentTasks((maxx - minx + 1) / numlists + 1);
-                for (int i = 0; minz + i * numlists + offset <= maxz; i++) {
-                    para.add(byz.get(minz + i * numlists + offset));
+                ConcurrentTasks<LongList> para = new ConcurrentTasks<>((maxX - minX + 1) / numlists + 1);
+                for (int i = 0; minZ + i * numlists + offset <= maxZ; i++) {
+                    para.add(byZ.get(minZ + i * numlists + offset));
                 }
                 tasks.add(para);
             }
@@ -576,15 +573,14 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         /**
          * Return the name of the wrapped {@code ChunkStatus}.
          *
-         * @param xz               represents the chunk coordinates of the chunk to process as denoted by {@code MathMan}
          * @param accessibleChunks a list of chunks that will be used during the execution of the wrapped {@code ChunkStatus}.
          *                         This list is order in the correct order required by the {@code ChunkStatus}, unless Mojang suddenly decides to do things differently.
          */
-        public abstract CompletableFuture<?> processChunk(Long xz, List<IChunkAccess> accessibleChunks);
+        public abstract CompletableFuture<?> processChunk(List<IChunkAccess> accessibleChunks);
 
-        void processChunkSave(Long xz, List<IChunkAccess> accessibleChunks) {
+        void processChunkSave(long xz, List<IChunkAccess> accessibleChunks) {
             try {
-                processChunk(xz, accessibleChunks).get();
+                processChunk(accessibleChunks).get();
             } catch (Exception e) {
                 LOGGER.error(
                         "Error while running " + name() + " on chunk " + MathMan.unpairIntX(xz) + "/" + MathMan.unpairIntY(xz),
@@ -597,16 +593,16 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
     public static class SequentialTasks<T> extends Tasks<T> {
 
-        public SequentialTasks(int expectedsize) {
-            super(expectedsize);
+        public SequentialTasks(int expectedSize) {
+            super(expectedSize);
         }
 
     }
 
     public static class ConcurrentTasks<T> extends Tasks<T> {
 
-        public ConcurrentTasks(int expectedsize) {
-            super(expectedsize);
+        public ConcurrentTasks(int expectedSize) {
+            super(expectedSize);
         }
 
     }
@@ -615,8 +611,8 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
 
         private final List<T> tasks;
 
-        public Tasks(int expectedsize) {
-            tasks = new ArrayList(expectedsize);
+        public Tasks(int expectedSize) {
+            tasks = new ArrayList<>(expectedSize);
         }
 
         public void add(T task) {

@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Processor that removes existing entities that would not be in air after the edit
  *
- * @since TODO
+ * @since 2.7.0
  */
 public class EntityInBlockRemovingProcessor implements IBatchProcessor {
 

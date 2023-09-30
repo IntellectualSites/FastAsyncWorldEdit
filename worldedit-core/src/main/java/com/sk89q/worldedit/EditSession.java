@@ -30,6 +30,7 @@ import com.fastasyncworldedit.core.extent.ResettableExtent;
 import com.fastasyncworldedit.core.extent.SingleRegionExtent;
 import com.fastasyncworldedit.core.extent.SourceMaskExtent;
 import com.fastasyncworldedit.core.extent.clipboard.WorldCopyClipboard;
+import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
 import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.function.SurfaceRegionFunction;
@@ -55,6 +56,7 @@ import com.fastasyncworldedit.core.queue.implementation.preloader.Preloader;
 import com.fastasyncworldedit.core.util.ExtentTraverser;
 import com.fastasyncworldedit.core.util.MaskTraverser;
 import com.fastasyncworldedit.core.util.MathMan;
+import com.fastasyncworldedit.core.util.ProcessorTraverser;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.collection.BlockVector3Set;
 import com.fastasyncworldedit.core.util.task.RunnableVal;
@@ -524,9 +526,17 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
      * @return mask, may be null
      */
     public Mask getMask() {
-        //FAWE start - ExtendTraverser & MaskingExtents
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(getExtent()).find(MaskingExtent.class);
-        return maskingExtent != null ? maskingExtent.get().getMask() : null;
+        //FAWE start - ExtentTraverser & MaskingExtents
+        MaskingExtent maskingExtent = new ExtentTraverser<>(getExtent()).findAndGet(MaskingExtent.class);
+        if (maskingExtent == null) {
+            ExtentBatchProcessorHolder processorExtent =
+                    new ExtentTraverser<>(getExtent()).findAndGet(ExtentBatchProcessorHolder.class);
+            if (processorExtent != null) {
+                maskingExtent =
+                        new ProcessorTraverser<>(processorExtent.getProcessor()).find(MaskingExtent.class);
+            }
+        }
+        return maskingExtent != null ? maskingExtent.getMask() : null;
         //FAWE end
     }
 
@@ -609,23 +619,31 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
     //FAWE start - use MaskingExtent & ExtentTraverser
 
     /**
-     * Set a mask.
+     * Set a mask. Combines with any existing masks, set null to clear existing masks.
      *
      * @param mask mask or null
      */
-    public void setMask(Mask mask) {
+    public void setMask(@Nullable Mask mask) {
         if (mask == null) {
             mask = Masks.alwaysTrue();
         } else {
             new MaskTraverser(mask).reset(this);
         }
-        ExtentTraverser<MaskingExtent> maskingExtent = new ExtentTraverser<>(getExtent()).find(MaskingExtent.class);
-        if (maskingExtent != null && maskingExtent.get() != null) {
-            Mask oldMask = maskingExtent.get().getMask();
+        MaskingExtent maskingExtent = new ExtentTraverser<>(getExtent()).findAndGet(MaskingExtent.class);
+        if (maskingExtent == null && mask != Masks.alwaysTrue()) {
+            ExtentBatchProcessorHolder processorExtent =
+                    new ExtentTraverser<>(getExtent()).findAndGet(ExtentBatchProcessorHolder.class);
+            if (processorExtent != null) {
+                maskingExtent =
+                        new ProcessorTraverser<>(processorExtent.getProcessor()).find(MaskingExtent.class);
+            }
+        }
+        if (maskingExtent != null) {
+            Mask oldMask = maskingExtent.getMask();
             if (oldMask instanceof ResettableMask) {
                 ((ResettableMask) oldMask).reset();
             }
-            maskingExtent.get().setMask(mask);
+            maskingExtent.setMask(mask);
         } else if (mask != Masks.alwaysTrue()) {
             addProcessor(new MaskingExtent(getExtent(), mask));
         }
@@ -2268,6 +2286,90 @@ public class EditSession extends PassthroughExtent implements AutoCloseable {
         //FAWE start
         return this.changes;
         //FAWE end
+    }
+
+    /**
+     * Makes a cone.
+     *
+     * @param pos Center of the cone
+     * @param block The block pattern to use
+     * @param radiusX The cone's largest north/south extent
+     * @param radiusZ The cone's largest east/west extent
+     * @param height The cone's up/down extent. If negative, extend downward.
+     * @param filled If false, only a shell will be generated.
+     * @param thickness The cone's wall thickness, if it's hollow.
+     * @return number of blocks changed
+     * @throws MaxChangedBlocksException thrown if too many blocks are changed
+     */
+    public int makeCone(
+            BlockVector3 pos,
+            Pattern block,
+            double radiusX,
+            double radiusZ,
+            int height,
+            boolean filled,
+            double thickness
+    ) throws MaxChangedBlocksException {
+        int affected = 0;
+
+        final int ceilRadiusX = (int) Math.ceil(radiusX);
+        final int ceilRadiusZ = (int) Math.ceil(radiusZ);
+
+        double rx2 = Math.pow(radiusX, 2);
+        double ry2 = Math.pow(height, 2);
+        double rz2 = Math.pow(radiusZ, 2);
+
+        int cx = pos.getX();
+        int cy = pos.getY();
+        int cz = pos.getZ();
+
+        for (int y = 0; y < height; ++y) {
+            double ySquaredMinusHeightOverHeightSquared = Math.pow(y - height, 2) / ry2;
+            int yy = cy + y;
+            forX:
+            for (int x = 0; x <= ceilRadiusX; ++x) {
+                double xSquaredOverRadiusX = Math.pow(x, 2) / rx2;
+                int xx = cx + x;
+                forZ:
+                for (int z = 0; z <= ceilRadiusZ; ++z) {
+                    int zz = cz + z;
+                    double zSquaredOverRadiusZ = Math.pow(z, 2) / rz2;
+                    double distanceFromOriginMinusHeightSquared = xSquaredOverRadiusX + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
+
+                    if (distanceFromOriginMinusHeightSquared > 1) {
+                        if (z == 0) {
+                            break forX;
+                        }
+                        break forZ;
+                    }
+
+                    if (!filled) {
+                        double xNext = Math.pow(x + thickness, 2) / rx2 + zSquaredOverRadiusZ - ySquaredMinusHeightOverHeightSquared;
+                        double yNext = xSquaredOverRadiusX + zSquaredOverRadiusZ - Math.pow(y + thickness - height, 2) / ry2;
+                        double zNext = xSquaredOverRadiusX + Math.pow(z + thickness, 2) / rz2 - ySquaredMinusHeightOverHeightSquared;
+                        if (xNext <= 0 && zNext <= 0 && (yNext <= 0 && y + thickness != height)) {
+                            continue;
+                        }
+                    }
+
+                    if (distanceFromOriginMinusHeightSquared <= 0) {
+                        if (setBlock(xx, yy, zz, block)) {
+                            ++affected;
+                        }
+                        if (setBlock(xx, yy, zz, block)) {
+                            ++affected;
+                        }
+                        if (setBlock(xx, yy, zz, block)) {
+                            ++affected;
+                        }
+                        if (setBlock(xx, yy, zz, block)) {
+                            ++affected;
+                        }
+                    }
+                }
+            }
+        }
+        return affected;
     }
 
     /**

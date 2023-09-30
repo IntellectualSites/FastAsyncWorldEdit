@@ -489,6 +489,8 @@
   "worldedit.jumpto.none": "No block in sight (or too far away)!",
   "worldedit.up.obstructed": "You would hit something above you.",
   "worldedit.up.moved": "Woosh!",
+  "worldedit.cone.invalid-radius": "You must either specify 1 or 2 radius values.",
+  "worldedit.cone.created": "{0} blocks have been created.",
   "worldedit.cyl.invalid-radius": "You must either specify 1 or 2 radius values.",
   "worldedit.cyl.created": "{0} blocks have been created.",
   "worldedit.hcyl.thickness-too-large": "Thickness cannot be larger than x or z radii.",

@@ -13,6 +13,7 @@ import com.mojang.datafixers.util.Either;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.biome.BiomeTypes;
 import com.sk89q.worldedit.world.block.BlockState;
@@ -50,6 +51,8 @@ import net.minecraft.world.level.chunk.LinearPalette;
 import net.minecraft.world.level.chunk.Palette;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
+import org.apache.logging.log4j.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_18_R2.CraftChunk;
 import sun.misc.Unsafe;
 
@@ -72,6 +75,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
 public final class PaperweightPlatformAdapter extends NMSAdapter {
@@ -89,14 +94,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final MethodHandle methodGetVisibleChunk;
 
-    private static final int CHUNKSECTION_BASE;
-    private static final int CHUNKSECTION_SHIFT;
-
     private static final Field fieldThreadingDetector;
-    private static final long fieldThreadingDetectorOffset;
-
     private static final Field fieldLock;
-    private static final long fieldLockOffset;
 
     private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
@@ -105,6 +104,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MerchantOffers OFFERS = new MerchantOffers();
 
     private static final Field fieldRemove;
+
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
 
     static {
         try {
@@ -134,20 +135,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             getVisibleChunkIfPresent.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
 
-            Unsafe unsafe = ReflectionUtils.getUnsafe();
             if (!PaperLib.isPaper()) {
                 fieldThreadingDetector = PalettedContainer.class.getDeclaredField(Refraction.pickName("threadingDetector", "f"));
-                fieldThreadingDetectorOffset = unsafe.objectFieldOffset(fieldThreadingDetector);
-
+                fieldThreadingDetector.setAccessible(true);
                 fieldLock = ThreadingDetector.class.getDeclaredField(Refraction.pickName("lock", "c"));
-                fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
+                fieldLock.setAccessible(true);
             } else {
                 // in paper, the used methods are synchronized properly
                 fieldThreadingDetector = null;
-                fieldThreadingDetectorOffset = -1;
-
                 fieldLock = null;
-                fieldLockOffset = -1;
             }
 
             Method removeGameEventListener = LevelChunk.class.getDeclaredMethod(
@@ -168,13 +164,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
 
-            CHUNKSECTION_BASE = unsafe.arrayBaseOffset(LevelChunkSection[].class);
-            int scale = unsafe.arrayIndexScale(LevelChunkSection[].class);
-            if ((scale & (scale - 1)) != 0) {
-                throw new Error("data type scale not a power of two");
-            }
-            CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
-
             fieldOffers = AbstractVillager.class.getDeclaredField(Refraction.pickName("offers", "bW"));
             fieldOffers.setAccessible(true);
         } catch (RuntimeException e) {
@@ -191,9 +180,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             LevelChunkSection value,
             int layer
     ) {
-        long offset = ((long) layer << CHUNKSECTION_SHIFT) + CHUNKSECTION_BASE;
         if (layer >= 0 && layer < sections.length) {
-            return ReflectionUtils.getUnsafe().compareAndSwapObject(sections, offset, expected, value);
+            return ReflectionUtils.compareAndSet(sections, expected, value, layer);
         }
         return false;
     }
@@ -208,19 +196,15 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         try {
             synchronized (section) {
-                Unsafe unsafe = ReflectionUtils.getUnsafe();
                 PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.getStates();
-                ThreadingDetector currentThreadingDetector = (ThreadingDetector) unsafe.getObject(
-                        blocks,
-                        fieldThreadingDetectorOffset
-                );
+                ThreadingDetector currentThreadingDetector = (ThreadingDetector) fieldThreadingDetector.get(blocks);
                 synchronized (currentThreadingDetector) {
-                    Semaphore currentLock = (Semaphore) unsafe.getObject(currentThreadingDetector, fieldLockOffset);
+                    Semaphore currentLock = (Semaphore) fieldLock.get(currentThreadingDetector);
                     if (currentLock instanceof DelegateSemaphore delegateSemaphore) {
                         return delegateSemaphore;
                     }
                     DelegateSemaphore newLock = new DelegateSemaphore(1, currentLock);
-                    unsafe.putObject(currentThreadingDetector, fieldLockOffset, newLock);
+                    fieldLock.set(currentThreadingDetector, newLock);
                     return newLock;
                 }
             }
@@ -256,7 +240,21 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
             CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
             try {
-                CraftChunk chunk = (CraftChunk) future.get();
+                CraftChunk chunk;
+                try {
+                    chunk = (CraftChunk) future.get(10, TimeUnit.SECONDS);
+                } catch (TimeoutException e) {
+                    String world = serverLevel.getWorld().getName();
+                    // We've already taken 10 seconds we can afford to wait a little here.
+                    boolean loaded = TaskManager.taskManager().sync(() -> Bukkit.getWorld(world) != null);
+                    if (loaded) {
+                        LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
+                        // Retry chunk load
+                        chunk = (CraftChunk) serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true).get();
+                    } else {
+                        throw new UnsupportedOperationException("Cannot load chunk from unloaded world " + world + "!");
+                    }
+                }
                 return chunk.getHandle();
             } catch (Throwable e) {
                 e.printStackTrace();
