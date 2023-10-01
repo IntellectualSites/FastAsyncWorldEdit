@@ -186,7 +186,7 @@ tasks.named<ShadowJar>("shadowJar") {
             include(dependency("net.kyori:adventure-nbt:4.14.0"))
         }
         relocate("com.zaxxer", "com.fastasyncworldedit.core.math") {
-            include(dependency("com.zaxxer:SparseBitSet:1.2"))
+            include(dependency("com.zaxxer:SparseBitSet:1.3"))
         }
         relocate("org.anarres", "com.fastasyncworldedit.core.internal.io") {
             include(dependency("org.anarres:parallelgzip:1.0.5"))
