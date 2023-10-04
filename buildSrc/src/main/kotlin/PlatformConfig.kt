@@ -87,16 +87,19 @@ fun Project.applyPlatformAndCoreConfiguration() {
                             name.set("Alexander Brandes")
                             email.set("contact(at)notmyfault.dev")
                             organization.set("IntellectualSites")
+                            organizationUrl.set("https://github.com/IntellectualSites")
                         }
                         developer {
                             id.set("SirYwell")
                             name.set("Hannes Greule")
                             organization.set("IntellectualSites")
+                            organizationUrl.set("https://github.com/IntellectualSites")
                         }
                         developer {
                             id.set("dordsor21")
                             name.set("dordsor21")
                             organization.set("IntellectualSites")
+                            organizationUrl.set("https://github.com/IntellectualSites")
                         }
                     }
 
