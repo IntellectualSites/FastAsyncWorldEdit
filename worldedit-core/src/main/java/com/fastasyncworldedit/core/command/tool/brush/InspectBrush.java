@@ -74,7 +74,12 @@ public class InspectBrush extends BrushTool {
             return false;
         }
         try {
-            BlockVector3 target = getTarget(player, rightClick).toBlockPoint();
+            Vector3 targetVector = getTarget(player, rightClick);
+            if (targetVector == null) {
+                player.print(Caption.of("worldedit.tool.no-block"));
+                return true;
+            }
+            BlockVector3 target = targetVector.toBlockPoint();
             final int x = target.getBlockX();
             final int y = target.getBlockY();
             final int z = target.getBlockZ();
