@@ -44,7 +44,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return POOL.poll();
     }
 
-    private final Lock calledLock = new ReentrantLock();
+    private final ReentrantLock calledLock = new ReentrantLock();
 
     private volatile IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private volatile IChunkSet chunkSet; // The blocks to be set to the chunkExisting
@@ -68,7 +68,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized void recycle() {
-        calledLock.lock();
         delegate = NULL;
         if (chunkSet != null) {
             chunkSet.recycle();
@@ -77,7 +76,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         chunkExisting = null;
         extent = null;
         POOL.offer(this);
-        calledLock.unlock();
     }
 
     public long initAge() {
@@ -92,10 +90,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * If the chunk is currently being "called", this method will block until completed.
      */
     private void checkAndWaitOnCalledLock() {
-        if (!calledLock.tryLock()) {
+        if (!calledLock.isLocked()) {
             calledLock.lock();
+            calledLock.unlock();
         }
-        calledLock.unlock();
     }
 
     @Override
@@ -1055,9 +1053,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             try {
                 IChunkSet copy = chunkSet.createCopy();
                 chunkSet = null;
-                return this.call(copy, () -> {
-                    // Do nothing
-                });
+                return this.call(copy, calledLock::unlock);
             } catch (Throwable t) {
                 calledLock.unlock();
                 throw t;
@@ -1082,7 +1078,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             } else {
                 finalizer = finalize;
             }
-            calledLock.unlock();
             return get.call(set, finalizer);
         }
         return null;
