@@ -406,12 +406,16 @@ public class LocalSession implements TextureHolder {
      */
     public void clearHistory() {
         //FAWE start
-        if (Fawe.isMainThread() && historyWriteLock.isLocked()) {
+        if (Fawe.isMainThread() && !historyWriteLock.tryLock()) {
             // Do not make main thread wait if we cannot immediately clear history (on player logout usually)
             TaskManager.taskManager().async(this::clearHistoryTask);
             return;
         }
-        clearHistoryTask();
+        try {
+            clearHistoryTask();
+        } finally {
+            historyWriteLock.unlock();
+        }
     }
 
     private void clearHistoryTask() {
