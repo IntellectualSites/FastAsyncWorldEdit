@@ -33,6 +33,7 @@ import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.BrushCache;
 import com.fastasyncworldedit.core.util.MainUtil;
 import com.fastasyncworldedit.core.util.StringMan;
+import com.fastasyncworldedit.core.util.TaskManager;
 import com.fastasyncworldedit.core.util.TextureHolder;
 import com.fastasyncworldedit.core.util.TextureUtil;
 import com.fastasyncworldedit.core.wrappers.WorldWrapper;
@@ -405,6 +406,15 @@ public class LocalSession implements TextureHolder {
      */
     public void clearHistory() {
         //FAWE start
+        if (Fawe.isMainThread() && !historyWriteLock.tryLock()) {
+            // Do not make main thread wait if we cannot immediately clear history (on player logout usually)
+            TaskManager.taskManager().async(this::clearHistoryTask);
+            return;
+        }
+        clearHistoryTask();
+    }
+
+    private void clearHistoryTask() {
         historyWriteLock.lock();
         try {
             // Ensure that changesets are properly removed
@@ -420,8 +430,8 @@ public class LocalSession implements TextureHolder {
         save();
         historySize = 0;
         currentWorld = null;
-        //FAWE end
     }
+    //FAWE end
 
     /**
      * Remember an edit session for the undo history. If the history maximum
