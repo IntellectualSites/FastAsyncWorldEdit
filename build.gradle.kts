@@ -97,7 +97,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.20.2")
+        minecraftVersion(supportedVersions.last())
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
 

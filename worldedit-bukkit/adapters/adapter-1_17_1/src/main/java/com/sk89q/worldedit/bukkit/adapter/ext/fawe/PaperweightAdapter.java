@@ -24,7 +24,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Futures;
 import com.mojang.datafixers.util.Either;
@@ -393,7 +392,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private net.minecraft.world.level.block.state.BlockState applyProperties(
+    public net.minecraft.world.level.block.state.BlockState applyProperties(
             StateDefinition<Block, net.minecraft.world.level.block.state.BlockState> stateContainer,
             net.minecraft.world.level.block.state.BlockState newState,
             Map<Property<?>, Object> states

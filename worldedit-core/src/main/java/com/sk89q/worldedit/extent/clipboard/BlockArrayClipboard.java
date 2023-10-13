@@ -201,6 +201,9 @@ public class BlockArrayClipboard implements Clipboard {
     //FAWE start
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
+        if (!region.contains(x, y, z)) {
+            return false;
+        }
         x -= offset.getX();
         y -= offset.getY();
         z -= offset.getZ();
@@ -214,6 +217,9 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) throws WorldEditException {
+        if (!region.contains(x, y, z)) {
+            return false;
+        }
         x -= offset.getX();
         y -= offset.getY();
         z -= offset.getZ();
@@ -238,6 +244,9 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public boolean setBiome(BlockVector3 position, BiomeType biome) {
+        if (!region.contains(position)) {
+            return false;
+        }
         int x = position.getBlockX() - offset.getX();
         int y = position.getBlockY() - offset.getY();
         int z = position.getBlockZ() - offset.getZ();
@@ -246,6 +255,9 @@ public class BlockArrayClipboard implements Clipboard {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
+        if (!region.contains(x, y, z)) {
+            return false;
+        }
         x -= offset.getX();
         y -= offset.getY();
         z -= offset.getZ();

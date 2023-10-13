@@ -27,6 +27,7 @@ import com.sk89q.worldedit.function.visitor.FlatRegionVisitor;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.world.RegenOptions;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldedit.world.biome.BiomeType;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -57,25 +58,26 @@ public class FaweDelegateRegionManager {
         TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
                 World world = BukkitAdapter.adapt(getWorld(area.getWorldName()));
-                EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).
-                        fastMode(true).limitUnlimited().changeSetNull().build();
-                for (CuboidRegion region : regions) {
-                    region.setPos1(region.getPos1().withY(minY));
-                    region.setPos2(region.getPos2().withY(maxY));
-                    session.setBlocks((Region) region, blocks);
-                }
-                try {
-                    session.flushQueue();
+                try(final EditSession session = WorldEdit.getInstance().newEditSessionBuilder().world(world).checkMemory(false).
+                        fastMode(true).limitUnlimited().changeSetNull().build()) {
                     for (CuboidRegion region : regions) {
-                        FaweAPI.fixLighting(world, region, null,
-                                RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
-                        );
+                        region.setPos1(region.getPos1().withY(minY));
+                        region.setPos2(region.getPos2().withY(maxY));
+                        session.setBlocks((Region) region, blocks);
                     }
-                } catch (MaxChangedBlocksException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (whenDone != null) {
-                        TaskManager.taskManager().task(whenDone);
+                    try {
+                        session.flushQueue();
+                        for (CuboidRegion region : regions) {
+                            FaweAPI.fixLighting(world, region, null,
+                                    RelightMode.valueOf(com.fastasyncworldedit.core.configuration.Settings.settings().LIGHTING.MODE)
+                            );
+                        }
+                    } catch (MaxChangedBlocksException e) {
+                        e.printStackTrace();
+                    } finally {
+                        if (whenDone != null) {
+                            TaskManager.taskManager().task(whenDone);
+                        }
                     }
                 }
             }
@@ -358,19 +360,18 @@ public class FaweDelegateRegionManager {
     public boolean regenerateRegion(final Location pos1, final Location pos2, boolean ignore, final Runnable whenDone) {
         TaskManager.taskManager().async(() -> {
             synchronized (FaweDelegateRegionManager.class) {
-                World pos1World = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
-                try (EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(pos1World)
+                World world = BukkitAdapter.adapt(getWorld(pos1.getWorldName()));
+                try (final EditSession editSession = WorldEdit.getInstance().newEditSessionBuilder().world(world)
                         .checkMemory(false)
                         .fastMode(true)
                         .limitUnlimited()
                         .changeSetNull()
                         .build()) {
-                    CuboidRegion region = new CuboidRegion(
-                            BlockVector3.at(pos1.getX(), pos1.getY(), pos1.getZ()),
-                            BlockVector3.at(pos2.getX(), pos2.getY(), pos2.getZ())
+                    world.regenerate(
+                            new CuboidRegion(pos1.getBlockVector3(), pos2.getBlockVector3()),
+                            editSession, RegenOptions.builder().regenBiomes(true).build()
                     );
-                    editSession.regenerate(region);
-                    editSession.flushQueue();
+                    Operations.completeBlindly(editSession.commit());
                 }
                 if (whenDone != null) {
                     TaskManager.taskManager().task(whenDone);
