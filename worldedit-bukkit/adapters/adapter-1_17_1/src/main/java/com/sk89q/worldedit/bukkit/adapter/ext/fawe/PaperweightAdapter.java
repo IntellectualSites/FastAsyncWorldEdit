@@ -38,6 +38,7 @@ import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightFaweAdapter;
+import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_17_R1_2.PaperweightPlatformAdapter;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.Watchdog;
 import com.sk89q.worldedit.extent.Extent;
@@ -288,7 +289,9 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
      * @param tag    the tag
      */
     private static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag tag) {
-        entity.save(tag);
+        //FAWE start - avoid villager async catcher
+        PaperweightPlatformAdapter.readEntityIntoTag(entity, tag);
+        //FAWE end
     }
 
     private static Block getBlockFromType(BlockType blockType) {

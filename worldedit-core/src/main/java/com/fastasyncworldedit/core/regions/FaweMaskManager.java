@@ -30,7 +30,7 @@ public abstract class FaweMaskManager {
     /**
      * Get a {@link FaweMask} for the given player and {@link MaskType}. If isWhitelist is false, will return a "blacklist" mask.
      *
-     * @since TODO
+     * @since 2.7.0
      */
     public FaweMask getMask(final Player player, MaskType type, boolean isWhitelist, boolean notify) {
         return getMask(player, type, isWhitelist);

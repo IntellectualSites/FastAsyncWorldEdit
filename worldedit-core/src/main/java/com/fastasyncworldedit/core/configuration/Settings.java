@@ -400,6 +400,7 @@ public class Settings extends Config {
                 "of a waterlogged fence). For blocking/remapping of all occurrences of a property like waterlogged, see",
                 "remap-properties below.",
                 "To generate a blank list, substitute the default content with a set of square brackets [] instead.",
+                "The 'worldedit.anyblock' permission is not considered here.",
                 "Example block property blocking:",
                 " - \"minecraft:conduit[waterlogged=true]\"",
                 " - \"minecraft:piston[extended=false,facing=west]\"",

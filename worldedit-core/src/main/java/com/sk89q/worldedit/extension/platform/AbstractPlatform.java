@@ -55,4 +55,9 @@ public abstract class AbstractPlatform implements Platform {
         return null;
     }
 
+    @Override
+    public long getTickCount() {
+        return System.nanoTime() / 50_000_000;
+    }
+
 }

@@ -27,6 +27,7 @@ import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.Future;
@@ -52,6 +53,7 @@ public abstract class QueueHandler implements Trimable, Runnable {
             null,
             false
     );
+
     /**
      * Secondary queue should be used for "cleanup" tasks that are likely to be shorter in life than those submitted to the
      * primary queue. They may be IO-bound tasks.
@@ -506,6 +508,30 @@ public abstract class QueueHandler implements Trimable, Runnable {
             }
         }
         return result;
+    }
+
+    /**
+     * Primary queue should be used for tasks that are unlikely to wait on other tasks, IO, etc. (i.e. spend most of their
+     * time utilising CPU.
+     * <p>
+     * Internal API usage only.
+     *
+     * @since 2.7.0
+     */
+    public ExecutorService getForkJoinPoolPrimary() {
+        return forkJoinPoolPrimary;
+    }
+
+    /**
+     * Secondary queue should be used for "cleanup" tasks that are likely to be shorter in life than those submitted to the
+     * primary queue. They may be IO-bound tasks.
+     * <p>
+     * Internal API usage only.
+     *
+     * @since 2.7.0
+     */
+    public ExecutorService getForkJoinPoolSecondary() {
+        return forkJoinPoolSecondary;
     }
 
 }

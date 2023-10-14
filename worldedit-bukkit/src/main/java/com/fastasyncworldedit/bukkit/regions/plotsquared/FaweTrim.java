@@ -1,13 +1,15 @@
 package com.fastasyncworldedit.bukkit.regions.plotsquared;
 
 import com.fastasyncworldedit.core.util.TaskManager;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import com.plotsquared.core.PlotSquared;
 import com.plotsquared.core.command.CommandCategory;
 import com.plotsquared.core.command.CommandDeclaration;
 import com.plotsquared.core.command.RequiredType;
 import com.plotsquared.core.command.SubCommand;
 import com.plotsquared.core.configuration.caption.StaticCaption;
-import com.plotsquared.core.configuration.caption.Templates;
 import com.plotsquared.core.configuration.caption.TranslatableCaption;
 import com.plotsquared.core.player.PlotPlayer;
 
@@ -33,7 +35,7 @@ public class FaweTrim extends SubCommand {
             return false;
         }
         if (!PlotSquared.platform().worldUtil().isWorld(strings[0])) {
-            plotPlayer.sendMessage(TranslatableCaption.of("errors.not_valid_plot_world"), Templates.of("value", strings[0]));
+            plotPlayer.sendMessage(TranslatableCaption.of("errors.not_valid_plot_world"), TagResolver.resolver("value", Tag.inserting(Component.text(strings[0]))));
             return false;
         }
         ran = true;

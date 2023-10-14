@@ -12,5 +12,5 @@ repositories {
 
 dependencies {
     the<PaperweightUserDependenciesExtension>().paperDevBundle("1.19.4-R0.1-20230608.201059-104")
-    compileOnly("io.papermc:paperlib")
+    compileOnly(libs.paperlib)
 }

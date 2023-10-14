@@ -607,20 +607,17 @@ public final class EditSessionBuilder {
             }
 
             FaweRegionExtent regionExtent = null;
-            if (disallowedRegions != null) { // Always use MultiRegionExtent if we have blacklist regions
+            // Always use MultiRegionExtent if we have blacklist regions
+            if (allowedRegions != null && allowedRegions.length == 0) {
+                regionExtent = new NullExtent(this.extent, FaweCache.NO_REGION);
+            } else if (disallowedRegions != null && disallowedRegions.length != 0) {
                 regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, disallowedRegions);
             } else if (allowedRegions == null) {
                 allowedRegions = new Region[]{RegionWrapper.GLOBAL()};
+            } else if (allowedRegions.length == 1) {
+                regionExtent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
             } else {
-                if (allowedRegions.length == 0) {
-                    regionExtent = new NullExtent(this.extent, FaweCache.NO_REGION);
-                } else {
-                    if (allowedRegions.length == 1) {
-                        regionExtent = new SingleRegionExtent(this.extent, this.limit, allowedRegions[0]);
-                    } else {
-                        regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, null);
-                    }
-                }
+                regionExtent = new MultiRegionExtent(this.extent, this.limit, allowedRegions, null);
             }
             if (regionExtent != null) {
                 if (placeChunks) {

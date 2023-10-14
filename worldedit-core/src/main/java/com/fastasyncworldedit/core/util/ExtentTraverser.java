@@ -4,6 +4,7 @@ import com.sk89q.worldedit.extent.AbstractDelegateExtent;
 import com.sk89q.worldedit.extent.Extent;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 
 public class ExtentTraverser<T extends Extent> {
@@ -24,6 +25,7 @@ public class ExtentTraverser<T extends Extent> {
         return root != null;
     }
 
+    @Nullable
     public T get() {
         return root;
     }
@@ -50,6 +52,7 @@ public class ExtentTraverser<T extends Extent> {
     }
 
     @SuppressWarnings("unchecked")
+    @Nullable
     public <U> U findAndGet(Class<U> clazz) {
         ExtentTraverser<Extent> traverser = find(clazz);
         return (traverser != null) ? (U) traverser.get() : null;

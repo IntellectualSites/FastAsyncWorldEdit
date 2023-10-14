@@ -1,7 +1,6 @@
 package com.fastasyncworldedit.core.queue.implementation.chunk;
 
 import com.fastasyncworldedit.core.FaweCache;
-import com.fastasyncworldedit.core.concurrent.ReentrantWrappedStampedLock;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
@@ -26,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks.
@@ -43,7 +44,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return POOL.poll();
     }
 
-    private final ReentrantWrappedStampedLock calledLock = new ReentrantWrappedStampedLock();
+    private final Lock calledLock = new ReentrantLock();
 
     private volatile IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private volatile IChunkSet chunkSet; // The blocks to be set to the chunkExisting
@@ -55,6 +56,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     private int bitMask = -1; // Allow forceful setting of bitmask (for lighting)
     private boolean isInit = false; // Lighting handles queue differently. It relies on the chunk cache and not doing init.
     private boolean createCopy = false;
+    private long initTime = -1L;
 
     private ChunkHolder() {
         this.delegate = NULL;
@@ -66,6 +68,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized void recycle() {
+        calledLock.lock();
         delegate = NULL;
         if (chunkSet != null) {
             chunkSet.recycle();
@@ -74,6 +77,11 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         chunkExisting = null;
         extent = null;
         POOL.offer(this);
+        calledLock.unlock();
+    }
+
+    public long initAge() {
+        return System.currentTimeMillis() - initTime;
     }
 
     public synchronized IBlockDelegate getDelegate() {
@@ -84,10 +92,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * If the chunk is currently being "called", this method will block until completed.
      */
     private void checkAndWaitOnCalledLock() {
-        if (calledLock.isLocked()) {
+        if (!calledLock.tryLock()) {
             calledLock.lock();
-            calledLock.unlock();
         }
+        calledLock.unlock();
     }
 
     @Override
@@ -1024,6 +1032,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized <V extends IChunk> void init(IQueueExtent<V> extent, int chunkX, int chunkZ) {
+        this.initTime = System.currentTimeMillis();
         this.extent = extent;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
@@ -1040,14 +1049,15 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     @Override
     public synchronized T call() {
         calledLock.lock();
-        final long stamp = calledLock.getStampChecked();
         if (chunkSet != null && !chunkSet.isEmpty()) {
             this.delegate = GET;
             chunkSet.setBitMask(bitMask);
             try {
                 IChunkSet copy = chunkSet.createCopy();
                 chunkSet = null;
-                return this.call(copy, () -> calledLock.unlock(stamp));
+                return this.call(copy, () -> {
+                    // Do nothing
+                });
             } catch (Throwable t) {
                 calledLock.unlock();
                 throw t;
@@ -1072,6 +1082,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             } else {
                 finalizer = finalize;
             }
+            calledLock.unlock();
             return get.call(set, finalizer);
         }
         return null;

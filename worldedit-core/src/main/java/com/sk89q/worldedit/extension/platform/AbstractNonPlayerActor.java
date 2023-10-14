@@ -19,10 +19,9 @@
 
 package com.sk89q.worldedit.extension.platform;
 
-import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.util.TaskManager;
-import com.fastasyncworldedit.core.util.task.AsyncNotifyQueue;
+import com.fastasyncworldedit.core.util.task.AsyncNotifyKeyedQueue;
 import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.util.formatting.text.TextComponent;
@@ -68,7 +67,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
 
     // Queue for async tasks
     private final AtomicInteger runningCount = new AtomicInteger();
-    private final AsyncNotifyQueue asyncNotifyQueue = new AsyncNotifyQueue((thread, throwable) -> {
+    private final AsyncNotifyKeyedQueue asyncNotifyQueue = new AsyncNotifyKeyedQueue((thread, throwable) -> {
         while (throwable.getCause() != null) {
             throwable = throwable.getCause();
         }
@@ -82,7 +81,7 @@ public abstract class AbstractNonPlayerActor implements Actor {
                 throwable.printStackTrace();
             }
         }
-    });
+    }, this::getUniqueId);
 
     /**
      * Run a task either async, or on the current thread.

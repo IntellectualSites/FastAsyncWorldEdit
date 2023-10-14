@@ -91,7 +91,7 @@ public abstract class TaskManager {
      *
      * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.7.0")
     public void parallel(Collection<Runnable> runables) {
         for (Runnable run : runables) {
             pool.submit(run);
@@ -106,7 +106,7 @@ public abstract class TaskManager {
      * @param numThreads number of threads (null = config.yml parallel threads)
      * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.7.0")
     public void parallel(Collection<Runnable> runnables, @Nullable Integer numThreads) {
         if (runnables == null) {
             return;
@@ -278,7 +278,7 @@ public abstract class TaskManager {
     /**
      * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.7.0")
     public void wait(AtomicBoolean running, int timeout) {
         try {
             long start = System.currentTimeMillis();
@@ -299,7 +299,7 @@ public abstract class TaskManager {
     /**
      * @deprecated Deprecated without replacement as unused internally, and poor implementation of what it's designed to do.
      */
-    @Deprecated(forRemoval = true, since = "TODO")
+    @Deprecated(forRemoval = true, since = "2.7.0")
     public void notify(AtomicBoolean running) {
         running.set(false);
         synchronized (running) {

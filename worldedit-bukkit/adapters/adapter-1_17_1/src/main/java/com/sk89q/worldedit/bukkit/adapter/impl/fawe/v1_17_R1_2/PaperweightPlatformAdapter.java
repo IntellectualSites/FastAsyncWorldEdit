@@ -34,6 +34,8 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -85,14 +87,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final MethodHandle methodGetVisibleChunk;
 
-    private static final int CHUNKSECTION_BASE;
-    private static final int CHUNKSECTION_SHIFT;
-
     private static final Field fieldLock;
-    private static final long fieldLockOffset;
 
     private static final Field fieldGameEventDispatcherSections;
     private static final MethodHandle methodremoveBlockEntityTicker;
+
+    private static final Field fieldOffers;
+    private static final MerchantOffers OFFERS = new MerchantOffers();
 
     private static final Field fieldRemove;
 
@@ -127,15 +128,12 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             getVisibleChunkIfPresent.setAccessible(true);
             methodGetVisibleChunk = MethodHandles.lookup().unreflect(getVisibleChunkIfPresent);
 
-            Unsafe unsafe = ReflectionUtils.getUnsafe();
             if (!PaperLib.isPaper()) {
-
                 fieldLock = PalettedContainer.class.getDeclaredField(Refraction.pickName("lock", "m"));
-                fieldLockOffset = unsafe.objectFieldOffset(fieldLock);
+                fieldLock.setAccessible(true);
             } else {
                 // in paper, the used methods are synchronized properly
                 fieldLock = null;
-                fieldLockOffset = -1;
             }
 
             fieldGameEventDispatcherSections = LevelChunk.class.getDeclaredField(Refraction.pickName(
@@ -153,12 +151,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
 
-            CHUNKSECTION_BASE = unsafe.arrayBaseOffset(LevelChunkSection[].class);
-            int scale = unsafe.arrayIndexScale(LevelChunkSection[].class);
-            if ((scale & (scale - 1)) != 0) {
-                throw new Error("data type scale not a power of two");
-            }
-            CHUNKSECTION_SHIFT = 31 - Integer.numberOfLeadingZeros(scale);
+            fieldOffers = AbstractVillager.class.getDeclaredField(Refraction.pickName("offers", "bU"));
+            fieldOffers.setAccessible(true);
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -173,9 +167,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             LevelChunkSection value,
             int layer
     ) {
-        long offset = ((long) layer << CHUNKSECTION_SHIFT) + CHUNKSECTION_BASE;
         if (layer >= 0 && layer < sections.length) {
-            return ReflectionUtils.getUnsafe().compareAndSwapObject(sections, offset, expected, value);
+            return ReflectionUtils.compareAndSet(sections, expected, value, layer);
         }
         return false;
     }
@@ -190,14 +183,13 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         try {
             synchronized (section) {
-                Unsafe unsafe = ReflectionUtils.getUnsafe();
                 PalettedContainer<net.minecraft.world.level.block.state.BlockState> blocks = section.getStates();
-                Semaphore currentLock = (Semaphore) unsafe.getObject(blocks, fieldLockOffset);
+                Semaphore currentLock = (Semaphore) fieldLock.get(blocks);
                 if (currentLock instanceof DelegateSemaphore delegateSemaphore) {
                     return delegateSemaphore;
                 }
                 DelegateSemaphore newLock = new DelegateSemaphore(1, currentLock);
-                unsafe.putObject(blocks, fieldLockOffset, newLock);
+                fieldLock.set(blocks, newLock);
                 return newLock;
             }
         } catch (Throwable e) {
@@ -506,6 +498,29 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static List<Entity> getEntities(LevelChunk chunk) {
         return chunk.level.entityManager.getEntities(chunk.getPos());
+    }
+
+    public static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
+        boolean isVillager = entity instanceof AbstractVillager && !Fawe.isMainThread();
+        boolean unset = false;
+        if (isVillager) {
+            try {
+                if (fieldOffers.get(entity) != null) {
+                    fieldOffers.set(entity, OFFERS);
+                    unset = true;
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to villager to avoid async catcher.", e);
+            }
+        }
+        entity.save(compoundTag);
+        if (unset) {
+            try {
+                fieldOffers.set(entity, null);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to null again on villager.", e);
+            }
+        }
     }
 
 }
