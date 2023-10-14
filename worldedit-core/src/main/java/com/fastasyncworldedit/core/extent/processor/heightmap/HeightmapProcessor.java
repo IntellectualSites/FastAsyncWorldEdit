@@ -12,8 +12,6 @@ import com.sk89q.worldedit.world.block.BlockTypesCache;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 
 public class HeightmapProcessor implements IBatchProcessor {
 
@@ -25,7 +23,7 @@ public class HeightmapProcessor implements IBatchProcessor {
 
     static {
         Arrays.fill(COMPLETE, true);
-        Arrays.fill(AIR_LAYER, (char) 1);
+        Arrays.fill(AIR_LAYER, (char) BlockTypesCache.ReservedIDs.AIR);
     }
 
     private final int minY;
