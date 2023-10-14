@@ -38,6 +38,9 @@ import net.minecraft.util.ThreadingDetector;
 import net.minecraft.util.Unit;
 import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -107,6 +110,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
+
+    private static final Field fieldOffers;
+    private static final MerchantOffers OFFERS = new MerchantOffers();
 
     /*
      * This is a workaround for the changes from https://hub.spigotmc.org/stash/projects/SPIGOT/repos/craftbukkit/commits/1fddefce1cdce44010927b888432bf70c0e88cde#src/main/java/org/bukkit/craftbukkit/CraftChunk.java
@@ -205,6 +211,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             } catch (NoSuchFieldException ignored) {
             }
             POST_CHUNK_REWRITE = chunkRewrite;
+
+            fieldOffers = AbstractVillager.class.getDeclaredField(Refraction.pickName("offers", "bU"));
+            fieldOffers.setAccessible(true);
         } catch (RuntimeException | Error e) {
             throw e;
         } catch (Exception e) {
@@ -672,6 +681,24 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         collector.throwIfPresent();
         return List.of();
+    }
+
+    public static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
+        boolean unset = false;
+        if (entity instanceof Villager villager && !Fawe.isMainThread()) {
+            try {
+                if (fieldOffers.get(entity) == null) {
+                    villager.setOffers(OFFERS);
+                    unset = true;
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to villager to avoid async catcher.", e);
+            }
+        }
+        entity.save(compoundTag);
+        if (unset) {
+            ((Villager) entity).setOffers(null);
+        }
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {

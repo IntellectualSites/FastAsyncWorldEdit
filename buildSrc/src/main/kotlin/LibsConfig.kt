@@ -241,8 +241,9 @@ fun Project.applyLibrariesConfiguration() {
 
                     scm {
                         url.set("https://github.com/IntellectualSites/FastAsyncWorldEdit")
-                        connection.set("scm:https://IntellectualSites@github.com/IntellectualSites/FastAsyncWorldEdit.git")
-                        developerConnection.set("scm:git://github.com/IntellectualSites/FastAsyncWorldEdit.git")
+                        connection.set("scm:git:https://github.com/IntellectualSites/FastAsyncWorldEdit.git")
+                        developerConnection.set("scm:git:git@github.com:IntellectualSites/FastAsyncWorldEdit.git")
+                        tag.set("${project.version}")
                     }
 
                     issueManagement {

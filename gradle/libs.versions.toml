@@ -14,22 +14,22 @@ mapmanager = "1.8.0-SNAPSHOT"
 griefprevention = "16.18.1"
 griefdefender = "2.1.0-SNAPSHOT"
 residence = "4.5._13.1"
-towny = "0.99.5.16"
+towny = "0.99.6.0"
 plotsquared = "7.0.0"
 
 # Third party
 bstats = "3.0.2"
-sparsebitset = "1.2"
+sparsebitset = "1.3"
 parallelgzip = "1.0.5"
 adventure = "4.14.0"
-adventure-bukkit = "4.3.0"
-checkerqual = "3.38.0"
+adventure-bukkit = "4.3.1"
+checkerqual = "3.39.0"
 truezip = "6.8.4"
-auto-value = "1.10.2"
+auto-value = "1.10.4"
 findbugs = "3.0.2"
 rhino-runtime = "1.7.14"
 zstd-jni = "1.4.8-1" # Not latest as it can be difficult to obtain latest ZSTD libs
-antlr4 = "4.13.0"
+antlr4 = "4.13.1"
 json-simple = "1.1.1"
 jlibnoise = "1.0.0"
 jchronic = "0.2.4a"
@@ -46,7 +46,7 @@ text = "3.0.4"
 piston = "0.5.7"
 
 # Tests
-mockito = "5.5.0"
+mockito = "5.6.0"
 
 # Gradle plugins
 pluginyml = "0.6.0"

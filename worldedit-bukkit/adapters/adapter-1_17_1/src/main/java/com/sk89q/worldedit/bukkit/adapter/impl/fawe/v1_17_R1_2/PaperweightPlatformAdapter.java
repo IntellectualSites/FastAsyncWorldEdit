@@ -34,6 +34,8 @@ import net.minecraft.server.level.TicketType;
 import net.minecraft.util.BitStorage;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -90,6 +92,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final Field fieldGameEventDispatcherSections;
     private static final MethodHandle methodremoveBlockEntityTicker;
 
+    private static final Field fieldOffers;
+    private static final MerchantOffers OFFERS = new MerchantOffers();
+
     private static final Field fieldRemove;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -145,6 +150,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
+
+            fieldOffers = AbstractVillager.class.getDeclaredField(Refraction.pickName("offers", "bU"));
+            fieldOffers.setAccessible(true);
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -490,6 +498,29 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static List<Entity> getEntities(LevelChunk chunk) {
         return chunk.level.entityManager.getEntities(chunk.getPos());
+    }
+
+    public static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
+        boolean isVillager = entity instanceof AbstractVillager && !Fawe.isMainThread();
+        boolean unset = false;
+        if (isVillager) {
+            try {
+                if (fieldOffers.get(entity) != null) {
+                    fieldOffers.set(entity, OFFERS);
+                    unset = true;
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to villager to avoid async catcher.", e);
+            }
+        }
+        entity.save(compoundTag);
+        if (unset) {
+            try {
+                fieldOffers.set(entity, null);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to null again on villager.", e);
+            }
+        }
     }
 
 }

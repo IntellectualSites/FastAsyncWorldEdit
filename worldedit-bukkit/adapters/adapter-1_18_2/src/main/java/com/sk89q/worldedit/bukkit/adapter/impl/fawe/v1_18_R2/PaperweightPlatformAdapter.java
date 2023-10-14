@@ -35,6 +35,8 @@ import net.minecraft.util.ThreadingDetector;
 import net.minecraft.util.Unit;
 import net.minecraft.util.ZeroBitStorage;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.item.trading.MerchantOffers;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
@@ -98,6 +100,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static final MethodHandle methodRemoveGameEventListener;
     private static final MethodHandle methodremoveTickingBlockEntity;
 
+    private static final Field fieldOffers;
+    private static final MerchantOffers OFFERS = new MerchantOffers();
+
     private static final Field fieldRemove;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
@@ -158,6 +163,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "p"));
             fieldRemove.setAccessible(true);
+
+            fieldOffers = AbstractVillager.class.getDeclaredField(Refraction.pickName("offers", "bW"));
+            fieldOffers.setAccessible(true);
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable rethrow) {
@@ -571,7 +579,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         return BiomeTypes.get(biome.unwrapKey().orElseThrow().location().toString());
     }
 
-    @SuppressWarnings("unchecked")
     static void removeBeacon(BlockEntity beacon, LevelChunk levelChunk) {
         try {
             // Do the method ourselves to avoid trying to reflect generic method parameters
@@ -593,6 +600,29 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     static List<Entity> getEntities(LevelChunk chunk) {
         return chunk.level.entityManager.getEntities(chunk.getPos());
+    }
+
+    public static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
+        boolean isVillager = entity instanceof AbstractVillager && !Fawe.isMainThread();
+        boolean unset = false;
+        if (isVillager) {
+            try {
+                if (fieldOffers.get(entity) != null) {
+                    fieldOffers.set(entity, OFFERS);
+                    unset = true;
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to villager to avoid async catcher.", e);
+            }
+        }
+        entity.save(compoundTag);
+        if (unset) {
+            try {
+                fieldOffers.set(entity, null);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to set offers field to null again on villager.", e);
+            }
+        }
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
