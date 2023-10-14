@@ -62,8 +62,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private boolean initialized;
     private Thread currentThread;
     // Last access pointers
-    private IQueueChunk lastChunk;
-    private long lastPair = Long.MAX_VALUE;
+    private volatile IQueueChunk lastChunk;
+    private volatile long lastPair = Long.MAX_VALUE;
     private boolean enabledQueue = true;
     private boolean fastmode = false;
     // Array for lazy avoidance of concurrent modification exceptions and needless overcomplication of code (synchronisation is
@@ -283,6 +283,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     private ChunkHolder poolOrCreate(int chunkX, int chunkZ) {
         ChunkHolder next = create(false);
         next.init(this, chunkX, chunkZ);
+        next.setFastMode(isFastMode());
         return next;
     }
 
@@ -454,7 +455,8 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         if (!chunks.isEmpty()) {
             getChunkLock.lock();
             if (MemUtil.isMemoryLimited()) {
-                for (IQueueChunk chunk : chunks.values()) {
+                while (!chunks.isEmpty()) {
+                    IQueueChunk chunk = chunks.removeFirst();
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         pollSubmissions(Settings.settings().QUEUE.PARALLEL_THREADS, true);
@@ -462,14 +464,14 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     }
                 }
             } else {
-                for (IQueueChunk chunk : chunks.values()) {
+                while (!chunks.isEmpty()) {
+                    IQueueChunk chunk = chunks.removeFirst();
                     final Future future = submitUnchecked(chunk);
                     if (future != null && !future.isDone()) {
                         submissions.add(future);
                     }
                 }
             }
-            chunks.clear();
             getChunkLock.unlock();
         }
         pollSubmissions(0, true);
