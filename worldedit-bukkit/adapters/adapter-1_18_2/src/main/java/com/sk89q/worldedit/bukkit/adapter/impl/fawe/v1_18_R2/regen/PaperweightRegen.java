@@ -178,9 +178,6 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
     protected boolean prepare() {
         this.originalServerWorld = ((CraftWorld) originalBukkitWorld).getHandle();
         originalChunkProvider = originalServerWorld.getChunkSource();
-        if (!(originalChunkProvider instanceof ServerChunkCache)) {
-            return false;
-        }
 
         //flat bedrock? (only on paper)
         if (paperConfigField != null) {
@@ -191,7 +188,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         seed = options.getSeed().orElse(originalServerWorld.getSeed());
-        chunkStati.forEach((s, c) -> super.chunkStati.put(new ChunkStatusWrap(s), c));
+        chunkStati.forEach((s, c) -> super.chunkStatuses.put(new ChunkStatusWrap(s), c));
 
         return true;
     }
@@ -345,7 +342,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
             }
         };
 
-        ReflectionUtils.unsafeSet(chunkSourceField, freshWorld, freshChunkProvider);
+        chunkSourceField.set(freshWorld, freshChunkProvider);
         //let's start then
         structureManager = server.getStructureManager();
         threadedLevelLightEngine = freshChunkProvider.getLightEngine();
@@ -523,7 +520,7 @@ public class PaperweightRegen extends Regenerator<ChunkAccess, ProtoChunk, Level
         }
 
         @Override
-        public CompletableFuture<?> processChunk(Long xz, List<ChunkAccess> accessibleChunks) {
+        public CompletableFuture<?> processChunk(List<ChunkAccess> accessibleChunks) {
             return chunkStatus.generate(
                     Runnable::run, // TODO revisit, we might profit from this somehow?
                     freshWorld,

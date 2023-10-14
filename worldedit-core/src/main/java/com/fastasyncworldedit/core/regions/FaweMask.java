@@ -38,7 +38,7 @@ public class FaweMask implements IDelegateRegion {
      * @param type   type of mask
      * @param notify if the player should be notified
      * @return if still valid
-     * @since TODO
+     * @since 2.7.0
      */
     public boolean isValid(Player player, FaweMaskManager.MaskType type, boolean notify) {
         return isValid(player, type);

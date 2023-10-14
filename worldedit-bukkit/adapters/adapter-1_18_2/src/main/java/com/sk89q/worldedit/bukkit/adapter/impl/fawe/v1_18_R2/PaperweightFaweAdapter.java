@@ -136,10 +136,6 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         return resourceLocation == null ? null : resourceLocation.toString();
     }
 
-    private static void readEntityIntoTag(Entity entity, net.minecraft.nbt.CompoundTag compoundTag) {
-        entity.save(compoundTag);
-    }
-
     @Override
     public BukkitImplAdapter<net.minecraft.nbt.Tag> getParent() {
         return parent;
@@ -360,7 +356,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
             EntityType type = com.sk89q.worldedit.world.entity.EntityTypes.get(id);
             Supplier<CompoundBinaryTag> saveTag = () -> {
                 final net.minecraft.nbt.CompoundTag minecraftTag = new net.minecraft.nbt.CompoundTag();
-                readEntityIntoTag(mcEntity, minecraftTag);
+                PaperweightPlatformAdapter.readEntityIntoTag(mcEntity, minecraftTag);
                 //add Id for AbstractChangeSet to work
                 final CompoundBinaryTag tag = (CompoundBinaryTag) toNativeBinary(minecraftTag);
                 final Map<String, BinaryTag> tags = NbtUtils.getCompoundBinaryTagValues(tag);

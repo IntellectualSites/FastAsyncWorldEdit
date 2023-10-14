@@ -4,19 +4,19 @@ import sun.misc.Unsafe;
 
 import javax.annotation.Nonnull;
 import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * This is an internal class not meant to be used outside the FAWE internals.
  */
 public class ReflectionUtils {
 
+    private static final VarHandle REFERENCE_ARRAY_HANDLE = MethodHandles.arrayElementVarHandle(Object[].class);
     private static Unsafe UNSAFE;
 
     static {
@@ -31,6 +31,21 @@ public class ReflectionUtils {
 
     public static <T> T as(Class<T> t, Object o) {
         return t.isInstance(o) ? t.cast(o) : null;
+    }
+
+    /**
+     * Performs CAS on the array element at the given index.
+     *
+     * @param array         the array in which to compare and set the value
+     * @param expectedValue the value expected to be at the index
+     * @param newValue      the new value to be set at the index if the expected value matches
+     * @param index         the index at which to compare and set the value
+     * @param <T>           the type of elements in the array
+     * @return true if the value at the index was successfully updated to the new value, false otherwise
+     * @see VarHandle#compareAndSet(Object...)
+     */
+    public static <T> boolean compareAndSet(T[] array, T expectedValue, T newValue, int index) {
+        return REFERENCE_ARRAY_HANDLE.compareAndSet(array, index, expectedValue, newValue);
     }
 
     public static void setAccessibleNonFinal(Field field) {

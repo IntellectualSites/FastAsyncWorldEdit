@@ -19,6 +19,8 @@
 
 package com.sk89q.wepif;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import org.bukkit.BanEntry;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -30,10 +32,13 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.profile.PlayerProfile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -140,6 +145,11 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     }
 
     @Override
+    public boolean isConnected() {
+        return false;
+    }
+
+    @Override
     public String getName() {
         return "Tester";
     }
@@ -156,6 +166,33 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
     @Override
     public boolean isBanned() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public <E extends BanEntry<? super PlayerProfile>> @Nullable E ban(
+            @Nullable final String reason,
+            @Nullable final Instant expires,
+            @Nullable final String source
+    ) {
+        return null;
+    }
+
+    @Override
+    public <E extends BanEntry<? super PlayerProfile>> @Nullable E ban(
+            @Nullable final String reason,
+            @Nullable final Duration duration,
+            @Nullable final String source
+    ) {
+        return null;
+    }
+
+    @Override
+    public @Nullable BanEntry<org.bukkit.profile.PlayerProfile> ban(
+            @Nullable final String reason,
+            @Nullable final Date expires,
+            @Nullable final String source
+    ) {
+        return null;
     }
 
     @Override
@@ -321,6 +358,11 @@ public class TestOfflinePermissible implements OfflinePlayer, Permissible {
             int newValue
     ) {
 
+    }
+
+    @Override
+    public @Nullable Location getLastDeathLocation() {
+        return null;
     }
 
 }

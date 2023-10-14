@@ -41,7 +41,7 @@ public class FaweException extends RuntimeException {
      * New instance of a given {@link FaweException.Type}
      *
      * @param ignorable if an edit can continue if this exception is caught, e.g. by {@link com.fastasyncworldedit.core.extent.LimitExtent}
-     * @since TODO
+     * @since 2.7.0
      */
     public FaweException(Component reason, Type type, boolean ignorable) {
         this.message = reason;
@@ -70,7 +70,7 @@ public class FaweException extends RuntimeException {
     /**
      * If an edit can continue if this exception is caught, e.g. by {@link com.fastasyncworldedit.core.extent.LimitExtent}
      *
-     * @since TODO
+     * @since 2.7.0
      */
     public boolean ignorable() {
         return ignorable;

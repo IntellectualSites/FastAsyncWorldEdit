@@ -216,6 +216,14 @@ public interface Platform extends Keyed {
      */
     Set<SideEffect> getSupportedSideEffects();
 
+    /**
+     * Get the number of ticks since the server started.
+     * On some platforms this value may be an approximation based on the JVM run time.
+     *
+     * @return The number of ticks since the server started.
+     */
+    long getTickCount();
+
     //FAWE start
 
     /**

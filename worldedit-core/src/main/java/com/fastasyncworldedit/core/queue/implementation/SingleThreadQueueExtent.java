@@ -83,17 +83,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
         this.maxY = maxY;
     }
 
-    /**
-     * Safety check to ensure that the thread being used matches the one being initialized on. - Can
-     * be removed later
-     */
-    private void checkThread() {
-        if (Thread.currentThread() != currentThread && currentThread != null) {
-            throw new UnsupportedOperationException(
-                    "This class must be used from a single thread. Use multiple queues for concurrent operations");
-        }
-    }
-
     @Override
     public void enableQueue() {
         enabledQueue = true;
@@ -154,10 +143,10 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             return;
         }
         if (!this.chunks.isEmpty()) {
+            getChunkLock.lock();
             for (IChunk chunk : this.chunks.values()) {
                 chunk.recycle();
             }
-            getChunkLock.lock();
             this.chunks.clear();
             getChunkLock.unlock();
         }
@@ -233,9 +222,21 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
      */
     private <V extends Future<V>> V submitUnchecked(IQueueChunk chunk) {
         if (chunk.isEmpty()) {
-            chunk.recycle();
-            Future result = Futures.immediateFuture(null);
-            return (V) result;
+            if (chunk instanceof ChunkHolder<?> holder) {
+                long age = holder.initAge();
+                // Ensure we've given time for the chunk to be used - it was likely used for a reason!
+                if (age < 5) {
+                    try {
+                        Thread.sleep(5 - age);
+                    } catch (InterruptedException ignored) {
+                    }
+                }
+            }
+            if (chunk.isEmpty()) {
+                chunk.recycle();
+                Future result = Futures.immediateFuture(null);
+                return (V) result;
+            }
         }
 
         if (Fawe.isMainThread()) {
@@ -451,6 +452,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
     @Override
     public synchronized void flush() {
         if (!chunks.isEmpty()) {
+            getChunkLock.lock();
             if (MemUtil.isMemoryLimited()) {
                 for (IQueueChunk chunk : chunks.values()) {
                     final Future future = submitUnchecked(chunk);
@@ -467,7 +469,6 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
                     }
                 }
             }
-            getChunkLock.lock();
             chunks.clear();
             getChunkLock.unlock();
         }

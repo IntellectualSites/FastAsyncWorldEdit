@@ -19,10 +19,15 @@
     "net.fabricmc:fabric-loader",
     "net.fabricmc.fabric-api:fabric-api",
     "com.github.luben:zstd-jni",
-    "net.kyori",
-    "net.kyori:adventure-nbt",
     "org.jetbrains.kotlin.jvm",
-    "log4j"
+    "log4j",
+    "org.apache.logging.log4j:log4j-api",
+    "org.apache.logging.log4j:log4j-bom",
+    "org.apache.logging.log4j:log4j-slf4j-impl",
+    "org.apache.logging.log4j:log4j-core",
+    "org.bstats:bstats-sponge",
+    "org.spongepowered:spongeapi",
+    "org.yaml:snakeyaml"
   ],
   "labels": ["Renovate"],
   "rebaseWhen": "conflicted",
