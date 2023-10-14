@@ -135,9 +135,6 @@ public interface IQueueExtent<T extends IChunk> extends Flushable, Trimable, ICh
             return block;
         }
         T chunk = this.getOrCreateChunk(chunkX, chunkZ);
-        // Initialize
-        chunk.init(this, chunkX, chunkZ);
-        chunk.setFastMode(isFastMode());
 
         T newChunk = filter.applyChunk(chunk, region);
         if (newChunk != null) {
