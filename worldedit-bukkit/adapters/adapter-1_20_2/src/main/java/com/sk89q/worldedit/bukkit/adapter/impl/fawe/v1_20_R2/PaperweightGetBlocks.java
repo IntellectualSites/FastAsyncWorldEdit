@@ -299,8 +299,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
         Entity entity = null;
         for (Entity e : entities) {
-            if (e.getUUID() == uuid) {
+            if (e.getUUID().equals(uuid)) {
                 entity = e;
+                break;
             }
         }
         if (entity != null) {
