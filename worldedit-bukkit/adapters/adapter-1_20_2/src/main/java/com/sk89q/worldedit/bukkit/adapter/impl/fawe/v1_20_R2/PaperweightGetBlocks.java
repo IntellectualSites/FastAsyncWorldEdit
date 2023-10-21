@@ -313,7 +313,15 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
     @Override
     public CompoundTag getEntity(UUID uuid) {
-        Entity entity = serverLevel.getEntity(uuid);
+        ensureLoaded(serverLevel, chunkX, chunkZ);
+        List<Entity> entities = PaperweightPlatformAdapter.getEntities(getChunk());
+        Entity entity = null;
+        for (Entity e : entities) {
+            if (e.getUUID().equals(uuid)) {
+                entity = e;
+                break;
+            }
+        }
         if (entity != null) {
             org.bukkit.entity.Entity bukkitEnt = entity.getBukkitEntity();
             return BukkitAdapter.adapt(bukkitEnt).getState().getNbtData();
