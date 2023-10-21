@@ -588,7 +588,7 @@ public class MCAChunk implements IChunk {
     }
 
     public boolean isModified() {
-        return modified;
+        return modified || deleted;
     }
 
     public boolean isDeleted() {

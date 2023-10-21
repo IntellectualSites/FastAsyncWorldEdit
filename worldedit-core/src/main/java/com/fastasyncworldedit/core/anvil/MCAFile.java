@@ -1,10 +1,11 @@
 package com.fastasyncworldedit.core.anvil;
 
+import com.fastasyncworldedit.core.FaweCache;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.math.FastBitSet;
 import com.fastasyncworldedit.core.util.task.RunnableVal4;
 import com.plotsquared.core.util.task.RunnableVal;
 import com.sk89q.jnbt.NBTInputStream;
-import com.sk89q.worldedit.MissingWorldException;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -53,26 +54,71 @@ public class MCAFile implements Closeable, Flushable {
     private boolean closed = false;
     private volatile boolean init = false;
 
-    public MCAFile(Path file) {
-        this.file = file;
-        if (!Files.exists(file)) {
-            throw new MissingWorldException();
-        }
-        String[] split = file.getFileName().toString().split("\\.");
-        X = Integer.parseInt(split[1]);
-        Z = Integer.parseInt(split[2]);
-        offsetMap = new Int2IntOpenHashMap();
-        offsetMap.defaultReturnValue(Integer.MAX_VALUE);
-        init();
-    }
-
-    public MCAFile(int mcrX, int mcrZ, Path file) {
+    private MCAFile(int mcrX, int mcrZ, Path file) {
         this.file = file;
         X = mcrX;
         Z = mcrZ;
         offsetMap = new Int2IntOpenHashMap();
         offsetMap.defaultReturnValue(Integer.MAX_VALUE);
-        init();
+    }
+
+    /**
+     * Create a new mca file
+     *
+     * @param mcrX      region x
+     * @param mcrZ      region z
+     * @param directory directory to create mca file in
+     * @return new mca file
+     * @throws IOException on io error
+     */
+    public static MCAFile create(int mcrX, int mcrZ, Path directory) throws IOException {
+        Files.createDirectories(directory);
+        Path file = directory.resolve("r." + mcrX + "." + mcrZ + ".mca");
+        Files.createFile(file);
+        MCAFile mca = new MCAFile(mcrX, mcrZ, file);
+        mca.initEmpty();
+        return mca;
+    }
+
+    /**
+     * Load an mca file
+     *
+     * @param mcrX      region x
+     * @param mcrZ      region z
+     * @param directory directory to load mca file from
+     * @return loaded mca file
+     * @throws IOException on io error
+     */
+    @Nullable
+    public static MCAFile load(int mcrX, int mcrZ, Path directory) throws IOException {
+        Path file = directory.resolve("r." + mcrX + "." + mcrZ + ".mca");
+        if (!Files.exists(file)) {
+            return null;
+        }
+        MCAFile mca = new MCAFile(mcrX, mcrZ, file);
+        mca.init();
+        return mca;
+    }
+
+    /**
+     * Load or create an mca file
+     *
+     * @param mcrX      region x
+     * @param mcrZ      region z
+     * @param directory directory to load or create mca file in
+     * @return mca file
+     * @throws IOException on io error
+     */
+    public static MCAFile loadOrCreate(int mcrX, int mcrZ, Path directory) throws IOException {
+        Path file = directory.resolve("r." + mcrX + "." + mcrZ + ".mca");
+        MCAFile mca = new MCAFile(mcrX, mcrZ, file);
+        if (!Files.exists(file)) {
+            Files.createFile(file);
+            mca.initEmpty();
+        } else {
+            mca.init();
+        }
+        return mca;
     }
 
     public void clear() {
@@ -80,7 +126,7 @@ public class MCAFile implements Closeable, Flushable {
             try {
                 raf.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Error clearing MCAFile", e);
             }
         }
         synchronized (chunks) {
@@ -94,9 +140,7 @@ public class MCAFile implements Closeable, Flushable {
      * Set if the file should be delete
      */
     public void setDeleted(boolean deleted) {
-        if (!init) {
-            init();
-        }
+        checkInit();
         this.deleted = deleted;
     }
 
@@ -107,47 +151,66 @@ public class MCAFile implements Closeable, Flushable {
         return deleted;
     }
 
+    protected void checkInit() {
+        if (!init) {
+            try {
+                init();
+            } catch (IOException e) {
+                throw new FaweException("Error initialising MCA file", FaweException.Type.ANVIL_IO, false, e);
+            }
+        }
+    }
+
     /**
      * Initialises the RandomAccessFile and loads the location header from disk if not done yet
      */
-    public synchronized void init() {
-        try {
-            if (raf == null) {
-                this.offsets = new int[SECTOR_INTS];
-                if (file != null) {
-                    this.raf = new RandomAccessFile(file.toFile(), "rw");
-                    final int nSectors = (int) Math.round(Math.ceil((double) raf.length() / SECTOR_BYTES));
-                    sectorFree = new FastBitSet(nSectors);
-                    sectorFree.setAll();
-                    sectorFree.set(0, false);
-                    sectorFree.set(1, false);
-                    if (raf.length() < 8192) {
-                        raf.setLength(8192);
-                    } else {
-                        if ((raf.length() & 0xFFF) != 0) {
-                            raf.setLength(((raf.length() + 0xFFF) >> 12) << 12);
-                        }
-                        raf.seek(0);
-                        for (int i = 0; i < SECTOR_INTS; i++) {
-                            final int offset = raf.readInt();
-                            offsets[i] = offset;
-                            int sectorStart = offset >> 8;
-                            int numSectors = offset & 0xFF;
-                            if (offset != 0 && sectorStart + numSectors <= sectorFree.size()) {
-                                offsetMap.put(offset, i);
-                                for (int sectorNum = 0; sectorNum < (offset & 0xFF); sectorNum++) {
-                                    sectorFree.set((offset >> 8) + sectorNum, false);
-                                }
+    private synchronized void init() throws IOException {
+        if (raf == null) {
+            this.offsets = new int[SECTOR_INTS];
+            if (file != null) {
+                this.raf = new RandomAccessFile(file.toFile(), "rw");
+                final int nSectors = (int) Math.round(Math.ceil((double) raf.length() / SECTOR_BYTES));
+                sectorFree = new FastBitSet(nSectors);
+                sectorFree.setAll();
+                sectorFree.set(0, false);
+                sectorFree.set(1, false);
+                if (raf.length() < 8192) {
+                    raf.setLength(8192);
+                } else {
+                    if ((raf.length() & 0xFFF) != 0) {
+                        raf.setLength(((raf.length() + 0xFFF) >> 12) << 12);
+                    }
+                    raf.seek(0);
+                    for (int i = 0; i < SECTOR_INTS; i++) {
+                        final int offset = raf.readInt();
+                        offsets[i] = offset;
+                        int sectorStart = offset >> 8;
+                        int numSectors = offset & 0xFF;
+                        if (offset != 0 && sectorStart + numSectors <= sectorFree.size()) {
+                            offsetMap.put(offset, i);
+                            for (int sectorNum = 0; sectorNum < (offset & 0xFF); sectorNum++) {
+                                sectorFree.set((offset >> 8) + sectorNum, false);
                             }
                         }
                     }
                 }
-                init = true;
-                closed = false;
             }
-        } catch (Throwable e) {
-            e.printStackTrace();
+            init = true;
+            closed = false;
         }
+    }
+
+    private synchronized void initEmpty() throws IOException {
+        this.offsets = new int[SECTOR_INTS];
+        this.raf = new RandomAccessFile(file.toFile(), "rw");
+
+        // Initialises with all zeroes
+        this.raf.setLength(8192L);
+        this.raf.seek(0);
+        this.raf.write(FaweCache.INSTANCE.BYTE_BUFFER_8192.get());
+        sectorFree = new FastBitSet(2);
+        init = true;
+        closed = false;
     }
 
     /**
@@ -183,9 +246,7 @@ public class MCAFile implements Closeable, Flushable {
      */
     @Nullable
     public MCAChunk getCachedChunk(int cx, int cz) {
-        if (!init) {
-            init();
-        }
+        checkInit();
         short pair = (short) ((cx & 31) + ((cz & 31) << 5));
         synchronized (chunks) {
             return chunks.get(pair);
@@ -196,9 +257,7 @@ public class MCAFile implements Closeable, Flushable {
      * Create a new empty {@link MCAChunk}.
      */
     public MCAChunk newChunk(int cx, int cz) {
-        if (!init) {
-            init();
-        }
+        checkInit();
         short pair = (short) ((cx & 31) + ((cz & 31) << 5));
         MCAChunk chunk;
         synchronized (chunks) {
@@ -211,9 +270,7 @@ public class MCAFile implements Closeable, Flushable {
      * Insert a {@link MCAChunk} into the cache.
      */
     public void setChunk(MCAChunk chunk) {
-        if (!init) {
-            init();
-        }
+        checkInit();
         int cx = chunk.getX();
         int cz = chunk.getZ();
         short pair = (short) ((cx & 31) + ((cz & 31) << 5));
@@ -226,9 +283,7 @@ public class MCAFile implements Closeable, Flushable {
      * Load data from the mca region into the given {@link MCAChunk}.
      */
     public void loadIntoChunkFromFile(MCAChunk chunk) throws IOException {
-        if (!init) {
-            init();
-        }
+        checkInit();
         int cx = chunk.getX();
         int cz = chunk.getZ();
         int i = (cx & 31) + ((cz & 31) << 5);
@@ -238,37 +293,13 @@ public class MCAFile implements Closeable, Flushable {
                 chunk.setEmpty(true);
                 return;
             }
-            chunk.loadFromNIS(getChunkIS(offset >> 8), false);
-            if (offset == 0) {
-                return;
-            }
-            if (i < 2) {
-                int length;
-                byte version;
-                byte[] data;
-                synchronized (this) {
-                    raf.seek((long) (offset >> 8) << 12);
-                    length = raf.readInt();
-                    version = raf.readByte();
-                    data = new byte[length - 1];
-                    raf.read(data);
-                }
-                FastByteArrayInputStream bais = new FastByteArrayInputStream(data);
-                BufferedInputStream bis = switch (version) {
-                    case VERSION_GZIP -> new BufferedInputStream(new GZIPInputStream(bais));
-                    case VERSION_DEFLATE -> new BufferedInputStream(new InflaterInputStream(bais));
-                    case VERSION_UNCOMPRESSED -> new BufferedInputStream(bais);
-                    default -> throw new IllegalStateException("Unexpected compression version: " + version);
-                };
-            }
+            chunk.loadFromNIS(new NBTInputStream(getChunkBIS(offset >> 8)), false);
         }
     }
 
     @Nonnull
-    public MCAChunk getChunk(int cx, int cz) throws IOException {
-        if (!init) {
-            init();
-        }
+    public MCAChunk getChunk(int cx, int cz) {
+        checkInit();
         MCAChunk cached = getCachedChunk(cx, cz);
         if (cached != null) {
             return cached;
@@ -277,10 +308,8 @@ public class MCAFile implements Closeable, Flushable {
         }
     }
 
-    public MCAChunk readChunk(int cx, int cz) throws IOException {
-        if (!init) {
-            init();
-        }
+    public MCAChunk readChunk(int cx, int cz) {
+        checkInit();
         int i = (cx & 31) + ((cz & 31) << 5);
         int offset = offsets[i];
         if (offset == 0) {
@@ -289,26 +318,8 @@ public class MCAFile implements Closeable, Flushable {
         try {
             MCAChunk chunk;
             synchronized (this) {
-                chunk = getChunkIS(offset >> 8, cx, cz);
-            }
-            if (i < 2) {
-                int length;
-                byte version;
-                byte[] data;
-                synchronized (this) {
-                    raf.seek((long) (offset >> 8) << 12);
-                    length = raf.readInt();
-                    version = raf.readByte();
-                    data = new byte[length - 1];
-                    raf.read(data);
-                }
-                FastByteArrayInputStream bais = new FastByteArrayInputStream(data);
-                BufferedInputStream bis = switch (version) {
-                    case VERSION_GZIP -> new BufferedInputStream(new GZIPInputStream(bais));
-                    case VERSION_DEFLATE -> new BufferedInputStream(new InflaterInputStream(bais));
-                    case VERSION_UNCOMPRESSED -> new BufferedInputStream(bais);
-                    default -> throw new IllegalStateException("Unexpected compression version: " + version);
-                };
+                NBTInputStream nis = new NBTInputStream(getChunkBIS(offset >> 8));
+                chunk = new MCAChunk(this, nis, cx, cz, false);
             }
             short pair = (short) ((cx & 31) + ((cz & 31) << 5));
             synchronized (chunks) {
@@ -322,12 +333,10 @@ public class MCAFile implements Closeable, Flushable {
     }
 
     /**
-     * @param onEach cx, cz, offset, size (in kB)
+     * @param onEach cx, cz, sector, sectorsAllocated (in kB)
      */
     public void forEachChunk(RunnableVal4<Integer, Integer, Integer, Integer> onEach) {
-        if (!init) {
-            init();
-        }
+        checkInit();
         int i = 0;
         for (int z = 0; z < 32; z++) {
             for (int x = 0; x < 32; x++, i += 4) {
@@ -341,9 +350,7 @@ public class MCAFile implements Closeable, Flushable {
     }
 
     public void forEachChunk(RunnableVal<MCAChunk> onEach) {
-        if (!init) {
-            init();
-        }
+        checkInit();
         int rx = X << 5;
         int rz = Z << 5;
         for (int z = 0; z < 32; z++) {
@@ -359,60 +366,90 @@ public class MCAFile implements Closeable, Flushable {
         }
     }
 
-    private NBTInputStream getChunkIS(int offset) throws IOException {
-        int length = -1;
-        byte version = -1;
-        byte[] data;
-        try {
-            if (offset == 0) {
-                return null;
-            }
-            synchronized (this) {
-                raf.seek((long) offset << 12);
-                length = raf.readInt();
-                version = raf.readByte();
-                data = new byte[length - 1];
-                raf.read(data);
-            }
-            FastByteArrayInputStream bais = new FastByteArrayInputStream(data);
-            BufferedInputStream bis = switch (version) {
-                case VERSION_GZIP -> new BufferedInputStream(new GZIPInputStream(bais));
-                case VERSION_DEFLATE -> new BufferedInputStream(new InflaterInputStream(bais));
-                case VERSION_UNCOMPRESSED -> new BufferedInputStream(bais);
-                default -> throw new IllegalStateException("Unexpected compression version: " + version);
-            };
-            return new NBTInputStream(bis);
-        } catch (IOException e) {
-            throw new IOException("Length: " + length + ", version: " + version + ", offset: " + offset, e);
-        }
+    @Nullable
+    protected BufferedInputStream getChunkIS(int cx, int cz) throws IOException {
+        checkInit();
+        int offset = offsets[(cx & 31) + ((cz & 31) << 5)];
+        return getChunkBIS(offset);
     }
 
-    private MCAChunk getChunkIS(int offset, int cx, int cz) throws IOException {
-        int length = -1;
-        byte version = -1;
-        byte[] data;
-        try {
-            if (offset == 0) {
-                return null;
-            }
-            synchronized (this) {
-                raf.seek((long) offset << 12);
-                length = raf.readInt();
-                version = raf.readByte();
-                data = new byte[length - 1];
-                raf.read(data);
-            }
-            FastByteArrayInputStream bais = new FastByteArrayInputStream(data);
-            BufferedInputStream bis = switch (version) {
-                case VERSION_GZIP -> new BufferedInputStream(new GZIPInputStream(bais));
-                case VERSION_DEFLATE -> new BufferedInputStream(new InflaterInputStream(bais));
-                case VERSION_UNCOMPRESSED -> new BufferedInputStream(bais);
-                default -> throw new IllegalStateException("Unexpected compression version: " + version);
-            };
-            return new MCAChunk(this, new NBTInputStream(bis), cx, cz, false);
-        } catch (Exception e) {
-            throw new IOException("Length: " + length + ", version: " + version + ", offset: " + offset, e);
+    @Nullable
+    private BufferedInputStream getChunkBIS(long offset) throws IOException {
+        if (offset == 0) {
+            return null;
         }
+        byte version;
+        byte[] data;
+        synchronized (this) {
+            raf.seek(offset << 12);
+            int length = raf.readInt();
+            version = raf.readByte();
+            data = new byte[length - 1];
+            raf.read(data);
+        }
+        FastByteArrayInputStream bais = new FastByteArrayInputStream(data);
+        return switch (version) {
+            case VERSION_GZIP -> new BufferedInputStream(new GZIPInputStream(bais));
+            case VERSION_DEFLATE -> new BufferedInputStream(new InflaterInputStream(bais));
+            case VERSION_UNCOMPRESSED -> new BufferedInputStream(bais);
+            default -> throw new IllegalStateException("Unexpected compression version: " + version);
+        };
+    }
+
+    public byte[] getFullChunkBytes(int cx, int cz) throws IOException {
+        checkInit();
+        int offset = offsets[(cx & 31) + ((cz & 31) << 5)];
+        int sectorNumber = offset >> 8;
+        int sectorsAllocated = offset & 0xFF;
+        byte[] data = new byte[sectorsAllocated << 12];
+        raf.seek((long) sectorNumber << 12);
+        raf.read(data);
+        return data;
+    }
+
+    /**
+     * Writes chunk bytes directly to the MCAFile and returns the next sector after the chunk
+     *
+     * @param cx           chunk x
+     * @param cz           chunk z
+     * @param sectorNumber sector to write chunk from
+     * @param bytes        byte to write
+     * @return next sector after the chunk
+     * @throws IOException on IO error
+     */
+    public synchronized int writeFullChunkBytes(int cx, int cz, int sectorNumber, byte[] bytes) throws IOException {
+        checkInit();
+        int allocate = (bytes.length >> 12) + 1;
+        int offset = (sectorNumber << 8) | (allocate & 0xFF);
+        setOffset(cx, cz, offset);
+        raf.seek((long) sectorNumber << 12);
+        raf.write(bytes);
+        int newSector = sectorNumber + allocate;
+        sectorFree.expandTo(newSector, false);
+        return newSector;
+    }
+
+    public synchronized void replaceChunkBytes(int cx, int cz, byte[] bytes) throws IOException {
+        checkInit();
+        int currOffset = offsets[(cx & 31) + ((cz & 31) << 5)];
+        int allocate = (bytes.length >> 12) + 1;
+        int sectorNumber = sectorFree.size() + 1;
+        if (currOffset != 0) {
+            int currSector = currOffset >> 8;
+            int currAllocate = currOffset & 0xFF;
+            sectorFree.setRange(currSector, currSector + currAllocate);
+            if (allocate <= currAllocate) {
+                sectorNumber = currSector;
+                sectorFree.clearRange(currSector, currSector + allocate);
+            }
+            System.out.println(sectorNumber);
+        }
+        int offset = (sectorNumber << 8) | (allocate & 0xFF);
+        setOffset(cx, cz, offset);
+        raf.seek((long) sectorNumber << 12);
+        raf.write(bytes);
+        int newSector = sectorNumber + allocate;
+        sectorFree.expandTo(newSector, false);
     }
 
     public List<MCAChunk> getCachedChunks() {
@@ -428,22 +465,28 @@ public class MCAFile implements Closeable, Flushable {
         }
     }
 
-    @Override
-    public synchronized void close() throws IOException {
+    public synchronized void close(boolean flush) throws IOException {
         if (raf == null || closed) {
             return;
         }
-        flush();
+        if (flush) {
+            flush();
+        }
         try {
             raf.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Error closing MCAFile", e);
         }
         raf = null;
         offsets = null;
         offsetMap.clear();
         closed = true;
         init = false;
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
+        close(true);
     }
 
     public boolean isModified() {
@@ -453,7 +496,7 @@ public class MCAFile implements Closeable, Flushable {
         synchronized (chunks) {
             for (Int2ObjectMap.Entry<MCAChunk> entry : chunks.int2ObjectEntrySet()) {
                 MCAChunk chunk = entry.getValue();
-                if (chunk.isModified() || chunk.isDeleted()) {
+                if (chunk.isModified()) {
                     return true;
                 }
             }
@@ -461,15 +504,19 @@ public class MCAFile implements Closeable, Flushable {
         return false;
     }
 
-    public synchronized void setOffset(final int x, final int z, final int offset)
+    public int getOffset(int cx, int cz) {
+        return offsets[cx + (cz << 5)];
+    }
+
+    public synchronized void setOffset(int cx, int cz, final int offset)
             throws IOException {
-        int i = (x & 31) + ((z & 31) << 5);
+        int i = (cx & 31) + ((cz & 31) << 5);
         if (offset == 0) {
             offsetMap.remove(offsets[i]);
         } else {
             offsetMap.put(offset, i);
         }
-        offsets[x + (z << 5)] = offset;
+        offsets[cx + (cz << 5)] = offset;
         raf.seek((long) i << 2);
         raf.writeInt(offset);
     }
@@ -479,6 +526,7 @@ public class MCAFile implements Closeable, Flushable {
      */
     @Override
     public synchronized void flush() throws IOException {
+        System.out.println(sectorFree);
         boolean delete = true;
         int currentSector = 2;
         Queue<Integer> offsets =
@@ -577,11 +625,12 @@ public class MCAFile implements Closeable, Flushable {
         int size = 0;
         for (int i = sectorFree.size(); i > 0; i--) {
             if (!sectorFree.get(i)) {
-                size = i + 1;
+                size = i + 1; // + 1 to fully encompass
                 break;
             }
         }
-        raf.setLength((long) (size + 1) * SECTOR_BYTES);
+        System.out.println(sectorFree);
+        raf.setLength((long) size << 12);
         if (delete || size < 3) {
             clear();
             Files.delete(file);

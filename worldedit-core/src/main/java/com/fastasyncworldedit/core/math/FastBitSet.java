@@ -95,10 +95,9 @@ public class FastBitSet {
     }
 
     public void expandTo(int newSize, boolean value) {
-        //System.out.println(newSize);
         int newLength = (newSize + 64) >> 6;
         if (newLength <= this.bits.length) {
-            if (this.size > newSize) {
+            if (this.size < newSize) {
                 this.size = newSize;
             }
             return;

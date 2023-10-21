@@ -97,7 +97,7 @@ public final class LimitExtent extends AbstractDelegateExtent implements IBatchP
     }
 
     private void handleException(FaweException e) {
-        if (e.ignorable() || !limit.MAX_FAILS()) {
+        if (!e.ignorable() || !limit.MAX_FAILS()) {
             throw e;
         }
         if (!faweExceptionReasonsUsed[e.getType().ordinal()]) {

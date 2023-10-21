@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.core.anvil;
 
 import com.fastasyncworldedit.core.Fawe;
+import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.implementation.packet.ChunkPacket;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -64,7 +65,9 @@ public class MCAWorld extends AbstractWorld {
      * @param folder World file/folder
      */
     public static synchronized MCAWorld of(String name, Path folder) {
-        if (Fawe.platform().isWorldLoaded(name)) {
+        if (folder.getParent().toAbsolutePath().equals(Fawe.platform().getWorldsFolder().toAbsolutePath()) && Fawe
+                .platform()
+                .isWorldLoaded(name)) {
             throw new IllegalStateException("World " + name + " is loaded. Anvil operations cannot be completed on a loaded world.");
         }
         // World could be the same name but in a different folder
@@ -78,10 +81,18 @@ public class MCAWorld extends AbstractWorld {
             short regionX = Short.parseShort(split[1]);
             short regionZ = Short.parseShort(split[2]);
             int paired = MathMan.pair(regionX, regionZ);
-            mcaFileCache.computeIfAbsent(
-                    paired,
-                    (i) -> new MCAFile(regionX, regionZ, regionFolder.resolve("r." + regionX + "." + regionZ + ".mca"))
-            );
+            mcaFileCache.computeIfAbsent(paired, (i) -> {
+                try {
+                    return MCAFile.load(regionX, regionZ, regionFolder);
+                } catch (IOException e) {
+                    throw new FaweException(
+                            "Error loading MCA file: `" + file.getFileName() + "`",
+                            FaweException.Type.ANVIL_IO,
+                            false,
+                            e
+                    );
+                }
+            });
         });
         return mcaFileCache.values();
     }
@@ -93,6 +104,29 @@ public class MCAWorld extends AbstractWorld {
             LOGGER.error("Error listing region files", e);
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * Get or create MCA file for the given region coordinates
+     *
+     * @param mcrX x region coordinate
+     * @param mcrZ z region coordinate
+     * @return mca file
+     */
+    public MCAFile getOrCreateMCA(int mcrX, int mcrZ) {
+        int pair = MathMan.pair((short) mcrX, (short) mcrZ);
+        return mcaFileCache.computeIfAbsent(pair, (i) -> {
+            try {
+                return MCAFile.loadOrCreate(mcrX, mcrZ, regionFolder);
+            } catch (IOException e) {
+                throw new FaweException(
+                        "Error loading MCA file " + mcrX + "," + mcrZ + " in folder " + regionFolder,
+                        FaweException.Type.ANVIL_IO,
+                        false,
+                        e
+                );
+            }
+        });
     }
 
     @Override
@@ -112,6 +146,10 @@ public class MCAWorld extends AbstractWorld {
 
     public Path getFolder() {
         return folder;
+    }
+
+    public Path getRegionFolder() {
+        return regionFolder;
     }
 
     @Override
@@ -173,14 +211,20 @@ public class MCAWorld extends AbstractWorld {
         int paired = MathMan.pair(regionX, regionZ);
         MCAFile mca = mcaFileCache.computeIfAbsent(
                 paired,
-                (i) -> new MCAFile(regionX, regionZ, regionFolder.resolve("r." + regionX + "." + regionZ + ".mca"))
+                (i) -> {
+                    try {
+                        return MCAFile.loadOrCreate(regionX, regionZ, regionFolder);
+                    } catch (IOException e) {
+                        throw new FaweException(
+                                "Error loading MCA file " + regionX + "," + regionZ + " in folder " + regionFolder,
+                                FaweException.Type.ANVIL_IO,
+                                false,
+                                e
+                        );
+                    }
+                }
         );
-        try {
-            return mca.getChunk(chunkX, chunkZ);
-        } catch (IOException e) {
-            LOGGER.error("Error loading chunk. Creating empty chunk.", e);
-            return mca.newChunk(chunkX, chunkZ);
-        }
+        return mca.getChunk(chunkX, chunkZ);
     }
 
     @Override
@@ -192,11 +236,31 @@ public class MCAWorld extends AbstractWorld {
     public synchronized void flush() {
         for (MCAFile mca : mcaFileCache.values()) {
             try {
-                mca.close();
+                mca.flush();
             } catch (IOException e) {
-                LOGGER.error("Could not flush MCAFile {}", mca.getFile().getFileName(), e);
+                LOGGER.error("Could not close MCAFile {}", mca.getFile().getFileName(), e);
             }
         }
+    }
+
+    public synchronized void close(boolean flush) {
+        for (MCAFile mca : mcaFileCache.values()) {
+            try {
+                mca.close(flush);
+            } catch (IOException e) {
+                LOGGER.error("Could not close MCAFile {}", mca.getFile().getFileName(), e);
+            }
+        }
+    }
+
+    /**
+     * Create a new MCA file for the given region x,z
+     *
+     * @param rX region X
+     * @param rZ region Z
+     */
+    public synchronized MCAFile createMCA(int rX, int rZ) throws IOException {
+        return MCAFile.create(rX, rZ, regionFolder);
     }
 
 }
