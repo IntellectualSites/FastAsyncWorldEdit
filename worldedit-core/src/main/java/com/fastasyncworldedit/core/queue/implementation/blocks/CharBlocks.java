@@ -121,6 +121,7 @@ public abstract class CharBlocks implements IBlocks {
     public synchronized IChunkSet reset() {
         for (int i = 0; i < sectionCount; i++) {
             sections[i] = EMPTY;
+            blocks[i] = null;
         }
         return null;
     }

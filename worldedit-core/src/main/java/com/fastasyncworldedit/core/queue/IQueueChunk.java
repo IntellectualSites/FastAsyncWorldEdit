@@ -36,4 +36,18 @@ public interface IQueueChunk<T extends Future<T>> extends IChunk, Callable<T> {
         }
     }
 
+    /**
+     * Get if the thank has any running tasks, locked locks, etc.
+     */
+    default boolean hasRunning() {
+        return false;
+    }
+
+    /**
+     * Prevent set operations to the chunk, should typically be used when a chunk is submitted before the edit is necessarily
+     * completed.
+     */
+    default void lockSet() {
+    }
+
 }

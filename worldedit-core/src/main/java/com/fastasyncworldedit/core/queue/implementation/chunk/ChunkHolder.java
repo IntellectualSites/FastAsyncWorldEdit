@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * An abstract {@link IChunk} class that implements basic get/set blocks.
@@ -43,8 +41,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     public static ChunkHolder newInstance() {
         return POOL.poll();
     }
-
-    private final Lock calledLock = new ReentrantLock();
 
     private volatile IChunkGet chunkExisting; // The existing chunk (e.g. a clipboard, or the world, before changes)
     private volatile IChunkSet chunkSet; // The blocks to be set to the chunkExisting
@@ -68,7 +64,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized void recycle() {
-        calledLock.lock();
         delegate = NULL;
         if (chunkSet != null) {
             chunkSet.recycle();
@@ -77,7 +72,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         chunkExisting = null;
         extent = null;
         POOL.offer(this);
-        calledLock.unlock();
     }
 
     public long initAge() {
@@ -88,68 +82,49 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
         return delegate;
     }
 
-    /**
-     * If the chunk is currently being "called", this method will block until completed.
-     */
-    private void checkAndWaitOnCalledLock() {
-        if (!calledLock.tryLock()) {
-            calledLock.lock();
-        }
-        calledLock.unlock();
-    }
-
     @Override
     public boolean setTile(int x, int y, int z, CompoundTag tag) {
-        checkAndWaitOnCalledLock();
         return delegate.set(this).setTile(x, y, z, tag);
     }
 
     @Override
     public CompoundTag getTile(int x, int y, int z) {
-        checkAndWaitOnCalledLock();
         return delegate.set(this).getTile(x, y, z);
     }
 
     @Override
     public void setEntity(CompoundTag tag) {
-        checkAndWaitOnCalledLock();
         delegate.set(this).setEntity(tag);
     }
 
     @Override
     public void removeEntity(UUID uuid) {
-        checkAndWaitOnCalledLock();
         delegate.set(this).removeEntity(uuid);
     }
 
     @Override
     public Set<UUID> getEntityRemoves() {
-        checkAndWaitOnCalledLock();
         return delegate.set(this).getEntityRemoves();
     }
 
     @Override
     public BiomeType[][] getBiomes() {
-        checkAndWaitOnCalledLock();
         // Uses set as this method is only used to retrieve biomes that have been set to the extent/chunk.
         return delegate.set(this).getBiomes();
     }
 
     @Override
     public char[][] getLight() {
-        checkAndWaitOnCalledLock();
         return delegate.set(this).getLight();
     }
 
     @Override
     public char[][] getSkyLight() {
-        checkAndWaitOnCalledLock();
         return delegate.set(this).getSkyLight();
     }
 
     @Override
     public void setBlocks(int layer, char[] data) {
-        checkAndWaitOnCalledLock();
         delegate.set(this).setBlocks(layer, data);
     }
 
@@ -174,12 +149,10 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public void setFastMode(boolean fastmode) {
-        checkAndWaitOnCalledLock();
         this.fastmode = fastmode;
     }
 
     public void setBitMask(int bitMask) {
-        checkAndWaitOnCalledLock();
         this.bitMask = bitMask;
     }
 
@@ -189,7 +162,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public boolean hasBiomes(final int layer) {
-        checkAndWaitOnCalledLock();
         // No need to go through delegate. hasBiomes is SET only.
         return chunkSet != null && chunkSet.hasBiomes(layer);
     }
@@ -200,14 +172,13 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public CompoundTag getEntity(UUID uuid) {
-        checkAndWaitOnCalledLock();
         return delegate.get(this).getEntity(uuid);
     }
 
     @Override
-    public void setCreateCopy(boolean createCopy) {
-        checkAndWaitOnCalledLock();
+    public int setCreateCopy(boolean createCopy) {
         this.createCopy = createCopy;
+        return -1;
     }
 
     @Override
@@ -217,19 +188,16 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public void setLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
-        checkAndWaitOnCalledLock();
         delegate.setLightingToGet(this, lighting);
     }
 
     @Override
     public void setSkyLightingToGet(char[][] lighting, int minSectionPosition, int maxSectionPosition) {
-        checkAndWaitOnCalledLock();
         delegate.setSkyLightingToGet(this, lighting);
     }
 
     @Override
     public void setHeightmapToGet(HeightMapType type, int[] data) {
-        checkAndWaitOnCalledLock();
         delegate.setHeightmapToGet(this, type, data);
     }
 
@@ -254,7 +222,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     public void flushLightToGet() {
-        checkAndWaitOnCalledLock();
         delegate.flushLightToGet(this);
     }
 
@@ -921,19 +888,16 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public Map<BlockVector3, CompoundTag> getTiles() {
-        checkAndWaitOnCalledLock();
         return delegate.get(this).getTiles();
     }
 
     @Override
     public Set<CompoundTag> getEntities() {
-        checkAndWaitOnCalledLock();
         return delegate.get(this).getEntities();
     }
 
     @Override
     public boolean hasSection(int layer) {
-        checkAndWaitOnCalledLock();
         return chunkExisting != null && chunkExisting.hasSection(layer);
     }
 
@@ -958,6 +922,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
             if (result) {
                 delegate = NULL;
                 chunkExisting = null;
+                chunkSet.recycle();
                 chunkSet = null;
                 return true;
             }
@@ -985,7 +950,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public boolean isEmpty() {
-        checkAndWaitOnCalledLock();
         return chunkSet == null || chunkSet.isEmpty();
     }
 
@@ -993,7 +957,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * Get or create the existing part of this chunk.
      */
     public final IChunkGet getOrCreateGet() {
-        checkAndWaitOnCalledLock();
         if (chunkExisting == null) {
             chunkExisting = newWrappedGet();
             chunkExisting.trim(false);
@@ -1005,7 +968,6 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * Get or create the settable part of this chunk.
      */
     public final IChunkSet getOrCreateSet() {
-        checkAndWaitOnCalledLock();
         if (chunkSet == null) {
             chunkSet = newWrappedSet();
         }
@@ -1026,7 +988,7 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
      * - The purpose of wrapping is to allow different extents to intercept / alter behavior
      * - e.g., caching, optimizations, filtering
      */
-    private synchronized IChunkGet newWrappedGet() {
+    private IChunkGet newWrappedGet() {
         return extent.getCachedGet(chunkX, chunkZ);
     }
 
@@ -1048,42 +1010,42 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public synchronized T call() {
-        calledLock.lock();
         if (chunkSet != null && !chunkSet.isEmpty()) {
-            this.delegate = GET;
             chunkSet.setBitMask(bitMask);
-            try {
-                IChunkSet copy = chunkSet.createCopy();
-                chunkSet = null;
-                return this.call(copy, () -> {
-                    // Do nothing
-                });
-            } catch (Throwable t) {
-                calledLock.unlock();
-                throw t;
-            }
+            IChunkSet copy = chunkSet.createCopy();
+            return this.call(copy, () -> {
+                // Do nothing
+            });
         }
+        recycle();
         return null;
     }
 
+    /**
+     * This method should never be called from outside ChunkHolder
+     */
     @Override
     public synchronized T call(IChunkSet set, Runnable finalize) {
         if (set != null) {
             IChunkGet get = getOrCreateGet();
-            boolean postProcess = !(getExtent().getPostProcessor() instanceof EmptyBatchProcessor);
-            get.setCreateCopy(postProcess);
-            final IChunkSet iChunkSet = getExtent().processSet(this, get, set);
-            Runnable finalizer;
-            if (postProcess) {
-                finalizer = () -> {
-                    getExtent().postProcess(this, get.getCopy(), iChunkSet);
-                    finalize.run();
-                };
-            } else {
-                finalizer = finalize;
+            try {
+                get.lockCall();
+                boolean postProcess = !(getExtent().getPostProcessor() instanceof EmptyBatchProcessor);
+                final IChunkSet iChunkSet = getExtent().processSet(this, get, set);
+                Runnable finalizer;
+                if (postProcess) {
+                    int copyKey = get.setCreateCopy(true);
+                    finalizer = () -> {
+                        getExtent().postProcess(this, get.getCopy(copyKey), iChunkSet);
+                        finalize.run();
+                    };
+                } else {
+                    finalizer = finalize;
+                }
+                return get.call(set, finalizer);
+            } finally {
+                get.unlockCall();
             }
-            calledLock.unlock();
-            return get.call(set, finalizer);
         }
         return null;
     }
@@ -1107,103 +1069,86 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
 
     @Override
     public boolean setBiome(int x, int y, int z, BiomeType biome) {
-        checkAndWaitOnCalledLock();
         return delegate.setBiome(this, x, y, z, biome);
     }
 
     @Override
     public <B extends BlockStateHolder<B>> boolean setBlock(int x, int y, int z, B block) {
-        checkAndWaitOnCalledLock();
         return delegate.setBlock(this, x, y, z, block);
     }
 
     @Override
     public BiomeType getBiomeType(int x, int y, int z) {
-        checkAndWaitOnCalledLock();
         return delegate.getBiome(this, x, y, z);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        checkAndWaitOnCalledLock();
         return delegate.getBlock(this, x, y, z);
     }
 
     @Override
     public BaseBlock getFullBlock(int x, int y, int z) {
-        checkAndWaitOnCalledLock();
         return delegate.getFullBlock(this, x, y, z);
     }
 
     @Override
     public void setSkyLight(int x, int y, int z, int value) {
-        checkAndWaitOnCalledLock();
         delegate.setSkyLight(this, x, y, z, value);
     }
 
     @Override
     public void setHeightMap(HeightMapType type, int[] heightMap) {
-        checkAndWaitOnCalledLock();
         delegate.setHeightMap(this, type, heightMap);
     }
 
     @Override
     public void removeSectionLighting(int layer, boolean sky) {
-        checkAndWaitOnCalledLock();
         delegate.removeSectionLighting(this, layer, sky);
     }
 
     @Override
     public void setFullBright(int layer) {
-        checkAndWaitOnCalledLock();
         delegate.setFullBright(this, layer);
     }
 
     @Override
     public void setBlockLight(int x, int y, int z, int value) {
-        checkAndWaitOnCalledLock();
         delegate.setBlockLight(this, x, y, z, value);
     }
 
     @Override
     public void setLightLayer(int layer, char[] toSet) {
-        checkAndWaitOnCalledLock();
         delegate.setLightLayer(this, layer, toSet);
     }
 
     @Override
     public void setSkyLightLayer(int layer, char[] toSet) {
-        checkAndWaitOnCalledLock();
         delegate.setSkyLightLayer(this, layer, toSet);
     }
 
     @Override
     public int getSkyLight(int x, int y, int z) {
-        checkAndWaitOnCalledLock();
         return delegate.getSkyLight(this, x, y, z);
     }
 
     @Override
     public int getEmittedLight(int x, int y, int z) {
-        checkAndWaitOnCalledLock();
         return delegate.getEmittedLight(this, x, y, z);
     }
 
     @Override
     public int getBrightness(int x, int y, int z) {
-        checkAndWaitOnCalledLock();
         return delegate.getBrightness(this, x, y, z);
     }
 
     @Override
     public int getOpacity(int x, int y, int z) {
-        checkAndWaitOnCalledLock();
         return delegate.getOpacity(this, x, y, z);
     }
 
     @Override
     public int[] getHeightMap(HeightMapType type) {
-        checkAndWaitOnCalledLock();
         return delegate.getHeightMap(this, type);
     }
 
