@@ -108,6 +108,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     private final Registry<Biome> biomeRegistry;
     private final IdMap<Holder<Biome>> biomeHolderIdMap;
     private final ConcurrentHashMap<Integer, PaperweightGetBlocks_Copy> copies = new ConcurrentHashMap<>();
+    private final Object sendLock = new Object();
     private LevelChunkSection[] sections;
     private LevelChunk levelChunk;
     private DataLayer[] blockLight;
@@ -917,8 +918,10 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
     }
 
     @Override
-    public synchronized void send(int mask, boolean lighting) {
-        PaperweightPlatformAdapter.sendChunk(serverLevel, chunkX, chunkZ, lighting);
+    public void send(int mask, boolean lighting) {
+        synchronized (sendLock) {
+            PaperweightPlatformAdapter.sendChunk(serverLevel, chunkX, chunkZ, lighting);
+        }
     }
 
     /**
