@@ -17,42 +17,30 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.sk89q.worldedit.world.generation;
+package com.fastasyncworldedit.core.command.factory;
 
+import com.fastasyncworldedit.core.function.generator.StructureGenerator;
 import com.sk89q.worldedit.EditSession;
-import com.sk89q.worldedit.math.BlockVector3;
-import com.sk89q.worldedit.registry.Keyed;
-import com.sk89q.worldedit.registry.NamespacedRegistry;
+import com.sk89q.worldedit.function.Contextual;
+import com.sk89q.worldedit.function.EditContext;
+import com.sk89q.worldedit.world.generation.StructureType;
 
-public class StructureType implements Keyed {
-    public static final NamespacedRegistry<StructureType> REGISTRY = new NamespacedRegistry<>("structure type");
+public final class StructureGeneratorFactory implements Contextual<StructureGenerator> {
 
-    private final String id;
+    private final StructureType type;
 
-    public StructureType(String id) {
-        this.id = id;
+    public StructureGeneratorFactory(StructureType type) {
+        this.type = type;
     }
 
     @Override
-    public String getId() {
-        return this.id;
+    public StructureGenerator createFromContext(EditContext input) {
+        return new StructureGenerator((EditSession) input.getDestination(), type);
     }
 
     @Override
     public String toString() {
-        return this.id;
+        return "structure of type " + type;
     }
 
-    //FAWE start
-    /**
-     * Place this structure into an {@link EditSession}
-     *
-     * @param extent   EditSession to place into
-     * @param position position to use for placement
-     * @return true if successful
-     */
-    public boolean place(EditSession extent, BlockVector3 position) {
-        return extent.getWorld().generateStructure(this, extent, position);
-    }
-    //FAWE end
 }
