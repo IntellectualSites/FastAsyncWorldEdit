@@ -26,8 +26,9 @@ import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.generation.ConfiguredFeatureType;
 
 /**
- * Generates forests by searching for the ground starting from the given upper Y
- * coordinate for every column given.
+ * Generate a feature at the given location
+ *
+ * @since TODO
  */
 public class FeatureGenerator implements RegionFunction {
 
@@ -39,6 +40,8 @@ public class FeatureGenerator implements RegionFunction {
      *
      * @param editSession the edit session
      * @param featureType the feature type
+     *
+     * @since TODO
      */
     public FeatureGenerator(EditSession editSession, ConfiguredFeatureType featureType) {
         this.editSession = editSession;
