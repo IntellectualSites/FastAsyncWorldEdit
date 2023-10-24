@@ -17,7 +17,7 @@ import com.sk89q.worldedit.world.generation.StructureType;
 import javax.annotation.Nullable;
 
 /**
- * Places a feature
+ * Places a structure
  *
  * @since TODO
  */
