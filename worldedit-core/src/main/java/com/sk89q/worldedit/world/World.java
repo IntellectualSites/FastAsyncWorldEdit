@@ -313,6 +313,14 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     boolean generateTree(TreeGenerator.TreeType type, EditSession editSession, BlockVector3 position) throws
             MaxChangedBlocksException;
 
+    /**
+     * Generate a structure at the given position
+     *
+     * @param type        The structure type
+     * @param editSession The {@link EditSession}
+     * @param position    The position
+     * @return True if the generation was successful
+     */
     default boolean generateStructure(StructureType type, EditSession editSession, BlockVector3 position) {
         return false;
     }
@@ -320,9 +328,9 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
     /**
      * Generate a feature at the given position.
      *
-     * @param type The feature type
+     * @param type        The feature type
      * @param editSession The {@link EditSession}
-     * @param position The position
+     * @param position    The position
      * @return True if the generation was successful
      */
     default boolean generateFeature(ConfiguredFeatureType type, EditSession editSession, BlockVector3 position) {
