@@ -19,6 +19,8 @@
 
 package com.sk89q.worldedit.world.generation;
 
+import com.sk89q.worldedit.EditSession;
+import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.NamespacedRegistry;
 
@@ -40,4 +42,17 @@ public class ConfiguredFeatureType implements Keyed  {
     public String toString() {
         return this.id;
     }
+
+    //FAWE start
+    /**
+     * Place this feature into an {@link EditSession}
+     *
+     * @param extent   EditSession to place into
+     * @param position position to use for placement
+     * @return true if successful
+     */
+    public boolean place(EditSession extent, BlockVector3 position) {
+        return extent.getWorld().generateFeature(this, extent, position);
+    }
+    //FAWE end
 }
