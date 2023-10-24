@@ -20,7 +20,6 @@ import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
-import com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_20_R2.regen.PaperweightRegen;
 import com.sk89q.worldedit.entity.BaseEntity;
@@ -124,7 +123,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
         }
     }
 
-    private final PaperweightAdapter parent;
+    private final com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R2.PaperweightAdapter parent;
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
     // ------------------------------------------------------------------------
@@ -135,7 +134,7 @@ public final class PaperweightFaweAdapter extends CachedBukkitAdapter implements
     private Map<String, List<Property<?>>> allBlockProperties = null;
 
     public PaperweightFaweAdapter() throws NoSuchFieldException, NoSuchMethodException {
-        this.parent = new PaperweightAdapter();
+        this.parent = new com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_20_R2.PaperweightAdapter();
     }
 
     @Nullable

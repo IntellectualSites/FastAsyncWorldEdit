@@ -168,7 +168,7 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
                 .getValue().getAsString();
     }
 
-    private final com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2.PaperweightAdapter adapter;
+    private final PaperweightAdapter adapter;
 
     private static final NbtOps OPS_NBT = NbtOps.INSTANCE;
     private static final int LEGACY_VERSION = 1343;
@@ -204,8 +204,7 @@ public class PaperweightDataConverters extends DataFixerBuilder implements com.s
         }
     }
 
-    public PaperweightDataConverters(int dataVersion,
-                                    com.sk89q.worldedit.bukkit.adapter.impl.v1_20_R2.PaperweightAdapter adapter) {
+    public PaperweightDataConverters(int dataVersion, PaperweightAdapter adapter) {
         super(dataVersion);
         DATA_VERSION = dataVersion;
         INSTANCE = this;
