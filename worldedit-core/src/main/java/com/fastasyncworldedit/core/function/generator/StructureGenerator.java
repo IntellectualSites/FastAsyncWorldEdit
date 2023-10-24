@@ -6,6 +6,11 @@ import com.sk89q.worldedit.function.RegionFunction;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.world.generation.StructureType;
 
+/**
+ * Generate a structure at the given location
+ *
+ * @since TODO
+ */
 public class StructureGenerator implements RegionFunction {
 
     private final StructureType structureType;
@@ -16,6 +21,8 @@ public class StructureGenerator implements RegionFunction {
      *
      * @param editSession   the edit session
      * @param structureType the structure type
+     *
+     * @since TODO
      */
     public StructureGenerator(EditSession editSession, StructureType structureType) {
         this.editSession = editSession;

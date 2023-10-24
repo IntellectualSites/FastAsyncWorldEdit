@@ -320,6 +320,8 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * @param editSession The {@link EditSession}
      * @param position    The position
      * @return True if the generation was successful
+     *
+     * @since TODO
      */
     default boolean generateStructure(StructureType type, EditSession editSession, BlockVector3 position) {
         return false;
@@ -332,6 +334,8 @@ public interface World extends Extent, Keyed, IChunkCache<IChunkGet> {
      * @param editSession The {@link EditSession}
      * @param position    The position
      * @return True if the generation was successful
+     *
+     * @since TODO
      */
     default boolean generateFeature(ConfiguredFeatureType type, EditSession editSession, BlockVector3 position) {
         return false;
