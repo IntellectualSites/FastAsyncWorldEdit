@@ -4,7 +4,6 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.math.BlockVectorSet;
 import com.fastasyncworldedit.core.math.MutableBlockVector3;
-import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -34,7 +33,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
-@SuppressWarnings("rawtypes")
 public class NMSRelighter implements Relighter {
 
     private static final int DISPATCH_SIZE = 64;
@@ -51,7 +49,7 @@ public class NMSRelighter implements Relighter {
     }
 
     public final MutableBlockVector3 mutableBlockPos = new MutableBlockVector3(0, 0, 0);
-    private final IQueueExtent<IQueueChunk> queue;
+    private final IQueueExtent<?> queue;
     private final Map<Long, RelightSkyEntry> skyToRelight;
     private final Object present = new Object();
     private final Map<Long, Integer> chunksToSend;
@@ -66,11 +64,11 @@ public class NMSRelighter implements Relighter {
     private final AtomicBoolean finished = new AtomicBoolean(false);
     private boolean removeFirst;
 
-    public NMSRelighter(IQueueExtent<IQueueChunk> queue) {
+    public NMSRelighter(IQueueExtent<?> queue) {
         this(queue, null);
     }
 
-    public NMSRelighter(IQueueExtent<IQueueChunk> queue, RelightMode relightMode) {
+    public NMSRelighter(IQueueExtent<?> queue, RelightMode relightMode) {
         this.queue = queue;
         this.skyToRelight = new Long2ObjectOpenHashMap<>(12);
         this.lightQueue = new Long2ObjectOpenHashMap<>(12);
