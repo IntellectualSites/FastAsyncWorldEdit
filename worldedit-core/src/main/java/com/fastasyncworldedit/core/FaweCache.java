@@ -61,14 +61,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public enum FaweCache implements Trimable {
     /**
-     * @deprecated Use {@link #INSTANCE} to get an instance.
-     */
-    @Deprecated(forRemoval = true, since = "2.0.0")
-    IMP,
-    /**
      * @since 2.0.0
      */
     INSTANCE;
+
+    /**
+     * @deprecated Use {@link #INSTANCE} to get an instance.
+     */
+    @Deprecated(forRemoval = true, since = "2.0.0")
+    public static final FaweCache IMP = INSTANCE;
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
