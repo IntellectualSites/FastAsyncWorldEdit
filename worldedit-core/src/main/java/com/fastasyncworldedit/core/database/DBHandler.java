@@ -13,7 +13,7 @@ public class DBHandler {
      * @deprecated Use {@link #dbHandler()} instead.
      */
     @Deprecated(forRemoval = true, since = "2.0.0")
-    public static final DBHandler IMP = new DBHandler();
+    public static final DBHandler IMP = dbHandler();
     private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static DBHandler INSTANCE;
     private final Map<World, RollbackDatabase> databases = new ConcurrentHashMap<>(8, 0.9f, 1);

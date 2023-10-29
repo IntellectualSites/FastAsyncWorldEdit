@@ -201,7 +201,7 @@ public class HistorySubCommands {
                                                         .at(summary.maxX, world.getMaxY(), summary.maxZ)
                                         );
                                         rollback.setTime(historyFile.lastModified());
-                                        RollbackDatabase db = DBHandler.IMP
+                                        RollbackDatabase db = DBHandler.dbHandler()
                                                 .getDatabase(world);
                                         db.logEdit(rollback);
                                         actor.print(TextComponent.of("Logging: " + historyFile));
