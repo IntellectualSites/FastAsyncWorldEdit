@@ -69,7 +69,8 @@ public final class NullChunkGet implements IChunkGet {
     }
 
     @Override
-    public void setCreateCopy(boolean createCopy) {
+    public int setCreateCopy(boolean createCopy) {
+        return -1;
     }
 
     @Override

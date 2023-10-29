@@ -144,7 +144,7 @@ public class Fawe {
                 0L,
                 TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<>(),
-                new ThreadFactoryBuilder().setNameFormat("fawe-clipboard-%d").build()
+                new ThreadFactoryBuilder().setNameFormat("FAWE Clipboard - %d").build()
         ));
     }
 

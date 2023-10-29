@@ -4,7 +4,6 @@ import com.fastasyncworldedit.core.extent.processor.lighting.NullRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelightMode;
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.RelighterFactory;
-import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.Bukkit;
@@ -15,9 +14,7 @@ import javax.annotation.Nonnull;
 public class PaperweightStarlightRelighterFactory implements RelighterFactory {
 
     @Override
-    public @Nonnull
-    @SuppressWarnings("rawtypes")
-    Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<IQueueChunk> queue) {
+    public @Nonnull Relighter createRelighter(RelightMode relightMode, World world, IQueueExtent<?> queue) {
         org.bukkit.World w = Bukkit.getWorld(world.getName());
         if (w == null) {
             return NullRelighter.INSTANCE;

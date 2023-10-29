@@ -3,7 +3,6 @@ package com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_18_R2;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.processor.lighting.NMSRelighter;
 import com.fastasyncworldedit.core.extent.processor.lighting.Relighter;
-import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -45,8 +44,7 @@ public class PaperweightStarlightRelighter implements Relighter {
     private final ReentrantLock areaLock = new ReentrantLock();
     private final NMSRelighter delegate;
 
-    @SuppressWarnings("rawtypes")
-    public PaperweightStarlightRelighter(ServerLevel serverLevel, IQueueExtent<IQueueChunk> queue) {
+    public PaperweightStarlightRelighter(ServerLevel serverLevel, IQueueExtent<?> queue) {
         this.serverLevel = serverLevel;
         this.delegate = new NMSRelighter(queue);
     }
