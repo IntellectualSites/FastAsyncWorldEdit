@@ -76,10 +76,14 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public <T> T syncAt(final Supplier<T> supplier, final World world, final int chunkX, final int chunkZ) {
+        final org.bukkit.World adapt = BukkitAdapter.adapt(world);
+        if (Bukkit.isOwnedByCurrentRegion(adapt, chunkX, chunkZ)) {
+            return supplier.get();
+        }
         FutureTask<T> task = new FutureTask<>(supplier::get);
         Bukkit.getRegionScheduler().run(
                 WorldEditPlugin.getInstance(),
-                BukkitAdapter.adapt(world),
+                adapt,
                 chunkX,
                 chunkZ,
                 asConsumer(task)
@@ -97,10 +101,12 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public <T> T syncWith(final Supplier<T> supplier, final Player context) {
+        final org.bukkit.entity.Player adapt = BukkitAdapter.adapt(context);
+        if (Bukkit.isOwnedByCurrentRegion(adapt)) {
+            return supplier.get();
+        }
         FutureTask<T> task = new FutureTask<>(supplier::get);
-        BukkitAdapter.adapt(context)
-                .getScheduler()
-                .execute(WorldEditPlugin.getInstance(), task, null, 0);
+        adapt.getScheduler().execute(WorldEditPlugin.getInstance(), task, null, 0);
         try {
             return task.get();
         } catch (InterruptedException | ExecutionException e) {
@@ -110,6 +116,7 @@ public class FoliaTaskManager extends TaskManager {
 
     @Override
     public <T> T syncGlobal(final Supplier<T> supplier) {
+        // TODO avoid deadlocks (Bukkit.isGlobalTickThread not available at time of writing)
         FutureTask<T> task = new FutureTask<>(supplier::get);
         Bukkit.getGlobalRegionScheduler().run(WorldEditPlugin.getInstance(), asConsumer(task));
         try {
