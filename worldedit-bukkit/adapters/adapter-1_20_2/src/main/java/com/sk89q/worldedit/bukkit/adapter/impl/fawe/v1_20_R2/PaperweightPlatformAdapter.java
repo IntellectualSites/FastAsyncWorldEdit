@@ -11,6 +11,7 @@ import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.mojang.datafixers.util.Either;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
 import com.sk89q.worldedit.bukkit.adapter.Refraction;
@@ -58,7 +59,6 @@ import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R2.CraftChunk;
-import sun.misc.Unsafe;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -298,7 +298,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 } catch (TimeoutException e) {
                     String world = serverLevel.getWorld().getName();
                     // We've already taken 10 seconds we can afford to wait a little here.
-                    boolean loaded = TaskManager.taskManager().sync(() -> Bukkit.getWorld(world) != null);
+                    boolean loaded = TaskManager.taskManager().syncGlobal(() -> Bukkit.getWorld(world) != null);
                     if (loaded) {
                         LOGGER.warn("Chunk {},{} failed to load in 10 seconds in world {}. Retrying...", chunkX, chunkZ, world);
                         // Retry chunk load
@@ -313,7 +313,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 e.printStackTrace();
             }
         }
-        return TaskManager.taskManager().sync(() -> serverLevel.getChunk(chunkX, chunkZ));
+        return TaskManager.taskManager().syncAt(() -> serverLevel.getChunk(chunkX, chunkZ),
+                BukkitAdapter.adapt(serverLevel.getWorld()), chunkX, chunkZ);
     }
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
@@ -374,7 +375,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 );
             }
             nearbyPlayers(nmsWorld, coordIntPair).forEach(p -> p.connection.send(packet));
-        });
+        }, BukkitAdapter.adapt(nmsWorld.getWorld()), chunkX, chunkZ);
     }
 
     private static List<ServerPlayer> nearbyPlayers(ServerLevel serverLevel, ChunkPos coordIntPair) {
@@ -672,6 +673,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         }
         collector.throwIfPresent();
         return List.of();
+    }
+
+    public static void task(Runnable task, ServerLevel level, int chunkX, int chunkZ) {
+        TaskManager.taskManager().task(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {

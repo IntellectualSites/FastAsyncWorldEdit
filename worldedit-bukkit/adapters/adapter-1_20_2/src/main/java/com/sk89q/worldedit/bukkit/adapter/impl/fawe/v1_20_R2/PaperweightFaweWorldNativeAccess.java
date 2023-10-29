@@ -15,9 +15,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ChunkHolder;
-import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.FullChunkStatus;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -251,7 +250,8 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
                 }
             }
         };
-        TaskManager.taskManager().async(() -> TaskManager.taskManager().sync(runnableVal));
+        // TODO global sync is not correct on folia
+        TaskManager.taskManager().async(() -> TaskManager.taskManager().syncGlobal(runnableVal));
     }
 
     @Override
@@ -270,7 +270,8 @@ public class PaperweightFaweWorldNativeAccess implements WorldNativeAccess<Level
         if (Fawe.isMainThread()) {
             runnableVal.run();
         } else {
-            TaskManager.taskManager().sync(runnableVal);
+            // TODO global sync is not correct on folia
+            TaskManager.taskManager().syncGlobal(runnableVal);
         }
         cachedChanges.clear();
         cachedChunksToSend.clear();

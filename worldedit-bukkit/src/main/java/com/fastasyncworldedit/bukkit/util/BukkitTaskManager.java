@@ -70,6 +70,11 @@ public class BukkitTaskManager extends TaskManager {
         return sync(supplier);
     }
 
+    @Override
+    public <T> T syncGlobal(final Supplier<T> supplier) {
+        return sync(supplier);
+    }
+
     private <T> T sync(final Supplier<T> supplier) {
         if (Fawe.isTickThread()) {
             return supplier.get();

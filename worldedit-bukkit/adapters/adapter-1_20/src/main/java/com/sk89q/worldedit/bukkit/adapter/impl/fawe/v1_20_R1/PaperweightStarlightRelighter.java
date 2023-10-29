@@ -35,17 +35,79 @@ public class PaperweightStarlightRelighter extends StarlightRelighter<ServerLeve
     }
 
     @Override
-    protected CompletableFuture<?> chunkLoadFuture(final ChunkPos chunkPos) {
-        return serverLevel.getWorld().getChunkAtAsync(chunkPos.x, chunkPos.z)
-                .thenAccept(c -> serverLevel.getChunkSource().addTicketAtLevel(
-                        FAWE_TICKET,
-                        chunkPos,
-                        LIGHT_LEVEL,
-                        Unit.INSTANCE
-                ));
+    public void fixLightingSafe(boolean sky) {
+        this.areaLock.lock();
+        try {
+            if (regions.isEmpty()) {
+                return;
+            }
+            LongSet first = regions.removeFirst();
+            fixLighting(first, () -> fixLightingSafe(true));
+        } finally {
+            this.areaLock.unlock();
+        }
     }
 
-    protected void invokeRelight(
+    /*
+     * Processes a set of chunks and runs an action afterwards.
+     * The action is run async, the chunks are partly processed on the main thread
+     * (as required by the server).
+     */
+    private void fixLighting(LongSet chunks, Runnable andThen) {
+        // convert from long keys to ChunkPos
+        Set<ChunkPos> coords = new HashSet<>();
+        LongIterator iterator = chunks.iterator();
+        while (iterator.hasNext()) {
+            coords.add(new ChunkPos(iterator.nextLong()));
+        }
+        if (FoliaSupport.isFolia()) {
+            relightRegion(andThen, coords);
+            return;
+        }
+        TaskManager.taskManager().task(() -> {
+            // trigger chunk load and apply ticket on main thread
+            relightRegion(andThen, coords);
+        });
+    }
+
+    private void relightRegion(Runnable andThen, Set<ChunkPos> coords) {
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+        for (ChunkPos pos : coords) {
+            futures.add(serverLevel.getWorld().getChunkAtAsync(pos.x, pos.z)
+                    .thenAccept(c -> serverLevel.getChunkSource().addTicketAtLevel(
+                            FAWE_TICKET,
+                            pos,
+                            LIGHT_LEVEL,
+                            Unit.INSTANCE
+                    ))
+            );
+        }
+        Location location = toLocation(coords.iterator().next());
+        // collect futures and trigger relight once all chunks are loaded
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).thenAcceptAsync(v ->
+                invokeRelight(
+                        coords,
+                        c -> {
+                        }, // no callback for single chunks required
+                        i -> {
+                            if (i != coords.size()) {
+                                LOGGER.warn("Processed {} chunks instead of {}", i, coords.size());
+                            }
+                            // post process chunks on main thread
+                            TaskManager.taskManager().task(() -> postProcessChunks(coords), location);
+                            // call callback on our own threads
+                            TaskManager.taskManager().async(andThen);
+                        }
+                ),
+                task -> TaskManager.taskManager().task(task, location)
+        );
+    }
+
+    private Location toLocation(ChunkPos chunkPos) {
+        return PaperweightPlatformAdapter.toLocation(this.serverLevel, chunkPos);
+    }
+
+    private void invokeRelight(
             Set<ChunkPos> coords,
             Consumer<ChunkPos> chunkCallback,
             IntConsumer processCallback
@@ -64,12 +126,20 @@ public class PaperweightStarlightRelighter extends StarlightRelighter<ServerLeve
     protected void postProcessChunks(Set<ChunkPos> coords) {
         boolean delay = Settings.settings().LIGHTING.DELAY_PACKET_SENDING;
         for (ChunkPos pos : coords) {
-            int x = pos.x;
-            int z = pos.z;
-            if (delay) { // we still need to send the block changes of that chunk
-                PaperweightPlatformAdapter.sendChunk(serverLevel, x, z, false);
-            }
-            serverLevel.getChunkSource().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
+            PaperweightPlatformAdapter.task(
+                    () -> {
+                        int x = pos.x;
+                        int z = pos.z;
+                        if (delay) { // we still need to send the block changes of that chunk
+                            PaperweightPlatformAdapter.sendChunk(serverLevel, x, z, false);
+                        }
+                        serverLevel.getChunkSource().removeTicketAtLevel(FAWE_TICKET, pos, LIGHT_LEVEL, Unit.INSTANCE);
+                    },
+                    serverLevel,
+                    pos.x,
+                    pos.z
+            );
+
         }
     }
 

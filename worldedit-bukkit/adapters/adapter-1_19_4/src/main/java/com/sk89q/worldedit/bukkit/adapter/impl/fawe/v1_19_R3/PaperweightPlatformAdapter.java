@@ -58,7 +58,6 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R3.CraftChunk;
 import sun.misc.Unsafe;
 
@@ -691,6 +690,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 throw new RuntimeException("Failed to set offers field to null again on villager.", e);
             }
         }
+    }
+
+    public static void task(Runnable task, ServerLevel level, int chunkX, int chunkZ) {
+        TaskManager.taskManager().task(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {

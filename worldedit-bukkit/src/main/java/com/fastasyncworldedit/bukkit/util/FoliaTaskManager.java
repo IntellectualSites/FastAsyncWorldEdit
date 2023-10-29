@@ -7,22 +7,14 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.World;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
-import java.lang.reflect.Method;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static java.lang.invoke.MethodHandles.insertArguments;
-import static java.lang.invoke.MethodType.methodType;
 
 public class FoliaTaskManager extends TaskManager {
 
@@ -109,6 +101,17 @@ public class FoliaTaskManager extends TaskManager {
         BukkitAdapter.adapt(context)
                 .getScheduler()
                 .execute(WorldEditPlugin.getInstance(), task, null, 0);
+        try {
+            return task.get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public <T> T syncGlobal(final Supplier<T> supplier) {
+        FutureTask<T> task = new FutureTask<>(supplier::get);
+        Bukkit.getGlobalRegionScheduler().run(WorldEditPlugin.getInstance(), asConsumer(task));
         try {
             return task.get();
         } catch (InterruptedException | ExecutionException e) {

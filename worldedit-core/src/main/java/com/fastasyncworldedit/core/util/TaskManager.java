@@ -3,8 +3,6 @@ package com.fastasyncworldedit.core.util;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
-import com.fastasyncworldedit.core.util.task.RunnableVal;
-import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.Location;
@@ -14,8 +12,6 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -243,5 +239,7 @@ public abstract class TaskManager {
     public abstract  <T> T syncAt(Supplier<T> supplier, World world, int chunkX, int chunkZ);
 
     public abstract <T> T syncWith(Supplier<T> supplier, Player context);
+
+    public abstract <T> T syncGlobal(Supplier<T> supplier);
 
 }

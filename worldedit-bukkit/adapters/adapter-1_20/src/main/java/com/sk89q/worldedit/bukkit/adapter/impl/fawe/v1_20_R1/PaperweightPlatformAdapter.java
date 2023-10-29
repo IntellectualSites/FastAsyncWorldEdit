@@ -63,7 +63,6 @@ import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.chunk.SingleValuePalette;
 import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import org.apache.logging.log4j.Logger;
-import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_20_R1.CraftChunk;
 import sun.misc.Unsafe;
 
@@ -714,6 +713,10 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
         if (unset) {
             ((Villager) entity).setOffers(null);
         }
+    }
+
+    public static void task(Runnable task, ServerLevel level, int chunkX, int chunkZ) {
+        TaskManager.taskManager().task(task, BukkitAdapter.adapt(level.getWorld()), chunkX, chunkZ);
     }
 
     record FakeIdMapBlock(int size) implements IdMap<net.minecraft.world.level.block.state.BlockState> {
