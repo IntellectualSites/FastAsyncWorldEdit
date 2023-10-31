@@ -3,7 +3,7 @@ package com.fastasyncworldedit.core.queue.implementation;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.extent.PassthroughExtent;
-import com.fastasyncworldedit.core.extent.filter.block.CharFilterBlock;
+import com.fastasyncworldedit.core.extent.filter.block.DataArrayFilterBlock;
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.fastasyncworldedit.core.extent.processor.EmptyBatchProcessor;
 import com.fastasyncworldedit.core.extent.processor.ExtentBatchProcessorHolder;
@@ -15,7 +15,7 @@ import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
-import com.fastasyncworldedit.core.queue.implementation.blocks.CharSetBlocks;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArraySetBlocks;
 import com.fastasyncworldedit.core.queue.implementation.chunk.ChunkHolder;
 import com.fastasyncworldedit.core.queue.implementation.chunk.NullChunk;
 import com.fastasyncworldedit.core.util.MathMan;
@@ -175,7 +175,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             };
         }
         if (set == null) {
-            set = (x, z) -> CharSetBlocks.newInstance();
+            set = (x, z) -> DataArraySetBlocks.newInstance();
         }
         this.cacheGet = get;
         this.cacheSet = set;
@@ -191,6 +191,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
             world = WorldWrapper.unwrap(extent);
         }
     }
+
 
     @Override
     public int size() {
@@ -477,7 +478,7 @@ public class SingleThreadQueueExtent extends ExtentBatchProcessorHolder implemen
 
     @Override
     public ChunkFilterBlock initFilterBlock() {
-        return new CharFilterBlock(this);
+        return new DataArrayFilterBlock(this);
     }
 
     @Override

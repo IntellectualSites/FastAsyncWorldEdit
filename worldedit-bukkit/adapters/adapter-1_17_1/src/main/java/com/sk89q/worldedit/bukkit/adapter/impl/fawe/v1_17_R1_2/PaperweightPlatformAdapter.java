@@ -7,6 +7,7 @@ import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.FaweCache;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.math.BitArrayUnstretched;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.ReflectionUtils;
 import com.fastasyncworldedit.core.util.TaskManager;
@@ -308,7 +309,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
      */
     public static LevelChunkSection newChunkSection(
             final int layer,
-            final char[] blocks,
+            final DataArray blocks,
             boolean fastMode,
             CachedBukkitAdapter adapter
     ) {
@@ -317,8 +318,8 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
     public static LevelChunkSection newChunkSection(
             final int layer,
-            final Function<Integer, char[]> get,
-            char[] set,
+            final Function<Integer, DataArray> get,
+            DataArray set,
             boolean fastMode,
             CachedBukkitAdapter adapter
     ) {

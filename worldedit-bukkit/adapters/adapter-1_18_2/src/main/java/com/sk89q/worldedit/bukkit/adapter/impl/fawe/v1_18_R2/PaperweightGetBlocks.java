@@ -10,11 +10,11 @@ import com.fastasyncworldedit.core.math.BitArrayUnstretched;
 import com.fastasyncworldedit.core.queue.IChunkGet;
 import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.implementation.QueueHandler;
-import com.fastasyncworldedit.core.queue.implementation.blocks.CharGetBlocks;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArrayGetBlocks;
 import com.fastasyncworldedit.core.util.MathMan;
 import com.fastasyncworldedit.core.util.collection.AdaptedMap;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Iterables;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.ListTag;
 import com.sk89q.jnbt.StringTag;
@@ -66,7 +66,6 @@ import javax.annotation.Nonnull;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,9 +81,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBlocks {
+public class PaperweightGetBlocks extends DataArrayGetBlocks implements BukkitGetBlocks {
 
     private static final Logger LOGGER = LogManagerCompat.getLogger();
 
@@ -458,7 +456,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                     );
                                     LevelChunkSection newSection = PaperweightPlatformAdapter.newChunkSection(
                                             layerNo,
-                                            new char[4096],
+                                            DataArray.createEmpty(),
                                             adapter,
                                             biomeRegistry,
                                             biomeData
@@ -469,7 +467,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                             newSection,
                                             getSectionIndex
                                     )) {
-                                        updateGet(nmsChunk, levelChunkSections, newSection, new char[4096], getSectionIndex);
+                                        updateGet(nmsChunk, levelChunkSections, newSection, DataArray.createEmpty(), getSectionIndex);
                                         continue;
                                     } else {
                                         existingSection = levelChunkSections[getSectionIndex];
@@ -493,9 +491,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
 
                     // setArr is modified by PaperweightPlatformAdapter#newChunkSection. This is in order to write changes to
                     // this chunk GET when #updateGet is called. Future dords, please listen this time.
-                    char[] tmp = set.load(layerNo);
-                    char[] setArr = new char[tmp.length];
-                    System.arraycopy(tmp, 0, setArr, 0, tmp.length);
+                    DataArray setArr = DataArray.createCopy(set.load(layerNo));
 
                     // synchronise on internal section to avoid circular locking with a continuing edit if the chunk was
                     // submitted to keep loaded internal chunks to queue target size.
@@ -512,10 +508,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                         }
 
                         if (createCopy) {
-                            char[] tmpLoad = loadPrivately(layerNo);
-                            char[] copyArr = new char[4096];
-                            System.arraycopy(tmpLoad, 0, copyArr, 0, 4096);
-                            copy.storeSection(getSectionIndex, copyArr);
+                            copy.storeSection(getSectionIndex, DataArray.createCopy(loadPrivately(layerNo)));
                             if (biomes != null && existingSection != null) {
                                 copy.storeBiomes(getSectionIndex, existingSection.getBiomes().copy());
                             }
@@ -578,10 +571,8 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                                 } else if (existingSection != getSections(false)[getSectionIndex]) {
                                     this.sections[getSectionIndex] = existingSection;
                                     this.reset();
-                                } else if (!Arrays.equals(
-                                        update(getSectionIndex, new char[4096], true),
-                                        loadPrivately(layerNo)
-                                )) {
+                                } else if (!update(getSectionIndex, DataArray.createEmpty(), true)
+                                        .equals(loadPrivately(layerNo))) {
                                     this.reset(layerNo);
                             /*} else if (lock.isModified()) {
                                 this.reset(layerNo);*/
@@ -852,7 +843,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             LevelChunk nmsChunk,
             LevelChunkSection[] chunkSections,
             LevelChunkSection section,
-            char[] arr,
+            DataArray arr,
             int layer
     ) {
         try {
@@ -877,14 +868,12 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
         this.blocks[layer] = arr;
     }
 
-    private char[] loadPrivately(int layer) {
+    private DataArray loadPrivately(int layer) {
         layer -= getMinSectionPosition();
         if (super.sections[layer] != null) {
             synchronized (super.sectionLocks[layer]) {
                 if (super.sections[layer].isFull() && super.blocks[layer] != null) {
-                    char[] blocks = new char[4096];
-                    System.arraycopy(super.blocks[layer], 0, blocks, 0, 4096);
-                    return blocks;
+                    return DataArray.createCopy(super.blocks[layer]);
                 }
             }
         }
@@ -908,21 +897,14 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
      */
     @Override
     @SuppressWarnings("unchecked")
-    public char[] update(int layer, char[] data, boolean aggressive) {
+    public DataArray update(int layer, DataArray data, boolean aggressive) {
         LevelChunkSection section = getSections(aggressive)[layer];
         // Section is null, return empty array
         if (section == null) {
-            data = new char[4096];
-            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
-            return data;
+            return DataArray.createFilled(BlockTypesCache.ReservedIDs.AIR);
         }
-        if (data != null && data.length != 4096) {
-            data = new char[4096];
-            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
-        }
-        if (data == null || data == FaweCache.INSTANCE.EMPTY_CHAR_4096) {
-            data = new char[4096];
-            Arrays.fill(data, (char) BlockTypesCache.ReservedIDs.AIR);
+        if (data == null || data == FaweCache.INSTANCE.EMPTY_DATA) {
+            data = DataArray.createFilled(BlockTypesCache.ReservedIDs.AIR);
         }
         Semaphore lock = PaperweightPlatformAdapter.applyLock(section);
         synchronized (lock) {
@@ -935,7 +917,7 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 final BitStorage bits = (BitStorage) PaperweightPlatformAdapter.fieldStorage.get(dataObject);
 
                 if (bits instanceof ZeroBitStorage) {
-                    Arrays.fill(data, adapter.adaptToChar(blocks.get(0, 0, 0))); // get(int) is only public on paper
+                    data.setAll(adapter.adaptToChar(blocks.get(0, 0, 0))); // get(int) is only public on paper
                     return data;
                 }
 
@@ -952,9 +934,9 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                 } else {
                     // The section's palette is the global block palette.
                     for (int i = 0; i < 4096; i++) {
-                        char paletteVal = data[i];
+                        char paletteVal = (char) data.getAt(i);
                         char ordinal = adapter.ibdIDToOrdinal(paletteVal);
-                        data[i] = ordinal;
+                        data.setAt(i, ordinal);
                     }
                     return data;
                 }
@@ -967,17 +949,17 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
                             paletteToOrdinal[i] = ordinal;
                         }
                         for (int i = 0; i < 4096; i++) {
-                            char paletteVal = data[i];
+                            char paletteVal = (char) data.getAt(i);
                             char val = paletteToOrdinal[paletteVal];
                             if (val == Character.MAX_VALUE) {
                                 val = ordinal(palette.valueFor(i), adapter);
                                 paletteToOrdinal[i] = val;
                             }
-                            data[i] = val;
+                            data.setAt(i, val);
                         }
                     } else {
                         char ordinal = ordinal(palette.valueFor(0), adapter);
-                        Arrays.fill(data, ordinal);
+                        data.setAll(ordinal);
                     }
                 } finally {
                     for (int i = 0; i < num_palette; i++) {
@@ -1153,5 +1135,4 @@ public class PaperweightGetBlocks extends CharGetBlocks implements BukkitGetBloc
             return true;
         }
     }
-
 }

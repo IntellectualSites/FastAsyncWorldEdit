@@ -12,6 +12,7 @@ import com.fastasyncworldedit.core.queue.IChunkSet;
 import com.fastasyncworldedit.core.queue.IQueueChunk;
 import com.fastasyncworldedit.core.queue.IQueueExtent;
 import com.fastasyncworldedit.core.queue.Pool;
+import com.fastasyncworldedit.core.queue.implementation.blocks.DataArray;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.regions.Region;
@@ -148,19 +149,19 @@ public class ChunkHolder<T extends Future<T>> implements IQueueChunk<T> {
     }
 
     @Override
-    public void setBlocks(int layer, char[] data) {
+    public void setBlocks(int layer, DataArray data) {
         checkAndWaitOnCalledLock();
         delegate.set(this).setBlocks(layer, data);
     }
 
     @Override
-    public char[] load(int layer) {
+    public DataArray load(int layer) {
         return getOrCreateGet().load(layer);
     }
 
     @Nullable
     @Override
-    public char[] loadIfPresent(final int layer) {
+    public DataArray loadIfPresent(final int layer) {
         if (chunkExisting == null) {
             return null;
         }
