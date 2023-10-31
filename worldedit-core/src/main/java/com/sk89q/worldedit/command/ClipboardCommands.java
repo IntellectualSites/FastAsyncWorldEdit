@@ -29,7 +29,6 @@ import com.fastasyncworldedit.core.extent.clipboard.DiskOptimizedClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.MultiClipboardHolder;
 import com.fastasyncworldedit.core.extent.clipboard.ReadOnlyClipboard;
 import com.fastasyncworldedit.core.extent.clipboard.URIClipboardHolder;
-import com.fastasyncworldedit.core.internal.exception.FaweException;
 import com.fastasyncworldedit.core.internal.io.FastByteArrayOutputStream;
 import com.fastasyncworldedit.core.limit.FaweLimit;
 import com.fastasyncworldedit.core.util.ImgurUtility;
@@ -449,6 +448,8 @@ public class ClipboardCommands {
                     boolean atOrigin,
             @Switch(name = 's', desc = "Select the region after pasting")
                     boolean selectPasted,
+            @Switch(name = 'n', desc = "No paste, select only. (Implies -s)")
+                    boolean onlySelect,
             @Switch(name = 'e', desc = "Paste entities if available")
                     boolean pasteEntities,
             @Switch(name = 'b', desc = "Paste biomes if available")
@@ -460,10 +461,12 @@ public class ClipboardCommands {
         final BlockVector3 to = atOrigin ? origin : session.getPlacementPosition(actor);
         checkPaste(actor, editSession, to, holder, clipboard);
 
-        clipboard.paste(editSession, to, !ignoreAirBlocks, pasteEntities, pasteBiomes);
+        if (!onlySelect) {
+            clipboard.paste(editSession, to, !ignoreAirBlocks, pasteEntities, pasteBiomes);
+        }
 
         Region region = clipboard.getRegion().clone();
-        if (selectPasted) {
+        if (selectPasted || onlySelect) {
             BlockVector3 clipboardOffset = clipboard.getRegion().getMinimumPoint().subtract(clipboard.getOrigin());
             BlockVector3 realTo = to.add(holder.getTransform().apply(clipboardOffset.toVector3()).toBlockPoint());
             BlockVector3 max = realTo.add(holder
@@ -475,7 +478,11 @@ public class ClipboardCommands {
             selector.learnChanges();
             selector.explainRegionAdjust(actor, session);
         }
-        actor.print(Caption.of("fawe.worldedit.paste.command.paste", to));
+        if (onlySelect) {
+            actor.print(Caption.of("worldedit.paste.selected"));
+        } else {
+            actor.print(Caption.of("fawe.worldedit.paste.command.paste", to));
+        }
 
         if (!actor.hasPermission("fawe.tips")) {
             actor.print(Caption.of("fawe.tips.tip.copypaste"));
@@ -512,7 +519,7 @@ public class ClipboardCommands {
         ClipboardHolder holder = session.getClipboard();
         //FAWE start - use place
         if (holder.getTransform().isIdentity() && sourceMask == null) {
-            place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted,
+            place(actor, world, session, editSession, ignoreAirBlocks, atOrigin, selectPasted, onlySelect,
                     pasteEntities, pasteBiomes
             );
             return;
