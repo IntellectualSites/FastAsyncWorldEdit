@@ -27,7 +27,7 @@ import java.util.function.IntConsumer;
  *
  * @param <SERVER_LEVEL> the version-specific ServerLevel type
  * @param <CHUNK_POS>    the version-specific ChunkPos type
- * @since TODO
+ * @since 2.8.2
  */
 public abstract class StarlightRelighter<SERVER_LEVEL, CHUNK_POS> implements Relighter {
 
