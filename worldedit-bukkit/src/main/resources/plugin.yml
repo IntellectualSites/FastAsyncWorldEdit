@@ -10,6 +10,8 @@ description: Blazingly fast world manipulation for builders, large networks and 
 authors: [ Empire92, MattBDev, IronApollo, dordsor21, NotMyFault ]
 loadbefore: [ WorldGuard, PlotSquared ]
 database: false
+libraries:
+- "com.github.luben:zstd-jni:1.5.5-10"
 permissions:
   fawe.plotsquared:
     default: true

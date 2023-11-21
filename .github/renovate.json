@@ -18,7 +18,6 @@
     "com.google.code.gson:gson",
     "net.fabricmc:fabric-loader",
     "net.fabricmc.fabric-api:fabric-api",
-    "com.github.luben:zstd-jni",
     "org.jetbrains.kotlin.jvm",
     "log4j",
     "org.apache.logging.log4j:log4j-api",
