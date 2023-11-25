@@ -15,8 +15,10 @@ import com.sk89q.jnbt.NBTOutputStream;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.function.operation.ChangeSetExecutor;
+import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.world.World;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +37,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DiskStorageHistory extends FaweStreamChangeSet {
 
+    private static final Logger LOGGER = LogManagerCompat.getLogger();
     private static final Map<String, Map<UUID, Integer>> NEXT_INDEX = new ConcurrentHashMap<>();
 
     private UUID uuid;
@@ -141,9 +144,9 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
             e.printStackTrace();
             return;
         }
-        EditSession session = toEditSession(actor, regions);
-        session.setBlocks(this, ChangeSetExecutor.Type.UNDO);
-        deleteFiles();
+        try (EditSession session = toEditSession(actor, regions)) {
+            session.setBlocks(this, ChangeSetExecutor.Type.UNDO);
+        }
     }
 
     public void undo(Actor actor) {
@@ -371,9 +374,14 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (!bdFile.exists()) {
             return null;
         }
-        FaweInputStream is = MainUtil.getCompressedIS(new FileInputStream(bdFile));
-        readHeader(is);
-        return is;
+        try {
+            FaweInputStream is = MainUtil.getCompressedIS(new FileInputStream(bdFile));
+            readHeader(is);
+            return is;
+        } catch (IOException e) {
+            LOGGER.error("Could not load block history file {}", bdFile);
+            throw e;
+        }
     }
 
     @Override
@@ -381,7 +389,12 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (!bioFile.exists()) {
             return null;
         }
-        return MainUtil.getCompressedIS(new FileInputStream(bioFile));
+        try {
+            return MainUtil.getCompressedIS(new FileInputStream(bioFile));
+        } catch (IOException e) {
+            LOGGER.error("Could not load biome history file {}", bdFile);
+            throw e;
+        }
     }
 
     @Override
@@ -389,7 +402,12 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (!enttFile.exists()) {
             return null;
         }
-        return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(enttFile)));
+        try {
+            return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(enttFile)));
+        } catch (IOException e) {
+            LOGGER.error("Could not load entity create history file {}", bdFile);
+            throw e;
+        }
     }
 
     @Override
@@ -397,7 +415,12 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (!entfFile.exists()) {
             return null;
         }
-        return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(entfFile)));
+        try {
+            return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(entfFile)));
+        } catch (IOException e) {
+            LOGGER.error("Could not load entity remove history file {}", bdFile);
+            throw e;
+        }
     }
 
     @Override
@@ -405,7 +428,12 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (!nbttFile.exists()) {
             return null;
         }
-        return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(nbttFile)));
+        try {
+            return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(nbttFile)));
+        } catch (IOException e) {
+            LOGGER.error("Could not load tile create history file {}", bdFile);
+            throw e;
+        }
     }
 
     @Override
@@ -413,7 +441,12 @@ public class DiskStorageHistory extends FaweStreamChangeSet {
         if (!nbtfFile.exists()) {
             return null;
         }
-        return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(nbtfFile)));
+        try {
+            return new NBTInputStream(MainUtil.getCompressedIS(new FileInputStream(nbtfFile)));
+        } catch (IOException e) {
+            LOGGER.error("Could not load tile remove history file {}", bdFile);
+            throw e;
+        }
     }
 
     @Override
