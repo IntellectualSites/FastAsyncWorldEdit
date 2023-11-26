@@ -2,7 +2,6 @@ package com.fastasyncworldedit.core.queue;
 
 import com.fastasyncworldedit.core.extent.filter.block.ChunkFilterBlock;
 import com.sk89q.worldedit.regions.Region;
-import org.jetbrains.annotations.Range;
 
 import javax.annotation.Nullable;
 
@@ -25,7 +24,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      *
      * @return the x coordinate of the chunk
      */
-    @Range(from = 0, to = 15)
     int getX();
 
     /**
@@ -33,7 +31,6 @@ public interface IChunk extends Trimable, IChunkGet, IChunkSet {
      *
      * @return the z coordinate of the chunk
      */
-    @Range(from = 0, to = 15)
     int getZ();
 
     /**
