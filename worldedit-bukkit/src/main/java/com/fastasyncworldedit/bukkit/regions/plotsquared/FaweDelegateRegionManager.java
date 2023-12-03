@@ -160,6 +160,8 @@ public class FaweDelegateRegionManager {
                         );
                         editSession.setBlocks(onTop, air);
                     }
+
+                    new CuboidRegion(pos1, pos2).forEach(bv3 -> editSession.setBiome(bv3, biome));
                 }
 
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {
