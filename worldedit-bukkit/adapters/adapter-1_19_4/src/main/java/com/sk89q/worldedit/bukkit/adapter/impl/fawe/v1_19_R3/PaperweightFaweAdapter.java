@@ -528,70 +528,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    public boolean generateTree(
-            TreeGenerator.TreeType treeType, EditSession editSession, BlockVector3 blockVector3,
-            org.bukkit.World bukkitWorld
-    ) {
-        TreeType bukkitType = BukkitWorld.toBukkitTreeType(treeType);
-        if (bukkitType == TreeType.CHORUS_PLANT) {
-            blockVector3 = blockVector3.add(
-                    0,
-                    1,
-                    0
-            ); // bukkit skips the feature gen which does this offset normally, so we have to add it back
-        }
-        ServerLevel serverLevel = ((CraftWorld) bukkitWorld).getHandle();
-        final BlockVector3 finalBlockVector = blockVector3;
-        // Sync to main thread to ensure no clashes occur
-        Map<BlockPos, CraftBlockState> placed = TaskManager.taskManager().sync(() -> {
-            if (this.parent.isFolia()) {
-                try {
-                    var data = currentWorldData.invoke(serverLevel);
-                    captureBlockStates.setBoolean(data, true);
-                    captureTreeGeneration.setBoolean(data, true);
-                    try {
-                        if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
-                            return null;
-                        }
-                        return ImmutableMap.copyOf((Map<BlockPos, CraftBlockState>) capturedBlockStates.get(data));
-                    } finally {
-                        captureBlockStates.setBoolean(data, false);
-                        captureTreeGeneration.setBoolean(data, false);
-                        ((Map<BlockPos, CraftBlockState>) capturedBlockStates.get(data)).clear();
-                    }
-                } catch (Throwable e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                serverLevel.captureTreeGeneration = true;
-                serverLevel.captureBlockStates = true;
-                try {
-                    if (!bukkitWorld.generateTree(BukkitAdapter.adapt(bukkitWorld, finalBlockVector), bukkitType)) {
-                        return null;
-                    }
-                    return ImmutableMap.copyOf(serverLevel.capturedBlockStates);
-                } finally {
-                    serverLevel.captureBlockStates = false;
-                    serverLevel.captureTreeGeneration = false;
-                    serverLevel.capturedBlockStates.clear();
-                }
-            }
-        });
-        if (placed == null || placed.isEmpty()) {
-            return false;
-        }
-        for (CraftBlockState craftBlockState : placed.values()) {
-            if (craftBlockState == null || craftBlockState.getType() == Material.AIR) {
-                continue;
-            }
-            editSession.setBlock(craftBlockState.getX(), craftBlockState.getY(), craftBlockState.getZ(),
-                    BukkitAdapter.adapt(((org.bukkit.block.BlockState) craftBlockState).getBlockData())
-            );
-        }
-        return true;
-    }
-
-    @Override
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
@@ -690,6 +626,29 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         }
         // Papers new chunk system has no related replacement - therefor we assume true.
         return true;
+    }
+
+    @Override
+    protected void preCaptureStates(final ServerLevel serverLevel) {
+        serverLevel.captureTreeGeneration = true;
+        serverLevel.captureBlockStates = true;
+    }
+
+    @Override
+    protected List<org.bukkit.block.BlockState> getCapturedBlockStatesCopy(final ServerLevel serverLevel) {
+        return new ArrayList<>(serverLevel.capturedBlockStates.values());
+    }
+
+    @Override
+    protected void postCaptureBlockStates(final ServerLevel serverLevel) {
+        serverLevel.captureBlockStates = false;
+        serverLevel.captureTreeGeneration = false;
+        serverLevel.capturedBlockStates.clear();
+    }
+
+    @Override
+    protected ServerLevel getServerLevel(final World world) {
+        return ((CraftWorld) world).getHandle();
     }
 
 }
