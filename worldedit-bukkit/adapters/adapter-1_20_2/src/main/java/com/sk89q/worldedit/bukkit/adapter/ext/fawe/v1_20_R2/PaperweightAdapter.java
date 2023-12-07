@@ -378,7 +378,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private net.minecraft.world.level.block.state.BlockState applyProperties(
+    public net.minecraft.world.level.block.state.BlockState applyProperties(
             StateDefinition<Block, net.minecraft.world.level.block.state.BlockState> stateContainer,
             net.minecraft.world.level.block.state.BlockState newState,
             Map<Property<?>, Object> states

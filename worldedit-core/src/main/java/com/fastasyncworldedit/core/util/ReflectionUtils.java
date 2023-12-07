@@ -1,5 +1,6 @@
 package com.fastasyncworldedit.core.util;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import sun.misc.Unsafe;
 
 import javax.annotation.Nonnull;
@@ -10,6 +11,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This is an internal class not meant to be used outside the FAWE internals.
@@ -118,6 +121,32 @@ public class ReflectionUtils {
             return (T) field.get(instance);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldThrowing(@Nonnull Field field, Object instance) throws IllegalAccessException {
+        field.setAccessible(true);
+        return (T) field.get(instance);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldOr(@Nonnull Field field, Object instance, @NonNull Supplier<T> fallback) {
+        field.setAccessible(true);
+        try {
+            return (T) field.get(instance);
+        } catch (IllegalAccessException e) {
+            return fallback.get();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldOr(@Nonnull Field field, Object instance, @NonNull Function<IllegalAccessException, T> fallback) {
+        field.setAccessible(true);
+        try {
+            return (T) field.get(instance);
+        } catch (IllegalAccessException e) {
+            return fallback.apply(e);
         }
     }
 

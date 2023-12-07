@@ -68,7 +68,7 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
     protected boolean generateConcurrent = true;
     protected long seed;
     private ExecutorService executor;
-    private SingleThreadQueueExtent source;
+    protected SingleThreadQueueExtent source;
 
     /**
      * Initializes an abstract regeneration handler.
@@ -83,6 +83,9 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
         this.region = region;
         this.target = target;
         this.options = options;
+
+        this.source = new SingleThreadQueueExtent(BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMinHeight() : 0,
+                BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMaxHeight() : 256);
     }
 
     private static Random getChunkRandom(long worldSeed, int x, int z) {
@@ -276,10 +279,6 @@ public abstract class Regenerator<IChunkAccess, ProtoChunk extends IChunkAccess,
                 populate(c, random, pop);
             });
         }
-
-        source = new SingleThreadQueueExtent(BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMinHeight() : 0,
-                BukkitWorld.HAS_MIN_Y ? originalBukkitWorld.getMaxHeight() : 256);
-        source.init(target, initSourceQueueCache(), null);
         return true;
     }
 

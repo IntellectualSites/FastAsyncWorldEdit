@@ -98,6 +98,11 @@ public class PositionTransformExtent extends ResettableExtent {
         return super.setBiome(getPos(mutable.getX(), mutable.getY(), mutable.getZ()), biome);
     }
 
+    @Override
+    public boolean setBiome(final int x, final int y, final int z, final BiomeType biome) {
+        return super.setBiome(getPos(x, y, z), biome);
+    }
+
     public void setTransform(Transform transform) {
         this.transform = transform;
     }

@@ -8,9 +8,11 @@ import com.sk89q.worldedit.util.nbt.CompoundBinaryTag;
 import com.sk89q.worldedit.util.nbt.IntBinaryTag;
 import com.sk89q.worldedit.util.nbt.ShortBinaryTag;
 import com.sk89q.worldedit.world.storage.InvalidFormatException;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class NbtUtils {
 
@@ -78,6 +80,40 @@ public class NbtUtils {
         Map<String, BinaryTag> value = new HashMap<>();
         tag.forEach((e) -> value.put(e.getKey(), e.getValue()));
         return value;
+    }
+
+    /**
+     * Gets the uuid out of an {@link CompoundBinaryTag}
+     *
+     * @param tag The tag containing the potential UUID
+     * @return the UUID or {@code null} if no format was found
+     */
+    public static @Nullable UUID getUuid(CompoundBinaryTag tag) {
+        final int[] uuidTag = tag.getIntArray("UUID");
+
+        if (uuidTag.length > 0) {
+            return new UUID(
+                    (long) uuidTag[0] << 32 | (uuidTag[1] & 0xFFFFFFFFL),
+                    (long) uuidTag[2] << 32 | (uuidTag[3] & 0xFFFFFFFFL)
+            );
+        }
+
+        final long uuidMost = tag.getLong("UUIDMost");
+        if (uuidMost != 0) {
+            return new UUID(uuidMost, tag.getLong("UUIDLeast"));
+        }
+
+        final long worldUuidMost = tag.getLong("WorldUUIDMost");
+        if (worldUuidMost != 0) {
+            return new UUID(uuidMost, tag.getLong("WorldUUIDLeast"));
+        }
+
+        final long persistentIdmsb = tag.getLong("PersistentIDMSB");
+        if (persistentIdmsb != 0) {
+            return new UUID(persistentIdmsb, tag.getLong("PersistentIDLSB"));
+        }
+
+        return null;
     }
 
 }
