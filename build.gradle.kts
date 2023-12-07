@@ -83,7 +83,7 @@ allprojects {
 }
 
 applyCommonConfiguration()
-val supportedVersions = listOf("1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.3")
+val supportedVersions = listOf("1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.4")
 
 tasks {
     supportedVersions.forEach {
@@ -97,7 +97,7 @@ tasks {
         }
     }
     runServer {
-        minecraftVersion("1.20.3")
+        minecraftVersion("1.20.4")
         pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
                 .toTypedArray())
 
