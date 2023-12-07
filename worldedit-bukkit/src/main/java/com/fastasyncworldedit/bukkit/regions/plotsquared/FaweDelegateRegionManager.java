@@ -160,6 +160,10 @@ public class FaweDelegateRegionManager {
                         );
                         editSession.setBlocks(onTop, air);
                     }
+
+                    FlatRegionFunction replace = new BiomeReplace(editSession, biome);
+                    FlatRegionVisitor visitor = new FlatRegionVisitor((CuboidRegion) floorRegion, replace, editSession);
+                    Operations.completeLegacy(visitor);
                 }
 
                 if (hybridPlotWorld.PLOT_SCHEMATIC) {
