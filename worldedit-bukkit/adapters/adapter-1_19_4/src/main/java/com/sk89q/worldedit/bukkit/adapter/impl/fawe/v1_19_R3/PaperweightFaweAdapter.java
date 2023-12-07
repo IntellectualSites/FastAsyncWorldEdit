@@ -16,6 +16,7 @@ import com.sk89q.jnbt.Tag;
 import com.sk89q.worldedit.blocks.BaseItemStack;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldedit.bukkit.adapter.BukkitImplAdapter;
+import com.sk89q.worldedit.bukkit.adapter.Refraction;
 import com.sk89q.worldedit.bukkit.adapter.ext.fawe.v1_19_R3.PaperweightAdapter;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R3.nbt.PaperweightLazyCompoundTag;
 import com.sk89q.worldedit.bukkit.adapter.impl.fawe.v1_19_R3.regen.PaperweightRegen;
@@ -77,6 +78,7 @@ import org.bukkit.World;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlockState;
 import org.bukkit.craftbukkit.v1_19_R3.block.data.CraftBlockData;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
@@ -85,6 +87,8 @@ import org.bukkit.craftbukkit.v1_19_R3.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -488,29 +492,6 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     }
 
     @Override
-    protected void preCaptureStates(final ServerLevel serverLevel) {
-        serverLevel.captureTreeGeneration = true;
-        serverLevel.captureBlockStates = true;
-    }
-
-    @Override
-    protected List<org.bukkit.block.BlockState> getCapturedBlockStatesCopy(final ServerLevel serverLevel) {
-        return new ArrayList<>(serverLevel.capturedBlockStates.values());
-    }
-
-    @Override
-    protected void postCaptureBlockStates(final ServerLevel serverLevel) {
-        serverLevel.captureBlockStates = false;
-        serverLevel.captureTreeGeneration = false;
-        serverLevel.capturedBlockStates.clear();
-    }
-
-    @Override
-    protected ServerLevel getServerLevel(final World world) {
-        return ((CraftWorld) world).getHandle();
-    }
-
-    @Override
     public BaseItemStack adapt(org.bukkit.inventory.ItemStack itemStack) {
         final ItemStack nmsStack = CraftItemStack.asNMSCopy(itemStack);
         final BaseItemStack weStack = new BaseItemStack(BukkitAdapter.asItemType(itemStack.getType()), itemStack.getAmount());
@@ -610,5 +591,77 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
         // Papers new chunk system has no related replacement - therefor we assume true.
         return true;
     }
+
+    @Override
+    protected void preCaptureStates(final ServerLevel serverLevel) {
+        if (this.isFolia()) {
+            try {
+                var data = currentWorldData.invoke(serverLevel);
+                captureBlockStates.setBoolean(data, true);
+                captureTreeGeneration.setBoolean(data, true);
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            serverLevel.captureTreeGeneration = true;
+            serverLevel.captureBlockStates = true;
+        }
+
+    }
+
+    @Override
+    protected List<org.bukkit.block.BlockState> getCapturedBlockStatesCopy(final ServerLevel serverLevel) {
+        return new ArrayList<>(serverLevel.capturedBlockStates.values());
+    }
+
+    // Folia - Start
+    @Override
+    protected void postCaptureBlockStates(final ServerLevel serverLevel) {
+        if (this.isFolia()) {
+            try {
+                var data = currentWorldData.invoke(serverLevel);
+                captureBlockStates.setBoolean(data, false);
+                captureTreeGeneration.setBoolean(data, false);
+                ((Map<BlockPos, CraftBlockState>) capturedBlockStates.get(data)).clear();
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            serverLevel.captureBlockStates = false;
+            serverLevel.captureTreeGeneration = false;
+            serverLevel.capturedBlockStates.clear();
+        }
+    }
+
+    // Folia - End
+
+    @Override
+    protected ServerLevel getServerLevel(final World world) {
+        return ((CraftWorld) world).getHandle();
+    }
+
+    // Folia - Start
+    @Override
+    protected MethodHandle getCurrentWorldData() {
+        if (this.isFolia()) {
+            Method getCurrentWorldData;
+            try {
+                getCurrentWorldData = ServerLevel.class.getSuperclass().getDeclaredMethod(
+                        "getCurrentWorldData"
+                );
+            } catch (NoSuchMethodException e) {
+                return null;
+            }
+            getCurrentWorldData.setAccessible(true);
+
+            try {
+                currentWorldData = MethodHandles.lookup().unreflect(getCurrentWorldData);
+            } catch (IllegalAccessException e) {
+            }
+        }
+        return null;
+    }
+
+    // Folia - End
 
 }

@@ -353,7 +353,7 @@ public abstract class AbstractChangeSet implements ChangeSet, IBatchProcessor {
     }
 
     public Future<?> addWriteTask(Runnable writeTask) {
-        return addWriteTask(writeTask, Fawe.isMainThread());
+        return addWriteTask(writeTask, Fawe.isTickThread());
     }
 
     public Future<?> addWriteTask(final Runnable writeTask, final boolean completeNow) {

@@ -27,7 +27,7 @@ public class SlowExtent extends AbstractDelegateExtent {
         increment += nanos;
         if (increment >= THRESHOLD) {
             long wait = increment / 1000000;
-            if (!Fawe.isMainThread()) {
+            if (!Fawe.isTickThread()) {
                 try {
                     Thread.sleep(wait);
                 } catch (InterruptedException e) {

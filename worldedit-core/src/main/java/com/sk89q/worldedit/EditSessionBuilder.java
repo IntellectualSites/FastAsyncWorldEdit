@@ -469,7 +469,7 @@ public final class EditSessionBuilder {
                 wnaMode = false;
                 if (unwrapped instanceof IQueueExtent) {
                     extent = queue = (IQueueExtent) unwrapped;
-                } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1 && !Fawe.isMainThread()) {
+                } else if (Settings.settings().QUEUE.PARALLEL_THREADS > 1 && !Fawe.isTickThread()) {
                     ParallelQueueExtent parallel = new ParallelQueueExtent(Fawe.instance().getQueueHandler(), world, fastMode);
                     queue = parallel.getExtent();
                     extent = parallel;

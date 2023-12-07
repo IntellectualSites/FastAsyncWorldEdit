@@ -1,6 +1,7 @@
 package com.fastasyncworldedit.bukkit.listener;
 
 import com.fastasyncworldedit.bukkit.FaweBukkit;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.Fawe;
 import com.fastasyncworldedit.core.configuration.Settings;
 import com.fastasyncworldedit.core.util.FaweTimer;

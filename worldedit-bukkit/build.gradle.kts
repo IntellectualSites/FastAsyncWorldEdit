@@ -60,7 +60,6 @@ val adapters = configurations.create("adapters") {
         )
     }
 }
-
 dependencies {
     // Modules
     api(projects.worldeditCore)

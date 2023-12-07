@@ -119,9 +119,20 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     private static Field LEVEL_CHUNK_ENTITIES;
     private static Field SERVER_LEVEL_ENTITY_MANAGER;
 
+    private static boolean FOLIA_SUPPORT;
+
     static {
         final MethodHandles.Lookup lookup = MethodHandles.lookup();
         try {
+            boolean isFolia = false;
+            try {
+                // Assume API is present
+                Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+                isFolia = true;
+            } catch (Exception unused) {
+
+            }
+            FOLIA_SUPPORT = isFolia;
             fieldData = PalettedContainer.class.getDeclaredField(Refraction.pickName("data", "d"));
             fieldData.setAccessible(true);
 
@@ -178,7 +189,6 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
 
             fieldRemove = BlockEntity.class.getDeclaredField(Refraction.pickName("remove", "q"));
             fieldRemove.setAccessible(true);
-
             boolean chunkRewrite;
             try {
                 ServerLevel.class.getDeclaredMethod("getEntityLookup");
@@ -257,7 +267,7 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             if (nmsChunk != null) {
                 return nmsChunk;
             }
-            if (Fawe.isMainThread()) {
+            if (Fawe.isTickThread()) {
                 return serverLevel.getChunk(chunkX, chunkZ);
             }
         } else {
@@ -272,11 +282,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
                 return nmsChunk;
             }
             // Avoid "async" methods from the main thread.
-            if (Fawe.isMainThread()) {
+            if (Fawe.isTickThread()) {
                 return serverLevel.getChunk(chunkX, chunkZ);
             }
             CompletableFuture<org.bukkit.Chunk> future = serverLevel.getWorld().getChunkAtAsync(chunkX, chunkZ, true, true);
             try {
+                /*
+                CraftChunk chunk = (CraftChunk) future.get();
+                if(!FOLIA_SUPPORT) {// TODO: Dirty folia workaround - Needs be discussed with FAWE members
+                    addTicket(serverLevel, chunkX, chunkZ);
+                }
+                 */
                 CraftChunk chunk;
                 try {
                     chunk = (CraftChunk) future.get(10, TimeUnit.SECONDS);
@@ -302,10 +318,17 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
     }
 
     private static void addTicket(ServerLevel serverLevel, int chunkX, int chunkZ) {
-        // Ensure chunk is definitely loaded before applying a ticket
-        io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(() -> serverLevel
-                .getChunkSource()
-                .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE));
+        if (FOLIA_SUPPORT) {
+            TaskManager.taskManager().taskNowMain(() -> serverLevel
+                    .getChunkSource()
+                    .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE));
+        } else {
+            // Ensure chunk is definitely loaded before applying a ticket
+            io.papermc.paper.util.MCUtil.MAIN_EXECUTOR.execute(() -> serverLevel
+                    .getChunkSource()
+                    .addRegionTicket(TicketType.UNLOAD_COOLDOWN, new ChunkPos(chunkX, chunkZ), 0, Unit.INSTANCE));
+        }
+
     }
 
     public static ChunkHolder getPlayerChunk(ServerLevel nmsWorld, final int chunkX, final int chunkZ) {
@@ -445,12 +468,16 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             }
 
             // Create palette with data
-            @SuppressWarnings("deprecation") // constructor is deprecated on paper, but needed to keep compatibility with spigot
+            @SuppressWarnings("deprecation")
+            // constructor is deprecated on paper, but needed to keep compatibility with spigot
             final PalettedContainer<net.minecraft.world.level.block.state.BlockState> blockStatePalettedContainer =
                     new PalettedContainer<>(
                             Block.BLOCK_STATE_REGISTRY,
                             PalettedContainer.Strategy.SECTION_STATES,
-                            PalettedContainer.Strategy.SECTION_STATES.getConfiguration(Block.BLOCK_STATE_REGISTRY, bitsPerEntry),
+                            PalettedContainer.Strategy.SECTION_STATES.getConfiguration(
+                                    Block.BLOCK_STATE_REGISTRY,
+                                    bitsPerEntry
+                            ),
                             nmsBits,
                             palette
                     );
@@ -641,7 +668,9 @@ public final class PaperweightPlatformAdapter extends NMSAdapter {
             if (POST_CHUNK_REWRITE) {
                 try {
                     //noinspection unchecked
-                    return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level.getEntityLookup().getChunk(chunk.locX, chunk.locZ));
+                    return (List<Entity>) PAPER_CHUNK_GEN_ALL_ENTITIES.invoke(chunk.level
+                            .getEntityLookup()
+                            .getChunk(chunk.locX, chunk.locZ));
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new RuntimeException("Failed to lookup entities [POST_CHUNK_REWRITE=true]", e);
                 }

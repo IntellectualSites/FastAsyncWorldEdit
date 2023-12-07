@@ -11,6 +11,8 @@ import org.bukkit.TreeType;
 import org.bukkit.World;
 import org.bukkit.block.BlockState;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Field;
 import java.util.List;
 
 /**
@@ -20,6 +22,32 @@ import java.util.List;
  * @param <SERVER_LEVEL> the version-specific ServerLevel type
  */
 public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter implements IDelegateBukkitImplAdapter<TAG> {
+
+
+    // Folia - Start
+    protected MethodHandle currentWorldData = getCurrentWorldData();
+
+    protected Class<?> regionizedWorldData = getRegionitedWorldData();
+
+    protected Field captureTreeGeneration = getCaptureTreeGeneration();
+
+    protected Field captureBlockStates = getCaptureBlockStates();
+
+    protected Field capturedBlockStates = getCapturedBlockStates();
+
+    private final boolean folia;
+
+    protected FaweAdapter() {
+        boolean isFolia = false;
+        try {
+            // Assume API is present
+            Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+            isFolia = true;
+        } catch (Exception unused) {
+
+        }
+        this.folia = isFolia;
+    }
 
     @Override
     public boolean generateTree(
@@ -68,5 +96,56 @@ public abstract class FaweAdapter<TAG, SERVER_LEVEL> extends CachedBukkitAdapter
     protected abstract void postCaptureBlockStates(SERVER_LEVEL serverLevel);
 
     protected abstract SERVER_LEVEL getServerLevel(World world);
+
+    // Folia Support
+    protected abstract MethodHandle getCurrentWorldData();
+
+    private Class<?> getRegionitedWorldData() {
+        try {
+            regionizedWorldData = Class.forName("io.papermc.paper.threadedregions.RegionizedWorldData");
+        } catch (ClassNotFoundException e) {
+        }
+        return null;
+    }
+
+    private Field getCaptureTreeGeneration() {
+        Field captureTreeGeneration = null;
+        if (regionizedWorldData != null) {
+            try {
+                captureTreeGeneration = regionizedWorldData.getDeclaredField("captureTreeGeneration");
+                captureTreeGeneration.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+            }
+        }
+        return captureTreeGeneration;
+    }
+
+    private Field getCaptureBlockStates() {
+        Field captureBlockStates = null;
+        if (regionizedWorldData != null) {
+            try {
+                captureBlockStates = regionizedWorldData.getDeclaredField("captureBlockStates");
+                captureBlockStates.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+            }
+        }
+        return captureBlockStates;
+    }
+
+    private Field getCapturedBlockStates() {
+        Field capturedBlockStates = null;
+        if (regionizedWorldData != null) {
+            try {
+                capturedBlockStates = regionizedWorldData.getDeclaredField("capturedBlockStates");
+                capturedBlockStates.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+            }
+        }
+        return capturedBlockStates;
+    }
+
+    protected boolean isFolia() {
+        return this.folia;
+    }
 
 }

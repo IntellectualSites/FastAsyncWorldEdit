@@ -89,6 +89,7 @@ import org.bukkit.craftbukkit.v1_18_R2.util.CraftNamespacedKey;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.lang.invoke.MethodHandle;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -545,6 +546,11 @@ public final class PaperweightFaweAdapter extends FaweAdapter<net.minecraft.nbt.
     @Override
     protected ServerLevel getServerLevel(final World world) {
         return ((CraftWorld) world).getHandle();
+    }
+
+    @Override
+    protected MethodHandle getCurrentWorldData() {
+        return null;
     }
 
     @Override

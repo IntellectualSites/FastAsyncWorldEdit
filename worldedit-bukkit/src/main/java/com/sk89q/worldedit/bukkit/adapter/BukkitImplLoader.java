@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.bukkit.adapter;
 
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.sk89q.worldedit.internal.util.LogManagerCompat;
 import com.sk89q.worldedit.util.io.Closer;
 import org.apache.logging.log4j.Logger;
@@ -44,9 +45,9 @@ public class BukkitImplLoader {
     private int zeroth = 0;
     private String customCandidate;
 
-    private static final String SEARCH_PACKAGE = "com.sk89q.worldedit.bukkit.adapter.impl.fawe";
-    private static final String SEARCH_PACKAGE_DOT = SEARCH_PACKAGE + ".";
-    private static final String SEARCH_PATH = SEARCH_PACKAGE.replace(".", "/");
+    private static String SEARCH_PACKAGE = "com.sk89q.worldedit.bukkit.adapter.impl.fawe";
+    private static String SEARCH_PACKAGE_DOT = SEARCH_PACKAGE + ".";
+    private static String SEARCH_PATH = SEARCH_PACKAGE.replace(".", "/");
     private static final String CLASS_SUFFIX = ".class";
 
     private static final String LOAD_ERROR_MESSAGE =

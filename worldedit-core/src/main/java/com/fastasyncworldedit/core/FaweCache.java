@@ -156,7 +156,7 @@ public enum FaweCache implements Trimable {
      */
     public <V> LongFunction<V> createMainThreadSafeCache(Supplier<V> withInitial) {
         return new LongFunction<>() {
-            private final LoadingCache<Long, V> loadingCache = Fawe.isMainThread() ? null : FaweCache.INSTANCE.createCache(
+            private final LoadingCache<Long, V> loadingCache = Fawe.isTickThread() ? null : FaweCache.INSTANCE.createCache(
                     withInitial);
 
             @Override

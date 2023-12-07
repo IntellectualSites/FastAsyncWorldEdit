@@ -11,6 +11,8 @@ import com.fastasyncworldedit.bukkit.regions.ResidenceFeature;
 import com.fastasyncworldedit.bukkit.regions.TownyFeature;
 import com.fastasyncworldedit.bukkit.regions.WorldGuardFeature;
 import com.fastasyncworldedit.bukkit.util.BukkitTaskManager;
+import com.fastasyncworldedit.bukkit.util.FoliaTaskManager;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.bukkit.util.ItemUtil;
 import com.fastasyncworldedit.bukkit.util.MinecraftVersion;
 import com.fastasyncworldedit.bukkit.util.image.BukkitImageViewer;
@@ -63,6 +65,7 @@ public class FaweBukkit implements IFawe, Listener {
     private ItemUtil itemUtil;
     private Preloader preloader;
     private volatile boolean keepUnloaded;
+    private static final Thread startingThread = Thread.currentThread();
 
     public FaweBukkit(Plugin plugin) {
         this.plugin = plugin;
@@ -74,7 +77,7 @@ public class FaweBukkit implements IFawe, Listener {
             } catch (Throwable e) {
                 LOGGER.error("Brush Listener Failed", e);
             }
-            if (PaperLib.isPaper() && Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
+            if (!FoliaSupport.isFolia() && PaperLib.isPaper() && Settings.settings().EXPERIMENTAL.DYNAMIC_CHUNK_RENDERING > 1) {
                 new RenderListener(plugin);
             }
         } catch (final Throwable e) {
@@ -89,20 +92,22 @@ public class FaweBukkit implements IFawe, Listener {
         platformAdapter = new NMSAdapter();
 
         //PlotSquared support is limited to Spigot/Paper as of 02/20/2020
-        TaskManager.taskManager().later(this::setupPlotSquared, 0);
+        // TODO plotsquared support
+        // TaskManager.taskManager().later(this::setupPlotSquared, 0);
 
+        // TODO moved out of task below??
+        Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
         // Registered delayed Event Listeners
-        TaskManager.taskManager().task(() -> {
+        /*TaskManager.taskManager().task(() -> {
             // Fix for ProtocolSupport
             Settings.settings().PROTOCOL_SUPPORT_FIX =
                     Bukkit.getPluginManager().isPluginEnabled("ProtocolSupport");
 
             // This class
-            Bukkit.getPluginManager().registerEvents(FaweBukkit.this, FaweBukkit.this.plugin);
 
             // The tick limiter
             new ChunkListener9();
-        });
+        });*/
 
         // Warn if small-edits are enabled with extended world heights
         if (version.isEqualOrHigherThan(MinecraftVersion.CAVES_18) && Settings.settings().HISTORY.SMALL_EDITS) {
@@ -192,6 +197,9 @@ public class FaweBukkit implements IFawe, Listener {
      */
     @Override
     public TaskManager getTaskManager() {
+        if (FoliaSupport.isFolia()) {
+            return new FoliaTaskManager();
+        }
         return new BukkitTaskManager(plugin);
     }
 
@@ -310,6 +318,14 @@ public class FaweBukkit implements IFawe, Listener {
     @Override
     public FAWEPlatformAdapterImpl getPlatformAdapter() {
         return platformAdapter;
+    }
+
+    @Override
+    public boolean isTickThread() {
+        if (FoliaSupport.isFolia()) {
+            return FoliaSupport.isTickThread();
+        }
+        return Thread.currentThread() == startingThread;
     }
 
     private void setupPlotSquared() {

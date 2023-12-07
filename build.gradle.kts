@@ -1,9 +1,9 @@
 import org.ajoberstar.grgit.Grgit
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+import xyz.jpenilla.runpaper.task.RunServer
 import java.net.URI
 import java.time.format.DateTimeFormatter
-import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     id("io.github.gradle-nexus.publish-plugin") version "1.3.0"
@@ -84,7 +84,7 @@ allprojects {
 
 applyCommonConfiguration()
 val supportedVersions = listOf("1.17.1", "1.18.2", "1.19.4", "1.20", "1.20.2")
-
+val foliaSupportedVersions = listOf("1.19.4", "1.20.1", "1.20.2")
 tasks {
     supportedVersions.forEach {
         register<RunServer>("runServer-$it") {
@@ -102,6 +102,17 @@ tasks {
                 .toTypedArray())
 
     }
+    foliaSupportedVersions.forEach {
+        register<RunServer>("runFolia-$it") {
+            downloadsApiService.set(xyz.jpenilla.runtask.service.DownloadsAPIService.folia(project))
+            minecraftVersion(it)
+            group = "run paper"
+            runDirectory.set(file("run-folia-$it"))
+            pluginJars(*project(":worldedit-bukkit").getTasksByName("shadowJar", false).map { (it as Jar).archiveFile }
+                .toTypedArray())
+        }
+    }
+
 }
 
 nexusPublishing {

@@ -21,6 +21,7 @@ package com.sk89q.worldedit.bukkit;
 
 import com.fastasyncworldedit.core.configuration.Caption;
 import com.fastasyncworldedit.core.configuration.Settings;
+import com.fastasyncworldedit.core.util.FoliaSupport;
 import com.fastasyncworldedit.core.util.TaskManager;
 import com.sk89q.util.StringUtil;
 import com.sk89q.wepif.VaultResolver;
@@ -70,6 +71,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 
 public class BukkitPlayer extends AbstractPlayerActor {
 
@@ -161,7 +163,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
     public void giveItem(BaseItemStack itemStack) {
         final PlayerInventory inv = player.getInventory();
         ItemStack newItem = BukkitAdapter.adapt(itemStack);
-        TaskManager.taskManager().sync(() -> {
+        TaskManager.taskManager().syncWith(() -> {
             if (itemStack.getType().getId().equalsIgnoreCase(WorldEdit.getInstance().getConfiguration().wandItem)) {
                 inv.remove(newItem);
             }
@@ -183,7 +185,7 @@ public class BukkitPlayer extends AbstractPlayerActor {
             }
             player.updateInventory();
             return null;
-        });
+        }, this);
     }
     //FAWE end
 
@@ -240,14 +242,30 @@ public class BukkitPlayer extends AbstractPlayerActor {
         }
         org.bukkit.World finalWorld = world;
         //FAWE end
-        return TaskManager.taskManager().sync(() -> player.teleport(new Location(
+        if (FoliaSupport.isFolia()) {
+            return TaskManager.taskManager().syncWith(() -> {
+                try {
+                    return player.teleportAsync(new Location(
+                            finalWorld,
+                            pos.getX(),
+                            pos.getY(),
+                            pos.getZ(),
+                            yaw,
+                            pitch
+                    )).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            }, this);
+        }
+        return TaskManager.taskManager().syncWith(() -> player.teleport(new Location(
                 finalWorld,
                 pos.getX(),
                 pos.getY(),
                 pos.getZ(),
                 yaw,
                 pitch
-        )));
+        )), this);
     }
 
     @Override
