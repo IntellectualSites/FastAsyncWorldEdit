@@ -50,7 +50,7 @@ mockito = "5.8.0"
 
 # Gradle plugins
 pluginyml = "0.6.0"
-minotaur = "2.8.6"
+minotaur = "2.8.7"
 
 [libraries]
 # Minecraft expectations
