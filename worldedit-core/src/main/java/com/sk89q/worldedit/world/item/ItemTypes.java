@@ -319,6 +319,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType BREAD = init();
     @Nullable
+    public static final ItemType BREEZE_SPAWN_EGG = init();
+    @Nullable
     public static final ItemType BREWER_POTTERY_SHERD = init();
     @Nullable
     public static final ItemType BREWING_STAND = init();
@@ -468,6 +470,8 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType CHISELED_BOOKSHELF = init();
     @Nullable
+    public static final ItemType CHISELED_COPPER = init();
+    @Nullable
     public static final ItemType CHISELED_DEEPSLATE = init();
     @Nullable
     public static final ItemType CHISELED_NETHER_BRICKS = init();
@@ -481,6 +485,10 @@ public final class ItemTypes {
     public static final ItemType CHISELED_SANDSTONE = init();
     @Nullable
     public static final ItemType CHISELED_STONE_BRICKS = init();
+    @Nullable
+    public static final ItemType CHISELED_TUFF = init();
+    @Nullable
+    public static final ItemType CHISELED_TUFF_BRICKS = init();
     @Nullable
     public static final ItemType CHORUS_FLOWER = init();
     @Nullable
@@ -560,9 +568,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType COPPER_BLOCK = init();
     @Nullable
+    public static final ItemType COPPER_BULB = init();
+    @Nullable
+    public static final ItemType COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType COPPER_GRATE = init();
+    @Nullable
     public static final ItemType COPPER_INGOT = init();
     @Nullable
     public static final ItemType COPPER_ORE = init();
+    @Nullable
+    public static final ItemType COPPER_TRAPDOOR = init();
     @Nullable
     public static final ItemType CORNFLOWER = init();
     @Nullable
@@ -577,6 +593,8 @@ public final class ItemTypes {
     public static final ItemType CRACKED_POLISHED_BLACKSTONE_BRICKS = init();
     @Nullable
     public static final ItemType CRACKED_STONE_BRICKS = init();
+    @Nullable
+    public static final ItemType CRAFTER = init();
     @Nullable
     public static final ItemType CRAFTING_TABLE = init();
     @Nullable
@@ -903,7 +921,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType EXPLORER_POTTERY_SHERD = init();
     @Nullable
+    public static final ItemType EXPOSED_CHISELED_COPPER = init();
+    @Nullable
     public static final ItemType EXPOSED_COPPER = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType EXPOSED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final ItemType EXPOSED_CUT_COPPER = init();
     @Nullable
@@ -1036,7 +1064,7 @@ public final class ItemTypes {
     public static final ItemType GRANITE_STAIRS = init();
     @Nullable
     public static final ItemType GRANITE_WALL = init();
-    @Nullable
+    @Nullable @Deprecated
     public static final ItemType GRASS = init();
     @Nullable
     public static final ItemType GRASS_BLOCK = init();
@@ -1670,7 +1698,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType OXEYE_DAISY = init();
     @Nullable
+    public static final ItemType OXIDIZED_CHISELED_COPPER = init();
+    @Nullable
     public static final ItemType OXIDIZED_COPPER = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType OXIDIZED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final ItemType OXIDIZED_CUT_COPPER = init();
     @Nullable
@@ -1807,6 +1845,14 @@ public final class ItemTypes {
     public static final ItemType POLISHED_GRANITE_SLAB = init();
     @Nullable
     public static final ItemType POLISHED_GRANITE_STAIRS = init();
+    @Nullable
+    public static final ItemType POLISHED_TUFF = init();
+    @Nullable
+    public static final ItemType POLISHED_TUFF_SLAB = init();
+    @Nullable
+    public static final ItemType POLISHED_TUFF_STAIRS = init();
+    @Nullable
+    public static final ItemType POLISHED_TUFF_WALL = init();
     @Nullable
     public static final ItemType POPPED_CHORUS_FRUIT = init();
     @Nullable
@@ -2060,6 +2106,8 @@ public final class ItemTypes {
     public static final ItemType SHELTER_POTTERY_SHERD = init();
     @Nullable
     public static final ItemType SHIELD = init();
+    @Nullable
+    public static final ItemType SHORT_GRASS = init();
     @Nullable
     public static final ItemType SHROOMLIGHT = init();
     @Nullable
@@ -2336,6 +2384,10 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType TRAPPED_CHEST = init();
     @Nullable
+    public static final ItemType TRIAL_KEY = init();
+    @Nullable
+    public static final ItemType TRIAL_SPAWNER = init();
+    @Nullable
     public static final ItemType TRIDENT = init();
     @Nullable
     public static final ItemType TRIPWIRE_HOOK = init();
@@ -2353,6 +2405,20 @@ public final class ItemTypes {
     public static final ItemType TUBE_CORAL_FAN = init();
     @Nullable
     public static final ItemType TUFF = init();
+    @Nullable
+    public static final ItemType TUFF_BRICK_SLAB = init();
+    @Nullable
+    public static final ItemType TUFF_BRICK_STAIRS = init();
+    @Nullable
+    public static final ItemType TUFF_BRICK_WALL = init();
+    @Nullable
+    public static final ItemType TUFF_BRICKS = init();
+    @Nullable
+    public static final ItemType TUFF_SLAB = init();
+    @Nullable
+    public static final ItemType TUFF_STAIRS = init();
+    @Nullable
+    public static final ItemType TUFF_WALL = init();
     @Nullable
     public static final ItemType TURTLE_EGG = init();
     @Nullable
@@ -2418,7 +2484,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WATER_BUCKET = init();
     @Nullable
+    public static final ItemType WAXED_CHISELED_COPPER = init();
+    @Nullable
     public static final ItemType WAXED_COPPER_BLOCK = init();
+    @Nullable
+    public static final ItemType WAXED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType WAXED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final ItemType WAXED_CUT_COPPER = init();
     @Nullable
@@ -2426,7 +2502,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_EXPOSED_CHISELED_COPPER = init();
+    @Nullable
     public static final ItemType WAXED_EXPOSED_COPPER = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_EXPOSED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final ItemType WAXED_EXPOSED_CUT_COPPER = init();
     @Nullable
@@ -2434,7 +2520,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_EXPOSED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_OXIDIZED_CHISELED_COPPER = init();
+    @Nullable
     public static final ItemType WAXED_OXIDIZED_COPPER = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_OXIDIZED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final ItemType WAXED_OXIDIZED_CUT_COPPER = init();
     @Nullable
@@ -2442,7 +2538,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAXED_OXIDIZED_CUT_COPPER_STAIRS = init();
     @Nullable
+    public static final ItemType WAXED_WEATHERED_CHISELED_COPPER = init();
+    @Nullable
     public static final ItemType WAXED_WEATHERED_COPPER = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WAXED_WEATHERED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final ItemType WAXED_WEATHERED_CUT_COPPER = init();
     @Nullable
@@ -2452,7 +2558,17 @@ public final class ItemTypes {
     @Nullable
     public static final ItemType WAYFINDER_ARMOR_TRIM_SMITHING_TEMPLATE = init();
     @Nullable
+    public static final ItemType WEATHERED_CHISELED_COPPER = init();
+    @Nullable
     public static final ItemType WEATHERED_COPPER = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_BULB = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_DOOR = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_GRATE = init();
+    @Nullable
+    public static final ItemType WEATHERED_COPPER_TRAPDOOR = init();
     @Nullable
     public static final ItemType WEATHERED_CUT_COPPER = init();
     @Nullable
