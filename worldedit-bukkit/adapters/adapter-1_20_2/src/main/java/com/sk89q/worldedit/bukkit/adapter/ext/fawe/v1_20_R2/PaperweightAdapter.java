@@ -171,6 +171,7 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
     private final Method getChunkFutureMethod;
     private final Field chunkProviderExecutorField;
     private final Watchdog watchdog;
+    private final Boolean folia;
 
     // ------------------------------------------------------------------------
     // Code that may break between versions of Minecraft
@@ -184,6 +185,16 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
         if (dataVersion != 3578) {
             throw new UnsupportedClassVersionError("Not 1.20.2!");
         }
+
+        boolean isFolia = false;
+        try {
+            // Assume API is present
+            Class.forName("io.papermc.paper.threadedregions.scheduler.EntityScheduler");
+            isFolia = true;
+        } catch (Exception unused) {
+
+        }
+        this.folia = isFolia;
 
         serverWorldsField = CraftServer.class.getDeclaredField("worlds");
         serverWorldsField.setAccessible(true);
@@ -219,6 +230,10 @@ public final class PaperweightAdapter implements BukkitImplAdapter<net.minecraft
             SpigotConfig.config.set("world-settings.faweregentempworld.verbose", false);
         } catch (ClassNotFoundException ignored) {
         }
+    }
+
+    public Boolean isFolia() {
+        return folia;
     }
 
     @Override
